@@ -1,0 +1,86 @@
+[
+	{
+		"category": "architecture",
+		"content": "HUD: CanvasLayer → MarginContainer(anchors full rect, margin 16px) → HBoxContainer(separation 8px) → ProgressBar(HealthBar, size_flags_horizontal=3, tint vermelho) + Label(HealthLabel, font 16px branco). Player se registra no grupo \"player\" via add_to_group(). HUD.gd busca Player via grupo ou cena, conecta sinais health_changed/died. Player tem max_hp=100, invincible_duration=0.5s, métodos take_damage()/heal().",
+		"created": "2026-05-20T23:33:14",
+		"id": "fact_1779291194",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Input: project.godot define move_left(A)/move_right(D)/move_up(W)/move_down(S)/attack(MouseLeft)/dodge(Space)/skill(MouseRight). InputSetup.gd (Node em main.tscn) é fallback redundante que recria ações se ausentes. Estados usam Input.get_vector() para movimento e Input.is_action_just_pressed() para ações.",
+		"created": "2026-05-20T23:33:14",
+		"id": "fact_1779291194",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Fireball (skills/fireball.tscn): Area2D com speed=500, damage=25, lifetime=3s. Spawn feito por Player.cast_skill() a 30px na direção do mouse. Fireball tem caster (referência ao Player) para evitar auto-dano. Colisão: CircleShape2D radius=8.0, corpo colidido chama take_damage() e queue_free().",
+		"created": "2026-05-20T23:33:14",
+		"id": "fact_1779291194",
+		"source": "ai"
+	},
+	{
+		"category": "project_info",
+		"content": "Mapa overworld.tscn: Node2D com TileMapLayer(Ground) + StaticBody2D(Walls, 4 SegmentShape2D nas bordas) + ColorRect(GroundVisual, verde escuro). Área: ~2000x1500px.",
+		"created": "2026-05-20T23:33:14",
+		"id": "fact_1779291194",
+		"source": "ai"
+	},
+	{
+		"category": "project_info",
+		"content": "Usuário fala português. Próximo passo planejado: sistema de inimigos com IA simples (patrolha→perseguição→ataque) para que o combate tenha consequência real (HP/HUD já implementados).",
+		"created": "2026-05-20T23:33:14",
+		"id": "fact_1779291194",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Enemy (CharacterBody2D): 3 estados — Idle (detecta Player no range 200px)→Chase (move_speed 120, persegue)→Attack (range 30px, dano 8, cooldown 1s). HP 30. StateMachine reutiliza state_machine.gd. Runtime: owner pode ser null, então enemy.gd._setup_state_machine() corrige entity dos estados. Sprite vermelha (modulate 0.8,0.25,0.25) scale 0.4.",
+		"created": "2026-05-20T23:42:44",
+		"id": "fact_1779291764",
+		"source": "ai"
+	},
+	{
+		"category": "project_info",
+		"content": "Inimigos são spawnados via Player._spawn_test_enemies() (temporário): 3 inimigos em posições (200,0), (-200,0), (0,200). UID da cena: uid://b7brg6m0g5u4c. Futuramente substituir por posicionamento no editor no overworld.tscn.",
+		"created": "2026-05-20T23:42:44",
+		"id": "fact_1779291764",
+		"source": "ai"
+	},
+	{
+		"category": "project_info",
+		"content": "Usuário fala português. Sistemas implementados: Player com 5 estados, HP 100 + HUD, Fireball, Enemy com 3 estados (Idle/Chase/Attack). Próximos passos: (1) posicionar inimigos no editor em vez de spawn code, (2) death screen / respawn, (3) skill cooldown com indicador visual, (4) mais tipos de inimigos.",
+		"created": "2026-05-20T23:51:16",
+		"id": "fact_1779292276",
+		"source": "ai"
+	},
+	{
+		"category": "bug_fix",
+		"content": "Godot 4.6: `add_child()` dentro de `_ready()` causa erro \"Parent node is busy setting up children\". Sempre usar `add_child.call_deferred(child)` ou `call_deferred(\"add_child\", child)` ao adicionar nós durante a inicialização da cena. Padrão aplicado em Player._spawn_test_enemies().",
+		"created": "2026-05-20T23:51:16",
+		"id": "fact_1779292276",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "StateMachine (state_machine.gd) usa `owner` para definir `child.entity`. Funciona no editor, mas em cenas instanciadas em runtime (ex: Enemy spawnado por código), `owner` é null. Solução: cada entidade (Enemy, Player) tem `_setup_state_machine()` que corrige `entity` dos estados se estiver null após StateMachine._ready().",
+		"created": "2026-05-20T23:51:16",
+		"id": "fact_1779292276",
+		"source": "ai"
+	},
+	{
+		"category": "convention",
+		"content": "state.gd: sinal `transitioned` declarado com `@warning_ignore(\"unused_signal\")` pois é usado apenas pelas subclasses (PlayerIdleState, EnemyIdleState, etc.), não pela classe base State. Sem a anotação, Godot gera warning UNUSED_SIGNAL.",
+		"created": "2026-05-20T23:51:16",
+		"id": "fact_1779292276",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Tanto Player quanto Enemy usam o mesmo padrão StateMachine: node StateMachine com script state_machine.gd + nós filhos State (Idle/Move/Attack/etc). StateMachine gerencia dicionário `states`, transições via sinal `transitioned`, e forwarding de `_process`/`_physics_process`. Entidades têm fallback `_setup_state_machine()` caso o script não esteja salvo no .tscn ou owner seja null em runtime.",
+		"created": "2026-05-20T23:52:08",
+		"id": "fact_1779292328",
+		"source": "ai"
+	}
+]

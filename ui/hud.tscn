@@ -1,0 +1,32 @@
+[gd_scene format=3 uid="uid://tc5h73volrpp"]
+
+[ext_resource type="Script" uid="uid://cxp750i7wkmoe" path="res://ui/hud.gd" id="1_rbyyf"]
+
+[node name="HUD" type="CanvasLayer" unique_id=1720897277]
+script = ExtResource("1_rbyyf")
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=943148421]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer" unique_id=439813557]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+theme_override_constants/separation = 8
+
+[node name="HealthLabel" type="Label" parent="MarginContainer/HBoxContainer" unique_id=1985136506]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 16
+text = "100 / 100"
+
+[node name="HealthBar" type="ProgressBar" parent="MarginContainer/HBoxContainer" unique_id=1314548555]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+value = 100.0

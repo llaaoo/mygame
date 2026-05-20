@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://wx74iv5pkp82"]
+
+[ext_resource type="PackedScene" uid="uid://dh2tkj6gryw1a" path="res://maps/overworld.tscn" id="1_ig7tw"]
+[ext_resource type="PackedScene" uid="uid://etuhwmvsawor" path="res://entities/player/player.tscn" id="2_h2yge"]
+[ext_resource type="PackedScene" uid="uid://cogsmfa8kr054" path="res://skills/fireball.tscn" id="4_1bvp3"]
+[ext_resource type="Script" uid="uid://chwid4l447g0c" path="res://systems/input_setup.gd" id="4_lquwl"]
+[ext_resource type="PackedScene" uid="uid://tc5h73volrpp" path="res://ui/hud.tscn" id="5_7mycd"]
+
+[node name="Game" type="Node" unique_id=1368087060]
+
+[node name="Overworld" parent="." unique_id=1549094242 instance=ExtResource("1_ig7tw")]
+
+[node name="Player" parent="." unique_id=87503594 instance=ExtResource("2_h2yge")]
+skill_scene = ExtResource("4_1bvp3")
+
+[node name="InputSetup" type="Node" parent="." unique_id=2019032865]
+script = ExtResource("4_lquwl")
+
+[node name="HUDLayer" parent="." unique_id=1720897277 instance=ExtResource("5_7mycd")]

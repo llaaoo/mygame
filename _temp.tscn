@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://ow355oyirk1e"]
+
+[node name="Temp" type="Node" unique_id=1135228766]
+
+[node name="MainInstance" type="Node" parent="." unique_id=327664042]
+
+[node name="_probe" type="Node" parent="." unique_id=2033227244]
