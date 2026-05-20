@@ -1,13 +1,6 @@
 [
 	{
 		"category": "architecture",
-		"content": "HUD: CanvasLayer → MarginContainer(anchors full rect, margin 16px) → HBoxContainer(separation 8px) → ProgressBar(HealthBar, size_flags_horizontal=3, tint vermelho) + Label(HealthLabel, font 16px branco). Player se registra no grupo \"player\" via add_to_group(). HUD.gd busca Player via grupo ou cena, conecta sinais health_changed/died. Player tem max_hp=100, invincible_duration=0.5s, métodos take_damage()/heal().",
-		"created": "2026-05-20T23:33:14",
-		"id": "fact_1779291194",
-		"source": "ai"
-	},
-	{
-		"category": "architecture",
 		"content": "Input: project.godot define move_left(A)/move_right(D)/move_up(W)/move_down(S)/attack(MouseLeft)/dodge(Space)/skill(MouseRight). InputSetup.gd (Node em main.tscn) é fallback redundante que recria ações se ausentes. Estados usam Input.get_vector() para movimento e Input.is_action_just_pressed() para ações.",
 		"created": "2026-05-20T23:33:14",
 		"id": "fact_1779291194",
@@ -81,6 +74,27 @@
 		"content": "Tanto Player quanto Enemy usam o mesmo padrão StateMachine: node StateMachine com script state_machine.gd + nós filhos State (Idle/Move/Attack/etc). StateMachine gerencia dicionário `states`, transições via sinal `transitioned`, e forwarding de `_process`/`_physics_process`. Entidades têm fallback `_setup_state_machine()` caso o script não esteja salvo no .tscn ou owner seja null em runtime.",
 		"created": "2026-05-20T23:52:08",
 		"id": "fact_1779292328",
+		"source": "ai"
+	},
+	{
+		"category": "project_info",
+		"content": "REVIEW 2025-03-22: Projeto funcional com ciclo de combate completo. 28 nós na cena principal, 16 scripts .gd, 6 cenas .tscn. Todos os scripts auditados — zero warnings críticos. Sistemas: Player (5 estados, HP 100, dano 10, ataque melee+skill Fireball), Enemy (3 estados, HP 30, dano 8, detecção 200px), HUD (CanvasLayer com ProgressBar). Dívidas técnicas: (1) player.tscn StateMachine sem script state_machine.gd salvo — depende do fallback do player.gd, (2) spawn de inimigos via código em vez de editor, (3) sem death screen/respawn, (4) fireball sem cooldown.",
+		"created": "2026-05-21T00:19:38",
+		"id": "fact_1779293978",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Fluxo de dados do combate: Player.atk → AttackHitbox(Area2D).body_entered → Enemy.take_damage(10) → Enemy.hp-=10 → Enemy.died → queue_free(). Enemy.atk → Enemy.perform_attack() → Player.take_damage(8) → Player.hp-=8 (com invincible check) → health_changed signal → HUD._on_health_changed() → ProgressBar.value + Label.text. Fireball.atk → Fireball._on_body_entered() com caster check → alvo.take_damage(25) → queue_free().",
+		"created": "2026-05-21T00:19:38",
+		"id": "fact_1779293978",
+		"source": "ai"
+	},
+	{
+		"category": "project_info",
+		"content": "Estrutura de arquivos (20 arquivos fonte): entities/player/ (player.gd, player.tscn, states/5 scripts), entities/enemy/ (enemy.gd, enemy.tscn, states/3 scripts), systems/ (state.gd, state_machine.gd, input_setup.gd), skills/ (fireball.gd, fireball.tscn), ui/ (hud.gd, hud.tscn), maps/ (overworld.tscn), testes/ (test_gameplay.gd, test_validation.gd). Raiz: main.tscn, project.godot.",
+		"created": "2026-05-21T00:19:38",
+		"id": "fact_1779293978",
 		"source": "ai"
 	}
 ]
