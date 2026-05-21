@@ -1,0 +1,115 @@
+[gd_scene format=3 uid="uid://drw4hlsa32cn0"]
+
+[ext_resource type="Script" uid="uid://bgys0ryq8a220" path="res://ui/inventory_panel.gd" id="1_shgow"]
+
+[node name="InventoryPanel" type="CanvasLayer" unique_id=972810696]
+script = ExtResource("1_shgow")
+
+[node name="Background" type="ColorRect" parent="." unique_id=2116436147]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+color = Color(0, 0, 0, 0.5)
+
+[node name="Panel" type="Panel" parent="." unique_id=1051899773]
+
+[node name="MarginContainer" type="MarginContainer" parent="Panel" unique_id=456080291]
+layout_mode = 0
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="MainHBox" type="HBoxContainer" parent="Panel/MarginContainer" unique_id=402839472]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="EquipmentSection" type="VBoxContainer" parent="Panel/MarginContainer/MainHBox" unique_id=985291315]
+layout_mode = 2
+
+[node name="EquipTitle" type="Label" parent="Panel/MarginContainer/MainHBox/EquipmentSection" unique_id=1410172234]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "⚔️ 装备栏"
+
+[node name="PaperDoll" type="Control" parent="Panel/MarginContainer/MainHBox/EquipmentSection" unique_id=1320902448]
+custom_minimum_size = Vector2(240, 380)
+layout_mode = 2
+
+[node name="Silhouette" type="ColorRect" parent="Panel/MarginContainer/MainHBox/EquipmentSection/PaperDoll" unique_id=966962306]
+layout_mode = 0
+offset_left = 55.0
+offset_top = 60.0
+offset_right = 185.0
+offset_bottom = 290.0
+color = Color(0.15, 0.15, 0.18, 1)
+
+[node name="HeadSlot" type="Button" parent="Panel/MarginContainer/MainHBox/EquipmentSection/PaperDoll" unique_id=437154989]
+layout_mode = 0
+offset_left = 58.0
+offset_top = 5.0
+offset_right = 182.0
+offset_bottom = 57.0
+text = "头部"
+
+[node name="ChestSlot" type="Button" parent="Panel/MarginContainer/MainHBox/EquipmentSection/PaperDoll" unique_id=310846658]
+layout_mode = 0
+offset_left = 58.0
+offset_top = 72.0
+offset_right = 182.0
+offset_bottom = 136.0
+text = "胸部"
+
+[node name="HandsSlot" type="Button" parent="Panel/MarginContainer/MainHBox/EquipmentSection/PaperDoll" unique_id=1414323895]
+layout_mode = 0
+offset_left = 3.0
+offset_top = 78.0
+offset_right = 55.0
+offset_bottom = 130.0
+text = "手部"
+
+[node name="LegsSlot" type="Button" parent="Panel/MarginContainer/MainHBox/EquipmentSection/PaperDoll" unique_id=106200211]
+layout_mode = 0
+offset_left = 58.0
+offset_top = 210.0
+offset_right = 182.0
+offset_bottom = 266.0
+text = "腿部"
+
+[node name="FeetSlot" type="Button" parent="Panel/MarginContainer/MainHBox/EquipmentSection/PaperDoll" unique_id=600630153]
+layout_mode = 0
+offset_left = 58.0
+offset_top = 280.0
+offset_right = 182.0
+offset_bottom = 336.0
+text = "足部"
+
+[node name="LeftHandSlot" type="Button" parent="Panel/MarginContainer/MainHBox/EquipmentSection/PaperDoll" unique_id=858234782]
+layout_mode = 0
+offset_left = 3.0
+offset_top = 145.0
+offset_right = 55.0
+offset_bottom = 197.0
+text = "副手"
+
+[node name="RightHandSlot" type="Button" parent="Panel/MarginContainer/MainHBox/EquipmentSection/PaperDoll" unique_id=183438940]
+layout_mode = 0
+offset_left = 185.0
+offset_top = 78.0
+offset_right = 237.0
+offset_bottom = 130.0
+text = "主手"
+
+[node name="InventorySection" type="VBoxContainer" parent="Panel/MarginContainer/MainHBox" unique_id=527438273]
+layout_mode = 2
+
+[node name="InvTitle" type="Label" parent="Panel/MarginContainer/MainHBox/InventorySection" unique_id=116913333]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "🎒 背包"
+
+[node name="InvGrid" type="GridContainer" parent="Panel/MarginContainer/MainHBox/InventorySection" unique_id=643032577]
+layout_mode = 2

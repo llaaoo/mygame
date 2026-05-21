@@ -120,11 +120,24 @@ func _setup_state_machine() -> void:
 	else:
 		print("❌ Player: 找不到 idle 状态！可用状态: ", _states.keys())
 
-## 连接背包面板
+## 连接背包面板（运行时实例化预制场景）
 func _setup_inventory_panel() -> void:
 	var panel = get_tree().current_scene.get_node_or_null("InventoryPanel")
+	
+	# 如果没在编辑器中放置，则运行时加载预制场景
+	if not panel:
+		var panel_scene = load("res://ui/inventory_panel.tscn") as PackedScene
+		if panel_scene:
+			panel = panel_scene.instantiate()
+			panel.name = "InventoryPanel"
+			get_tree().current_scene.add_child.call_deferred(panel)
+			print("📦 InventoryPanel: 运行时实例化")
+	
 	if panel and panel is InventoryPanel:
 		inventory_panel = panel
+		# 如果背包资源为空，加载默认背包
+		if not inventory:
+			inventory = load("res://items/player_inventory.tres") as Inventory
 		inventory_panel.setup(inventory, $EquipmentManager)
 		# 添加测试物品
 		_add_test_items()

@@ -313,5 +313,19 @@
 		"created": "2026-05-21T23:38:46",
 		"id": "fact_1779377926",
 		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "InventoryPanel (res://ui/inventory_panel.tscn + inventory_panel.gd): CanvasLayer 集成面板，I 键切换。左侧纸娃娃装备栏 (7槽: HeadSlot/ChestSlot/HandsSlot/LegsSlot/FeetSlot/LeftHandSlot/RightHandSlot 围绕 240×380 区域排列，中央 Silhouette ColorRect)。右侧 GridContainer 网格背包 (5列，每格 52×52，品质着色: 白/蓝/紫/橙)。点击背包槽装备→卸旧→穿新，点击纸娃娃槽→卸到背包。",
+		"created": "2026-05-22T00:18:03",
+		"id": "fact_1779380283",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "InventoryPanel 运行时实例化: player.gd._setup_inventory_panel() 先查找场景中已有的 InventoryPanel，找不到则 load(\"res://ui/inventory_panel.tscn\").instantiate() + call_deferred(\"add_child\")。因工具无法切换到 main.tscn 做编辑器放置，采用此方案。inventory 资源在 player.tscn 中已关联 player_inventory.tres。",
+		"created": "2026-05-22T00:18:03",
+		"id": "fact_1779380283",
+		"source": "ai"
 	}
 ]
