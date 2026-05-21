@@ -4,9 +4,12 @@
 [ext_resource type="Script" uid="uid://cfww8gxoetv4q" path="res://entities/player/states/idle.gd" id="1_symyc"]
 [ext_resource type="Script" uid="uid://4nugo7eloomy" path="res://entities/player/states/move.gd" id="2_abrql"]
 [ext_resource type="Texture2D" uid="uid://ucd888rpepul" path="res://icon.svg" id="2_qiwj3"]
+[ext_resource type="Script" uid="uid://dlvm6y7rbfhvi" path="res://systems/state_machine.gd" id="3_26q78"]
 [ext_resource type="Script" uid="uid://cqka051ddjpnn" path="res://entities/player/states/attack.gd" id="3_sglur"]
 [ext_resource type="Script" uid="uid://bktmmthfxihqy" path="res://entities/player/states/dodge.gd" id="4_bls4j"]
 [ext_resource type="Script" uid="uid://cn54q1qvccd2p" path="res://entities/player/states/skill.gd" id="5_fkugw"]
+[ext_resource type="Script" uid="uid://yrqmtyiw2k2" path="res://items/buff_manager.gd" id="9_bectd"]
+[ext_resource type="Script" uid="uid://c2inl37mcrnjd" path="res://items/equipment_manager.gd" id="10_wvtmh"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_qiwj3"]
 radius = 80.48
@@ -34,6 +37,7 @@ monitorable = false
 shape = SubResource("CircleShape2D_26q78")
 
 [node name="StateMachine" type="Node" parent="." unique_id=641815222]
+script = ExtResource("3_26q78")
 
 [node name="Idle" type="Node" parent="StateMachine" unique_id=1755270046]
 script = ExtResource("1_symyc")
@@ -49,3 +53,9 @@ script = ExtResource("4_bls4j")
 
 [node name="Skill" type="Node" parent="StateMachine" unique_id=1232374708]
 script = ExtResource("5_fkugw")
+
+[node name="BuffManager" type="Node" parent="." unique_id=818895408]
+script = ExtResource("9_bectd")
+
+[node name="EquipmentManager" type="Node" parent="." unique_id=1763722490]
+script = ExtResource("10_wvtmh")

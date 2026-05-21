@@ -96,5 +96,222 @@
 		"created": "2026-05-21T00:19:38",
 		"id": "fact_1779293978",
 		"source": "ai"
+	},
+	{
+		"category": "project_info",
+		"content": "TODO #1: Salvar state_machine.gd no player.tscn — abrir player.tscn, selecionar nó StateMachine, attach script res://systems/state_machine.gd, setar initial_state=NodePath(\"Idle\"), Ctrl+S.",
+		"created": "2026-05-21T00:21:15",
+		"id": "fact_1779294075",
+		"source": "ai"
+	},
+	{
+		"category": "project_info",
+		"content": "TODO #2: Mover spawn de inimigos do código para o editor — remover _spawn_test_enemies() do player.gd, abrir overworld.tscn, instancear enemy.tscn 3× em posições (200,0), (-200,0), (0,200).",
+		"created": "2026-05-21T00:21:15",
+		"id": "fact_1779294075",
+		"source": "ai"
+	},
+	{
+		"category": "project_info",
+		"content": "TODO #3: Death screen + respawn — conectar Player.died → mostrar tela escura com \"Você morreu\" + botão \"Tentar novamente\" → reload main.tscn. Ou respawn simples: reset HP, teleport para (0,0).",
+		"created": "2026-05-21T00:21:15",
+		"id": "fact_1779294075",
+		"source": "ai"
+	},
+	{
+		"category": "project_info",
+		"content": "TODO #4: Cooldown visual para Fireball — adicionar @export var skill_cooldown: float = 2.0 no player.gd, variável skill_ready: bool, após cast_skill() iniciar timer. HUD: adicionar TextureProgressBar/ProgressBar pequeno abaixo da health bar mostrando o cooldown.",
+		"created": "2026-05-21T00:21:15",
+		"id": "fact_1779294075",
+		"source": "ai"
+	},
+	{
+		"category": "project_info",
+		"content": "TODO #1 完成：player.tscn 的 StateMachine 已挂载 state_machine.gd，initial_state=NodePath(\"Idle\")。player.gd._setup_state_machine() 会在 StateMachine 有脚本时修正 entity（因 owner 可能不是 Player）。",
+		"created": "2026-05-21T22:10:53",
+		"id": "fact_1779372653",
+		"source": "ai"
+	},
+	{
+		"category": "project_info",
+		"content": "TODO #2 完成：_spawn_test_enemies() 已从 player.gd 移除。3个敌人 Enemy1(200,0)/Enemy2(-200,0)/Enemy3(0,200) 已通过编辑器放置在 main.tscn 的 Overworld 节点下。",
+		"created": "2026-05-21T22:10:53",
+		"id": "fact_1779372653",
+		"source": "ai"
+	},
+	{
+		"category": "project_info",
+		"content": "TODO #3 完成：死亡画面 - HUD 中有 DeathScreen (ColorRect, 半透明黑, 默认隐藏)。包含 DeathLabel \"💀 Você morreu!\" 和 RetryButton \"Tentar novamente\"。Player.died → DeathScreen.visible=true。RetryButton → reload_current_scene()。",
+		"created": "2026-05-21T22:10:53",
+		"id": "fact_1779372653",
+		"source": "ai"
+	},
+	{
+		"category": "project_info",
+		"content": "TODO #4 完成：Fireball 技能冷却 - player.gd 有 @export skill_cooldown=2.0s 和 skill_cooldown_remaining。_process 递减冷却，cast_skill() 检查冷却并设置 skill_cooldown_remaining。HUD 有蓝色 SkillCooldownBar (ProgressBar)，通过 skill_cooldown_changed 信号更新。",
+		"created": "2026-05-21T22:10:53",
+		"id": "fact_1779372653",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Padrão de correção de entity do StateMachine: TANTO Player quanto Enemy usam `entity != self` (não `entity == null`) em `_setup_state_machine()`. Motivo: StateMachine._ready() define entity=owner (nó raiz da cena, ex: Game), que NÃO é null, então a verificação `== null` nunca disparava. A correção compara `!= self` para garantir que entity aponte para a entidade correta.",
+		"created": "2026-05-21T22:40:57",
+		"id": "fact_1779374457",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Inimigos NÃO atacavam porque attack_range (30px) era menor que a soma dos raios de colisão: Enemy(30px) + Player(16px) = 46px de distância mínima. attack_range foi aumentado para 55px. Regra: sempre garantir que attack_range > soma dos raios de colisão + buffer.",
+		"created": "2026-05-21T22:40:57",
+		"id": "fact_1779374457",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Morte do Player: variável `is_dead: bool = false` é setada como true em take_damage() quando hp<=0. Em seguida: set_process(false), set_physics_process(false), collision_shape.disabled=true. Estados dos inimigos (idle/chase/attack) verificam `entity.player.is_dead` e retornam/transicionam para idle se true.",
+		"created": "2026-05-21T22:40:57",
+		"id": "fact_1779374457",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "DeathScreen (ColorRect preto semitransparente + \"💀 Você morreu!\" + botão \"Tentar novamente\") foi adicionado como filho DIRETO da instância HUDLayer em main.tscn (não no hud.tscn fonte). Botão de retry conectado via código em hud.gd._ready() com `retry_btn.pressed.connect(_on_retry_pressed)` porque connect_signal do editor não persiste no .tscn.",
+		"created": "2026-05-21T22:40:57",
+		"id": "fact_1779374457",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Sistema de cooldown da Fireball: player.gd tem `skill_cooldown: float = 2.0` e `skill_cooldown_remaining: float`. _process() decrementa o remaining e emite `skill_cooldown_changed`. cast_skill() verifica `skill_cooldown_remaining > 0` e retorna se em cooldown. HUD tem barra azul (ProgressBar) atualizada pelo sinal.",
+		"created": "2026-05-21T22:40:57",
+		"id": "fact_1779374457",
+		"source": "ai"
+	},
+	{
+		"category": "bug_fix",
+		"content": "SkillCooldownBar do HUD é criada dinamicamente em hud.gd._setup_cooldown_bar() com `ProgressBar.new()` porque `add_node` do editor não consegue adicionar nós dentro da hierarquia de cenas instanciadas (ex: dentro de HBoxContainer que está dentro de uma cena PackedScene). A barra tenta primeiro `get_node_or_null(\"SkillCooldownBar\")` e, se não encontrar, cria em código.",
+		"created": "2026-05-21T22:40:57",
+		"id": "fact_1779374457",
+		"source": "ai"
+	},
+	{
+		"category": "project_info",
+		"content": "Inimigos são agora posicionados no editor: Enemy1(200,0), Enemy2(-200,0), Enemy3(0,200) como filhos de Overworld em main.tscn. O método `_spawn_test_enemies()` foi removido de player.gd.",
+		"created": "2026-05-21T22:40:58",
+		"id": "fact_1779374458",
+		"source": "ai"
+	},
+	{
+		"category": "bug_fix",
+		"content": "Ferramentas do editor têm limitações: (1) `patch_script` às vezes falha silenciosamente — sempre verificar com `read_file` após; (2) `add_node` não penetra hierarquias de cenas instanciadas (PackedScene), só adiciona filhos diretos; (3) `connect_signal` persiste na memória mas NÃO grava `[connection]` no arquivo .tscn — conexões críticas devem ser feitas em código no _ready().",
+		"created": "2026-05-21T22:40:58",
+		"id": "fact_1779374458",
+		"source": "ai"
+	},
+	{
+		"category": "project_info",
+		"content": "player.tscn: StateMachine agora tem state_machine.gd anexado com initial_state=NodePath(\"Idle\"). Player.gd._setup_state_machine() corrige entity dos estados se `entity != self` após o StateMachine._ready().",
+		"created": "2026-05-21T22:40:58",
+		"id": "fact_1779374458",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Pickup 系统 (res://pickups/): Pickup (Area2D 基类) — body_entered → _on_collected(player) 虚函数 → auto_destroy. HealthPickup extends Pickup — heal_amount=20, chama player.heal(). 基类自动创建 CollisionShape2D 如果没有。扩展：继承 Pickup 覆写 _on_collected() 即可 (ManaPickup, BuffPickup).",
+		"created": "2026-05-21T22:55:31",
+		"id": "fact_1779375331",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Enemy 死亡掉落: take_damage() → hp<=0 → _spawn_drop() → instancia drop_scene. Se drop_scene for null (editor não persistiu), carrega \"res://pickups/health_pickup.tscn\" via load(). Futuro: trocar drop_scene único por drop_table (Array[PackedScene]) com pesos.",
+		"created": "2026-05-21T22:55:31",
+		"id": "fact_1779375331",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Player 脱战自回: regen_delay=5s (sem dano), regen_rate=3HP/s. _process checa `not is_dead and hp < max_hp`, incrementa _time_since_damage, quando >= regen_delay aplica regen_rate*delta. take_damage() reseta _time_since_damage=0. heal() é público para Pickup/Buff/技能 chamarem.",
+		"created": "2026-05-21T22:55:32",
+		"id": "fact_1779375332",
+		"source": "ai"
+	},
+	{
+		"category": "bug_fix",
+		"content": "Bug: hp era declarado como `int`, então `hp + regen_rate * delta` (ex: 92 + 0.048) era truncado para int = 92, nunca aumentava. Solução: acumulador float `_regen_accumulator` que acumula frações até `int(accumulator) >= 1`, daí aplica `hp += heal_amt` e subtrai do acumulador. Padrão essencial para qualquer sistema de regen com HP inteiro.",
+		"created": "2026-05-21T23:24:12",
+		"id": "fact_1779377052",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Sistema de Pickup (res://pickups/): Pickup (Area2D base) com _on_collected(player) virtual. Características: auto_destroy, cooldown (re-coletável), _setup_shape() cria CollisionShape2D automático se não existir. HealthPickup estende com heal_amount=20. Extensibilidade: basta herdar Pickup e sobrescrever _on_collected(). Futuro: ManaPickup, BuffPickup, XP pickup.",
+		"created": "2026-05-21T23:25:44",
+		"id": "fact_1779377144",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Enemy._spawn_drop(): chamado em take_damage() antes do queue_free(). Usa @export var drop_scene: PackedScene. Fallback: se drop_scene for null, carrega \"res://pickups/health_pickup.tscn\" via load(). Futuro: substituir por drop_table (Array[Droppable] com pesos e condições).",
+		"created": "2026-05-21T23:25:44",
+		"id": "fact_1779377144",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Sistema de regen do Player usa padrão de acumulador float → int: `_regen_accumulator += regen_rate * delta`, `heal_amt = int(accumulator)`, se >0 aplica `hp += heal_amt` e subtrai. Necessário porque `hp: int` trunca adições fracionárias. Aplicável a qualquer sistema de regeneração com HP inteiro (mana, stamina, etc).",
+		"created": "2026-05-21T23:25:44",
+		"id": "fact_1779377144",
+		"source": "ai"
+	},
+	{
+		"category": "preference",
+		"content": "Usuário prefere \"击杀掉落血包\" (drop de HealthPickup no inimigo) em vez de \"击杀直接回血\". Cura direta (heal on kill) será implementada depois como Buff genérico aplicável a armas, skills, itens.",
+		"created": "2026-05-21T23:25:44",
+		"id": "fact_1779377144",
+		"source": "ai"
+	},
+	{
+		"category": "project_info",
+		"content": "Três sistemas de recuperação de HP implementados: (1) Pickup - HealthPickup dropa do inimigo ao morrer, (2) Regen - 5s sem dano → 3HP/s até max_hp, (3) heal() API pública para Buffs/skills/itens futuros. Todos verificados e funcionando.",
+		"created": "2026-05-21T23:25:44",
+		"id": "fact_1779377144",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Sistema de itens (res://items/): ItemData (Resource base: id, name, icon, type, stackable, rarity), EquipmentData extends ItemData (SlotType enum: HEAD/CHEST/LEGS/FEET/HANDS/LEFT_HAND/RIGHT_HAND, stat_modifiers Dictionary, stat_multipliers). Cada item/equipamento é um arquivo .tres editável no inspector.",
+		"created": "2026-05-21T23:38:46",
+		"id": "fact_1779377926",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Buff system (res://items/): Buff (Resource) com stat_modifiers, duration=0=permanente, tick_interval, tick_heal. apply_to(entity)/remove_from(entity) modificam propriedades diretamente via set/get. BuffManager (Node no Player) gerencia _active_buffs, tick a cada 1s, apply_buff/remove_buff/clear_all.",
+		"created": "2026-05-21T23:38:46",
+		"id": "fact_1779377926",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "EquipmentManager (Node no Player): 7 slots mapeados em _equipped Dictionary. equip(EquipmentData) → unequip slot antigo → cria Buff temporário → BuffManager.apply_buff(). unequip(slot) → BuffManager.remove_buff(). _equipped_buffs rastreia qual Buff veio de qual slot. Sinal equipment_changed(slot_type, equipment) para UI.",
+		"created": "2026-05-21T23:38:46",
+		"id": "fact_1779377926",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Inventory (Resource): grid de slots (capacity=20). add_item() primeiro tenta empilhar em slots existentes (stackable), depois preenche vazios. remove_item() escaneia de trás pra frente. Suporta stackable/max_stack do ItemData. Será usado tanto pelo Player (backpack) quanto pelo EquipmentManager.",
+		"created": "2026-05-21T23:38:46",
+		"id": "fact_1779377926",
+		"source": "ai"
+	},
+	{
+		"category": "project_info",
+		"content": "Backend do sistema de inventário completo. Player tem BuffManager + EquipmentManager como filhos. 3 equipamentos exemplo: iron_helmet.tres (HEAD,+15HP), leather_armor.tres (CHEST,+25HP), iron_boots.tres (FEET,+25move_speed). PRÓXIMO: UI (inventory_ui + equipment_ui).",
+		"created": "2026-05-21T23:38:46",
+		"id": "fact_1779377926",
+		"source": "ai"
 	}
 ]

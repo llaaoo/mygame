@@ -2,7 +2,7 @@ extends State
 class_name EnemyIdleState
 
 func physics_update(_delta: float) -> void:
-	if not entity.player:
+	if not entity.player or entity.player.is_dead:
 		return
 	
 	var dist = entity.distance_to_player()

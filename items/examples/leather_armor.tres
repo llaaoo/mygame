@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="EquipmentData" format=3 uid="uid://33a5gjgesq6l"]
+
+[ext_resource type="Script" uid="uid://cawkj840aybfi" path="res://items/equipment_data.gd" id="1_tyiv8"]
+
+[resource]
+script = ExtResource("1_tyiv8")
+slot_type = 1
+stat_modifiers = {
+"max_hp": 25.0
+}
+display_name = "皮甲"
+item_type = 1

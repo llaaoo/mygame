@@ -5,9 +5,12 @@ class_name Enemy
 @export var max_hp: int = 30
 @export var move_speed: float = 120.0
 @export var detect_range: float = 200.0
-@export var attack_range: float = 30.0
+@export var attack_range: float = 55.0
 @export var attack_damage: int = 8
 @export var attack_cooldown: float = 1.0
+
+## 掉落物（死亡时生成，可扩展为 loot table）
+@export var drop_scene: PackedScene
 
 var hp: int = 30
 var player: Player = null
@@ -25,18 +28,14 @@ func _ready() -> void:
 func _setup_state_machine() -> void:
 	var sm = $StateMachine
 	if not sm.get_script():
-		# StateMachine 无脚本，手动管理（备用）
 		return
-	# StateMachine._ready() 已经用 owner 设置了 entity
-	# 但运行时 owner 可能为 null，手动补救
 	for child in sm.get_children():
-		if child.has_method("enter") and child.get("entity") == null:
+		if child.has_method("enter") and child.get("entity") != self:
 			child.set("entity", self)
 
 func _find_player() -> void:
 	player = get_tree().get_first_node_in_group("player") as Player
 	if not player:
-		# 重试
 		await get_tree().create_timer(0.5).timeout
 		_find_player()
 
@@ -64,8 +63,19 @@ func take_damage(amount: int) -> void:
 	hp = max(0, hp - amount)
 	print("👹 敌人受到伤害: ", amount, " 剩余HP: ", hp)
 	if hp <= 0:
+		_spawn_drop()
 		died.emit()
 		queue_free()
+
+## 生成掉落物（可扩展：未来可用 drop_table 替代单一 drop_scene）
+func _spawn_drop() -> void:
+	if not drop_scene:
+		drop_scene = load("res://pickups/health_pickup.tscn")
+	if not drop_scene:
+		return
+	var drop = drop_scene.instantiate()
+	get_tree().current_scene.add_child(drop)
+	drop.global_position = global_position
 
 ## 执行攻击
 func perform_attack() -> void:

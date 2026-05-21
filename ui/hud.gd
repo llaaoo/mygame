@@ -3,13 +3,33 @@ extends CanvasLayer
 
 @onready var health_bar: ProgressBar = $MarginContainer/HBoxContainer/HealthBar
 @onready var health_label: Label = $MarginContainer/HBoxContainer/HealthLabel
+@onready var death_screen: ColorRect = $DeathScreen
 
 var player: Player = null
+var cooldown_bar: ProgressBar = null
 
 func _ready() -> void:
+	_setup_cooldown_bar()
+	# 确保重试按钮连接（编辑器连接可能丢失）
+	var retry_btn = $DeathScreen/VBoxContainer/RetryButton
+	if retry_btn and not retry_btn.pressed.is_connected(_on_retry_pressed):
+		retry_btn.pressed.connect(_on_retry_pressed)
 	# 延迟查找 Player（等场景完全加载后）
 	await get_tree().process_frame
 	_connect_player()
+
+func _setup_cooldown_bar() -> void:
+	# 尝试在 HBoxContainer 中查找 SkillCooldownBar
+	var hbox = $MarginContainer/HBoxContainer
+	cooldown_bar = hbox.get_node_or_null("SkillCooldownBar") as ProgressBar
+	if not cooldown_bar:
+		# 动态创建冷却条
+		cooldown_bar = ProgressBar.new()
+		cooldown_bar.name = "SkillCooldownBar"
+		cooldown_bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		cooldown_bar.value = 0.0
+		cooldown_bar.add_theme_color_override("fill_color", Color(0.3, 0.5, 1, 1))
+		hbox.add_child(cooldown_bar)
 
 func _connect_player() -> void:
 	# 通过 group 或场景树查找 Player
@@ -17,10 +37,13 @@ func _connect_player() -> void:
 	if not player:
 		var root = get_tree().current_scene
 		player = root.get_node_or_null("Player") as Player if root else null
-	
+
 	if player:
 		player.health_changed.connect(_on_health_changed)
 		player.died.connect(_on_player_died)
+		player.skill_cooldown_changed.connect(_on_skill_cooldown_changed)
+		cooldown_bar.max_value = player.skill_cooldown
+		cooldown_bar.value = 0
 		health_bar.max_value = player.max_hp
 		health_bar.value = player.hp
 		health_label.text = "%d / %d" % [player.hp, player.max_hp]
@@ -37,4 +60,13 @@ func _on_health_changed(current_hp: int, max_hp: int) -> void:
 
 func _on_player_died() -> void:
 	print("💀 HUD: 玩家死亡！")
-	# TODO: 显示死亡画面 / 重新开始按钮
+	if death_screen:
+		death_screen.visible = true
+
+func _on_retry_pressed() -> void:
+	get_tree().paused = false
+	get_tree().reload_current_scene()
+
+func _on_skill_cooldown_changed(remaining: float, total: float) -> void:
+	cooldown_bar.max_value = total
+	cooldown_bar.value = remaining

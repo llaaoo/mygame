@@ -10,7 +10,7 @@ func enter() -> void:
 	entity.perform_attack()
 
 func physics_update(delta: float) -> void:
-	if not entity.player:
+	if not entity.player or entity.player.is_dead:
 		transitioned.emit(self, "idle")
 		return
 	

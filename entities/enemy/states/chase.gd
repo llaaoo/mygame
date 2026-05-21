@@ -5,7 +5,7 @@ func enter() -> void:
 	pass
 
 func physics_update(_delta: float) -> void:
-	if not entity.player:
+	if not entity.player or entity.player.is_dead:
 		transitioned.emit(self, "idle")
 		return
 	
