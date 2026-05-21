@@ -281,13 +281,6 @@
 	},
 	{
 		"category": "architecture",
-		"content": "Sistema de itens (res://items/): ItemData (Resource base: id, name, icon, type, stackable, rarity), EquipmentData extends ItemData (SlotType enum: HEAD/CHEST/LEGS/FEET/HANDS/LEFT_HAND/RIGHT_HAND, stat_modifiers Dictionary, stat_multipliers). Cada item/equipamento é um arquivo .tres editável no inspector.",
-		"created": "2026-05-21T23:38:46",
-		"id": "fact_1779377926",
-		"source": "ai"
-	},
-	{
-		"category": "architecture",
 		"content": "Buff system (res://items/): Buff (Resource) com stat_modifiers, duration=0=permanente, tick_interval, tick_heal. apply_to(entity)/remove_from(entity) modificam propriedades diretamente via set/get. BuffManager (Node no Player) gerencia _active_buffs, tick a cada 1s, apply_buff/remove_buff/clear_all.",
 		"created": "2026-05-21T23:38:46",
 		"id": "fact_1779377926",
@@ -326,6 +319,62 @@
 		"content": "InventoryPanel 运行时实例化: player.gd._setup_inventory_panel() 先查找场景中已有的 InventoryPanel，找不到则 load(\"res://ui/inventory_panel.tscn\").instantiate() + call_deferred(\"add_child\")。因工具无法切换到 main.tscn 做编辑器放置，采用此方案。inventory 资源在 player.tscn 中已关联 player_inventory.tres。",
 		"created": "2026-05-22T00:18:03",
 		"id": "fact_1779380283",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "SLOT_BUTTON_MAP (inventory_panel.gd): Dictionary constante que mapeia EquipmentData.SlotType enum → nome do nó Button no PaperDoll (ex: SlotType.HEAD → \"HeadSlot\"). Usado em _setup_equip_buttons() para conectar cada botão ao slot_type correto via bind(). SLOT_NAMES complementar fornece nomes chineses (头部/胸部/etc) como placeholder text e tooltip quando slot vazio.",
+		"created": "2026-05-22T00:20:18",
+		"id": "fact_1779380418",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Fluxo de equip/unequip no InventoryPanel: (1) Clique no slot do inventário → se item é EquipmentData → inventory.remove_item() → verifica old = equipment_manager.get_equipment(slot_type) → se old existe, inventory.add_item(old) → equipment_manager.equip(new) → _refresh_all(). (2) Clique no slot paper doll → equipment_manager.unequip(slot_type) → inventory.add_item(item) → _refresh_all(). O EquipmentManager.emite equipment_changed → _on_equipment_changed() → _refresh_equipment_slot().",
+		"created": "2026-05-22T00:20:18",
+		"id": "fact_1779380418",
+		"source": "ai"
+	},
+	{
+		"category": "convention",
+		"content": "Rarity coloring no inventário: inventory_panel.gd define `rarity_colors = [Color.WHITE, Color(0.3,0.5,1.0), Color(0.7,0.2,1.0), Color(1.0,0.65,0.0)]` para raridades 0-3 (普通/稀有/史诗/传说). Aplicado via `btn.modulate = rarity_colors[rarity]` em _refresh_inventory(). Se item tem icon, usa btn.icon + expand_icon=true; senão mostra primeiro caractere de display_name.",
+		"created": "2026-05-22T00:20:18",
+		"id": "fact_1779380418",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "InventoryPanel usa _input() com KEY_I (não InputMap action) para toggle. Padrão simples e direto. Se futuramente precisar de rebind, migrar para ação no InputMap. O toggle() chama open() (show + _refresh_all) ou close() (hide). _background (ColorRect fullscreen) também é mostrado/escondido para criar overlay escuro.",
+		"created": "2026-05-22T00:20:18",
+		"id": "fact_1779380418",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "PaperDoll layout: Control 240×380px com layout_mode=0 (posicionamento absoluto). Silhouette (ColorRect 130×230, cor #26262E) posicionado em (55,60) atrás dos botões. Slots: HeadSlot(58,5,124×52), ChestSlot(58,72,124×64), HandsSlot(3,78,52×52), LeftHandSlot(3,145,52×52), RightHandSlot(185,78,52×52), LegsSlot(58,210,124×56), FeetSlot(58,280,124×56). Texto placeholder em chinês (头部/胸部/手部/副手/主手/腿部/足部).",
+		"created": "2026-05-22T00:20:18",
+		"id": "fact_1779380418",
+		"source": "ai"
+	},
+	{
+		"category": "project_info",
+		"content": "Sistema de inventário COMPLETO (backend + frontend). Backend: ItemData/EquipmentData (Resource), Inventory (Resource, 20 slots), Buff (Resource), BuffManager (Node), EquipmentManager (Node, 7 slots). Frontend: InventoryPanel (CanvasLayer, I键, 纸娃娃+网格). Player tem BuffManager + EquipmentManager como filhos + inventory vinculado a player_inventory.tres. 3 equipamentos exemplo: iron_helmet.tres (HEAD,+15HP), leather_armor.tres (CHEST,+25HP), iron_boots.tres (FEET,+25move_speed). PRÓXIMO: (1) drag-and-drop entre slots, (2) item tooltip detalhado no hover, (3) mais equipamentos .tres (armas, anéis), (4) consumíveis (poção).",
+		"created": "2026-05-22T00:20:45",
+		"id": "fact_1779380445",
+		"source": "ai"
+	},
+	{
+		"category": "bug_fix",
+		"content": "GridContainer do inventário configurado em _ready() com columns=5, h/v_separation=4 como fallback porque as propriedades setadas via set_property no editor podem não persistir no .tscn. Botões criados dinamicamente em _refresh_inventory() com custom_minimum_size=Vector2(52,52) e flat=false.",
+		"created": "2026-05-22T00:20:45",
+		"id": "fact_1779380445",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "InventoryPanel._format_stats() extrai stat_modifiers e stat_multipliers do EquipmentData e formata em string multilinha para tooltip. Ex: \"+15 max_hp\\n+25 move_speed\" ou \"+10% atk\". Usado em _refresh_equipment_slot() para btn.tooltip_text. Se sem stats, mostra \"无属性\".",
+		"created": "2026-05-22T00:20:45",
+		"id": "fact_1779380445",
 		"source": "ai"
 	}
 ]
