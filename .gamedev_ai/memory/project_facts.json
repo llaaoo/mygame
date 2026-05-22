@@ -376,5 +376,117 @@
 		"created": "2026-05-22T00:20:45",
 		"id": "fact_1779380445",
 		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "SlotButton (res://ui/slot_button.gd): 通用 Button 子类，内置 (1) 拖拽系统 — _get_drag_data 创建预览 + 幽灵透明度，NOTIFICATION_DRAG_END 恢复，_can_drop_data/_drop_data 通过 slot_dropped 信号传出；(2) 富文本 Tooltip — _make_custom_tooltip 动态构建 PanelContainer，显示名称(品质色)、⭐品质标签、装备属性(绿色)、描述、操作提示。使用 set_item_data(data) 更新物品，set_empty_placeholder(txt) 重置空槽。",
+		"created": "2026-05-22T10:01:18",
+		"id": "fact_1779415278",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "InventoryPanel (res://ui/inventory_panel.gd) 重写：纸娃娃装备槽在 _setup_equip_buttons 中用 _replace_with_slot_button 将 .tscn 的 Button 替换为 SlotButton（保留布局）。背包格子用 SlotButton.new()。4种拖放情况：(1) INV→INV 交换 inventory.set_slot，(2) INV→EQ 检查 EquipmentData 和 slot_type 匹配后 equip，(3) EQ→INV unequip + add_item（自动寻空格），(4) EQ→EQ 检查类型兼容后交换。点击快速装备/卸载保留。",
+		"created": "2026-05-22T10:01:18",
+		"id": "fact_1779415278",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Inventory (res://items/inventory.gd) 新增 set_slot(index, item, quantity) 方法，用于拖拽交换时直接写入指定槽位。",
+		"created": "2026-05-22T10:01:18",
+		"id": "fact_1779415278",
+		"source": "ai"
+	},
+	{
+		"category": "project_info",
+		"content": "TODO #1 (拖拽) 和 TODO #2 (Tooltip) 已完成。SlotButton 统一处理拖拽和富文本提示，InventoryPanel 处理 4 种拖放路径。Tooltip 显示名称、品质、装备属性、描述、操作提示。下一步可考虑：消耗品使用、物品排序、装备对比提示。",
+		"created": "2026-05-22T10:01:18",
+		"id": "fact_1779415278",
+		"source": "ai"
+	},
+	{
+		"category": "project_info",
+		"content": "REVIEW 2025-03-24: 项目 34 源文件，16 脚本 + 9 场景 + 4 Resource。6 核心系统全部运行：StateMachine、Player(5态)、Enemy(3态AI)、战斗(近战+火球)、Inventory+Equipment(拖拽+Tooltip)、HUD+Pickup+Regen。废弃文件: inventory_ui.gd/.tscn, _inventory_ui.tscn, equipment_ui.gd/.tscn (被 inventory_panel 取代)。代码质量: 状态脚本 print 泛滥, player.gd 死代码 fallback, _add_test_items 强制注入。功能缺失: 音频、动画、胜负条件、存档。",
+		"created": "2026-05-22T10:07:25",
+		"id": "fact_1779415645",
+		"source": "ai"
+	},
+	{
+		"category": "project_info",
+		"content": "TODO 清单 (2025-03-24): 【立即】01-删除废弃UI文件(inventory_ui/equipment_ui), 02-清除状态print, 03-移除player.gd死代码fallback, 04-debug_items flag; 【中期】05-拆分player.gd(HealthComponent/CombatComponent), 06-敌人视觉差异化, 07-移动test到tests/, 08-碰撞体移到tscn; 【长期】09-音效系统, 10-动画驱动, 11-游戏循环/胜负, 12-存档。",
+		"created": "2026-05-22T10:07:25",
+		"id": "fact_1779415645",
+		"source": "ai"
+	},
+	{
+		"category": "project_info",
+		"content": "TODO-01 完成：已删除 7 个废弃 UI 文件 — inventory_ui.gd/.uid/.tscn, equipment_ui.gd/.uid/.tscn, _inventory_ui.tscn。class_name InventoryUI 和 EquipmentUI 从项目中移除。ui/ 目录现仅含 4 个活跃文件: hud + inventory_panel + slot_button。",
+		"created": "2026-05-22T10:24:37",
+		"id": "fact_1779416677",
+		"source": "ai"
+	},
+	{
+		"category": "project_info",
+		"content": "TODO-03 完成：player.gd 移除 4 处死代码 — (1) _states/_current_state 变量声明, (2) _setup_state_machine 的 fallback 手动状态管理分支(23行), (3) _process/_physics_process 中冗余的状态转发, (4) _on_state_transition 方法(7行)。文件从 ~217 行精简到 ~195 行。StateMachine 现在统一管理所有状态生命周期。",
+		"created": "2026-05-22T10:27:25",
+		"id": "fact_1779416845",
+		"source": "ai"
+	},
+	{
+		"category": "project_info",
+		"content": "TODO-07 完成：test_gameplay.gd 和 test_validation.gd 从 res:// 根目录移动到 res://tests/。同时更新了 test_gameplay.gd 中过时的 _current_state/_states 引用（改用 StateMachine 的 current_state/states），test_validation.gd 新增了 StateMachine 脚本挂载检查。根目录现仅含核心目录和配置文件。",
+		"created": "2026-05-22T10:31:04",
+		"id": "fact_1779417064",
+		"source": "ai"
+	},
+	{
+		"category": "project_info",
+		"content": "TODO-04 完成：player.gd 新增 @export var debug_items: bool = false，_add_test_items() 仅在 debug_items=true 时调用。默认 false — 正常游戏启动不再强制注入测试装备。需测试时在编辑器中勾选 debug_items 即可。",
+		"created": "2026-05-22T10:34:19",
+		"id": "fact_1779417259",
+		"source": "ai"
+	},
+	{
+		"category": "project_info",
+		"content": "TODO-08 完成：碰撞体形状从代码迁移到编辑器。新建 3 个 Shape 资源: player_body_shape.tres(CircleShape2D r=16), attack_hitbox_shape.tres(RectangleShape2D 24×24), enemy_body_shape.tres(CircleShape2D r=14)。player.gd _setup_collisions 从 15 行减至 8 行(仅信号连接)，enemy.gd _setup_collision 完全删除(12 行)。碰撞体现在可在编辑器中可视化调整。",
+		"created": "2026-05-22T10:37:55",
+		"id": "fact_1779417475",
+		"source": "ai"
+	},
+	{
+		"category": "bug_fix",
+		"content": "TODO-08 修正：set_property 设置 shape 引用不会持久化到 .tscn（场景关闭后丢失）。改用折中方案：保留 .tres Shape 资源（可在编辑器中可视化编辑），在 _ready 中用 load() 加载赋值（保证运行时正确）。player.gd 加载 player_body_shape.tres + attack_hitbox_shape.tres，enemy.gd 加载 enemy_body_shape.tres。这是编辑器中可调 + 运行时保证的混合方案。",
+		"created": "2026-05-22T10:45:04",
+		"id": "fact_1779417904",
+		"source": "ai"
+	},
+	{
+		"category": "bug_fix",
+		"content": "BUG: set_property 对 Resource 类型属性的修改只在编辑器会话内存中生效，不会写入 .tscn 文件。场景关闭重开后恢复旧值。涉及 shape、material、texture 等资源引用属性时应使用 load() 在 _ready 中运行时加载，或用 create_resource + .tres 文件定义，代码中 load 赋值。",
+		"created": "2026-05-22T10:45:04",
+		"id": "fact_1779417904",
+		"source": "ai"
+	},
+	{
+		"category": "bug_fix",
+		"content": "BUG: create_resource 对 RectangleShape2D.size 属性序列化失败 — 始终写入 size=Vector2(0,0)。CircleShape2D.radius 正常。解决方案：圆形用 .tres+load()，矩形在代码中 RectangleShape2D.new() 创建。攻击盒已修复：rect.size=Vector2(24,24) 在 _setup_collisions 中直接赋值。",
+		"created": "2026-05-22T10:48:43",
+		"id": "fact_1779418123",
+		"source": "ai"
+	},
+	{
+		"category": "project_info",
+		"content": "TODO-08 最终方案：player_body_shape.tres(CircleShape2D r=16) + enemy_body_shape.tres(CircleShape2D r=14) 用 load() 加载，攻击盒 RectangleShape2D(24×24) 代码创建。攻击盒 size=(0,0) bug 已修复。",
+		"created": "2026-05-22T10:48:43",
+		"id": "fact_1779418123",
+		"source": "ai"
+	},
+	{
+		"category": "project_info",
+		"content": "TODO-06 完成：敌人视觉差异化。改用 enemy_type (int) 预设系统（0=哨兵🟢, 1=士兵🔴, 2=坦克🟣），PRESETS 表定义颜色/大小/名称。int 类型可持久化到 main.tscn。Enemy1(type=0,HP20,速160,伤5)、Enemy2(type=1默认,HP30,速120,伤8)、Enemy3(type=2,HP50,速90,伤12)。受击闪白 _flash_damage() 0.1s。关键发现：int/float 属性可通过 set_property 持久化，Color/Vector2/String 不行。",
+		"created": "2026-05-22T10:58:06",
+		"id": "fact_1779418686",
+		"source": "ai"
 	}
 ]

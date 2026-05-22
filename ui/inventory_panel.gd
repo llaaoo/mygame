@@ -1,6 +1,7 @@
 class_name InventoryPanel
 extends CanvasLayer
 ## 背包+纸娃娃装备 集成面板 — I 键切换
+## 支持拖拽装备/交换 + 富文本悬浮提示
 
 @export var columns: int = 5
 
@@ -12,10 +13,10 @@ var equipment_manager: EquipmentManager
 @onready var _inv_grid: GridContainer = $Panel/MarginContainer/MainHBox/InventorySection/InvGrid
 @onready var _paper_doll: Control = $Panel/MarginContainer/MainHBox/EquipmentSection/PaperDoll
 
-## 纸娃娃按钮映射: slot_type → Button
+## 纸娃娃按钮映射: slot_type → SlotButton
 var _equip_buttons: Dictionary = {}
 ## 背包格子按钮
-var _inv_buttons: Array[Button] = []
+var _inv_buttons: Array[SlotButton] = []
 
 ## 槽位名称 → 按钮节点名 映射
 const SLOT_BUTTON_MAP: Dictionary = {
@@ -80,18 +81,48 @@ func close() -> void:
 	_background.hide()
 
 
-## 连接纸娃娃按钮
+## ── 初始化：将 .tscn 中的普通 Button 替换为 SlotButton ──
+
 func _setup_equip_buttons() -> void:
 	for slot_type in SLOT_BUTTON_MAP:
-		var btn_name = SLOT_BUTTON_MAP[slot_type]
-		var btn = _paper_doll.get_node_or_null(btn_name) as Button
-		if btn:
-			_equip_buttons[slot_type] = btn
-			var st = slot_type
-			if btn.pressed.is_connected(_on_equip_clicked):
-				btn.pressed.disconnect(_on_equip_clicked)
-			btn.pressed.connect(_on_equip_clicked.bind(st))
+		var btn_name: String = SLOT_BUTTON_MAP[slot_type]
+		var slot_btn := _replace_with_slot_button(btn_name, slot_type)
+		if slot_btn:
+			_equip_buttons[slot_type] = slot_btn
+			slot_btn.slot_dropped.connect(_on_slot_dropped)
+			# 保留点击快速装备/卸载
+			slot_btn.pressed.connect(_on_equip_clicked.bind(slot_type))
 
+
+func _replace_with_slot_button(btn_name: String, slot_type: int) -> SlotButton:
+	var old = _paper_doll.get_node_or_null(btn_name)
+	if not old:
+		return null
+
+	var parent = old.get_parent()
+	if not parent:
+		return null
+
+	# 复制布局属性
+	var new_btn := SlotButton.new()
+	new_btn.name = btn_name
+	new_btn.layout_mode = old.layout_mode
+	new_btn.offset_left = old.offset_left
+	new_btn.offset_right = old.offset_right
+	new_btn.offset_top = old.offset_top
+	new_btn.offset_bottom = old.offset_bottom
+	new_btn.custom_minimum_size = old.custom_minimum_size
+
+	new_btn.slot_role = SlotButton.SlotRole.EQUIPMENT
+	new_btn.slot_id = slot_type
+	new_btn.set_empty_placeholder(SLOT_NAMES.get(slot_type, ""))
+
+	old.queue_free()
+	parent.add_child(new_btn)
+	return new_btn
+
+
+## ── 刷新全部 ──
 
 func _refresh_all() -> void:
 	_refresh_inventory()
@@ -99,7 +130,12 @@ func _refresh_all() -> void:
 
 
 func _refresh_inventory() -> void:
+	# 清除旧按钮
 	for btn in _inv_buttons:
+		if btn.slot_dropped.is_connected(_on_slot_dropped):
+			btn.slot_dropped.disconnect(_on_slot_dropped)
+		if btn.pressed.is_connected(_on_inv_clicked):
+			btn.pressed.disconnect(_on_inv_clicked)
 		btn.queue_free()
 	_inv_buttons.clear()
 
@@ -107,42 +143,49 @@ func _refresh_inventory() -> void:
 		return
 
 	for i in range(inventory.capacity):
-		var data = inventory.get_slot(i)
-		var btn = Button.new()
+		var slot = inventory.get_slot(i)
+		var btn := SlotButton.new()
 		btn.custom_minimum_size = Vector2(52, 52)
 		btn.flat = false
+		btn.slot_role = SlotButton.SlotRole.INVENTORY
+		btn.slot_id = i
 
-		if data.item:
-			# 根据品质着色
-			var rarity_colors = [
-				Color.WHITE,           # 0: 普通
-				Color(0.3, 0.5, 1.0),  # 1: 稀有 (蓝)
-				Color(0.7, 0.2, 1.0),  # 2: 史诗 (紫)
-				Color(1.0, 0.65, 0.0), # 3: 传说 (橙)
-			]
-			var rarity = clampi(data.item.rarity, 0, 3)
-
-			# 显示图标或首字
-			if data.item.icon:
-				btn.icon = data.item.icon
-				btn.expand_icon = true
-			else:
-				btn.text = data.item.display_name[0]
-
-			# 堆叠数量
-			if data.quantity > 1:
-				btn.text = "x%d" % data.quantity
-
-			btn.tooltip_text = "%s\n%s" % [data.item.display_name, data.item.description]
-			btn.modulate = rarity_colors[rarity]
+		# 设置物品数据（SlotButton 自动处理图标/文字/品质色/tooltip）
+		if slot.item:
+			btn.set_item_data(slot.item)
+			# 堆叠数量覆盖
+			if slot.quantity > 1:
+				btn.text = "x%d" % slot.quantity
 		else:
-			btn.text = ""
+			btn.set_item_data(null)
 
-		var idx = i
-		btn.pressed.connect(_on_inv_clicked.bind(idx))
+		btn.slot_dropped.connect(_on_slot_dropped)
+		btn.pressed.connect(_on_inv_clicked.bind(i))
 		_inv_grid.add_child(btn)
 		_inv_buttons.append(btn)
 
+
+func _refresh_equipment() -> void:
+	for slot_type in _equip_buttons:
+		_refresh_equipment_slot(slot_type)
+
+
+func _refresh_equipment_slot(slot_type: int) -> void:
+	var btn: SlotButton = _equip_buttons.get(slot_type)
+	if not btn:
+		return
+
+	if equipment_manager:
+		var eq = equipment_manager.get_equipment(slot_type)
+		if eq:
+			btn.set_item_data(eq)
+		else:
+			btn.set_empty_placeholder(SLOT_NAMES.get(slot_type, ""))
+	else:
+		btn.set_empty_placeholder(SLOT_NAMES.get(slot_type, ""))
+
+
+## ── 点击事件（快速装备/卸载，保留给不想拖拽的用户） ──
 
 func _on_inv_clicked(index: int) -> void:
 	if not inventory:
@@ -153,8 +196,7 @@ func _on_inv_clicked(index: int) -> void:
 
 	# 装备类型 → 装备
 	if data.item is EquipmentData and equipment_manager:
-		var eq = data.item as EquipmentData
-		# 先卸下旧装备
+		var eq := data.item as EquipmentData
 		var old = equipment_manager.get_equipment(eq.slot_type)
 		inventory.remove_item(eq, 1)
 		if old:
@@ -175,44 +217,101 @@ func _on_equip_clicked(slot_type: int) -> void:
 		_refresh_all()
 
 
-func _on_equipment_changed(slot_type: int, _eq: EquipmentData) -> void:
-	_refresh_equipment_slot(slot_type)
+## ── 拖拽事件处理 ──
 
-
-func _refresh_equipment() -> void:
-	for slot_type in _equip_buttons:
-		_refresh_equipment_slot(slot_type)
-
-
-func _refresh_equipment_slot(slot_type: int) -> void:
-	var btn = _equip_buttons.get(slot_type) as Button
-	if not btn:
+func _on_slot_dropped(target: SlotButton, data: Dictionary) -> void:
+	if not inventory or not equipment_manager:
 		return
 
-	if equipment_manager:
-		var eq = equipment_manager.get_equipment(slot_type)
-		if eq:
-			if eq.icon:
-				btn.icon = eq.icon
-				btn.expand_icon = true
-				btn.text = ""
-			else:
-				btn.icon = null
-				btn.text = eq.display_name[0]
-			btn.tooltip_text = eq.display_name + "\n" + _format_stats(eq)
-		else:
-			btn.icon = null
-			btn.text = SLOT_NAMES.get(slot_type, "")
-			btn.tooltip_text = SLOT_NAMES.get(slot_type, "")
-	else:
-		btn.icon = null
-		btn.text = SLOT_NAMES.get(slot_type, "")
+	var source_role: SlotButton.SlotRole = data["slot_role"]
+	var source_id: int = data["slot_id"]
+	var source_item: ItemData = data["item"]
+
+	# 情况 1: 背包 → 背包（交换）
+	if source_role == SlotButton.SlotRole.INVENTORY and target.slot_role == SlotButton.SlotRole.INVENTORY:
+		_swap_inventory_slots(source_id, target.slot_id)
+
+	# 情况 2: 背包 → 装备槽
+	elif source_role == SlotButton.SlotRole.INVENTORY and target.slot_role == SlotButton.SlotRole.EQUIPMENT:
+		_inventory_to_equip(source_id, target.slot_id)
+
+	# 情况 3: 装备槽 → 背包
+	elif source_role == SlotButton.SlotRole.EQUIPMENT and target.slot_role == SlotButton.SlotRole.INVENTORY:
+		_equip_to_inventory(source_id, target.slot_id)
+
+	# 情况 4: 装备槽 → 装备槽（交换）
+	elif source_role == SlotButton.SlotRole.EQUIPMENT and target.slot_role == SlotButton.SlotRole.EQUIPMENT:
+		_swap_equipment_slots(source_id, target.slot_id)
 
 
-func _format_stats(eq: EquipmentData) -> String:
-	var lines: Array[String] = []
-	for s in eq.stat_modifiers:
-		lines.append("+%s %s" % [eq.stat_modifiers[s], s])
-	for s in eq.stat_multipliers:
-		lines.append("+%d%% %s" % [eq.stat_multipliers[s] * 100, s])
-	return "\n".join(lines) if lines else "无属性"
+func _swap_inventory_slots(idx_a: int, idx_b: int) -> void:
+	if idx_a == idx_b:
+		return
+	var slot_a = inventory.get_slot(idx_a)
+	var slot_b = inventory.get_slot(idx_b)
+	inventory.set_slot(idx_a, slot_b.item, slot_b.quantity)
+	inventory.set_slot(idx_b, slot_a.item, slot_a.quantity)
+	_refresh_all()
+
+
+func _inventory_to_equip(inv_idx: int, equip_slot: int) -> void:
+	var slot = inventory.get_slot(inv_idx)
+	if not slot.item or not slot.item is EquipmentData:
+		return
+	var eq := slot.item as EquipmentData
+	if eq.slot_type != equip_slot:
+		print("⚠️ 槽位不匹配: %s 需要 %s 槽" % [eq.display_name, SLOT_NAMES.get(eq.slot_type, "?")])
+		return
+
+	# 如果目标装备槽已有装备，先卸到背包
+	var old = equipment_manager.get_equipment(equip_slot)
+	inventory.remove_item(eq, 1)
+	if old:
+		inventory.add_item(old, 1)
+	equipment_manager.equip(eq)
+	_refresh_all()
+
+
+func _equip_to_inventory(equip_slot: int, _inv_idx: int) -> void:
+	var eq = equipment_manager.get_equipment(equip_slot)
+	if not eq:
+		return
+	equipment_manager.unequip(equip_slot)
+	# add_item 自动寻找可用槽位（堆叠或空格），比强制 set_slot 更安全
+	inventory.add_item(eq, 1)
+	_refresh_all()
+
+
+func _swap_equipment_slots(slot_a: int, slot_b: int) -> void:
+	if slot_a == slot_b:
+		return
+	var eq_a = equipment_manager.get_equipment(slot_a)
+	var eq_b = equipment_manager.get_equipment(slot_b)
+
+	# 检查类型兼容：A 物品能否放入 B 槽，B 物品能否放入 A 槽
+	var can_a_to_b = not eq_a or (eq_a.slot_type == slot_b)
+	var can_b_to_a = not eq_b or (eq_b.slot_type == slot_a)
+
+	if not can_a_to_b or not can_b_to_a:
+		print("⚠️ 装备槽位类型不匹配，无法直接交换")
+		return
+
+	# 卸下双方
+	if eq_a:
+		equipment_manager.unequip(slot_a)
+	if eq_b:
+		equipment_manager.unequip(slot_b)
+
+	# 重新装备（equip 根据物品自身 slot_type 放置，因此仅同类型交换有效）
+	if eq_a:
+		equipment_manager.equip(eq_a)
+	if eq_b:
+		equipment_manager.equip(eq_b)
+
+	_refresh_all()
+
+
+## ── 信号回调 ──
+
+func _on_equipment_changed(slot_type: int, _eq: EquipmentData) -> void:
+	_refresh_equipment_slot(slot_type)

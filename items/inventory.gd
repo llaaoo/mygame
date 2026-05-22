@@ -81,6 +81,12 @@ func get_item_count(item: ItemData) -> int:
 	return count
 
 
+## 设置指定槽位（用于拖拽交换）
+func set_slot(index: int, item: ItemData, quantity: int) -> void:
+	if index >= 0 and index < capacity:
+		_slots[index] = {"item": item, "quantity": quantity}
+
+
 ## 是否有足够空间
 func has_space(item: ItemData, quantity: int = 1) -> bool:
 	var space = 0

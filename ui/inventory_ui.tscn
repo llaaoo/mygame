@@ -1,6 +1,6 @@
-[gd_scene format=3 uid="uid://othlwcodce3n"]
+[gd_scene format=3 uid="uid://c86xi0tjhs2xi"]
 
-[ext_resource type="Script" uid="uid://cpgv3446p5off" path="res://ui/inventory_ui.gd" id="1_7v2e4"]
+[ext_resource type="Script" path="res://ui/inventory_ui.gd" id="1_7v2e4"]
 
 [node name="InventoryUI" type="CanvasLayer" unique_id=1512110107]
 script = ExtResource("1_7v2e4")

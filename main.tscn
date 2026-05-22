@@ -13,15 +13,24 @@
 
 [node name="Enemy1" parent="Overworld" unique_id=1874515091 instance=ExtResource("2_272bh")]
 position = Vector2(200, 0)
+max_hp = 20.0
+move_speed = 160.0
+attack_damage = 5.0
+enemy_type = 0.0
 
 [node name="Enemy2" parent="Overworld" unique_id=268381738 instance=ExtResource("2_272bh")]
 position = Vector2(-200, 0)
 
 [node name="Enemy3" parent="Overworld" unique_id=843982397 instance=ExtResource("2_272bh")]
 position = Vector2(0, 200)
+max_hp = 50.0
+move_speed = 90.0
+attack_damage = 12.0
+enemy_type = 2.0
 
 [node name="Player" parent="." unique_id=87503594 instance=ExtResource("2_h2yge")]
 skill_scene = ExtResource("4_1bvp3")
+debug_items = true
 
 [node name="InputSetup" type="Node" parent="." unique_id=2019032865]
 script = ExtResource("4_lquwl")

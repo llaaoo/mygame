@@ -36,6 +36,9 @@ var _regen_accumulator: float = 0.0
 @export var skill_cooldown: float = 2.0
 var skill_cooldown_remaining: float = 0.0
 
+## 调试：启动时自动注入测试装备
+@export var debug_items: bool = false
+
 ## 信号
 signal health_changed(current_hp: int, max_hp: int)
 signal died
@@ -51,10 +54,8 @@ var facing_direction: Vector2 = Vector2.DOWN
 @onready var attack_hitbox: Area2D = $AttackHitbox
 @onready var attack_hitbox_shape: CollisionShape2D = $AttackHitbox/CollisionShape2D
 
-## 状态机引用
+## 状态机引用 — 由 StateMachine 节点统一管理
 var state_machine: Node
-var _states: Dictionary = {}
-var _current_state: Node = null
 
 func _ready() -> void:
 	hp = max_hp
@@ -87,38 +88,18 @@ func _process(delta: float) -> void:
 				hp = min(max_hp, hp + heal_amt)
 				health_changed.emit(hp, max_hp)
 
-	if _current_state and _current_state.has_method("update"):
-		_current_state.update(delta)
+func _physics_process(_delta: float) -> void:
+	pass  # StateMachine 负责转发 physics_update
 
-func _physics_process(delta: float) -> void:
-	if _current_state and _current_state.has_method("physics_update"):
-		_current_state.physics_update(delta)
-
-## 如果 StateMachine 节点有脚本就用它，否则自行管理状态
+## 修正 StateMachine 中状态的 entity 引用（运行时 owner 可能不指向 Player）
 func _setup_state_machine() -> void:
 	state_machine = $StateMachine
-
-	if state_machine.get_script():
-		print("🔍 Player: StateMachine 脚本已挂载，由它管理状态")
-		for child in state_machine.get_children():
-			if child.has_method("enter") and child.get("entity") != self:
-				child.set("entity", self)
+	if not state_machine.get_script():
 		return
 
-	print("🔍 Player: StateMachine 无脚本，使用备用状态管理")
 	for child in state_machine.get_children():
-		if child is State or child.has_method("enter"):
-			_states[child.name.to_lower()] = child
-			if child.has_signal("transitioned") and not child.transitioned.is_connected(_on_state_transition):
-				child.transitioned.connect(_on_state_transition)
+		if child.has_method("enter") and child.get("entity") != self:
 			child.set("entity", self)
-
-	_current_state = _states.get("idle")
-	if _current_state:
-		print("🔍 Player: 进入初始状态: ", _current_state.name)
-		_current_state.enter()
-	else:
-		print("❌ Player: 找不到 idle 状态！可用状态: ", _states.keys())
 
 ## 连接背包面板（运行时实例化预制场景）
 func _setup_inventory_panel() -> void:
@@ -139,8 +120,8 @@ func _setup_inventory_panel() -> void:
 		if not inventory:
 			inventory = load("res://items/player_inventory.tres") as Inventory
 		inventory_panel.setup(inventory, $EquipmentManager)
-		# 添加测试物品
-		_add_test_items()
+		if debug_items:
+			_add_test_items()
 
 
 func _add_test_items() -> void:
@@ -156,22 +137,10 @@ func _add_test_items() -> void:
 	print("🎒 测试装备已添加到背包")
 
 
-func _on_state_transition(state: Node, new_state_name: String) -> void:
-	if state != _current_state:
-		return
-	var new_state = _states.get(new_state_name.to_lower())
-	if not new_state:
-		return
-	if _current_state:
-		_current_state.exit()
-	new_state.enter()
-	_current_state = new_state
-
 func _setup_collisions() -> void:
-	var circle = CircleShape2D.new()
-	circle.radius = 16.0
-	collision_shape.shape = circle
-
+	# 从 .tres 加载圆形碰撞（可在编辑器中可视化调整）
+	collision_shape.shape = load("res://entities/player/player_body_shape.tres")
+	# RectangleShape2D 直接创建（create_resource 对 size 序列化有 bug）
 	var rect = RectangleShape2D.new()
 	rect.size = Vector2(24, 24)
 	attack_hitbox_shape.shape = rect
