@@ -55,6 +55,7 @@ func _on_body_entered(body: Node2D) -> void:
 	if body == caster:
 		return
 	if body.has_method("take_damage"):
+		_emit_hit_event(body)
 		body.take_damage(damage)
 	queue_free()
 
@@ -65,5 +66,21 @@ func _on_area_entered(area: Area2D) -> void:
 	if area.is_in_group("projectile"):
 		return
 	if area.has_method("take_damage"):
+		_emit_hit_event(area)
 		area.take_damage(damage)
 	queue_free()
+
+
+## 发射 ON_HIT 事件到全局总线
+func _emit_hit_event(target: Node2D) -> void:
+	var bus := CombatEventBus.instance
+	if not bus:
+		return
+	var ev := CombatEvent.create(CombatEvent.Type.ON_HIT, caster, target)
+	ev.data["damage"] = damage
+	ev.data["position"] = global_position
+	var skill := get_meta("skill_data", null) as SkillData
+	if skill:
+		ev.skill = skill
+		ev.data["tags"] = skill.tags
+	bus.emit(ev)

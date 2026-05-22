@@ -60,14 +60,18 @@ func _ready() -> void:
 	health_component.died.connect(_on_died)
 	_apply_stats_to_health()
 
-	# 技能
+	# 技能（纯数据，伤害计算交给 SkillExecutor）
 	var bolt_data := load("res://skills/shadow_bolt_data.tres") as SkillData
 	if bolt_data:
 		bolt_data.skill_type = SkillData.SkillType.PROJECTILE
 		bolt_data.projectile_scene = load("res://skills/shadow_bolt.tscn")
 		bolt_data.scene = bolt_data.projectile_scene  # 兼容
 		bolt_data.projectile_speed = 250.0
-		bolt_data.damage = 10 + stats_component.magic_damage
+		bolt_data.damage = 10
+		bolt_data.damage_scaling = 0.6               # 60% 魔法伤害加成
+		skill_manager.pool = SkillPool.new()
+		skill_manager.pool.add_skill(bolt_data)
+		skill_manager.pool.build()
 		skill_manager.equip_hand("right", bolt_data)
 
 	# 视觉

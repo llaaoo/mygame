@@ -747,5 +747,68 @@
 		"created": "2026-05-22T22:39:17",
 		"id": "fact_1779460757",
 		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Skill system uses layered architecture: SkillData (pure data), SkillPool (ID index with build() + map dict), SkillLoadout (slot→skill_id mapping), SkillExecutor (centralized compute_damage + execute), SkillManager (runtime orchestrator). Damage calculation is centralized in SkillExecutor.compute_damage() using formula: base_damage + magic_damage * damage_scaling. Player/Enemy no longer compute damage inline.",
+		"created": "2026-05-23T00:56:00",
+		"id": "fact_1779468960",
+		"source": "ai"
+	},
+	{
+		"category": "convention",
+		"content": "SkillData fields: id (primary), skill_id (deprecated alias), damage_scaling (float, magic coefficient), tags (Array[String] for modifier matching), cast_type (String), range (float). SkillData.get_id() returns id or falls back to skill_id. SkillPool.get_skill() uses O(1) map lookup, requires build() after loading.",
+		"created": "2026-05-23T00:56:00",
+		"id": "fact_1779468960",
+		"source": "ai"
+	},
+	{
+		"category": "project_info",
+		"content": "Skill file structure: skills/data/ (SkillData + .tres), skills/runtime/ (CastContext, SkillExecutor, SkillInstance), skills/registry/ (SkillPool + .tres), skills/loadout/ (SkillLoadout + .tres), skills/manager/ (SkillManager), skills/scenes/ (scene .tscn files). components/skill_manager.gd was moved to skills/manager/skill_manager.gd.",
+		"created": "2026-05-23T00:56:00",
+		"id": "fact_1779468960",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Damage uses Modifier Pipeline: DamageContext (data carrier) → Array[DamageModifier].modify() → final_damage. SkillExecutor holds modifiers array, resolve_damage() runs pipeline. Core principle: \"Damage isn't calculated — it's modified layer by layer.\" Three modifier types: StatScalingModifier (stat→damage), TagMultiplierModifier (tag-based %), FlatBonusModifier (flat +/-).",
+		"created": "2026-05-23T01:01:38",
+		"id": "fact_1779469298",
+		"source": "ai"
+	},
+	{
+		"category": "convention",
+		"content": "DamageModifier base class: Resource with required_tags, ignored_tags, enabled. should_apply() checks tag matching. Concrete modifiers in skills/modifiers/. Player/Enemy inject modifiers into SkillExecutor in _setup_damage_modifiers(). Modifiers execute in array order (first=first applied). StatScalingModifier reads ctx.skill.damage_scaling as effective ratio (per-skill tuning).",
+		"created": "2026-05-23T01:01:38",
+		"id": "fact_1779469298",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "DamageModifier uses staged execution: FLAT → MULTIPLY → OVERRIDE → FINAL. Each modifier declares its stage via `@export var stage: Stage` and priority within stage via `@export var priority: int`. SkillExecutor holds modifiers_by_stage dict, resolve_damage() runs _apply_stage() in fixed order. This eliminates the \"who runs last wins\" ordering bug — FLAT always before MULTIPLY, OVERRIDE always overrides everything.",
+		"created": "2026-05-23T01:06:05",
+		"id": "fact_1779469565",
+		"source": "ai"
+	},
+	{
+		"category": "convention",
+		"content": "Default stages: StatScalingModifier=FLAT, FlatBonusModifier=FLAT, TagMultiplierModifier=MULTIPLY. add_modifier() auto-sorts bucket by priority (ascending). remove_modifiers_of_class() works across all stages. modifiers getter provides flat array for backward compatibility.",
+		"created": "2026-05-23T01:06:05",
+		"id": "fact_1779469565",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "CombatEventBus is a global publish/subscribe system (systems/combat_event_bus.gd). Static singleton pattern via CombatEventBus.instance. Events: ON_CAST (SkillExecutor), ON_HIT (Projectile/FlameStorm), ON_DAMAGE/ON_KILL/ON_HEAL (HealthComponent). TriggeredEffect base class (systems/triggered_effect.gd) bridges events→behavior with auto-register/unregister and cooldown support.",
+		"created": "2026-05-23T01:13:33",
+		"id": "fact_1779470013",
+		"source": "ai"
+	},
+	{
+		"category": "convention",
+		"content": "Event emission points: SkillExecutor._emit_event() after successful cast, Projectile._emit_hit_event() before take_damage, FlameStorm._emit_hit_event() before take_damage, HealthComponent._emit_damage_event()/_emit_kill_event() after damage/death. ON_HIT carries skill tags in data[\"tags\"] for tag-based reactions.",
+		"created": "2026-05-23T01:13:33",
+		"id": "fact_1779470013",
+		"source": "ai"
 	}
 ]

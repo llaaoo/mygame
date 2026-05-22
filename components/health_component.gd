@@ -51,8 +51,13 @@ func take_damage(amount: int) -> void:
 	_time_since_damage = 0.0
 	health_changed.emit(hp, max_hp)
 
+	# 发射 ON_DAMAGE 事件（伤害已应用）
+	_emit_damage_event(amount)
+
 	if hp <= 0:
 		is_dead = true
+		# 发射 ON_KILL 事件（在 died 信号之前）
+		_emit_kill_event(amount)
 		died.emit()
 		if _collision_shape:
 			_collision_shape.set_deferred("disabled", true)
@@ -66,3 +71,42 @@ func take_damage(amount: int) -> void:
 func heal(amount: int) -> void:
 	hp = mini(max_hp, hp + amount)
 	health_changed.emit(hp, max_hp)
+	_emit_heal_event(amount)
+
+
+## ── 事件发射 ──
+
+func _emit_damage_event(amount: int) -> void:
+	var bus := CombatEventBus.instance
+	if not bus:
+		return
+	var ev := CombatEvent.new()
+	ev.type = CombatEvent.Type.ON_DAMAGE
+	ev.target = get_parent()  ## HealthComponent 的父节点即实体
+	ev.data["damage"] = amount
+	ev.data["remaining_hp"] = hp
+	bus.emit(ev)
+
+
+func _emit_kill_event(amount: int) -> void:
+	var bus := CombatEventBus.instance
+	if not bus:
+		return
+	var parent := get_parent()
+	var ev := CombatEvent.new()
+	ev.type = CombatEvent.Type.ON_KILL
+	ev.target = parent
+	ev.data["overkill_damage"] = amount
+	ev.data["position"] = parent.get("global_position") if "global_position" in parent else Vector2.ZERO
+	bus.emit(ev)
+
+
+func _emit_heal_event(amount: int) -> void:
+	var bus := CombatEventBus.instance
+	if not bus:
+		return
+	var ev := CombatEvent.new()
+	ev.type = CombatEvent.Type.ON_HEAL
+	ev.target = get_parent()
+	ev.data["amount"] = amount
+	bus.emit(ev)

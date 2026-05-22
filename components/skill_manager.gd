@@ -1,7 +1,8 @@
 class_name SkillManager
 extends Node
-## 技能管理器 — 左手/右手 + 4 快捷键槽位
-## 左右手可装备技能或留空（左手空=近战，右手空=无动作）
+## 技能管理器 — 纯运行态，描述"怎么装备"
+## 左手/右手 + 4 快捷键槽位
+## 执行逻辑委托给 SkillExecutor
 
 const MAX_SLOTS := 4
 
@@ -11,54 +12,86 @@ signal slot_changed(slot_index: int)
 signal cooldown_changed(source: String, remaining: float, total: float)
 signal skill_used(source: String, skill: SkillData)
 
-## ── 左右手 ──
-var left_hand_skill: SkillData = null
-var right_hand_skill: SkillData = null
+## ── 核心依赖 ──
+var pool: SkillPool = null                 ## 技能池（ID索引）
+var executor: SkillExecutor = null         ## 执行器（计算+执行）
+
+## ── 左右手（SkillInstance 包装） ──
+var left_hand: SkillInstance = null
+var right_hand: SkillInstance = null
 
 ## ── 快捷键槽位 ──
-var _slots: Array[Dictionary] = []
+var _slots: Array[SkillInstance] = []
 
-## ── 冷却（统一字典） ──
+## ── 冷却（统一字典，source → remaining） ──
 var _cooldowns: Dictionary = {}
 
 
 func _ready() -> void:
 	_slots.resize(MAX_SLOTS)
 	for i in range(MAX_SLOTS):
-		_slots[i] = {"skill": null, "cooldown": 0.0}
-	_cooldowns["left"] = 0.0
-	_cooldowns["right"] = 0.0
-	for i in range(MAX_SLOTS):
-		_cooldowns["slot_%d" % i] = 0.0
+		_slots[i] = null
+	# 自动创建 executor（如果未从外部注入）
+	if not executor:
+		executor = SkillExecutor.new()
+		executor.name = "SkillExecutor"
+		add_child(executor)
 
 
 func _process(delta: float) -> void:
+	# 更新所有 SkillInstance 冷却
+	_tick_instance(left_hand, delta)
+	_tick_instance(right_hand, delta)
+	for i in range(MAX_SLOTS):
+		_tick_instance(_slots[i], delta)
+
+	# 更新旧版 _cooldowns（兼容）
 	for key in _cooldowns:
 		var cd: float = _cooldowns[key]
 		if cd > 0.0:
 			cd = maxf(0.0, cd - delta)
 			_cooldowns[key] = cd
-			var total := _get_cooldown_total(key)
-			if total > 0:
-				cooldown_changed.emit(key, cd, total)
+
+
+func _tick_instance(inst: SkillInstance, delta: float) -> void:
+	if inst:
+		inst.tick(delta)
+
+
+## ── Loadout 应用（推荐入口） ──
+
+func apply_loadout(loadout: SkillLoadout) -> void:
+	if not loadout:
+		return
+	if loadout.left_hand and pool:
+		equip_hand("left", pool.get_skill(loadout.left_hand))
+	if loadout.right_hand and pool:
+		equip_hand("right", pool.get_skill(loadout.right_hand))
+	for i in range(mini(loadout.slots.size(), MAX_SLOTS)):
+		var sid := loadout.slots[i]
+		if sid and pool:
+			equip_slot(i, pool.get_skill(sid))
 
 
 ## ── 装备管理 ──
 
 func equip_hand(hand: String, skill: SkillData) -> void:
+	var inst := SkillInstance.new(skill) if skill else null
 	match hand:
-		"left":  left_hand_skill = skill
-		"right": right_hand_skill = skill
-	_cooldowns[hand] = 0.0
+		"left":  left_hand = inst
+		"right": right_hand = inst
 	hand_changed.emit(hand)
 
 
 func unequip_hand(hand: String) -> SkillData:
 	var old: SkillData = null
 	match hand:
-		"left":  old = left_hand_skill;  left_hand_skill = null
-		"right": old = right_hand_skill; right_hand_skill = null
-	_cooldowns[hand] = 0.0
+		"left":
+			if left_hand: old = left_hand.data
+			left_hand = null
+		"right":
+			if right_hand: old = right_hand.data
+			right_hand = null
 	hand_changed.emit(hand)
 	return old
 
@@ -66,214 +99,37 @@ func unequip_hand(hand: String) -> SkillData:
 func equip_slot(idx: int, skill: SkillData) -> void:
 	if idx < 0 or idx >= MAX_SLOTS:
 		return
-	_slots[idx]["skill"] = skill
-	_slots[idx]["cooldown"] = 0.0
-	_cooldowns["slot_%d" % idx] = 0.0
+	_slots[idx] = SkillInstance.new(skill) if skill else null
 	slot_changed.emit(idx)
 
 
 func unequip_slot(idx: int) -> SkillData:
 	if idx < 0 or idx >= MAX_SLOTS:
 		return null
-	var old: SkillData = _slots[idx]["skill"]
-	_slots[idx] = {"skill": null, "cooldown": 0.0}
-	_cooldowns["slot_%d" % idx] = 0.0
+	var old: SkillData = _slots[idx].data if _slots[idx] else null
+	_slots[idx] = null
 	slot_changed.emit(idx)
 	return old
 
 
-func get_slot(idx: int) -> Dictionary:
+## ── 查询 ──
+
+func get_slot(idx: int) -> SkillInstance:
 	if idx < 0 or idx >= MAX_SLOTS:
-		return {"skill": null, "cooldown": 0.0}
+		return null
 	return _slots[idx]
 
 
-## ── 查询 ──
-
 func has_left_spell() -> bool:
-	return left_hand_skill != null
+	return left_hand != null
 
 
 func has_right_spell() -> bool:
-	return right_hand_skill != null
+	return right_hand != null
 
 
 func can_use(source: String) -> bool:
 	return _cooldowns.get(source, 0.0) <= 0.0
-
-
-## ── 释放 ──
-
-func use_hand(hand: String, caster: Node2D, direction: Vector2) -> bool:
-	var skill: SkillData = left_hand_skill if hand == "left" else right_hand_skill
-	if not skill:
-		return false
-	return _execute(skill, hand, caster, direction)
-
-
-func use_slot(idx: int, caster: Node2D, direction: Vector2) -> bool:
-	if idx < 0 or idx >= MAX_SLOTS:
-		return false
-	var skill: SkillData = _slots[idx]["skill"]
-	if not skill:
-		return false
-	return _execute(skill, "slot_%d" % idx, caster, direction)
-
-
-func _execute(skill: SkillData, source: String, caster: Node2D, direction: Vector2) -> bool:
-	if _cooldowns.get(source, 0.0) > 0.0:
-		return false
-
-	# MP 检查
-	var mana := caster.get_node_or_null("ManaComponent") as ManaComponent
-	if mana and skill.mp_cost > 0 and not mana.use_mp(skill.mp_cost):
-		return false
-
-	# 按类型分发
-	var ok := false
-	match skill.skill_type:
-		SkillData.SkillType.PROJECTILE:
-			ok = _execute_projectile(skill, caster, direction)
-		SkillData.SkillType.BUFF:
-			ok = _execute_buff(skill, caster)
-		SkillData.SkillType.AOE:
-			ok = _execute_aoe(skill, caster, direction)
-		SkillData.SkillType.DASH:
-			ok = _execute_dash(skill, caster, direction)
-
-	if not ok:
-		if mana and skill.mp_cost > 0:
-			mana.restore_mp(skill.mp_cost)
-		return false
-
-	_cooldowns[source] = skill.cooldown
-	cooldown_changed.emit(source, skill.cooldown, skill.cooldown)
-	skill_used.emit(source, skill)
-	return true
-
-
-## ── 执行器 ──
-
-func _execute_projectile(skill: SkillData, caster: Node2D, direction: Vector2) -> bool:
-	var scene := skill.projectile_scene if skill.projectile_scene else skill.scene
-	if not scene:
-		return false
-	var instance := scene.instantiate() as Node2D
-	caster.get_tree().current_scene.add_child(instance)
-	instance.global_position = caster.global_position + direction * skill.cast_distance
-	if instance is Projectile:
-		var proj := instance as Projectile
-		proj.set_direction(direction)
-		proj.set_caster(caster)
-		proj.damage = skill.damage
-		proj.speed = skill.projectile_speed
-	return true
-
-
-func _execute_buff(skill: SkillData, caster: Node2D) -> bool:
-	if not skill.buff_resource:
-		return false
-	var buff_manager := caster.get_node_or_null("BuffManager")
-	if not buff_manager:
-		return false
-	var buff := skill.buff_resource.duplicate() as Buff
-	if skill.buff_duration > 0:
-		buff.duration = skill.buff_duration
-	buff_manager.apply_buff(buff)
-	return true
-
-
-func _execute_aoe(skill: SkillData, caster: Node2D, direction: Vector2) -> bool:
-	if not skill.aoe_scene:
-		return false
-	var instance := skill.aoe_scene.instantiate() as Node2D
-	caster.get_tree().current_scene.add_child(instance)
-	instance.global_position = caster.global_position + direction * skill.cast_distance
-	if "damage" in instance:
-		instance.damage = skill.damage
-	if instance.has_method("set_caster"):
-		instance.set_caster(caster)
-	return true
-
-
-func _execute_dash(skill: SkillData, caster: Node2D, direction: Vector2) -> bool:
-	if not caster is CharacterBody2D:
-		return false
-	var body := caster as CharacterBody2D
-
-	# 暗影步：优先传送到敌人身后
-	var target_pos := body.global_position + direction * skill.dash_distance
-	if skill.buff_resource:
-		target_pos = _find_shadow_step_target(body, direction, skill.dash_distance)
-
-	var tween := body.create_tween()
-	tween.tween_property(body, "global_position", target_pos,
-		body.global_position.distance_to(target_pos) / skill.dash_speed
-	).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
-
-	if skill.buff_resource:
-		tween.tween_callback(_apply_dash_buff.bind(skill, caster))
-	return true
-
-
-## 暗影步：扫描方向内最近的敌人，返回其身后位置
-func _find_shadow_step_target(body: CharacterBody2D, direction: Vector2, max_dist: float) -> Vector2:
-	var best_target := Vector2.INF
-	var best_dist := max_dist
-
-	for enemy in body.get_tree().get_nodes_in_group("enemy"):
-		var epos: Vector2 = enemy.global_position
-		var to_enemy := epos - body.global_position
-		var proj_dist := to_enemy.dot(direction)
-		# 只考虑前方的敌人
-		if proj_dist <= 0 or proj_dist > max_dist:
-			continue
-		# 横向偏移不能太大（不能太偏）
-		var lateral := (to_enemy - direction * proj_dist).length()
-		if lateral > 80:
-			continue
-		if proj_dist < best_dist:
-			best_dist = proj_dist
-			# 身后 = 敌人位置 + 从玩家指向敌人的方向 * 40px
-			best_target = epos + direction * 40.0
-
-	if best_target != Vector2.INF:
-		return best_target
-	# 没找到敌人，普通闪现
-	return body.global_position + direction * max_dist
-
-
-func _apply_dash_buff(skill: SkillData, caster: Node2D) -> void:
-	var buff_manager := caster.get_node_or_null("BuffManager")
-	if not buff_manager:
-		return
-	var buff := skill.buff_resource.duplicate() as Buff
-	if skill.buff_duration > 0:
-		buff.duration = skill.buff_duration
-	buff_manager.apply_buff(buff)
-
-
-## ── 初始化 ──
-
-func initialize(pool: SkillPool) -> void:
-	for i in range(MAX_SLOTS):
-		_slots[i] = {"skill": null, "cooldown": 0.0}
-		if pool and i < pool.skills.size():
-			_slots[i]["skill"] = pool.skills[i]
-			slot_changed.emit(i)
-
-
-## ── 查询冷却（兼容旧 API） ──
-
-func _get_cooldown_total(source: String) -> float:
-	match source:
-		"left":  return left_hand_skill.cooldown if left_hand_skill else 1.0
-		"right": return right_hand_skill.cooldown if right_hand_skill else 1.0
-	var idx := source.trim_prefix("slot_").to_int()
-	if idx >= 0 and idx < MAX_SLOTS:
-		var skill: SkillData = _slots[idx]["skill"]
-		return skill.cooldown if skill else 1.0
-	return 1.0
 
 
 func get_cooldown(source: String) -> float:
@@ -282,3 +138,83 @@ func get_cooldown(source: String) -> float:
 
 func get_cooldown_total(source: String) -> float:
 	return _get_cooldown_total(source)
+
+
+## ── 释放（委托给 SkillExecutor） ──
+
+func use_hand(hand: String, caster: Node2D, direction: Vector2) -> bool:
+	var inst: SkillInstance = left_hand if hand == "left" else right_hand
+	if not inst or not inst.data:
+		return false
+	return _execute(inst.data, hand, caster, direction)
+
+
+func use_slot(idx: int, caster: Node2D, direction: Vector2) -> bool:
+	if idx < 0 or idx >= MAX_SLOTS:
+		return false
+	var inst := _slots[idx]
+	if not inst or not inst.data:
+		return false
+	return _execute(inst.data, "slot_%d" % idx, caster, direction)
+
+
+## ── 内部执行（委托给 SkillExecutor） ──
+
+func _execute(skill: SkillData, source: String, caster: Node2D, direction: Vector2) -> bool:
+	# 冷却检查
+	var inst := _find_instance(source)
+	if inst and not inst.is_ready():
+		return false
+
+	# MP 检查
+	var mana := caster.get_node_or_null("ManaComponent") as ManaComponent
+	if mana and skill.mp_cost > 0 and not mana.use_mp(skill.mp_cost):
+		return false
+
+	# 委托给 SkillExecutor
+	var ctx := CastContext.simple(caster, direction, skill)
+	var ok := executor.execute(skill, ctx)
+
+	if not ok:
+		if mana and skill.mp_cost > 0:
+			mana.restore_mp(skill.mp_cost)
+		return false
+
+	# 触发冷却
+	if inst:
+		inst.trigger_cooldown()
+	_cooldowns[source] = skill.cooldown
+	cooldown_changed.emit(source, skill.cooldown, skill.cooldown)
+	skill_used.emit(source, skill)
+	return true
+
+
+func _find_instance(source: String) -> SkillInstance:
+	match source:
+		"left":  return left_hand
+		"right": return right_hand
+	var idx := source.trim_prefix("slot_").to_int()
+	if idx >= 0 and idx < MAX_SLOTS:
+		return _slots[idx]
+	return null
+
+
+## ── 冷却内部 ──
+
+func _get_cooldown_total(source: String) -> float:
+	var inst := _find_instance(source)
+	if inst and inst.data:
+		return inst.data.cooldown
+	return 1.0
+
+
+## ── 初始化（兼容旧 API） ──
+
+func initialize(pool_res: SkillPool) -> void:
+	pool = pool_res
+	pool.build()
+	for i in range(MAX_SLOTS):
+		_slots[i] = null
+		if pool_res and i < pool_res.skills.size():
+			_slots[i] = SkillInstance.new(pool_res.skills[i])
+			slot_changed.emit(i)

@@ -75,6 +75,9 @@ func _ready() -> void:
 	# 技能初始化
 	_setup_skills()
 
+	# 战斗事件总线（如果有则复用，没有则创建）
+	_setup_event_bus()
+
 	# 转发组件信号 → Player 信号
 	health_component.health_changed.connect(_on_health_changed)
 	health_component.died.connect(_on_died)
@@ -168,34 +171,94 @@ func restore_mp(amount: int) -> void:
 ## ── 技能初始化 ──
 
 func _setup_skills() -> void:
+	# 1. 加载技能池（注册表）
 	_skill_pool = load("res://skills/player_skill_pool.tres") as SkillPool
 	if not _skill_pool:
 		_skill_pool = SkillPool.new()
 
-	# 确保火球在池中
+	# 2. 确保所有技能在池中（纯数据，不计算伤害）
 	if not _skill_pool.has_skill("fireball"):
 		var fireball := load("res://skills/fireball_data.tres") as SkillData
 		if fireball:
 			fireball.projectile_scene = load("res://skills/fireball.tscn")
-			fireball.damage = 25 + stats_component.magic_damage
+			fireball.damage = 25
+			fireball.damage_scaling = 1.0          # 100% 魔法伤害加成
 			fireball.mp_cost = 15
 			fireball.skill_type = SkillData.SkillType.PROJECTILE
 			_skill_pool.add_skill(fireball)
 
-	# 加入冰霜护盾、烈焰风暴、暗影步
 	for sid in ["ice_armor", "flame_storm", "shadow_step"]:
 		if not _skill_pool.has_skill(sid):
 			var skill := load("res://skills/%s_data.tres" % sid) as SkillData
 			if skill:
 				if sid == "flame_storm":
-					skill.cast_distance = 150.0  # AoE 施法距离
+					skill.cast_distance = 150.0
+					skill.damage_scaling = 1.2       # 120% 魔法伤害加成
 				_skill_pool.add_skill(skill)
 
-	# 装备：左手冰甲、右手火球、键1烈焰风暴、键2暗影步
-	skill_manager.equip_hand("left", _skill_pool.get_skill("ice_armor"))
-	skill_manager.equip_hand("right", _skill_pool.get_skill("fireball"))
-	skill_manager.equip_slot(0, _skill_pool.get_skill("flame_storm"))
-	skill_manager.equip_slot(1, _skill_pool.get_skill("shadow_step"))
+	# 3. 构建索引
+	_skill_pool.build()
+
+	# 4. 注入 pool 到 skill_manager（供 loadout 使用）
+	skill_manager.pool = _skill_pool
+
+	# 5. 应用装备映射表
+	var loadout := SkillLoadout.create(
+		"ice_armor",    # 左手
+		"fireball",     # 右手
+		["flame_storm", "shadow_step"]  # 快捷键槽位
+	)
+	skill_manager.apply_loadout(loadout)
+
+	# 6. 注入 Modifier Pipeline（伤害不是算出来的，是一层层改出来的）
+	_setup_damage_modifiers()
+
+
+## 配置伤害管线（分阶段：FLAT → MULTIPLY → OVERRIDE → FINAL）
+func _setup_damage_modifiers() -> void:
+	var executor := skill_manager.executor
+	if not executor:
+		return
+
+	# Stage FLAT: 属性缩放 — 智力 → 魔法伤害
+	var stat_mod := StatScalingModifier.new()
+	stat_mod.stat_name = "magic_damage"
+	stat_mod.ratio = 1.0  # fallback，技能自身的 damage_scaling 优先
+	executor.add_modifier(stat_mod)
+
+	# Stage MULTIPLY: 火焰增伤 +20%（示例：火系天赋/装备）
+	# var fire_mod := TagMultiplierModifier.new()
+	# fire_mod.required_tags = ["fire"]
+	# fire_mod.multiplier = 1.2
+	# executor.add_modifier(fire_mod)
+
+	# Stage OVERRIDE: 火焰免疫（示例：Boss 词缀）
+	# var fire_immune := TagMultiplierModifier.new()
+	# fire_immune.required_tags = ["fire"]
+	# fire_immune.multiplier = 0.0
+	# fire_immune.stage = DamageModifier.Stage.OVERRIDE
+	# executor.add_modifier(fire_immune)
+
+
+## 确保全局 CombatEventBus 存在
+func _setup_event_bus() -> void:
+	if CombatEventBus.instance:
+		return
+	var bus := CombatEventBus.new()
+	bus.name = "CombatEventBus"
+	get_tree().current_scene.add_child.call_deferred(bus)
+	print("📡 CombatEventBus 已创建")
+
+	# 注册演示：ON_KILL → 额外经验
+	var on_kill_exp := OnKillBonusExp.new()
+	on_kill_exp.bonus_exp = 15
+	# deferred: 等 bus 进入场景树后再注册
+	call_deferred("_register_triggered_effects", on_kill_exp)
+
+
+func _register_triggered_effects(effect: TriggeredEffect) -> void:
+	effect.register()
+	print("⚡ 已注册触发效果: ", effect.get_script().get_global_name())
 
 
 ## ── 信号转发 ──
