@@ -17,7 +17,7 @@ var _pending: Dictionary = {}
 @onready var _panel: Panel = $Panel
 @onready var _level_label: Label = $Panel/MarginContainer/MainVBox/LevelLabel
 @onready var _points_label: Label = $Panel/MarginContainer/MainVBox/PointsLabel
-@onready var _derived_label: Label = $Panel/MarginContainer/MainVBox/DerivedStatsLabel
+@onready var _derived_label: RichTextLabel = $Panel/MarginContainer/MainVBox/DerivedStatsLabel
 @onready var _confirm_button: Button = $Panel/MarginContainer/MainVBox/ConfirmButton
 @onready var _effect_flash: ColorRect = $LevelUpEffect/FlashRect
 @onready var _effect_label: Label = $LevelUpEffect/LevelUpText
@@ -38,6 +38,12 @@ func _ready() -> void:
 	hide()
 	_setup_stat_rows()
 	_confirm_button.pressed.connect(_on_confirm_pressed)
+
+
+func _input(event: InputEvent) -> void:
+	# 面板显示时只拦截键盘输入，保留鼠标给 UI 按钮
+	if visible and event is InputEventKey:
+		get_viewport().set_input_as_handled()
 
 
 func setup(comp: StatsComponent) -> void:
@@ -75,7 +81,6 @@ func _on_level_up(new_level: int) -> void:
 
 func _show_with_effect() -> void:
 	show()
-	get_tree().paused = true
 
 	# 重置特效元素
 	_effect_flash.modulate.a = 0.7
@@ -109,7 +114,6 @@ func _hide() -> void:
 	tween.tween_property(_panel, "modulate:a", 0.0, 0.2)
 	tween.tween_property(_panel, "scale", Vector2(0.9, 0.9), 0.2)
 	tween.tween_callback(hide).set_delay(0.2)
-	tween.tween_callback(func(): get_tree().paused = false).set_delay(0.2)
 
 
 ## ── 按钮回调 ──
@@ -200,23 +204,23 @@ func _refresh_derived_preview() -> void:
 		return
 
 	# 计算临时属性值（当前 + 待确认）
-	var s := stats_component.strength + _pending.get("strength", 0)
-	var i := stats_component.intelligence + _pending.get("intelligence", 0)
-	var a := stats_component.agility + _pending.get("agility", 0)
-	var e := stats_component.endurance + _pending.get("endurance", 0)
+	var s: int = stats_component.strength + (_pending.get("strength", 0) as int)
+	var i: int = stats_component.intelligence + (_pending.get("intelligence", 0) as int)
+	var a: int = stats_component.agility + (_pending.get("agility", 0) as int)
+	var e: int = stats_component.endurance + (_pending.get("endurance", 0) as int)
 
-	var hp_bonus := e * 5
-	var phys_dmg := s * 2
-	var magic_dmg := i * 2
-	var speed_bonus := a * 3.0
+	var hp_bonus: int = e * 5
+	var phys_dmg: int = s * 2
+	var magic_dmg: int = i * 2
+	var speed_bonus: float = a * 3.0
 
 	var lines: Array[String] = ["━━ 派生属性预览 ━━"]
 
 	# 对比当前值
-	var cur_hp := stats_component.endurance * 5
-	var cur_phys := stats_component.strength * 2
-	var cur_magic := stats_component.intelligence * 2
-	var cur_speed := stats_component.agility * 3.0
+	var cur_hp: int = stats_component.endurance * 5
+	var cur_phys: int = stats_component.strength * 2
+	var cur_magic: int = stats_component.intelligence * 2
+	var cur_speed: float = stats_component.agility * 3.0
 
 	if hp_bonus != cur_hp:
 		lines.append("❤️ 生命加成: %d → %s" % [cur_hp, _colored(hp_bonus, cur_hp)])
@@ -238,7 +242,9 @@ func _refresh_derived_preview() -> void:
 	else:
 		lines.append("💨 移速加成: %.0f" % speed_bonus)
 
-	_derived_label.text = "\n".join(lines)
+	_derived_label.clear()
+	for line in lines:
+		_derived_label.append_text(line + "\n")
 
 
 func _colored(new_val: int, old_val: int) -> String:

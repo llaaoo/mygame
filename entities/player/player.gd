@@ -80,12 +80,35 @@ func _ready() -> void:
 
 ## ── 属性系统 ──
 
+## 追踪上一次属性推导值，用于增量应用（保留装备加成不被覆盖）
+var _last_stat_hp: int = 0
+var _last_stat_dmg: int = 0
+var _last_stat_speed: float = 0.0
+
+
 func _apply_stats() -> void:
 	stats_component._recalculate_all()
-	move_speed = base_move_speed + stats_component.move_speed_bonus
-	health_component.max_hp = 50 + stats_component.max_hp_bonus
-	health_component.hp = health_component.max_hp
-	combat_component.attack_damage = 10 + stats_component.physical_damage
+
+	var new_hp := 50 + stats_component.max_hp_bonus
+	var new_dmg := 10 + stats_component.physical_damage
+	var new_speed := base_move_speed + stats_component.move_speed_bonus
+
+	if _last_stat_hp == 0:
+		# 首次调用：绝对赋值
+		health_component.max_hp = new_hp
+		combat_component.attack_damage = new_dmg
+		move_speed = new_speed
+	else:
+		# 后续调用：只应用差值，保留装备等外部加成
+		health_component.max_hp += new_hp - _last_stat_hp
+		combat_component.attack_damage += new_dmg - _last_stat_dmg
+		move_speed += new_speed - _last_stat_speed
+
+	health_component.hp = clampi(health_component.hp, 1, health_component.max_hp)
+
+	_last_stat_hp = new_hp
+	_last_stat_dmg = new_dmg
+	_last_stat_speed = new_speed
 
 
 func _on_stat_changed(_stat_name: String, _new_value: int) -> void:
