@@ -42,10 +42,4 @@ func _on_body_entered(body: Node2D) -> void:
 
 
 func _emit_hit_event(target: Node2D) -> void:
-	var bus := CombatEventBus.instance
-	if not bus:
-		return
-	var ev := CombatEvent.create(CombatEvent.Type.ON_HIT, caster, target)
-	ev.data["damage"] = damage
-	ev.data["position"] = global_position
-	bus.emit(ev)
+	CombatExecutor.report_hit(caster, target, damage, global_position)

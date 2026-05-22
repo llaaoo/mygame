@@ -35,20 +35,44 @@ var modifiers: Array[DamageModifier]:
 
 func resolve_damage(skill: SkillData, ctx: CastContext) -> int:
 	var dc := DamageContext.from_cast(skill, ctx)
+	var trace := CombatDebugger.active()
 
-	_apply_stage(dc, DamageModifier.Stage.FLAT)
-	_apply_stage(dc, DamageModifier.Stage.MULTIPLY)
-	_apply_stage(dc, DamageModifier.Stage.OVERRIDE)
-	_apply_stage(dc, DamageModifier.Stage.FINAL)
+	if trace:
+		trace.record(
+			CombatTraceEvent.Category.DAMAGE_RESOLVE,
+			CombatPhase.Phase.MODIFIER,
+			"resolve_damage: %s" % skill.display_name,
+			skill.get_id(), "",
+			{"base_damage": dc.base_damage},
+			{},
+			{"tags": skill.tags}
+		)
 
-	return maxi(1, dc.final_damage)
+	_apply_stage(dc, DamageModifier.Stage.FLAT, trace)
+	_apply_stage(dc, DamageModifier.Stage.MULTIPLY, trace)
+	_apply_stage(dc, DamageModifier.Stage.OVERRIDE, trace)
+	_apply_stage(dc, DamageModifier.Stage.FINAL, trace)
+
+	var result := maxi(1, dc.final_damage)
+
+	if trace:
+		trace.final_damage = result
+
+	return result
 
 
-## 执行单个阶段的所有 modifier
-func _apply_stage(ctx: DamageContext, stage: DamageModifier.Stage) -> void:
+## 执行单个阶段的所有 modifier（带 trace）
+func _apply_stage(ctx: DamageContext, stage: DamageModifier.Stage, trace: CombatTrace = null) -> void:
+	var stage_names := ["FLAT", "MULTIPLY", "OVERRIDE", "FINAL"]
 	for mod in modifiers_by_stage[stage]:
 		if mod and mod.enabled:
+			var before := ctx.final_damage
 			mod.modify(ctx)
+			var after := ctx.final_damage
+
+			if trace and before != after:
+				var mod_name := mod.get_script().get_global_name() if mod.get_script() else "UnknownModifier"
+				trace.record_modifier(mod_name, stage_names[stage], before, after, ctx.tags)
 
 
 ## ── 统一施法入口 ──
@@ -56,6 +80,18 @@ func _apply_stage(ctx: DamageContext, stage: DamageModifier.Stage) -> void:
 func execute(skill: SkillData, context: CastContext) -> bool:
 	if not skill or not context or not context.caster:
 		return false
+
+	# 开始追踪
+	var trace := CombatDebugger.begin("cast_%s" % skill.get_id(), skill.display_name)
+	if trace:
+		trace.record(
+			CombatTraceEvent.Category.PHASE_ENTER,
+			CombatPhase.Phase.INPUT,
+			"cast: %s" % skill.display_name,
+			skill.get_id(), "",
+			{"mp_cost": skill.mp_cost, "cooldown": skill.cooldown},
+			{}
+		)
 
 	var ok := false
 	match skill.skill_type:
@@ -71,18 +107,24 @@ func execute(skill: SkillData, context: CastContext) -> bool:
 	if ok:
 		_emit_event(CombatEvent.Type.ON_CAST, context.caster, context.target, skill)
 
+	# 存储追踪
+	if trace:
+		trace.record(
+			CombatTraceEvent.Category.SKILL_EXECUTE,
+			CombatPhase.Phase.POST,
+			"done: %s" % skill.display_name,
+			skill.get_id(), "",
+			{},
+			{"success": ok, "final_damage": trace.final_damage}
+		)
+		CombatDebugger.store(trace)
+
 	return ok
 
 
-## 发射战斗事件到全局总线
+## 发射战斗事件 → CombatExecutor（唯一权威入口）
 func _emit_event(type: CombatEvent.Type, source: Node2D, target: Node2D = null, skill: SkillData = null, extra_data: Dictionary = {}) -> void:
-	var bus := CombatEventBus.instance
-	if not bus:
-		return
-	var ev := CombatEvent.create(type, source, target)
-	ev.skill = skill
-	ev.data = extra_data
-	bus.emit(ev)
+	CombatExecutor.report_cast(source, target, skill)
 
 
 ## ── 投射物 ──

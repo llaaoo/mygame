@@ -14,6 +14,12 @@ extends Node
 ## ── 全局静态访问 ──
 static var instance: CombatEventBus = null
 
+## 当前事件发射深度（防递归爆炸，TriggeredEffect.max_recursion 引用）
+static var _emit_depth: int = 0
+
+## 硬上限（不可绕过）
+const MAX_DEPTH_HARD: int = 5
+
 
 ## ── 订阅表 ──
 ## key = CombatEvent.Type (int), value = Array[Callable]
@@ -60,13 +66,22 @@ func emit(ev: CombatEvent) -> void:
 	if not _listeners.has(ev.type):
 		return
 
+	# 硬上限防火墙
+	if _emit_depth >= MAX_DEPTH_HARD:
+		push_warning("[CombatEventBus] emit blocked: max depth %d reached" % MAX_DEPTH_HARD)
+		return
+
+	# 递归深度 +1
+	_emit_depth += 1
+
 	# 复制列表，防止回调中修改订阅表
 	var arr: Array = _listeners[ev.type].duplicate()
 	for cb in arr:
 		# 容错：单个回调崩溃不中断其他
-		var result := cb.call(ev)
-		if result is CombatEvent and result.type == CombatEvent.Type.ON_KILL:
-			pass  # reserved for chaining
+		cb.call(ev)
+
+	# 递归深度 -1
+	_emit_depth -= 1
 
 
 ## ── 静态快捷方法 ──

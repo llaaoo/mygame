@@ -810,5 +810,61 @@
 		"created": "2026-05-23T01:13:33",
 		"id": "fact_1779470013",
 		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Condition System (systems/conditions/) provides intelligent filtering for TriggeredEffect. Base Condition class with evaluate(ctx)→bool and invert support. Concrete conditions: TagCondition (group check), StatusCondition (buff check), LowHPCondition (hp threshold), SkillTagCondition (skill tag check), TargetTypeCondition (player/enemy/boss). Conditions execute in array order (AND logic), fail-fast on first false.",
+		"created": "2026-05-23T01:19:06",
+		"id": "fact_1779470346",
+		"source": "ai"
+	},
+	{
+		"category": "convention",
+		"content": "TriggeredEffect upgraded with conditions Array, scope_source (skill/buff/equipment/global), max_recursion (depth limit for chain prevention). CombatEventBus has static _emit_depth counter incremented during emit(). Recursion guard: TriggeredEffect skips if _emit_depth > max_recursion. OnKillBonusExp uses create_for_player() factory with TargetTypeCondition. OnHitFireBonus demonstrates multi-condition chain (SkillTagCondition + TargetTypeCondition).",
+		"created": "2026-05-23T01:19:06",
+		"id": "fact_1779470346",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Effect Graph system (systems/effect_graph/) enables composable node trees instead of flat rule lists. EffectNode base class with process(ctx). Flow nodes: SequenceNode (sequential children), BranchNode (if→true/false), ConditionGateNode (condition→pass/skip), EmptyNode (terminal). Leaf nodes: CallableNode (wraps lambda), LogNode (debug). EffectGraph container holds root node, run(ev) creates EffectGraphContext and executes tree. TriggeredEffect upgraded with optional graph field — when set, graph mode replaces flat conditions+_execute.",
+		"created": "2026-05-23T01:24:45",
+		"id": "fact_1779470685",
+		"source": "ai"
+	},
+	{
+		"category": "convention",
+		"content": "Graph demo in player.gd: ON_HIT fire skill → ConditionGate(fire) → Branch(IsBoss → BossLog, NormalLog). EffectGraphContext carries event/source/target/skill/data with halt() for early termination and store dict for inter-node communication. All nodes are Resources (can be .tres), enabling data-driven graph construction in editor.",
+		"created": "2026-05-23T01:24:45",
+		"id": "fact_1779470685",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Single Authority Rule enforced: CombatExecutor is the sole event emission authority. All systems (SkillExecutor, Projectile, FlameStorm, HealthComponent) route through CombatExecutor.report_*() static methods instead of directly accessing CombatEventBus. CombatExecutor enforces phase gating (_can_emit_in_phase), depth firewall (MAX_EVENT_DEPTH=3), and chain firewall (MAX_CHAIN_LENGTH=5). CombatEventBus has hard MAX_DEPTH_HARD=5 limit.",
+		"created": "2026-05-23T01:35:19",
+		"id": "fact_1779471319",
+		"source": "ai"
+	},
+	{
+		"category": "convention",
+		"content": "CombatPhase enum: IDLE→INPUT→CONDITION→MODIFIER→EFFECT→EVENT→POST. CombatScope enum: SKILL/BATTLE/GLOBAL. CombatExecutor.current_phase tracks active phase. Cross-phase calls are rejected. Modifier Pipeline (ONLY values), Event Bus (ONLY broadcast), Condition System (ONLY bool), Effect Graph (ONLY behavior). No system may cross layers.",
+		"created": "2026-05-23T01:35:19",
+		"id": "fact_1779471319",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Combat Trace System (systems/debug/) provides observability into every combat step. CombatTraceEvent records category/phase/input/output/metadata. CombatTrace collects events for one chain with query methods (find_by_category, get_damage_chain). CombatDebugger is static storage (MAX_TRACES=50) with begin/active/store/get_last/find_by_skill/replay_step/summarize. CombatDebugUI is a toggleable (~ key) panel showing BBCode-formatted trace with color-coded events.",
+		"created": "2026-05-23T01:43:10",
+		"id": "fact_1779471790",
+		"source": "ai"
+	},
+	{
+		"category": "convention",
+		"content": "Trace integration: SkillExecutor.execute() calls CombatDebugger.begin(), resolve_damage() records per-modifier before/after deltas, execute() stores on completion. CombatExecutor._enforce_emit() records EVENT_EMIT and FIREWALL_BLOCK. CombatDebugger.enabled is auto-set in OS.is_debug_build(). Trace recording is zero-cost when disabled — all calls check enabled flag first.",
+		"created": "2026-05-23T01:43:10",
+		"id": "fact_1779471790",
+		"source": "ai"
 	}
 ]

@@ -71,16 +71,8 @@ func _on_area_entered(area: Area2D) -> void:
 	queue_free()
 
 
-## 发射 ON_HIT 事件到全局总线
+## 发射 ON_HIT → CombatExecutor（唯一权威入口）
 func _emit_hit_event(target: Node2D) -> void:
-	var bus := CombatEventBus.instance
-	if not bus:
-		return
-	var ev := CombatEvent.create(CombatEvent.Type.ON_HIT, caster, target)
-	ev.data["damage"] = damage
-	ev.data["position"] = global_position
 	var skill := get_meta("skill_data", null) as SkillData
-	if skill:
-		ev.skill = skill
-		ev.data["tags"] = skill.tags
-	bus.emit(ev)
+	var tags: Array[String] = skill.tags if skill else []
+	CombatExecutor.report_hit(caster, target, damage, global_position, skill, tags)

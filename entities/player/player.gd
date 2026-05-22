@@ -240,25 +240,102 @@ func _setup_damage_modifiers() -> void:
 	# executor.add_modifier(fire_immune)
 
 
-## 确保全局 CombatEventBus 存在
+## 确保全局 CombatEventBus + CombatExecutor 存在
 func _setup_event_bus() -> void:
+	# CombatExecutor（唯一控制流入口，必须在 EventBus 之前）
+	if not CombatExecutor.instance:
+		var exec := CombatExecutor.new()
+		exec.name = "CombatExecutor"
+		get_tree().current_scene.add_child.call_deferred(exec)
+
+	# CombatEventBus（事件广播）
 	if CombatEventBus.instance:
 		return
 	var bus := CombatEventBus.new()
 	bus.name = "CombatEventBus"
 	get_tree().current_scene.add_child.call_deferred(bus)
-	print("📡 CombatEventBus 已创建")
+	print("📡 CombatEventBus + CombatExecutor 已创建")
 
-	# 注册演示：ON_KILL → 额外经验
-	var on_kill_exp := OnKillBonusExp.new()
-	on_kill_exp.bonus_exp = 15
-	# deferred: 等 bus 进入场景树后再注册
+	# 演示：ON_KILL 对敌人 → 额外经验（Condition: target_is_enemy）
+	var on_kill_exp := OnKillBonusExp.create_for_player(15)
 	call_deferred("_register_triggered_effects", on_kill_exp)
+
+	# 演示 EffectGraph：ON_HIT 火焰技能 → Branch(IsBoss → 双倍日志, Normal → 普通日志)
+	call_deferred("_register_graph_demo")
+
+	# 战斗调试器（开发模式下启用追踪 + UI）
+	call_deferred("_setup_combat_debugger")
 
 
 func _register_triggered_effects(effect: TriggeredEffect) -> void:
 	effect.register()
 	print("⚡ 已注册触发效果: ", effect.get_script().get_global_name())
+
+
+## 演示 EffectGraph：ON_HIT → 火焰技能分支
+func _register_graph_demo() -> void:
+	# 条件1: 技能必须是火焰标签
+	var fire_cond := SkillTagCondition.new()
+	fire_cond.required_skill_tag = "fire"
+
+	# 条件2: 目标必须是 Boss
+	var boss_cond := TargetTypeCondition.new()
+	boss_cond.target_is_boss = true
+	boss_cond.target_is_player = false
+	boss_cond.target_is_enemy = true
+
+	# 效果节点
+	var boss_log := LogNode.new()
+	boss_log.message = "🔥 Boss 被火焰命中！触发二段伤害！"
+	boss_log.node_name = "BossFireHit"
+
+	var normal_log := LogNode.new()
+	normal_log.message = "🔥 火焰命中"
+	normal_log.node_name = "NormalFireHit"
+
+	# 分支: if FireSkill AND Boss → BossLog, else → NormalLog
+	var fire_gate := ConditionGateNode.new()
+	fire_gate.condition = fire_cond
+	fire_gate.node_name = "Gate:IsFire"
+
+	var boss_branch := BranchNode.new()
+	boss_branch.condition = boss_cond
+	boss_branch.true_branch = boss_log
+	boss_branch.false_branch = normal_log
+	boss_branch.node_name = "Branch:IsBoss"
+
+	fire_gate.child = boss_branch
+
+	# 构建图
+	var graph := EffectGraph.new()
+	graph.root = fire_gate
+
+	# 创建 TriggeredEffect 包装
+	var effect := TriggeredEffect.new()
+	effect.trigger_type = CombatEvent.Type.ON_HIT
+	effect.graph = graph
+	effect.scope_source = "skill"
+	effect.max_recursion = 0
+
+	call_deferred("_register_triggered_effects_deferred", effect)
+
+
+func _register_triggered_effects_deferred(effect: TriggeredEffect) -> void:
+	effect.register()
+	print("🧠 已注册 EffectGraph: ", effect.graph.root.node_name if effect.graph else "(flat)")
+
+
+## 战斗调试器：开启追踪 + 挂载Debug UI
+func _setup_combat_debugger() -> void:
+	# 开发模式下默认开启追踪
+	if OS.is_debug_build():
+		CombatDebugger.enabled = true
+		print("📊 CombatDebugger: trace enabled")
+
+	# 挂载 Debug UI（按 ~ 切换）
+	var debug_ui := CombatDebugUI.new()
+	debug_ui.name = "CombatDebugUI"
+	get_tree().current_scene.add_child.call_deferred(debug_ui)
 
 
 ## ── 信号转发 ──

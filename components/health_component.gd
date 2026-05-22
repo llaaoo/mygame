@@ -74,34 +74,20 @@ func heal(amount: int) -> void:
 	_emit_heal_event(amount)
 
 
-## ── 事件发射 ──
+## ── 事件发射 → CombatExecutor（唯一权威入口） ──
 
 func _emit_damage_event(amount: int) -> void:
-	var bus := CombatEventBus.instance
-	if not bus:
-		return
-	var ev := CombatEvent.new()
-	ev.type = CombatEvent.Type.ON_DAMAGE
-	ev.target = get_parent()  ## HealthComponent 的父节点即实体
-	ev.data["damage"] = amount
-	ev.data["remaining_hp"] = hp
-	bus.emit(ev)
+	CombatExecutor.report_damage(get_parent(), amount, hp)
 
 
 func _emit_kill_event(amount: int) -> void:
-	var bus := CombatEventBus.instance
-	if not bus:
-		return
 	var parent := get_parent()
-	var ev := CombatEvent.new()
-	ev.type = CombatEvent.Type.ON_KILL
-	ev.target = parent
-	ev.data["overkill_damage"] = amount
-	ev.data["position"] = parent.get("global_position") if "global_position" in parent else Vector2.ZERO
-	bus.emit(ev)
+	var pos: Vector2 = parent.get("global_position") if "global_position" in parent else Vector2.ZERO
+	CombatExecutor.report_kill(parent, amount, pos)
 
 
 func _emit_heal_event(amount: int) -> void:
+	# 治疗事件暂不走 CombatExecutor 严格门控
 	var bus := CombatEventBus.instance
 	if not bus:
 		return

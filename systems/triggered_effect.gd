@@ -1,23 +1,39 @@
 class_name TriggeredEffect
 extends Resource
-## 触发式效果 — 订阅战斗事件并作出响应
+## 触发式效果 — Event + Condition + Effect 的完整闭环
 ## 
-## 这是"事件系统 → 行为系统"的桥梁
+## 支持两种模式：
+##   1. 简单模式：conditions[] + _execute()（向后兼容）
+##   2. 图模式：graph: EffectGraph（组合节点树）
 ## 
-## 用法：
-##   var effect := OnKillExplosion.new()
-##   effect.register()  # 自动订阅到 CombatEventBus
+## 当 graph 不为 null 时，优先使用图模式
 
 ## ── 配置 ──
 
 ## 监听的事件类型
 @export var trigger_type: CombatEvent.Type = CombatEvent.Type.ON_KILL
 
+## ── 简单模式（向后兼容） ──
+## 触发条件（AND 逻辑，全部满足才执行）
+@export var conditions: Array[Condition] = []
+
+## ── 图模式（优先） ──
+## 效果图 — 节点组合的完整执行树
+@export var graph: EffectGraph = null
+
 ## 是否启用
 @export var enabled: bool = true
 
 ## 冷却（秒，0=无冷却）
 @export var cooldown: float = 0.0
+
+## ── 作用域控制（防递归爆炸） ──
+
+## 作用域来源：skill / buff / equipment / global
+@export var scope_source: String = "skill"
+
+## 最大递归深度（0=不允许链式触发，1=允许触发1层新事件）
+@export var max_recursion: int = 0
 
 ## ── 运行时 ──
 var _last_trigger_time: float = -INF
@@ -30,21 +46,53 @@ func register() -> void:
 
 ## 从事件总线注销
 func unregister() -> void:
-	CombatEventBus.instance.unsubscribe(trigger_type, _on_event)
+	if CombatEventBus.instance:
+		CombatEventBus.instance.unsubscribe(trigger_type, _on_event)
 
 
-## 内部回调（处理冷却）
+## 内部回调：冷却 → 递归守卫 → 条件/图 → 执行
 func _on_event(ev: CombatEvent) -> void:
 	if not enabled:
 		return
+
+	# 递归守卫：超出深度上限则跳过
+	if CombatEventBus._emit_depth > max_recursion:
+		return
+
+	# 冷却检查
 	if cooldown > 0:
 		var now := Time.get_ticks_msec() / 1000.0
 		if now - _last_trigger_time < cooldown:
 			return
 		_last_trigger_time = now
+
+	# 🆕 图模式：优先
+	if graph and graph.root:
+		graph.run(ev)
+		return
+
+	# 简单模式：条件 → 执行
+	var ctx := _build_context(ev)
+	for cond in conditions:
+		if cond and not cond.check(ctx):
+			return
+
 	_execute(ev)
 
 
-## 子类覆写：响应事件的具体逻辑
+## 构建条件评估上下文
+func _build_context(ev: CombatEvent) -> Dictionary:
+	return {
+		"event": ev,
+		"source": ev.source,
+		"target": ev.target,
+		"skill": ev.skill,
+		"data": ev.data,
+		"depth": CombatEventBus._emit_depth,
+	}
+
+
+## 子类覆写：响应事件的具体逻辑（仅简单模式）
 func _execute(ev: CombatEvent) -> void:
 	pass
+
