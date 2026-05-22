@@ -866,5 +866,12 @@
 		"created": "2026-05-23T01:43:10",
 		"id": "fact_1779471790",
 		"source": "ai"
+	},
+	{
+		"category": "bug_fix",
+		"content": "Bug fixes: (1) BuffManager now has has_buff(name) method for StatusCondition lookup. (2) CombatExecutor._can_emit_in_phase() allows IDLE phase (default before phase tracking is activated), preventing all events from being silently dropped. (3) SkillExecutor.execute() calls CombatExecutor.instance.reset_chain() at start to prevent chain_count overflow after 5 casts. (4) OnHitFireBonus._execute() now checks target is alive and routes through HealthComponent directly to avoid re-entrant ON_HIT cascade. (5) EffectGraph.from_flat() removed unused trigger_type parameter.",
+		"created": "2026-05-23T01:50:58",
+		"id": "fact_1779472258",
+		"source": "ai"
 	}
 ]

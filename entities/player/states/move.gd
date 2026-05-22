@@ -81,7 +81,9 @@ func _can_cast(source: String) -> bool:
 	match source:
 		"left":  return sm.has_left_spell()
 		"right": return sm.has_right_spell()
-		_:       return sm.get_slot(source.trim_prefix("slot_").to_int())["skill"] != null
+		_:       
+			var inst: SkillInstance = sm.get_slot(source.trim_prefix("slot_").to_int())
+			return inst != null and inst.data != null
 
 
 func _cast(source: String) -> bool:
@@ -91,11 +93,13 @@ func _cast(source: String) -> bool:
 
 
 func _show_aim_for(source: String) -> void:
-	var skill: SkillData
+	var skill: SkillData = null
 	var sm = entity.skill_manager
 	match source:
-		"left":  skill = sm.left_hand_skill
-		"right": skill = sm.right_hand_skill
-		_:       skill = sm.get_slot(source.trim_prefix("slot_").to_int())["skill"]
+		"left":  skill = sm.left_hand.data if sm.left_hand else null
+		"right": skill = sm.right_hand.data if sm.right_hand else null
+		_:
+			var inst: SkillInstance = sm.get_slot(source.trim_prefix("slot_").to_int())
+			skill = inst.data if inst else null
 	if skill:
 		entity.show_aim(source, skill)

@@ -99,7 +99,7 @@ static func summarize(trace: CombatTrace) -> String:
 				var delta: int = ev.metadata.get("delta", 0)
 				lines.append("%s 📊 %s: %d → %d (%+d)" % [prefix, ev.event_name, ev.input_data.get("damage", 0), ev.output_data.get("damage", 0), delta])
 			CombatTraceEvent.Category.CONDITION_CHECK:
-				var r := ev.output_data.get("result", false)
+				var r: bool = ev.output_data.get("result", false)
 				lines.append("%s 🔍 %s: %s" % [prefix, ev.event_name, "✅" if r else "❌"])
 			CombatTraceEvent.Category.EVENT_EMIT:
 				lines.append("%s 📡 %s → %s" % [prefix, ev.event_name, ev.target])

@@ -54,7 +54,8 @@ func unsubscribe(event_type: CombatEvent.Type, callback: Callable) -> void:
 
 ## 一次性订阅（触发后自动移除）
 func once(event_type: CombatEvent.Type, callback: Callable) -> void:
-	var wrapper: Callable = func(ev: CombatEvent):
+	var wrapper: Callable
+	wrapper = func(ev: CombatEvent):
 		unsubscribe(event_type, wrapper)
 		callback.call(ev)
 	subscribe(event_type, wrapper)
@@ -76,9 +77,21 @@ func emit(ev: CombatEvent) -> void:
 
 	# 复制列表，防止回调中修改订阅表
 	var arr: Array = _listeners[ev.type].duplicate()
+	var pruned := false
 	for cb in arr:
-		# 容错：单个回调崩溃不中断其他
+		# 容错：跳过已释放的回调
+		if not (cb as Callable).is_valid():
+			pruned = true
+			continue
 		cb.call(ev)
+
+	# 清理无效回调
+	if pruned:
+		var clean: Array = []
+		for cb in _listeners[ev.type]:
+			if (cb as Callable).is_valid():
+				clean.append(cb)
+		_listeners[ev.type] = clean
 
 	# 递归深度 -1
 	_emit_depth -= 1

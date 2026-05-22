@@ -71,7 +71,7 @@ func _apply_stage(ctx: DamageContext, stage: DamageModifier.Stage, trace: Combat
 			var after := ctx.final_damage
 
 			if trace and before != after:
-				var mod_name := mod.get_script().get_global_name() if mod.get_script() else "UnknownModifier"
+				var mod_name: String = mod.get_script().get_global_name() if mod.get_script() else "UnknownModifier"
 				trace.record_modifier(mod_name, stage_names[stage], before, after, ctx.tags)
 
 
@@ -80,6 +80,10 @@ func _apply_stage(ctx: DamageContext, stage: DamageModifier.Stage, trace: Combat
 func execute(skill: SkillData, context: CastContext) -> bool:
 	if not skill or not context or not context.caster:
 		return false
+
+	# 重置链式计数（每次新技能施放开始新链）
+	if CombatExecutor.instance:
+		CombatExecutor.instance.reset_chain()
 
 	# 开始追踪
 	var trace := CombatDebugger.begin("cast_%s" % skill.get_id(), skill.display_name)

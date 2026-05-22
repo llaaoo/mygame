@@ -22,7 +22,7 @@ func run(ev: CombatEvent) -> void:
 
 
 ## 从 TriggeredEffect 的旧模式迁移：条件列表 → ConditionGate + 效果
-static func from_flat(trigger_type: CombatEvent.Type, conds: Array[Condition], action: EffectNode) -> EffectGraph:
+static func from_flat(conds: Array[Condition], action: EffectNode) -> EffectGraph:
 	var graph := EffectGraph.new()
 
 	if conds.is_empty():

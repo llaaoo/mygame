@@ -36,7 +36,7 @@ static func from_cast(skill: SkillData, ctx: CastContext) -> DamageContext:
 	dc.caster = ctx.caster
 	dc.target = ctx.target
 	dc.skill = skill
-	dc.tags = skill.tags.duplicate() if skill.tags else []
+	dc.tags.assign(skill.tags.duplicate() if skill.tags else [])
 	return dc
 
 

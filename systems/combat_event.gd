@@ -37,5 +37,5 @@ static func create(event_type: Type, source: Node2D, target: Node2D = null) -> C
 
 ## 调试字符串
 func _to_string() -> String:
-	var tname := Type.keys()[type] if type < Type.size() else "UNKNOWN"
+	var tname: String = Type.keys()[type] if type < Type.size() else "UNKNOWN"
 	return "CombatEvent(%s | src=%s → tgt=%s | data=%s)" % [tname, source, target, data]

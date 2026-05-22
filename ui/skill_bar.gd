@@ -96,11 +96,13 @@ func _refresh_all() -> void:
 
 func _refresh_idx(idx: int) -> void:
 	var src := _sources[idx]
-	var skill: SkillData
+	var skill: SkillData = null
 	match src:
-		"left":  skill = _skill_manager.left_hand_skill
-		"right": skill = _skill_manager.right_hand_skill
-		_:       skill = _skill_manager.get_slot(src.trim_prefix("slot_").to_int())["skill"]
+		"left":  skill = _skill_manager.left_hand.data if _skill_manager.left_hand else null
+		"right": skill = _skill_manager.right_hand.data if _skill_manager.right_hand else null
+		_:
+			var inst := _skill_manager.get_slot(src.trim_prefix("slot_").to_int())
+			skill = inst.data if inst else null
 
 	var icon := _icons[idx]
 	if skill and skill.icon:

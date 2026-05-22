@@ -119,13 +119,16 @@ func _record_trace_event(type: CombatEvent.Type, source: Node2D, target: Node2D,
 	var trace := CombatDebugger.active()
 	if not trace:
 		return
-	var src_name := source.name if source else "?"
-	var tgt_name := target.name if target else "?"
+	var src_name: String = source.name if source else "?"
+	var tgt_name: String = target.name if target else "?"
 	trace.record_event(CombatEvent.Type.keys()[type], src_name, tgt_name, data)
 
 
 ## 阶段门控：某些事件类型只能在特定阶段发射
 func _can_emit_in_phase(type: CombatEvent.Type) -> bool:
+	# IDLE 阶段允许（phase tracking 未激活时的默认状态）
+	if current_phase == CombatPhase.Phase.IDLE:
+		return true
 	# EVENT 阶段允许所有类型
 	if current_phase == CombatPhase.Phase.EVENT:
 		return true

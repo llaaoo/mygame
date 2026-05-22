@@ -46,6 +46,14 @@ func remove_buff(buff: Buff) -> void:
 	print("🔴 BuffManager: 移除 %s" % buff.display_name)
 
 
+## 检查是否拥有指定名称的 Buff（供 StatusCondition 等系统查询）
+func has_buff(buff_name: String) -> bool:
+	for buff in _active_buffs:
+		if buff.display_name == buff_name:
+			return true
+	return false
+
+
 ## 移除所有 Buff（死亡/重置时）
 func clear_all() -> void:
 	for buff in _active_buffs:
