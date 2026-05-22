@@ -1,0 +1,237 @@
+[gd_scene format=3 uid="uid://b71dje7n4ax0m"]
+
+[ext_resource type="Script" uid="uid://4q5ses65uv1k" path="res://ui/level_up_ui.gd" id="1_hgbw6"]
+
+[node name="LevelUpUI" type="CanvasLayer" unique_id=1281822551]
+script = ExtResource("1_hgbw6")
+
+[node name="LevelUpEffect" type="Control" parent="." unique_id=1820411746]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="FlashRect" type="ColorRect" parent="LevelUpEffect" unique_id=820698280]
+layout_mode = 0
+mouse_filter = 2
+color = Color(1, 0.85, 0.3, 0.7)
+
+[node name="LevelUpText" type="Label" parent="LevelUpEffect" unique_id=1271019194]
+layout_mode = 0
+theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
+theme_override_font_sizes/font_size = 64
+text = "LEVEL UP!"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Panel" type="Panel" parent="." unique_id=2123297576]
+custom_minimum_size = Vector2(340, 440)
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -170.0
+offset_top = -220.0
+offset_right = 170.0
+offset_bottom = 220.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="Panel" unique_id=1994941912]
+layout_mode = 0
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 14
+
+[node name="MainVBox" type="VBoxContainer" parent="Panel/MarginContainer" unique_id=1032185183]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="LevelLabel" type="Label" parent="Panel/MarginContainer/MainVBox" unique_id=94624303]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
+theme_override_font_sizes/font_size = 24
+horizontal_alignment = 1
+
+[node name="PointsLabel" type="Label" parent="Panel/MarginContainer/MainVBox" unique_id=1428642255]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 16
+horizontal_alignment = 1
+
+[node name="HSeparator1" type="HSeparator" parent="Panel/MarginContainer/MainVBox" unique_id=166834458]
+layout_mode = 2
+
+[node name="StatRow_Strength" type="HBoxContainer" parent="Panel/MarginContainer/MainVBox" unique_id=1829490611]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="IconLabel" type="Label" parent="Panel/MarginContainer/MainVBox/StatRow_Strength" unique_id=845879826]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "💪"
+
+[node name="NameLabel" type="Label" parent="Panel/MarginContainer/MainVBox/StatRow_Strength" unique_id=574930782]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 16
+text = "力量"
+
+[node name="ValueLabel" type="Label" parent="Panel/MarginContainer/MainVBox/StatRow_Strength" unique_id=561854575]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 16
+text = "10"
+
+[node name="PreviewLabel" type="Label" parent="Panel/MarginContainer/MainVBox/StatRow_Strength" unique_id=1402702440]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 1)
+theme_override_font_sizes/font_size = 14
+text = "→ 10"
+
+[node name="MinusBtn" type="Button" parent="Panel/MarginContainer/MainVBox/StatRow_Strength" unique_id=1588080572]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+text = "−"
+
+[node name="PlusBtn" type="Button" parent="Panel/MarginContainer/MainVBox/StatRow_Strength" unique_id=1141981600]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+text = "+"
+
+[node name="StatRow_Intelligence" type="HBoxContainer" parent="Panel/MarginContainer/MainVBox" unique_id=2097787279]
+layout_mode = 2
+
+[node name="IconLabel" type="Label" parent="Panel/MarginContainer/MainVBox/StatRow_Intelligence" unique_id=2064648655]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "🧠"
+
+[node name="NameLabel" type="Label" parent="Panel/MarginContainer/MainVBox/StatRow_Intelligence" unique_id=1911861580]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 16
+text = "智力"
+
+[node name="ValueLabel" type="Label" parent="Panel/MarginContainer/MainVBox/StatRow_Intelligence" unique_id=446393074]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "10"
+
+[node name="PreviewLabel" type="Label" parent="Panel/MarginContainer/MainVBox/StatRow_Intelligence" unique_id=1009454028]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 1)
+theme_override_font_sizes/font_size = 14
+text = "→ 10"
+
+[node name="MinusBtn" type="Button" parent="Panel/MarginContainer/MainVBox/StatRow_Intelligence" unique_id=1558165451]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+text = "−"
+
+[node name="PlusBtn" type="Button" parent="Panel/MarginContainer/MainVBox/StatRow_Intelligence" unique_id=448518969]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+text = "+"
+
+[node name="StatRow_Agility" type="HBoxContainer" parent="Panel/MarginContainer/MainVBox" unique_id=1489218664]
+layout_mode = 2
+
+[node name="IconLabel" type="Label" parent="Panel/MarginContainer/MainVBox/StatRow_Agility" unique_id=1856195992]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "🏃"
+
+[node name="NameLabel" type="Label" parent="Panel/MarginContainer/MainVBox/StatRow_Agility" unique_id=2045956356]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 16
+text = "敏捷"
+
+[node name="ValueLabel" type="Label" parent="Panel/MarginContainer/MainVBox/StatRow_Agility" unique_id=101521015]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "10"
+
+[node name="PreviewLabel" type="Label" parent="Panel/MarginContainer/MainVBox/StatRow_Agility" unique_id=586100263]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 1)
+theme_override_font_sizes/font_size = 14
+text = "→ 10"
+
+[node name="MinusBtn" type="Button" parent="Panel/MarginContainer/MainVBox/StatRow_Agility" unique_id=1707337547]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+text = "−"
+
+[node name="PlusBtn" type="Button" parent="Panel/MarginContainer/MainVBox/StatRow_Agility" unique_id=868913385]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+text = "+"
+
+[node name="StatRow_Endurance" type="HBoxContainer" parent="Panel/MarginContainer/MainVBox" unique_id=267077068]
+layout_mode = 2
+
+[node name="IconLabel" type="Label" parent="Panel/MarginContainer/MainVBox/StatRow_Endurance" unique_id=477819214]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "🛡️"
+
+[node name="NameLabel" type="Label" parent="Panel/MarginContainer/MainVBox/StatRow_Endurance" unique_id=1808784895]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 16
+text = "耐力"
+
+[node name="ValueLabel" type="Label" parent="Panel/MarginContainer/MainVBox/StatRow_Endurance" unique_id=263238008]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "10"
+
+[node name="PreviewLabel" type="Label" parent="Panel/MarginContainer/MainVBox/StatRow_Endurance" unique_id=561360269]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 1)
+theme_override_font_sizes/font_size = 14
+text = "→ 10"
+
+[node name="MinusBtn" type="Button" parent="Panel/MarginContainer/MainVBox/StatRow_Endurance" unique_id=1050100199]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+text = "−"
+
+[node name="PlusBtn" type="Button" parent="Panel/MarginContainer/MainVBox/StatRow_Endurance" unique_id=714039510]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+text = "+"
+
+[node name="HSeparator2" type="HSeparator" parent="Panel/MarginContainer/MainVBox" unique_id=2104803727]
+layout_mode = 2
+
+[node name="DerivedStatsLabel" type="Label" parent="Panel/MarginContainer/MainVBox" unique_id=1104087536]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 12
+
+[node name="HSeparator3" type="HSeparator" parent="Panel/MarginContainer/MainVBox" unique_id=812185308]
+layout_mode = 2
+
+[node name="ConfirmButton" type="Button" parent="Panel/MarginContainer/MainVBox" unique_id=838565792]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "确认分配"
+
+[node name="Background" type="ColorRect" parent="." unique_id=2014235639]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+color = Color(0, 0, 0, 0.6)

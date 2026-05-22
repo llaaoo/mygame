@@ -635,5 +635,12 @@
 		"created": "2026-05-22T12:24:32",
 		"id": "fact_1779423872",
 		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "LevelUpUI (res://ui/level_up_ui.tscn) is a CanvasLayer instantiated by HUD at runtime. Uses pending allocation pattern — stat changes previewed in UI, only applied on Confirm via StatsComponent.spend_attribute_point(). Game pauses during allocation. Level-up effects use Tween animations (golden flash + \"LEVEL UP!\" text).",
+		"created": "2026-05-22T12:52:02",
+		"id": "fact_1779425522",
+		"source": "ai"
 	}
 ]

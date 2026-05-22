@@ -8,6 +8,7 @@ extends CanvasLayer
 var player: Player = null
 var cooldown_bar: ProgressBar = null
 var stats_label: Label = null
+var level_up_ui: LevelUpUI = null
 
 func _ready() -> void:
 	_setup_cooldown_bar()
@@ -56,6 +57,7 @@ func _connect_player() -> void:
 		health_label.text = "%d / %d" % [player.health_component.hp, player.health_component.max_hp]
 		player.stats_component.stat_changed.connect(_on_stat_changed)
 		player.stats_component.leveled_up.connect(_on_level_up)
+		_setup_level_up_ui()
 		_update_stats_display()
 		print("✅ HUD: 已连接到 Player")
 	else:
@@ -89,6 +91,22 @@ func _on_stat_changed(_stat_name: String, _new_value: int) -> void:
 func _on_level_up(new_level: int) -> void:
 	print("🎉 升级！Lv.%d" % new_level)
 	_update_stats_display()
+	if level_up_ui:
+		level_up_ui._on_level_up(new_level)
+
+
+func _setup_level_up_ui() -> void:
+	# 实例化升级面板
+	var lui_scene := load("res://ui/level_up_ui.tscn") as PackedScene
+	if not lui_scene:
+		print("⚠️ HUD: 无法加载 level_up_ui.tscn")
+		return
+	level_up_ui = lui_scene.instantiate() as LevelUpUI
+	level_up_ui.name = "LevelUpUI"
+	get_tree().current_scene.add_child(level_up_ui)
+	level_up_ui.setup(player.stats_component)
+	# 分配确认后刷新 HUD
+	level_up_ui.allocation_confirmed.connect(_update_stats_display)
 
 
 func _update_stats_display() -> void:
