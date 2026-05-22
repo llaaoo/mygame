@@ -268,11 +268,18 @@ func _refresh_equip_slots() -> void:
 	for i in range(_equip_sources.size()):
 		var src := _equip_sources[i]
 		var panel := _equip_slots[i]
-		var skill: SkillData
+		var skill: SkillData = null
 		match src:
-			"left":  skill = _skill_manager.left_hand_skill
-			"right": skill = _skill_manager.right_hand_skill
-			_:       skill = _skill_manager.get_slot(src.trim_prefix("slot_").to_int())["skill"]
+			"left":
+				if _skill_manager.left_hand:
+					skill = _skill_manager.left_hand.data
+			"right":
+				if _skill_manager.right_hand:
+					skill = _skill_manager.right_hand.data
+			_:
+				var inst := _skill_manager.get_slot(src.trim_prefix("slot_").to_int())
+				if inst:
+					skill = inst.data
 
 		var hbox := panel.get_child(0) as HBoxContainer
 		var tex := hbox.get_node("Icon") as TextureRect

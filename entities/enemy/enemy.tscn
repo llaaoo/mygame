@@ -7,7 +7,7 @@
 [ext_resource type="Script" uid="uid://dfdg1os45xtxd" path="res://entities/enemy/states/attack.gd" id="3_3fvr7"]
 [ext_resource type="Script" uid="uid://dlvm6y7rbfhvi" path="res://systems/state_machine.gd" id="3_721x4"]
 [ext_resource type="Script" uid="uid://bumjex67lou7i" path="res://components/health_component.gd" id="7_61ikd"]
-[ext_resource type="Script" uid="uid://c5j4rrriddj4m" path="res://skills/manager/skill_manager.gd" id="8_721x4"]
+[ext_resource type="Script" uid="uid://c5j4rrriddj4m" path="res://components/skill_manager.gd" id="8_721x4"]
 [ext_resource type="Script" uid="uid://b7bqxvy40h1fl" path="res://components/stats_component.gd" id="9_eaj7m"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_d50e0"]

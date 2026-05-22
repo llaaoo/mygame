@@ -10,6 +10,7 @@ extends Area2D
 
 var direction: Vector2 = Vector2.DOWN
 var caster: Node2D = null
+var _has_hit: bool = false
 
 
 func _ready() -> void:
@@ -52,20 +53,30 @@ func set_caster(c: Node2D) -> void:
 
 
 func _on_body_entered(body: Node2D) -> void:
+	if _has_hit:
+		return
 	if body == caster:
 		return
+	if not is_instance_valid(caster) or not is_instance_valid(body):
+		return
 	if body.has_method("take_damage"):
+		_has_hit = true
 		_emit_hit_event(body)
 		body.take_damage(damage)
 	queue_free()
 
 
 func _on_area_entered(area: Area2D) -> void:
+	if _has_hit:
+		return
 	if area.owner == caster:
 		return
 	if area.is_in_group("projectile"):
 		return
+	if not is_instance_valid(caster) or not is_instance_valid(area):
+		return
 	if area.has_method("take_damage"):
+		_has_hit = true
 		_emit_hit_event(area)
 		area.take_damage(damage)
 	queue_free()
