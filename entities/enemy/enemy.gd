@@ -47,6 +47,7 @@ signal died
 
 
 func _ready() -> void:
+	add_to_group("enemy")
 	# 碰撞形状
 	$CollisionShape2D.shape = load("res://entities/enemy/enemy_body_shape.tres")
 
@@ -173,11 +174,15 @@ func _on_died() -> void:
 
 func _spawn_drop() -> void:
 	if not drop_scene:
-		drop_scene = load("res://pickups/health_pickup.tscn")
+		if randf() < 0.5:
+			drop_scene = load("res://pickups/health_pickup.tscn")
+		else:
+			drop_scene = load("res://pickups/mana_pickup.tscn")
+
 	if not drop_scene:
 		return
 	var drop = drop_scene.instantiate()
-	get_tree().current_scene.add_child(drop)
+	get_tree().current_scene.add_child.call_deferred(drop)
 	drop.global_position = global_position
 
 

@@ -41,7 +41,6 @@ func _ready() -> void:
 
 
 func _input(event: InputEvent) -> void:
-	# 面板显示时只拦截键盘输入，保留鼠标给 UI 按钮
 	if visible and event is InputEventKey:
 		get_viewport().set_input_as_handled()
 
@@ -257,3 +256,8 @@ func _colored_float(new_val: float, old_val: float) -> String:
 	if new_val > old_val:
 		return "[color=#4dff4d]%.0f[/color]" % new_val
 	return "%.0f" % new_val
+
+
+func _set_ui_blocked(blocked: bool) -> void:
+	var p = get_tree().get_first_node_in_group("player")
+	if p: p.set("ui_blocked", blocked)

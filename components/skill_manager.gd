@@ -188,7 +188,7 @@ func _execute_aoe(skill: SkillData, caster: Node2D, direction: Vector2) -> bool:
 		return false
 	var instance := skill.aoe_scene.instantiate() as Node2D
 	caster.get_tree().current_scene.add_child(instance)
-	instance.global_position = caster.global_position + direction * skill.aoe_radius
+	instance.global_position = caster.global_position + direction * skill.cast_distance
 	if "damage" in instance:
 		instance.damage = skill.damage
 	if instance.has_method("set_caster"):
@@ -200,12 +200,57 @@ func _execute_dash(skill: SkillData, caster: Node2D, direction: Vector2) -> bool
 	if not caster is CharacterBody2D:
 		return false
 	var body := caster as CharacterBody2D
+
+	# 暗影步：优先传送到敌人身后
+	var target_pos := body.global_position + direction * skill.dash_distance
+	if skill.buff_resource:
+		target_pos = _find_shadow_step_target(body, direction, skill.dash_distance)
+
 	var tween := body.create_tween()
-	tween.tween_property(body, "global_position",
-		body.global_position + direction * skill.dash_distance,
-		skill.dash_distance / skill.dash_speed
+	tween.tween_property(body, "global_position", target_pos,
+		body.global_position.distance_to(target_pos) / skill.dash_speed
 	).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
+
+	if skill.buff_resource:
+		tween.tween_callback(_apply_dash_buff.bind(skill, caster))
 	return true
+
+
+## 暗影步：扫描方向内最近的敌人，返回其身后位置
+func _find_shadow_step_target(body: CharacterBody2D, direction: Vector2, max_dist: float) -> Vector2:
+	var best_target := Vector2.INF
+	var best_dist := max_dist
+
+	for enemy in body.get_tree().get_nodes_in_group("enemy"):
+		var epos: Vector2 = enemy.global_position
+		var to_enemy := epos - body.global_position
+		var proj_dist := to_enemy.dot(direction)
+		# 只考虑前方的敌人
+		if proj_dist <= 0 or proj_dist > max_dist:
+			continue
+		# 横向偏移不能太大（不能太偏）
+		var lateral := (to_enemy - direction * proj_dist).length()
+		if lateral > 80:
+			continue
+		if proj_dist < best_dist:
+			best_dist = proj_dist
+			# 身后 = 敌人位置 + 从玩家指向敌人的方向 * 40px
+			best_target = epos + direction * 40.0
+
+	if best_target != Vector2.INF:
+		return best_target
+	# 没找到敌人，普通闪现
+	return body.global_position + direction * max_dist
+
+
+func _apply_dash_buff(skill: SkillData, caster: Node2D) -> void:
+	var buff_manager := caster.get_node_or_null("BuffManager")
+	if not buff_manager:
+		return
+	var buff := skill.buff_resource.duplicate() as Buff
+	if skill.buff_duration > 0:
+		buff.duration = skill.buff_duration
+	buff_manager.apply_buff(buff)
 
 
 ## ── 初始化 ──

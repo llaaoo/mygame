@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="SkillData" format=3 uid="uid://b3knge41va0ar"]
+
+[ext_resource type="PackedScene" uid="uid://cawie2yeb3o60" path="res://skills/flame_storm.tscn" id="1_cpyof"]
+[ext_resource type="Script" uid="uid://doebuhwul6dk4" path="res://skills/skill_data.gd" id="2_euui1"]
+
+[resource]
+script = ExtResource("2_euui1")
+skill_id = "flame_storm"
+display_name = "烈焰风暴"
+description = "在目标区域召唤烈焰风暴，灼烧范围内所有敌人"
+skill_type = 2
+cooldown = 8.0
+mp_cost = 35
+damage = 30
+aoe_scene = ExtResource("1_cpyof")
+aoe_radius = 80.0

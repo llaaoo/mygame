@@ -37,13 +37,20 @@ func toggle() -> void:
 
 
 func open() -> void:
+	_set_ui_blocked(true)
 	_refresh_all()
 	show()
 
 
 func close() -> void:
+	_set_ui_blocked(false)
 	_selected_skill = null
 	hide()
+
+
+func _set_ui_blocked(blocked: bool) -> void:
+	var p = get_tree().get_first_node_in_group("player")
+	if p: p.set("ui_blocked", blocked)
 
 
 func _build_ui() -> void:

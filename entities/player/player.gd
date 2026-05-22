@@ -34,11 +34,17 @@ var facing_direction: Vector2 = Vector2.DOWN
 @onready var stats_component: StatsComponent = $StatsComponent
 var mana_component: ManaComponent = null
 
-## ── 瞄准状态 ──
-var _aiming_left: bool = false
-var _aiming_right: bool = false
-## ── 待释放的技能来源（"left"/"right"/"slot_N"） ──
+## ── 待释放的技能来源（"slot_N"，仅快捷键用） ──
 var pending_skill_source: String = ""
+## ── 瞄准状态（跨状态保持） ──
+var aiming_sources: Dictionary = {}
+var cancel_aim: bool = false
+## ── UI 面板打开时阻止游戏输入 ──
+var ui_blocked: bool = false
+## ── 瞄准指示器 ──
+var _aim_line: Line2D = null
+var _aim_dot: Sprite2D = null
+var _aim_distance: float = 60.0
 
 ## ── 运行时移动速度（基础 + 敏捷加成） ──
 var move_speed: float = 300.0
@@ -73,6 +79,9 @@ func _ready() -> void:
 	health_component.health_changed.connect(_on_health_changed)
 	health_component.died.connect(_on_died)
 	skill_manager.cooldown_changed.connect(_on_skill_cooldown)
+
+	# 瞄准指示器
+	_setup_aim_indicator()
 
 	# 状态机
 	_setup_state_machine()
@@ -173,9 +182,20 @@ func _setup_skills() -> void:
 			fireball.skill_type = SkillData.SkillType.PROJECTILE
 			_skill_pool.add_skill(fireball)
 
-	# 右手默认装备火球
-	var fireball := _skill_pool.get_skill("fireball")
-	skill_manager.equip_hand("right", fireball)
+	# 加入冰霜护盾、烈焰风暴、暗影步
+	for sid in ["ice_armor", "flame_storm", "shadow_step"]:
+		if not _skill_pool.has_skill(sid):
+			var skill := load("res://skills/%s_data.tres" % sid) as SkillData
+			if skill:
+				if sid == "flame_storm":
+					skill.cast_distance = 150.0  # AoE 施法距离
+				_skill_pool.add_skill(skill)
+
+	# 装备：左手冰甲、右手火球、键1烈焰风暴、键2暗影步
+	skill_manager.equip_hand("left", _skill_pool.get_skill("ice_armor"))
+	skill_manager.equip_hand("right", _skill_pool.get_skill("fireball"))
+	skill_manager.equip_slot(0, _skill_pool.get_skill("flame_storm"))
+	skill_manager.equip_slot(1, _skill_pool.get_skill("shadow_step"))
 
 
 ## ── 信号转发 ──
@@ -191,7 +211,7 @@ func _on_died() -> void:
 	died.emit()
 
 
-func _on_skill_cooldown(skill_index: int, remaining: float, total: float) -> void:
+func _on_skill_cooldown(_source: String, remaining: float, total: float) -> void:
 	skill_cooldown_changed.emit(remaining, total)
 
 
@@ -246,6 +266,97 @@ func _add_test_items() -> void:
 	print("🎒 测试装备已添加到背包")
 
 
+## ── 瞄准指示器 ──
+
+func _setup_aim_indicator() -> void:
+	_aim_line = Line2D.new()
+	_aim_line.name = "AimLine"
+	_aim_line.width = 2.0
+	_aim_line.default_color = Color(1, 1, 1, 0.5)
+	_aim_line.z_index = 20
+	_aim_line.visible = false
+	add_child(_aim_line)
+
+	_aim_dot = Sprite2D.new()
+	_aim_dot.name = "AimDot"
+	_aim_dot.texture = load("res://icon.svg")
+	_aim_dot.scale = Vector2(0.08, 0.08)
+	_aim_dot.modulate = Color(1, 1, 1, 0.6)
+	_aim_dot.z_index = 20
+	_aim_dot.visible = false
+	add_child(_aim_dot)
+
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventMouseButton:
+		if (event.button_index == MOUSE_BUTTON_WHEEL_UP or event.button_index == MOUSE_BUTTON_WHEEL_DOWN) and event.pressed:
+			if aiming_sources.size() > 0:
+				cancel_aim = true
+
+
+func _process(_delta: float) -> void:
+	if not _aim_dot or not _aim_dot.visible:
+		return
+	if _aim_line.visible:
+		var dir := get_mouse_direction()
+		_aim_line.points = PackedVector2Array([Vector2.ZERO, dir * _aim_distance])
+		_aim_dot.global_position = global_position + dir * _aim_distance
+	else:
+		_aim_dot.global_position = global_position
+
+
+func show_aim(_source: String, skill: SkillData) -> void:
+	if not skill or not _aim_line or not _aim_dot:
+		return
+
+	var color := _aim_color(skill.skill_type)
+
+	match skill.skill_type:
+		SkillData.SkillType.BUFF:
+			_aim_line.visible = false
+			_aim_dot.modulate = color
+			_aim_dot.scale = Vector2(0.5, 0.5)
+			_aim_dot.visible = true
+
+		SkillData.SkillType.AOE:
+			_aim_distance = skill.cast_distance
+			_aim_line.default_color = color
+			_aim_line.visible = true
+			_aim_dot.modulate = color
+			_aim_dot.scale = Vector2(skill.aoe_radius / 80.0, skill.aoe_radius / 80.0)
+			_aim_dot.visible = true
+
+		SkillData.SkillType.DASH:
+			_aim_distance = skill.dash_distance
+			_aim_line.default_color = color
+			_aim_line.visible = true
+			_aim_dot.modulate = color
+			_aim_dot.scale = Vector2(0.08, 0.08)
+			_aim_dot.visible = true
+
+		_:
+			_aim_distance = 60.0
+			_aim_line.default_color = color
+			_aim_line.visible = true
+			_aim_dot.modulate = color
+			_aim_dot.scale = Vector2(0.08, 0.08)
+			_aim_dot.visible = true
+
+
+func _aim_color(skill_type: int) -> Color:
+	match skill_type:
+		SkillData.SkillType.BUFF:       return Color(0.3, 0.7, 1.0, 0.5)
+		SkillData.SkillType.AOE:        return Color(1.0, 0.3, 0.1, 0.6)
+		SkillData.SkillType.DASH:       return Color(0.3, 1.0, 0.5, 0.6)
+		SkillData.SkillType.PROJECTILE: return Color(1.0, 0.5, 0.2, 0.7)
+	return Color.WHITE
+
+
+func hide_aim() -> void:
+	if _aim_line: _aim_line.visible = false
+	if _aim_dot: _aim_dot.visible = false
+
+
 ## ── 公开 API ──
 
 func get_mouse_direction() -> Vector2:
@@ -257,34 +368,19 @@ func perform_melee_attack() -> void:
 
 
 ## 释放左手或右手技能
-func cast_hand(hand: String) -> void:
+func cast_hand(hand: String) -> bool:
 	var ok := skill_manager.use_hand(hand, self, get_mouse_direction())
 	if ok and animation_player.has_animation("skill"):
 		animation_player.play("skill")
+	return ok
 
 
 ## 释放快捷键槽位技能
-func cast_slot(idx: int) -> void:
+func cast_slot(idx: int) -> bool:
 	var ok := skill_manager.use_slot(idx, self, get_mouse_direction())
 	if ok and animation_player.has_animation("skill"):
 		animation_player.play("skill")
-
-
-## 开始瞄准（按下时调用）
-func start_aim(hand: String) -> void:
-	if hand == "left":
-		_aiming_left = true
-	else:
-		_aiming_right = true
-
-
-## 结束瞄准并释放（松手时调用）
-func end_aim(hand: String) -> void:
-	if hand == "left":
-		_aiming_left = false
-	else:
-		_aiming_right = false
-	pending_skill_source = hand
+	return ok
 
 
 func take_damage(amount: int) -> void:

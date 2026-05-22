@@ -22,16 +22,18 @@ func _ready() -> void:
 
 
 func _setup_shape() -> void:
-	# 确保有碰撞形状用于检测
+	# 确保有有效的碰撞形状
 	for child in get_children():
-		if child is CollisionShape2D or child is CollisionPolygon2D:
+		if child is CollisionShape2D and child.shape != null:
 			return
-	# 没有形状则自动创建一个
-	var shape = CollisionShape2D.new()
+		if child is CollisionPolygon2D and child.polygon != null:
+			return
+	# 无有效形状则自动创建
+	var shape_node = CollisionShape2D.new()
 	var circle = CircleShape2D.new()
 	circle.radius = 16.0
-	shape.shape = circle
-	add_child(shape)
+	shape_node.shape = circle
+	add_child(shape_node)
 
 
 func _on_body_entered(body: Node2D) -> void:

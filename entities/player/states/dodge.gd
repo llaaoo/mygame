@@ -13,6 +13,8 @@ func enter() -> void:
 	dodge_direction = dodge_direction.normalized()
 
 func physics_update(delta: float) -> void:
+	if entity.get("ui_blocked"):
+		return
 	dodge_timer += delta
 
 	entity.velocity = dodge_direction * dodge_speed

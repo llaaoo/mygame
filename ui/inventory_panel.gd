@@ -71,14 +71,21 @@ func toggle() -> void:
 
 
 func open() -> void:
+	_set_ui_blocked(true)
 	_refresh_all()
 	show()
 	_background.show()
 
 
 func close() -> void:
+	_set_ui_blocked(false)
 	hide()
 	_background.hide()
+
+
+func _set_ui_blocked(blocked: bool) -> void:
+	var p = get_tree().get_first_node_in_group("player")
+	if p: p.set("ui_blocked", blocked)
 
 
 ## ── 初始化：将 .tscn 中的普通 Button 替换为 SlotButton ──

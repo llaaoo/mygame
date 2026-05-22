@@ -16,6 +16,8 @@ func enter() -> void:
 		entity.cast_hand(src)
 
 func physics_update(delta: float) -> void:
+	if entity.get("ui_blocked"):
+		return
 	skill_timer += delta
 
 	if Input.is_action_just_pressed("dodge"):
