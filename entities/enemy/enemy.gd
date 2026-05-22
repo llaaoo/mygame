@@ -24,6 +24,13 @@ const PRESETS: Array[Dictionary] = [
 	{"name": "坦克", "color": Color(0.6, 0.2, 0.7, 1), "scale": Vector2(0.55, 0.55)},
 ]
 
+## ── 预设属性表（哨兵/士兵/坦克） ──
+const PRESET_STATS: Array[Dictionary] = [
+	{"strength": 5,  "intelligence": 5,  "agility": 15, "endurance": 5},   # 哨兵：高敏捷
+	{"strength": 10, "intelligence": 8,  "agility": 10, "endurance": 10},  # 士兵：均衡
+	{"strength": 15, "intelligence": 5,  "agility": 5,  "endurance": 15},  # 坦克：高力耐
+]
+
 var enemy_color: Color = Color.RED
 var enemy_scale: Vector2 = Vector2(0.4, 0.4)
 var enemy_name: String = "敌人"
@@ -36,24 +43,28 @@ signal died
 
 @onready var health_component: HealthComponent = $HealthComponent
 @onready var skill_manager: SkillManager = $SkillManager
+@onready var stats_component: StatsComponent = $StatsComponent
 
 
 func _ready() -> void:
 	# 碰撞形状
 	$CollisionShape2D.shape = load("res://entities/enemy/enemy_body_shape.tres")
 
+	# 应用预设属性
+	_apply_preset_stats(enemy_type)
+
 	# 生命值组件
 	health_component.setup($CollisionShape2D)
-	health_component.max_hp = max_hp
-	health_component.hp = max_hp
-	health_component.regen_rate = 0.0  # 敌人不自回
+	health_component.regen_rate = 0.0
 	health_component.died.connect(_on_died)
+	_apply_stats_to_health()
 
 	# 技能
 	var bolt_data := load("res://skills/shadow_bolt_data.tres") as SkillData
 	if bolt_data:
 		bolt_data.scene = load("res://skills/fireball.tscn")
-		bolt_data.projectile_speed = 250.0  # 敌人投射物更慢
+		bolt_data.projectile_speed = 250.0
+		bolt_data.damage = 10 + stats_component.magic_damage
 		skill_manager.skills = [bolt_data]
 		skill_manager._ready()
 
@@ -65,6 +76,26 @@ func _ready() -> void:
 	_setup_state_machine()
 
 	call_deferred("_find_player")
+
+
+## ── 属性 ──
+
+func _apply_preset_stats(type_idx: int) -> void:
+	if type_idx < 0 or type_idx >= PRESET_STATS.size():
+		return
+	var s = PRESET_STATS[type_idx]
+	stats_component.strength = s["strength"]
+	stats_component.intelligence = s["intelligence"]
+	stats_component.agility = s["agility"]
+	stats_component.endurance = s["endurance"]
+	stats_component._recalculate_all()
+
+
+func _apply_stats_to_health() -> void:
+	health_component.max_hp = 20 + stats_component.max_hp_bonus
+	health_component.hp = health_component.max_hp
+	move_speed = 80 + stats_component.move_speed_bonus
+	attack_damage = 3 + stats_component.physical_damage
 
 
 ## ── 视觉 ──
@@ -131,6 +162,9 @@ func take_damage(amount: int) -> void:
 
 
 func _on_died() -> void:
+	# 击杀奖励经验
+	if player and player.stats_component:
+		player.stats_component.add_experience(30 + stats_component.level * 10)
 	_spawn_drop()
 	died.emit()
 	queue_free()

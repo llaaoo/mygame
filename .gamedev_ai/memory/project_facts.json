@@ -586,5 +586,54 @@
 		"created": "2026-05-22T11:43:23",
 		"id": "fact_1779421403",
 		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Player Component Architecture (final): Player node delegates to 4 reusable components — HealthComponent (HP/regen/death), CombatComponent (melee hitbox), SkillManager (multi-skill cooldowns), plus BuffManager + EquipmentManager (legacy). Each component is a child Node with @export vars, setup() injection, and signals. Player.gd acts as thin coordinator: node refs, signal forwarding, state machine init, inventory loading.",
+		"created": "2026-05-22T11:49:47",
+		"id": "fact_1779421787",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Skill System: SkillData (Resource) defines skill_id/name/cooldown/damage/scene/cast_distance/projectile_speed. SkillManager (Node) manages Array[SkillData] with per-skill cooldowns, emits cooldown_changed(skill_index,remaining,total). Both Player and Enemy use SkillManager. Player loads fireball_data.tres + sets scene via code (Resource refs don't persist). Enemy loads shadow_bolt_data.tres + sets scene=fireball.tscn + projectile_speed=250.",
+		"created": "2026-05-22T11:49:47",
+		"id": "fact_1779421787",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "EnemyChaseState fires skills at range: checks entity.skill_manager.can_use(0) each frame, fires use_skill(0) when ready. Enemy has HealthComponent (regen_rate=0), SkillManager with shadow_bolt, and enemy_type preset (0=scout🟢, 1=soldier🔴, 2=tank🟣). Enemy.tscn was corrupted by attach_script and had to be fully rebuilt from scratch.",
+		"created": "2026-05-22T11:49:47",
+		"id": "fact_1779421787",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "fireball.gd now adds itself to \"projectile\" group in _ready(). _on_area_entered skips area.is_in_group(\"projectile\") to prevent projectile-projectile collision. SkillManager passes damage and speed from SkillData to instantiated projectile via \"damage\" in instance and \"speed\" in instance checks.",
+		"created": "2026-05-22T11:49:47",
+		"id": "fact_1779421787",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "StatsComponent (res://components/stats_component.gd): 属性组件 — 主属性(strength/intelligence/agility/endurance) → 派生属性(max_hp_bonus/max_mana/physical_damage/magic_damage/move_speed_bonus)。支持等级/经验/属性点、modify_stat()、add_experience() 自动升级(exp_to_next×1.5每级)、spend_attribute_point()。Player/Enemy/NPC 共用，挂载为子节点即可。",
+		"created": "2026-05-22T12:24:32",
+		"id": "fact_1779423872",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Stats 集成：Player._ready() 中 _apply_stats() 从 StatsComponent 计算 move_speed(base+agility)、health(max_hp_bonus)、attack_damage(physical_damage)、skill_damage(magic_damage)。stat_changed 信号触发重新计算。Enemy 有 PRESET_STATS 表按 enemy_type 分配属性(哨兵高敏/士兵均衡/坦克高力耐)，击杀时 player.stats_component.add_experience(30+level×10)。HUD 显示 Lv + 四属性 + XP。",
+		"created": "2026-05-22T12:24:32",
+		"id": "fact_1779423872",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "NPC 基类 (res://entities/npc/npc.gd + npc.tscn): CharacterBody2D + Sprite2D + StatsComponent。@export npc_name/npc_color。子类化用于商人/任务NPC/训练师等。StatsComponent 共用，后续加 DialogComponent/QuestGiver 等扩展。",
+		"created": "2026-05-22T12:24:32",
+		"id": "fact_1779423872",
+		"source": "ai"
 	}
 ]

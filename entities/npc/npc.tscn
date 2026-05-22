@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://c5kv2h3c648hl"]
+
+[ext_resource type="Script" uid="uid://bxtdg44yp5xwq" path="res://entities/npc/npc.gd" id="1_gwous"]
+[ext_resource type="Script" uid="uid://b7bqxvy40h1fl" path="res://components/stats_component.gd" id="2_e3lg2"]
+
+[node name="NPC" type="CharacterBody2D" unique_id=1871993625]
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=414840670]
+script = ExtResource("1_gwous")
+
+[node name="StatsComponent" type="Node" parent="." unique_id=905031940]
+script = ExtResource("2_e3lg2")

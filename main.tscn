@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://etuhwmvsawor" path="res://entities/player/player.tscn" id="2_h2yge"]
 [ext_resource type="Script" uid="uid://chwid4l447g0c" path="res://systems/input_setup.gd" id="4_lquwl"]
 [ext_resource type="PackedScene" uid="uid://tc5h73volrpp" path="res://ui/hud.tscn" id="5_7mycd"]
+[ext_resource type="Script" uid="uid://b7bqxvy40h1fl" path="res://components/stats_component.gd" id="5_272bh"]
 [ext_resource type="Script" uid="uid://c5j4rrriddj4m" path="res://components/skill_manager.gd" id="6_7mycd"]
 
 [node name="Game" type="Node" unique_id=1368087060]
@@ -25,6 +26,9 @@ debug_items = true
 
 [node name="SkillManager" type="Node" parent="Player" unique_id=1978715642]
 script = ExtResource("6_7mycd")
+
+[node name="StatsComponent" type="Node" parent="Player" unique_id=1491100307]
+script = ExtResource("5_272bh")
 
 [node name="InputSetup" type="Node" parent="." unique_id=2019032865]
 script = ExtResource("4_lquwl")

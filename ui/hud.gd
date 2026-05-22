@@ -7,6 +7,7 @@ extends CanvasLayer
 
 var player: Player = null
 var cooldown_bar: ProgressBar = null
+var stats_label: Label = null
 
 func _ready() -> void:
 	_setup_cooldown_bar()
@@ -30,6 +31,12 @@ func _setup_cooldown_bar() -> void:
 		cooldown_bar.value = 0.0
 		cooldown_bar.add_theme_color_override("fill_color", Color(0.3, 0.5, 1, 1))
 		hbox.add_child(cooldown_bar)
+	# 创建属性标签
+	stats_label = Label.new()
+	stats_label.name = "StatsLabel"
+	stats_label.add_theme_font_size_override("font_size", 11)
+	stats_label.add_theme_color_override("font_color", Color(0.8, 0.8, 0.3))
+	hbox.add_child(stats_label)
 
 func _connect_player() -> void:
 	# 通过 group 或场景树查找 Player
@@ -47,6 +54,9 @@ func _connect_player() -> void:
 		health_bar.max_value = player.health_component.max_hp
 		health_bar.value = player.health_component.hp
 		health_label.text = "%d / %d" % [player.health_component.hp, player.health_component.max_hp]
+		player.stats_component.stat_changed.connect(_on_stat_changed)
+		player.stats_component.leveled_up.connect(_on_level_up)
+		_update_stats_display()
 		print("✅ HUD: 已连接到 Player")
 	else:
 		print("⚠️ HUD: 未找到 Player，1秒后重试...")
@@ -70,3 +80,22 @@ func _on_retry_pressed() -> void:
 func _on_skill_cooldown(_skill_index: int, remaining: float, total: float) -> void:
 	cooldown_bar.max_value = total
 	cooldown_bar.value = remaining
+
+
+func _on_stat_changed(_stat_name: String, _new_value: int) -> void:
+	_update_stats_display()
+
+
+func _on_level_up(new_level: int) -> void:
+	print("🎉 升级！Lv.%d" % new_level)
+	_update_stats_display()
+
+
+func _update_stats_display() -> void:
+	if not player or not stats_label:
+		return
+	var s = player.stats_component
+	stats_label.text = "Lv.%d  💪%d 🧠%d 🏃%d 🛡️%d  XP:%d/%d" % [
+		s.level, s.strength, s.intelligence, s.agility, s.endurance,
+		s.experience, s.exp_to_next
+	]
