@@ -45,12 +45,13 @@ func _process(delta: float) -> void:
 	for i in range(MAX_SLOTS):
 		_tick_instance(_slots[i], delta)
 
-	# 更新旧版 _cooldowns（兼容）
+	# 更新 _cooldowns 并发射信号通知 UI
 	for key in _cooldowns:
 		var cd: float = _cooldowns[key]
 		if cd > 0.0:
 			cd = maxf(0.0, cd - delta)
 			_cooldowns[key] = cd
+			cooldown_changed.emit(key, cd, _get_cooldown_total(key))
 
 
 func _tick_instance(inst: SkillInstance, delta: float) -> void:
