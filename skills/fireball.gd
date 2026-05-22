@@ -19,6 +19,7 @@ func _ready() -> void:
 	# 连接信号 - 碰撞到物体时
 	body_entered.connect(_on_body_entered)
 	area_entered.connect(_on_area_entered)
+	add_to_group("projectile")
 	
 	# 自动销毁
 	await get_tree().create_timer(lifetime).timeout
@@ -43,7 +44,9 @@ func _on_body_entered(body: Node2D) -> void:
 
 func _on_area_entered(area: Area2D) -> void:
 	if area.owner == caster:
-		return  # 不打施法者的子节点
+		return
+	if area.is_in_group("projectile"):
+		return  # 投射物之间不碰撞
 	if area.has_method("take_damage"):
 		area.take_damage(damage)
 	queue_free()

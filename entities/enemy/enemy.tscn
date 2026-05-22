@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://b7brg6m0g5u4c"]
+[gd_scene format=3 uid="uid://dcbumdieobptq"]
 
 [ext_resource type="Script" uid="uid://dr4tuwps3ut87" path="res://entities/enemy/enemy.gd" id="1_d50e0"]
 [ext_resource type="Script" uid="uid://d14nf01ptg71j" path="res://entities/enemy/states/idle.gd" id="1_ksmh7"]
@@ -6,6 +6,8 @@
 [ext_resource type="Script" uid="uid://bi7n28drvonhu" path="res://entities/enemy/states/chase.gd" id="2_im2q6"]
 [ext_resource type="Script" uid="uid://dfdg1os45xtxd" path="res://entities/enemy/states/attack.gd" id="3_3fvr7"]
 [ext_resource type="Script" uid="uid://dlvm6y7rbfhvi" path="res://systems/state_machine.gd" id="3_721x4"]
+[ext_resource type="Script" uid="uid://bumjex67lou7i" path="res://components/health_component.gd" id="7_61ikd"]
+[ext_resource type="Script" uid="uid://c5j4rrriddj4m" path="res://components/skill_manager.gd" id="8_721x4"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_d50e0"]
 radius = 30.0
@@ -14,8 +16,8 @@ radius = 30.0
 script = ExtResource("1_d50e0")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=549220085]
-modulate = Color(0.8, 0.25, 0.25, 1)
-scale = Vector2(0.4, 0.4)
+modulate = Color(0.5, 0.2, 0.7, 1)
+scale = Vector2(0.3, 0.3)
 texture = ExtResource("2_61ikd")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2058523350]
@@ -32,3 +34,9 @@ script = ExtResource("2_im2q6")
 
 [node name="Attack" type="Node" parent="StateMachine" unique_id=1145564447]
 script = ExtResource("3_3fvr7")
+
+[node name="HealthComponent" type="Node" parent="." unique_id=1102841421]
+script = ExtResource("7_61ikd")
+
+[node name="SkillManager" type="Node" parent="." unique_id=51103859]
+script = ExtResource("8_721x4")

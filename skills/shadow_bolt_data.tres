@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="SkillData" format=3 uid="uid://dk22nrg7buifv"]
+
+[ext_resource type="Script" uid="uid://doebuhwul6dk4" path="res://skills/skill_data.gd" id="1_4cqic"]
+
+[resource]
+script = ExtResource("1_4cqic")
+skill_id = "shadow_bolt"
+display_name = "暗影弹"
+damage = 10
+cast_distance = 25.0

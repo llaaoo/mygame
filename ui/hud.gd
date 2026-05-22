@@ -41,12 +41,12 @@ func _connect_player() -> void:
 	if player:
 		player.health_changed.connect(_on_health_changed)
 		player.died.connect(_on_player_died)
-		player.skill_cooldown_changed.connect(_on_skill_cooldown_changed)
-		cooldown_bar.max_value = player.skill_cooldown
+		player.skill_manager.cooldown_changed.connect(_on_skill_cooldown)
+		cooldown_bar.max_value = player.skill_manager.get_cooldown_total(0)
 		cooldown_bar.value = 0
-		health_bar.max_value = player.max_hp
-		health_bar.value = player.hp
-		health_label.text = "%d / %d" % [player.hp, player.max_hp]
+		health_bar.max_value = player.health_component.max_hp
+		health_bar.value = player.health_component.hp
+		health_label.text = "%d / %d" % [player.health_component.hp, player.health_component.max_hp]
 		print("✅ HUD: 已连接到 Player")
 	else:
 		print("⚠️ HUD: 未找到 Player，1秒后重试...")
@@ -67,6 +67,6 @@ func _on_retry_pressed() -> void:
 	get_tree().paused = false
 	get_tree().reload_current_scene()
 
-func _on_skill_cooldown_changed(remaining: float, total: float) -> void:
+func _on_skill_cooldown(_skill_index: int, remaining: float, total: float) -> void:
 	cooldown_bar.max_value = total
 	cooldown_bar.value = remaining

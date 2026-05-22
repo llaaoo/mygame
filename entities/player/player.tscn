@@ -11,6 +11,8 @@
 [ext_resource type="Script" uid="uid://cn54q1qvccd2p" path="res://entities/player/states/skill.gd" id="5_fkugw"]
 [ext_resource type="Script" uid="uid://yrqmtyiw2k2" path="res://items/buff_manager.gd" id="9_bectd"]
 [ext_resource type="Script" uid="uid://c2inl37mcrnjd" path="res://items/equipment_manager.gd" id="10_wvtmh"]
+[ext_resource type="Script" uid="uid://bumjex67lou7i" path="res://components/health_component.gd" id="12_a1qjk"]
+[ext_resource type="Script" uid="uid://s1dyheimj1oe" path="res://components/combat_component.gd" id="13_j3ovn"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_qiwj3"]
 radius = 80.48
@@ -61,3 +63,9 @@ script = ExtResource("9_bectd")
 
 [node name="EquipmentManager" type="Node" parent="." unique_id=1763722490]
 script = ExtResource("10_wvtmh")
+
+[node name="HealthComponent" type="Node" parent="." unique_id=612362159]
+script = ExtResource("12_a1qjk")
+
+[node name="CombatComponent" type="Node" parent="." unique_id=1469821846]
+script = ExtResource("13_j3ovn")

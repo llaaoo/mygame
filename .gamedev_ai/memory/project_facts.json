@@ -488,5 +488,103 @@
 		"created": "2026-05-22T10:58:06",
 		"id": "fact_1779418686",
 		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Padrão SlotButton (res://ui/slot_button.gd): Button 子类 unificado para slots de inventário e equipamento. Encapsula 3 responsabilidades: (1) Drag-and-drop via _get_drag_data/_can_drop_data/_drop_data + sinal slot_dropped, (2) Tooltip rico via _make_custom_tooltip com PanelContainer dinâmico (nome+cor rarity, stats verdes, descrição, hint), (3) Atualização visual via set_item_data/set_empty_placeholder. SlotRole enum (INVENTORY/EQUIPMENT) diferencia origem no drop.",
+		"created": "2026-05-22T11:01:21",
+		"id": "fact_1779418881",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "InventoryPanel (res://ui/inventory_panel.gd) — 4 rotas de drag-drop: INV→INV (swap com inventory.set_slot), INV→EQ (verifica EquipmentData + slot_type match, equip), EQ→INV (unequip + inventory.add_item para auto-encontrar vaga), EQ→EQ (verifica compatibilidade de slot_type). PaperDoll usa _replace_with_slot_button() em _ready() para substituir Button do .tscn por SlotButton preservando layout. Clique rápido mantido como fallback.",
+		"created": "2026-05-22T11:01:21",
+		"id": "fact_1779418881",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Sistema de presets de inimigo (enemy.gd): enemy_type (int 0-2) → PRESETS[type] dicionário com name/color/scale. int persiste via set_property no .tscn, enquanto Color/Vector2/String não persistem. _apply_preset() chamado no setter e em _ready(). Separado de stats (max_hp/move_speed/attack_damage) que são @export independentes também persistentes.",
+		"created": "2026-05-22T11:01:21",
+		"id": "fact_1779418881",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Formas de colisão: abordagem híbrida — CircleShape2D em .tres + load() no _ready() (editável no inspector), RectangleShape2D criado em código (bug do create_resource: size sempre serializa Vector2(0,0)). player_body_shape.tres (r=16), enemy_body_shape.tres (r=14).",
+		"created": "2026-05-22T11:01:21",
+		"id": "fact_1779418881",
+		"source": "ai"
+	},
+	{
+		"category": "bug_fix",
+		"content": "create_resource bug conhecido: RectangleShape2D.size sempre serializa como Vector2(0,0) independente do valor passado em properties. CircleShape2D.radius funciona corretamente. Workaround: criar RectangleShape2D em código com RectangleShape2D.new() + atribuir size diretamente.",
+		"created": "2026-05-22T11:01:22",
+		"id": "fact_1779418882",
+		"source": "ai"
+	},
+	{
+		"category": "convention",
+		"content": "Player.gd pós-limpeza (TODO-03/04): StateMachine é o único gerenciador de estados — removidos _states, _current_state, _on_state_transition, fallback manual. _physics_process é pass (StateMachine faz forwarding). _setup_collisions apenas conecta sinais + carrega formas (shapes em .tres ou código). debug_items=false por padrão.",
+		"created": "2026-05-22T11:01:22",
+		"id": "fact_1779418882",
+		"source": "ai"
+	},
+	{
+		"category": "project_info",
+		"content": "Estrutura pós-limpeza (TODO-01/07 concluídos): ui/ contém 4 arquivos ativos (hud + inventory_panel + slot_button). tests/ centraliza test_gameplay.gd + test_validation.gd. Removidos: inventory_ui.gd/tscn, equipment_ui.gd/tscn, _inventory_ui.tscn (7 arquivos). Root limpo, sem scripts soltos.",
+		"created": "2026-05-22T11:01:22",
+		"id": "fact_1779418882",
+		"source": "ai"
+	},
+	{
+		"category": "bug_fix",
+		"content": "Regras de persistência do set_property: (1) int/float/bool PERSISTEM no .tscn — usar para @export customizáveis. (2) Resource (Shape2D, Material, Texture) NÃO persistem — usar load() no _ready(). (3) Color/Vector2/String em PackedScene instances NÃO persistem — usar int indexando tabela de presets.",
+		"created": "2026-05-22T11:01:30",
+		"id": "fact_1779418890",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "TODO-05 完成：player.gd 拆分为 3 个文件。HealthComponent (res://components/health_component.gd, 60行) — HP/受伤/无敌/死亡/自回，Player 和 Enemy 共用。CombatComponent (res://components/combat_component.gd, 80行) — 近战攻击/技能释放/冷却/攻击命中。player.gd (135行, -60行) — 纯协调层：节点引用、信号转发、状态机初始化、背包加载、公开 API 委托。enemy.gd 也改用 HealthComponent（设 regen_rate=0）。",
+		"created": "2026-05-22T11:11:19",
+		"id": "fact_1779419479",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Componentes compartilháveis (res://components/): HealthComponent — qualquer entidade com HP pode usar (Player, Enemy, Boss, Destrutível). API: setup(shape), take_damage(), heal(), sinais health_changed/died. CombatComponent — específico do Player (requer entity com get_mouse_direction/facing_direction). API: setup(entity,hitbox,shape,anim), perform_melee_attack(), cast_skill(), sinal skill_cooldown_changed.",
+		"created": "2026-05-22T11:11:19",
+		"id": "fact_1779419479",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "技能系统模块化：SkillData (res://skills/skill_data.gd, Resource) — 定义技能属性(id/name/cooldown/damage/scene/cast_distance)。SkillManager (res://components/skill_manager.gd, Node) — 管理多技能冷却+释放，信号 cooldown_changed(skill_index,remaining,total)。Player._ready() 加载 fireball_data.tres + 设置 scene=fireball.tscn。cast_skill() → skill_manager.use_skill(0)。新增技能只需创建 .tres 文件 + 加入 skills 数组。",
+		"created": "2026-05-22T11:28:13",
+		"id": "fact_1779420493",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "CombatComponent (res://components/combat_component.gd) 精简为纯近战：移除 skill_scene/skill_cooldown/cast_skill/_process，仅保留 perform_melee_attack() + 攻击命中检测。Player 组件体系：HealthComponent(HP) + CombatComponent(近战) + SkillManager(技能)，各司其职。",
+		"created": "2026-05-22T11:28:13",
+		"id": "fact_1779420493",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "敌人技能系统：enemy.tscn 新增 SkillManager 节点，_ready() 加载 shadow_bolt_data.tres + 设置 scene=shadow_bolt.tscn。EnemyChaseState 追击时检测 skill_manager.can_use(0) → use_skill(0)，自动处理冷却。暗影弹 (ShadowBolt, 250速/10伤/紫色) 在 200-55px 距离内发射，配合近战形成远近双层攻击。",
+		"created": "2026-05-22T11:33:50",
+		"id": "fact_1779420830",
+		"source": "ai"
+	},
+	{
+		"category": "bug_fix",
+		"content": "BUG CRÍTICO: attach_script em uma cena .tscn pode corromper a referência do script do nó raiz, apontando para um caminho errado. Enemy.tscn foi corrompido — o script raiz apontava para shadow_bolt.gd deletado. Solução: deletar e recriar o .tscn do zero com create_scene + add_node. O UID da cena muda, mas Godot resolve pelo path.",
+		"created": "2026-05-22T11:43:23",
+		"id": "fact_1779421403",
+		"source": "ai"
 	}
 ]
