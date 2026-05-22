@@ -22,9 +22,9 @@ func physics_update(_delta: float) -> void:
 		return
 
 	# 远程技能：冷却好了就放
-	if entity.skill_manager and entity.skill_manager.can_use(0):
+	if entity.skill_manager and entity.skill_manager.can_use("right"):
 		var dir = entity.get_player_direction()
-		entity.skill_manager.use_skill(0, entity, dir)
+		entity.skill_manager.use_hand("right", entity, dir)
 
 	# 向玩家移动
 	var dir = entity.get_player_direction()

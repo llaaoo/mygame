@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="SkillPool" format=3 uid="uid://dtwkpoa5pdyd6"]
+
+[ext_resource type="Script" uid="uid://b0o63prdql2d5" path="res://skills/skill_pool.gd" id="1_k4f4b"]
+[ext_resource type="Script" uid="uid://doebuhwul6dk4" path="res://skills/skill_data.gd" id="2_71c82"]
+
+[resource]
+script = ExtResource("1_k4f4b")

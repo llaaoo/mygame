@@ -62,11 +62,12 @@ func _ready() -> void:
 	# 技能
 	var bolt_data := load("res://skills/shadow_bolt_data.tres") as SkillData
 	if bolt_data:
-		bolt_data.scene = load("res://skills/fireball.tscn")
+		bolt_data.skill_type = SkillData.SkillType.PROJECTILE
+		bolt_data.projectile_scene = load("res://skills/shadow_bolt.tscn")
+		bolt_data.scene = bolt_data.projectile_scene  # 兼容
 		bolt_data.projectile_speed = 250.0
 		bolt_data.damage = 10 + stats_component.magic_damage
-		skill_manager.skills = [bolt_data]
-		skill_manager._ready()
+		skill_manager.equip_hand("right", bolt_data)
 
 	# 视觉
 	_apply_preset(enemy_type)

@@ -57,8 +57,8 @@ func _validate_player() -> void:
 		print("✅ 属性 move_speed = %s" % player.move_speed)
 	if "attack_damage" in player:
 		print("✅ 属性 attack_damage = %s" % player.attack_damage)
-	if "skill_scene" in player:
-		print("✅ 属性 skill_scene = %s" % ("已设置" if player.skill_scene else "未设置"))
+	if player.has_method("cast_skill"):
+		print("✅ 方法 cast_skill() 存在")
 
 	# 检查子节点
 	var children = ["Sprite2D", "CollisionShape2D", "Camera2D", "AnimationPlayer", "AttackHitbox", "StateMachine"]

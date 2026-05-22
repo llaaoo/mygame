@@ -561,23 +561,9 @@
 	},
 	{
 		"category": "architecture",
-		"content": "技能系统模块化：SkillData (res://skills/skill_data.gd, Resource) — 定义技能属性(id/name/cooldown/damage/scene/cast_distance)。SkillManager (res://components/skill_manager.gd, Node) — 管理多技能冷却+释放，信号 cooldown_changed(skill_index,remaining,total)。Player._ready() 加载 fireball_data.tres + 设置 scene=fireball.tscn。cast_skill() → skill_manager.use_skill(0)。新增技能只需创建 .tres 文件 + 加入 skills 数组。",
-		"created": "2026-05-22T11:28:13",
-		"id": "fact_1779420493",
-		"source": "ai"
-	},
-	{
-		"category": "architecture",
 		"content": "CombatComponent (res://components/combat_component.gd) 精简为纯近战：移除 skill_scene/skill_cooldown/cast_skill/_process，仅保留 perform_melee_attack() + 攻击命中检测。Player 组件体系：HealthComponent(HP) + CombatComponent(近战) + SkillManager(技能)，各司其职。",
 		"created": "2026-05-22T11:28:13",
 		"id": "fact_1779420493",
-		"source": "ai"
-	},
-	{
-		"category": "architecture",
-		"content": "敌人技能系统：enemy.tscn 新增 SkillManager 节点，_ready() 加载 shadow_bolt_data.tres + 设置 scene=shadow_bolt.tscn。EnemyChaseState 追击时检测 skill_manager.can_use(0) → use_skill(0)，自动处理冷却。暗影弹 (ShadowBolt, 250速/10伤/紫色) 在 200-55px 距离内发射，配合近战形成远近双层攻击。",
-		"created": "2026-05-22T11:33:50",
-		"id": "fact_1779420830",
 		"source": "ai"
 	},
 	{
@@ -585,13 +571,6 @@
 		"content": "BUG CRÍTICO: attach_script em uma cena .tscn pode corromper a referência do script do nó raiz, apontando para um caminho errado. Enemy.tscn foi corrompido — o script raiz apontava para shadow_bolt.gd deletado. Solução: deletar e recriar o .tscn do zero com create_scene + add_node. O UID da cena muda, mas Godot resolve pelo path.",
 		"created": "2026-05-22T11:43:23",
 		"id": "fact_1779421403",
-		"source": "ai"
-	},
-	{
-		"category": "architecture",
-		"content": "Player Component Architecture (final): Player node delegates to 4 reusable components — HealthComponent (HP/regen/death), CombatComponent (melee hitbox), SkillManager (multi-skill cooldowns), plus BuffManager + EquipmentManager (legacy). Each component is a child Node with @export vars, setup() injection, and signals. Player.gd acts as thin coordinator: node refs, signal forwarding, state machine init, inventory loading.",
-		"created": "2026-05-22T11:49:47",
-		"id": "fact_1779421787",
 		"source": "ai"
 	},
 	{
@@ -641,6 +620,132 @@
 		"content": "LevelUpUI (res://ui/level_up_ui.tscn) is a CanvasLayer instantiated by HUD at runtime. Uses pending allocation pattern — stat changes previewed in UI, only applied on Confirm via StatsComponent.spend_attribute_point(). Game pauses during allocation. Level-up effects use Tween animations (golden flash + \"LEVEL UP!\" text).",
 		"created": "2026-05-22T12:52:02",
 		"id": "fact_1779425522",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Skill System Phase 2 complete: (1) Projectile base class (res://skills/projectile.gd) — Area2D with speed/damage/lifetime/collision_radius, _apply_visual() hook, set_direction/set_caster, auto-destroy. (2) Fireball and ShadowBolt now extend Projectile with only @export overrides + _apply_visual(). (3) SkillManager.use_skill() uses `is Projectile` type-check instead of duck-typing. (4) Player legacy skill_scene export var and _setup_skill_from_legacy() removed — unified to _setup_skills().",
+		"created": "2026-05-22T21:23:37",
+		"id": "fact_1779456217",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "MP System (Phase 3): (1) ManaComponent (res://components/mana_component.gd) — max_mp/mp/regen_rate/regen_delay, use_mp(amount)→bool, restore_mp(amount), mp_changed signal. (2) SkillData.mp_cost added (default 10). (3) SkillManager.use_skill() checks caster ManaComponent before casting — if no ManaComponent, MP check is skipped (enemies cast for free). (4) Player has ManaComponent with max_mp derived from StatsComponent.max_mana (30+INT×3), mp_cost=15 for fireball. (5) HUD MP bar (blue) + multi-skill cooldown bars (one per skill, color-coded). HUD layout restructured: MarginContainer→MainVBox(VBoxContainer)→TopRow(HBoxContainer)[HealthBar,HealthLabel,ManaBar,ManaLabel] + CooldownContainer(dynamic) + StatsLabel.",
+		"created": "2026-05-22T21:33:14",
+		"id": "fact_1779456794",
+		"source": "ai"
+	},
+	{
+		"category": "bug_fix",
+		"content": "GDScript NÃO permite subclasse redeclarar @export var já existente na classe pai. Ex: `extends Projectile` + `@export var speed` causa erro \"member already exists\". Solução: sobrescrever defaults no método `_apply_visual()` (ex: `speed = 500.0`) que é chamado pelo `_ready()` da base antes da criação do CollisionShape.",
+		"created": "2026-05-22T21:40:42",
+		"id": "fact_1779457242",
+		"source": "ai"
+	},
+	{
+		"category": "bug_fix",
+		"content": "@onready var x = $NodeName causa erro \"Node not found\" se o nó não existir no .tscn — o @onready NÃO protege contra falha do get_node(). Use `var x: Type = null` + criação em código no _ready() com verificação `if not x: _create_x()`. Ex: ManaComponent no Player.",
+		"created": "2026-05-22T21:40:42",
+		"id": "fact_1779457242",
+		"source": "ai"
+	},
+	{
+		"category": "bug_fix",
+		"content": "Ferramentas remove_node/add_node em .tscn NÃO persistem no disco — a estrutura reverte ao estado original quando a cena é reaberta. Solução: construir UI dinamicamente em código no _ready() (ex: HUD._build_ui() que extrai nós existentes, destrói estrutura velha e reconstrói layout completo).",
+		"created": "2026-05-22T21:40:42",
+		"id": "fact_1779457242",
+		"source": "ai"
+	},
+	{
+		"category": "convention",
+		"content": "SkillManager.initialize(skills: Array[SkillData]) é o método público para configurar skills em runtime. _ready() apenas faz `initialize(skills)` com os @export do editor. NUNCA chamar _ready() manualmente. Player e Enemy usam `skill_manager.initialize([data])` após configurar SkillData.",
+		"created": "2026-05-22T21:40:42",
+		"id": "fact_1779457242",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "MP check no SkillManager é opcional e backwards-compatible: `var mana = caster.get_node_or_null(\"ManaComponent\")` — se não existir ManaComponent (ex: Enemy sem MP), o check é skipado e a skill é liberada (cooldown-only). Se existir, chama `mana.use_mp(skill.mp_cost)` e falha se MP insuficiente.",
+		"created": "2026-05-22T21:40:42",
+		"id": "fact_1779457242",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Projetile._ready() chama _apply_visual() ANTES de criar CollisionShape2D. Isso permite que subclasses sobrescrevam `collision_radius` no _apply_visual() e o valor seja usado na criação do CircleShape2D. A ordem correta é: _apply_visual() → criar shape → conectar sinais → iniciar timer de auto-destruição.",
+		"created": "2026-05-22T21:40:42",
+		"id": "fact_1779457242",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "HUD pattern: _build_ui() extrai nós existentes do .tscn com remove_child (sem queue_free), depois recria a hierarquia completa em código. Layout final: MarginContainer → MainVBox(VBoxContainer) → TopRow(HBoxContainer)[HealthBar, HealthLabel, ManaBar, ManaLabel] → CooldownContainer(HBoxContainer, barras de cooldown coloridas por skill) → StatsLabel. Isso isola o HUD de mudanças no .tscn.",
+		"created": "2026-05-22T21:40:42",
+		"id": "fact_1779457242",
+		"source": "ai"
+	},
+	{
+		"category": "project_info",
+		"content": "Skill System Phase 1-3 complete (2025-03-24): (Phase1) shadow_bolt.gd criado — ShadowBolt extends Projectile com cor roxa, speed=250, damage=10, radius=6. shadow_bolt.tscn agora referencia script existente. Enemy usa shadow_bolt.tscn (não mais fireball.tscn). (Phase2) Projectile base class extraída com _apply_visual() hook. Fireball e ShadowBolt são subclasses finas. SkillManager usa `is Projectile` type-check. Player legacy skill_scene removido. (Phase3) ManaComponent adicionado. SkillData.mp_cost. HUD com barra MP azul + múltiplas barras de cooldown.",
+		"created": "2026-05-22T21:40:42",
+		"id": "fact_1779457242",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Player States refatorados (2025-03-24) para resolver \"卡顿\" e \"无法同时操作\": (1) Attack/Skill NÃO congelam mais o movimento — processam input_dir com velocidade reduzida (60%/50%). (2) Dodge pode cancelar Attack e Skill (Input.is_action_just_pressed(\"dodge\") verificado nos estados de ação). (3) Transição inteligente: após ação/dodge, se há input de movimento → vai direto para Move (não Idle), eliminando 1 frame morto. (4) Todos os prints de debug removidos de Idle e Move. (5) facing_direction atualizado durante ações para manter orientação correta.",
+		"created": "2026-05-22T21:44:04",
+		"id": "fact_1779457444",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "SkillManager v3 (final 2025-03-24): LEFT/RIGHT hand + 4 hotkey slots. No BindType enum. left_hand_skill/right_hand_skill (SkillData or null=空). _slots[4] for hotkeys. Cooldowns unified in Dictionary keyed by source string (\"left\",\"right\",\"slot_0\"..\"slot_3\"). Signals: hand_changed(hand:String), slot_changed(idx:int), cooldown_changed(source:String,remaining,total). API: equip_hand(hand,skill), unequip_hand(hand), equip_slot(idx,skill), unequip_slot(idx), use_hand(hand,caster,dir), use_slot(idx,caster,dir). _execute() dispatches by skill.skill_type: PROJECTILE/BUFF/AOE/DASH. MP check uses get_node_or_null(\"ManaComponent\") — optional, backwards-compatible.",
+		"created": "2026-05-22T22:39:17",
+		"id": "fact_1779460757",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Player input flow v3: Left-click press → if has_left_spell() → start_aim(\"left\"); else → melee attack. Left-click release → if aiming → end_aim(\"left\") → SkillState. Right-click press → if has_right_spell() → start_aim(\"right\"). Right-click release → if aiming → end_aim(\"right\") → SkillState. Keys 1-4 press → pending_skill_source=\"slot_N\" → SkillState (instant). SkillState reads pending_skill_source: if starts with \"slot_\" → cast_slot(idx); else → cast_hand(src). Both hands use release-to-cast for spells. Hotkeys are instant-cast.",
+		"created": "2026-05-22T22:39:17",
+		"id": "fact_1779460757",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "SkillBar (res://ui/skill_bar.gd): HBoxContainer with 6 items — left hand[L], right hand[R], 4 hotkey slots[1-4]. Each item: PanelContainer→Control(clip)→TextureRect(icon)+ColorRect(cooldown mask from top)+Label(cd text)+Label(bind key, hidden when equipped). Refresh maps source string→SkillManager (left/right for hands, slot_N for hotkeys). Cooldown updates via cooldown_changed(source) signal. Built entirely in code.",
+		"created": "2026-05-22T22:39:17",
+		"id": "fact_1779460757",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "SkillPoolUI (res://ui/skill_pool_ui.gd): K-key CanvasLayer. Left: Grid of skill cards (icon+name+type emoji). Right: 2 hand slots (🖐️双手: 左手/右手) + 4 hotkey slots (⌨️快捷键: 键1-4). Click skill→selected (green highlight). Left-click slot→equip. Right-click slot→unequip. No bind cycling — simplified UX. Built entirely in code.",
+		"created": "2026-05-22T22:39:17",
+		"id": "fact_1779460757",
+		"source": "ai"
+	},
+	{
+		"category": "bug_fix",
+		"content": "GDScript type inference limitations (Godot 4.6): (1) Dictionary access can't infer type — always use explicit `: Type` annotation (e.g., `var slot: Dictionary = ...`, `var bind: int = dict[\"key\"]`). (2) Ternary expressions can't infer type — use `var x: int = a if cond else b`. (3) Subclass cannot redeclare parent @export var — use method override pattern (_apply_visual()). (4) @onready var x = $Node crashes if node missing — use regular var + runtime check. (5) remove_node/add_node on .tscn don't persist to disk — build UI in code.",
+		"created": "2026-05-22T22:39:17",
+		"id": "fact_1779460757",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "SkillPool (res://skills/skill_pool.gd): Resource with Array[SkillData]. Methods: add_skill(skill), remove_skill(skill_id), get_skill(skill_id)→SkillData, has_skill(skill_id)→bool. Player._skill_pool shared between _setup_skills() and SkillPoolUI via member variable (not reloaded from disk — avoids cache issues). Pool initialized with fireball on first load.",
+		"created": "2026-05-22T22:39:17",
+		"id": "fact_1779460757",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "SkillData v2: SkillType enum (PROJECTILE/BUFF/AOE/DASH). Common: skill_id, display_name, icon, description, cooldown, mp_cost. PROJECTILE: projectile_scene, projectile_speed, cast_distance, damage. BUFF: buff_resource (Buff), buff_duration. AOE: aoe_scene, aoe_radius. DASH: dash_distance, dash_speed. Deprecated: scene (use projectile_scene). SkillManager._execute() dispatch by match skill_type.",
+		"created": "2026-05-22T22:39:17",
+		"id": "fact_1779460757",
 		"source": "ai"
 	}
 ]

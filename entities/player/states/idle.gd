@@ -1,30 +1,54 @@
 extends State
 class_name PlayerIdleState
 
+var _aiming_left: bool = false
+var _aiming_right: bool = false
+
 func enter() -> void:
-	# 停止移动
 	if entity is CharacterBody2D:
 		entity.velocity = Vector2.ZERO
+	_aiming_left = false
+	_aiming_right = false
 
 func physics_update(_delta: float) -> void:
 	var input_dir = Input.get_vector("move_left", "move_right", "move_up", "move_down")
-	
+
 	if input_dir.length() > 0.05:
-		print("🔍 Idle: 检测到移动输入! input_dir=", input_dir)
 		transitioned.emit(self, "move")
 		return
-	
+
 	if Input.is_action_just_pressed("dodge"):
-		print("🔍 Idle: 检测到闪避输入!")
 		transitioned.emit(self, "dodge")
 		return
-	
+
+	# ── 左键 ──
 	if Input.is_action_just_pressed("attack"):
-		print("🔍 Idle: 检测到攻击输入!")
-		transitioned.emit(self, "attack")
-		return
-	
+		if entity.skill_manager.has_left_spell():
+			_aiming_left = true
+			entity.start_aim("left")
+		else:
+			transitioned.emit(self, "attack")
+	if Input.is_action_just_released("attack"):
+		if _aiming_left:
+			_aiming_left = false
+			entity.end_aim("left")
+			transitioned.emit(self, "skill")
+
+	# ── 右键 ──
 	if Input.is_action_just_pressed("skill"):
-		print("🔍 Idle: 检测到技能输入!")
-		transitioned.emit(self, "skill")
-		return
+		if entity.skill_manager.has_right_spell():
+			_aiming_right = true
+			entity.start_aim("right")
+	if Input.is_action_just_released("skill"):
+		if _aiming_right:
+			_aiming_right = false
+			entity.end_aim("right")
+			transitioned.emit(self, "skill")
+
+	# ── 快捷键 1-4 ──
+	for i in range(4):
+		var key := "skill_%d" % (i + 1)
+		if Input.is_action_just_pressed(key):
+			entity.pending_skill_source = "slot_%d" % i
+			transitioned.emit(self, "skill")
+			return
