@@ -1,8 +1,8 @@
 # 🌍 World Contracts — 世界模拟运行时契约
 
 > **状态**: 已固化  
-> **版本**: 1.0  
-> **最后更新**: 2025-07  
+> **版本**: 1.5  
+> **最后更新**: 2026-05-23  
 > **适用范围**: `res://world/` `res://systems/` `res://maps/`
 
 ---
@@ -304,36 +304,28 @@ INTACT ──(HP≤0)──► DESTROYED ──(倒计时结束)──► RESPAW
 ## CONTRACT 8: 文件夹所有权
 
 ```
-res://world/
-  world_manager.gd              # 全局单例，地图生命周期
+res://runtime/world/
+  world_runtime.gd              # 世界运行时入口
   world_state_manager.gd        # MapObject 持久化状态
   world_spatial_index.gd        # 统一空间查询层
+  interaction/
+    surface_reaction.gd         # SurfaceReaction Resource
+    surface_manager.gd          # SurfaceManager 外观 (static instance)
 
-res://world/map/
-  map_base.gd                   # OverworldMap / SubMap / OverlayMap 基类
-  overworld_map.gd              # Chunk 流式大地图
-  sub_map.gd                    # 显式过渡子地图
-  overlay_map.gd                # 叠加模式
-
-res://world/chunk/
-  map_chunk.gd                  # 单个区块
-  chunk_loader.gd               # 9 宫格异步加载
+res://runtime/simulation/
+  simulation_runtime.gd         # 统一调度 (Surface → Propagation → Respawn)
+  surface_scheduler.gd          # 表面倒计时过期
+  propagation_scheduler.gd      # BFS 传播队列
 
 res://world/object/
-  map_object.gd                 # 基类 (Damageable+Interactable+Persistent+Taggable)
-  map_object_data.gd            # MapObjectData Resource
+  map_object.gd                 # MapObject 基类 (四接口 + 破坏AOE + 表面生成)
+  map_object_data.gd            # MapObjectData Resource (含 destruction_surface)
+  oil_barrel.tscn               # 油桶 Scene 示例
+  oil_barrel_data.tres          # 油桶 Data 示例
 
-res://world/interaction/
-  interaction_system.gd         # 三层协调器 (Tier A/B/C)
-  reaction_rule.gd              # 标签匹配规则
-  propagation_queue.gd          # BFS 传播队列
-  surface_manager.gd            # 表面状态管理
-  surface_data.gd               # SurfaceData Resource
-
-res://maps/
-  overworld.tscn                # 大地图场景（已有）
-  test_dungeon.tscn
-  test_interior.tscn
+res://skills/
+  archetypes/                   # Runtime 行为模板
+  visuals/                      # 表现层 Resource
 ```
 
 ### 依赖方向（单向）

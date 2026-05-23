@@ -1,8 +1,8 @@
 # 🧠 Runtime Topology — 运行时拓扑与边界契约
 
 > **状态**: 已固化  
-> **版本**: 1.0  
-> **最后更新**: 2025-07  
+> **版本**: 1.5  
+> **最后更新**: 2026-05-23  
 > **适用范围**: 整个项目运行时架构
 
 ---
@@ -296,11 +296,15 @@ Projectile
 ### 已完成 ✅
 
 - CombatRuntime：核心计算链路完整（12 条契约）
-- WorldRuntime 设计：9 条契约
-- 三层地图模型设计
-- MapObject 接口界定
-- 表面状态机设计
-- 传播队列设计
+- WorldRuntime：WorldSpatialIndex + WorldStateManager + MapObject 注册/注销
+- SimulationRuntime：统一调度（Surface → Propagation → Respawn）
+- Status/Buff Runtime：status_id + 叠加规则 + DOT + 减速 + 状态查询
+- Surface Runtime：SurfaceReaction 数据驱动 + SurfaceManager + 7 条默认反应
+- MapObject 基类：四接口 + 破坏 AOE 链 + 表面生成 + 空间索引
+- Skill Architecture：Entity Archetype 收敛（2 Scene + N Data）
+- Visual Layer：ProjectileVisualData / AOEVisualData Resource
+- 三层激活模型设计
+- CommandBus 设计
 
 ### 停止线 ⛔
 
@@ -336,51 +340,63 @@ Projectile
 
 ```
 res://runtime/
-├── game_runtime.gd              # 顶层 GameRuntime (Autoload)
-├── command_bus.gd               # RuntimeCommand 总线 (Autoload)
+├── game_runtime.gd              # 顶层 GameRuntime
+├── command_bus.gd               # RuntimeCommand 总线 (预留)
 ├── runtime_command.gd           # RuntimeCommand Resource
 │
 ├── combat/
-│   └── (现有 res://systems/ + res://skills/ 迁移引用)
+│   ├── combat_executor.gd       # 唯一世界写入口
+│   ├── combat_event.gd
+│   ├── combat_event_bus.gd
+│   ├── combat_phase.gd
+│   ├── combat_scope.gd
+│   ├── triggered_effect.gd
+│   ├── on_hit_apply_status.gd   # 命中挂状态通用模块
+│   ├── conditions/              # 条件判定
+│   ├── effect_graph/            # 效果图节点
+│   ├── debug/                   # CombatDebugger
+│   └── skills/
+│       ├── data/                # SkillData + status .tres
+│       ├── runtime/             # SkillExecutor, Projectile, CastContext
+│       ├── manager/             # SkillManager
+│       ├── modifiers/           # DamageModifier 管线
+│       ├── registry/            # SkillPool
+│       └── loadout/             # SkillLoadout
 │
 ├── world/
 │   ├── world_runtime.gd         # WorldRuntime 入口
 │   ├── world_state_manager.gd   # 真实世界状态
 │   ├── world_spatial_index.gd   # 统一空间查询
-│   │
-│   ├── map/
-│   │   ├── map_base.gd
-│   │   ├── overworld_map.gd
-│   │   ├── sub_map.gd
-│   │   └── overlay_map.gd
-│   │
-│   ├── chunk/
-│   │   ├── map_chunk.gd
-│   │   └── chunk_loader.gd
-│   │
-│   ├── object/
-│   │   ├── map_object.gd        # 4 接口基类
-│   │   └── map_object_data.gd
-│   │
 │   └── interaction/
-│       ├── interaction_system.gd
-│       ├── reaction_rule.gd
-│       ├── propagation_queue.gd
-│       ├── surface_manager.gd
-│       └── surface_data.gd
+│       ├── surface_reaction.gd  # ReactionRule Resource
+│       └── surface_manager.gd   # SurfaceManager 外观
 │
 ├── simulation/
 │   ├── simulation_runtime.gd    # 统一调度器
-│   ├── surface_scheduler.gd
-│   ├── propagation_scheduler.gd
-│   ├── respawn_scheduler.gd
-│   └── time_scheduler.gd        # 预留
+│   ├── surface_scheduler.gd     # 表面倒计时
+│   ├── propagation_scheduler.gd # BFS 传播队列
+│   └── respawn_scheduler.gd     # 重生倒计时
 │
 ├── ui/
-│   └── ui_runtime.gd            # UI 协调器（预留）
-│
 └── save/
-    └── save_runtime.gd          # 持久化（预留）
+
+res://skills/
+├── archetypes/                  # Runtime 行为模板
+│   ├── linear_projectile.tscn
+│   └── persistent_aoe.tscn     # + persistent_aoe.gd
+└── visuals/                     # 表现层 Resource
+    ├── projectile_visual_data.gd
+    ├── aoe_visual_data.gd
+    ├── fire_visual.tres
+    ├── shadow_visual.tres
+    ├── fire_aoe_visual.tres
+    └── ice_aoe_visual.tres
+
+res://world/object/
+├── map_object.gd               # MapObject 基类 (4 接口)
+├── map_object_data.gd          # MapObjectData Resource
+├── oil_barrel.tscn             # 油桶 Scene
+└── oil_barrel_data.tres        # 油桶配置
 ```
 
 ### 依赖方向（铁律）

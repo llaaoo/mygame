@@ -425,5 +425,40 @@
 		"created": "2026-05-23T17:18:24",
 		"id": "fact_1779527904",
 		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "MapObject v1.0 完成：四接口（Damageable/Interactable/Persistent/Taggable）。破坏时支持 AOE 伤害链（通过 CombatExecutor.report_hit + 直接 take_damage，经 WorldSpatialIndex.query_radius 查找相邻目标）、表面生成（destruction_surface + destruction_surface_radius 字段，force_set_surface 绕过 ReactionRule）、空间索引自动注册/注销。油桶连锁爆炸验证通过：一发火焰风暴命中→相邻桶 AOE 传导→oiled 表面→fire 标签触发 burning 传播。",
+		"created": "2026-05-23T18:11:27",
+		"id": "fact_1779531087",
+		"source": "ai"
+	},
+	{
+		"category": "bug_fix",
+		"content": "Runtime 时序修复：WorldRuntime 的 spatial_index 和 state_manager 在 _init() 中初始化（而非 _ready()），确保早于 MapObject._ready() 的注册调用。场景树路径查找使用 \"Game/GameRuntime/WorldRuntime\"（因为 get_tree().root 是 Window 节点）。PersistentAOE 增加 area_entered 信号处理以检测 Area2D 子节点（MapObject 的 HitArea）。Projectile._on_body_entered 增加同组免伤：enemy 投射物不伤 enemy，player 投射物不伤 player。",
+		"created": "2026-05-23T18:11:32",
+		"id": "fact_1779531092",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "v1.5 三系统全链路验证通过：Combat（烈焰风暴/火球命中）→ World（油桶 AOE 连锁破坏，WorldSpatialIndex 空间查询）→ Surface（oiled 表面生成 + fire 标签触发 ReactionRule → burning 传播）→ Status（tick_entity_surface 每 0.5s 给站在 burning 上的实体挂 burning DOT）。从玩家技能到 DOT 扣血，全链路闭环，零断点。",
+		"created": "2026-05-23T18:11:38",
+		"id": "fact_1779531098",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "MapObject 分层抽象原则：Scene = 空间单位（负责节点树/视觉/碰撞/编辑器摆放），Resource = 内容差异（MapObjectData .tres 配置 HP/tags/表面/AOE/掉落），Behavior = 统一运行时（MapObject 基类）。不要每个物体一个 Scene——一个 barrel.tscn + N 个 .tres 配置即可覆盖木材桶/爆炸桶/冰桶。此原则与技能 Archetype 一致：Scene 数量远少于内容数量。",
+		"created": "2026-05-23T18:12:39",
+		"id": "fact_1779531159",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Data-Driven Gameplay 全领域原则：Runtime Archetype（少，负责行为机制）× Data Resource（多，负责内容差异）= 无限内容。适用于技能、物品、装备、MapObject、掉落物。新增内容判断标准：只是换贴图/数值/粒子/标签/EffectGraph？→ ❌ 不需要新 Runtime。行为机制变了？→ ✅ 才需要新 Runtime。理想状态：新增物品 = 新建 .tres 配置，零代码。项目已有此基础设施：SkillData/ProjectileVisualData/AOEVisualData/MapObjectData。",
+		"created": "2026-05-23T18:13:20",
+		"id": "fact_1779531200",
+		"source": "ai"
 	}
 ]

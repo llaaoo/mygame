@@ -1,6 +1,6 @@
 # 技能系统架构设计文档
 
-> 版本: v1.3 | 日期: 2026-05-23
+> 版本: v1.5 | 日期: 2026-05-23
 >
 > **文档层级**: 本文档定义**技能内容生产**方式。Runtime 间边界见 [RUNTIME_TOPOLOGY](./RUNTIME_TOPOLOGY.md)，战斗内部契约见 [COMBAT_CONTRACTS](./COMBAT_CONTRACTS.md)，世界模拟契约见 [WORLD_CONTRACTS](./WORLD_CONTRACTS.md)。
 

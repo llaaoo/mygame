@@ -1,8 +1,8 @@
 # ⚔️ Combat Contracts — 确定性战斗运行时契约
 
 > **状态**: 已固化  
-> **版本**: 1.2  
-> **最后更新**: 2025-07  
+> **版本**: 1.5  
+> **最后更新**: 2026-05-23  
 > **适用范围**: `res://skills/` `res://systems/` `res://components/` `res://items/`
 
 ---
@@ -361,6 +361,35 @@ BuffManager.remove_buff(buff)
 - Dash 技能的 Buff trace 在 tween 之前以预览形式记录（因实际施加在 trace 关闭后）
 
 ---
+
+## CONTRACT 11.1: Status 身份与叠加
+
+### Buff.status_id
+- `status_id` 非空时，Buff 视为"状态"（burning/frozen/poison 等）
+- 供 `StatusCondition`、`BuffManager.has_buff()`、AI 查询
+- 同 `status_id` 的 Buff 按 `stack_behavior` 处理叠加
+
+### 叠加规则
+| 行为 | 效果 |
+|------|------|
+| `REFRESH` | 移除旧实例，重新施加（默认） |
+| `INTENSITY` | 增加层数（上限 `max_stacks`），层数影响 tick 效果 |
+| `INDEPENDENT` | 允许多个同 status_id 实例共存 |
+
+### DOT/HOT
+- `tick_damage` / `tick_heal` × 层数 = 每 tick 效果
+- `tick_damage_scaling` 叠加 StatsComponent.magic_damage 缩放
+- `speed_multiplier` 施加时乘入/移除时除出
+
+### Combat→Status 闭环
+- `OnHitApplyStatus`: ON_HIT → SkillTagCondition 匹配 → `BuffManager.apply_buff(status)`
+- 已验证: 火球命中 → 挂 burning DOT，全程 trace 记录
+
+### Surface→Status 桥接
+- `SurfaceManager.tick_entity_surface()` 每 0.5s 检查实体所在格
+- `get_entity_buffs(cell)` 映射: burning → burning.tres, frozen → frozen.tres
+- 只对尚未拥有该状态的实体施加
+
 
 ## CONTRACT 12: AoE Trace 规则
 
