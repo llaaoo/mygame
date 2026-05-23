@@ -509,5 +509,75 @@
 		"created": "2026-05-23T20:28:39",
 		"id": "fact_1779539319",
 		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "架构终极收敛方向：core → gameplay/action(统一行为入口) → combat/abilities/interaction → entities → world → content。行为入口不能分裂——PlayerInput → Action → ActionExecutor → Skill/Combat/Interaction，否则后期爆炸。",
+		"created": "2026-05-23T20:39:43",
+		"id": "fact_1779539983",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "gameplay/action/ 层设计（下一阶段）：action.gd 基类 + cast_skill_action/melee_attack_action/interact_action/use_item_action/pickup_action 子类 + action_executor.gd。所有玩家行为统一走 Action，不直调 SkillExecutor/CombatComponent。",
+		"created": "2026-05-23T20:39:43",
+		"id": "fact_1779539983",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "WorldObject 系统是下一阶段最优先投资：world/objects/ 下建 world_object.gd 基类 + destructible_object/interactable_object/switch_object/door_object/loot_container 子类。未来 70% 内容生产靠这套体系，不是靠技能系统。",
+		"created": "2026-05-23T20:39:43",
+		"id": "fact_1779539983",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "停止继续抽象技能系统。Modifier Pipeline / Event Bus / Condition / EffectGraph / CombatExecutor 已经超过多数商业独立游戏。不要做 AbilityNode/BehaviorTree/DSL——那是为了抽象而抽象。当前优先级：WorldObject > Region System > Action Layer 收敛。",
+		"created": "2026-05-23T20:39:43",
+		"id": "fact_1779539983",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "区域驱动世界（非 open world）：每个 region/ 目录含 region_data.tres + region_rules.tres + spawn_table.tres + weather.tres。像 Skyrim/Elden Ring/Zelda 的区域定义方式。",
+		"created": "2026-05-23T20:39:43",
+		"id": "fact_1779539983",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "坚持 Hybrid Component Architecture，不要纯 ECS。Godot 不适合 pure ECS——会导致调试地狱、Inspector 消失、SceneTree 失去意义、编辑器不可视。",
+		"created": "2026-05-23T20:39:43",
+		"id": "fact_1779539983",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "ARCHITECTURE.md v2.0 已创建于 res://docs/，替换 RUNTIME_TOPOLOGY.md 成为最高级架构文档。六层边界：core(基础设施) → gameplay(规则) → entities(生命体) → world(空间) → content(纯数据) → ui(表现)。依赖方向：content被所有层引用 → world依赖entities → gameplay依赖entities → core被所有层使用。禁止反向。",
+		"created": "2026-05-23T20:42:23",
+		"id": "fact_1779540143",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "下一阶段优先级（v2.0 已明确）：P0 WorldObject 体系（world/objects/ 基类+子类，70%内容靠它）→ P1 Action Layer 收敛（gameplay/action/ 统一行为入口）→ P2 Region System（区域驱动世界）。停止线：不再扩展技能系统/Modifier/Condition/EffectGraph，不搞纯ECS。",
+		"created": "2026-05-23T20:42:23",
+		"id": "fact_1779540143",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Content vs Gameplay 是最关键边界：gameplay/abilities/runtime/ 回答「技能怎么运行」，content/abilities/ 回答「火球伤害多少、什么颜色」。新增技能 = 新建 content/abilities/xxx.tres，不改 Runtime。只要这个边界不混，项目后期就不会崩。",
+		"created": "2026-05-23T20:42:23",
+		"id": "fact_1779540143",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "目录迁移待执行（阶段 1）：runtime/world → world 合并、runtime/combat/skills + skills/ → gameplay/abilities 合并、runtime/simulation → gameplay/interaction。这是消除语义重叠最关键的两步，已完成文档规划，待用户确认后执行。",
+		"created": "2026-05-23T20:42:23",
+		"id": "fact_1779540143",
+		"source": "ai"
 	}
 ]
