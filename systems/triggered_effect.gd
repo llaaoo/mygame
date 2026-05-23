@@ -35,8 +35,7 @@ extends Resource
 ## 最大递归深度（0=不允许链式触发，1=允许触发1层新事件）
 @export var max_recursion: int = 0
 
-## ── 运行时 ──
-var _last_trigger_time: float = -INF
+## ── 运行时（冷却状态已上交 CombatExecutor） ──
 
 
 ## 注册到事件总线
@@ -60,12 +59,10 @@ func _on_event(ev: CombatEvent) -> void:
 	if CombatEventBus._emit_depth > max_recursion + 1:
 		return
 
-	# 冷却检查
-	if cooldown > 0:
-		var now := Time.get_ticks_msec() / 1000.0
-		if now - _last_trigger_time < cooldown:
+	# 冷却检查委托给 CombatExecutor（唯一冷却权威）
+	if cooldown > 0 and CombatExecutor.instance:
+		if not CombatExecutor.instance.check_trigger_cooldown(self, cooldown):
 			return
-		_last_trigger_time = now
 
 	# 🆕 图模式：优先
 	if graph and graph.root:

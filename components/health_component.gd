@@ -87,12 +87,4 @@ func _emit_kill_event(amount: int) -> void:
 
 
 func _emit_heal_event(amount: int) -> void:
-	# 治疗事件暂不走 CombatExecutor 严格门控
-	var bus := CombatEventBus.instance
-	if not bus:
-		return
-	var ev := CombatEvent.new()
-	ev.type = CombatEvent.Type.ON_HEAL
-	ev.target = get_parent()
-	ev.data["amount"] = amount
-	bus.emit(ev)
+	CombatExecutor.report_heal(get_parent(), amount)

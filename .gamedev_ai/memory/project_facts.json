@@ -1,7 +1,7 @@
 [
 	{
 		"category": "project_info",
-		"content": "PROJECT SUMMARY: 2D动作RPG (Godot 4.6.2/GDScript 2.0), 用户说葡萄牙语。完整战斗循环：Player(5状态) + Enemy(3状态,3种预设) + 近战+技能(火球/暗影弹/冰甲/烈焰风暴/暗影步) + 背包装备(拖拽) + 属性升级 + HUD(HP/MP/冷却/属性) + 掉落+自回。代码质量：零warnings，组件化架构。",
+		"content": "PROJECT SUMMARY: 2D动作RPG (Godot 4.6.2/GDScript 2.0), 用户说中文。完整战斗循环：Player(5状态) + Enemy(3状态,3种预设) + 近战+技能(火球/暗影弹/冰甲/烈焰风暴/暗影步) + 背包装备(拖拽) + 属性升级 + HUD(HP/MP/冷却/属性) + 掉落+自回。代码质量：零warnings，组件化架构。",
 		"created": "2026-05-23T12:43:26",
 		"id": "fact_1779511406",
 		"source": "ai"
@@ -81,6 +81,76 @@
 		"content": "UI SYSTEMS: HUD(CanvasLayer, _build_ui()提取现有节点→重建完整布局: HP条+MP条+冷却条+属性标签), LevelUpUI(待定分配模式, 确认后才spend_attribute_point, 暂停游戏, Tween动画), SkillBar(HBoxContainer 6格: 左手/右手/4快捷键, 冷却遮罩从顶部), SkillPoolUI(K键, 技能卡片网格+装备槽, 左键装备/右键卸载), InventoryPanel(I键, 纸娃娃+背包网格, 拖拽+点击双模式)。所有复杂UI在代码中构建(_build_ui模式), 因编辑器持久化不可靠。",
 		"created": "2026-05-23T12:44:25",
 		"id": "fact_1779511465",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "技能系统采用六层架构：数据层(SkillData/SkillPool/SkillLoadout) → 运行时层(SkillInstance/SkillManager/SkillExecutor/CastContext/DamageContext) → Modifier管线(FLAT→MULTIPLY→OVERRIDE→FINAL四阶段，同阶段按priority排序) → 事件系统(CombatEvent 9种类型 + CombatEventBus pub/sub + CombatExecutor唯一权威入口) → TriggeredEffect(简单模式conditions[]+_execute / 图模式EffectGraph优先) → 调试系统(CombatDebugger/CombatTrace/CombatDebugUI)",
+		"created": "2026-05-23T13:00:01",
+		"id": "fact_1779512401",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Modifier管线四阶段：FLAT(加法层：StatScalingModifier属性缩放、FlatBonusModifier固定加成) → MULTIPLY(乘法层：TagMultiplierModifier标签倍率) → OVERRIDE(覆盖层：规则级覆写如火免→0、必暴) → FINAL(最终层：钳制、暴击倍率)。已有4种Modifier子类，可无限扩展。所有modifier通过required_tags/ignored_tags做标签匹配过滤。",
+		"created": "2026-05-23T13:00:06",
+		"id": "fact_1779512406",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "事件系统：CombatEvent有9种类型(ON_CAST/ON_HIT/ON_DAMAGE/ON_KILL/ON_STATUS_APPLIED/ON_STATUS_REMOVED/ON_HEAL/ON_DODGE/ON_CRIT)。CombatEventBus全局pub/sub单例，递归深度硬限制MAX_DEPTH_HARD=5。CombatExecutor是唯一权威事件发射入口，带链式防火墙MAX_CHAIN_LENGTH=5和MAX_EVENT_DEPTH=3。所有Projectile/FlameStorm/HealthComponent必须通过CombatExecutor.report_hit/damage/kill/cast发射事件。",
+		"created": "2026-05-23T13:00:10",
+		"id": "fact_1779512410",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "TriggeredEffect支持两种模式：简单模式(conditions[] AND逻辑→_execute)和图模式(EffectGraph优先)。EffectGraph节点类型：SequenceNode顺序执行、BranchNode if/else分支、ConditionGateNode条件门、CallableNode/LogNode/EmptyNode。条件库：SkillTagCondition、TargetTypeCondition、TagCondition、LowHpCondition、StatusCondition，基类Condition支持invert取反。已实现OnHitFireBonus(火焰命中+50%伤害)和OnKillBonusExp(击杀+15经验)。",
+		"created": "2026-05-23T13:00:14",
+		"id": "fact_1779512414",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "已实现4种技能类型：PROJECTILE(火球500速25伤、暗影弹250速10伤，继承Projectile基类Area2D)、BUFF(冰甲、暗影步，通过BuffManager.apply_buff)、AOE(烈焰风暴半径80/30伤/0.6秒自毁)、DASH(暗影步Tween位移+锁定最近敌人+施后Buff)。SkillData包含cast_type字段(\"instant\"/\"channel\"/\"charge\")但引导/蓄力逻辑尚未实现。SkillManager管理左右手+4快捷键槽位，通过SkillLoadout热切换，冷却+蓝耗双重门控。",
+		"created": "2026-05-23T13:00:19",
+		"id": "fact_1779512419",
+		"source": "ai"
+	},
+	{
+		"category": "project_info",
+		"content": "技能系统目录结构：res://skills/data/(SkillData+各技能.tres)、res://skills/registry/(SkillPool)、res://skills/loadout/(SkillLoadout)、res://skills/manager/(SkillManager)、res://skills/runtime/(SkillInstance/SkillExecutor/CastContext/DamageContext/Projectile)、res://skills/modifiers/(4种Modifier)、res://skills/scenes/(火球/暗影弹/烈焰风暴场景+脚本)。配套系统：res://systems/(CombatEvent/CombatEventBus/CombatExecutor/CombatPhase/TriggeredEffect/conditions/effect_graph/debug)、res://components/(CombatComponent/HealthComponent/ManaComponent/StatsComponent)。可扩展方向：蓄力/引导技能、弹射/穿透投射物、地面持续效果、组合技连招、元素反应、技能升级进化。",
+		"created": "2026-05-23T13:00:24",
+		"id": "fact_1779512424",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "P0 已完成：1) TriggeredEffect 冷却运行时状态（_last_trigger_time）已删除，冷却检查委托给 CombatExecutor.check_trigger_cooldown()，冷却表 _trigger_cooldowns: Dictionary 由 Executor 持有；2) OnHitFireBonus._execute 不再直接调 health.take_damage()，改为 CombatExecutor.report_bonus_damage()；3) OnKillBonusExp._execute 不再直接调 player.stats_component.add_experience()，改为 CombatExecutor.report_exp_bonus()。CombatExecutor 新增三个入口：check_trigger_cooldown / report_bonus_damage / report_exp_bonus。",
+		"created": "2026-05-23T13:06:58",
+		"id": "fact_1779512818",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "P1 已完成：阶段机完整收敛。CombatPhase 新增 is_valid_transition() 和 allowed_phases_for_event()。CombatExecutor 新增 _previous_phase/_phase_violations 跟踪，enter_phase() 带转移验证（非法转移记警告，连续3次违规强制 IDLE），_can_emit_in_phase() 改为精确映射。新增 begin_cast_sequence/end_cast_sequence（施法生命周期）和 begin_hit_sequence/end_hit_sequence（异步命中）。SkillManager._execute 进入 INPUT 阶段，SkillExecutor.execute 内驱动 MODIFIER→EFFECT→EVENT→POST→IDLE。Projectile/FlameStorm 命中包裹异步事件序列。",
+		"created": "2026-05-23T13:13:53",
+		"id": "fact_1779513233",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "近战攻击已收敛到阶段机：CombatComponent._apply_melee_hit() 包裹 begin_hit_sequence→report_hit(melee/player标签)→take_damage→end_hit_sequence；Enemy.perform_attack() 同样包裹 report_hit(melee/enemy标签)→take_damage。全项目 take_damage 调用已全部经 CombatExecutor.report_hit 或在其内部，零绕过。",
+		"created": "2026-05-23T13:16:49",
+		"id": "fact_1779513409",
+		"source": "ai"
+	},
+	{
+		"category": "bug_fix",
+		"content": "修复三个 trace/debug 问题：1) begin_hit_sequence 增加 _chain_count=0 重置，解决近战 ON_KILL 被 MAX_CHAIN_LENGTH 阻断；2) projectile/flame_storm 移除 _emit_hit_event 中手动 trace.record(ON_HIT)，消除与 _enforce_emit→_record_trace_event 的双重记录；3) CombatComponent.perform_melee_attack 和 Enemy.perform_attack 增加 CombatDebugger.begin/store，近战现在有自己的独立 trace。",
+		"created": "2026-05-23T13:24:58",
+		"id": "fact_1779513898",
 		"source": "ai"
 	}
 ]

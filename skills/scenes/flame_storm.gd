@@ -56,19 +56,21 @@ func _on_body_entered(body: Node2D) -> void:
 func _emit_hit_event(target: Node2D) -> void:
 	var skill := get_meta("skill_data", null) as SkillData
 	var tags: Array[String] = skill.tags if skill else []
+
+	# 进入异步事件序列
+	if CombatExecutor.instance:
+		CombatExecutor.instance.begin_hit_sequence()
+
 	CombatExecutor.report_hit(caster, target, damage, global_position, skill, tags)
 
-	# 追加 ON_HIT 到 trace 并关闭
+	# 关闭技能 trace（ON_HIT 事件已由 _enforce_emit → _record_trace_event 记录）
 	if has_meta("_combat_trace"):
 		var trace := get_meta("_combat_trace") as CombatTrace
 		if trace:
-			trace.record(
-				CombatTraceEvent.Category.EVENT_EMIT,
-				CombatPhase.Phase.EVENT,
-				"ON_HIT", caster.name if caster else "?", target.name,
-				{"damage": damage},
-				{"damage": damage, "target": target.name}
-			)
 			trace.final_damage = damage
 			CombatDebugger.store(trace)
 			remove_meta("_combat_trace")
+
+	# 结束异步事件序列
+	if CombatExecutor.instance:
+		CombatExecutor.instance.end_hit_sequence()

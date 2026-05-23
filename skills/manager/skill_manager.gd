@@ -162,26 +162,37 @@ func use_slot(idx: int, caster: Node2D, direction: Vector2) -> bool:
 ## ── 内部执行（委托给 SkillExecutor） ──
 
 func _execute(skill: SkillData, source: String, caster: Node2D, direction: Vector2) -> bool:
+	# ── INPUT 阶段（阶段机门控） ──
+	var exec_inst := CombatExecutor.instance
+	if exec_inst:
+		exec_inst.begin_cast_sequence()
+
 	# 冷却检查
 	var inst := _find_instance(source)
 	if inst and not inst.is_ready():
+		if exec_inst:
+			exec_inst.enter_phase(CombatPhase.Phase.IDLE)
 		return false
 
 	# MP 检查
 	var mana := caster.get_node_or_null("ManaComponent") as ManaComponent
 	if mana and skill.mp_cost > 0 and not mana.use_mp(skill.mp_cost):
+		if exec_inst:
+			exec_inst.enter_phase(CombatPhase.Phase.IDLE)
 		return false
 
-	# 委托给 SkillExecutor
+	# 委托给 SkillExecutor（内部驱动 MODIFIER → EFFECT → EVENT → POST → IDLE）
 	var ctx := CastContext.simple(caster, direction, skill)
 	var ok := executor.execute(skill, ctx)
 
 	if not ok:
 		if mana and skill.mp_cost > 0:
 			mana.restore_mp(skill.mp_cost)
+		if exec_inst:
+			exec_inst.enter_phase(CombatPhase.Phase.IDLE)
 		return false
 
-	# 触发冷却
+	# 触发冷却（POST 之后）
 	if inst:
 		inst.trigger_cooldown()
 	_cooldowns[source] = skill.cooldown

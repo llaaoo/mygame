@@ -22,6 +22,9 @@ static var instance: CombatExecutor = null
 
 ## ── 阶段跟踪 ──
 var current_phase: CombatPhase.Phase = CombatPhase.Phase.IDLE
+var _previous_phase: CombatPhase.Phase = CombatPhase.Phase.IDLE
+var _phase_violations: int = 0                ## 阶段违规计数器（调试用）
+var _phase_violation_limit: int = 3           ## 连续违规上限（触发即重置）
 
 ## ── 深度限制（防爆炸） ──
 const MAX_EVENT_DEPTH: int = 3
@@ -30,6 +33,11 @@ const MAX_CHAIN_LENGTH: int = 5
 
 ## ── 链式计数 ──
 var _chain_count: int = 0
+
+## ── TriggeredEffect 冷却表（所有权上交） ──
+## key = TriggeredEffect Resource, value = last_trigger_time (float)
+## TriggeredEffect 自身不再持有任何运行时状态
+var _trigger_cooldowns: Dictionary = {}
 
 
 func _ready() -> void:
@@ -124,19 +132,10 @@ func _record_trace_event(type: CombatEvent.Type, source: Node2D, target: Node2D,
 	trace.record_event(CombatEvent.Type.keys()[type], src_name, tgt_name, data)
 
 
-## 阶段门控：某些事件类型只能在特定阶段发射
+## 阶段门控：事件类型只能在指定阶段发射
 func _can_emit_in_phase(type: CombatEvent.Type) -> bool:
-	# IDLE 阶段允许（phase tracking 未激活时的默认状态）
-	if current_phase == CombatPhase.Phase.IDLE:
-		return true
-	# EVENT 阶段允许所有类型
-	if current_phase == CombatPhase.Phase.EVENT:
-		return true
-	# POST 阶段也允许（后处理）
-	if current_phase == CombatPhase.Phase.POST:
-		return true
-	# 其他阶段：拒绝
-	return false
+	var allowed := CombatPhase.allowed_phases_for_event(type)
+	return current_phase in allowed
 
 
 ## ── 直发（无 CombatExecutor 时的降级路径） ──
@@ -155,6 +154,151 @@ func reset_chain() -> void:
 	_chain_count = 0
 
 
-## ── 阶段转换（仅 CombatExecutor 可调用） ──
-func enter_phase(phase: CombatPhase.Phase) -> void:
+## ── 阶段转换（带转移验证） ──
+
+## 进入新阶段 — 验证转移合法性
+func enter_phase(phase: CombatPhase.Phase) -> bool:
+	if not CombatPhase.is_valid_transition(current_phase, phase):
+		_phase_violations += 1
+		push_warning("[CombatExecutor] 非法阶段转移: %s → %s (#%d)" % [
+			CombatPhase.name_of(current_phase),
+			CombatPhase.name_of(phase),
+			_phase_violations
+		])
+		if _phase_violations >= _phase_violation_limit:
+			push_error("[CombatExecutor] 阶段违规达上限 (%d)，强制重置为 IDLE" % _phase_violation_limit)
+			_force_idle()
+		return false
+
+	_previous_phase = current_phase
 	current_phase = phase
+	_phase_violations = 0
+
+	var trace := CombatDebugger.active()
+	if trace:
+		trace.record(
+			CombatTraceEvent.Category.PHASE_ENTER,
+			phase,
+			"PHASE: %s" % CombatPhase.name_of(phase),
+			"", "",
+			{"from": CombatPhase.name_of(_previous_phase)},
+			{}
+		)
+	return true
+
+
+func _force_idle() -> void:
+	_previous_phase = current_phase
+	current_phase = CombatPhase.Phase.IDLE
+	_phase_violations = 0
+	_chain_count = 0
+
+
+## ── 施法序列（完整阶段生命周期，供 SkillManager 调用） ──
+
+func begin_cast_sequence() -> bool:
+	return enter_phase(CombatPhase.Phase.INPUT)
+
+
+func end_cast_sequence() -> void:
+	enter_phase(CombatPhase.Phase.POST)
+	enter_phase(CombatPhase.Phase.IDLE)
+	_chain_count = 0
+
+
+## ── 异步命中序列（供 Projectile/FlameStorm.hit 调用） ──
+
+func begin_hit_sequence() -> bool:
+	_chain_count = 0  ## 每个命中链独立计数，避免跨链累计阻断 ON_KILL
+	return enter_phase(CombatPhase.Phase.EVENT)
+
+
+func end_hit_sequence() -> void:
+	enter_phase(CombatPhase.Phase.IDLE)
+
+
+## ── TriggeredEffect 冷却管理（唯一权威） ──
+
+## 检查并更新 TriggeredEffect 冷却
+## 返回 true = 允许触发，false = 冷却中
+func check_trigger_cooldown(effect: Resource, cd: float) -> bool:
+	var now := Time.get_ticks_msec() / 1000.0
+	var last: float = _trigger_cooldowns.get(effect, -INF)
+	if now - last < cd:
+		return false
+	_trigger_cooldowns[effect] = now
+	return true
+
+
+## ── 额外伤害（TriggeredEffect 专用入口，不走事件系统避免递归） ──
+
+## 施加奖金伤害 — 唯一世界写入口
+static func report_bonus_damage(source: Node2D, target: Node2D, amount: int, skill: SkillData = null, tags: Array = []) -> void:
+	if amount <= 0:
+		return
+	if not instance:
+		# 降级路径：无 Executor 时直接调用
+		if target and target.has_method("take_damage"):
+			target.take_damage(amount)
+		return
+	instance._apply_bonus_damage(source, target, amount, skill, tags)
+
+
+func _apply_bonus_damage(source: Node2D, target: Node2D, amount: int, skill: SkillData, tags: Array) -> void:
+	if not target or not target.has_method("take_damage"):
+		return
+	# 安全检查：目标已死则跳过
+	if "hp" in target and target.hp <= 0:
+		return
+	target.take_damage(amount)
+
+	var trace := CombatDebugger.active()
+	if trace:
+		var src_name: String = source.name if source else "?"
+		trace.record(
+			CombatTraceEvent.Category.EVENT_EMIT,
+			CombatPhase.Phase.EVENT,
+			"BONUS_DAMAGE", src_name, target.name,
+			{"damage": amount},
+			{"damage": amount, "target": target.name}
+		)
+
+
+## ── 经验奖励（TriggeredEffect 专用入口） ──
+
+## 发放经验 — 唯一世界写入口
+static func report_exp_bonus(target: Node2D, amount: int) -> void:
+	if amount <= 0 or not target:
+		return
+	if not instance:
+		# 降级路径
+		_apply_exp_fallback(target, amount)
+		return
+	instance._apply_exp_bonus(target, amount)
+
+
+func _apply_exp_bonus(target: Node2D, amount: int) -> void:
+	var stats := target.get_node_or_null("StatsComponent")
+	if stats and stats.has_method("add_experience"):
+		stats.add_experience(amount)
+		return
+	_apply_exp_fallback(target, amount)
+
+
+static func _apply_exp_fallback(target: Node2D, amount: int) -> void:
+	if target.has_method("add_experience"):
+		target.add_experience(amount)
+		return
+	var stats := target.get_node_or_null("StatsComponent")
+	if stats and stats.has_method("add_experience"):
+		stats.add_experience(amount)
+
+
+## ── 治疗事件（HealthComponent 专用入口） ──
+
+## 报告治疗 — 唯一事件发射入口
+static func report_heal(target: Node2D, amount: int) -> void:
+	if not instance:
+		_emit_direct(CombatEvent.Type.ON_HEAL, null, target, {"amount": amount}, null)
+		return
+	instance._enforce_emit(CombatEvent.Type.ON_HEAL, null, target, {"amount": amount}, null)

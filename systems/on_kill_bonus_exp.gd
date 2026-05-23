@@ -26,10 +26,10 @@ static func create_for_player(exp: int = 15) -> OnKillBonusExp:
 
 
 func _execute(ev: CombatEvent) -> void:
-	# 击杀奖励发放给玩家
+	# 击杀奖励发放给玩家（副作用收敛到 CombatExecutor）
 	var player := ev.target.get_tree().get_first_node_in_group("player") as Player
-	if not player or not player.stats_component:
+	if not player:
 		return
 
-	player.stats_component.add_experience(bonus_exp)
+	CombatExecutor.report_exp_bonus(player, bonus_exp)
 	print("⚡ [OnKillBonusExp] +%d 额外经验 (target=%s)" % [bonus_exp, ev.target.name])

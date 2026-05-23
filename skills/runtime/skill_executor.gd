@@ -81,9 +81,15 @@ func execute(skill: SkillData, context: CastContext) -> bool:
 	if not skill or not context or not context.caster:
 		return false
 
+	var exec_inst := CombatExecutor.instance
+
 	# 重置链式计数（每次新技能施放开始新链）
-	if CombatExecutor.instance:
-		CombatExecutor.instance.reset_chain()
+	if exec_inst:
+		exec_inst.reset_chain()
+
+	# ── MODIFIER 阶段 ──
+	if exec_inst:
+		exec_inst.enter_phase(CombatPhase.Phase.MODIFIER)
 
 	# 开始追踪
 	var trace := CombatDebugger.begin("cast_%s" % skill.get_id(), skill.display_name)
@@ -96,6 +102,10 @@ func execute(skill: SkillData, context: CastContext) -> bool:
 			{"mp_cost": skill.mp_cost, "cooldown": skill.cooldown},
 			{}
 		)
+
+	# ── EFFECT 阶段 ──
+	if exec_inst:
+		exec_inst.enter_phase(CombatPhase.Phase.EFFECT)
 
 	var ok := false
 	var defer_store := false  ## 投射物/AoE 延迟 store，在命中时由实例负责
@@ -111,8 +121,16 @@ func execute(skill: SkillData, context: CastContext) -> bool:
 		SkillData.SkillType.DASH:
 			ok = _execute_dash(skill, context)
 
+	# ── EVENT 阶段（ON_CAST 必须在此阶段发射） ──
+	if exec_inst:
+		exec_inst.enter_phase(CombatPhase.Phase.EVENT)
+
 	if ok:
 		_emit_event(CombatEvent.Type.ON_CAST, context.caster, context.target, skill)
+
+	# ── POST 阶段 ──
+	if exec_inst:
+		exec_inst.enter_phase(CombatPhase.Phase.POST)
 
 	# 存储追踪
 	if trace:
@@ -128,6 +146,10 @@ func execute(skill: SkillData, context: CastContext) -> bool:
 			# Buff/Dash: 立即关闭 trace
 			CombatDebugger.store(trace)
 		# Projectile/AoE: trace 保持活跃，由实例在命中/超时后 store
+
+	# ── 回到 IDLE ──
+	if exec_inst:
+		exec_inst.enter_phase(CombatPhase.Phase.IDLE)
 
 	return ok
 

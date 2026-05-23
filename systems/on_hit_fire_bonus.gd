@@ -28,19 +28,16 @@ static func create_default() -> OnHitFireBonus:
 
 func _execute(ev: CombatEvent) -> void:
 	var target := ev.target
-	if not target or not target.has_method("take_damage"):
-		return
-
-	# 安全检查：目标已死则不追加伤害
-	if "hp" in target and target.hp <= 0:
+	if not target:
 		return
 
 	var original_damage: int = ev.data.get("damage", 0)
 	var bonus := int(original_damage * (bonus_multiplier - 1.0))
 
 	if bonus > 0:
-		# 通过直接调用 HealthComponent 避免触发新的 ON_HIT
-		var health := target.get_node_or_null("HealthComponent")
-		if health and health.has_method("take_damage"):
-			health.take_damage(bonus)
-			print("🔥 [OnHitFireBonus] 火焰增伤 +%d (%.0f%%) → %s" % [bonus, bonus_multiplier * 100, target.name])
+		# 副作用收敛：通过 CombatExecutor 统一施加，不走事件系统避免递归
+		var caster: Node2D = ev.source
+		var skill: SkillData = ev.skill
+		var tags: Array = ev.data.get("tags", [])
+		CombatExecutor.report_bonus_damage(caster, target, bonus, skill, tags)
+		print("🔥 [OnHitFireBonus] 火焰增伤 +%d (%.0f%%) → %s" % [bonus, bonus_multiplier * 100, target.name])

@@ -169,9 +169,9 @@ func take_damage(amount: int) -> void:
 
 
 func _on_died() -> void:
-	# 击杀奖励经验
-	if player and player.stats_component:
-		player.stats_component.add_experience(30 + stats_component.level * 10)
+	# 击杀奖励经验（副作用收敛到 CombatExecutor）
+	if player:
+		CombatExecutor.report_exp_bonus(player, 30 + stats_component.level * 10)
 	_spawn_drop()
 	died.emit()
 	queue_free()
@@ -197,6 +197,28 @@ func perform_attack() -> void:
 	if not attack_ready or not player:
 		return
 	attack_ready = false
+
+	# 敌人近战 trace
+	var trace := CombatDebugger.begin("melee_enemy", "敌人近战")
+
+	# 近战命中走 CombatExecutor 事件序列
+	var exec_inst := CombatExecutor.instance
+	if exec_inst:
+		exec_inst.begin_hit_sequence()
+
+	CombatExecutor.report_hit(self, player, attack_damage, player.global_position, null, ["melee", "enemy"])
 	player.take_damage(attack_damage)
+
+	# 写入 trace 最终伤害
+	if trace:
+		trace.final_damage = attack_damage
+
+	if exec_inst:
+		exec_inst.end_hit_sequence()
+
+	# 关闭敌人近战 trace
+	if trace:
+		CombatDebugger.store(trace)
+
 	await get_tree().create_timer(attack_cooldown).timeout
 	attack_ready = true

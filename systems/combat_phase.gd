@@ -20,3 +20,36 @@ enum Phase {
 ## 阶段名称（调试用）
 static func name_of(phase: Phase) -> String:
 	return Phase.keys()[phase]
+
+
+## 阶段转移验证 — 只允许顺序前进，或重置到 IDLE / 异步进入 EVENT
+static func is_valid_transition(from: Phase, to: Phase) -> bool:
+	# 始终允许回到 IDLE（重置）
+	if to == Phase.IDLE:
+		return true
+	# 始终允许进入 EVENT（异步触发链：投射物命中、TriggeredEffect 链）
+	if to == Phase.EVENT:
+		return true
+	# 否则必须严格顺序前进
+	return to == from + 1
+
+
+## 事件类型 → 允许的阶段映射
+static func allowed_phases_for_event(event_type: CombatEvent.Type) -> Array[Phase]:
+	match event_type:
+		CombatEvent.Type.ON_CAST:
+			return [Phase.EVENT]                    ## 仅施法事件阶段
+		CombatEvent.Type.ON_HIT:
+			return [Phase.IDLE, Phase.EVENT]        ## 异步命中 或 链式触发
+		CombatEvent.Type.ON_DAMAGE:
+			return [Phase.IDLE, Phase.EVENT, Phase.POST]
+		CombatEvent.Type.ON_KILL:
+			return [Phase.IDLE, Phase.EVENT, Phase.POST]
+		CombatEvent.Type.ON_HEAL:
+			return [Phase.IDLE, Phase.EVENT, Phase.POST]
+		CombatEvent.Type.ON_STATUS_APPLIED, CombatEvent.Type.ON_STATUS_REMOVED:
+			return [Phase.IDLE, Phase.EVENT, Phase.POST]
+		CombatEvent.Type.ON_DODGE, CombatEvent.Type.ON_CRIT:
+			return [Phase.IDLE, Phase.EVENT]
+		_:
+			return [Phase.EVENT]
