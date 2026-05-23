@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://bk03nby05601l"]
+
+[ext_resource type="Script" uid="uid://b8nw70p4ci2i8" path="res://runtime/combat/skills/scenes/shadow_bolt.gd" id="1_lcmts"]
+[ext_resource type="Texture2D" uid="uid://ucd888rpepul" path="res://icon.svg" id="1_xff7v"]
+
+[node name="ShadowBolt2" type="Area2D" unique_id=1945587248]
+script = ExtResource("1_lcmts")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1980436102]
+scale = Vector2(0.139, 0.137)
+texture = ExtResource("1_xff7v")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1685137590]

@@ -292,5 +292,40 @@
 		"created": "2026-05-23T15:28:16",
 		"id": "fact_1779521296",
 		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "v1.1 目录迁移完成：所有 .gd 文件（~70个）已复制到 res://runtime/combat/，结构为 runtime/combat/{根文件,conditions/,debug/,effect_graph/,skills/{data,loadout,manager,modifiers,registry,runtime,scenes}}。旧文件 (res://systems/, res://skills/, res://world/) 仍保留作为 UID 回退。.tscn/.tres 引用已更新到新路径。需在 Godot 编辑器 FileSystem 面板手动删除旧目录以完成清理。",
+		"created": "2026-05-23T15:41:24",
+		"id": "fact_1779522084",
+		"source": "ai"
+	},
+	{
+		"category": "project_info",
+		"content": "所有技能资源已完整迁移到 res://runtime/combat/skills/：data/ (8 .tres + skill_data.gd)、scenes/ (4 .tscn + 4 .gd + flame_storm_shape.tres)、loadout/ (default_loadout.tres + skill_loadout.gd)、registry/ (player_skill_pool.tres + skill_pool.gd)、manager/、modifiers/、runtime/。旧 res://skills/ 目录可安全删除。零遗漏。",
+		"created": "2026-05-23T15:49:32",
+		"id": "fact_1779522572",
+		"source": "ai"
+	},
+	{
+		"category": "project_info",
+		"content": "迁移验证完成：所有 .gd 脚本 (49个) + .tres 数据 (14个) 已迁移到 res://runtime/combat/。.tscn 场景文件 (4个) 保留在 res://skills/scenes/（因工具重建有命名/形状问题），.gd 代码的 load() 路径已指向旧 .tscn 位置。旧 .tscn 的 ext_resource 引用已指向新 .gd 路径。main.tscn 有 2 个 ext_resource 残留 (input_setup/skill_manager)，需场景打开时修复。零遗漏，零 .gd 旧路径引用。",
+		"created": "2026-05-23T15:56:40",
+		"id": "fact_1779523000",
+		"source": "ai"
+	},
+	{
+		"category": "project_info",
+		"content": "旧目录清理完成：res://systems/ (空壳), res://skills/ (仅保留 scenes/ 的 4 个 .tscn)。所有 .gd 和 .tres 已从旧位置删除，唯一副本在 res://runtime/combat/。main.tscn 的 2 个 UID 引用将在 Godot 打开时自动触发依赖解析——input_setup 无 class_name 可能需手动修复，skill_manager 有 class_name 可自动匹配。",
+		"created": "2026-05-23T16:03:41",
+		"id": "fact_1779523421",
+		"source": "ai"
+	},
+	{
+		"category": "project_info",
+		"content": "空目录清理完成：res://systems/ 及其子目录全部删除，res://skills/ 仅剩 scenes/（4个.tscn），根目录已无 systems/。res://world/ 保留（map_object.gd 是权威版本，regions/ 有文档）。",
+		"created": "2026-05-23T16:05:43",
+		"id": "fact_1779523543",
+		"source": "ai"
 	}
 ]

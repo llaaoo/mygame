@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://1qugh6jpxen0"]
+
+[ext_resource type="Texture2D" uid="uid://ucd888rpepul" path="res://icon.svg" id="1_6goyc"]
+[ext_resource type="Script" uid="uid://lm1pigwgt485" path="res://runtime/combat/skills/scenes/flame_storm.gd" id="1_wuowj"]
+[ext_resource type="Shape2D" uid="uid://cergm01uabyai" path="res://runtime/combat/skills/scenes/flame_storm_shape.tres" id="2_fkjvo"]
+
+[node name="FlameStorm" type="Area2D" unique_id=1000912175]
+script = ExtResource("1_wuowj")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=167438354]
+modulate = Color(1, 0.3, 0.1, 0.6)
+scale = Vector2(0.8, 0.8)
+texture = ExtResource("1_6goyc")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=698696731]
+shape = ExtResource("2_fkjvo")

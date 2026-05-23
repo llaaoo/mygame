@@ -52,6 +52,10 @@ func _setup_runtimes() -> void:
 	# CombatRuntime（如果存在）
 	if has_node("CombatRuntime"):
 		combat_runtime = $CombatRuntime
+	
+	# 连接 Simulation → World 依赖
+	if simulation_runtime and world_runtime and simulation_runtime.has_method("setup_dependencies"):
+		simulation_runtime.setup_dependencies(world_runtime.spatial_index, world_runtime.state_manager)
 
 
 ## 暂停/恢复

@@ -6,9 +6,9 @@ extends Node
 ## 调度顺序显式、可审计、可暂停
 
 ## 子调度器
-var surface_scheduler: SurfaceScheduler = null
-var propagation_scheduler: PropagationScheduler = null
-var respawn_scheduler: RespawnScheduler = null
+var _surface_scheduler: SurfaceScheduler = null
+var _propagation_scheduler: PropagationScheduler = null
+var _respawn_scheduler: RespawnScheduler = null
 
 ## 暂停标记
 var is_paused: bool = false
@@ -26,6 +26,14 @@ func _ready() -> void:
 	_respawn_scheduler = RespawnScheduler.new()
 	_respawn_scheduler.name = "RespawnScheduler"
 	add_child(_respawn_scheduler)
+
+
+## 注入外部依赖（由 GameRuntime 在初始化时调用）
+func setup_dependencies(spatial_index: WorldSpatialIndex, state_manager: WorldStateManager) -> void:
+	if _propagation_scheduler:
+		_propagation_scheduler.setup(_surface_scheduler, spatial_index)
+	if _respawn_scheduler:
+		_respawn_scheduler.setup(state_manager)
 
 
 ## 统一 tick（由 GameRuntime._process 驱动）

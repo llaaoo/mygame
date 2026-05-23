@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://bqapk4jgp4rsn"]
+
+[ext_resource type="Script" uid="uid://cgp1iriaufv45" path="res://runtime/combat/skills/scenes/ice_explosion.gd" id="1_6etk1"]
+[ext_resource type="Texture2D" uid="uid://ucd888rpepul" path="res://icon.svg" id="1_uoloh"]
+
+[node name="IceExplosion" type="Area2D" unique_id=765729926]
+script = ExtResource("1_6etk1")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=46278099]
+texture = ExtResource("1_uoloh")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=127091471]

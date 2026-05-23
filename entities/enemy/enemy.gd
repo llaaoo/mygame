@@ -64,7 +64,7 @@ func _ready() -> void:
 	var bolt_data := load("res://runtime/combat/skills/data/shadow_bolt_data.tres") as SkillData
 	if bolt_data:
 		bolt_data.skill_type = SkillData.SkillType.PROJECTILE
-		bolt_data.projectile_scene = load("res://runtime/combat/skills/scenes/shadow_bolt.tscn")
+		bolt_data.projectile_scene = load("res://skills/scenes/shadow_bolt.tscn")
 		bolt_data.scene = bolt_data.projectile_scene  # 兼容
 		bolt_data.projectile_speed = 250.0
 		bolt_data.damage = 10
