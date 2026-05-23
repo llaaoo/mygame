@@ -229,5 +229,40 @@
 		"created": "2026-05-23T14:30:11",
 		"id": "fact_1779517811",
 		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "WORLD_CONTRACTS.md v1.0 已创建于 res://docs/，与 COMBAT_CONTRACTS.md 平行。9条契约：C0(MapObject≠角色，仅4接口：Damageable/Interactable/Persistent/Taggable)、C1(只有CombatExecutor修改HP)、C2(表面系统只产生状态变化不直接伤害)、C3(传播BFS队列化禁止递归，MAX_DEPTH=4/MAX_JOBS=8)、C4(表面用5状态dry/wet/burning/frozen/oiled，状态迁移非元素组合)、C5(WorldSpatialIndex统一空间查询入口)、C6(WorldState是真实状态，SceneTree是表现层)、C7(交互密度是设计资源，三层分区低/中/高)、C8(文件夹所有权+单向依赖)、C9(防火墙硬限制)。两个契约体系唯一共享基础设施：CombatExecutor。",
+		"created": "2026-05-23T14:59:49",
+		"id": "fact_1779519589",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "RUNTIME_TOPOLOGY.md v1.0 已创建 — 项目上层宪法。五大Runtime边界：CombatRuntime(纯计算，输入Cast/Hit/DamageRequest→输出CombatResult)、WorldRuntime(状态一致性，WorldState是真，SceneTree是表现)、SimulationRuntime(统一调度所有tick，禁止各系统独立_process)、UIRuntime(只观察)、SaveRuntime(持久化)。Runtime间通信必须走CommandBus异步命令，禁止直接互相调用。世界激活三级：Loaded(全模拟)/Dormant(只WorldState+低频Respawn tick)/Abstracted(统计结果)。停止线：不再加新功能，开始内容能力验证(完整地牢/城镇/野外三个场景)。工程标准：能否低成本产出内容，不是系统有多高级。",
+		"created": "2026-05-23T15:05:18",
+		"id": "fact_1779519918",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "三层契约体系已完成：RUNTIME_TOPOLOGY.md(Runtime间边界+CommandBus+三级激活) → COMBAT_CONTRACTS.md(CombatRuntime内部12条) → WORLD_CONTRACTS.md(WorldRuntime内部9条)。依赖方向铁律：simulation→world→combat(通过CommandBus)，combat纯计算无依赖。禁止反向。唯一共享基础设施CombatExecutor。项目从\"功能堆叠\"进入\"运行时工程化\"阶段。",
+		"created": "2026-05-23T15:05:18",
+		"id": "fact_1779519918",
+		"source": "ai"
+	},
+	{
+		"category": "project_info",
+		"content": "项目已从\"功能堆叠\"进入\"内容生产\"阶段。三份契约(RUNTIME_TOPOLOGY/COMBAT_CONTRACTS/WORLD_CONTRACTS)已固化，不再新增系统层。系统本质已是 Deterministic Gameplay Runtime：CombatExecutor唯一写入口→可回放/可Debug/可联网同步/可SaveLoad/Trace。核心是可组合Gameplay语义(Modifier数学规则+Condition逻辑判断+EffectGraph行为组合)。禁止方向：DSL/可视化蓝图/公式引擎/规则推导/动态脚本/热更新。真正缺失的是Content Pipeline(低成本产出内容)。四个下一阶段：世界区域模板化/Encounter Pipeline/Loot Pipeline/AI Runtime。",
+		"created": "2026-05-23T15:08:41",
+		"id": "fact_1779520121",
+		"source": "ai"
+	},
+	{
+		"category": "convention",
+		"content": "内容生产速度基准（验证架构是否成功）：1周=完整地牢(机关+战斗+表面+地图切换+宝箱+Boss+可破坏场景)、3天=完整野外区域(Chunk流式+交互热点+环境传播)、1天=Boss、30分钟=新技能。不是系统有多高级，而是能否低成本规模化产出内容。",
+		"created": "2026-05-23T15:08:41",
+		"id": "fact_1779520121",
+		"source": "ai"
 	}
 ]
