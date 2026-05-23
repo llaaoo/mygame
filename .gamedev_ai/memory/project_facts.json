@@ -579,5 +579,40 @@
 		"created": "2026-05-23T20:42:23",
 		"id": "fact_1779540143",
 		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "v2.0 目录迁移已执行：components/ → entities/components/（combat/health/mana/stats 组件归实体层）；items/ 拆分为 gameplay/status/（buff/buff_manager）、gameplay/inventory/（equipment_manager）、content/items/（item_data/equipment_data/inventory/.tres 示例）；runtime/combat/ 拆分为 core/state/（state/state_machine）、gameplay/abilities/（skills data/registry/manager/runtime/modifiers/conditions/triggered_effect/archetypes）、gameplay/interaction/（simulation_runtime）；skills/visuals → content/visuals/；maps/ → world/maps/；pickups/ → entities/pickups/；runtime/game_runtime → core/game_runtime；runtime/world_runtime → world/world_runtime；runtime/simulation_runtime → gameplay/interaction/simulation_runtime",
+		"created": "2026-05-23T21:26:56",
+		"id": "fact_1779542816",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "v2.0 迁移后六层目录对应关系：core/（game_runtime/state_machine/command_bus — 基础设施）、gameplay/（abilities/inventory/status/interaction — 游戏规则）、entities/（player/enemy/npc/pickups/components — 生命体）、world/（maps/objects — 空间）、content/（items/visuals — 纯数据 .tres）、ui/（hud — 表现层）。遵循 ARCHITECTURE.md v2.0 的依赖方向：content 被所有层引用 → world 依赖 entities → gameplay 依赖 entities → core 被所有层使用。禁止反向依赖。",
+		"created": "2026-05-23T21:27:01",
+		"id": "fact_1779542821",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "迁移关键决策：1) input_setup.gd 从独立脚本改为 main.tscn 中内嵌 GDScript（sub_resource），消除对 runtime/combat/ 的残留依赖；2) portal.gd/portal.tscn/portal_shape.tres 删除（区域切换功能暂移除）；3) 旧 runtime/ 目录下所有文件（combat/ 子系统、game_runtime、world_runtime、simulation_runtime）已全部迁移到新位置并删除原文件；4) Content vs Gameplay 边界强化：content/visuals/ 和 content/items/ 只放 .tres 纯数据，gameplay/abilities/ 放运行时逻辑",
+		"created": "2026-05-23T21:27:08",
+		"id": "fact_1779542828",
+		"source": "ai"
+	},
+	{
+		"category": "project_info",
+		"content": "UPDATED FILE STRUCTURE (v2.0 migration complete): core/ (game_runtime, command_bus, runtime_command, state/, state_machine), gameplay/ (abilities/ with data+registry+manager+runtime+modifiers+conditions+archetypes+triggered_effect, inventory/, status/, interaction/ with simulation_runtime+surface+propagation+respawn), entities/ (player/, enemy/, npc/, pickups/, components/ with health+combat+stats+mana), world/ (maps/overworld, objects/ with MapObject+oil_barrel etc, world_runtime, world_spatial_index, world_state_manager), content/ (items/ with examples+player_inventory, visuals/ with projectile+aoe visual data), ui/ (hud), tests/, docs/ (ARCHITECTURE, COMBAT_CONTRACTS, WORLD_CONTRACTS, skill_architecture)",
+		"created": "2026-05-23T21:27:15",
+		"id": "fact_1779542835",
+		"source": "ai"
+	},
+	{
+		"category": "bug_fix",
+		"content": "碰撞修复 (2025-07-23): 1) Player-Enemy 碰撞穿透 — 根因: Player collision_mask=1(仅WORLD_STATIC)，Enemy collision_mask=1(仅WORLD_STATIC)，但双方 collision_layer=2(ACTOR)，互不可见。修复: player.tscn 和 enemy.tscn 模板 + main.tscn 实例均设 collision_mask=3 (WORLD_STATIC|ACTOR)。2) 油桶破坏后仍阻挡 — 根因: oil_barrel_data.tres 缺少 blocks_path=true，_on_destroyed() 中 _remove_collision() 从不触发。修复: 重建 .tres 添加 blocks_path=true。",
+		"created": "2026-05-23T21:31:19",
+		"id": "fact_1779543079",
+		"source": "ai"
 	}
 ]

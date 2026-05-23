@@ -42,7 +42,7 @@ Layer  名称              用途                          检测方(典型 Mask
 ```
 CollisionShape2D (根碰撞体):
   layer = ACTOR
-  mask  = WORLD_STATIC
+  mask  = WORLD_STATIC | ACTOR    ⚠️ 必须含 ACTOR，否则角色间互穿！
 
 Hurtbox (Area2D 子节点):
   layer = HURTBOX
@@ -139,8 +139,29 @@ Effect Graph   → 事件链（"ON_HIT → 挂 burning"）
 
 当前项目所有节点使用默认值（layer=1, mask=1），需逐节点迁移：
 
-1. **CharacterBody2D**（Player, Enemy）→ 根体 layer=ACTOR, mask=WORLD_STATIC
+1. **CharacterBody2D**（Player, Enemy）→ 根体 layer=ACTOR, mask=WORLD_STATIC|ACTOR（缺 ACTOR 会导致角色互穿）
 2. **Area2D**（Portal）→ layer=TRIGGER, mask=ACTOR
 3. **Area2D**（Hitbox/Hurtbox）→ 分别设 HITBOX/HURTBOX
 4. **MapObject**（oil_barrel 等）→ layer=WORLD_STATIC, HitArea=HURTBOX
 5. **新增节点**按上表配置，不再使用默认值
+
+
+---
+
+## 已知问题 & 经验教训
+
+### 2025-07-23：Actor-Actor 碰撞穿透
+
+**现象**：玩家和敌人互相穿过，无碰撞。
+
+**根因**：CharacterBody2D 的 `collision_mask` 只设了 `WORLD_STATIC`（bit 1），但双方 `collision_layer=ACTOR`（bit 2）。mask 不含 ACTOR → 互不可见。
+
+**教训**：Actor 的 `collision_mask` 必须包含 `ACTOR` 自身（即 `WORLD_STATIC | ACTOR = 3`），否则角色之间永远是幽灵。
+
+### 2025-07-23：MapObject 破坏后仍阻挡
+
+**现象**：油桶爆炸后，StaticBody2D 未禁用，玩家无法通过。
+
+**根因**：`oil_barrel_data.tres` 缺少 `blocks_path = true`，导致 `_on_destroyed()` 中的 `_remove_collision()` 从不被调用。
+
+**教训**：所有阻挡通行的 MapObject 必须在其 `.tres` 数据中显式设置 `blocks_path = true`。

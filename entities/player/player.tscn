@@ -5,14 +5,14 @@
 [ext_resource type="Resource" uid="uid://ci1ivpfultrb2" path="res://content/items/player_inventory.tres" id="2_7thud"]
 [ext_resource type="Script" uid="uid://4nugo7eloomy" path="res://entities/player/states/move.gd" id="2_abrql"]
 [ext_resource type="Texture2D" uid="uid://ucd888rpepul" path="res://icon.svg" id="2_qiwj3"]
-[ext_resource type="Script" uid="uid://d0shk0qdqd76j" path="res://core/state/state_machine.gd" id="3_26q78"]
+[ext_resource type="Script" uid="uid://cxndt4i7ah38r" path="res://core/state/state_machine.gd" id="3_26q78"]
 [ext_resource type="Script" uid="uid://cqka051ddjpnn" path="res://entities/player/states/attack.gd" id="3_sglur"]
 [ext_resource type="Script" uid="uid://bktmmthfxihqy" path="res://entities/player/states/dodge.gd" id="4_bls4j"]
 [ext_resource type="Script" uid="uid://cn54q1qvccd2p" path="res://entities/player/states/skill.gd" id="5_fkugw"]
-[ext_resource type="Script" uid="uid://yrqmtyiw2k2" path="res://gameplay/status/buff_manager.gd" id="9_bectd"]
-[ext_resource type="Script" uid="uid://c2inl37mcrnjd" path="res://gameplay/inventory/equipment_manager.gd" id="10_wvtmh"]
-[ext_resource type="Script" uid="uid://bumjex67lou7i" path="res://entities/components/health_component.gd" id="12_a1qjk"]
-[ext_resource type="Script" uid="uid://s1dyheimj1oe" path="res://entities/components/combat_component.gd" id="13_j3ovn"]
+[ext_resource type="Script" uid="uid://ksa7xupqxsma" path="res://gameplay/status/buff_manager.gd" id="9_bectd"]
+[ext_resource type="Script" uid="uid://b747rhjrtnus7" path="res://gameplay/inventory/equipment_manager.gd" id="10_wvtmh"]
+[ext_resource type="Script" uid="uid://bina3ctxqpy1c" path="res://entities/components/health_component.gd" id="12_a1qjk"]
+[ext_resource type="Script" uid="uid://dw6d243ux5jl4" path="res://entities/components/combat_component.gd" id="13_j3ovn"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_qiwj3"]
 radius = 80.48
@@ -20,6 +20,8 @@ radius = 80.48
 [sub_resource type="CircleShape2D" id="CircleShape2D_26q78"]
 
 [node name="Player" type="CharacterBody2D" unique_id=87503594]
+collision_layer = 2
+collision_mask = 3
 script = ExtResource("1_8fjmc")
 inventory = ExtResource("2_7thud")
 

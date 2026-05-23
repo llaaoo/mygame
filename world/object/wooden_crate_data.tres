@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="MapObjectData" format=3 uid="uid://bbv747nnx5etb"]
+[gd_resource type="Resource" script_class="MapObjectData" format=3 uid="uid://bnjq85q5oipvh"]
 
 [ext_resource type="Script" uid="uid://em8hc0a4wlnk" path="res://world/object/map_object_data.gd" id="1_4eo12"]
 
@@ -6,3 +6,4 @@
 script = ExtResource("1_4eo12")
 display_name = "木箱"
 respawn_time = 60.0
+blocks_path = true

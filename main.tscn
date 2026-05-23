@@ -59,14 +59,17 @@ position = Vector2(283, -634)
 
 [node name="Enemy1" parent="Overworld" unique_id=1874515091 instance=ExtResource("2_272bh")]
 position = Vector2(200, 0)
+collision_mask = 3
 max_hp = 100
 
 [node name="Enemy2" parent="Overworld" unique_id=268381738 instance=ExtResource("2_272bh")]
 position = Vector2(-200, 0)
+collision_mask = 3
 max_hp = 100
 
 [node name="Enemy3" parent="Overworld" unique_id=843982397 instance=ExtResource("2_272bh")]
 position = Vector2(0, 200)
+collision_mask = 3
 max_hp = 100
 
 [node name="OilBarrel" parent="Overworld" unique_id=964153624 instance=ExtResource("3_efxa6")]
@@ -84,6 +87,7 @@ position = Vector2(280, -536)
 [node name="Player" parent="." unique_id=87503594 instance=ExtResource("2_h2yge")]
 position = Vector2(-6, -419)
 collision_layer = 2
+collision_mask = 3
 debug_items = true
 
 [node name="SkillManager" type="Node" parent="Player" unique_id=1978715642]
