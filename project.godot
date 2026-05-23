@@ -15,13 +15,17 @@ run/main_scene="uid://wx74iv5pkp82"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
 
+[autoload]
+
+DialogueManager="*uid://c3rodes2l3gxb"
+
 [display]
 
 window/stretch/mode="canvas_items"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/gamedev_ai/plugin.cfg", "res://addons/godot_mcp/plugin.cfg")
+enabled=PackedStringArray("res://addons/dialogue_manager/plugin.cfg", "res://addons/gamedev_ai/plugin.cfg", "res://addons/godot_mcp/plugin.cfg", "res://addons/godot_state_charts/plugin.cfg")
 
 [input]
 

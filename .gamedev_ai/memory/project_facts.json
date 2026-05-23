@@ -649,5 +649,12 @@
 		"created": "2026-05-23T22:55:42",
 		"id": "fact_1779548142",
 		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "NPC 对话系统升级：1) 自定义 DialogueBalloon (CanvasLayer, _unhandled_input 接收点击/任意键推进, 不依赖键盘焦点)；2) 保留 Dialogue Manager 集成（_show_from_dialogue_resource, 需要 project.godot 启用 autoload + 插件）；3) 旧 NPCDialogue .tres 格式仍兼容（_show_balloon 直接显示 lines 数组）。NPC 按 E → Interactable → _on_talk → 显示气球",
+		"created": "2026-05-23T23:14:41",
+		"id": "fact_1779549281",
+		"source": "ai"
 	}
 ]
