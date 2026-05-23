@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="ProjectileVisualData" format=3 uid="uid://dfg26rknl8jfd"]
+
+[ext_resource type="Script" uid="uid://k1hj0mrok6qf" path="res://skills/visuals/projectile_visual_data.gd" id="1_cr2e7"]
+
+[resource]
+script = ExtResource("1_cr2e7")
+scale = 0.138

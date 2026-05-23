@@ -163,21 +163,44 @@ func _emit_event(type: CombatEvent.Type, source: Node2D, target: Node2D = null, 
 
 ## ── 投射物 ──
 
+const _ARCHETYPE_SCENES := {
+	"linear_projectile": "res://skills/archetypes/linear_projectile.tscn",
+	"persistent_aoe": "res://skills/archetypes/persistent_aoe.tscn",
+}
+
+
 func _execute_projectile(skill: SkillData, ctx: CastContext) -> bool:
-	var scene := skill.projectile_scene if skill.projectile_scene else skill.scene
+	var scene: PackedScene
+	
+	# 优先用 SkillData 显式指定的场景（兼容旧数据）
+	if skill.projectile_scene:
+		scene = skill.projectile_scene
+	elif skill.scene:
+		scene = skill.scene
+	elif not skill.archetype.is_empty() and _ARCHETYPE_SCENES.has(skill.archetype):
+		scene = load(_ARCHETYPE_SCENES[skill.archetype]) as PackedScene
+	
 	if not scene:
+		push_warning("[SkillExecutor] 无可用 archetype 场景: %s" % skill.archetype)
 		return false
+	
 	var instance := scene.instantiate() as Node2D
 	ctx.world.add_child(instance)
 	instance.global_position = ctx.caster.global_position + ctx.direction * skill.cast_distance
+	
 	if instance is Projectile:
 		var proj := instance as Projectile
-		proj.set_direction(ctx.direction)
-		proj.set_caster(ctx.caster)
+		proj.setup(skill, ctx.caster, ctx.direction)
 		proj.damage = resolve_damage(skill, ctx)
-		proj.speed = skill.projectile_speed
-		proj.set_meta("skill_data", skill)  ## 供事件系统追溯技能
-		proj.set_meta("_combat_trace", CombatDebugger.active())  ## trace 跟随投射物
+		proj.set_meta("skill_data", skill)
+		proj.set_meta("_combat_trace", CombatDebugger.active())
+	elif instance.has_method("setup"):
+		instance.setup(skill, ctx.caster, ctx.direction)
+		if "damage" in instance:
+			instance.damage = resolve_damage(skill, ctx)
+		instance.set_meta("skill_data", skill)
+		instance.set_meta("_combat_trace", CombatDebugger.active())
+	
 	return true
 
 
@@ -200,17 +223,32 @@ func _execute_buff(skill: SkillData, ctx: CastContext) -> bool:
 ## ── AoE ──
 
 func _execute_aoe(skill: SkillData, ctx: CastContext) -> bool:
-	if not skill.aoe_scene:
+	var scene: PackedScene
+	
+	# 优先用 SkillData 显式指定的场景（兼容旧数据）
+	if skill.aoe_scene:
+		scene = skill.aoe_scene
+	elif not skill.archetype.is_empty() and _ARCHETYPE_SCENES.has(skill.archetype):
+		scene = load(_ARCHETYPE_SCENES[skill.archetype]) as PackedScene
+	
+	if not scene:
+		push_warning("[SkillExecutor] 无可用 AoE archetype 场景: %s" % skill.archetype)
 		return false
-	var instance := skill.aoe_scene.instantiate() as Node2D
+	
+	var instance := scene.instantiate() as Node2D
 	ctx.world.add_child(instance)
 	instance.global_position = ctx.caster.global_position + ctx.direction * skill.cast_distance
-	if "damage" in instance:
-		instance.damage = resolve_damage(skill, ctx)
-	if instance.has_method("set_caster"):
-		instance.set_caster(ctx.caster)
-	instance.set_meta("skill_data", skill)  ## 供事件系统追溯技能
-	instance.set_meta("_combat_trace", CombatDebugger.active())  ## trace 跟随 AoE
+	
+	if instance.has_method("setup"):
+		instance.setup(skill, ctx.caster)
+	else:
+		if "damage" in instance:
+			instance.damage = resolve_damage(skill, ctx)
+		if instance.has_method("set_caster"):
+			instance.set_caster(ctx.caster)
+	
+	instance.set_meta("skill_data", skill)
+	instance.set_meta("_combat_trace", CombatDebugger.active())
 	return true
 
 

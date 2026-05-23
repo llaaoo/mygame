@@ -33,8 +33,20 @@ enum SkillType {
 @export var damage_scaling: float = 1.0          ## 魔法伤害系数（1.0 = 100% intelligence→magic_damage）
 @export var range: float = 0.0                   ## 施法距离（0 = 使用 cast_distance 或默认）
 
+## ── Archetype（运行时行为模板） ──
+@export var archetype: String = ""               ## "linear_projectile" / "persistent_aoe" / "beam" 等
+
+## ── 表现层（推荐） ──
+@export var visual: ProjectileVisualData         ## 投射物视觉配置（贴图/颜色/缩放/音效）
+@export var aoe_visual: AOEVisualData            ## AoE 视觉配置（颜色/缩放/半径/持续时间）
+
+## ── 视觉（@deprecated 用 visual 替代） ──
+@export var projectile_texture: Texture2D
+@export var projectile_color: Color = Color.WHITE
+@export var projectile_scale: float = 0.1
+
 ## ── 投射物专用 ──
-@export var projectile_scene: PackedScene        ## 投射物场景
+@export var projectile_scene: PackedScene        ## @deprecated 用 archetype + SkillExecutor 统一加载
 @export var projectile_speed: float = 500.0
 @export var cast_distance: float = 30.0          ## 生成偏移
 
@@ -43,8 +55,11 @@ enum SkillType {
 @export var buff_duration: float = 5.0           ## 覆盖 Buff 的 duration（0=使用 Buff 自身值）
 
 ## ── AoE 专用 ──
-@export var aoe_scene: PackedScene               ## AoE 场景（Area2D，自毁型）
-@export var aoe_radius: float = 100.0            ## AoE 半径（备用）
+@export var aoe_scene: PackedScene               ## @deprecated 用 archetype + SkillExecutor 统一加载
+@export var aoe_radius: float = 100.0            ## AoE 半径
+@export var aoe_color: Color = Color.WHITE       ## AoE 视觉颜色
+@export var aoe_scale: float = 1.0               ## AoE 视觉缩放
+@export var aoe_lifetime: float = 0.6            ## AoE 持续时间
 
 ## ── 位移专用 ──
 @export var dash_distance: float = 200.0

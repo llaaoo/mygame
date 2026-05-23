@@ -1,7 +1,8 @@
 class_name Projectile
 extends Area2D
-## 投射物基类 — 所有飞行技能（火球、暗影弹、冰箭等）继承此类
-## 子类覆写 _apply_visual() 设置外观，或覆写 @export 默认值
+## 投射物基类 — SkillData 驱动的通用线性投射物
+## 所有直线飞行技能（火球、暗影弹、冰箭等）共用此 Archetype
+## 视觉由 SkillData.{texture, color, scale} 注入
 
 @export var speed: float = 300.0
 @export var damage: int = 10
@@ -11,12 +12,42 @@ extends Area2D
 var direction: Vector2 = Vector2.DOWN
 var caster: Node2D = null
 var _has_hit: bool = false
+var _needs_setup: bool = true  ## setup() 调用前不进入 _ready 逻辑
+
+
+## 核心入口：SkillData 注入所有参数（替代子类覆写）
+func setup(skill: SkillData, caster_node: Node2D, dir: Vector2) -> void:
+	caster = caster_node
+	direction = dir.normalized()
+	rotation = direction.angle()
+	
+	# SkillData 驱动数值
+	speed = skill.projectile_speed
+	damage = skill.projectile_speed  ## 会被 SkillExecutor 覆写为 resolve_damage()
+	lifetime = 3.0
+	
+	# SkillData.visual 优先，fallback 到旧字段
+	var spr = $Sprite2D
+	if spr and skill:
+		if skill.visual:
+			if skill.visual.texture:
+				spr.texture = skill.visual.texture
+			spr.modulate = skill.visual.color
+			spr.scale = Vector2(skill.visual.scale, skill.visual.scale)
+		else:
+			# @deprecated fallback
+			if skill.projectile_texture:
+				spr.texture = skill.projectile_texture
+			spr.modulate = skill.projectile_color
+			spr.scale = Vector2(skill.projectile_scale, skill.projectile_scale)
+	
+	_needs_setup = false
 
 
 func _ready() -> void:
-	# 子类视觉定制（必须在形状创建之前，允许覆写 collision_radius）
-	_apply_visual()
-
+	if _needs_setup:
+		_apply_visual()  ## @deprecated: 旧子类覆写路径，保留兼容
+	
 	# 确保碰撞形状
 	var shape_node = $CollisionShape2D
 	if shape_node and shape_node.shape == null:
@@ -31,7 +62,6 @@ func _ready() -> void:
 
 	# 自动销毁
 	await get_tree().create_timer(lifetime).timeout
-	# 超时未命中：关闭 trace（如果尚未被 ON_HIT 关闭）
 	if has_meta("_combat_trace"):
 		var trace := get_meta("_combat_trace") as CombatTrace
 		if trace:
@@ -46,7 +76,7 @@ func _ready() -> void:
 	queue_free()
 
 
-## 子类覆写：设置 modulate / 粒子 / 缩放等视觉属性
+## @deprecated 子类覆写：设置 modulate / 粒子 / 缩放等视觉属性
 func _apply_visual() -> void:
 	pass
 

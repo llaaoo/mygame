@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="AOEVisualData" format=3 uid="uid://dpprpf8sm3f8w"]
+
+[ext_resource type="Script" uid="uid://c31vhxyrekx0m" path="res://skills/visuals/aoe_visual_data.gd" id="1_by5t3"]
+
+[resource]
+script = ExtResource("1_by5t3")
+scale = 1.5
+radius = 120.0
+lifetime = 0.5

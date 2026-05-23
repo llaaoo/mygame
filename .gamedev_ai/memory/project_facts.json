@@ -334,5 +334,54 @@
 		"created": "2026-05-23T16:31:41",
 		"id": "fact_1779525101",
 		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "v1.3 Entity Archetype 收敛完成：res://skills/archetypes/ 取代逐技能场景。linear_projectile.tscn（Projectile 基类 + setup()）服务于所有直线投射物，persistent_aoe.tscn（PersistentAOE + setup()）服务于所有 AoE。SkillData 新增 archetype/visual 字段（projectile_color/scale, aoe_color/scale/radius/lifetime）。SkillExecutor._execute_projectile/_aoe 通过 _ARCHETYPE_SCENES 字典按 archetype 名加载。旧 projectile/ aoe/ scenes/ 目录已删除。原则：Scene=Runtime行为模型，非技能身份。",
+		"created": "2026-05-23T16:39:33",
+		"id": "fact_1779525573",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Skill = Data Composition, not Scene. 技能本质是 Runtime Archetype（行为模型）+ Payload（伤害/Buff）+ Visual Profile（表现层）的组合。Scene 表示行为模型而非技能身份。新增技能只需创建 .tres 配置，不应新增 Scene、Class、Runtime。",
+		"created": "2026-05-23T16:46:09",
+		"id": "fact_1779525969",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Entity Archetype 原则：只有\"存在于世界中\"的实体才需要 Scene（有位置、有生命周期、会被碰撞/查询）。Scene 数量 = 行为维度（LinearProjectile、PersistentAOE、Beam 等 < 10 个），与技能数量解耦。技能数 200+ 时 Scene 仍应 < 10。",
+		"created": "2026-05-23T16:46:09",
+		"id": "fact_1779525969",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "技能系统发展阶段：阶段1(当前) Enum + GenericProjectile 半数据驱动 → 阶段2 少量 Behavior Object 当逻辑重复时 → 阶段3 完全 Runtime 组件化。当前处于阶段1，不要过早进入全组件化。MovementType enum (LINEAR/HOMING/ARC) 在当前内容量下足够。",
+		"created": "2026-05-23T16:46:09",
+		"id": "fact_1779525969",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "四大后续方向（按优先级）：1. Status/Buff Runtime 深化（burning/frozen/poison/wet/shock 状态系统，连接战斗×世界×表面×AI）；2. Surface Runtime 深化（水面/油/火/冰/毒/电/烟/血，传播/融合/熄灭/冻结/蒸发）；3. Skill Augment System（Split/Pierce/Explode/Chain/Homing 增强器，技能组合指数爆炸）；4. Enemy Combat Brain（AI 威胁评估/技能选择/何时AOE/闪避/逃跑）。",
+		"created": "2026-05-23T16:46:09",
+		"id": "fact_1779525969",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Projectile 行为维度分层：MovementBehavior（linear/homing/arc/orbit/stationary）、HitBehavior（destroy/pierce/explode/chain/stick）、LifetimeBehavior（timeout/distance/return/persistent）、CollisionBehavior（enemy_only/world_only/all/bounce）。未来按需从 enum 迁移到 Behavior Object 组合，而非拆出更多 Archetype 子类。",
+		"created": "2026-05-23T16:46:09",
+		"id": "fact_1779525969",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "v1.3.1 ProjectileVisualData 收敛完成：res://skills/visuals/projectile_visual_data.gd（含 texture/color/scale/trail/hit_effect/sound_cast/sound_hit 字段）。SkillData 新增 visual: ProjectileVisualData 字段，旧字段 projectile_color/scale/texture 标记 @deprecated 保留兼容。Projectile.setup() 优先读 skill.visual，fallback 到旧字段。示例 .tres：fire_visual.tres、shadow_visual.tres。新增投射物技能 = 创建 visual .tres + SkillData .tres，零代码。",
+		"created": "2026-05-23T16:53:02",
+		"id": "fact_1779526382",
+		"source": "ai"
 	}
 ]

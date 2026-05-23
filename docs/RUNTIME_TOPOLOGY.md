@@ -421,9 +421,12 @@ RUNTIME_TOPOLOGY.md (本文档)
     │
     ├──► COMBAT_CONTRACTS.md (CombatRuntime 内部契约)
     │
-    └──► WORLD_CONTRACTS.md (WorldRuntime 内部契约)
+    ├──► WORLD_CONTRACTS.md (WorldRuntime 内部契约)
+    │
+    └──► skill_architecture.md (技能内容架构 — 数据驱动, Archetype 收敛)
 ```
 
 - Runtime Topology 定义 **Runtime 之间** 的边界
 - Combat/World Contracts 定义 **Runtime 内部** 的规则
+- skill_architecture.md 定义 **技能内容生产** 的方式（Scene ≠ 技能身份）
 - 任何跨 Runtime 调用 = 违反本文档 = 必须通过 CommandBus

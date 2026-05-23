@@ -60,15 +60,15 @@ func _ready() -> void:
 	health_component.died.connect(_on_died)
 	_apply_stats_to_health()
 
-	# 技能（纯数据，伤害计算交给 SkillExecutor）
+	# 技能（archetype 驱动场景，SkillData 纯配置）
 	var bolt_data := load("res://runtime/combat/skills/data/shadow_bolt_data.tres") as SkillData
 	if bolt_data:
 		bolt_data.skill_type = SkillData.SkillType.PROJECTILE
-		bolt_data.projectile_scene = load("res://skills/scenes/projectile/shadow_bolt.tscn")
-		bolt_data.scene = bolt_data.projectile_scene  # 兼容
+		bolt_data.archetype = "linear_projectile"
+		bolt_data.visual = load("res://skills/visuals/shadow_visual.tres")
 		bolt_data.projectile_speed = 250.0
 		bolt_data.damage = 10
-		bolt_data.damage_scaling = 0.6               # 60% 魔法伤害加成
+		bolt_data.damage_scaling = 0.6
 		skill_manager.pool = SkillPool.new()
 		skill_manager.pool.add_skill(bolt_data)
 		skill_manager.pool.build()

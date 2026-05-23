@@ -181,13 +181,15 @@ func _setup_skills() -> void:
 	if not _skill_pool:
 		_skill_pool = SkillPool.new()
 
-	# 2. 确保所有技能在池中（纯数据，不计算伤害）
+	# 2. 确保所有技能在池中（纯数据，archetype 驱动场景加载）
 	if not _skill_pool.has_skill("fireball"):
 		var fireball := load("res://runtime/combat/skills/data/fireball_data.tres") as SkillData
 		if fireball:
-			fireball.projectile_scene = load("res://skills/scenes/projectile/fireball.tscn")
+			fireball.archetype = "linear_projectile"
+			fireball.visual = load("res://skills/visuals/fire_visual.tres")
+			fireball.projectile_speed = 500.0
 			fireball.damage = 25
-			fireball.damage_scaling = 1.0          # 100% 魔法伤害加成
+			fireball.damage_scaling = 1.0
 			fireball.mp_cost = 15
 			fireball.skill_type = SkillData.SkillType.PROJECTILE
 			fireball.tags = ["fire"]
@@ -202,15 +204,20 @@ func _setup_skills() -> void:
 						skill.buff_resource = load("res://runtime/combat/skills/data/ice_armor_buff.tres") as Buff
 						skill.tags = ["ice"]
 					"flame_storm":
-						skill.aoe_scene = load("res://skills/scenes/aoe/flame_storm.tscn") as PackedScene
+						skill.archetype = "persistent_aoe"
+						skill.aoe_visual = load("res://skills/visuals/fire_aoe_visual.tres")
 						skill.cast_distance = 150.0
+						skill.damage = 30
 						skill.damage_scaling = 1.2
 						skill.tags = ["fire"]
 					"shadow_step":
 						skill.buff_resource = load("res://runtime/combat/skills/data/shadow_step_buff.tres") as Buff
 						skill.tags = ["shadow"]
 					"ice_explosion":
-						skill.aoe_scene = load("res://skills/scenes/aoe/ice_explosion.tscn") as PackedScene
+						skill.archetype = "persistent_aoe"
+						skill.aoe_visual = load("res://skills/visuals/ice_aoe_visual.tres")
+						skill.damage = 25
+						skill.damage_scaling = 0.8
 						skill.tags = ["ice", "aoe"]
 				_skill_pool.add_skill(skill)
 
