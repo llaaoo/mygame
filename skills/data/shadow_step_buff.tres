@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="Buff" format=3 uid="uid://45k6facr7kdy"]
+
+[ext_resource type="Script" uid="uid://c2ye4olqmm32c" path="res://items/buff.gd" id="1_2kehg"]
+
+[resource]
+script = ExtResource("1_2kehg")
+display_name = "暗影步"
+duration = 3.0
+stat_modifiers = {
+"attack_damage": 25.0
+}

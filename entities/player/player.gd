@@ -172,28 +172,38 @@ func restore_mp(amount: int) -> void:
 
 func _setup_skills() -> void:
 	# 1. 加载技能池（注册表）
-	_skill_pool = load("res://skills/player_skill_pool.tres") as SkillPool
+	_skill_pool = load("res://skills/registry/player_skill_pool.tres") as SkillPool
 	if not _skill_pool:
 		_skill_pool = SkillPool.new()
 
 	# 2. 确保所有技能在池中（纯数据，不计算伤害）
 	if not _skill_pool.has_skill("fireball"):
-		var fireball := load("res://skills/fireball_data.tres") as SkillData
+		var fireball := load("res://skills/data/fireball_data.tres") as SkillData
 		if fireball:
-			fireball.projectile_scene = load("res://skills/fireball.tscn")
+			fireball.projectile_scene = load("res://skills/scenes/fireball.tscn")
 			fireball.damage = 25
 			fireball.damage_scaling = 1.0          # 100% 魔法伤害加成
 			fireball.mp_cost = 15
 			fireball.skill_type = SkillData.SkillType.PROJECTILE
+			fireball.tags = ["fire"]
 			_skill_pool.add_skill(fireball)
 
 	for sid in ["ice_armor", "flame_storm", "shadow_step"]:
 		if not _skill_pool.has_skill(sid):
-			var skill := load("res://skills/%s_data.tres" % sid) as SkillData
+			var skill := load("res://skills/data/%s_data.tres" % sid) as SkillData
 			if skill:
-				if sid == "flame_storm":
-					skill.cast_distance = 150.0
-					skill.damage_scaling = 1.2       # 120% 魔法伤害加成
+				match sid:
+					"ice_armor":
+						skill.buff_resource = load("res://skills/data/ice_armor_buff.tres") as Buff
+						skill.tags = ["ice"]
+					"flame_storm":
+						skill.aoe_scene = load("res://skills/scenes/flame_storm.tscn") as PackedScene
+						skill.cast_distance = 150.0
+						skill.damage_scaling = 1.2
+						skill.tags = ["fire"]
+					"shadow_step":
+						skill.buff_resource = load("res://skills/data/shadow_step_buff.tres") as Buff
+						skill.tags = ["shadow"]
 				_skill_pool.add_skill(skill)
 
 	# 3. 构建索引

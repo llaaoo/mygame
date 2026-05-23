@@ -1,16 +1,16 @@
 [gd_scene format=3 uid="uid://l2ppgawjyksk"]
 
-[ext_resource type="Script" uid="uid://blyteyblgduky" path="res://skills/shadow_bolt.gd" id="1_4kwxk"]
-[ext_resource type="Texture2D" uid="uid://ucd888rpepul" path="res://icon.svg" id="2_ddnht"]
+[ext_resource type="Script" uid="uid://c6sst5p402s8g" path="res://skills/scenes/shadow_bolt.gd" id="1_4c5bo"]
+[ext_resource type="Texture2D" uid="uid://ucd888rpepul" path="res://icon.svg" id="2_1me5v"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_4et00"]
 
 [node name="ShadowBolt" type="Area2D" unique_id=2091139589]
-script = ExtResource("1_4kwxk")
+script = ExtResource("1_4c5bo")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=199595014]
 scale = Vector2(0.13867188, 0.13671874)
-texture = ExtResource("2_ddnht")
+texture = ExtResource("2_1me5v")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=685142953]
 shape = SubResource("CircleShape2D_4et00")

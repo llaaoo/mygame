@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="SkillData" format=3 uid="uid://ctrc0hd708h8u"]
+
+[ext_resource type="Script" uid="uid://ba3b1ncau54mq" path="res://skills/data/skill_data.gd" id="1_h0ytt"]
+
+[resource]
+script = ExtResource("1_h0ytt")
+id = "ice_armor"
+skill_id = "ice_armor"
+display_name = "冰霜护盾"
+description = "冰霜之力凝聚护盾，临时提升生命值上限"
+skill_type = 1
+mp_cost = 25
+cooldown = 12.0
+damage = 0
+damage_scaling = 0.0
+buff_duration = 8.0

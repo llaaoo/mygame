@@ -1,16 +1,16 @@
 [gd_scene format=3 uid="uid://cogsmfa8kr054"]
 
-[ext_resource type="Script" uid="uid://xhlnpwn48n8e" path="res://skills/fireball.gd" id="1_p4cjx"]
-[ext_resource type="Texture2D" uid="uid://ucd888rpepul" path="res://icon.svg" id="2_5twxi"]
+[ext_resource type="Script" uid="uid://4t175cx4cony" path="res://skills/scenes/fireball.gd" id="1_8ulf6"]
+[ext_resource type="Texture2D" uid="uid://ucd888rpepul" path="res://icon.svg" id="2_7dpfm"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_5twxi"]
 
 [node name="Fireball" type="Area2D" unique_id=1726207394]
-script = ExtResource("1_p4cjx")
+script = ExtResource("1_8ulf6")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=846373968]
 scale = Vector2(0.1, 0.1)
-texture = ExtResource("2_5twxi")
+texture = ExtResource("2_7dpfm")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=982359511]
 shape = SubResource("CircleShape2D_5twxi")

@@ -873,5 +873,12 @@
 		"created": "2026-05-23T01:50:58",
 		"id": "fact_1779472258",
 		"source": "ai"
+	},
+	{
+		"category": "bug_fix",
+		"content": "BUG修复 (2025-03-24): player.gd _setup_skills() 中加载 ice_armor/flame_storm/shadow_step 的路径错误 — 写成了 \"res://skills/%s_data.tres\" 缺少 data/ 子目录，导致三个技能加载失败（load返回null，技能池为空，UI中不显示）。已修正为 \"res://skills/data/%s_data.tres\"。同时补充了 buff_resource、aoe_scene 等 Resource 引用（.tres 中 Resource 引用无法持久化，需代码中 load 赋值），以及 tags 标签（ice/fire/shadow）。",
+		"created": "2026-05-23T11:27:58",
+		"id": "fact_1779506878",
+		"source": "ai"
 	}
 ]

@@ -6,7 +6,7 @@
 [ext_resource type="Script" uid="uid://chwid4l447g0c" path="res://systems/input_setup.gd" id="4_lquwl"]
 [ext_resource type="PackedScene" uid="uid://tc5h73volrpp" path="res://ui/hud.tscn" id="5_7mycd"]
 [ext_resource type="Script" uid="uid://b7bqxvy40h1fl" path="res://components/stats_component.gd" id="5_272bh"]
-[ext_resource type="Script" uid="uid://c5j4rrriddj4m" path="res://components/skill_manager.gd" id="6_7mycd"]
+[ext_resource type="Script" uid="uid://c5j4rrriddj4m" path="res://skills/manager/skill_manager.gd" id="6_7mycd"]
 
 [node name="Game" type="Node" unique_id=1368087060]
 
