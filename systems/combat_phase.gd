@@ -22,7 +22,7 @@ static func name_of(phase: Phase) -> String:
 	return Phase.keys()[phase]
 
 
-## 阶段转移验证 — 只允许顺序前进，或重置到 IDLE / 异步进入 EVENT
+## 阶段转移验证 — 允许向前跳跃（可跳过 CONDITION 等），禁止倒退，允许 IDLE/EVENT
 static func is_valid_transition(from: Phase, to: Phase) -> bool:
 	# 始终允许回到 IDLE（重置）
 	if to == Phase.IDLE:
@@ -30,8 +30,8 @@ static func is_valid_transition(from: Phase, to: Phase) -> bool:
 	# 始终允许进入 EVENT（异步触发链：投射物命中、TriggeredEffect 链）
 	if to == Phase.EVENT:
 		return true
-	# 否则必须严格顺序前进
-	return to == from + 1
+	# 允许向前跳跃（某些技能类型跳过 CONDITION，近战跳过 MODIFIER 等）
+	return to > from
 
 
 ## 事件类型 → 允许的阶段映射
@@ -48,7 +48,7 @@ static func allowed_phases_for_event(event_type: CombatEvent.Type) -> Array[Phas
 		CombatEvent.Type.ON_HEAL:
 			return [Phase.IDLE, Phase.EVENT, Phase.POST]
 		CombatEvent.Type.ON_STATUS_APPLIED, CombatEvent.Type.ON_STATUS_REMOVED:
-			return [Phase.IDLE, Phase.EVENT, Phase.POST]
+			return [Phase.IDLE, Phase.EFFECT, Phase.EVENT, Phase.POST]
 		CombatEvent.Type.ON_DODGE, CombatEvent.Type.ON_CRIT:
 			return [Phase.IDLE, Phase.EVENT]
 		_:

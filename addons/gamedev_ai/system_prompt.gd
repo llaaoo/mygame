@@ -179,4 +179,3 @@ At the end of your response, ALWAYS provide 1-3 highly relevant, concise, action
 			file_name = skills_dir.get_next()
 	
 	return prompt
-

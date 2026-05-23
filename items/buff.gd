@@ -32,6 +32,32 @@ extends Resource
 const PRIMARY_STATS: Array[String] = ["strength", "intelligence", "agility", "endurance"]
 
 
+## 描述 Buff 效果为可读字符串（供 trace/debug 使用）
+func describe() -> String:
+	var parts: Array[String] = []
+	var name := display_name if not display_name.is_empty() else "未命名效果"
+
+	for stat in stat_modifiers:
+		var val: float = stat_modifiers[stat]
+		var sign := "+" if val >= 0 else ""
+		parts.append("%s%s%d" % [stat, sign, int(val)])
+
+	for stat in stat_multipliers:
+		var val: float = stat_multipliers[stat]
+		var sign := "+" if val >= 0 else ""
+		parts.append("%s%s%d%%" % [stat, sign, int(val * 100)])
+
+	if tick_heal != 0:
+		if tick_interval > 0:
+			parts.append("tick_heal+%d/%ds" % [tick_heal, tick_interval])
+		else:
+			parts.append("tick_heal+%d" % tick_heal)
+
+	var effect_str := ", ".join(parts) if not parts.is_empty() else "无属性效果"
+	var dur_str := " (%.1fs)" % duration if duration > 0 else " (永久)"
+	return "%s: %s%s" % [name, effect_str, dur_str]
+
+
 ## 应用此 Buff 到目标实体
 func apply_to(entity: Node) -> void:
 	if not entity:

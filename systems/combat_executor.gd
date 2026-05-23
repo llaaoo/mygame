@@ -302,3 +302,30 @@ static func report_heal(target: Node2D, amount: int) -> void:
 		_emit_direct(CombatEvent.Type.ON_HEAL, null, target, {"amount": amount}, null)
 		return
 	instance._enforce_emit(CombatEvent.Type.ON_HEAL, null, target, {"amount": amount}, null)
+
+
+## ── 状态事件（BuffManager 专用入口） ──
+
+## Buff/Debuff 施加
+static func report_status_applied(target: Node2D, buff: Buff) -> void:
+	var data := {
+		"buff_name": buff.display_name,
+		"effect": buff.describe(),
+		"duration": buff.duration,
+	}
+	if not instance:
+		_emit_direct(CombatEvent.Type.ON_STATUS_APPLIED, null, target, data, null)
+		return
+	instance._enforce_emit(CombatEvent.Type.ON_STATUS_APPLIED, null, target, data, null)
+
+
+## Buff/Debuff 移除
+static func report_status_removed(target: Node2D, buff: Buff) -> void:
+	var data := {
+		"buff_name": buff.display_name,
+		"effect": buff.describe(),
+	}
+	if not instance:
+		_emit_direct(CombatEvent.Type.ON_STATUS_REMOVED, null, target, data, null)
+		return
+	instance._enforce_emit(CombatEvent.Type.ON_STATUS_REMOVED, null, target, data, null)

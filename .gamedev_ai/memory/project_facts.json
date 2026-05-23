@@ -152,5 +152,40 @@
 		"created": "2026-05-23T13:24:58",
 		"id": "fact_1779513898",
 		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "COMBAT_CONTRACTS.md 已创建于 res://docs/COMBAT_CONTRACTS.md，包含10条核心契约：CONTRACT 0(架构分层)、1(CombatExecutor唯一写入口)、2(Modifier纯函数)、3(Condition无副作用)、4(EffectGraph无时间控制)、5(EventBus只观察)、6(阶段机规则+事件映射)、7(文件夹所有权+依赖方向)、8(标签体系)、9(伤害全链路)、10(防火墙硬限制) + 反模式速查 + 扩展指南。",
+		"created": "2026-05-23T13:44:14",
+		"id": "fact_1779515054",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Buff 卸载 trace 已完成：1) Buff 类新增 describe() 方法（自描述为可读字符串），SkillExecutor._describe_buff 简化为委托调用；2) CombatExecutor 新增 report_status_applied(target, buff) 和 report_status_removed(target, buff)，发射 ON_STATUS_APPLIED / ON_STATUS_REMOVED 事件；3) BuffManager.apply_buff/remove_buff/clear_all 全部接入 CombatExecutor + trace 记录（BUFF → / BUFF_REMOVE →）。ON_STATUS_* 事件对 TriggeredEffect 系统开放，可监听做连锁反应。",
+		"created": "2026-05-23T13:46:58",
+		"id": "fact_1779515218",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Buff 自动过期系统：BuffManager 新增 _buff_remaining: Dictionary（key=Buff实例, value=剩余秒数）。_process 中 _expire_buffs(delta) 每秒倒计时，到期自动 remove_buff（含 ON_STATUS_REMOVED + trace）。duration=0 的永久 Buff 不加入 _buff_remaining，永不过期。apply_buff/remove_buff/clear_all 同步维护 _buff_remaining 生命周期。Buff 类新增 describe() 自描述方法，SkillExecutor._describe_buff 简化为委托调用。",
+		"created": "2026-05-23T13:52:37",
+		"id": "fact_1779515557",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Buff trace 最终收敛：1) ON_STATUS_APPLIED/ON_STATUS_REMOVED 的 allowed_phases 新增 EFFECT（Buff 在 EFFECT 阶段施加时不再被阻断）；2) SkillExecutor._execute_buff 移除 _record_buff_trace 调用（消除与 BuffManager 的双重记录），BuffManager 成为 Buff trace 唯一入口；3) Dash 技能保留 _execute_dash 中的预览 trace（因 tween 异步施加 Buff 时 trace 已关闭）；4) 阶段转移规则从 to==from+1 改为 to>from（允许向前跳跃，适配跳过 CONDITION 的 Buff/Dash 技能类型）。",
+		"created": "2026-05-23T13:52:44",
+		"id": "fact_1779515564",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "本次对话的架构硬化路径（按顺序）：Review（识别3处危险区：TriggeredEffect冷却、_execute副作用、CombatComponent绕过Executor）→ P0（冷却上交CombatExecutor + 副作用收敛到report_bonus_damage/report_exp_bonus + enemy/health_component绕过修复）→ P1（阶段机CombatPhase完整收敛：is_valid_transition/allowed_phases + enter_phase验证 + begin_cast/hit_sequence生命周期 + SkillManager/SkillExecutor驱动完整序列）→ 近战收敛（CombatComponent/Enemy走begin_hit_sequence+report_hit+标签）→ Trace修复（链式计数重置、双重ON_HIT消除、近战独立trace、Buff trace、final_damage写入）→ COMBAT_CONTRACTS.md（10条契约+反模式+扩展指南）→ Buff自动过期（_buff_remaining倒计时+ON_STATUS_REMOVED）→ Buff trace最终收敛（EFFECT阶段允许、去重、Dash预览保留）。系统已从\"功能堆叠\"进入\"职责边界清晰\"阶段。",
+		"created": "2026-05-23T13:52:53",
+		"id": "fact_1779515573",
+		"source": "ai"
 	}
 ]

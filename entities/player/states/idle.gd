@@ -45,7 +45,7 @@ func _is_held(source: String) -> bool:
 	match source:
 		"left":  return Input.is_action_pressed("attack")
 		"right": return Input.is_action_pressed("skill")
-		_:       return Input.is_action_pressed("skill_%s" % source.trim_prefix("slot_"))
+		_:       return Input.is_action_pressed("skill_%d" % (source.trim_prefix("slot_").to_int() + 1))
 
 
 func _handle_press(source: String, action: String) -> void:

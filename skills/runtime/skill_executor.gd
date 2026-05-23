@@ -87,11 +87,7 @@ func execute(skill: SkillData, context: CastContext) -> bool:
 	if exec_inst:
 		exec_inst.reset_chain()
 
-	# ── MODIFIER 阶段 ──
-	if exec_inst:
-		exec_inst.enter_phase(CombatPhase.Phase.MODIFIER)
-
-	# 开始追踪
+	# 开始追踪（必须在阶段转移之前，确保 enter_phase 的 trace 能被记录）
 	var trace := CombatDebugger.begin("cast_%s" % skill.get_id(), skill.display_name)
 	if trace:
 		trace.record(
@@ -102,6 +98,10 @@ func execute(skill: SkillData, context: CastContext) -> bool:
 			{"mp_cost": skill.mp_cost, "cooldown": skill.cooldown},
 			{}
 		)
+
+	# ── MODIFIER 阶段 ──
+	if exec_inst:
+		exec_inst.enter_phase(CombatPhase.Phase.MODIFIER)
 
 	# ── EFFECT 阶段 ──
 	if exec_inst:
@@ -192,6 +192,7 @@ func _execute_buff(skill: SkillData, ctx: CastContext) -> bool:
 	if skill.buff_duration > 0:
 		buff.duration = skill.buff_duration
 	buff_manager.apply_buff(buff)
+	# trace 由 BuffManager.apply_buff 统一记录
 	return true
 
 
@@ -229,6 +230,12 @@ func _execute_dash(skill: SkillData, ctx: CastContext) -> bool:
 	).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
 
 	if skill.buff_resource:
+		# trace：在 tween 之前记录 Buff（避免异步导致 trace 已关闭）
+		var buff_preview := skill.buff_resource.duplicate() as Buff
+		if skill.buff_duration > 0:
+			buff_preview.duration = skill.buff_duration
+		_record_buff_trace(buff_preview, ctx.caster.name)
+
 		tween.tween_callback(_apply_dash_buff.bind(skill, ctx.caster))
 	return true
 
@@ -263,6 +270,28 @@ func _apply_dash_buff(skill: SkillData, caster: Node2D) -> void:
 	if skill.buff_duration > 0:
 		buff.duration = skill.buff_duration
 	buff_manager.apply_buff(buff)
+
+
+## ── Buff Trace ──
+
+## 描述 Buff 效果为可读字符串（委托给 Buff.describe()）
+func _describe_buff(buff: Buff) -> String:
+	return buff.describe()
+
+
+## 在活跃 trace 中记录 Buff 应用
+func _record_buff_trace(buff: Buff, caster_name: String) -> void:
+	var trace := CombatDebugger.active()
+	if not trace:
+		return
+	var desc := _describe_buff(buff)
+	trace.record(
+		CombatTraceEvent.Category.EVENT_EMIT,
+		CombatPhase.Phase.EFFECT,
+		"BUFF → %s" % caster_name, "", "",
+		{},
+		{"effect": desc}
+	)
 
 
 ## ── Modifier 管理（分阶段版本） ──
