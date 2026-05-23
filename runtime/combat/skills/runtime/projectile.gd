@@ -126,10 +126,12 @@ func _on_area_entered(area: Area2D) -> void:
 		return
 	if not is_instance_valid(caster) or not is_instance_valid(area):
 		return
-	if area.has_method("take_damage"):
+	# 检查 area 自身或 owner（如 MapObject 的 HitArea → MapObject 有 take_damage）
+	var target: Node2D = area if area.has_method("take_damage") else (area.owner if area.owner and area.owner.has_method("take_damage") else null)
+	if target:
 		_has_hit = true
-		_emit_hit_event(area)
-		area.take_damage(damage)
+		_emit_hit_event(target)
+		target.take_damage(damage)
 	queue_free()
 
 

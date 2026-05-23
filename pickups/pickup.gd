@@ -17,6 +17,9 @@ var _collectible: bool = true
 
 
 func _ready() -> void:
+	# 碰撞层：掉落物检测 ACTOR（玩家）
+	collision_layer = 512  # ITEM
+	collision_mask = 2     # ACTOR
 	body_entered.connect(_on_body_entered)
 	_setup_shape()
 

@@ -5,9 +5,18 @@
 [ext_resource type="Texture2D" uid="uid://ucd888rpepul" path="res://icon.svg" id="3_vjcv7"]
 [ext_resource type="Shape2D" uid="uid://bli18lj54nqc6" path="res://world/object/barrel_shape.tres" id="4_1l0vb"]
 
+[sub_resource type="CircleShape2D" id="CircleShape2D_1l0vb"]
+radius = 20.0
+
 [node name="OilBarrel" type="Node2D" unique_id=638277641]
 script = ExtResource("1_bsdls")
 object_data = ExtResource("2_vjcv7")
+
+[node name="Body" type="StaticBody2D" parent="." unique_id=1920187752]
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Body" unique_id=665159495]
+shape = SubResource("CircleShape2D_1l0vb")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1576391586]
 modulate = Color(0.5, 0.3, 0.1, 1)

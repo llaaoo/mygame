@@ -5,9 +5,18 @@
 [ext_resource type="Texture2D" uid="uid://ucd888rpepul" path="res://icon.svg" id="3_gue5g"]
 [ext_resource type="Shape2D" uid="uid://bli18lj54nqc6" path="res://world/object/barrel_shape.tres" id="4_vclfn"]
 
+[sub_resource type="CircleShape2D" id="CircleShape2D_vclfn"]
+radius = 20.0
+
 [node name="WoodenFence" type="Node2D" unique_id=202205351]
 script = ExtResource("1_41f3i")
 object_data = ExtResource("2_gue5g")
+
+[node name="Body" type="StaticBody2D" parent="." unique_id=643117068]
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Body" unique_id=1972488452]
+shape = SubResource("CircleShape2D_vclfn")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1241838998]
 modulate = Color(0.5, 0.35, 0.15, 1)

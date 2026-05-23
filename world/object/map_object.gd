@@ -199,6 +199,13 @@ func _spawn_destruction_surface() -> void:
 
 
 func _remove_collision() -> void:
+	# 禁用物理阻挡体（StaticBody2D → CollisionShape2D）
+	var body := get_node_or_null("Body")
+	if body:
+		for shape_child in body.get_children():
+			if shape_child is CollisionShape2D or shape_child is CollisionPolygon2D:
+				shape_child.set_deferred("disabled", true)
+	# 兼容旧结构：直接子节点的碰撞形状
 	for child in get_children():
 		if child is CollisionShape2D or child is CollisionPolygon2D:
 			child.set_deferred("disabled", true)
