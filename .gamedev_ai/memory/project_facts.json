@@ -222,5 +222,12 @@
 		"created": "2026-05-23T14:19:21",
 		"id": "fact_1779517161",
 		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "技能系统架构已固化：12条COMBAT_CONTRACTS.md契约(v1.1)，六层架构（数据层→运行时层→管线层→事件层→调试层），CombatExecutor唯一写入口，四阶段Modifier管线(FLAT→MULTIPLY→OVERRIDE→FINAL)，CombatPhase阶段机完整收敛。现有四种技能类型(PROJECTILE/BUFF/AOE/DASH)纯增量扩展——新技能只需新建.tres+场景+注册。新Modifier/Condition/TriggeredEffect各只需继承基类覆写一个方法。蓄力/引导技能需要加_execute_channel()分支(cast_type字段已有)，全新技能形态需加SkillType枚举值。多人联网需额外RPC层。架构不需大改，只做增量。",
+		"created": "2026-05-23T14:30:11",
+		"id": "fact_1779517811",
+		"source": "ai"
 	}
 ]
