@@ -481,5 +481,33 @@
 		"created": "2026-05-23T19:44:07",
 		"id": "fact_1779536647",
 		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Portal 区域切换采用「摘除+暂存+恢复」模式：game_root.set_meta(\"saved_region\", region_root) + remove_child() — 不销毁原始 Overworld，ESC 返回时恢复。Player、HUD、GameRuntime 常驻，只替换地图区域。",
+		"created": "2026-05-23T20:28:39",
+		"id": "fact_1779539319",
+		"source": "ai"
+	},
+	{
+		"category": "bug_fix",
+		"content": "MapObject 物理阻挡方案：每个对象场景加 StaticBody2D 子节点（名 \"Body\"，layer=WORLD_STATIC(1), mask=0），复用 HitArea 的形状。map_object.gd 的 _remove_collision() 在对象销毁时禁用 Body 的 CollisionShape2D。Physics layer 不要硬编码在脚本 _ready() 中，Scene 有文件的用场景属性，只有纯代码实例化的节点（Projectile/PersistentAOE/Pickup）才在 _ready() 设。",
+		"created": "2026-05-23T20:28:39",
+		"id": "fact_1779539319",
+		"source": "ai"
+	},
+	{
+		"category": "bug_fix",
+		"content": "Pickup 基类在 _ready() 中设 collision_layer=512(ITEM), collision_mask=2(ACTOR)，因为 Player 已迁到 ACTOR 层(2)，默认 mask=1 检测不到。",
+		"created": "2026-05-23T20:28:39",
+		"id": "fact_1779539319",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "11 层物理标准迁移清单：portal(1024/2), player(2/1), enemy(2/1), AttackHitbox(4/10), oil_barrel/wooden_crate/wooden_fence/ice_wall HitArea(8/20), 每个 MapObject 新增 Body StaticBody2D(1/0)。Projectile/PersistentAOE/Pickup 在代码 _ready() 中设。",
+		"created": "2026-05-23T20:28:39",
+		"id": "fact_1779539319",
+		"source": "ai"
 	}
 ]
