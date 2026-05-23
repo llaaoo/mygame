@@ -51,6 +51,9 @@ func _ready() -> void:
 	# 碰撞形状
 	$CollisionShape2D.shape = load("res://entities/enemy/enemy_body_shape.tres")
 
+	# BuffManager（状态/减益接收）
+	_create_buff_manager()
+
 	# 应用预设属性
 	_apply_preset_stats(enemy_type)
 
@@ -82,6 +85,14 @@ func _ready() -> void:
 	_setup_state_machine()
 
 	call_deferred("_find_player")
+
+
+func _create_buff_manager() -> void:
+	if has_node("BuffManager"):
+		return
+	var bm := BuffManager.new()
+	bm.name = "BuffManager"
+	add_child(bm)
 
 
 ## ── 属性 ──

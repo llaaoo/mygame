@@ -17,6 +17,7 @@ var _skill_pool: SkillPool = null
 var _on_kill_effect: OnKillBonusExp = null
 var _on_hit_effect: TriggeredEffect = null
 var _on_ice_expire: OnIceArmorExpire = null
+var _on_hit_fire_status: OnHitApplyStatus = null  ## 持有引用防 GC
 
 ## ── 信号（HUD 订阅） ──
 signal health_changed(current_hp: int, max_hp: int)
@@ -290,6 +291,10 @@ func _setup_event_bus() -> void:
 	# ON_STATUS_REMOVED 冰甲 → 冰爆
 	_on_ice_expire = OnIceArmorExpire.create_default()
 	_register_triggered_effects(_on_ice_expire)
+
+	# ON_HIT 火焰技能 → 挂 burning 状态
+	_on_hit_fire_status = OnHitApplyStatus.create("fire", "res://runtime/combat/skills/data/burning.tres")
+	_register_triggered_effects(_on_hit_fire_status)
 
 	# EffectGraph：ON_HIT 火焰技能
 	_register_graph_demo()

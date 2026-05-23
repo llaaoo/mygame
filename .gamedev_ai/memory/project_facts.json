@@ -390,5 +390,33 @@
 		"created": "2026-05-23T17:00:16",
 		"id": "fact_1779526816",
 		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "OnHitApplyStatus 通用模块（res://runtime/combat/on_hit_apply_status.gd）：ON_HIT 事件触发 → SkillTagCondition 匹配 → BuffManager.apply_buff(status)。一行创建：OnHitApplyStatus.create(\"fire\", burning_path)。Combat→Status 闭环已验证：火球命中敌人 → ON_HIT → 挂 burning（DOT 5/秒, 3层, 持续4秒），trace 完整记录 ON_STATUS_APPLIED。敌人已添加 BuffManager（enemy.gd _create_buff_manager()）以接收状态。",
+		"created": "2026-05-23T17:12:47",
+		"id": "fact_1779527567",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "AOEVisualData Resource（res://skills/visuals/aoe_visual_data.gd）已创建：color/scale/radius/lifetime/hit_effect/sound_cast。SkillData 新增 aoe_visual 字段。PersistentAOE.setup() 优先读 skill.aoe_visual，fallback 到旧字段。示例 .tres：fire_aoe_visual.tres（橙红/radius=80/lifetime=0.6）、ice_aoe_visual.tres（冰蓝/radius=120/lifetime=0.5）。AoE 视觉同样从代码完全解耦。",
+		"created": "2026-05-23T17:12:47",
+		"id": "fact_1779527567",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "四份架构文档已交叉引用：RUNTIME_TOPOLOGY.md（Runtime间边界）→ COMBAT_CONTRACTS.md（战斗内部契约）→ WORLD_CONTRACTS.md（世界内部契约）→ skill_architecture.md（内容生产方式）。skill_architecture.md 新增连接点表：SkillExecutor→CombatExecutor(Contract 1)、setup()→伤害链路(Contract 9)、archetype→SimulationRuntime(Topology)、tags→Modifier匹配(Contract 8)、Surface交互→World Contract 2。文档体系完整，每份回答不同层级的问题。",
+		"created": "2026-05-23T17:12:47",
+		"id": "fact_1779527567",
+		"source": "ai"
+	},
+	{
+		"category": "project_info",
+		"content": "项目根目录已清理：删除 5 个残留 .tscn（fireball/flame_storm/ice_explosion/shadow_bolt/shadow_bolt_2，均为 archetype 迁移遗留）和 3 个 main.tscn .tmp 编辑器临时文件。所有文件均无代码引用。当前根目录仅含合法目录：components/ docs/ entities/ items/ maps/ pickups/ runtime/ skills/ tests/ ui/ world/。",
+		"created": "2026-05-23T17:12:47",
+		"id": "fact_1779527567",
+		"source": "ai"
 	}
 ]
