@@ -86,12 +86,12 @@ func query_radius(pos: Vector2, radius: float) -> Array[MapObject]:
 
 
 ## 单元格查询
-func query_cell(cell: Vector2i) -> Array[MapObject]:
+func query_cell(cell: Vector2i) -> Array:
 	return _grid.get(cell, [])
 
 
 ## 标签过滤半径查询
-func query_tags(pos: Vector2, radius: float, tags: Array[String]) -> Array[MapObject]:
+func query_tags(pos: Vector2, radius: float, tags: Array[String]) -> Array:
 	var results: Array[MapObject] = []
 	var all := query_radius(pos, radius)
 	for obj: MapObject in all:

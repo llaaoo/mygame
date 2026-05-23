@@ -418,5 +418,12 @@
 		"created": "2026-05-23T17:12:47",
 		"id": "fact_1779527567",
 		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "v1.5 Surface Runtime 深化完成：1) SurfaceReaction Resource 数据驱动反应规则（required_state + required_tags → result_state + spread），替代硬编码；2) SurfaceManager 外观层包装 SurfaceScheduler，持有 ReactionRule 表 + 实体 Buff 桥接（get_entity_buffs/tick_entity_surface），全局 static instance 可访问；3) PropagationScheduler 重构为使用 SurfaceManager.apply_tags()，支持 spread_to_neighbors 自动传播；4) 5条默认反应规则注册（oil+fire→burning传播, wet+ice→frozen, wet+fire→dry, burn+ice→dry, burn+water→dry）；5) PersistentAOE.setup() 中 _apply_surface() 在生成时设置表面；6) SimulationRuntime 每 0.5s tick_entity_surface，实体站在 burning/frozen/wet 上自动挂对应 Buff。",
+		"created": "2026-05-23T17:18:24",
+		"id": "fact_1779527904",
+		"source": "ai"
 	}
 ]

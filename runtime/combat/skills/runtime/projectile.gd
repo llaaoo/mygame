@@ -99,6 +99,11 @@ func _on_body_entered(body: Node2D) -> void:
 		return
 	if body == caster:
 		return
+	# 同组免伤：敌人投射物不伤敌人，玩家投射物不伤玩家
+	if caster and body.is_in_group("enemy") and caster.is_in_group("enemy"):
+		return
+	if caster and body.is_in_group("player") and caster.is_in_group("player"):
+		return
 	if not is_instance_valid(caster) or not is_instance_valid(body):
 		return
 	if body.has_method("take_damage"):

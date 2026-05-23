@@ -42,7 +42,20 @@ func setup(skill: SkillData, caster_node: Node2D) -> void:
 			if shape and shape is CircleShape2D:
 				shape.radius = skill.aoe_radius
 	
+	
+	# 表面交互：AoE 生成 → 设置所在格表面状态
+	_apply_surface(skill)
+	
 	_needs_setup = false
+
+
+## 根据技能标签在 AoE 所在格设置表面状态
+func _apply_surface(skill: SkillData) -> void:
+	var sm := SurfaceManager.instance
+	if not sm:
+		return
+	var cell := Vector2i(floori(global_position.x / 64), floori(global_position.y / 64))
+	sm.apply_tags(cell, skill.tags, skill.display_name)
 
 
 func _ready() -> void:
