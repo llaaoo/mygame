@@ -5,6 +5,8 @@
 [ext_resource type="Shape2D" uid="uid://pwyrv3tgiq3m" path="res://world/portal_shape.tres" id="4_om30o"]
 
 [node name="Portal" type="Area2D" unique_id=1869604937]
+collision_layer = 1024
+collision_mask = 2
 script = ExtResource("1_xsykg")
 target_path = "res://world/regions/burning_forest/burning_forest.tscn"
 target_label = "🔥燃烧森林"

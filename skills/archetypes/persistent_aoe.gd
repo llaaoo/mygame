@@ -59,6 +59,10 @@ func _apply_surface(skill: SkillData) -> void:
 
 
 func _ready() -> void:
+	# 碰撞层：AoE 是 HITBOX，检测 ACTOR + HURTBOX
+	collision_layer = 4   # HITBOX
+	collision_mask = 10   # ACTOR(2) | HURTBOX(8)
+	
 	# 确保碰撞形状
 	var shape_node = $CollisionShape2D
 	if shape_node and shape_node.shape == null:

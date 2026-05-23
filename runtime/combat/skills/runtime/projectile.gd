@@ -45,6 +45,10 @@ func setup(skill: SkillData, caster_node: Node2D, dir: Vector2) -> void:
 
 
 func _ready() -> void:
+	# 碰撞层：投射物检测 ACTOR + HURTBOX + WORLD_STATIC
+	collision_layer = 16  # PROJECTILE
+	collision_mask = 11   # WORLD_STATIC(1) | ACTOR(2) | HURTBOX(8)
+	
 	if _needs_setup:
 		_apply_visual()  ## @deprecated: 旧子类覆写路径，保留兼容
 	

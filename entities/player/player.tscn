@@ -34,6 +34,7 @@ shape = SubResource("CircleShape2D_qiwj3")
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=574934240]
 
 [node name="AttackHitbox" type="Area2D" parent="." unique_id=1087245058]
+collision_mask = 10
 monitoring = false
 monitorable = false
 

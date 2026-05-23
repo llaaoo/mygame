@@ -13,7 +13,7 @@ extends EditorPlugin
 		auto_start = value
 		notify_property_list_changed()
 
-@export var vibe_coding_mode: bool = true:
+@export var vibe_coding_mode: bool = false:
 	set(value):
 		vibe_coding_mode = value
 		notify_property_list_changed()

@@ -460,5 +460,26 @@
 		"created": "2026-05-23T18:13:20",
 		"id": "fact_1779531200",
 		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Physics layers 按 Gameplay Domain 划分（11层）：WORLD_STATIC(1) / ACTOR(2) / HITBOX(3) / HURTBOX(4) / PROJECTILE(5) / INTERACTION(6) / SURFACE(7) / SENSOR(8) / NAVIGATION(9) / ITEM(10) / TRIGGER(11)。Layer 不等于对象类型，Barrel 等跨多个 Domain 的对象需要多个子节点分别设置。",
+		"created": "2026-05-23T19:44:07",
+		"id": "fact_1779536647",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Gameplay 含义（火/冰/亡灵/Boss 等）应通过 tags + conditions + effect graph 实现，绝不用 Layer。元素类型是 Data/Tag，不是 Layer。",
+		"created": "2026-05-23T19:44:07",
+		"id": "fact_1779536647",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Actor 推荐结构：CharacterBody2D(CollisionBody on WORLD_STATIC) + Hurtbox(HURTBOX) + MeleeHitbox(HITBOX) + InteractionArea(INTERACTION) + PickupArea(ITEM) + SensorArea(SENSOR)。Projectile: Area2D layer=PROJECTILE mask=WORLD_STATIC|HURTBOX|SURFACE。",
+		"created": "2026-05-23T19:44:07",
+		"id": "fact_1779536647",
+		"source": "ai"
 	}
 ]

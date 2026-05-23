@@ -11,6 +11,7 @@ RUNTIME_TOPOLOGY.md (宪法 — 系统边界)
     │
     ├── COMBAT_CONTRACTS.md (战斗内部契约)
     ├── WORLD_CONTRACTS.md (世界内部契约)
+    ├── PHYSICS_LAYERS.md (物理层与碰撞标准)
     └── skill_architecture.md (内容生产方式)
 ```
 
@@ -99,6 +100,7 @@ RUNTIME_TOPOLOGY.md (宪法 — 系统边界)
 | 修复战斗 Bug | COMBAT_CONTRACTS.md 反模式速查 |
 | 修复世界 Bug | WORLD_CONTRACTS.md 反模式速查 |
 | 理解数据驱动原则 | skill_architecture.md 核心原则 |
+| 设置碰撞层/掩码 | PHYSICS_LAYERS.md |
 
 ---
 
@@ -110,3 +112,4 @@ RUNTIME_TOPOLOGY.md (宪法 — 系统边界)
 | v1.3 | 2026-05 | Entity Archetype 收敛，Scene ≠ 技能身份 |
 | v1.4 | 2026-05 | Status/Buff Runtime（DOT/叠加/减速/状态查询） |
 | v1.5 | 2026-05 | Surface Runtime + MapObject + 油桶连锁验证 |
+| v1.6 | 2026-05 | PHYSICS_LAYERS.md — 物理层 11 层标准 |
