@@ -16,6 +16,7 @@ var _skill_pool: SkillPool = null
 ## ── 持有 TriggeredEffect 引用以防 Resource GC ──
 var _on_kill_effect: OnKillBonusExp = null
 var _on_hit_effect: TriggeredEffect = null
+var _on_ice_expire: OnIceArmorExpire = null
 
 ## ── 信号（HUD 订阅） ──
 signal health_changed(current_hp: int, max_hp: int)
@@ -192,7 +193,7 @@ func _setup_skills() -> void:
 			fireball.tags = ["fire"]
 			_skill_pool.add_skill(fireball)
 
-	for sid in ["ice_armor", "flame_storm", "shadow_step"]:
+	for sid in ["ice_armor", "flame_storm", "shadow_step", "ice_explosion"]:
 		if not _skill_pool.has_skill(sid):
 			var skill := load("res://skills/data/%s_data.tres" % sid) as SkillData
 			if skill:
@@ -208,6 +209,9 @@ func _setup_skills() -> void:
 					"shadow_step":
 						skill.buff_resource = load("res://skills/data/shadow_step_buff.tres") as Buff
 						skill.tags = ["shadow"]
+					"ice_explosion":
+						skill.aoe_scene = load("res://skills/scenes/ice_explosion.tscn") as PackedScene
+						skill.tags = ["ice", "aoe"]
 				_skill_pool.add_skill(skill)
 
 	# 3. 构建索引
@@ -220,7 +224,7 @@ func _setup_skills() -> void:
 	var loadout := SkillLoadout.create(
 		"ice_armor",    # 左手
 		"fireball",     # 右手
-		["flame_storm", "shadow_step"]  # 快捷键槽位
+		["flame_storm", "shadow_step", "ice_explosion"]  # 快捷键 1/2/3
 	)
 	skill_manager.apply_loadout(loadout)
 
@@ -275,6 +279,10 @@ func _setup_event_bus() -> void:
 	# ON_KILL 对敌人 → 额外经验（持有引用防止 Resource GC）
 	_on_kill_effect = OnKillBonusExp.create_for_player(15)
 	_register_triggered_effects(_on_kill_effect)
+
+	# ON_STATUS_REMOVED 冰甲 → 冰爆
+	_on_ice_expire = OnIceArmorExpire.create_default()
+	_register_triggered_effects(_on_ice_expire)
 
 	# EffectGraph：ON_HIT 火焰技能
 	_register_graph_demo()

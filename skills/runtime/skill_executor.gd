@@ -83,8 +83,9 @@ func execute(skill: SkillData, context: CastContext) -> bool:
 
 	var exec_inst := CombatExecutor.instance
 
-	# 重置链式计数（每次新技能施放开始新链）
+	# 阶段重置：确保无论从何处调用，始终从 IDLE 开始（TriggeredEffect 链可能在 EVENT 中调用）
 	if exec_inst:
+		exec_inst.enter_phase(CombatPhase.Phase.IDLE)
 		exec_inst.reset_chain()
 
 	# 开始追踪（必须在阶段转移之前，确保 enter_phase 的 trace 能被记录）

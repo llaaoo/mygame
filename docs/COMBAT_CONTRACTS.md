@@ -1,9 +1,9 @@
 # ⚔️ Combat Contracts — 确定性战斗运行时契约
 
 > **状态**: 已固化  
-> **版本**: 1.0  
+> **版本**: 1.1  
 > **最后更新**: 2025-07  
-> **适用范围**: `res://skills/` `res://systems/` `res://components/`
+> **适用范围**: `res://skills/` `res://systems/` `res://components/` `res://items/`
 
 ---
 
@@ -41,7 +41,9 @@ CombatExecutor.report_kill()       ← HealthComponent
 CombatExecutor.report_cast()       ← SkillExecutor
 CombatExecutor.report_bonus_damage() ← TriggeredEffect
 CombatExecutor.report_exp_bonus()  ← TriggeredEffect / Enemy._on_died
-CombatExecutor.report_heal()       ← HealthComponent
+CombatExecutor.report_heal()            ← HealthComponent
+CombatExecutor.report_status_applied()  ← BuffManager
+CombatExecutor.report_status_removed()  ← BuffManager
 CombatExecutor.check_trigger_cooldown() ← TriggeredEffect
 ```
 
@@ -178,7 +180,7 @@ IDLE(0) → INPUT(1) → CONDITION(2) → MODIFIER(3) → EFFECT(4) → EVENT(5)
 | `ON_DAMAGE` | `IDLE`, `EVENT`, `POST` |
 | `ON_KILL` | `IDLE`, `EVENT`, `POST` |
 | `ON_HEAL` | `IDLE`, `EVENT`, `POST` |
-| `ON_STATUS_*` | `IDLE`, `EVENT`, `POST` |
+| `ON_STATUS_*` | `IDLE`, `EFFECT`, `EVENT`, `POST` |
 | `ON_DODGE/CRIT` | `IDLE`, `EVENT` |
 
 ### 施法完整阶段序列
@@ -187,6 +189,7 @@ IDLE(0) → INPUT(1) → CONDITION(2) → MODIFIER(3) → EFFECT(4) → EVENT(5)
 SkillManager._execute()
   ├─ begin_cast_sequence()        → INPUT
   ├─ SkillExecutor.execute()
+  │    ├─ enter_phase(IDLE)       → 阶段重置（支持从 EVENT 链中安全调用）
   │    ├─ enter_phase(MODIFIER)   → MODIFIER
   │    ├─ enter_phase(EFFECT)     → EFFECT
   │    │    ├─ PROJECTILE: spawn
@@ -258,6 +261,7 @@ entities/       ──→  components/ + skills/manager/ + systems/
 | ShadowBolt | `["shadow"]` | SkillData.tags |
 | IceArmor | `["ice"]` | SkillData.tags |
 | ShadowStep | `["shadow"]` | SkillData.tags |
+| IceExplosion | `["ice", "aoe"]` | SkillData.tags |
 | 玩家近战 | `["melee", "player"]` | CombatComponent |
 | 敌人近战 | `["melee", "enemy"]` | Enemy |
 
@@ -272,9 +276,11 @@ entities/       ──→  components/ + skills/manager/ + systems/
 ────────────────────────────────────────────────────────────
 Projectile._on_body    → begin_hit → report_hit → take_damage → HealthComponent
 FlameStorm._on_body    → begin_hit → report_hit → take_damage → HealthComponent
+IceExplosion._on_body  → begin_hit → report_hit → take_damage → HealthComponent
 CombatComponent (近战) → begin_hit → report_hit → take_damage → HealthComponent
 Enemy.perform_attack   → begin_hit → report_hit → take_damage → HealthComponent
 OnHitFireBonus         →             report_bonus_damage → take_damage (Executor内部)
+TriggeredEffect→Skill  → SkillExecutor.execute() → 完整管线 → trace (独立)
 
 HealthComponent.take_damage
   → report_damage (ON_DAMAGE)
@@ -299,6 +305,72 @@ HealthComponent.take_damage
 
 ---
 
+## CONTRACT 11: Buff 生命周期
+
+### 施加
+```
+BuffManager.apply_buff(buff)
+  ├─ buff.apply_to(entity)           ← 修改属性
+  ├─ _active_buffs.append(buff)
+  ├─ if duration > 0: _buff_remaining[buff] = duration
+  ├─ _record_buff_trace("BUFF")      ← trace（若在技能 trace 内）
+  └─ CombatExecutor.report_status_applied()  ← ON_STATUS_APPLIED 事件
+```
+
+### 自动过期
+```
+BuffManager._process(delta)
+  └─ _expire_buffs(delta)
+       for buff in _active_buffs:
+         if _buff_remaining[buff] > 0:
+           rem -= delta
+           if rem <= 0: remove_buff(buff)
+```
+
+### 移除
+```
+BuffManager.remove_buff(buff)
+  ├─ buff.remove_from(entity)        ← 还原属性
+  ├─ _active_buffs.erase(buff)
+  ├─ _buff_remaining.erase(buff)
+  ├─ _record_buff_trace("BUFF_REMOVE")  ← trace（必须在事件之前，防泄漏）
+  └─ CombatExecutor.report_status_removed()  ← ON_STATUS_REMOVED 事件
+       └─ TriggeredEffect 链（如冰甲→冰爆）
+```
+
+### 规则
+- `duration = 0` 的 Buff 不加入 `_buff_remaining`，永不过期（装备 Buff）
+- `_record_buff_trace` 必须在 `report_status_*` **之前**调用，防止事件链中创建的 SkillExecutor trace 被污染
+- Buff trace 统一由 BuffManager 记录，SkillExecutor._execute_buff 不再重复记录
+- Dash 技能的 Buff trace 在 tween 之前以预览形式记录（因实际施加在 trace 关闭后）
+
+---
+
+## CONTRACT 12: AoE Trace 规则
+
+### ❌ 禁止
+```gdscript
+# _emit_hit_event 中过早关闭 trace
+CombatDebugger.store(trace)   # 第一个命中就关 → 后续命中全部丢失
+remove_meta("_combat_trace")  # meta 删除 → 后续命中找不到 trace
+```
+
+### ✅ 正确
+```gdscript
+# _emit_hit_event: 只更新伤害，不关闭 trace
+trace.final_damage = maxi(trace.final_damage, damage)
+
+# 超时处理器: 统一关闭 trace
+await get_tree().create_timer(lifetime).timeout
+CombatDebugger.store(trace)
+```
+
+### 原则
+AoE 的 trace 生命周期 = AoE 实例的生命周期。命中事件持续记录，超时统一关闭。
+多个命中共享一个 trace，`final_damage` 取最大值（单次最高伤害）。
+
+---
+
 ## 🔴 反模式速查
 
 | 反模式 | 正确做法 |
@@ -310,6 +382,8 @@ HealthComponent.take_damage
 | `Condition.evaluate()` 内修改状态 | 只返回 `bool` |
 | EffectGraph 加 `await/timer/loop` | 只在当前 tick 描述 |
 | `TriggeredEffect._execute()` 直接写世界 | 通过 `CombatExecutor.report_*()` |
+| AoE `_emit_hit_event` 中 `store(trace)+remove_meta` | 只更新 `final_damage`，超时处理器统一 store |
+| BuffManager 事件发射在 trace 记录之前 | `_record_buff_trace` 在 `report_status_*` 之前 |
 
 ---
 

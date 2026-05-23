@@ -81,11 +81,11 @@ func remove_buff(buff: Buff) -> void:
 	_active_buffs.erase(buff)
 	_buff_remaining.erase(buff)
 
-	# 发射 ON_STATUS_REMOVED 事件
-	CombatExecutor.report_status_removed(get_parent(), buff)
-
-	# trace：记录 Buff 移除
+	# trace 必须在事件之前：事件处理器可能创建新 trace（如 SkillExecutor.execute）
 	_record_buff_trace("BUFF_REMOVE", buff)
+
+	# 发射 ON_STATUS_REMOVED（可能触发 TriggeredEffect → SkillExecutor → 新 trace）
+	CombatExecutor.report_status_removed(get_parent(), buff)
 
 	print("🔴 BuffManager: 移除 %s" % buff.display_name)
 

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="SkillData" format=3 uid="uid://bb7jxw7f4wjqv"]
+
+[ext_resource type="Script" uid="uid://ba3b1ncau54mq" path="res://skills/data/skill_data.gd" id="1_18nfb"]
+
+[resource]
+script = ExtResource("1_18nfb")
+id = "ice_explosion"
+display_name = "冰爆"
+description = "冰霜之力爆发，对周围敌人造成范围伤害"
+skill_type = 2
+mp_cost = 0
+cooldown = 0.0
+damage_scaling = 0.8
+cast_distance = 0.0
+aoe_radius = 120.0

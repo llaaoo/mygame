@@ -187,5 +187,40 @@
 		"created": "2026-05-23T13:52:53",
 		"id": "fact_1779515573",
 		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "冰爆升级为独立技能：新建 ice_explosion_data.tres (SkillData, AoE, damage=25, scaling=0.8, tags=[\"ice\",\"aoe\"]) + ice_explosion.gd/.tscn (冰蓝视觉，复用 FlameStorm 命中逻辑)。注册到 _skill_pool + Loadout 快捷键3。OnIceArmorExpire 从手搓 Area2D 改为委托 SkillExecutor.execute(ice_explosion)，走完整 Modifier 管线 + 独立 trace。SkillExecutor.execute 新增 enter_phase(IDLE) 阶段重置，确保从 TriggeredEffect 链（EVENT 阶段）中安全调用。",
+		"created": "2026-05-23T14:18:55",
+		"id": "fact_1779517135",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "OnIceArmorExpire 通用化：1) 新建 BuffNameCondition — 通用条件，匹配 ev.data[\"buff_name\"]，替代硬编码字符串检查；2) OnIceArmorExpire 改为 conditions=[BuffNameCondition(\"冰霜护盾\")] + @export unleash_skill_path 可配置；同一类现在支持任意 Buff→任意 AoE 技能映射，只需改 .tres 配置。验证了 TriggeredEffect + Condition + SkillExecutor 的完整组合链。",
+		"created": "2026-05-23T14:19:00",
+		"id": "fact_1779517140",
+		"source": "ai"
+	},
+	{
+		"category": "bug_fix",
+		"content": "AoE 多命中 trace 修复：FlameStorm/IceExplosion 的 _emit_hit_event 原先在第一个命中时调用 CombatDebugger.store(trace)+remove_meta，导致后续命中全部丢失。修复为只更新 trace.final_damage=max(...)，不关闭不删 meta，trace 统一由超时处理器关闭。同时移除超时处理器中误导的 \"EXPIRE (no hits)\" 日志。BuffManager.remove_buff 的 trace 记录时序修复：_record_buff_trace 移到 report_status_removed 之前，防止事件链中创建的 SkillExecutor trace 被 BUFF_REMOVE 污染。",
+		"created": "2026-05-23T14:19:06",
+		"id": "fact_1779517146",
+		"source": "ai"
+	},
+	{
+		"category": "bug_fix",
+		"content": "idle.gd 技能快捷键输入修复：_is_held 中 slot 是 0-indexed（slot_0~slot_3），但 InputMap 注册的是 skill_1~skill_4（1-indexed）。修复为 source.trim_prefix(\"slot_\").to_int()+1，使 \"slot_0\" 正确映射到 \"skill_1\"。按住数字键时不再报 \"skill_0 doesn't exist\" 错误。",
+		"created": "2026-05-23T14:19:11",
+		"id": "fact_1779517151",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "本轮对话后半段架构决策（按顺序）：1) Buff 自动过期（_buff_remaining 倒计时 + ON_STATUS_REMOVED）；2) ON_STATUS_APPLIED/REMOVED 事件接入 CombatExecutor + trace 收敛（去重、EFFECT 阶段允许）；3) COMBAT_CONTRACTS.md 法典化；4) 冰爆独立技能化（SkillData+场景+Loadout）；5) OnIceArmorExpire 通用化（BuffNameCondition+可配置技能路径）；6) AoE 多命中 trace 修复（延迟 store）+ BuffManager 时序修复；7) 技能快捷键 slot 映射修复。系统现在支持：任意 Buff 过期→触发任意 AoE 技能→完整 trace 记录每个命中→ON_KILL 链不受限。",
+		"created": "2026-05-23T14:19:21",
+		"id": "fact_1779517161",
+		"source": "ai"
 	}
 ]
