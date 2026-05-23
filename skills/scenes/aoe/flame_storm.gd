@@ -1,7 +1,6 @@
 class_name FlameStorm
 extends Area2D
 ## 烈焰风暴 — AoE 范围伤害，生成后立即伤害范围内所有敌人，短暂延迟后自毁
-
 @export var damage: int = 30
 @export var lifetime: float = 0.6
 

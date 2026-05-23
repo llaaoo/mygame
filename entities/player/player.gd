@@ -185,7 +185,7 @@ func _setup_skills() -> void:
 	if not _skill_pool.has_skill("fireball"):
 		var fireball := load("res://runtime/combat/skills/data/fireball_data.tres") as SkillData
 		if fireball:
-			fireball.projectile_scene = load("res://skills/scenes/fireball.tscn")
+			fireball.projectile_scene = load("res://skills/scenes/projectile/fireball.tscn")
 			fireball.damage = 25
 			fireball.damage_scaling = 1.0          # 100% 魔法伤害加成
 			fireball.mp_cost = 15
@@ -202,7 +202,7 @@ func _setup_skills() -> void:
 						skill.buff_resource = load("res://runtime/combat/skills/data/ice_armor_buff.tres") as Buff
 						skill.tags = ["ice"]
 					"flame_storm":
-						skill.aoe_scene = load("res://skills/scenes/flame_storm.tscn") as PackedScene
+						skill.aoe_scene = load("res://skills/scenes/aoe/flame_storm.tscn") as PackedScene
 						skill.cast_distance = 150.0
 						skill.damage_scaling = 1.2
 						skill.tags = ["fire"]
@@ -210,7 +210,7 @@ func _setup_skills() -> void:
 						skill.buff_resource = load("res://runtime/combat/skills/data/shadow_step_buff.tres") as Buff
 						skill.tags = ["shadow"]
 					"ice_explosion":
-						skill.aoe_scene = load("res://skills/scenes/ice_explosion.tscn") as PackedScene
+						skill.aoe_scene = load("res://skills/scenes/aoe/ice_explosion.tscn") as PackedScene
 						skill.tags = ["ice", "aoe"]
 				_skill_pool.add_skill(skill)
 

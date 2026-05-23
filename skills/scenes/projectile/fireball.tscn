@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://bhwqt2ysk5als"]
+
+[ext_resource type="Script" uid="uid://x22rmysmik48" path="res://skills/scenes/projectile/fireball.gd" id="1_ibbwr"]
+[ext_resource type="Texture2D" uid="uid://ucd888rpepul" path="res://icon.svg" id="2_t47mq"]
+
+[node name="Fireball" type="Area2D" unique_id=12843697]
+script = ExtResource("1_ibbwr")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=127427038]
+scale = Vector2(0.1, 0.1)
+texture = ExtResource("2_t47mq")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1135374885]

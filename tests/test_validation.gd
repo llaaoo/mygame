@@ -104,7 +104,7 @@ func _validate_state_machine() -> void:
 
 func _validate_skills() -> void:
 	print("\n--- 技能验证 ---")
-	var fireball = load("res://skills/scenes/fireball.tscn")
+	var fireball = load("res://skills/scenes/projectile/fireball.tscn")
 	if fireball:
 		print("✅ fireball.tscn 可加载")
 		var instance = fireball.instantiate()

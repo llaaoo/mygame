@@ -1,8 +1,8 @@
-[gd_scene format=3 uid="uid://cawie2yeb3o60"]
+[gd_scene format=3 uid="uid://d4nlh12lyrnu0"]
 
-[ext_resource type="Script" uid="uid://d3v2vcjpmoart" path="res://runtime/combat/skills/scenes/flame_storm.gd" id="1_viybd"]
+[ext_resource type="Script" path="res://runtime/combat/skills/scenes/flame_storm.gd" id="1_viybd"]
 [ext_resource type="Texture2D" uid="uid://ucd888rpepul" path="res://icon.svg" id="2_6gxn3"]
-[ext_resource type="Shape2D" uid="uid://cur1vx2y0yq5h" path="res://runtime/combat/skills/scenes/flame_storm_shape.tres" id="3_viybd"]
+[ext_resource type="Shape2D" path="res://runtime/combat/skills/scenes/flame_storm_shape.tres" id="3_viybd"]
 
 [node name="FlameStorm" type="Area2D" unique_id=488598478]
 script = ExtResource("1_viybd")

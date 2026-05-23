@@ -327,5 +327,12 @@
 		"created": "2026-05-23T16:05:43",
 		"id": "fact_1779523543",
 		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "v1.2 技能场景收敛完成：res://skills/scenes/ 按实体类型分 projectile/ (fireball, shadow_bolt) 和 aoe/ (flame_storm, ice_explosion)，每个子目录内含完整 .tscn + .gd + .uid。res://runtime/combat/skills/scenes/ 已删除。flame_storm 的碰撞形状改为内嵌 sub_resource（无外部 .tres 依赖）。代码 load() 路径已全部指向新位置。",
+		"created": "2026-05-23T16:31:41",
+		"id": "fact_1779525101",
+		"source": "ai"
 	}
 ]
