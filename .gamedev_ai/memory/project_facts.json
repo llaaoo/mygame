@@ -614,5 +614,40 @@
 		"created": "2026-05-23T21:31:19",
 		"id": "fact_1779543079",
 		"source": "ai"
+	},
+	{
+		"category": "bug_fix",
+		"content": "WorldObject 体系 v1.0 验证通过：1) SignalReceiver + Interactable 改为显式 Callback 模式（set_callback）—— Godot 4 不支持 obj.method = callable 动态赋值；2) switch.tscn 模板必须挂 switch.gd 脚本才能 _ready() 注册 interactable 组；3) NodePath/Resource 类型属性无法通过 set_property 持久化到 .tscn——Switch target 用兄弟节点扫描 fallback、Door object_data 用 load() fallback；4) 门碰撞需要显式设 Body/CollisionShape2D.shape + collision_layer=1；5) Portal 在 v2.0 迁移时被删除，已重建",
+		"created": "2026-05-23T22:30:39",
+		"id": "fact_1779546639",
+		"source": "ai"
+	},
+	{
+		"category": "project_info",
+		"content": "现有 WorldObject：OilBarrel(油桶/爆炸连锁/表面)、Door(可开关/可破坏/SignalReceiver)、Switch(按E交互/自动扫描兄弟节点)、Chest(宝箱/LootTable)、PressurePlate(压力板/自动信号)。场景模板在 world/doors/、world/switches/、world/loot/。交互键 E 已注册。overworld.tscn 中有 Switch1+Door1 验证组",
+		"created": "2026-05-23T22:30:39",
+		"id": "fact_1779546639",
+		"source": "ai"
+	},
+	{
+		"category": "bug_fix",
+		"content": "Chest 验证通过：1) object_data fallback 在 _ready() 中自动创建默认 MapObjectData（display_name=\"宝箱\", max_hp=10）；2) loot_table 为空时 roll() 返回空数组 → fallback 至少掉落 1 个 HealthPickup；3) _spawn_item 当前是占位实现（始终生成 health_pickup.tscn），未来需改为按 item_path 分发生成对应 Pickup 场景；4) Chest 加入 interactable 组，按 E 交互后变灰半透明（_opened=true, _state=DAMAGED）",
+		"created": "2026-05-23T22:41:13",
+		"id": "fact_1779547273",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "WorldObject 体系 v1.1 新增：SpikeTrap (Area2D, 实体进入后周期性 damage/tick_interval, 走 CombatExecutor.report_hit)、BreakableWall (纯 MapObject + breakable_wall_data.tres, HP=50/blocks_path=true)、NPC (Node2D + Interactable + NPCDialogue Resource, 按E循环播放对话行, 3秒气泡自动消失)。MapObject 基类新增 object_data 通用 fallback（null 时自动创建 MapObjectData.new()）。overworld 布局：NPC1(-500) → BreakableWall1(-300) → Chest1(-150) → SpikeTrap1(0,-380) → Player(-6) → Switch1(220) → Door1(300) → Portal(742)",
+		"created": "2026-05-23T22:45:35",
+		"id": "fact_1779547535",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Action Layer 浅包装完成：PlayerAction (RefCounted, 6种Type: MOVE/MELEE/CAST_PRESS/CAST_RELEASE/DODGE/INTERACT) + Player.poll_actions() (每帧从Input生成Action数组) + Player.try_action(action) (验证+路由到StateMachine)。idle.gd 和 move.gd 从各~140行缩减到~25行，全部重复的 _handle_press/_handle_release/_can_cast/_cast 等辅助方法已移除。交互从 _input() 收敛到 poll_actions() 统一出口。核心原则：Action=意图(数据), StateMachine=行为, 中间状态不变",
+		"created": "2026-05-23T22:55:42",
+		"id": "fact_1779548142",
+		"source": "ai"
 	}
 ]

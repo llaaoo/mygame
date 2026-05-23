@@ -1,9 +1,11 @@
 extends State
 class_name PlayerIdleState
 
+
 func enter() -> void:
 	if entity is CharacterBody2D:
 		entity.velocity = Vector2.ZERO
+
 
 func physics_update(_delta: float) -> void:
 	if entity.get("ui_blocked"):
@@ -14,89 +16,14 @@ func physics_update(_delta: float) -> void:
 		entity.aiming_sources.clear()
 		entity.hide_aim()
 
-	var want_dodge := Input.is_action_just_pressed("dodge")
+	var actions: Array = entity.poll_actions()
 
-	var input_dir = Input.get_vector("move_left", "move_right", "move_up", "move_down")
-	if input_dir.length() > 0.05:
-		transitioned.emit(self, "move")
-		return
-
-	_handle_press("left",  "attack")
-	_handle_press("right", "skill")
-	for i in range(4):
-		_handle_press("slot_%d" % i, "skill_%d" % (i + 1))
-
-	_handle_release("left", "attack")
-	_handle_release("right", "skill")
-	for i in range(4):
-		_handle_release("slot_%d" % i, "skill_%d" % (i + 1))
-
-	if entity.aiming_sources.size() > 0:
-		for src in entity.aiming_sources:
-			if _is_held(src):
-				_show_aim_for(src)
-				break
-
-	if want_dodge:
-		transitioned.emit(self, "dodge")
-
-
-func _is_held(source: String) -> bool:
-	match source:
-		"left":  return Input.is_action_pressed("attack")
-		"right": return Input.is_action_pressed("skill")
-		_:       return Input.is_action_pressed("skill_%d" % (source.trim_prefix("slot_").to_int() + 1))
-
-
-func _handle_press(source: String, action: String) -> void:
-	if not Input.is_action_just_pressed(action):
-		return
-	if _can_cast(source):
-		entity.aiming_sources[source] = true
-		_show_aim_for(source)
-	elif source == "left":
-		entity.aiming_sources.clear()
-		entity.hide_aim()
-		transitioned.emit(self, "attack")
-
-
-func _handle_release(source: String, action: String) -> bool:
-	if not entity.aiming_sources.has(source):
-		return false
-	if Input.is_action_pressed(action):
-		return false
-	# 松手了：先清理瞄准状态（无论释放是否成功）
-	entity.aiming_sources.erase(source)
-	var ok := _cast(source)
-	if entity.aiming_sources.size() == 0:
-		entity.hide_aim()
-	return true  # 松手已处理，阻止同帧闪避
-
-
-func _can_cast(source: String) -> bool:
-	var sm = entity.skill_manager
-	match source:
-		"left":  return sm.has_left_spell()
-		"right": return sm.has_right_spell()
-		_:       
-			var inst: SkillInstance = sm.get_slot(source.trim_prefix("slot_").to_int())
-			return inst != null and inst.data != null
-
-
-func _cast(source: String) -> bool:
-	match source:
-		"left", "right": return entity.cast_hand(source)
-		_:               return entity.cast_slot(source.trim_prefix("slot_").to_int())
-
-
-func _show_aim_for(source: String) -> void:
-	var skill: SkillData = null
-	var sm = entity.skill_manager
-	match source:
-		"left":  skill = sm.left_hand.data if sm.left_hand else null
-		"right": skill = sm.right_hand.data if sm.right_hand else null
-		_:
-			var inst: SkillInstance = sm.get_slot(source.trim_prefix("slot_").to_int())
-			skill = inst.data if inst else null
-	if skill:
-		entity.show_aim(source, skill)
+	for action in actions:
+		match action.type:
+			PlayerAction.Type.MOVE:
+				transitioned.emit(self, "move")
+				return
+			PlayerAction.Type.INTERACT, PlayerAction.Type.DODGE, PlayerAction.Type.MELEE:
+				entity.try_action(action)
+			PlayerAction.Type.CAST_PRESS, PlayerAction.Type.CAST_RELEASE:
+				entity.try_action(action)

@@ -1,0 +1,26 @@
+[gd_scene format=3 uid="uid://c7f3a0khd1ifa"]
+
+[ext_resource type="Texture2D" uid="uid://ucd888rpepul" path="res://icon.svg" id="1_4r4fh"]
+[ext_resource type="Script" uid="uid://boh3tr52kimjt" path="res://world/object/door.gd" id="1_hg41a"]
+[ext_resource type="Shape2D" uid="uid://bobvhd8nd1qtb" path="res://world/doors/door_shape.tres" id="2_qukr2"]
+
+[node name="Door" type="Node2D" unique_id=1615456958]
+script = ExtResource("1_hg41a")
+
+[node name="Body" type="StaticBody2D" parent="." unique_id=1347197980]
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Body" unique_id=1011230711]
+shape = ExtResource("2_qukr2")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=446139250]
+modulate = Color(0.5, 0.3, 0.1, 1)
+scale = Vector2(0.4, 1.2)
+texture = ExtResource("1_4r4fh")
+
+[node name="HitArea" type="Area2D" parent="." unique_id=576169141]
+collision_layer = 8
+collision_mask = 20
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitArea" unique_id=797799445]
+shape = ExtResource("2_qukr2")

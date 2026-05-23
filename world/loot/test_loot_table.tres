@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="LootTable" format=3 uid="uid://cux276xarbvjp"]
+
+[ext_resource type="Script" uid="uid://h3m4hwv8kw0a" path="res://world/loot/loot_entry.gd" id="1_kpg65"]
+[ext_resource type="Script" uid="uid://bnqc4ql1jp3hn" path="res://world/loot/loot_table.gd" id="2_8xb26"]
+
+[resource]
+script = ExtResource("2_8xb26")

@@ -1,6 +1,18 @@
 [gd_scene format=3 uid="uid://dh2tkj6gryw1a"]
 
-[ext_resource type="PackedScene" uid="uid://haom0tvqfjsi" path="res://world/portals/portal.tscn" id="7_jexs8"]
+[ext_resource type="PackedScene" uid="uid://c7f3a0khd1ifa" path="res://world/doors/door.tscn" id="2_atiof"]
+[ext_resource type="PackedScene" uid="uid://k5ptb5a1wdwn" path="res://world/portal.tscn" id="3_i3mdx"]
+[ext_resource type="PackedScene" uid="uid://bd7xfxkmspack" path="res://world/switches/switch.tscn" id="3_v7wls"]
+[ext_resource type="Script" uid="uid://ccn767lgb03l1" path="res://world/object/portal.gd" id="4_m253i"]
+[ext_resource type="PackedScene" uid="uid://cecvc7pwbeguq" path="res://world/loot/chest.tscn" id="5_ukkfe"]
+[ext_resource type="Script" uid="uid://c0nuapr3iffjl" path="res://world/object/chest.gd" id="6_a0ygq"]
+[ext_resource type="PackedScene" uid="uid://c24d5y8qltinq" path="res://world/traps/spike_trap.tscn" id="7_vy63c"]
+[ext_resource type="Script" uid="uid://b5fgdlpuricni" path="res://world/object/spike_trap.gd" id="8_tvkwe"]
+[ext_resource type="PackedScene" uid="uid://b5xmh76cbb2kq" path="res://world/object/breakable_wall.tscn" id="9_0ne8o"]
+[ext_resource type="Script" uid="uid://nkf4o3flqs3g" path="res://world/object/map_object.gd" id="10_4iy5e"]
+[ext_resource type="PackedScene" uid="uid://c8wb0qe4p258t" path="res://world/npcs/npc_villager.tscn" id="11_848wx"]
+[ext_resource type="Resource" uid="uid://lt6105ynaour" path="res://world/object/breakable_wall_data.tres" id="11_t6jhl"]
+[ext_resource type="Script" uid="uid://b60vvl55geoeu" path="res://world/object/npc.gd" id="12_t6jhl"]
 
 [sub_resource type="SegmentShape2D" id="SegmentShape2D_y0h06"]
 
@@ -39,5 +51,31 @@ offset_right = 1000.0
 offset_bottom = 750.0
 color = Color(0.2, 0.35, 0.15, 1)
 
-[node name="Portal" parent="." unique_id=1869604937 instance=ExtResource("7_jexs8")]
+[node name="Door1" type="Node2D" parent="." unique_id=1615456958 instance=ExtResource("2_atiof")]
+position = Vector2(300, -419)
+
+[node name="Switch1" type="Node2D" parent="." unique_id=77349399 instance=ExtResource("3_v7wls")]
+position = Vector2(220, -419)
+
+[node name="Portal" type="Area2D" parent="." unique_id=1763517635 instance=ExtResource("3_i3mdx")]
 position = Vector2(742, -393)
+collision_layer = 1024
+collision_mask = 2
+script = ExtResource("4_m253i")
+
+[node name="Chest1" type="Node2D" parent="." unique_id=1568131560 instance=ExtResource("5_ukkfe")]
+position = Vector2(-150, -419)
+script = ExtResource("6_a0ygq")
+
+[node name="SpikeTrap1" type="Area2D" parent="." unique_id=1007731522 instance=ExtResource("7_vy63c")]
+position = Vector2(0, -380)
+script = ExtResource("8_tvkwe")
+
+[node name="BreakableWall1" type="Node2D" parent="." unique_id=1567625591 instance=ExtResource("9_0ne8o")]
+position = Vector2(-300, -419)
+script = ExtResource("10_4iy5e")
+object_data = ExtResource("11_t6jhl")
+
+[node name="NPC1" type="Node2D" parent="." unique_id=1103088156 instance=ExtResource("11_848wx")]
+position = Vector2(-500, -419)
+script = ExtResource("12_t6jhl")

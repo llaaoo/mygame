@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="MapObjectData" format=3 uid="uid://lt6105ynaour"]
+
+[ext_resource type="Script" uid="uid://em8hc0a4wlnk" path="res://world/object/map_object_data.gd" id="1_te5ah"]
+
+[resource]
+script = ExtResource("1_te5ah")
+display_name = "可破坏墙"
+max_hp = 50
+blocks_path = true

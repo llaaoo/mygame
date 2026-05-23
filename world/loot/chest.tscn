@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://cecvc7pwbeguq"]
+
+[ext_resource type="Script" uid="uid://c0nuapr3iffjl" path="res://world/object/chest.gd" id="1_0lo4e"]
+[ext_resource type="Texture2D" uid="uid://ucd888rpepul" path="res://icon.svg" id="2_0i672"]
+
+[node name="Chest" type="Node2D" unique_id=1568131560]
+script = ExtResource("1_0lo4e")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=806297308]
+modulate = Color(0.8, 0.6, 0.2, 1)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("2_0i672")
+
+[node name="HitArea" type="Area2D" parent="." unique_id=520820981]
+collision_layer = 8
+collision_mask = 20
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitArea" unique_id=739630874]

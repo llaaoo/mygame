@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="NPCDialogue" format=3 uid="uid://d00pv08t6bmvd"]
+
+[ext_resource type="Script" uid="uid://b8aa0cwgs6vpq" path="res://world/object/npc_dialogue.gd" id="1_eoipm"]
+
+[resource]
+script = ExtResource("1_eoipm")
+npc_name = "村民"

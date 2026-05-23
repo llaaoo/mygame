@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://be8pno66twns2"]
+
+[ext_resource type="Script" uid="uid://b5vgnnljevxc1" path="res://world/object/switch.gd" id="1_a30ji"]
+[ext_resource type="Texture2D" uid="uid://ucd888rpepul" path="res://icon.svg" id="2_ptmfc"]
+
+[node name="Switch" type="Node2D" unique_id=3842662]
+script = ExtResource("1_a30ji")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1822413470]
+modulate = Color(1, 0, 0, 1)
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("2_ptmfc")
+
+[node name="InteractionArea" type="Area2D" parent="." unique_id=739318042]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="InteractionArea" unique_id=1512424442]

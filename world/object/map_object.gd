@@ -15,7 +15,9 @@ var _respawn_timer: float = 0.0
 
 
 func _ready() -> void:
-	assert(object_data != null, "MapObject requires MapObjectData")
+	if not object_data:
+		object_data = MapObjectData.new()
+		object_data.display_name = name
 	_object_id = str(get_instance_id())
 	_current_hp = object_data.max_hp
 	_apply_visual()

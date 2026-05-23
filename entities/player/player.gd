@@ -40,8 +40,6 @@ var facing_direction: Vector2 = Vector2.DOWN
 @onready var stats_component: StatsComponent = $StatsComponent
 var mana_component: ManaComponent = null
 
-## ── 待释放的技能来源（"slot_N"，仅快捷键用） ──
-var pending_skill_source: String = ""
 ## ── 瞄准状态（跨状态保持） ──
 var aiming_sources: Dictionary = {}
 var cancel_aim: bool = false
@@ -59,11 +57,16 @@ var move_speed: float = 300.0
 var state_machine: Node
 
 
+func _enter_tree() -> void:
+	# 必须在 _ready 之前注册，否则第一帧 _input 可能触发 Missing action 错误
+	_register_interact_key()
+
+
 func _ready() -> void:
 	add_to_group("player")
 
 	# 身体碰撞形状
-	collision_shape.shape = load("res://entities/player/player_body_shape.tres")
+	collision_shape.shape = load("res://entities/player/player_shape.tres")
 
 	# MP 组件（先创建，_apply_stats 依赖它）
 	if not mana_component:
@@ -372,6 +375,156 @@ func _setup_combat_debugger() -> void:
 	var debug_ui := CombatDebugUI.new()
 	debug_ui.name = "CombatDebugUI"
 	get_tree().current_scene.add_child.call_deferred(debug_ui)
+
+
+## ── Action Layer ── 统一输入 → 意图 → 执行 ──
+
+const INTERACT_RANGE: float = 80.0
+
+## 每帧从原始 Input 产生 Action 列表（供各 State 调用）
+func poll_actions() -> Array[PlayerAction]:
+	if ui_blocked or health_component.is_dead:
+		return []
+
+	var actions: Array[PlayerAction] = []
+
+	# 移动
+	var input_dir := Input.get_vector("move_left", "move_right", "move_up", "move_down")
+	if input_dir.length() > 0.05:
+		var a := PlayerAction.new()
+		a.type = PlayerAction.Type.MOVE
+		a.direction = input_dir
+		actions.append(a)
+
+	# 闪避
+	if Input.is_action_just_pressed("dodge"):
+		var a := PlayerAction.new()
+		a.type = PlayerAction.Type.DODGE
+		actions.append(a)
+
+	# 近战（左键 = 无左手技能时直接近战）
+	if Input.is_action_just_pressed("attack") and not skill_manager.has_left_spell():
+		var a := PlayerAction.new()
+		a.type = PlayerAction.Type.MELEE
+		actions.append(a)
+
+	# 技能按下/释放（左手/右手/快捷键1-4）
+	for pair in [["left", "attack"], ["right", "skill"]]:
+		_poll_skill_action(actions, pair[0], pair[1])
+	for i in range(4):
+		_poll_skill_action(actions, "slot_%d" % i, "skill_%d" % (i + 1))
+
+	# 交互
+	if Input.is_action_just_pressed("interact"):
+		var a := PlayerAction.new()
+		a.type = PlayerAction.Type.INTERACT
+		actions.append(a)
+
+	return actions
+
+
+func _poll_skill_action(actions: Array[PlayerAction], source: String, input_action: String) -> void:
+	if not _can_cast_source(source):
+		return
+
+	if Input.is_action_just_pressed(input_action):
+		var a := PlayerAction.new()
+		a.type = PlayerAction.Type.CAST_PRESS
+		a.skill_source = source
+		actions.append(a)
+	elif Input.is_action_just_released(input_action):
+		var a := PlayerAction.new()
+		a.type = PlayerAction.Type.CAST_RELEASE
+		a.skill_source = source
+		actions.append(a)
+
+
+## 尝试执行单个 Action（验证 + 路由）
+func try_action(action: PlayerAction) -> void:
+	match action.type:
+		PlayerAction.Type.MELEE:
+			aiming_sources.clear()
+			hide_aim()
+			state_machine.transition_to("attack")
+
+		PlayerAction.Type.DODGE:
+			state_machine.transition_to("dodge")
+
+		PlayerAction.Type.INTERACT:
+			_try_interact()
+
+		PlayerAction.Type.CAST_PRESS:
+			aiming_sources[action.skill_source] = true
+			var skill := _get_skill_for_source(action.skill_source)
+			if skill:
+				show_aim(action.skill_source, skill)
+
+		PlayerAction.Type.CAST_RELEASE:
+			if aiming_sources.has(action.skill_source):
+				aiming_sources.erase(action.skill_source)
+				_cast_source(action.skill_source)
+				state_machine.transition_to("skill")
+			if aiming_sources.is_empty():
+				hide_aim()
+
+
+## 技能查找/施放辅助
+
+func _can_cast_source(source: String) -> bool:
+	match source:
+		"left":  return skill_manager.has_left_spell()
+		"right": return skill_manager.has_right_spell()
+		_:
+			var idx := source.trim_prefix("slot_").to_int()
+			var inst: SkillInstance = skill_manager.get_slot(idx)
+			return inst != null and inst.data != null
+
+
+func _get_skill_for_source(source: String) -> SkillData:
+	var sm = skill_manager
+	match source:
+		"left":  return sm.left_hand.data if sm.left_hand else null
+		"right": return sm.right_hand.data if sm.right_hand else null
+		_:
+			var inst: SkillInstance = sm.get_slot(source.trim_prefix("slot_").to_int())
+			return inst.data if inst else null
+
+
+func _cast_source(source: String) -> void:
+	match source:
+		"left", "right":
+			cast_hand(source)
+		_:
+			cast_slot(source.trim_prefix("slot_").to_int())
+
+
+## ── 交互键 ──
+
+func _register_interact_key() -> void:
+	if not InputMap.has_action("interact"):
+		InputMap.add_action("interact")
+		var event := InputEventKey.new()
+		event.keycode = KEY_E
+		InputMap.action_add_event("interact", event)
+
+
+func _try_interact() -> void:
+	var nearest: Node2D = null
+	var nearest_dist: float = INTERACT_RANGE
+
+	for node in get_tree().get_nodes_in_group("interactable"):
+		var target := node as Node2D
+		if not target:
+			continue
+		var dist := global_position.distance_to(target.global_position)
+		if dist < nearest_dist:
+			nearest = target
+			nearest_dist = dist
+
+	if nearest:
+		var interactable := nearest.get_node_or_null("Interactable") as Interactable
+		if interactable:
+			interactable.interact(self)
 
 
 ## ── 信号转发 ──

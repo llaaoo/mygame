@@ -1,0 +1,26 @@
+[gd_scene format=3 uid="uid://b5xmh76cbb2kq"]
+
+[ext_resource type="Script" uid="uid://nkf4o3flqs3g" path="res://world/object/map_object.gd" id="1_3v05t"]
+[ext_resource type="Texture2D" uid="uid://ucd888rpepul" path="res://icon.svg" id="2_ibsgn"]
+[ext_resource type="Shape2D" uid="uid://dy8j3t3vhaykg" path="res://world/object/wall_shape.tres" id="2_ojsws"]
+
+[node name="BreakableWall" type="Node2D" unique_id=1567625591]
+script = ExtResource("1_3v05t")
+
+[node name="Body" type="StaticBody2D" parent="." unique_id=593085083]
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Body" unique_id=596067257]
+shape = ExtResource("2_ojsws")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=729032961]
+modulate = Color(0.4, 0.4, 0.4, 1)
+scale = Vector2(0.5, 0.25)
+texture = ExtResource("2_ibsgn")
+
+[node name="HitArea" type="Area2D" parent="." unique_id=498259950]
+collision_layer = 8
+collision_mask = 20
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitArea" unique_id=161847034]
+shape = ExtResource("2_ojsws")

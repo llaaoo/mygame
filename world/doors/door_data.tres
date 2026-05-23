@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="MapObjectData" format=3 uid="uid://btjkdop02tsfq"]
+
+[ext_resource type="Script" uid="uid://em8hc0a4wlnk" path="res://world/object/map_object_data.gd" id="1_6ea10"]
+
+[resource]
+script = ExtResource("1_6ea10")
+display_name = "门"
+max_hp = 30
+blocks_path = true

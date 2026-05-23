@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://c24d5y8qltinq"]
+
+[ext_resource type="Script" uid="uid://b5fgdlpuricni" path="res://world/object/spike_trap.gd" id="1_twutp"]
+[ext_resource type="Shape2D" uid="uid://dh4i8g8u5dc6" path="res://world/traps/trap_shape.tres" id="2_oktx0"]
+[ext_resource type="Texture2D" uid="uid://ucd888rpepul" path="res://icon.svg" id="2_snoxh"]
+
+[node name="SpikeTrap" type="Area2D" unique_id=1007731522]
+script = ExtResource("1_twutp")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1678669424]
+shape = ExtResource("2_oktx0")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1428133407]
+modulate = Color(0.8, 0.1, 0.1, 1)
+scale = Vector2(0.4, 0.13)
+texture = ExtResource("2_snoxh")

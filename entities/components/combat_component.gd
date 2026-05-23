@@ -72,8 +72,10 @@ func _on_attack_hit(body: Node2D) -> void:
 func _on_attack_hit_area(area: Area2D) -> void:
 	if area.owner == _entity:
 		return
-	if area.has_method("take_damage"):
-		_apply_melee_hit(area)
+	# HitArea 自身无 take_damage，检查其 owner（MapObject 等）
+	var target: Node2D = area if area.has_method("take_damage") else (area.owner if area.owner and area.owner.has_method("take_damage") else null)
+	if target:
+		_apply_melee_hit(target)
 
 
 ## 近战命中统一入口 — 走 CombatExecutor 事件序列
