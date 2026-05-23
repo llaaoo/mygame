@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://bwp88vxjs1mk4"]
+
+[ext_resource type="Script" uid="uid://nkf4o3flqs3g" path="res://world/object/map_object.gd" id="1_n3feu"]
+[ext_resource type="Resource" uid="uid://dfkxpts6vjpx1" path="res://world/object/ice_wall_data.tres" id="2_schqw"]
+[ext_resource type="Texture2D" uid="uid://ucd888rpepul" path="res://icon.svg" id="3_schqw"]
+[ext_resource type="Shape2D" uid="uid://bli18lj54nqc6" path="res://world/object/barrel_shape.tres" id="4_8mjli"]
+
+[node name="IceWall" type="Node2D" unique_id=339018666]
+script = ExtResource("1_n3feu")
+object_data = ExtResource("2_schqw")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1052488324]
+modulate = Color(0.3, 0.7, 1, 0.8)
+scale = Vector2(1.5, 1)
+texture = ExtResource("3_schqw")
+
+[node name="HitArea" type="Area2D" parent="." unique_id=1921098356]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitArea" unique_id=367557574]
+shape = ExtResource("4_8mjli")

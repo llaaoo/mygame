@@ -3,7 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://dh2tkj6gryw1a" path="res://maps/overworld.tscn" id="1_ig7tw"]
 [ext_resource type="PackedScene" uid="uid://dcbumdieobptq" path="res://entities/enemy/enemy.tscn" id="2_272bh"]
 [ext_resource type="PackedScene" uid="uid://etuhwmvsawor" path="res://entities/player/player.tscn" id="2_h2yge"]
-[ext_resource type="PackedScene" uid="uid://b0n0tqgwlthxt" path="res://world/object/oil_barrel.tscn" id="3_efxa6"]
+[ext_resource type="PackedScene" uid="uid://dbv2k2e21cmb7" path="res://world/object/oil_barrel.tscn" id="3_efxa6"]
 [ext_resource type="Script" uid="uid://c3iy2rv25rufo" path="res://runtime/combat/skills/manager/skill_manager.gd" id="4_4c57u"]
 [ext_resource type="PackedScene" uid="uid://tc5h73volrpp" path="res://ui/hud.tscn" id="5_7mycd"]
 [ext_resource type="Script" uid="uid://b7bqxvy40h1fl" path="res://components/stats_component.gd" id="5_272bh"]

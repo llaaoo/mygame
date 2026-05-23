@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://dp525velrfjnu"]
+
+[ext_resource type="Script" uid="uid://nkf4o3flqs3g" path="res://world/object/map_object.gd" id="1_1hwat"]
+[ext_resource type="Resource" uid="uid://bbv747nnx5etb" path="res://world/object/wooden_crate_data.tres" id="2_ywd2k"]
+[ext_resource type="Texture2D" uid="uid://ucd888rpepul" path="res://icon.svg" id="3_ywd2k"]
+[ext_resource type="Shape2D" uid="uid://bli18lj54nqc6" path="res://world/object/barrel_shape.tres" id="4_x2ji4"]
+
+[node name="WoodenCrate" type="Node2D" unique_id=1472283687]
+script = ExtResource("1_1hwat")
+object_data = ExtResource("2_ywd2k")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=78603464]
+modulate = Color(0.6, 0.45, 0.2, 1)
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("3_ywd2k")
+
+[node name="HitArea" type="Area2D" parent="." unique_id=844175200]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitArea" unique_id=64075755]
+shape = ExtResource("4_x2ji4")

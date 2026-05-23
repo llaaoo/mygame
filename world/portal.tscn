@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://haom0tvqfjsi"]
+
+[ext_resource type="Texture2D" uid="uid://ucd888rpepul" path="res://icon.svg" id="1_g82av"]
+[ext_resource type="Script" uid="uid://1rni2qcfd3ps" path="res://world/portal.gd" id="1_xsykg"]
+[ext_resource type="Shape2D" uid="uid://pwyrv3tgiq3m" path="res://world/portal_shape.tres" id="4_om30o"]
+
+[node name="Portal" type="Area2D" unique_id=1869604937]
+script = ExtResource("1_xsykg")
+target_path = "res://world/regions/burning_forest/burning_forest.tscn"
+target_label = "🔥燃烧森林"
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=2062429759]
+modulate = Color(1, 0.3, 0.1, 1)
+scale = Vector2(1.5, 1.5)
+texture = ExtResource("1_g82av")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1553724561]
+shape = ExtResource("4_om30o")
+
+[node name="Label" type="Label" parent="." unique_id=2080677034]
+offset_top = -40.0
+offset_right = 86.0
+offset_bottom = -17.0
+text = "🔥燃烧森林"
