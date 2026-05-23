@@ -98,10 +98,11 @@ func _apply_preset_stats(type_idx: int) -> void:
 
 
 func _apply_stats_to_health() -> void:
-	health_component.max_hp = 20 + stats_component.max_hp_bonus
+	# HP 直接使用 @export max_hp，不叠加耐力加成（耐力加成仅对 Player 生效）
+	health_component.max_hp = max_hp
 	health_component.hp = health_component.max_hp
-	move_speed = 80 + stats_component.move_speed_bonus
-	attack_damage = 3 + stats_component.physical_damage
+	move_speed = move_speed + stats_component.move_speed_bonus
+	attack_damage = attack_damage + stats_component.physical_damage
 
 
 ## ── 视觉 ──

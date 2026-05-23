@@ -55,8 +55,9 @@ func _on_event(ev: CombatEvent) -> void:
 	if not enabled:
 		return
 
-	# 递归守卫：超出深度上限则跳过
-	if CombatEventBus._emit_depth > max_recursion:
+	# 递归守卫：_emit_depth 在进入回调前已被 emit() 置为 1
+	# max_recursion=0 表示仅允许非嵌套触发，即 _emit_depth <= 1
+	if CombatEventBus._emit_depth > max_recursion + 1:
 		return
 
 	# 冷却检查

@@ -32,6 +32,4 @@ func _execute(ev: CombatEvent) -> void:
 		return
 
 	player.stats_component.add_experience(bonus_exp)
-	print("⚡ [OnKillBonusExp] +%d 额外经验 (target=%s, conditions=%d passed)" % [
-		bonus_exp, ev.target.name, conditions.size()
-	])
+	print("⚡ [OnKillBonusExp] +%d 额外经验 (target=%s)" % [bonus_exp, ev.target.name])

@@ -13,6 +13,10 @@ var _skill_pool: SkillPool = null
 ## ── 调试 ──
 @export var debug_items: bool = false
 
+## ── 持有 TriggeredEffect 引用以防 Resource GC ──
+var _on_kill_effect: OnKillBonusExp = null
+var _on_hit_effect: TriggeredEffect = null
+
 ## ── 信号（HUD 订阅） ──
 signal health_changed(current_hp: int, max_hp: int)
 signal mp_changed(current_mp: int, max_mp: int)
@@ -252,29 +256,31 @@ func _setup_damage_modifiers() -> void:
 
 ## 确保全局 CombatEventBus + CombatExecutor 存在
 func _setup_event_bus() -> void:
-	# CombatExecutor（唯一控制流入口，必须在 EventBus 之前）
+	# CombatExecutor（唯一控制流入口，手动设 instance 绕过 add_child 时序限制）
 	if not CombatExecutor.instance:
 		var exec := CombatExecutor.new()
 		exec.name = "CombatExecutor"
+		CombatExecutor.instance = exec  # 立即可用，无需等待 _ready()
 		get_tree().current_scene.add_child.call_deferred(exec)
 
-	# CombatEventBus（事件广播）
+	# CombatEventBus（事件广播，手动设 instance）
 	if CombatEventBus.instance:
 		return
 	var bus := CombatEventBus.new()
 	bus.name = "CombatEventBus"
+	CombatEventBus.instance = bus  # 立即可用，订阅/发射无需等待场景树
 	get_tree().current_scene.add_child.call_deferred(bus)
 	print("📡 CombatEventBus + CombatExecutor 已创建")
 
-	# 演示：ON_KILL 对敌人 → 额外经验（Condition: target_is_enemy）
-	var on_kill_exp := OnKillBonusExp.create_for_player(15)
-	call_deferred("_register_triggered_effects", on_kill_exp)
+	# ON_KILL 对敌人 → 额外经验（持有引用防止 Resource GC）
+	_on_kill_effect = OnKillBonusExp.create_for_player(15)
+	_register_triggered_effects(_on_kill_effect)
 
-	# 演示 EffectGraph：ON_HIT 火焰技能 → Branch(IsBoss → 双倍日志, Normal → 普通日志)
-	call_deferred("_register_graph_demo")
+	# EffectGraph：ON_HIT 火焰技能
+	_register_graph_demo()
 
-	# 战斗调试器（开发模式下启用追踪 + UI）
-	call_deferred("_setup_combat_debugger")
+	# 战斗调试器
+	_setup_combat_debugger()
 
 
 func _register_triggered_effects(effect: TriggeredEffect) -> void:
@@ -320,14 +326,14 @@ func _register_graph_demo() -> void:
 	var graph := EffectGraph.new()
 	graph.root = fire_gate
 
-	# 创建 TriggeredEffect 包装
-	var effect := TriggeredEffect.new()
-	effect.trigger_type = CombatEvent.Type.ON_HIT
-	effect.graph = graph
-	effect.scope_source = "skill"
-	effect.max_recursion = 0
+	# 创建 TriggeredEffect 包装（持有引用防止 Resource GC）
+	_on_hit_effect = TriggeredEffect.new()
+	_on_hit_effect.trigger_type = CombatEvent.Type.ON_HIT
+	_on_hit_effect.graph = graph
+	_on_hit_effect.scope_source = "skill"
+	_on_hit_effect.max_recursion = 0
 
-	call_deferred("_register_triggered_effects_deferred", effect)
+	call_deferred("_register_triggered_effects_deferred", _on_hit_effect)
 
 
 func _register_triggered_effects_deferred(effect: TriggeredEffect) -> void:

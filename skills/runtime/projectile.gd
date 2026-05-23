@@ -31,17 +31,18 @@ func _ready() -> void:
 
 	# 自动销毁
 	await get_tree().create_timer(lifetime).timeout
-	# 超时未命中：关闭 trace（记录 MISS）
-	var trace := get_meta("_combat_trace", null) as CombatTrace
-	if trace:
-		trace.record(
-			CombatTraceEvent.Category.EVENT_EMIT,
-			CombatPhase.Phase.POST,
-			"MISS (timeout)", name, "",
-			{"lifetime": lifetime},
-			{}
-		)
-		CombatDebugger.store(trace)
+	# 超时未命中：关闭 trace（如果尚未被 ON_HIT 关闭）
+	if has_meta("_combat_trace"):
+		var trace := get_meta("_combat_trace") as CombatTrace
+		if trace:
+			trace.record(
+				CombatTraceEvent.Category.EVENT_EMIT,
+				CombatPhase.Phase.POST,
+				"MISS (timeout)", name, "",
+				{"lifetime": lifetime},
+				{}
+			)
+			CombatDebugger.store(trace)
 	queue_free()
 
 
