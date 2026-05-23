@@ -656,5 +656,40 @@
 		"created": "2026-05-23T23:14:41",
 		"id": "fact_1779549281",
 		"source": "ai"
+	},
+	{
+		"category": "bug_fix",
+		"content": "GDScript 动态方法赋值不可用：在 Godot 4 中 `obj.method_name = some_callable` 对自定义类方法返回 \"Cannot assign a new value to a constant\"。正确模式：使用显式 Callback — 存储 `var _callback: Callable` + `func set_callback(cb)`，方法体内调用 `_callback.call(args)`。Interactable 和 SignalReceiver 均已采用此模式",
+		"created": "2026-05-23T23:16:45",
+		"id": "fact_1779549405",
+		"source": "ai"
+	},
+	{
+		"category": "bug_fix",
+		"content": "poll_actions 设计教训：对非 instant 技能每帧生成重复 CAST_PRESS action（`Input.is_action_pressed`）导致 cancel_aim 被立即覆盖。正确做法：仅 `is_action_just_pressed` 生成 CAST_PRESS（初始瞄准），按住状态通过 `aiming_sources` 字典隐式追踪（有 source → 正在瞄准），不重复生成 action。所有技能统一 press→aim、release→cast",
+		"created": "2026-05-23T23:16:45",
+		"id": "fact_1779549405",
+		"source": "ai"
+	},
+	{
+		"category": "bug_fix",
+		"content": "CombatComponent 近战无法伤害 MapObject：_on_attack_hit_area 只检查 `area.has_method(\"take_damage\")`，但 MapObject 的 HitArea 是纯 Area2D 没有此方法。修复：对齐 Projectile 逻辑，增加 `area.owner` fallback 检查 `area.owner.has_method(\"take_damage\")`",
+		"created": "2026-05-23T23:16:45",
+		"id": "fact_1779549405",
+		"source": "ai"
+	},
+	{
+		"category": "project_info",
+		"content": "project.godot 已启用插件：dialogue_manager (DialogueManager autoload)、godot_state_charts、gamedev_ai、godot_mcp。DialogueManager 通过 Engine.register_singleton 在 _ready() 中注册；NPC._get_dialogue_manager() 含 fallback 自动创建实例（插件未启用时）",
+		"created": "2026-05-23T23:16:45",
+		"id": "fact_1779549405",
+		"source": "ai"
+	},
+	{
+		"category": "project_info",
+		"content": "文档更新 (2026-05-24): INDEX.md → v2.1 (Action Layer ✅ + WorldObject 7种 ✅ + NPC对话 ✅ + Dialogue Manager集成)。ARCHITECTURE.md → 更新六层边界图反映真实代码结构、Action Layer 标记为已完成、WorldObject 标记为已完成含7种类型详细表、目录结构反映实际部署、下一阶段优先级调整为 Region System / Loot Pipeline / Content Pipeline。WORLD_CONTRACTS.md → v1.6，更新 CONTRACT 0 (7种WorldObject + 交互框架)、CONTRACT 8 (实际目录结构)、扩展指南 (三种新增模式)",
+		"created": "2026-05-23T23:20:30",
+		"id": "fact_1779549630",
+		"source": "ai"
 	}
 ]

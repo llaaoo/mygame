@@ -1,9 +1,9 @@
 # 🌍 World Contracts — 世界模拟运行时契约
 
 > **状态**: 已固化  
-> **版本**: 1.5  
-> **最后更新**: 2026-05-23  
-> **适用范围**: `res://world/` `res://systems/` `res://maps/`
+> **版本**: 1.6  
+> **最后更新**: 2026-05-24  
+> **适用范围**: `res://world/` `res://entities/components/`
 
 ---
 
@@ -35,12 +35,25 @@
 
 ### MapObject 允许的四个接口
 
-| 接口 | 职责 | 示例 |
-|------|------|------|
-| `Damageable` | 有 HP，可被 CombatExecutor 修改 | 木箱、木桶、冰墙 |
-| `Interactable` | 可按 E 键触发（非战斗交互） | 宝箱、门、拉杆 |
-| `Persistent` | 状态需持久化（WorldStateManager 管理） | 关键障碍物、任务物体 |
-| `Taggable` | 有 `tags` 数组，参与 InteractionSystem | 所有可交互物体 |
+| 接口 | 职责 | 已实现 |
+|------|------|--------|
+| `Damageable` | 有 HP，可被 CombatExecutor 修改 | OilBarrel, BreakableWall, Door, Chest, WoodenCrate, WoodenFence |
+| `Interactable` | 可按 E 键触发（非战斗交互） | Switch, Chest, NPC |
+| `Persistent` | 状态需持久化（WorldStateManager 管理） | Door, Chest |
+| `Taggable` | 有 `tags` 数组，参与 InteractionSystem | 所有 MapObject |
+
+### 已实现的 WorldObject 类型（7 种）
+
+| 类型 | 基类 | 特有接口 |
+|------|------|---------|
+| OilBarrel | MapObject | 破坏AOE + 表面生成 |
+| BreakableWall | MapObject | 纯碰撞阻挡 |
+| Door | MapObject + SignalReceiver | 开关驱动，可破坏 |
+| Chest | MapObject + Interactable | LootTable 随机掉落 |
+| Switch | Node2D + Interactable | 按E → 扫描兄弟节点发信号 |
+| PressurePlate | Area2D | body进入/离开 → 自动信号 |
+| SpikeTrap | Area2D | 周期性 CombatExecutor.report_hit |
+| NPC | Node2D + Interactable | DialogueBalloon 对话 |
 
 ### ❌ 禁止添加
 
@@ -304,41 +317,52 @@ INTACT ──(HP≤0)──► DESTROYED ──(倒计时结束)──► RESPAW
 ## CONTRACT 8: 文件夹所有权
 
 ```
-res://runtime/world/
-  world_runtime.gd              # 世界运行时入口
-  world_state_manager.gd        # MapObject 持久化状态
-  world_spatial_index.gd        # 统一空间查询层
+world/
+  maps/
+    overworld.tscn
+  object/
+    map_object.gd                 # MapObject 基类
+    map_object_data.gd            # MapObjectData Resource
+    interactable.gd               # Interactable 接口 (Callback模式)
+    signal_receiver.gd            # SignalReceiver 接口
+    switch.gd                     # 开关
+    door.gd                       # 门 (MapObject + SignalReceiver)
+    chest.gd                      # 宝箱 (MapObject + Interactable + LootTable)
+    spike_trap.gd                 # 地刺
+    pressure_plate.gd             # 压力板
+    npc.gd                        # NPC + DialogueBalloon
+    dialogue_balloon.gd           # 自定义对话气球
+    portal.gd                     # 传送门
+    npc_dialogue.gd               # 旧对话兼容
+  doors/
+  switches/
+  traps/
+  loot/
+    loot_table.gd                 # 掉落表 Resource
+    loot_entry.gd                 # 掉落条目 Resource
+  npcs/
+  world_runtime.gd
+  world_spatial_index.gd
+  world_state_manager.gd
+
+gameplay/
+  action/
+    player_action.gd              # Action Layer (6 Type)
   interaction/
-    surface_reaction.gd         # SurfaceReaction Resource
-    surface_manager.gd          # SurfaceManager 外观 (static instance)
-
-res://runtime/simulation/
-  simulation_runtime.gd         # 统一调度 (Surface → Propagation → Respawn)
-  surface_scheduler.gd          # 表面倒计时过期
-  propagation_scheduler.gd      # BFS 传播队列
-
-res://world/object/
-  map_object.gd                 # MapObject 基类 (四接口 + 破坏AOE + 表面生成)
-  map_object_data.gd            # MapObjectData Resource (含 destruction_surface)
-  oil_barrel.tscn               # 油桶 Scene 示例
-  oil_barrel_data.tres          # 油桶 Data 示例
-
-res://skills/
-  archetypes/                   # Runtime 行为模板
-  visuals/                      # 表现层 Resource
+    simulation_runtime.gd
+    surface_manager.gd
+    surface_reaction.gd
+    propagation_scheduler.gd
 ```
 
 ### 依赖方向（单向）
 
 ```
-world/object/        ──→  systems/ (CombatExecutor)
-world/interaction/   ──→  systems/ (CombatExecutor)
-world/interaction/   ──→  world/object/ (MapObject)
-world/map/           ──→  world/chunk/ + world/object/ + world/interaction/
-world/               ──→  skills/data/ (SkillData.tags — 只读)
-```
-
-**`res://world/` 不引用 `res://entities/`**。方向永远是：world 是底层，entities 依赖 world。
+world/object/        ──→  gameplay/ (CombatExecutor)
+world/interaction/   ──→  gameplay/ (CombatExecutor)
+world/               ──→  entities/ (Actor + Components)
+world/               ──→  content/ (只读 .tres 数据)
+``
 
 ---
 
@@ -377,10 +401,26 @@ world/               ──→  skills/data/ (SkillData.tags — 只读)
 ### 新增可破坏物类型
 
 ```
-1. 新建 MapObjectData .tres (tags, max_hp, respawn_time, reactions)
-2. 创建可视化 .tscn (sprite + collision)
-3. 在该场景挂载 MapObject 脚本，引用 MapObjectData
+1. 新建 MapObjectData .tres (tags, max_hp, respawn_time, blocks_path)
+2. 创建可视化 .tscn (sprite + Body/StaticBody2D + HitArea/Area2D)
+3. 挂载 map_object.gd 脚本
 4. 放置在关卡中（手工放置，不要均匀撒）
+```
+
+### 新增交互物体（开关/按钮类）
+
+```
+1. 新建 Node2D .tscn + 挂载 switch.gd 或自定义脚本
+2. 实现 Interactable 接口（set_callback 模式）
+3. target 可为空 → 自动扫描兄弟节点找 SignalReceiver
+```
+
+### 新增 SignalReceiver（门/机关类）
+
+```
+1. 继承 MapObject 或 Node2D
+2. 在 _ready() 中创建 SignalReceiver 子节点 + set_callback
+3. 实现 _on_signal(signal_id) → 处理 "activate"/"deactivate"/"toggle"
 ```
 
 ### 新增 ReactionRule
