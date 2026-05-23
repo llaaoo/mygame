@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="SkillData" format=3 uid="uid://dla3i3ov611xp"]
 
-[ext_resource type="Script" uid="uid://ba3b1ncau54mq" path="res://skills/data/skill_data.gd" id="1_o6w5o"]
+[ext_resource type="Script" uid="uid://ba3b1ncau54mq" path="res://runtime/combat/skills/data/skill_data.gd" id="1_o6w5o"]
 
 [resource]
 script = ExtResource("1_o6w5o")

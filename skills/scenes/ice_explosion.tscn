@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://b2nhdnw53hhnd"]
 
-[ext_resource type="Script" uid="uid://dfswf0mr6ril0" path="res://skills/scenes/ice_explosion.gd" id="1_qh2nt"]
+[ext_resource type="Script" uid="uid://dfswf0mr6ril0" path="res://runtime/combat/skills/scenes/ice_explosion.gd" id="1_qh2nt"]
 [ext_resource type="Texture2D" uid="uid://ucd888rpepul" path="res://icon.svg" id="2_2mli4"]
 
 [node name="IceExplosion" type="Area2D" unique_id=1976536504]

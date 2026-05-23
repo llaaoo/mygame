@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="SkillPool" format=3 uid="uid://bogymu1qbb2q2"]
 
-[ext_resource type="Script" uid="uid://d0uw3hufdj7r3" path="res://skills/registry/skill_pool.gd" id="1_pftpx"]
-[ext_resource type="Script" uid="uid://ba3b1ncau54mq" path="res://skills/data/skill_data.gd" id="2_nt41q"]
+[ext_resource type="Script" uid="uid://d0uw3hufdj7r3" path="res://runtime/combat/skills/registry/skill_pool.gd" id="1_pftpx"]
+[ext_resource type="Script" uid="uid://ba3b1ncau54mq" path="res://runtime/combat/skills/data/skill_data.gd" id="2_nt41q"]
 
 [resource]
 script = ExtResource("1_pftpx")

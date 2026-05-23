@@ -264,5 +264,33 @@
 		"created": "2026-05-23T15:08:41",
 		"id": "fact_1779520121",
 		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "v1.1 目录迁移：res://runtime/ 已创建，包含 game_runtime.gd (顶层协调器, 驱动CommandBus dispatch + SimulationRuntime tick)、command_bus.gd (跨Runtime异步命令总线, MAX_QUEUE=128)、runtime_command.gd (RuntimeCommand Resource, type/source/target/payload)。WorldRuntime (world_runtime.gd + world_spatial_index.gd + world_state_manager.gd) 和 SimulationRuntime (simulation_runtime.gd + surface_scheduler.gd + propagation_scheduler.gd + respawn_scheduler.gd) 已实现并添加到 main.tscn 的 GameRuntime 节点下。",
+		"created": "2026-05-23T15:28:04",
+		"id": "fact_1779521284",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "WorldSpatialIndex: 固定网格分桶方案 (cell_size=64px, MAX_QUERY_RESULTS=32), 接口: register/unregister/update_position/query_radius/query_cell/query_tags。所有空间查询必须走此Index，禁止SceneTree遍历。MapObject._trigger_destruction_aoe() 已更新为通过 WorldRuntime.spatial_index 查询。",
+		"created": "2026-05-23T15:28:08",
+		"id": "fact_1779521288",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "SimulationRuntime 统一调度三个子调度器 (tick顺序: SurfaceScheduler → PropagationScheduler → RespawnScheduler)。SurfaceScheduler: 5状态倒计时过期 (MAX_CELLS=256), burning→dry/frozen→wet自然迁移。PropagationScheduler: BFS队列 (MAX_DEPTH=4/MAX_JOBS=8/MAX_QUEUE=64/DECAY=0.5), oiled+fire→burning连锁。RespawnScheduler: 重生倒计时, 到期通知WorldStateManager。",
+		"created": "2026-05-23T15:28:12",
+		"id": "fact_1779521292",
+		"source": "ai"
+	},
+	{
+		"category": "project_info",
+		"content": "文件迁移说明: move_files_batch 对此项目不可靠（创建目标目录但未实际移动文件），systems/ 和 skills/ 旧文件仍保留在 res://systems/ 和 res://skills/。新 runtime/ 基础设施文件通过 create_script 创建。旧文件仍正常工作（全部使用 class_name），与新文件并存。后续讨论是否清理旧目录。",
+		"created": "2026-05-23T15:28:16",
+		"id": "fact_1779521296",
+		"source": "ai"
 	}
 ]

@@ -19,6 +19,12 @@ func _ready() -> void:
 	_object_id = str(get_instance_id())
 	_current_hp = object_data.max_hp
 	_apply_visual()
+	_register_with_world_runtime()
+
+
+## 公开 object_id
+func get_object_id() -> String:
+	return _object_id
 
 
 ## --- Damageable 接口 ---
@@ -111,20 +117,43 @@ func _on_destroyed() -> void:
 
 
 func _trigger_destruction_aoe() -> void:
-	# AOE 伤害通过 CombatExecutor（如果存在）
-	var executor: Node = get_node_or_null("/root/GameRuntime/CombatRuntime/CombatExecutor")
-	if executor and executor.has_method("report_hit"):
-		var space: Node = get_node_or_null("/root/GameRuntime/WorldRuntime/WorldSpatialIndex")
-		if space and space.has_method("query_radius"):
-			var targets: Array = space.query_radius(global_position, object_data.destruction_radius)
-			for t in targets:
-				if t != self and t.has_method("take_damage"):
-					executor.report_hit({
-						"source": self,
-						"target": t,
-						"damage": object_data.destruction_aoe_damage,
-						"tags": object_data.destruction_aoe_tags
-					})
+	# 通过 WorldRuntime 的空间索引查询 + CombatExecutor 执行
+	var world_runtime: WorldRuntime = _find_world_runtime()
+	var executor: Node = _find_combat_executor()
+	
+	if world_runtime and executor and executor.has_method("report_hit"):
+		var targets: Array = world_runtime.spatial_index.query_radius(
+			global_position, object_data.destruction_radius
+		)
+		for t in targets:
+			if t != self and t.has_method("take_damage"):
+				executor.report_hit({
+					"source": self,
+					"target": t,
+					"damage": object_data.destruction_aoe_damage,
+					"tags": object_data.destruction_aoe_tags
+				})
+
+
+func _register_with_world_runtime() -> void:
+	var wr: WorldRuntime = _find_world_runtime()
+	if wr:
+		wr.register_object(self)
+
+
+func _find_world_runtime() -> WorldRuntime:
+	var root := get_tree().root
+	if root.has_node("GameRuntime/WorldRuntime"):
+		return root.get_node("GameRuntime/WorldRuntime")
+	return null
+
+
+func _find_combat_executor() -> Node:
+	var root := get_tree().root
+	if root.has_node("GameRuntime/CombatRuntime/CombatExecutor"):
+		return root.get_node("GameRuntime/CombatRuntime/CombatExecutor")
+	# Fallback: old path
+	return get_node_or_null("/root/Game/CombatExecutor")
 
 
 func _remove_collision() -> void:

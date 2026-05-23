@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://l2ppgawjyksk"]
 
-[ext_resource type="Script" uid="uid://c6sst5p402s8g" path="res://skills/scenes/shadow_bolt.gd" id="1_4c5bo"]
+[ext_resource type="Script" uid="uid://c6sst5p402s8g" path="res://runtime/combat/skills/scenes/shadow_bolt.gd" id="1_4c5bo"]
 [ext_resource type="Texture2D" uid="uid://ucd888rpepul" path="res://icon.svg" id="2_1me5v"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_4et00"]

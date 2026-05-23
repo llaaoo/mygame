@@ -10,13 +10,13 @@
 
 ```
 入口营地 (安全)
-    │
-    ▼
+	│
+	▼
 烧毁道路 (引导教学)
-    │  首次接触：燃烧表面 + 可破坏木箱
-    │  学会：火球点燃油桶 → 连锁爆炸 → 清理路障
-    │
-    ▼
+	│  首次接触：燃烧表面 + 可破坏木箱
+	│  学会：火球点燃油桶 → 连锁爆炸 → 清理路障
+	│
+	▼
 岔路区
  ┌──────────┴──────────┐
  │                      │
@@ -27,21 +27,21 @@
  室内搜刮                AI 寻路因火焰改变
  │                      │
  └──────────┬──────────┘
-            ▼
-      地下洞穴入口 (Portal)
-            │
-            ▼
-      洞穴深处 (SubMap)
-      狭窄通道 + 黑暗
-      冰墙堵路 → 用火球融化
-            │
-            ▼
-      Boss Arena
-      火焰领主 + 环境互动
-      击败后 → 打开捷径
-            │
-            ▼
-      捷径返回营地 (Loop Close)
+			▼
+	  地下洞穴入口 (Portal)
+			│
+			▼
+	  洞穴深处 (SubMap)
+	  狭窄通道 + 黑暗
+	  冰墙堵路 → 用火球融化
+			│
+			▼
+	  Boss Arena
+	  火焰领主 + 环境互动
+	  击败后 → 打开捷径
+			│
+			▼
+	  捷径返回营地 (Loop Close)
 ```
 
 ---
@@ -151,7 +151,7 @@ res://world/regions/burning_forest/
 │   └── oil_spill.tres               # 油污 SurfaceData
 │
 └── encounters/
-    ├── wolf_pack.tres                # 2只狼
-    ├── burning_undead.tres           # 3只燃烧亡灵
-    └── fire_lord_boss.tres           # Boss 战
+	├── wolf_pack.tres                # 2只狼
+	├── burning_undead.tres           # 3只燃烧亡灵
+	└── fire_lord_boss.tres           # Boss 战
 ```

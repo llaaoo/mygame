@@ -8,7 +8,7 @@ extends TriggeredEffect
 ## 验证链路：Buff过期 → ON_STATUS_REMOVED → Condition(BuffName) → SkillExecutor → AoE
 
 ## 消失时释放的技能路径（res://...）
-@export var unleash_skill_path: String = "res://skills/data/ice_explosion_data.tres"
+@export var unleash_skill_path: String = "res://runtime/combat/skills/data/ice_explosion_data.tres"
 
 
 static func create_default() -> OnIceArmorExpire:
