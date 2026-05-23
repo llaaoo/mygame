@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://b0n0tqgwlthxt"]
+
+[ext_resource type="Script" uid="uid://nkf4o3flqs3g" path="res://world/object/map_object.gd" id="1_bsdls"]
+[ext_resource type="Resource" uid="uid://6mvqlm5qfsv1" path="res://world/object/oil_barrel_data.tres" id="2_vjcv7"]
+[ext_resource type="Texture2D" uid="uid://ucd888rpepul" path="res://icon.svg" id="3_vjcv7"]
+[ext_resource type="Shape2D" uid="uid://bli18lj54nqc6" path="res://world/object/barrel_shape.tres" id="4_1l0vb"]
+
+[node name="OilBarrel" type="Node2D" unique_id=964153624]
+script = ExtResource("1_bsdls")
+object_data = ExtResource("2_vjcv7")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1538536495]
+modulate = Color(0.5, 0.3, 0.1, 1)
+scale = Vector2(0.8, 0.8)
+texture = ExtResource("3_vjcv7")
+
+[node name="@Sprite2D@49401" type="Sprite2D" parent="." unique_id=1426768916]
+
+[node name="HitArea" type="Area2D" parent="." unique_id=942643078]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitArea" unique_id=1012631449]
+shape = ExtResource("4_1l0vb")

@@ -128,6 +128,11 @@ func get_cells_in_radius(pos: Vector2, radius: float) -> Array[Vector2i]:
 	return []
 
 
+func force_set_surface(cell: Vector2i, state: String, duration: float, source: String = "") -> void:
+	if _surface_scheduler:
+		_surface_scheduler.set_surface(cell, state, duration, source)
+
+
 func _to_string() -> String:
 	return "SurfaceManager(rules=%d, cells=%d)" % [
 		_reactions.size(),

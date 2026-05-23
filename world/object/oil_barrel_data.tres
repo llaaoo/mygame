@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="MapObjectData" format=3 uid="uid://dbcyecil0waxe"]
+
+[ext_resource type="Script" uid="uid://em8hc0a4wlnk" path="res://world/object/map_object_data.gd" id="1_v1dc3"]
+
+[resource]
+script = ExtResource("1_v1dc3")
+display_name = "油桶"
+destruction_radius = 96.0
+destruction_aoe_damage = 20
+destruction_surface = "oiled"
+destruction_surface_radius = 96.0

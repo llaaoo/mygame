@@ -9,18 +9,19 @@ extends Node
 ## 依赖: WorldSpatialIndex + WorldStateManager
 ## 禁止: 伤害计算、AI 调度、技能逻辑
 
-var spatial_index: WorldSpatialIndex = null
-var state_manager: WorldStateManager = null
+var spatial_index: WorldSpatialIndex
+var state_manager: WorldStateManager
 var command_bus: CommandBus = null
 
 
-func _ready() -> void:
+func _init() -> void:
 	spatial_index = WorldSpatialIndex.new()
 	state_manager = WorldStateManager.new()
+
+
+func _ready() -> void:
 	state_manager.name = "WorldStateManager"
 	add_child(state_manager)
-	
-	# 连接 CommandBus
 	_connect_to_bus()
 
 

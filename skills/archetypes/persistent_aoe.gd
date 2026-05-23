@@ -67,6 +67,7 @@ func _ready() -> void:
 		shape_node.shape = circle
 
 	body_entered.connect(_on_body_entered)
+	area_entered.connect(_on_area_entered)
 
 	await get_tree().create_timer(lifetime).timeout
 	if has_meta("_combat_trace"):
@@ -86,6 +87,14 @@ func _on_body_entered(body: Node2D) -> void:
 	if body.has_method("take_damage"):
 		_emit_hit_event(body)
 		body.take_damage(damage)
+
+
+func _on_area_entered(area: Area2D) -> void:
+	# 检测 Area2D 子节点（如 MapObject 的 HitArea）
+	var owner := area.owner
+	if owner and owner.has_method("take_damage"):
+		_emit_hit_event(owner)
+		owner.take_damage(damage)
 
 
 func _emit_hit_event(target: Node2D) -> void:

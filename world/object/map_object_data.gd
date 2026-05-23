@@ -19,6 +19,8 @@ extends Resource
 @export var destruction_radius: float = 0.0       ## >0 时破坏产生 AOE 伤害（油桶引爆）
 @export var destruction_aoe_damage: int = 0
 @export var destruction_aoe_tags: Array[String] = []  ## AOE 的标签（用于连锁反应）
+@export var destruction_surface: String = ""       ## 破坏后生成的表面状态（"oiled"/"wet"等）
+@export var destruction_surface_radius: float = 0.0 ## 表面生成半径（>0 时生成）
 
 ## 屏障属性（阻挡物专用）
 @export var blocks_path: bool = false  ## 破坏前阻挡通行
