@@ -68,11 +68,11 @@ static func report_kill(target: Node2D, overkill: int, position: Vector2) -> voi
 
 
 ## 报告施法（替代 SkillExecutor._emit_event）
-static func report_cast(caster: Node2D, target: Node2D, skill: SkillData) -> void:
+static func report_cast(caster: Node2D, target: Node2D, skill: SkillData, extra_data: Dictionary = {}) -> void:
 	if not instance:
-		_emit_direct(CombatEvent.Type.ON_CAST, caster, target, {}, skill)
+		_emit_direct(CombatEvent.Type.ON_CAST, caster, target, extra_data, skill)
 		return
-	instance._enforce_emit(CombatEvent.Type.ON_CAST, caster, target, {}, skill)
+	instance._enforce_emit(CombatEvent.Type.ON_CAST, caster, target, extra_data, skill)
 
 
 ## ── 强制执行 ──

@@ -38,10 +38,62 @@ static func active() -> CombatTrace:
 static func store(trace: CombatTrace) -> void:
 	if not enabled or not trace:
 		return
+	# 防重复存储（trace 可在命中或超时时多次尝试 store）
+	if trace._stored:
+		return
+	trace._stored = true
 	traces.append(trace)
 	if traces.size() > MAX_TRACES:
 		traces.pop_front()
 	_active_trace = null
+
+	# 同步输出到控制台
+	print_console(trace)
+
+
+## ── 控制台输出 ──
+
+const _SEP := "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+## 将追踪摘要打印到 Godot 控制台
+static func print_console(trace: CombatTrace) -> void:
+	print("\n" + _SEP)
+	print("⚔️  CombatTrace  #%d | %s" % [traces.size(), trace.chain_id])
+	print("   技能: %s | 事件数: %d | 最终伤害: %d" % [trace.skill_name, trace.events.size(), trace.final_damage])
+	print("   伤害链: %s" % trace.get_damage_chain())
+
+	var i := 1
+	for ev in trace.events:
+		var prefix := "   %2d." % i
+		match ev.category:
+			CombatTraceEvent.Category.FIREWALL_BLOCK:
+				print("%s 🚫 BLOCKED | %s" % [prefix, ev.event_name])
+			CombatTraceEvent.Category.MODIFIER_APPLY:
+				var delta: int = ev.metadata.get("delta", 0)
+				var sign := "+" if delta >= 0 else ""
+				print("%s 📊 %s: %d → %d (%s%d)" % [prefix, ev.event_name, ev.input_data.get("damage", 0), ev.output_data.get("damage", 0), sign, delta])
+			CombatTraceEvent.Category.CONDITION_CHECK:
+				var r: bool = ev.output_data.get("result", false)
+				print("%s 🔍 %s: %s" % [prefix, ev.event_name, "PASS ✅" if r else "FAIL ❌"])
+			CombatTraceEvent.Category.EVENT_EMIT:
+				var data_str := ""
+				for k in ev.output_data:
+					if not data_str.is_empty(): data_str += ", "
+					data_str += "%s=%s" % [k, ev.output_data[k]]
+				if not data_str.is_empty(): data_str = "  [%s]" % data_str
+				print("%s 📡 %s → %s%s" % [prefix, ev.event_name, ev.target, data_str])
+			CombatTraceEvent.Category.DAMAGE_RESOLVE:
+				print("%s 💥 %s | base=%d" % [prefix, ev.event_name, ev.input_data.get("base_damage", 0)])
+			CombatTraceEvent.Category.SKILL_EXECUTE:
+				var ok: bool = ev.output_data.get("success", false)
+				print("%s ⚡ %s | success=%s" % [prefix, ev.event_name, "OK ✅" if ok else "FAIL ❌"])
+			CombatTraceEvent.Category.PHASE_ENTER:
+				print("%s ▶  %s" % [prefix, ev.event_name])
+			_:
+				print("%s  · %s" % [prefix, ev.event_name])
+		i += 1
+
+	print(_SEP + "\n")
 
 
 ## 获取最近一次追踪

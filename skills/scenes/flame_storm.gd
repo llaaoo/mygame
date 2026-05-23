@@ -26,6 +26,17 @@ func _ready() -> void:
 
 	# 短暂延迟后自毁
 	await get_tree().create_timer(lifetime).timeout
+	# 超时无命中：关闭 trace
+	var trace := get_meta("_combat_trace", null) as CombatTrace
+	if trace:
+		trace.record(
+			CombatTraceEvent.Category.EVENT_EMIT,
+			CombatPhase.Phase.POST,
+			"EXPIRE (no hits)", name, "",
+			{"lifetime": lifetime},
+			{}
+		)
+		CombatDebugger.store(trace)
 	queue_free()
 
 
@@ -42,4 +53,21 @@ func _on_body_entered(body: Node2D) -> void:
 
 
 func _emit_hit_event(target: Node2D) -> void:
-	CombatExecutor.report_hit(caster, target, damage, global_position)
+	var skill := get_meta("skill_data", null) as SkillData
+	var tags: Array[String] = skill.tags if skill else []
+	CombatExecutor.report_hit(caster, target, damage, global_position, skill, tags)
+
+	# 追加 ON_HIT 到 trace 并关闭
+	if has_meta("_combat_trace"):
+		var trace := get_meta("_combat_trace") as CombatTrace
+		if trace:
+			trace.record(
+				CombatTraceEvent.Category.EVENT_EMIT,
+				CombatPhase.Phase.EVENT,
+				"ON_HIT", caster.name if caster else "?", target.name,
+				{"damage": damage},
+				{"damage": damage, "target": target.name}
+			)
+			trace.final_damage = damage
+			CombatDebugger.store(trace)
+			remove_meta("_combat_trace")

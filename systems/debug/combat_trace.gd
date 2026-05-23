@@ -20,6 +20,9 @@ var events: Array[CombatTraceEvent] = []
 ## 总伤害（快速查询）
 var final_damage: int = 0
 
+## 是否已存储（防重复输出）
+var _stored: bool = false
+
 
 func _init(chain_name: String = "") -> void:
 	chain_id = chain_name

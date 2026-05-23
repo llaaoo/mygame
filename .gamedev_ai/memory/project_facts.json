@@ -880,5 +880,19 @@
 		"created": "2026-05-23T11:27:58",
 		"id": "fact_1779506878",
 		"source": "ai"
+	},
+	{
+		"category": "bug_fix",
+		"content": "BUG修复 (2025-03-24): (1) FlameStorm._emit_hit_event 现在通过 get_meta(\"skill_data\") 传递 skill 和 tags 到 CombatExecutor.report_hit，与 Projectile 行为一致。(2) SkillExecutor._execute_aoe 新增 instance.set_meta(\"skill_data\", skill)，使 FlameStorm 能追溯技能数据。(3) SkillExecutor._emit_event 现在将 tags 通过 extra_data 传递到 CombatExecutor.report_cast，ON_CAST 事件携带完整标签。CombatExecutor.report_cast 签名新增 extra_data 参数。",
+		"created": "2026-05-23T11:34:04",
+		"id": "fact_1779507244",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Trace 生命周期改造 (2025-03-24): trace 不再在 SkillExecutor.execute() 返回时立即 store。PROJECTILE/AOE 类型通过 set_meta(\"_combat_trace\") 将 trace 传给实例，由实例在命中(ON_HIT)或超时(MISS/EXPIRE)时调用 CombatDebugger.store()。Buff/Dash 保持立即 store。CombatTrace 新增 _stored 防重复标记，CombatDebugger.store() 检查 _stored 避免重复输出。",
+		"created": "2026-05-23T11:49:05",
+		"id": "fact_1779508145",
+		"source": "ai"
 	}
 ]

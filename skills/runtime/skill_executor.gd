@@ -98,13 +98,16 @@ func execute(skill: SkillData, context: CastContext) -> bool:
 		)
 
 	var ok := false
+	var defer_store := false  ## 投射物/AoE 延迟 store，在命中时由实例负责
 	match skill.skill_type:
 		SkillData.SkillType.PROJECTILE:
 			ok = _execute_projectile(skill, context)
+			defer_store = ok
 		SkillData.SkillType.BUFF:
 			ok = _execute_buff(skill, context)
 		SkillData.SkillType.AOE:
 			ok = _execute_aoe(skill, context)
+			defer_store = ok
 		SkillData.SkillType.DASH:
 			ok = _execute_dash(skill, context)
 
@@ -121,14 +124,18 @@ func execute(skill: SkillData, context: CastContext) -> bool:
 			{},
 			{"success": ok, "final_damage": trace.final_damage}
 		)
-		CombatDebugger.store(trace)
+		if not defer_store:
+			# Buff/Dash: 立即关闭 trace
+			CombatDebugger.store(trace)
+		# Projectile/AoE: trace 保持活跃，由实例在命中/超时后 store
 
 	return ok
 
 
 ## 发射战斗事件 → CombatExecutor（唯一权威入口）
 func _emit_event(type: CombatEvent.Type, source: Node2D, target: Node2D = null, skill: SkillData = null, extra_data: Dictionary = {}) -> void:
-	CombatExecutor.report_cast(source, target, skill)
+	var tags: Array[String] = skill.tags if skill else []
+	CombatExecutor.report_cast(source, target, skill, {"tags": tags, "extra": extra_data})
 
 
 ## ── 投射物 ──
@@ -147,6 +154,7 @@ func _execute_projectile(skill: SkillData, ctx: CastContext) -> bool:
 		proj.damage = resolve_damage(skill, ctx)
 		proj.speed = skill.projectile_speed
 		proj.set_meta("skill_data", skill)  ## 供事件系统追溯技能
+		proj.set_meta("_combat_trace", CombatDebugger.active())  ## trace 跟随投射物
 	return true
 
 
@@ -177,6 +185,8 @@ func _execute_aoe(skill: SkillData, ctx: CastContext) -> bool:
 		instance.damage = resolve_damage(skill, ctx)
 	if instance.has_method("set_caster"):
 		instance.set_caster(ctx.caster)
+	instance.set_meta("skill_data", skill)  ## 供事件系统追溯技能
+	instance.set_meta("_combat_trace", CombatDebugger.active())  ## trace 跟随 AoE
 	return true
 
 
