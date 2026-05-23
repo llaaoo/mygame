@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://yx4rgoeq45o8"]
+
+[ext_resource type="Script" uid="uid://fasbhx6yoft2" path="res://entities/pickups/mana_pickup.gd" id="1_kpvpu"]
+[ext_resource type="Texture2D" uid="uid://ucd888rpepul" path="res://icon.svg" id="2_61715"]
+[ext_resource type="Shape2D" uid="uid://b3fojs2r5x30j" path="res://pickups/mana_pickup_shape.tres" id="3_61715"]
+
+[node name="ManaPickup" type="Area2D" unique_id=1795329497]
+script = ExtResource("1_kpvpu")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=707494782]
+modulate = Color(0.2, 0.4, 0.9, 1)
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("2_61715")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=59384875]
+shape = ExtResource("3_61715")

@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="SkillData" format=3 uid="uid://d0spcf341tnhy"]
+
+[ext_resource type="Script" uid="uid://4315ku8pp3vc" path="res://gameplay/abilities/data/skill_data.gd" id="1_jt4iv"]
+
+[resource]
+script = ExtResource("1_jt4iv")
+id = "shadow_step"
+skill_id = "shadow_step"
+display_name = "暗影步"
+description = "化身影子闪现到目标方向，3秒内近战伤害翻倍"
+skill_type = 3
+mp_cost = 20
+cooldown = 6.0
+damage = 0
+damage_scaling = 0.0
+buff_duration = 3.0
+dash_distance = 250.0
+dash_speed = 1000.0

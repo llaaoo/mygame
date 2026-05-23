@@ -1,6 +1,0 @@
-[gd_resource type="Resource" script_class="ProjectileVisualData" format=3 uid="uid://c5mgkqieunj7x"]
-
-[ext_resource type="Script" uid="uid://k1hj0mrok6qf" path="res://skills/visuals/projectile_visual_data.gd" id="1_djddt"]
-
-[resource]
-script = ExtResource("1_djddt")

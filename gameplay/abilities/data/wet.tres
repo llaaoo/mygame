@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="Buff" format=3 uid="uid://1jxj3ta0p8u7"]
+
+[ext_resource type="Script" uid="uid://c2ye4olqmm32c" path="res://gameplay/status/buff.gd" id="1_v1oy5"]
+
+[resource]
+script = ExtResource("1_v1oy5")
+display_name = "潮湿"
+status_id = "wet"
+duration = 6.0

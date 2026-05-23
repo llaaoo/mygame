@@ -1,93 +1,101 @@
 [gd_scene format=3 uid="uid://wx74iv5pkp82"]
 
-[ext_resource type="PackedScene" uid="uid://dh2tkj6gryw1a" path="res://maps/overworld.tscn" id="1_ig7tw"]
+[ext_resource type="PackedScene" uid="uid://dh2tkj6gryw1a" path="res://world/maps/overworld.tscn" id="1_ig7tw"]
 [ext_resource type="PackedScene" uid="uid://dcbumdieobptq" path="res://entities/enemy/enemy.tscn" id="2_272bh"]
 [ext_resource type="PackedScene" uid="uid://etuhwmvsawor" path="res://entities/player/player.tscn" id="2_h2yge"]
 [ext_resource type="PackedScene" uid="uid://dbv2k2e21cmb7" path="res://world/object/oil_barrel.tscn" id="3_efxa6"]
-[ext_resource type="Script" uid="uid://nkf4o3flqs3g" path="res://world/object/map_object.gd" id="3_yaehf"]
-[ext_resource type="Script" uid="uid://c3iy2rv25rufo" path="res://runtime/combat/skills/manager/skill_manager.gd" id="4_4c57u"]
-[ext_resource type="Resource" uid="uid://dbcyecil0waxe" path="res://world/object/oil_barrel_data.tres" id="4_074og"]
+[ext_resource type="Script" uid="uid://cgn2i161esv0a" path="res://gameplay/abilities/manager/skill_manager.gd" id="5_4c57u"]
 [ext_resource type="PackedScene" uid="uid://tc5h73volrpp" path="res://ui/hud.tscn" id="5_7mycd"]
-[ext_resource type="Script" uid="uid://b7bqxvy40h1fl" path="res://components/stats_component.gd" id="5_272bh"]
-[ext_resource type="Script" uid="uid://dr4tuwps3ut87" path="res://entities/enemy/enemy.gd" id="6_cegan"]
-[ext_resource type="Script" uid="uid://clvjxdralueol" path="res://runtime/combat/input_setup.gd" id="6_efxa6"]
-[ext_resource type="Script" uid="uid://ccy41lime1vp4" path="res://runtime/game_runtime.gd" id="8_5vw27"]
-[ext_resource type="Script" uid="uid://276b15xba5pv" path="res://entities/player/player.gd" id="8_82xsv"]
-[ext_resource type="Resource" uid="uid://ci1ivpfultrb2" path="res://items/player_inventory.tres" id="9_getpj"]
-[ext_resource type="Script" uid="uid://cwfhi0pf8lbay" path="res://runtime/world/world_runtime.gd" id="9_kek77"]
-[ext_resource type="Script" uid="uid://bj1hwchmvov3o" path="res://runtime/simulation/simulation_runtime.gd" id="10_4c57u"]
-[ext_resource type="Script" uid="uid://cxp750i7wkmoe" path="res://ui/hud.gd" id="14_ryguw"]
+[ext_resource type="Script" uid="uid://d1uc57ucjrid5" path="res://entities/components/stats_component.gd" id="6_efxa6"]
+[ext_resource type="Script" uid="uid://ca7adgccfaejq" path="res://core/game_runtime.gd" id="8_dg77c"]
+[ext_resource type="Script" uid="uid://d2dwn66h08hu2" path="res://world/world_runtime.gd" id="9_ycdy4"]
+[ext_resource type="Script" uid="uid://8ghdd2c772lv" path="res://gameplay/interaction/simulation_runtime.gd" id="10_w48qg"]
+
+[sub_resource type="GDScript" id="GDScript_272bh"]
+script/source = "extends Node
+## 自动注册输入映射（运行时 fallback，避免手动配置 Input Map）
+
+func _enter_tree() -> void:
+	_setup_key_action(\"move_left\", KEY_A)
+	_setup_key_action(\"move_right\", KEY_D)
+	_setup_key_action(\"move_up\", KEY_W)
+	_setup_key_action(\"move_down\", KEY_S)
+	_setup_key_action(\"dodge\", KEY_SPACE)
+	_setup_mouse_action(\"attack\", MOUSE_BUTTON_LEFT)
+	_setup_mouse_action(\"skill\", MOUSE_BUTTON_RIGHT)
+	_setup_key_action(\"skill_1\", KEY_1)
+	_setup_key_action(\"skill_2\", KEY_2)
+	_setup_key_action(\"skill_3\", KEY_3)
+	_setup_key_action(\"skill_4\", KEY_4)
+
+
+func _setup_key_action(action_name: String, key: Key) -> void:
+	if InputMap.has_action(action_name):
+		return
+	InputMap.add_action(action_name)
+	var event := InputEventKey.new()
+	event.keycode = key
+	InputMap.action_add_event(action_name, event)
+
+
+func _setup_mouse_action(action_name: String, button: MouseButton) -> void:
+	if InputMap.has_action(action_name):
+		return
+	InputMap.add_action(action_name)
+	var event := InputEventMouseButton.new()
+	event.button_index = button
+	InputMap.action_add_event(action_name, event)
+"
 
 [node name="Game" type="Node" unique_id=1368087060]
 
-[node name="Overworld" type="Node2D" parent="." unique_id=1549094242 instance=ExtResource("1_ig7tw")]
+[node name="Overworld" parent="." unique_id=1549094242 instance=ExtResource("1_ig7tw")]
 
-[node name="OilBarrel6" type="Node2D" parent="Overworld" unique_id=1368180406 instance=ExtResource("3_efxa6")]
+[node name="OilBarrel6" parent="Overworld" unique_id=1368180406 instance=ExtResource("3_efxa6")]
 position = Vector2(277, -226)
-script = ExtResource("3_yaehf")
-object_data = ExtResource("4_074og")
 
-[node name="OilBarrel5" type="Node2D" parent="Overworld" unique_id=1591392191 instance=ExtResource("3_efxa6")]
+[node name="OilBarrel5" parent="Overworld" unique_id=1591392191 instance=ExtResource("3_efxa6")]
 position = Vector2(283, -634)
-script = ExtResource("3_yaehf")
-object_data = ExtResource("4_074og")
 
-[node name="Enemy1" type="CharacterBody2D" parent="Overworld" unique_id=1874515091 instance=ExtResource("2_272bh")]
+[node name="Enemy1" parent="Overworld" unique_id=1874515091 instance=ExtResource("2_272bh")]
 position = Vector2(200, 0)
-collision_layer = 2
-script = ExtResource("6_cegan")
 max_hp = 100
 
-[node name="Enemy2" type="CharacterBody2D" parent="Overworld" unique_id=268381738 instance=ExtResource("2_272bh")]
+[node name="Enemy2" parent="Overworld" unique_id=268381738 instance=ExtResource("2_272bh")]
 position = Vector2(-200, 0)
-collision_layer = 2
-script = ExtResource("6_cegan")
 max_hp = 100
 
-[node name="Enemy3" type="CharacterBody2D" parent="Overworld" unique_id=843982397 instance=ExtResource("2_272bh")]
+[node name="Enemy3" parent="Overworld" unique_id=843982397 instance=ExtResource("2_272bh")]
 position = Vector2(0, 200)
-collision_layer = 2
-script = ExtResource("6_cegan")
 max_hp = 100
 
-[node name="OilBarrel" type="Node2D" parent="Overworld" unique_id=964153624 instance=ExtResource("3_efxa6")]
+[node name="OilBarrel" parent="Overworld" unique_id=964153624 instance=ExtResource("3_efxa6")]
 position = Vector2(281, -426)
-script = ExtResource("3_yaehf")
-object_data = ExtResource("4_074og")
 
-[node name="OilBarrel2" type="Node2D" parent="Overworld" unique_id=1431751229 instance=ExtResource("3_efxa6")]
+[node name="OilBarrel2" parent="Overworld" unique_id=1431751229 instance=ExtResource("3_efxa6")]
 position = Vector2(270, -463)
-script = ExtResource("3_yaehf")
-object_data = ExtResource("4_074og")
 
-[node name="OilBarrel3" type="Node2D" parent="Overworld" unique_id=1666970899 instance=ExtResource("3_efxa6")]
+[node name="OilBarrel3" parent="Overworld" unique_id=1666970899 instance=ExtResource("3_efxa6")]
 position = Vector2(282, -325)
-script = ExtResource("3_yaehf")
-object_data = ExtResource("4_074og")
 
-[node name="OilBarrel4" type="Node2D" parent="Overworld" unique_id=1301996663 instance=ExtResource("3_efxa6")]
+[node name="OilBarrel4" parent="Overworld" unique_id=1301996663 instance=ExtResource("3_efxa6")]
 position = Vector2(280, -536)
-script = ExtResource("3_yaehf")
-object_data = ExtResource("4_074og")
 
-[node name="Player" type="CharacterBody2D" parent="." unique_id=87503594 instance=ExtResource("2_h2yge")]
+[node name="Player" parent="." unique_id=87503594 instance=ExtResource("2_h2yge")]
 position = Vector2(-6, -419)
 collision_layer = 2
-script = ExtResource("8_82xsv")
-inventory = ExtResource("9_getpj")
 debug_items = true
 
 [node name="SkillManager" type="Node" parent="Player" unique_id=1978715642]
-script = ExtResource("4_4c57u")
+script = ExtResource("5_4c57u")
 
 [node name="StatsComponent" type="Node" parent="Player" unique_id=1491100307]
-script = ExtResource("5_272bh")
-
-[node name="InputSetup" type="Node" parent="." unique_id=2019032865]
 script = ExtResource("6_efxa6")
 
-[node name="HUDLayer" type="CanvasLayer" parent="." unique_id=1720897277 instance=ExtResource("5_7mycd")]
-script = ExtResource("14_ryguw")
+[node name="InputSetup" type="Node" parent="." unique_id=2019032865]
+script = SubResource("GDScript_272bh")
+
+[node name="HUDLayer" parent="." unique_id=1720897277 instance=ExtResource("5_7mycd")]
 
 [node name="DeathScreen" type="ColorRect" parent="HUDLayer" unique_id=1789513381]
 visible = false
@@ -117,10 +125,10 @@ theme_override_font_sizes/font_size = 24
 text = "Reload"
 
 [node name="GameRuntime" type="Node" parent="." unique_id=2108780999]
-script = ExtResource("8_5vw27")
+script = ExtResource("8_dg77c")
 
 [node name="WorldRuntime" type="Node" parent="GameRuntime" unique_id=808621723]
-script = ExtResource("9_kek77")
+script = ExtResource("9_ycdy4")
 
 [node name="SimulationRuntime" type="Node" parent="GameRuntime" unique_id=752857783]
-script = ExtResource("10_4c57u")
+script = ExtResource("10_w48qg")

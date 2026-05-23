@@ -5,10 +5,10 @@
 [ext_resource type="Texture2D" uid="uid://ucd888rpepul" path="res://icon.svg" id="2_61ikd"]
 [ext_resource type="Script" uid="uid://bi7n28drvonhu" path="res://entities/enemy/states/chase.gd" id="2_im2q6"]
 [ext_resource type="Script" uid="uid://dfdg1os45xtxd" path="res://entities/enemy/states/attack.gd" id="3_3fvr7"]
-[ext_resource type="Script" uid="uid://d0shk0qdqd76j" path="res://runtime/combat/state_machine.gd" id="3_721x4"]
-[ext_resource type="Script" uid="uid://bumjex67lou7i" path="res://components/health_component.gd" id="7_61ikd"]
-[ext_resource type="Script" uid="uid://c3iy2rv25rufo" path="res://runtime/combat/skills/manager/skill_manager.gd" id="8_eaj7m"]
-[ext_resource type="Script" uid="uid://b7bqxvy40h1fl" path="res://components/stats_component.gd" id="9_eaj7m"]
+[ext_resource type="Script" uid="uid://d0shk0qdqd76j" path="res://core/state/state_machine.gd" id="3_721x4"]
+[ext_resource type="Script" uid="uid://bumjex67lou7i" path="res://entities/components/health_component.gd" id="7_61ikd"]
+[ext_resource type="Script" uid="uid://c3iy2rv25rufo" path="res://gameplay/abilities/manager/skill_manager.gd" id="8_eaj7m"]
+[ext_resource type="Script" uid="uid://b7bqxvy40h1fl" path="res://entities/components/stats_component.gd" id="9_eaj7m"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_d50e0"]
 radius = 30.0

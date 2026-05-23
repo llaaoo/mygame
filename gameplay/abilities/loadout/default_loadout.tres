@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="SkillLoadout" format=3 uid="uid://b6fm5svpvtsoj"]
+
+[ext_resource type="Script" uid="uid://bh1rbhuf8477i" path="res://gameplay/abilities/loadout/skill_loadout.gd" id="1_v4e5t"]
+
+[resource]
+script = ExtResource("1_v4e5t")
+left_hand = "ice_armor"
+right_hand = "fireball"

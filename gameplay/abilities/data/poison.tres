@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="Buff" format=3 uid="uid://3k2its67jytv"]
+
+[ext_resource type="Script" uid="uid://c2ye4olqmm32c" path="res://gameplay/status/buff.gd" id="1_pl221"]
+
+[resource]
+script = ExtResource("1_pl221")
+display_name = "中毒"
+status_id = "poison"
+duration = 5.0
+tick_interval = 1.0
+stack_behavior = 1
+max_stacks = 5
+tick_damage = 3
+tick_damage_scaling = 0.2

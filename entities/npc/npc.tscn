@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://c5kv2h3c648hl"]
 
 [ext_resource type="Script" uid="uid://bxtdg44yp5xwq" path="res://entities/npc/npc.gd" id="1_gwous"]
-[ext_resource type="Script" uid="uid://b7bqxvy40h1fl" path="res://components/stats_component.gd" id="2_e3lg2"]
+[ext_resource type="Script" uid="uid://b7bqxvy40h1fl" path="res://entities/components/stats_component.gd" id="2_e3lg2"]
 
 [node name="NPC" type="CharacterBody2D" unique_id=1871993625]
 

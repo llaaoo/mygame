@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="AOEVisualData" format=3 uid="uid://lqgqttn2rf0d"]
+
+[ext_resource type="Script" uid="uid://c31vhxyrekx0m" path="res://gameplay/abilities/visuals/aoe_visual_data.gd" id="1_rb878"]
+
+[resource]
+script = ExtResource("1_rb878")
+scale = 0.8

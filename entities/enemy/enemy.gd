@@ -64,11 +64,11 @@ func _ready() -> void:
 	_apply_stats_to_health()
 
 	# 技能（archetype 驱动场景，SkillData 纯配置）
-	var bolt_data := load("res://runtime/combat/skills/data/shadow_bolt_data.tres") as SkillData
+	var bolt_data := load("res://gameplay/abilities/data/shadow_bolt_data.tres") as SkillData
 	if bolt_data:
 		bolt_data.skill_type = SkillData.SkillType.PROJECTILE
 		bolt_data.archetype = "linear_projectile"
-		bolt_data.visual = load("res://skills/visuals/shadow_visual.tres")
+		bolt_data.visual = load("res://content/visuals/shadow_visual.tres")
 		bolt_data.projectile_speed = 250.0
 		bolt_data.damage = 10
 		bolt_data.damage_scaling = 0.6
@@ -191,9 +191,9 @@ func _on_died() -> void:
 func _spawn_drop() -> void:
 	if not drop_scene:
 		if randf() < 0.5:
-			drop_scene = load("res://pickups/health_pickup.tscn")
+			drop_scene = load("res://entities/pickups/health_pickup.tscn")
 		else:
-			drop_scene = load("res://pickups/mana_pickup.tscn")
+			drop_scene = load("res://entities/pickups/mana_pickup.tscn")
 
 	if not drop_scene:
 		return

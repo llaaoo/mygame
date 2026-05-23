@@ -1,0 +1,43 @@
+[gd_scene format=3 uid="uid://dh2tkj6gryw1a"]
+
+[ext_resource type="PackedScene" uid="uid://haom0tvqfjsi" path="res://world/portals/portal.tscn" id="7_jexs8"]
+
+[sub_resource type="SegmentShape2D" id="SegmentShape2D_y0h06"]
+
+[sub_resource type="SegmentShape2D" id="SegmentShape2D_fmvh5"]
+
+[sub_resource type="SegmentShape2D" id="SegmentShape2D_8j7uc"]
+
+[sub_resource type="SegmentShape2D" id="SegmentShape2D_2yvwq"]
+
+[node name="Overworld" type="Node2D" unique_id=1549094242]
+
+[node name="Ground" type="TileMapLayer" parent="." unique_id=1938388878]
+
+[node name="Walls" type="StaticBody2D" parent="." unique_id=2089885178]
+
+[node name="WallTop" type="CollisionShape2D" parent="Walls" unique_id=517423054]
+position = Vector2(0, -760)
+shape = SubResource("SegmentShape2D_y0h06")
+
+[node name="WallBottom" type="CollisionShape2D" parent="Walls" unique_id=1753584731]
+position = Vector2(0, 760)
+shape = SubResource("SegmentShape2D_fmvh5")
+
+[node name="WallLeft" type="CollisionShape2D" parent="Walls" unique_id=190552398]
+position = Vector2(-1010, 0)
+shape = SubResource("SegmentShape2D_8j7uc")
+
+[node name="WallRight" type="CollisionShape2D" parent="Walls" unique_id=642867725]
+position = Vector2(1010, 0)
+shape = SubResource("SegmentShape2D_2yvwq")
+
+[node name="GroundVisual" type="ColorRect" parent="." unique_id=1023583791]
+offset_left = -1000.0
+offset_top = -750.0
+offset_right = 1000.0
+offset_bottom = 750.0
+color = Color(0.2, 0.35, 0.15, 1)
+
+[node name="Portal" parent="." unique_id=1869604937 instance=ExtResource("7_jexs8")]
+position = Vector2(742, -393)

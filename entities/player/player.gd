@@ -178,16 +178,16 @@ func restore_mp(amount: int) -> void:
 
 func _setup_skills() -> void:
 	# 1. 加载技能池（注册表）
-	_skill_pool = load("res://runtime/combat/skills/registry/player_skill_pool.tres") as SkillPool
+	_skill_pool = load("res://gameplay/abilities/registry/player_skill_pool.tres") as SkillPool
 	if not _skill_pool:
 		_skill_pool = SkillPool.new()
 
 	# 2. 确保所有技能在池中（纯数据，archetype 驱动场景加载）
 	if not _skill_pool.has_skill("fireball"):
-		var fireball := load("res://runtime/combat/skills/data/fireball_data.tres") as SkillData
+		var fireball := load("res://gameplay/abilities/data/fireball_data.tres") as SkillData
 		if fireball:
 			fireball.archetype = "linear_projectile"
-			fireball.visual = load("res://skills/visuals/fire_visual.tres")
+			fireball.visual = load("res://content/visuals/fire_visual.tres")
 			fireball.projectile_speed = 500.0
 			fireball.damage = 25
 			fireball.damage_scaling = 1.0
@@ -198,25 +198,25 @@ func _setup_skills() -> void:
 
 	for sid in ["ice_armor", "flame_storm", "shadow_step", "ice_explosion"]:
 		if not _skill_pool.has_skill(sid):
-			var skill := load("res://runtime/combat/skills/data/%s_data.tres" % sid) as SkillData
+			var skill := load("res://gameplay/abilities/data/%s_data.tres" % sid) as SkillData
 			if skill:
 				match sid:
 					"ice_armor":
-						skill.buff_resource = load("res://runtime/combat/skills/data/ice_armor_buff.tres") as Buff
+						skill.buff_resource = load("res://gameplay/abilities/data/ice_armor_buff.tres") as Buff
 						skill.tags = ["ice"]
 					"flame_storm":
 						skill.archetype = "persistent_aoe"
-						skill.aoe_visual = load("res://skills/visuals/fire_aoe_visual.tres")
+						skill.aoe_visual = load("res://content/visuals/fire_aoe_visual.tres")
 						skill.cast_distance = 150.0
 						skill.damage = 30
 						skill.damage_scaling = 1.2
 						skill.tags = ["fire"]
 					"shadow_step":
-						skill.buff_resource = load("res://runtime/combat/skills/data/shadow_step_buff.tres") as Buff
+						skill.buff_resource = load("res://gameplay/abilities/data/shadow_step_buff.tres") as Buff
 						skill.tags = ["shadow"]
 					"ice_explosion":
 						skill.archetype = "persistent_aoe"
-						skill.aoe_visual = load("res://skills/visuals/ice_aoe_visual.tres")
+						skill.aoe_visual = load("res://content/visuals/ice_aoe_visual.tres")
 						skill.damage = 25
 						skill.damage_scaling = 0.8
 						skill.tags = ["ice", "aoe"]
@@ -293,7 +293,7 @@ func _setup_event_bus() -> void:
 	_register_triggered_effects(_on_ice_expire)
 
 	# ON_HIT 火焰技能 → 挂 burning 状态
-	_on_hit_fire_status = OnHitApplyStatus.create("fire", "res://runtime/combat/skills/data/burning.tres")
+	_on_hit_fire_status = OnHitApplyStatus.create("fire", "res://gameplay/abilities/data/burning.tres")
 	_register_triggered_effects(_on_hit_fire_status)
 
 	# EffectGraph：ON_HIT 火焰技能
@@ -417,7 +417,7 @@ func _setup_inventory_panel() -> void:
 	if panel and panel is InventoryPanel:
 		inventory_panel = panel
 		if not inventory:
-			inventory = load("res://items/player_inventory.tres") as Inventory
+			inventory = load("res://content/items/player_inventory.tres") as Inventory
 		inventory_panel.setup(inventory, $EquipmentManager)
 		if debug_items:
 			_add_test_items()
@@ -433,9 +433,9 @@ func _setup_skill_pool_ui() -> void:
 func _add_test_items() -> void:
 	if not inventory:
 		return
-	var helmet = load("res://items/examples/iron_helmet.tres")
-	var armor = load("res://items/examples/leather_armor.tres")
-	var boots = load("res://items/examples/iron_boots.tres")
+	var helmet = load("res://content/items/examples/iron_helmet.tres")
+	var armor = load("res://content/items/examples/leather_armor.tres")
+	var boots = load("res://content/items/examples/iron_boots.tres")
 	inventory.add_item(helmet, 1)
 	inventory.add_item(armor, 1)
 	inventory.add_item(boots, 1)
