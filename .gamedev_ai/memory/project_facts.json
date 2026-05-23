@@ -383,5 +383,12 @@
 		"created": "2026-05-23T16:53:02",
 		"id": "fact_1779526382",
 		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "v1.4 Status/Buff Runtime 深化完成：Buff Resource 扩展 status_id（状态身份）、stack_behavior（REFRESH/INTENSITY/INDEPENDENT）、tick_damage（DOT伤害）、speed_multiplier（减速）。BuffManager 新增叠加层数追踪、DOT tick 伤害、get_active_statuses() 查询接口供 AI/Surface 系统使用。示例状态 .tres：burning（3层DOT）、frozen（70%减速）、wet（纯标记）、poison（5层DOT）。现有 Buff 完全向后兼容——旧 .tres 无 status_id 仍正常工作。",
+		"created": "2026-05-23T17:00:16",
+		"id": "fact_1779526816",
+		"source": "ai"
 	}
 ]

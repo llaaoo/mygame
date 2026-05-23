@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="Buff" format=3 uid="uid://bkapqttcs8wwn"]
+
+[ext_resource type="Script" uid="uid://c2ye4olqmm32c" path="res://items/buff.gd" id="1_k5jbb"]
+
+[resource]
+script = ExtResource("1_k5jbb")
+display_name = "燃烧"
+status_id = "burning"
+duration = 4.0
+tick_interval = 1.0
+stack_behavior = 1
+max_stacks = 3
+tick_damage = 5
+tick_damage_scaling = 0.3

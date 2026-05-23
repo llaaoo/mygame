@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="Buff" format=3 uid="uid://djy58gk7c8fwp"]
+
+[ext_resource type="Script" uid="uid://c2ye4olqmm32c" path="res://items/buff.gd" id="1_ia31t"]
+
+[resource]
+script = ExtResource("1_ia31t")
+display_name = "冻结"
+status_id = "frozen"
+duration = 3.0
+speed_multiplier = 0.3

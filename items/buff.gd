@@ -1,32 +1,36 @@
 class_name Buff
 extends Resource
-## Buff/被动效果 — 可被装备、技能、消耗品等任何系统复用
+## Buff/被动效果/状态 — 可被装备、技能、消耗品、表面交互等任何系统复用
 ##
 ## duration = 0 表示永久（装备类 Buff）
 ## tick_interval = 0 表示不触发 tick
+## status_id 非空时视为"状态"（burning/frozen/poison 等），参与 Surface 交互和 AI 查询
 
-## 显示名称
+## ── 核心标识 ──
 @export var display_name: String = ""
-
-## 图标
 @export var icon: Texture2D
+@export var status_id: String = ""               ## "burning"/"frozen"/"wet"/"poison"/"shock"/"bleeding" — 空=纯数值Buff
 
-## 持续时间（秒，0=永久）
-@export var duration: float = 0.0
+## ── 生命周期 ──
+@export var duration: float = 0.0                ## 秒，0=永久
+@export var tick_interval: float = 0.0           ## 秒，0=不触发
 
-## tick 间隔（秒，0=不触发）
-@export var tick_interval: float = 0.0
+## ── 叠加规则 ──
+enum StackBehavior { REFRESH, INTENSITY, INDEPENDENT }
+@export var stack_behavior: StackBehavior = StackBehavior.REFRESH
+@export var max_stacks: int = 1                  ## INTENSITY 模式最大层数
 
-## 属性加成（固定值）
-## 支持: strength/intelligence/agility/endurance (主属性, StatsComponent)
-##       max_hp (HealthComponent), move_speed (Player), attack_damage (CombatComponent)
+## ── 属性加成（固定值） ──
 @export var stat_modifiers: Dictionary = {}
 
-## 属性百分比加成（如 {"atk": 0.1} = +10% 攻击力）
+## ── 属性百分比加成 ──
 @export var stat_multipliers: Dictionary = {}
 
-## tick 时回复 HP
-@export var tick_heal: int = 0
+## ── Tick 效果 ──
+@export var tick_heal: int = 0                   ## 每 tick 回复 HP
+@export var tick_damage: int = 0                 ## 每 tick 造成伤害
+@export var tick_damage_scaling: float = 0.0     ## 伤害属性缩放系数
+@export var speed_multiplier: float = 1.0        ## 移动速度倍率（0.5=减速50%, 移除时还原）
 
 ## ── 主属性名集合 ──
 const PRIMARY_STATS: Array[String] = ["strength", "intelligence", "agility", "endurance"]
@@ -47,11 +51,13 @@ func describe() -> String:
 		var sign := "+" if val >= 0 else ""
 		parts.append("%s%s%d%%" % [stat, sign, int(val * 100)])
 
-	if tick_heal != 0:
-		if tick_interval > 0:
-			parts.append("tick_heal+%d/%ds" % [tick_heal, tick_interval])
-		else:
-			parts.append("tick_heal+%d" % tick_heal)
+	if tick_damage > 0:
+		parts.append("DOT+%d/%ds" % [tick_damage, tick_interval])
+	if tick_heal > 0:
+		parts.append("HOT+%d/%ds" % [tick_heal, tick_interval])
+	if speed_multiplier != 1.0:
+		var pct := int((1.0 - speed_multiplier) * 100)
+		parts.append("slow%d%%" % pct)
 
 	var effect_str := ", ".join(parts) if not parts.is_empty() else "无属性效果"
 	var dur_str := " (%.1fs)" % duration if duration > 0 else " (永久)"
@@ -64,6 +70,10 @@ func apply_to(entity: Node) -> void:
 		return
 	for stat_name in stat_modifiers:
 		_apply_stat(entity, stat_name, stat_modifiers[stat_name])
+	
+	# 速度修正
+	if speed_multiplier != 1.0 and "move_speed" in entity:
+		entity.move_speed *= speed_multiplier
 
 
 ## 从目标实体移除此 Buff
@@ -72,6 +82,10 @@ func remove_from(entity: Node) -> void:
 		return
 	for stat_name in stat_modifiers:
 		_apply_stat(entity, stat_name, -stat_modifiers[stat_name])
+	
+	# 还原速度
+	if speed_multiplier != 1.0 and "move_speed" in entity and speed_multiplier != 0.0:
+		entity.move_speed /= speed_multiplier
 
 
 ## 应用单个属性修改
