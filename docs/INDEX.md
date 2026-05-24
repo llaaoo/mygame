@@ -1,6 +1,6 @@
 # 📚 项目文档索引
 
-> 版本: v2.1 | 最后更新: 2026-05-24
+> 版本: v2.3 | 最后更新: 2026-05-24
 
 ---
 
@@ -26,12 +26,11 @@ ARCHITECTURE.md (宪法 — 六层边界)
 **回答的问题**: 项目分几层？每层管什么？依赖方向是什么？
 
 **核心内容**:
-- 六层边界模型（core / gameplay / entities / world / content / ui）
-- 依赖方向铁律
-- Action Layer — ✅ 已实现（PlayerAction + poll_actions + try_action）
-- WorldObject 体系 — ✅ 已实现（7 种物体 + 交互框架）
-- Content vs Gameplay 边界
-- 下一阶段优先级
+- 六层边界模型 + NPC 五层架构（WorldTime→Brain→Task→Action→FSM）
+- FSM 铁律（只执行，不决策）
+- Enemy vs NPC 根本区别（反应式 vs 生活式）
+- Action Layer / WorldObject / Quest / NPC Schedule 各系统状态
+- Content vs Gameplay 边界 + 停止线
 
 **何时阅读**: 新人入职第一天。任何架构决策前。
 
@@ -79,6 +78,7 @@ ARCHITECTURE.md (宪法 — 六层边界)
 | 新增表面状态 | WORLD_CONTRACTS.md CONTRACT 4 |
 | 新增 WorldObject | ARCHITECTURE.md §五 |
 | 新增 NPC 对话 | 查阅 world/object/npc.gd 内注释 |
+| 新增 NPC 日程 | ARCHITECTURE.md §一 NPC 五层架构 |
 | 新增交互物体 | 查阅 SignalReceiver / Interactable 基类 |
 | 设置碰撞层/掩码 | PHYSICS_LAYERS.md |
 | 修复战斗 Bug | COMBAT_CONTRACTS.md 反模式速查 |
@@ -98,3 +98,4 @@ ARCHITECTURE.md (宪法 — 六层边界)
 | v2.0 | 2026-05 | ARCHITECTURE.md — 六层边界模型 + 停止线 |
 | v2.1 | 2026-05 | Action Layer ✅ + WorldObject 7 种 ✅ + NPC 对话 ✅ + Dialogue Manager 集成 |
 | v2.2 | 2026-05 | Enemy StateChart 迁移 ✅ + Quest 系统设计 + 事件驱动统一架构 |
+| v2.3 | 2026-05 | Quest P1-P3 ✅ + NPC Schedule P1 ✅ + NPC 五层架构 + FSM 铁律 + Enemy/NPC 分离 |

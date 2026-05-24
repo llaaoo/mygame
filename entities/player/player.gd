@@ -308,6 +308,9 @@ func _setup_event_bus() -> void:
 	# 战斗调试器
 	_setup_combat_debugger()
 
+	# WorldTime（世界时间驱动）
+	_setup_world_time()
+
 	# QuestManager（接在 EventBus 之后）
 	_setup_quest_manager()
 
@@ -381,6 +384,16 @@ func _setup_combat_debugger() -> void:
 	var debug_ui := CombatDebugUI.new()
 	debug_ui.name = "CombatDebugUI"
 	get_tree().current_scene.add_child.call_deferred(debug_ui)
+
+
+## ── 世界时间 ──
+
+func _setup_world_time() -> void:
+	if WorldTime.instance:
+		return
+	var wt := WorldTime.new()
+	wt.name = "WorldTime"
+	get_tree().current_scene.add_child.call_deferred(wt)
 
 
 ## ── Quest 系统 ──

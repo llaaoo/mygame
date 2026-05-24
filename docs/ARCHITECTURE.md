@@ -1,6 +1,6 @@
 # 🏛️ 项目架构 — 六层边界与工程契约
 
-> **状态**: v2.2  
+> **状态**: v2.3  
 > **最后更新**: 2026-05-24  
 > **替换**: RUNTIME_TOPOLOGY.md (v1.0–v1.5)
 
@@ -14,14 +14,16 @@
 
 ---
 
-## 一、六层边界 + 事件总线
+## 一、六层边界 + 事件总线 + NPC 五层
+
+### 全局事件总线
 
 ```
                       CombatEventBus (唯一事件流)
                      ┌──────────┼──────────┐
                      ▼          ▼          ▼
                   Quest     NPCBrain   TriggeredEffect
-                (Condition  (AI状态)    (Buff/反应)
+                (Condition  (AI决策)    (Buff/反应)
                  +Counter)
                      │          │          │
                      └──────────┼──────────┘
@@ -42,31 +44,45 @@
                            ↓
                      content/
                      (纯 .tres，零运行时)
-
-        ┌─────────┬─────────┬─────────┬─────────┬─────────┐
-        ▼         ▼         ▼         ▼         ▼         ▼
-      core    gameplay  entities   world    content     ui
 ```
 
-| 层 | 职责 | 已实现 |
-|----|------|--------|
-| **core** | 引擎基础设施（状态机、事件总线、命令总线） | StateMachine, CombatEventBus, CombatExecutor, CommandBus |
-| **gameplay** | 游戏规则（Action、战斗、技能、状态、交互、背包、任务） | Action Layer, 6种技能, Modifier管线, Buff系统, 交互框架, Quest系统(设计中) |
-| **entities** | Actor + 组件（Player/Enemy/NPC + 组件） | Player(5状态), Enemy(StateChart), NPC(DialogueBalloon), 4个组件 |
-| **world** | 空间系统（地图、物体、传送门、表面、空间索引） | 7种WorldObject, 表面系统, 空间索引, 传送门 |
-| **content** | 纯数据 .tres（技能数据、物品、状态预设、视觉预设、任务配置） | 技能.tres, 物品.tres, 状态.tres, 视觉.tres, 任务.tres(规划中) |
-| **ui** | HUD / 菜单 / 背包面板 / 技能栏 / 对话气球 / 任务追踪 | HUD, InventoryPanel, SkillBar, DialogueBalloon, QuestTracker(规划中) |
-
-### 核心原则：事件驱动统一
+### NPC 五层架构（关键分层）
 
 ```
-World Event → EventBus → Quest / NPCBrain / TriggeredEffect
+WorldTime (全局事实: 几点/白天黑夜)
+    ↓
+NPCBrain (决策: "现在该干什么" — 只读Schedule，不移动不播动画)
+    ↓
+Task (意图: "去铁匠铺工作" — MoveToTask/WanderTask/IdleTask)
+    ↓
+Action (行为: "怎么去" — MoveAction/UseAction/InteractAction)
+    ↓
+StateMachine (执行: 动画/移动/Tween — 禁止读WorldTime/选行为)
 ```
 
-三套系统监听同一事件流。Quest 本质是 "Condition + Counter" 的 Triggered System。
-QuestManager 极小 — 只做 `for quest in active: quest.on_event(ev)`，不认识任务类型。
+| 层 | 职责 | 禁止 |
+|----|------|------|
+| **WorldTime** | 全局时钟 0-24h | 不控制 NPC |
+| **NPCBrain** | 读 Schedule → 选 Task | 不移动、不播动画、不攻击 |
+| **Task** | 目标意图（MoveTo/Sleep/Work） | 不直接控制动画 |
+| **Action** | 行为执行（Move/Use/Interact） | — |
+| **StateMachine** | 动画/移动/Tween/死亡 | 禁止读 WorldTime/Quest/Schedule |
 
-### 依赖方向（铁律）
+### Enemy vs NPC 根本区别
+
+| | Enemy | NPC |
+|------|------|------|
+| 模式 | 反应式 AI | 生活式 AI |
+| 驱动 | 玩家距离 | Schedule（时间） |
+| 无玩家时 | 原地待机 | 持续执行日程 |
+| 架构 | StateChart 直接驱动 | Schedule→Task→Action→FSM |
+
+```
+Enemy: Idle → Chase → Attack  (只对玩家反应)
+NPC:   06:00 Wake → 08:00 Work → 18:00 Eat → 22:00 Sleep  (独立生活)
+```
+
+### 依赖方向（铁律）+ FSM 铁律
 
 ```
 content  ← 被所有层引用（只读数据）
@@ -76,7 +92,21 @@ core     ← 被所有层使用
 ui       → 只读所有层
 ```
 
-**禁止反向**。**禁止系统互相引用**（Quest ↔ Dialogue 通过 EventBus 通信，不直调）。
+**禁止反向**。**禁止系统互相引用**。
+
+**FSM 铁律**: FSM 永远不允许直接选行为、读 WorldTime、读 Quest、改 Schedule。FSM 只能执行动画/移动/Tween/受击/死亡。
+
+### 最终收敛结构
+
+```
+World (Time + Quest + EventBus + Relationship + Crime)
+    │
+NPC (Brain + Schedule + Task + Action + FSM)
+    │
+Combat (Executor + Modifier + Event + EffectGraph)
+    │
+Action Layer (Move/Attack/Use/Interact/Cast — Player/NPC/Boss 统一)
+```
 
 ---
 
@@ -87,6 +117,8 @@ core/
 ├── state/
 │   ├── state.gd
 │   └── state_machine.gd
+├── event/
+│   └── combat_event.gd
 ├── game_runtime.gd
 ├── command_bus.gd
 └── runtime_command.gd
@@ -98,7 +130,7 @@ core/
 
 ```
 gameplay/
-├── action/                          ← ✅ Action Layer
+├── action/                          ← ✅ Action Layer (Player)
 │   └── player_action.gd
 │
 ├── abilities/                       ← 技能系统
@@ -111,26 +143,19 @@ gameplay/
 │   ├── conditions/
 │   └── triggered_effect.gd
 │
-├── quest/                           ← 🔜 Quest 系统
+├── quest/                           ← ✅ Quest P1-P3
 │   ├── data/
 │   │   ├── quest_data.gd
 │   │   ├── quest_stage.gd
-│   │   ├── objective.gd
-│   │   └── reward.gd
+│   │   └── objective.gd
 │   ├── runtime/
 │   │   ├── quest_runtime.gd
-│   │   ├── objective_runtime.gd
 │   │   └── quest_manager.gd
 │   ├── objectives/
 │   │   ├── kill_objective.gd
-│   │   ├── interact_objective.gd
-│   │   └── reach_region_objective.gd
-│   ├── rewards/
-│   │   ├── give_item_reward.gd
-│   │   └── open_door_reward.gd
+│   │   └── interact_objective.gd
 │   └── ui/
-│       ├── quest_tracker.gd
-│       └── quest_journal.gd
+│       └── quest_tracker.gd
 │
 ├── status/
 │   ├── buff.gd
@@ -145,32 +170,6 @@ gameplay/
     ├── surface_manager.gd
     ├── surface_reaction.gd
     └── propagation_scheduler.gd
-```
-
-### Quest 系统 — 设计中
-
-**核心约束**：
-- QuestManager 极小 — 只做 `for q in active: q.on_event(ev)`
-- Objective 不用 enum，用类继承（KillObjective / InteractObjective）
-- Reward 不用写死，用类继承（GiveItemReward / OpenDoorReward）
-- Quest 与 Dialogue 不互相引用，通过 EventBus 通信
-- Quest 配置全部用 .tres 纯数据，禁止 quest 脚本
-
-**数据流**：
-```
-CombatEventBus.on_event(ev)
-    → QuestManager._on_event(ev)
-    → for quest in active_quests:
-        quest.current_stage.objective.on_event(ev)
-        if objective.completed:
-            stage.complete → reward.apply() → next_stage
-```
-
-### Action Layer — ✅ 已实现
-
-**数据流**：
-```
-Input.xxx() → poll_actions() → PlayerAction[] → try_action(action) → StateMachine
 ```
 
 ---
@@ -190,17 +189,42 @@ entities/
 │   └── states/
 ├── enemy/
 │   ├── enemy.tscn
-│   ├── enemy.gd
+│   ├── enemy.gd               # StateChart (反应式AI)
 └── pickups/
 ```
 
-**Enemy 状态机**：已迁移到 godot_state_charts（StateChart → CompoundState "Brain" → AtomicState Idle/Chase/Attack）。
+**Enemy**: godot_state_charts 驱动（Idle→Chase→Attack），反应式 AI。
+**NPC**: Schedule → NPCBrain → Task → FSM 五层架构（生活式 AI）。
 
 ---
 
 ## 五、世界层 (world/)
 
-已有 7 种 WorldObject（OilBarrel / Door / Switch / Chest / SpikeTrap / PressurePlate / NPC）+ BreakableWall。详见 [WORLD_CONTRACTS.md](./WORLD_CONTRACTS.md)。
+```
+world/
+├── time/                       ← ✅ NPC Schedule P1
+│   └── world_time.gd           # 全局 24h 时钟
+├── markers/                    ← ✅ NPC Schedule P1
+│   ├── world_marker.gd         # 地图锚点
+│   └── marker_registry.gd      # marker_id → 位置
+├── npcs/                       ← ✅ NPC Schedule P1
+│   ├── npc_brain.gd            # 决策层
+│   ├── npc_schedule.gd         # 日程 Resource
+│   ├── schedule_entry.gd       # 日程条目 Resource
+│   ├── move_to_task.gd         # 移动到 Marker
+│   └── npc_villager.tscn       # 村民场景
+├── object/                     ← WorldObject 体系
+│   ├── map_object.gd / map_object_data.gd
+│   ├── interactable.gd / signal_receiver.gd
+│   ├── switch.gd / door.gd / chest.gd
+│   ├── spike_trap.gd / pressure_plate.gd
+│   ├── npc.gd (DialogueNPC) / dialogue_balloon.gd
+│   ├── portal.gd
+│   └── oil_barrel.tscn / breakable_wall.tscn / ...
+├── maps/overworld.tscn
+├── doors/ / switches/ / traps/ / loot/
+└── world_runtime.gd / world_spatial_index.gd / world_state_manager.gd
+```
 
 ---
 
@@ -208,25 +232,9 @@ entities/
 
 ```
 content/
-├── items/
-│   ├── player_inventory.tres
-│   └── examples/
-├── visuals/
-│   ├── fire_visual.tres
-│   ├── shadow_visual.tres
-│   └── ...
-└── quests/                    ← 规划中
-    ├── main/
-    └── side/
-```
-
-### Content vs Gameplay — 最关键边界
-
-```
-gameplay/abilities/runtime/   ← 「火球怎么飞」
-gameplay/quest/runtime/        ← 「任务怎么推进」
-content/visuals/               ← 「火球什么颜色」
-content/quests/                ← 「任务目标是什么」
+├── items/   (player_inventory.tres, examples/)
+├── visuals/ (fire_visual.tres, shadow_visual.tres...)
+└── quests/  (kill_enemies_quest.tres)
 ```
 
 ---
@@ -236,13 +244,15 @@ content/quests/                ← 「任务目标是什么」
 | 状态 | 任务 | 说明 |
 |:--:|------|------|
 | ✅ | WorldObject 体系 | 7 种物体 + 交互框架 |
-| ✅ | Action Layer 收敛 | 5 state 统一走 poll_actions/try_action |
-| ✅ | Enemy StateChart 迁移 | godot_state_charts |
-| 🔜 | **Quest 系统 P1** | QuestData + QuestRuntime + Kill/Interact Objective |
+| ✅ | Action Layer (Player) | 5 state 统一走 poll_actions/try_action |
+| ✅ | Enemy StateChart | godot_state_charts |
+| ✅ | **Quest P1-P3** | Kill/Interact Objective + 多阶段 + QuestTracker |
+| ✅ | **NPC Schedule P1** | WorldTime + Marker + Schedule + MoveToTask |
+| 🔜 | Action Layer 统一 | Move/Use/Attack Action — Player/NPC/Boss 共享 |
+| 🔜 | NPC Schedule P2 | WanderTask / SleepTask / WorkTask |
 | 🔜 | Region System | 区域驱动世界 |
-| 🔜 | Quest 系统 P2 | Reward + Quest UI + 地图标记 |
 | ⚪ 不做 | 技能系统继续抽象 | 已经够了 |
-| ⚪ 不做 | Quest Script DSL | 用 .tres 纯数据 |
+| ⚪ 不做 | 行为树 / GOAP / Planner | 用 Schedule + Task 模式 |
 
 ---
 
@@ -250,13 +260,13 @@ content/quests/                ← 「任务目标是什么」
 
 **不要再扩展的方向**：
 - 新技能类型 / Modifier / Condition / GraphNode
-- AbilityNode / BehaviorTree / DSL / Quest Script
-- Quest ↔ Dialogue 互相引用
+- AbilityNode / BehaviorTree / DSL / Quest Script / GOAP / Planner
+- FSM 读 WorldTime / Quest / Schedule
 
 **应该投入的方向**：
-- Quest 系统 P1（纯数据驱动任务）
-- 用现有积木搭可玩关卡
-- Content Pipeline（设计师 2 小时配一个地牢 + 任务链）
+- Action Layer 统一（Player/NPC/Boss 共享 Action）
+- NPC Schedule P2（Wander/Sleep/Work）
+- Content Pipeline（设计师 2 小时配一个地牢 + 任务链 + NPC 日程）
 
 ---
 
@@ -265,7 +275,7 @@ content/quests/                ← 「任务目标是什么」
 | 不是 | 而是 |
 |------|------|
 | 系统有多高级 | 能否低成本产出内容 |
-| 功能多少 | 三个验证场景是否通过 |
-| 任务类型枚举多少 | 一个 .tres 配一个任务够不够快 |
+| 功能多少 | NPC 是否持续生活而非玩家靠近才激活 |
+| AI 复杂度 | WorldTime + Schedule 是否让世界"活起来" |
 
-> **Runtime 是「怎么运行」，Content 是「有什么内容」。Quest 不是脚本，是数据。**
+> **Runtime 是「怎么运行」，Content 是「有什么内容」。FSM 只执行，不决策。**

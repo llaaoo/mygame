@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="NPCSchedule" format=3 uid="uid://dunwo1al2sy2x"]
+
+[ext_resource type="Script" uid="uid://ovmbphiw8q0u" path="res://world/npcs/schedule_entry.gd" id="1_lt3uq"]
+[ext_resource type="Script" uid="uid://b384wddh03pt7" path="res://world/npcs/npc_schedule.gd" id="2_6drmv"]
+
+[resource]
+script = ExtResource("2_6drmv")

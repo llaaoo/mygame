@@ -754,5 +754,47 @@
 		"created": "2026-05-24T13:17:10",
 		"id": "fact_1779599830",
 		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "NPC 日常行为架构：五层模型 — WorldTime/Weather/Crime(世界驱动) → NPCBrain(决策,每秒tick) → Task(WorkTask/EatTask/CombatTask,score/start/tick/is_finished) → Action(MoveToAction/UseObjectAction) → StateMachine(只负责动画执行)。核心不是状态机而是\"需求驱动+日程+世界感知+行为任务\"。Schedule(NPCSchedule Resource + ScheduleEntry按小时切换Task)+Marker(地图锚点,NPC只引用marker_id非硬编码坐标)。Task是\"意图\"，FSM是\"动作执行\"，严格分离。三阶段实现：P1=WorldTime+ScheduleSystem+MarkerSystem+Task基类+MoveToTask, P2=Wander/Sleep/Work/Interaction, P3=Crime/Reaction。不做行为树/GOAP/Planner",
+		"created": "2026-05-24T14:00:43",
+		"id": "fact_1779602443",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Skyrim NPC核心不是AI聪明，而是\"持续存在的生活规律\"：每天去固定地方、晚上回家、会吃饭睡觉、因世界变化改变路线、对事件有反应。实现关键：Schedule(时间驱动)+Marker(世界锚点解耦位置)+Task(意图层)≠StateMachine(执行层)。不要写成行为状态机地狱(SleepState/EatState/WorkState)，而是SleepTask→StateMachine.MoveTo→StateMachine.Interact→StateMachine.Idle",
+		"created": "2026-05-24T14:00:43",
+		"id": "fact_1779602443",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "FSM 铁律：永远不允许直接选行为、读 WorldTime、读 Quest、改 Schedule。FSM 只能执行动画/移动/Tween/受击/死亡。Task 是意图(目标)，Action 是行为(怎么做)，FSM 是执行(动画控制)。三者严格分离",
+		"created": "2026-05-24T14:03:20",
+		"id": "fact_1779602600",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Action Layer 是整个系统的统一层：Player/NPC/召唤物/Boss 共享 MoveAction/AttackAction/UseAction/InteractAction/CastSkillAction。AI 和玩家在此统一。最终收敛结构：World(Time+Quest+EventBus+Relationship+Crime) / NPC(Brain+Schedule+Task+Action+FSM) / Combat(Executor+Modifier+Event+EffectGraph)。已经是大型开放世界 RPG 的中层架构标准",
+		"created": "2026-05-24T14:03:20",
+		"id": "fact_1779602600",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Enemy vs NPC 根本区别：Enemy 是\"反应式 AI\"（只对玩家反应，不生活，Idle→Chase→Attack），NPC 是\"生活式 AI\"（无玩家时也持续执行 Schedule→Task→FSM：工作/吃饭/睡觉/巡逻/聊天）。现在不往 AI 复杂度方向堆（神经网络/行为树/GOAP/黑板），而是朝\"世界一致性\"方向（Schedule/Marker/Action/Relationship/Crime/Memory/Dialogue）",
+		"created": "2026-05-24T14:03:20",
+		"id": "fact_1779602600",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "NPC 日程 P1 已实现：1) WorldTime (24h推进, time_scale=60, static instance)；2) MarkerSystem (WorldMarker+MarkerRegistry, marker_id→位置解耦)；3) Schedule (ScheduleEntry: start_hour/end_hour/action_type/target_marker + NPCSchedule: entries[], get_entry_for_hour())；4) MoveToTask (NavigationAgent2D寻路→到达)；5) NPCBrain (P1极简:只读schedule→创建task)；6) DialogueNPC 集成: @export schedule + _create_default_schedule()测试日程(6-18去forge/18-22 idle/22-6回bed) + _process tick brain+task",
+		"created": "2026-05-24T14:09:05",
+		"id": "fact_1779602945",
+		"source": "ai"
 	}
 ]
