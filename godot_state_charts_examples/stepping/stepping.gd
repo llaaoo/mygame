@@ -55,5 +55,3 @@ func _on_drill_has_no_coal_state_stepped() -> void:
 func _on_next_round_button_pressed() -> void:
 	# when the next round button is pressed we handle all currently active states
 	_state_chart.step()
-
-

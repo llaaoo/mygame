@@ -1,6 +1,6 @@
-class_name NPC
+class_name DialogueNPC
 extends Node2D
-## NPC — 按 E 对话，使用 Dialogue Manager 插件显示气泡
+## 对话 NPC — 按 E 对话，使用 DialogueBalloon 显示气泡
 ##
 ## 配置优先级:
 ##   1. dialogue_resource — .dialogue 文件（编辑器创建）

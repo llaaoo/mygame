@@ -77,6 +77,9 @@ func _ready() -> void:
 	_apply_stats()
 	stats_component.stat_changed.connect(_on_stat_changed)
 
+	# 攻击盒碰撞层（设为 HITBOX 以便 MapObject 的 HitArea 可检测）
+	attack_hitbox.collision_layer = 4  # HITBOX
+
 	# 初始化组件
 	health_component.setup(collision_shape)
 	combat_component.setup(self, attack_hitbox, attack_hitbox_shape, animation_player)
