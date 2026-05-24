@@ -118,4 +118,4 @@ PROJECT_ANALYSIS.md (完整项目分析 — 架构评估 + 文件功能清单 + 
 | v2.1 | 2026-05 | Action Layer ✅ + WorldObject 7 种 ✅ + NPC 对话 ✅ + Dialogue Manager 集成 |
 | v2.2 | 2026-05 | Enemy StateChart 迁移 ✅ + Quest 系统设计 + 事件驱动统一架构 |
 | v2.3 | 2026-05 | Quest P1-P3 ✅ + NPC Schedule P1 ✅ + NPC 五层架构 + FSM 铁律 + Enemy/NPC 分离 |
-| v2.4 | 2026-07 | PROJECT_ANALYSIS.md — 全项目文件功能清单 + 架构评估 + P0/P1/P2 迭代建议 |
+| v2.4 | 2026-05 | PROJECT_ANALYSIS.md — 全项目文件功能清单 + 架构评估 + P0/P1/P2 迭代建议 |

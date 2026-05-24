@@ -113,7 +113,7 @@ func _on_body_entered(body: Node2D) -> void:
 	if body.has_method("take_damage"):
 		_has_hit = true
 		_emit_hit_event(body)
-		body.take_damage(damage)
+		# report_hit() 内部已调用 take_damage()
 	queue_free()
 
 
@@ -131,7 +131,7 @@ func _on_area_entered(area: Area2D) -> void:
 	if target:
 		_has_hit = true
 		_emit_hit_event(target)
-		target.take_damage(damage)
+		# report_hit() 内部已调用 take_damage()
 	queue_free()
 
 

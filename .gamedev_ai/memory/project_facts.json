@@ -915,5 +915,61 @@
 		"created": "2026-05-24T16:59:51",
 		"id": "fact_1779613191",
 		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "P0.1 完成：CombatExecutor.report_hit() 是唯一伤害入口。内部新增 _apply_damage() 统一调用 target.take_damage()。7 个伤害源（projectile/persistent_aoe/combat_component/enemy/spike_trap/map_object/buff_manager）不再直接调用 take_damage()，全部走 report_hit()。",
+		"created": "2026-05-24T21:05:42",
+		"id": "fact_1779627942",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "P1.1 完成：WorldTime._process() 迁移到 SimulationRuntime.tick() 统一驱动。SimulationRuntime 新增 get_surface_manager() 公开访问器，并在 setup_dependencies() 中注入 spatial_index.set_surface_manager()。persistent_aoe 和 map_object 改用公开访问器替代 _surface_manager 直接访问。",
+		"created": "2026-05-24T21:05:48",
+		"id": "fact_1779627948",
+		"source": "ai"
+	},
+	{
+		"category": "bug_fix",
+		"content": "SpikeTrap 根因修复：陷阱扫描 parent.get_children() 只能看到 Overworld 的子节点，Player 是 main.tscn 中 Overworld 的兄弟节点。改为距离检测 + get_tree().get_nodes_in_group(\"player\"/\"enemy\")。同时发现 trap_shape.tres 的 size=(0,0) 导致零碰撞区域，已在 _ready() 中编程创建 RectangleShape2D(64,32) 覆盖。",
+		"created": "2026-05-24T21:05:53",
+		"id": "fact_1779627953",
+		"source": "ai"
+	},
+	{
+		"category": "bug_fix",
+		"content": "WorldSpatialIndex 加固：query_radius() 新增 is_instance_valid(obj) 守卫和 _cleanup_stale() 自动清理。防止油桶 AOE 连锁时访问已销毁的 MapObject 实例导致 \"invalid previously freed instance\" 错误。",
+		"created": "2026-05-24T21:05:58",
+		"id": "fact_1779627958",
+		"source": "ai"
+	},
+	{
+		"category": "bug_fix",
+		"content": "LevelUpUI 输入修复：layer=200（高于 HUD 的 100），Background.mouse_filter=STOP 拦截点击穿透，_input() 只拦截游戏操作键（WASD/空格/E 等）放过 Enter 和鼠标，_show_with_effect()/_hide() 调用 _set_ui_blocked(true/false) 阻止 poll_universal_actions() 产生 Action。",
+		"created": "2026-05-24T21:06:04",
+		"id": "fact_1779627964",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Portal 区域切换模式：新增 is_region=true（默认）支持保存当前区域→实例化新区→附加到 Game 根，配合 region 脚本的 ESC 返回逻辑。使用 lambda 闭包 + call_deferred 绕过物理回调限制。清理了重复的 world/portals/ 目录（4 个文件）。Overworld 中 Portal 连接 burning_forest。",
+		"created": "2026-05-24T21:06:09",
+		"id": "fact_1779627969",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "物理层标准化：6 个 MapObject 场景（IceWall/OilBarrel/WoodenCrate/WoodenFence/BreakableWall/Door）的 Body StaticBody2D 全部显式设为 collision_layer=1 (WORLD_STATIC)、collision_mask=2 (ACTOR)。HitArea Area2D 保持 layer=8 (HURTBOX)、mask=20 (HITBOX|PROJECTILE)。",
+		"created": "2026-05-24T21:06:14",
+		"id": "fact_1779627974",
+		"source": "ai"
+	},
+	{
+		"category": "project_info",
+		"content": "工程卫生清理：删除 burning_forest.tscn*.tmp 临时文件、gameplay/action/action_result.gd.uid 和 tools/fix_collision_layers.gd.uid 孤儿 UID 文件、world/portals/ 整个重复目录。trap_shape.tres 的 size=(0,0) 通过 SpikeTrap._ready() 编程创建形状绕过。player_inventory.tres UID 过期警告为低优先级遗留问题。",
+		"created": "2026-05-24T21:06:20",
+		"id": "fact_1779627980",
+		"source": "ai"
 	}
 ]

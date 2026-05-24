@@ -213,8 +213,8 @@ func _do_melee_attack() -> void:
 	if exec_inst:
 		exec_inst.begin_hit_sequence()
 
+	# report_hit() 内部已调用 take_damage()
 	CombatExecutor.report_hit(self, player, attack_damage, player.global_position, null, ["melee", "enemy"])
-	player.take_damage(attack_damage)
 
 	if trace:
 		trace.final_damage = attack_damage

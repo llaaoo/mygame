@@ -63,7 +63,7 @@ position = Vector2(0, 200)
 max_hp = 100
 
 [node name="Player" parent="." unique_id=87503594 instance=ExtResource("2_h2yge")]
-position = Vector2(-6, -419)
+position = Vector2(7, -475)
 debug_items = true
 
 [node name="SkillManager" type="Node" parent="Player" unique_id=1978715642]

@@ -1,63 +1,58 @@
 class_name SpikeTrap
 extends Area2D
-## 陷阱 — 实体进入后周期性造成伤害
-##
-## 适用: 地刺、毒雾、火焰地板等
+## 陷阱 — 每 tick_interval 对范围内的实体造成 damage 点伤害
+## 使用距离检测（不依赖 body_entered 信号或碰撞形状）
 
 
 @export var damage: int = 10
 @export var tick_interval: float = 0.5
+@export var trap_radius: float = 48.0  ## 伤害范围（> 碰撞形状尺寸）
 
-var _bodies_in_trap: Array[Node2D] = []
 var _timer: float = 0.0
 
 
 func _ready() -> void:
-	collision_layer = 0
-	collision_mask = 2  # ACTOR
-	body_entered.connect(_on_body_entered)
-	body_exited.connect(_on_body_exited)
-	# 禁用独立 _process，改为 SimulationRuntime 统一驱动
+	# tick 由 SimulationRuntime 统一驱动
 	process_mode = Node.PROCESS_MODE_DISABLED
-	call_deferred("_register_with_simulation")
+	_try_register()
 
 
-## 注册到 SimulationRuntime（统一 tick）
-func _register_with_simulation() -> void:
-	var gr := GameRuntime.instance
-	if not gr:
-		call_deferred("_register_with_simulation")
-		return
-	var sim := gr.get_simulation_runtime()
-	if not sim:
-		call_deferred("_register_with_simulation")
-		return
-	sim.register_ticker(self)
+func _try_register() -> void:
+	var cb := func():
+		var gr := GameRuntime.instance
+		if not gr:
+			_try_register()
+			return
+		var sim := gr.get_simulation_runtime()
+		if not sim:
+			_try_register()
+			return
+		sim.register_ticker(self)
+		print("📎 SpikeTrap 已注册到 SimulationRuntime")
+	cb.call_deferred()
 
 
-## 统一 tick 入口（由 SimulationRuntime 驱动，替代独立 _process）
 func tick(delta: float) -> void:
-	if _bodies_in_trap.is_empty():
-		return
 	_timer += delta
-	if _timer >= tick_interval:
-		_timer -= tick_interval
-		_deal_damage()
+	if _timer < tick_interval:
+		return
+	_timer -= tick_interval
+
+	for target in _get_damage_targets():
+		if target.global_position.distance_squared_to(global_position) <= trap_radius * trap_radius:
+			CombatExecutor.report_hit(self, target, damage, target.global_position, null, ["trap"])
 
 
-func _on_body_entered(body: Node2D) -> void:
-	if body not in _bodies_in_trap:
-		_bodies_in_trap.append(body)
-
-
-func _on_body_exited(body: Node2D) -> void:
-	_bodies_in_trap.erase(body)
-
-
-func _deal_damage() -> void:
-	for body in _bodies_in_trap:
-		if not is_instance_valid(body):
-			continue
-		if body.has_method("take_damage"):
-			CombatExecutor.report_hit(self, body, damage, body.global_position, null, ["trap"])
-			body.take_damage(damage)
+func _get_damage_targets() -> Array[Node2D]:
+	var targets: Array[Node2D] = []
+	for group_name in ["player", "enemy"]:
+		for node in get_tree().get_nodes_in_group(group_name):
+			if not (node is Node2D):
+				continue
+			var target := node as Node2D
+			if target == self or not target.has_method("take_damage"):
+				continue
+			if target in targets:
+				continue
+			targets.append(target)
+	return targets

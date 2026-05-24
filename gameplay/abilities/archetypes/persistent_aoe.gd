@@ -56,9 +56,11 @@ func _apply_surface(skill: SkillData) -> void:
 	if not gr:
 		return
 	var sim := gr.get_simulation_runtime()
-	if not sim or not sim._surface_manager:
+	if not sim:
 		return
-	var sm := sim._surface_manager
+	var sm := sim.get_surface_manager()
+	if not sm:
+		return
 	var cell := Vector2i(floori(global_position.x / 64), floori(global_position.y / 64))
 	sm.apply_tags(cell, skill.tags, skill.display_name)
 
@@ -95,7 +97,7 @@ func _on_body_entered(body: Node2D) -> void:
 		return
 	if body.has_method("take_damage"):
 		_emit_hit_event(body)
-		body.take_damage(damage)
+		# report_hit() 内部已调用 take_damage()
 
 
 func _on_area_entered(area: Area2D) -> void:
@@ -103,7 +105,7 @@ func _on_area_entered(area: Area2D) -> void:
 	var owner := area.owner
 	if owner and owner.has_method("take_damage"):
 		_emit_hit_event(owner)
-		owner.take_damage(damage)
+		# report_hit() 内部已调用 take_damage()
 
 
 func _emit_hit_event(target: Node2D) -> void:

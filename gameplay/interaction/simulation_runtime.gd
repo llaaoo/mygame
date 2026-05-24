@@ -45,6 +45,10 @@ func setup_dependencies(spatial_index: WorldSpatialIndex, state_manager: WorldSt
 	# 注册默认 ReactionRule
 	_register_default_reactions()
 	
+	# 注入 SurfaceManager 到空间索引（使 query_surface() 可用）
+	if spatial_index and spatial_index.has_method("set_surface_manager"):
+		spatial_index.set_surface_manager(_surface_manager)
+	
 	# 传递依赖给子调度器
 	if _propagation_scheduler:
 		_propagation_scheduler.setup(_surface_scheduler, spatial_index, _surface_manager)
@@ -168,6 +172,11 @@ func _tick_entities(delta: float) -> void:
 			continue
 		if ticker.has_method("tick"):
 			ticker.tick(delta)
+
+
+## 公开访问器（替代外部直接访问 _surface_manager）
+func get_surface_manager() -> SurfaceManager:
+	return _surface_manager
 
 
 func _to_string() -> String:

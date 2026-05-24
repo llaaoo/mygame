@@ -87,8 +87,8 @@ func _apply_melee_hit(target: Node2D) -> void:
 		exec_inst.begin_hit_sequence()
 
 	# 发射 ON_HIT（带 melee/player 标签，供 TriggeredEffect 匹配）
+	# report_hit() 内部已调用 take_damage()
 	CombatExecutor.report_hit(_entity, target, attack_damage, target.global_position, null, ["melee", "player"])
-	target.take_damage(attack_damage)
 
 	# 更新 trace 最终伤害
 	var trace := CombatDebugger.active()

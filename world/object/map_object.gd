@@ -146,11 +146,11 @@ func _trigger_destruction_aoe() -> void:
 		var names: Array[String] = []
 		for t in valid_targets:
 			names.append(t.name)
+			# report_hit() 内部已调用 take_damage()
 			CombatExecutor.report_hit(
 				self, t, object_data.destruction_aoe_damage,
 				global_position, null, object_data.destruction_aoe_tags
 			)
-			t.take_damage(object_data.destruction_aoe_damage)
 		
 		print("💥 AOE: %s → %d目标 (r=%.0f): %s" % [object_data.display_name, valid_targets.size(), object_data.destruction_radius, ", ".join(names)])
 
@@ -176,9 +176,11 @@ func _spawn_destruction_surface() -> void:
 	if not gr:
 		return
 	var sim := gr.get_simulation_runtime()
-	if not sim or not sim._surface_manager:
+	if not sim:
 		return
-	var sm := sim._surface_manager
+	var sm := sim.get_surface_manager()
+	if not sm:
+		return
 	
 	var cell_radius := ceili(object_data.destruction_surface_radius / 64.0) + 1
 	var center := Vector2i(floori(global_position.x / 64), floori(global_position.y / 64))

@@ -78,15 +78,14 @@ func _tick_buffs() -> void:
 		
 		var stacks: int = _stacks.get(buff, 1)
 		
-		# DOT 伤害
+		# DOT 伤害 — 统一走 CombatExecutor.report_hit()（不再直接 take_damage）
 		if buff.tick_damage > 0:
 			var dmg: int = buff.tick_damage * stacks
 			if buff.tick_damage_scaling > 0.0:
 				var stats := entity.get_node_or_null("StatsComponent")
 				if stats and "magic_damage" in stats:
 					dmg += int(stats.magic_damage * buff.tick_damage_scaling)
-			if entity.has_method("take_damage"):
-				entity.take_damage(dmg)
+			CombatExecutor.report_hit(entity, entity, dmg, entity.global_position, null, ["dot", buff.status_id])
 		
 		# HOT 治疗
 		if buff.tick_heal > 0 and entity.has_method("heal"):
