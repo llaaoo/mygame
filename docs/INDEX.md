@@ -1,18 +1,22 @@
 # 📚 项目文档索引
 
-> 版本: v2.3 | 最后更新: 2026-05-24
+> 版本: v2.4 | 最后更新: 2026-07-14
 
 ---
 
 ## 文档层级
 
 ```
-ARCHITECTURE.md (宪法 — 六层边界)
+PROJECT_ANALYSIS.md (完整项目分析 — 架构评估 + 文件功能清单 + 迭代建议)
     │
-    ├── COMBAT_CONTRACTS.md (战斗内部 12 条契约)
-    ├── WORLD_CONTRACTS.md (世界内部 9 条契约)
-    ├── PHYSICS_LAYERS.md (物理层 11 层标准)
-    └── skill_architecture.md (技能内容生产方式)
+    ├── ARCHITECTURE.md (宪法 — 六层边界)
+    │       │
+    │       ├── COMBAT_CONTRACTS.md (战斗内部 12 条契约)
+    │       ├── WORLD_CONTRACTS.md (世界内部 9 条契约)
+    │       ├── PHYSICS_LAYERS.md (物理层 11 层标准)
+    │       └── skill_architecture.md (技能内容生产方式)
+    │
+    └── RUNTIME_TOPOLOGY.md (运行时拓扑 — 五大 Runtime 边界)
 ```
 
 每份文档回答不同层级的问题。从上往下读，逐层深入。
@@ -20,6 +24,20 @@ ARCHITECTURE.md (宪法 — 六层边界)
 ---
 
 ## 文档概要
+
+### [PROJECT_ANALYSIS.md](./PROJECT_ANALYSIS.md)
+
+**回答的问题**: 项目整体状态如何？每个文件做什么？接下来该做什么？
+
+**核心内容**:
+- 完整目录树（含每个子目录和文件的用途说明）
+- 六层每层所有文件的详细功能描述
+- 架构优势与当前问题评估
+- 分级迭代建议（P0/P1/P2 优先级 + 停止线）
+
+**何时阅读**: 新人入职、架构评审、迭代规划前。
+
+---
 
 ### [ARCHITECTURE.md](./ARCHITECTURE.md)
 
@@ -72,6 +90,7 @@ ARCHITECTURE.md (宪法 — 六层边界)
 
 | 想做什么 | 读哪个 |
 |---------|--------|
+| 了解项目全貌 | PROJECT_ANALYSIS.md |
 | 理解项目架构 | ARCHITECTURE.md |
 | 新增技能 | skill_architecture.md |
 | 新增 Modifier/Condition | COMBAT_CONTRACTS.md 扩展指南 |
@@ -99,3 +118,4 @@ ARCHITECTURE.md (宪法 — 六层边界)
 | v2.1 | 2026-05 | Action Layer ✅ + WorldObject 7 种 ✅ + NPC 对话 ✅ + Dialogue Manager 集成 |
 | v2.2 | 2026-05 | Enemy StateChart 迁移 ✅ + Quest 系统设计 + 事件驱动统一架构 |
 | v2.3 | 2026-05 | Quest P1-P3 ✅ + NPC Schedule P1 ✅ + NPC 五层架构 + FSM 铁律 + Enemy/NPC 分离 |
+| v2.4 | 2026-07 | PROJECT_ANALYSIS.md — 全项目文件功能清单 + 架构评估 + P0/P1/P2 迭代建议 |

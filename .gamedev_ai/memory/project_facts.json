@@ -810,5 +810,89 @@
 		"created": "2026-05-24T15:45:48",
 		"id": "fact_1779608748",
 		"source": "ai"
+	},
+	{
+		"category": "project_info",
+		"content": "项目名称为 \"Study\"，是一个 2D 俯视角动作 RPG 原型项目，使用 Godot 4.6.2，自 2025-07 开发至 2026-05 v2.3 版本。核心特性包括：六层架构模型(content/world/entities/gameplay/core/ui)、数据驱动技能系统(Archetype收敛)、CombatExecutor唯一写入口、EffectGraph效果图、Buff/状态系统、Quest系统、NPC Schedule系统、WorldObject体系(MapObject基类+7种物体)、表面交互系统(5状态+反应规则)。",
+		"created": "2026-05-24T15:58:54",
+		"id": "fact_1779609534",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "迭代优先级：P0-基础设施修复(物理层迁移/清理重复文件/WorldRuntime硬编码路径修复)；P1-架构收敛(CommandBus启用/场景验证/空间索引性能测试)；P2-内容管道(NPC Schedule P2/Action Layer统一/存档系统)。停止线：禁止新增技能类型/Modifier/Condition/GraphNode/表面状态/行为树/GOAP。",
+		"created": "2026-05-24T15:58:58",
+		"id": "fact_1779609538",
+		"source": "ai"
+	},
+	{
+		"category": "project_info",
+		"content": "文档体系：PROJECT_ANALYSIS.md(全项目分析+迭代建议 v2.4) → ARCHITECTURE.md(六层宪法 v2.3) → COMBAT_CONTRACTS.md(12条契约)+WORLD_CONTRACTS.md(9条契约)+PHYSICS_LAYERS.md(11层标准)+skill_architecture.md(技能架构)+RUNTIME_TOPOLOGY.md(五大Runtime)。docs/INDEX.md为文档导航索引。",
+		"created": "2026-05-24T15:59:02",
+		"id": "fact_1779609542",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Action Layer 统一从 P2 提升至 P1 优先级。Player/Enemy/NPC/Boss 必须共享统一的 Action 体系（MoveAction/AttackAction/UseAction/CastAction），只有 Brain/Task/Available Actions 不同，而不是各写一套 Player.gd / Enemy.gd / Boss.gd。",
+		"created": "2026-05-24T16:12:44",
+		"id": "fact_1779610364",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "CommandBus 需要领域分区。后期必须加入 command domain 枚举（combat/*, world/*, simulation/*, ui/*, save/*）以及 request/result/event 分层，避免退化为\"上帝总线\"式的隐式调用地狱。",
+		"created": "2026-05-24T16:12:52",
+		"id": "fact_1779610372",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "EffectGraph CONTRACT 4 为 UNBREAKABLE 级别。EffectGraph 永远不得拥有时间控制权（禁止 loop/async/delay/parallel），否则会变成\"第二个 Runtime\"，导致系统失控。这是 Runtime Sovereignty 的核心防火墙。",
+		"created": "2026-05-24T16:12:52",
+		"id": "fact_1779610372",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Surface System 必须走有限状态迁移模式（dry/wet/oiled/burning/frozen），禁止元素×元素×元素组合系统。新增状态必须经过所有现有 ReactionRule 审计 + 显式更新 WORLD_CONTRACTS.md 的 SURFACE_STATES。",
+		"created": "2026-05-24T16:12:52",
+		"id": "fact_1779610372",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "当前项目处于\"两套世界共存\"的危险过渡期：纸上架构（GameRuntime→CommandBus→Runtime）已设计完整，但实际代码中 Runtime Boundary 仍被 SceneTree 穿透（如 map_object.gd 硬编码路径查找 WorldRuntime）。最优先任务不是加新系统，而是\"Runtime 化迁移\"——让 GameRuntime 成为真正的 Runtime Root，所有跨系统通信通过 CommandBus，禁止 Runtime 间直接调用。",
+		"created": "2026-05-24T16:15:01",
+		"id": "fact_1779610501",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Runtime 化迁移三步走：Step 1—GameRuntime 成为 Runtime Root（CombatRuntime/WorldRuntime/SimulationRuntime/CommandBus 全部挂入，GameRuntime 成为 autoload）；Step 2—禁止 Runtime 直接调用（MapObject→SurfaceManager、HealthComponent→CombatEventBus 等全部改为 CommandBus.emit()）；Step 3—SimulationRuntime 统一接管所有 _process() tick（BuffManager/NPCBrain/Surface/Propagation/Respawn 不再独立 tick）。",
+		"created": "2026-05-24T16:15:09",
+		"id": "fact_1779610509",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Actor Scheduler 化是后续关键。SimulationRuntime.tick() 应支持 tick_group(\"high\"/\"medium\"/\"low\") 预算调度，控制每帧 AI/Propagation/低频 Actor 的 tick 数量。这是 Chunk Streaming、大地图、100+NPC 的基础。",
+		"created": "2026-05-24T16:15:09",
+		"id": "fact_1779610509",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Runtime 迁移 Step 1+2 完成。GameRuntime 现为 Runtime Root（拥有 static instance），统一创建并管理 CommandBus/CombatExecutor/CombatEventBus/WorldRuntime/SimulationRuntime/WorldTime。所有跨 Runtime 访问统一通过 GameRuntime.instance 的访问器方法（get_world_runtime/get_command_bus/get_simulation_runtime），禁止硬编码 SceneTree 路径。MapObject、WorldRuntime、persistent_aoe 已从直接路径查找/全局单例模式迁移到 GameRuntime.instance 模式。",
+		"created": "2026-05-24T16:22:31",
+		"id": "fact_1779610951",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Step 3 完成：SimulationRuntime 统一接管所有实体 Tick。新增 _entity_tickers 注册表 + register_ticker()/unregister_ticker() + _tick_entities()。6 个系统从独立 _process 迁移到 tick(delta)：BuffManager、DialogueNPC、SkillManager、HealthComponent、ManaComponent、SpikeTrap。每个系统 process_mode=DISABLED + _register_with_simulation() 延迟注册。SimulationRuntime.tick() 调度顺序：Surface → Propagation → Respawn → Entity Tickers → entity-surface(0.5s)。保留独立 _process 的只有：GameRuntime(Runtime Root)、StateMachine(FSM执行)、WorldTime(时间源)、Player(瞄准指示器)。",
+		"created": "2026-05-24T16:28:44",
+		"id": "fact_1779611324",
+		"source": "ai"
 	}
 ]

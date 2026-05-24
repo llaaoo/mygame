@@ -27,9 +27,26 @@ var _collision_shape: CollisionShape2D = null
 func setup(shape: CollisionShape2D) -> void:
 	_collision_shape = shape
 	hp = max_hp
+	# 禁用独立 _process，改为 SimulationRuntime 统一驱动
+	process_mode = Node.PROCESS_MODE_DISABLED
+	call_deferred("_register_with_simulation")
 
 
-func _process(delta: float) -> void:
+## 注册到 SimulationRuntime（统一 tick）
+func _register_with_simulation() -> void:
+	var gr := GameRuntime.instance
+	if not gr:
+		call_deferred("_register_with_simulation")
+		return
+	var sim := gr.get_simulation_runtime()
+	if not sim:
+		call_deferred("_register_with_simulation")
+		return
+	sim.register_ticker(self)
+
+
+## 统一 tick 入口（由 SimulationRuntime 驱动，替代独立 _process）
+func tick(delta: float) -> void:
 	# 脱战自回
 	if is_dead or hp >= max_hp:
 		return

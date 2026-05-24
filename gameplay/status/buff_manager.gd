@@ -17,7 +17,29 @@ var _stacks: Dictionary = {}
 var _tick_timer: float = 0.0
 
 
-func _process(delta: float) -> void:
+func _ready() -> void:
+	# 禁用独立 _process，改为 SimulationRuntime 统一驱动
+	process_mode = Node.PROCESS_MODE_DISABLED
+	_register_with_simulation()
+
+
+## 注册到 SimulationRuntime（统一 tick）
+func _register_with_simulation() -> void:
+	var gr := GameRuntime.instance
+	if not gr:
+		call_deferred("_register_with_simulation")
+		return
+	var sim := gr.get_simulation_runtime()
+	if not sim:
+		# GameRuntime._ready() 尚未完成 setup，延迟重试
+		call_deferred("_register_with_simulation")
+		return
+	sim.register_ticker(self)
+	print("📎 BuffManager 已注册到 SimulationRuntime")
+
+
+## 统一 tick 入口（由 SimulationRuntime 驱动，替代独立 _process）
+func tick(delta: float) -> void:
 	if _active_buffs.is_empty():
 		return
 

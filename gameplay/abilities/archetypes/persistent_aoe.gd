@@ -51,9 +51,14 @@ func setup(skill: SkillData, caster_node: Node2D) -> void:
 
 ## 根据技能标签在 AoE 所在格设置表面状态
 func _apply_surface(skill: SkillData) -> void:
-	var sm := SurfaceManager.instance
-	if not sm:
+	# 通过 GameRuntime → SimulationRuntime → SurfaceManager 访问（不再用全局单例）
+	var gr := GameRuntime.instance
+	if not gr:
 		return
+	var sim := gr.get_simulation_runtime()
+	if not sim or not sim._surface_manager:
+		return
+	var sm := sim._surface_manager
 	var cell := Vector2i(floori(global_position.x / 64), floori(global_position.y / 64))
 	sm.apply_tags(cell, skill.tags, skill.display_name)
 

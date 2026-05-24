@@ -11,6 +11,10 @@ var _surface_manager: SurfaceManager = null
 var _propagation_scheduler: PropagationScheduler = null
 var _respawn_scheduler: RespawnScheduler = null
 
+## 实体 Tick 注册表 — 所有需要持续 tick 的实体组件在此注册
+## 实体实现 tick(delta) 方法，SimulationRuntime 统一驱动
+var _entity_tickers: Array[Node] = []
+
 ## 暂停标记
 var is_paused: bool = false
 var _tick_accumulator: float = 0.0  ## 实体-表面交互低频 tick
@@ -120,21 +124,50 @@ func _register_default_reactions() -> void:
 	_surface_manager.register_reaction(dry_ice)
 
 
+## ── 实体 Tick 注册 ──
+
+## 注册需要每帧 tick 的实体/组件（替代独立 _process）
+func register_ticker(node: Node) -> void:
+	if node in _entity_tickers:
+		return
+	_entity_tickers.append(node)
+
+
+## 注销（实体销毁时调用）
+func unregister_ticker(node: Node) -> void:
+	_entity_tickers.erase(node)
+
+
 ## 统一 tick（由 GameRuntime._process 驱动）
 func tick(delta: float) -> void:
 	if is_paused:
 		return
 	
-	# 调度顺序: Surface → Propagation → Respawn
+	# 调度顺序: Surface → Propagation → Respawn → Entity Tickers
 	_surface_scheduler.tick(delta)
 	_propagation_scheduler.tick(delta)
 	_respawn_scheduler.tick(delta)
+	
+	# 实体 Tick（统一驱动，替代各系统独立 _process）
+	_tick_entities(delta)
 	
 	# 实体-表面交互（低频, 0.5s）
 	_tick_accumulator += delta
 	if _tick_accumulator >= 0.5 and _surface_manager:
 		_tick_accumulator -= 0.5
 		_surface_manager.tick_entity_surface()
+
+
+## 驱动所有注册的实体 ticker
+func _tick_entities(delta: float) -> void:
+	# 倒序遍历以支持 tick 中安全删除
+	for i in range(_entity_tickers.size() - 1, -1, -1):
+		var ticker := _entity_tickers[i]
+		if not is_instance_valid(ticker):
+			_entity_tickers.remove_at(i)
+			continue
+		if ticker.has_method("tick"):
+			ticker.tick(delta)
 
 
 func _to_string() -> String:

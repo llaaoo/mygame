@@ -33,11 +33,11 @@
 - Добавление в Godot распознавания исходных графических файлов как изображений со всеми штатными возможностями их импорта (для анимированных файлов импортируется только первый кадр).
 - Поддержка файлов Aseprite (и LibreSprite), Krita, Pencil2D, Piskel и Pixelorama. В будущем возможна поддержка других форматов.
 - Импорт файлов в качестве:
-    - Атласа спрайтов (sprite sheet) - текстуры с метаданными;
-    - Ресурса `SpriteFrames` для создания собственных `AnimatedSprite2D` и `AnimatedSprite3D` на его основе;
-    - Запакованных сцен (`PackedScene`) с готовыми для использования узлами (`Node`):
-        - `AnimatedSprite2D` и `AnimatedSprite3D`
-        - `Sprite2D`, `Sprite3D` и `TextureRect`, анимированных с помощью `AnimationPlayer`
+	- Атласа спрайтов (sprite sheet) - текстуры с метаданными;
+	- Ресурса `SpriteFrames` для создания собственных `AnimatedSprite2D` и `AnimatedSprite3D` на его основе;
+	- Запакованных сцен (`PackedScene`) с готовыми для использования узлами (`Node`):
+		- `AnimatedSprite2D` и `AnimatedSprite3D`
+		- `Sprite2D`, `Sprite3D` и `TextureRect`, анимированных с помощью `AnimationPlayer`
 - Несколько методов борьбы с артефактами по краям спрайтов.
 - Табличный и упакованный варианты раскладки атласа спрайтов.
 - Несколько стратегий анимации узлов с помощью `AnimationPlayer`.
@@ -55,11 +55,11 @@
 ## 💽 Как установить
 
 1. Установите его из [Библиотеки Ассетов Godot](https://godotengine.org/asset-library/asset/2025) или:
-    - Склонируйте этот репозиторий или скачайте его содержимое в виде архива.
-    - Поместите содержимое папки `addons` репозитория в папку `addons` вашего проекта.
+	- Склонируйте этот репозиторий или скачайте его содержимое в виде архива.
+	- Поместите содержимое папки `addons` репозитория в папку `addons` вашего проекта.
 1. Настройте параметры в `Editor Settings` -> `Importality`
-    - [Укажите директорию для временных файлов](https://github.com/nklbdev/godot-4-importality/wiki/about-temporary-files-and-ram_drives-(ru)).
-    - Укажите команду и её параметры для запуска вашего редактора в режиме экспорта данных, если это необходимо. Как настроить параметры для вашего графического приложения читайте в соответствующей статье [вики](https://github.com/nklbdev/godot-4-importality/wiki), посвящённой ему.
+	- [Укажите директорию для временных файлов](https://github.com/nklbdev/godot-4-importality/wiki/about-temporary-files-and-ram_drives-(ru)).
+	- Укажите команду и её параметры для запуска вашего редактора в режиме экспорта данных, если это необходимо. Как настроить параметры для вашего графического приложения читайте в соответствующей статье [вики](https://github.com/nklbdev/godot-4-importality/wiki), посвящённой ему.
 
 ## 👷 Как использовать
 
@@ -89,11 +89,11 @@
 - Текстовое описание формата или работы с CLI.
 - [Пулл-реквест](https://github.com/nklbdev/godot-4-importality/pulls) с новым экспортером.
 - Временная или постоянная лицензия на платное ПО для возможности изучить его и создать экспортер. Например для:
-    - [Adobe Photoshop](https://www.adobe.com/products/photoshop.html)
-    - [Adobe Animate](https://www.adobe.com/products/animate.html)
-    - [Adobe Character Animator](https://www.adobe.com/products/character-animator.html)
-    - [Affinity Photo](https://affinity.serif.com/photo)
-    - [Moho Debut](https://moho.lostmarble.com/products/moho-debut) / [Moho Pro](https://moho.lostmarble.com/products/moho-pro)
-    - [Toon Boom Harmony](https://www.toonboom.com/products/harmony)
-    - [PyxelEdit](https://pyxeledit.com)
-    - и других
+	- [Adobe Photoshop](https://www.adobe.com/products/photoshop.html)
+	- [Adobe Animate](https://www.adobe.com/products/animate.html)
+	- [Adobe Character Animator](https://www.adobe.com/products/character-animator.html)
+	- [Affinity Photo](https://affinity.serif.com/photo)
+	- [Moho Debut](https://moho.lostmarble.com/products/moho-debut) / [Moho Pro](https://moho.lostmarble.com/products/moho-pro)
+	- [Toon Boom Harmony](https://www.toonboom.com/products/harmony)
+	- [PyxelEdit](https://pyxeledit.com)
+	- и других

@@ -26,19 +26,19 @@ func _ready() -> void:
 
 
 func _connect_to_bus() -> void:
-	var bus: CommandBus = _find_command_bus()
-	if bus:
-		command_bus = bus
-		bus.subscribe("DESTROYED", _on_destroyed_command)
-		bus.subscribe("RESPAWN_REQUEST", _on_respawn_request)
-		bus.subscribe("CHUNK_LOAD_REQUEST", _on_chunk_load_request)
-
-
-func _find_command_bus() -> CommandBus:
-	var root := get_tree().root
-	if root.has_node("GameRuntime/CommandBus"):
-		return root.get_node("GameRuntime/CommandBus")
-	return null
+	# 通过 GameRuntime.instance 获取 CommandBus（不再硬编码路径）
+	var gr := GameRuntime.instance
+	if gr:
+		command_bus = gr.get_command_bus()
+	
+	if command_bus:
+		command_bus.subscribe("DESTROYED", _on_destroyed_command)
+		command_bus.subscribe("RESPAWN_REQUEST", _on_respawn_request)
+		command_bus.subscribe("CHUNK_LOAD_REQUEST", _on_chunk_load_request)
+	else:
+		# 延迟重试：GameRuntime 可能尚未初始化完成
+		await get_tree().process_frame
+		_connect_to_bus()
 
 
 ## 注册 MapObject（场景加载时调用）

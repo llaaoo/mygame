@@ -12,6 +12,9 @@ extends Node2D
 @export var schedule: NPCSchedule = null             ## 日程表（为 null 则原地不动）
 
 
+var _tick_count: int = 0
+
+
 func _ready() -> void:
 	add_to_group("interactable")
 	var interactable := Interactable.new()
@@ -19,17 +22,34 @@ func _ready() -> void:
 	interactable.set_callback(_on_talk)
 	add_child(interactable)
 
+	# 禁用独立 _process，改为 SimulationRuntime 统一驱动
+	process_mode = Node.PROCESS_MODE_DISABLED
+
 	# 日程 Brain + Markers（全部延迟到树稳定后）
 	call_deferred("_setup_npc_schedule")
+	# 注册到 SimulationRuntime
+	call_deferred("_register_with_simulation")
 
 
-var _tick_count: int = 0
+## 注册到 SimulationRuntime（统一 tick）
+func _register_with_simulation() -> void:
+	var gr := GameRuntime.instance
+	if not gr:
+		call_deferred("_register_with_simulation")
+		return
+	var sim := gr.get_simulation_runtime()
+	if not sim:
+		call_deferred("_register_with_simulation")
+		return
+	sim.register_ticker(self)
+	print("📎 %s 已注册到 SimulationRuntime" % name)
 
-func _process(delta: float) -> void:
+
+## 统一 tick 入口（由 SimulationRuntime 驱动，替代独立 _process）
+func tick(delta: float) -> void:
 	_tick_count += 1
 	if _tick_count == 1:
-		print("🟢 %s._process 开始, schedule=%s, pos=%s" % [name, "有" if schedule else "无", position])
-	# Tick Brain + MoveToTask
+		print("🟢 %s.tick 开始, schedule=%s, pos=%s" % [name, "有" if schedule else "无", position])
 	var brain := get_node_or_null("NPCBrain") as NPCBrain
 	if brain:
 		brain.tick(delta)

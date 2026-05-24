@@ -273,22 +273,13 @@ func _setup_damage_modifiers() -> void:
 
 
 ## 确保全局 CombatEventBus + CombatExecutor 存在
+## CombatExecutor / CombatEventBus / WorldTime 现在由 GameRuntime 统一管理
+## Player 只做自己的 TriggeredEffect 注册 + CombatDebugger + QuestManager
 func _setup_event_bus() -> void:
-	# CombatExecutor（唯一控制流入口，手动设 instance 绕过 add_child 时序限制）
-	if not CombatExecutor.instance:
-		var exec := CombatExecutor.new()
-		exec.name = "CombatExecutor"
-		CombatExecutor.instance = exec  # 立即可用，无需等待 _ready()
-		get_tree().current_scene.add_child.call_deferred(exec)
-
-	# CombatEventBus（事件广播，手动设 instance）
-	if CombatEventBus.instance:
-		return
-	var bus := CombatEventBus.new()
-	bus.name = "CombatEventBus"
-	CombatEventBus.instance = bus  # 立即可用，订阅/发射无需等待场景树
-	get_tree().current_scene.add_child.call_deferred(bus)
-	print("📡 CombatEventBus + CombatExecutor 已创建")
+	# 等待 GameRuntime 初始化完成（它负责创建 CombatExecutor / CombatEventBus / WorldTime）
+	# ⚠️ 必须 await，否则 _ensure_runtime_ready 内部 yield 后后续代码立即执行，
+	# 此时 CombatEventBus.instance 为 null，subscribe_static 静默失败
+	await _ensure_runtime_ready()
 
 	# ON_KILL 对敌人 → 额外经验（持有引用防止 Resource GC）
 	_on_kill_effect = OnKillBonusExp.create_for_player(15)
@@ -308,11 +299,34 @@ func _setup_event_bus() -> void:
 	# 战斗调试器
 	_setup_combat_debugger()
 
-	# WorldTime（世界时间驱动）
-	_setup_world_time()
-
 	# QuestManager（接在 EventBus 之后）
 	_setup_quest_manager()
+
+
+## 确保 GameRuntime 已初始化（CombatExecutor / CombatEventBus 可用）
+func _ensure_runtime_ready() -> void:
+	var gr := GameRuntime.instance
+	if not gr:
+		# GameRuntime 还未初始化，等待一帧
+		await get_tree().process_frame
+		_ensure_runtime_ready()
+		return
+
+	# 如果 CombatExecutor 仍不可用，等待
+	if not CombatExecutor.instance:
+		await get_tree().process_frame
+		_ensure_runtime_ready()
+		return
+
+	if not CombatEventBus.instance:
+		await get_tree().process_frame
+		_ensure_runtime_ready()
+		return
+
+	print("📡 GameRuntime 就绪: CombatExecutor=%s, CombatEventBus=%s" % [
+		"✅" if CombatExecutor.instance else "❌",
+		"✅" if CombatEventBus.instance else "❌"
+	])
 
 
 func _register_triggered_effects(effect: TriggeredEffect) -> void:
@@ -386,17 +400,8 @@ func _setup_combat_debugger() -> void:
 	get_tree().current_scene.add_child.call_deferred(debug_ui)
 
 
-## ── 世界时间 ──
-
-func _setup_world_time() -> void:
-	if WorldTime.instance:
-		return
-	var wt := WorldTime.new()
-	wt.name = "WorldTime"
-	get_tree().current_scene.add_child.call_deferred(wt)
-
-
 ## ── Quest 系统 ──
+## WorldTime 现在由 GameRuntime 统一管理，Player 不再创建
 
 var quest_manager: QuestManager = null
 

@@ -87,7 +87,7 @@ func _on_destroyed() -> void:
 	_state = "DESTROYED"
 	
 	# 从空间索引注销
-	var wr: WorldRuntime = _find_world_runtime()
+	var wr: WorldRuntime = _get_world_runtime()
 	if wr:
 		wr.unregister_object(self)
 	
@@ -129,7 +129,7 @@ func _on_destroyed() -> void:
 
 
 func _trigger_destruction_aoe() -> void:
-	var world_runtime: WorldRuntime = _find_world_runtime()
+	var world_runtime: WorldRuntime = _get_world_runtime()
 	
 	if world_runtime and CombatExecutor.instance:
 		var targets: Array = world_runtime.spatial_index.query_radius(
@@ -156,27 +156,29 @@ func _trigger_destruction_aoe() -> void:
 
 
 func _register_with_world_runtime() -> void:
-	var wr: WorldRuntime = _find_world_runtime()
+	var wr: WorldRuntime = _get_world_runtime()
 	if wr:
 		wr.register_object(self)
 
 
-func _find_world_runtime() -> WorldRuntime:
-	var root := get_tree().root
-	# 路径: Game/GameRuntime/WorldRuntime
-	if root.has_node("Game/GameRuntime/WorldRuntime"):
-		return root.get_node("Game/GameRuntime/WorldRuntime")
-	# Fallback: 直接路径
-	if root.has_node("GameRuntime/WorldRuntime"):
-		return root.get_node("GameRuntime/WorldRuntime")
+## 通过 GameRuntime.instance 获取 WorldRuntime（不再硬编码路径）
+func _get_world_runtime() -> WorldRuntime:
+	var gr := GameRuntime.instance
+	if gr:
+		return gr.get_world_runtime()
 	return null
 
 
 ## 破坏时在半径内生成表面
 func _spawn_destruction_surface() -> void:
-	var sm := SurfaceManager.instance
-	if not sm:
+	# 通过 GameRuntime → SimulationRuntime → SurfaceManager 访问（不再用全局单例）
+	var gr := GameRuntime.instance
+	if not gr:
 		return
+	var sim := gr.get_simulation_runtime()
+	if not sim or not sim._surface_manager:
+		return
+	var sm := sim._surface_manager
 	
 	var cell_radius := ceili(object_data.destruction_surface_radius / 64.0) + 1
 	var center := Vector2i(floori(global_position.x / 64), floori(global_position.y / 64))
