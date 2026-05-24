@@ -76,11 +76,17 @@ func query_radius(pos: Vector2, radius: float) -> Array[MapObject]:
 			if not _grid.has(cell):
 				continue
 			
+			var stale: Array = []
 			for obj: MapObject in _grid[cell]:
+				if not is_instance_valid(obj):
+					stale.append(obj)
+					continue
 				if results.size() >= MAX_QUERY_RESULTS:
+					_cleanup_stale(stale, cell)
 					return results
 				if obj.global_position.distance_squared_to(pos) <= radius * radius:
 					results.append(obj)
+			_cleanup_stale(stale, cell)
 	
 	return results
 
@@ -138,6 +144,18 @@ func _world_to_cell(pos: Vector2) -> Vector2i:
 		floori(pos.x / CELL_SIZE),
 		floori(pos.y / CELL_SIZE)
 	)
+
+
+## 清理网格中的无效引用
+func _cleanup_stale(stale: Array, cell: Vector2i) -> void:
+	if stale.is_empty() or not _grid.has(cell):
+		return
+	var list: Array = _grid[cell]
+	for obj in stale:
+		list.erase(obj)
+		_object_count -= 1
+	if list.is_empty():
+		_grid.erase(cell)
 
 
 func get_object_count() -> int:

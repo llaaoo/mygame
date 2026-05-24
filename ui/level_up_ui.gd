@@ -36,13 +36,24 @@ const STAT_DISPLAY: Dictionary = {
 
 func _ready() -> void:
 	hide()
+	layer = 200  # 高于 HUD(100)，确保不被遮挡
+	# Background 必须拦截点击，防止穿透到游戏
+	_background.mouse_filter = Control.MOUSE_FILTER_STOP
 	_setup_stat_rows()
 	_confirm_button.pressed.connect(_on_confirm_pressed)
 
 
+const _GAME_KEYS := ["move_left", "move_right", "move_up", "move_down", "dodge", "attack", "skill", "skill_1", "skill_2", "skill_3", "skill_4", "interact", "ui_cancel"]
+
 func _input(event: InputEvent) -> void:
-	if visible and event is InputEventKey:
-		get_viewport().set_input_as_handled()
+	if not visible:
+		return
+	# 仅拦截游戏操作按键，放过鼠标和 UI 按键（Enter 等）
+	if event is InputEventKey:
+		for action in _GAME_KEYS:
+			if event.is_action(action):
+				get_viewport().set_input_as_handled()
+				return
 
 
 func setup(comp: StatsComponent) -> void:
@@ -79,6 +90,7 @@ func _on_level_up(new_level: int) -> void:
 ## ── 显示 / 隐藏 ──
 
 func _show_with_effect() -> void:
+	_set_ui_blocked(true)
 	show()
 
 	# 重置特效元素
@@ -108,6 +120,7 @@ func _show_with_effect() -> void:
 
 
 func _hide() -> void:
+	_set_ui_blocked(false)
 	var tween := create_tween()
 	tween.set_parallel(true)
 	tween.tween_property(_panel, "modulate:a", 0.0, 0.2)

@@ -54,6 +54,7 @@ position = Vector2(220, -419)
 
 [node name="Portal" parent="." unique_id=1763517635 instance=ExtResource("3_i3mdx")]
 position = Vector2(742, -393)
+target_path = "res://world/regions/burning_forest/burning_forest.tscn"
 
 [node name="Chest1" parent="." unique_id=1568131560 instance=ExtResource("5_ukkfe")]
 position = Vector2(-150, -419)

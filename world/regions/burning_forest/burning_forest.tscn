@@ -45,17 +45,14 @@ position = Vector2(540, 100)
 
 [node name="Woods_Undead1" parent="." unique_id=1874515091 instance=ExtResource("9_yy20m")]
 position = Vector2(620, 0)
-collision_layer = 2
 enemy_type = 2.0
 
 [node name="Woods_Undead2" parent="." unique_id=873306199 instance=ExtResource("9_yy20m")]
 position = Vector2(700, 0)
-collision_layer = 2
 enemy_type = 2.0
 
 [node name="Woods_Undead3" parent="." unique_id=1438807444 instance=ExtResource("9_yy20m")]
 position = Vector2(780, 0)
-collision_layer = 2
 enemy_type = 2.0
 
 [node name="Cave_IceWall" parent="." unique_id=339018666 instance=ExtResource("11_r26f1")]
@@ -63,7 +60,6 @@ position = Vector2(880, 0)
 
 [node name="Boss_FireLord" parent="." unique_id=623877852 instance=ExtResource("9_yy20m")]
 position = Vector2(1020, 0)
-collision_layer = 2
 max_hp = 200.0
 enemy_type = 2.0
 
