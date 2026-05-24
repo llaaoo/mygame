@@ -10,6 +10,7 @@ var _surface_scheduler: SurfaceScheduler = null
 var _surface_manager: SurfaceManager = null
 var _propagation_scheduler: PropagationScheduler = null
 var _respawn_scheduler: RespawnScheduler = null
+var _spatial_index: WorldSpatialIndex = null
 
 ## 实体 Tick 注册表 — 所有需要持续 tick 的实体组件在此注册
 ## 实体实现 tick(delta) 方法，SimulationRuntime 统一驱动
@@ -32,10 +33,15 @@ func _ready() -> void:
 	_respawn_scheduler = RespawnScheduler.new()
 	_respawn_scheduler.name = "RespawnScheduler"
 	add_child(_respawn_scheduler)
+	
+	# 订阅 CommandBus 命令
+	call_deferred("_subscribe_to_bus")
 
 
 ## 注入外部依赖（由 GameRuntime 在初始化时调用）
 func setup_dependencies(spatial_index: WorldSpatialIndex, state_manager: WorldStateManager) -> void:
+	_spatial_index = spatial_index
+	
 	# SurfaceManager 作为外观层
 	_surface_manager = SurfaceManager.new()
 	_surface_manager.name = "SurfaceManager"
@@ -177,6 +183,77 @@ func _tick_entities(delta: float) -> void:
 ## 公开访问器（替代外部直接访问 _surface_manager）
 func get_surface_manager() -> SurfaceManager:
 	return _surface_manager
+
+
+## ── CommandBus 订阅 ──
+
+func _subscribe_to_bus() -> void:
+	var gr := GameRuntime.instance
+	if not gr:
+		call_deferred("_subscribe_to_bus")
+		return
+	var bus := gr.get_command_bus()
+	if bus:
+		bus.subscribe_for_target(RuntimeCommand.TYPE_SURFACE_CHANGE, RuntimeCommand.Target.SIMULATION, _on_surface_change_command)
+		bus.subscribe_for_target(RuntimeCommand.TYPE_RESPAWN_REQUEST, RuntimeCommand.Target.SIMULATION, _on_respawn_request_command)
+
+
+func _on_respawn_request_command(cmd: RuntimeCommand) -> void:
+	if not _respawn_scheduler:
+		return
+	var object_id: String = cmd.payload.get("object_id", "")
+	var respawn_time: float = cmd.payload.get("respawn_time", 0.0)
+	if respawn_time > 0.0 and not object_id.is_empty():
+		_respawn_scheduler.enqueue(object_id, respawn_time)
+		print("⏱️ SimulationRuntime: 加入重生队列 %s (%.0fs)" % [object_id, respawn_time])
+
+
+func _on_surface_change_command(cmd: RuntimeCommand) -> void:
+	if not _surface_manager:
+		return
+	
+	var pos: Vector2 = cmd.payload.get("position", Vector2.ZERO)
+	var aoe_radius: float = cmd.payload.get("destruction_radius", 0.0)
+	var aoe_damage: int = cmd.payload.get("destruction_aoe_damage", 0)
+	var aoe_tags: Array = cmd.payload.get("destruction_aoe_tags", [])
+	var surface_state: String = cmd.payload.get("surface_state", "")
+	var surface_radius: float = cmd.payload.get("surface_radius", 0.0)
+	var display_name: String = cmd.payload.get("display_name", "?")
+	
+	# 表面生成
+	if not surface_state.is_empty() and surface_radius > 0.0:
+		var cell_radius := ceili(surface_radius / 64.0) + 1
+		var center := Vector2i(floori(pos.x / 64), floori(pos.y / 64))
+		for dx in range(-cell_radius, cell_radius + 1):
+			for dy in range(-cell_radius, cell_radius + 1):
+				var cell := Vector2i(center.x + dx, center.y + dy)
+				var dist := pos.distance_to(Vector2(cell.x * 64 + 32, cell.y * 64 + 32))
+				if dist <= surface_radius:
+					_surface_manager.force_set_surface(cell, surface_state, 10.0, "destroyed_%s" % display_name)
+		
+		print("💥 SimulationRuntime: 生成 %s 表面 (r=%.0f, pos=%s)" % [surface_state, surface_radius, pos])
+	
+	# AOE 标签触发 ReactionRule（如 oiled + fire → burning）
+	if not aoe_tags.is_empty() and surface_radius > 0.0:
+		var cell_radius := ceili(surface_radius / 64.0) + 1
+		var center := Vector2i(floori(pos.x / 64), floori(pos.y / 64))
+		for dx in range(-cell_radius, cell_radius + 1):
+			for dy in range(-cell_radius, cell_radius + 1):
+				var cell := Vector2i(center.x + dx, center.y + dy)
+				var dist := pos.distance_to(Vector2(cell.x * 64 + 32, cell.y * 64 + 32))
+				if dist <= surface_radius:
+					_surface_manager.apply_tags(cell, aoe_tags, "aoe_%s" % display_name)
+	
+	# AOE 伤害
+	if aoe_radius > 0.0 and aoe_damage > 0 and _spatial_index:
+		var targets: Array = _spatial_index.query_radius(pos, aoe_radius)
+		var hit_count := 0
+		for t in targets:
+			if t.has_method("take_damage"):
+				CombatExecutor.report_hit(null, t, aoe_damage, pos, null, aoe_tags)
+				hit_count += 1
+		if hit_count > 0:
+			print("💥 SimulationRuntime: AOE 伤害 %d → %d 目标 (r=%.0f, tags=%s)" % [aoe_damage, hit_count, aoe_radius, aoe_tags])
 
 
 func _to_string() -> String:

@@ -32,9 +32,9 @@ func _connect_to_bus() -> void:
 		command_bus = gr.get_command_bus()
 	
 	if command_bus:
-		command_bus.subscribe("DESTROYED", _on_destroyed_command)
-		command_bus.subscribe("RESPAWN_REQUEST", _on_respawn_request)
-		command_bus.subscribe("CHUNK_LOAD_REQUEST", _on_chunk_load_request)
+		command_bus.subscribe_for_target(RuntimeCommand.TYPE_DESTROYED, RuntimeCommand.Target.WORLD, _on_destroyed_command)
+		command_bus.subscribe_for_target(RuntimeCommand.TYPE_RESPAWN_REQUEST, RuntimeCommand.Target.WORLD, _on_respawn_request)
+		command_bus.subscribe_for_target("CHUNK_LOAD_REQUEST", RuntimeCommand.Target.WORLD, _on_chunk_load_request)
 	else:
 		# 延迟重试：GameRuntime 可能尚未初始化完成
 		await get_tree().process_frame
@@ -57,26 +57,49 @@ func unregister_object(obj: MapObject) -> void:
 
 func _on_destroyed_command(cmd: RuntimeCommand) -> void:
 	var object_id: String = cmd.payload.get("object_id", "")
-	var object_node: MapObject = cmd.payload.get("object_node")
+	var state_data: Dictionary = cmd.payload.get("state_data", {})
 	
-	if object_node:
-		state_manager.update_state(object_id, object_node.get_state())
-		
-		# 如果有 AOE 连锁，发布 SURFACE_CHANGE 命令
-		var aoe_radius: float = cmd.payload.get("destruction_radius", 0.0)
-		if aoe_radius > 0.0 and command_bus:
-			var aoe_cmd := RuntimeCommand.create(
-				"SURFACE_CHANGE",
+	# 更新 WorldState
+	if not state_data.is_empty():
+		state_manager.update_state(object_id, state_data)
+	
+	# 重生倒计时 → 转发给 SimulationRuntime
+	var respawn_time: float = cmd.payload.get("respawn_time", -1.0)
+	if respawn_time > 0.0 and command_bus:
+		var respawn_cmd := RuntimeCommand.create(
+			RuntimeCommand.TYPE_RESPAWN_REQUEST,
+			"WorldRuntime",
+			RuntimeCommand.Target.SIMULATION,
+			{
+				"object_id": object_id,
+				"respawn_time": respawn_time,
+			}
+		)
+		command_bus.emit(respawn_cmd)
+	
+	# AOE 伤害 + 表面生成 → 转发给 SimulationRuntime
+	var aoe_radius: float = cmd.payload.get("destruction_radius", 0.0)
+	var surface: String = cmd.payload.get("destruction_surface", "")
+	var surface_radius: float = cmd.payload.get("destruction_surface_radius", 0.0)
+	
+	if (aoe_radius > 0.0) or (not surface.is_empty() and surface_radius > 0.0):
+		if command_bus:
+			var surf_cmd := RuntimeCommand.create(
+				RuntimeCommand.TYPE_SURFACE_CHANGE,
 				"WorldRuntime",
 				RuntimeCommand.Target.SIMULATION,
 				{
 					"position": cmd.payload.get("position", Vector2.ZERO),
-					"radius": aoe_radius,
-					"tags": cmd.payload.get("destruction_aoe_tags", []),
-					"damage": cmd.payload.get("destruction_aoe_damage", 0)
+					"destruction_radius": aoe_radius,
+					"destruction_aoe_damage": cmd.payload.get("destruction_aoe_damage", 0),
+					"destruction_aoe_tags": cmd.payload.get("destruction_aoe_tags", []),
+					"surface_state": surface,
+					"surface_radius": surface_radius,
+					"display_name": cmd.payload.get("display_name", ""),
 				}
 			)
-			command_bus.emit(aoe_cmd)
+			command_bus.emit(surf_cmd)
+			print("📨 WorldRuntime: 转发 TYPE_SURFACE_CHANGE → SimulationRuntime (r=%.0f, surface=%s)" % [aoe_radius + surface_radius, surface])
 
 
 func _on_respawn_request(cmd: RuntimeCommand) -> void:

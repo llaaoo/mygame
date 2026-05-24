@@ -22,6 +22,8 @@ func _ready() -> void:
 	_current_hp = object_data.max_hp
 	_apply_visual()
 	_register_with_world_runtime()
+	
+
 
 
 ## 公开 object_id
@@ -70,6 +72,7 @@ func get_state() -> Dictionary:
 		"id": _object_id,
 		"state": _state,
 		"hp": _current_hp,
+		"max_hp": object_data.max_hp,
 		"respawn_at": _respawn_timer if _state == "RESPAWNING" else 0.0
 	}
 
@@ -86,32 +89,25 @@ func restore_state(data: Dictionary) -> void:
 func _on_destroyed() -> void:
 	_state = "DESTROYED"
 	
-	# 从空间索引注销
+	# 空间索引维护例外：register/unregister 保留直接调用（性能关键路径）
 	var wr: WorldRuntime = _get_world_runtime()
 	if wr:
 		wr.unregister_object(self)
 	
 	destroyed.emit(_object_id)
 	
-	# 破坏特效
+	# 破坏特效 + 掉落物（本地表现，非跨 Runtime）
 	if object_data.destruction_effect_scene:
 		var effect: Node = object_data.destruction_effect_scene.instantiate()
 		effect.global_position = global_position
 		get_parent().add_child(effect)
-	
-	# 掉落物
 	if object_data.destruction_loot_scene:
 		var loot: Node = object_data.destruction_loot_scene.instantiate()
 		loot.global_position = global_position
 		get_parent().add_child(loot)
 	
-	# AOE 伤害（油桶引爆等）
-	if object_data.destruction_radius > 0:
-		_trigger_destruction_aoe()
-	
-	# 表面生成（油桶破坏 → oiled）
-	if not object_data.destruction_surface.is_empty() and object_data.destruction_surface_radius > 0.0:
-		_spawn_destruction_surface()
+	# 通过 CommandBus 异步路由到 WorldRuntime / SimulationRuntime（始终发射）
+	_emit_destroyed_command()
 	
 	# 重生倒计时
 	if object_data.respawn_time == -1.0:
@@ -128,37 +124,41 @@ func _on_destroyed() -> void:
 		_remove_collision()
 
 
-func _trigger_destruction_aoe() -> void:
-	var world_runtime: WorldRuntime = _get_world_runtime()
+## 通过 CommandBus 发送 world/destroyed 命令（替代直接调用 SimulationRuntime）
+func _emit_destroyed_command() -> void:
+	var gr := GameRuntime.instance
+	if not gr:
+		return
+	var bus := gr.get_command_bus()
+	if not bus:
+		return
 	
-	if world_runtime and CombatExecutor.instance:
-		var targets: Array = world_runtime.spatial_index.query_radius(
-			global_position, object_data.destruction_radius
-		)
-		var valid_targets: Array = []
-		for t in targets:
-			if t != self and t.has_method("take_damage"):
-				valid_targets.append(t)
-		
-		if valid_targets.is_empty():
-			return
-		
-		var names: Array[String] = []
-		for t in valid_targets:
-			names.append(t.name)
-			# report_hit() 内部已调用 take_damage()
-			CombatExecutor.report_hit(
-				self, t, object_data.destruction_aoe_damage,
-				global_position, null, object_data.destruction_aoe_tags
-			)
-		
-		print("💥 AOE: %s → %d目标 (r=%.0f): %s" % [object_data.display_name, valid_targets.size(), object_data.destruction_radius, ", ".join(names)])
+	var cmd := RuntimeCommand.create(
+		RuntimeCommand.TYPE_DESTROYED,
+		object_data.display_name,
+		RuntimeCommand.Target.WORLD,
+		{
+			"object_id": _object_id,
+			"state_data": get_state(),
+			"position": global_position,
+			"respawn_time": object_data.respawn_time,
+			"destruction_radius": object_data.destruction_radius,
+			"destruction_aoe_damage": object_data.destruction_aoe_damage,
+			"destruction_aoe_tags": object_data.destruction_aoe_tags,
+			"destruction_surface": object_data.destruction_surface,
+			"destruction_surface_radius": object_data.destruction_surface_radius,
+		}
+	)
+	bus.emit(cmd)
 
 
 func _register_with_world_runtime() -> void:
 	var wr: WorldRuntime = _get_world_runtime()
 	if wr:
 		wr.register_object(self)
+	else:
+		# GameRuntime._ready() 尚未完成，延迟重试
+		call_deferred("_register_with_world_runtime")
 
 
 ## 通过 GameRuntime.instance 获取 WorldRuntime（不再硬编码路径）
@@ -169,41 +169,6 @@ func _get_world_runtime() -> WorldRuntime:
 	return null
 
 
-## 破坏时在半径内生成表面
-func _spawn_destruction_surface() -> void:
-	# 通过 GameRuntime → SimulationRuntime → SurfaceManager 访问（不再用全局单例）
-	var gr := GameRuntime.instance
-	if not gr:
-		return
-	var sim := gr.get_simulation_runtime()
-	if not sim:
-		return
-	var sm := sim.get_surface_manager()
-	if not sm:
-		return
-	
-	var cell_radius := ceili(object_data.destruction_surface_radius / 64.0) + 1
-	var center := Vector2i(floori(global_position.x / 64), floori(global_position.y / 64))
-	
-	for dx in range(-cell_radius, cell_radius + 1):
-		for dy in range(-cell_radius, cell_radius + 1):
-			var cell := Vector2i(center.x + dx, center.y + dy)
-			var dist := global_position.distance_to(Vector2(cell.x * 64 + 32, cell.y * 64 + 32))
-			if dist <= object_data.destruction_surface_radius:
-				sm.force_set_surface(cell, object_data.destruction_surface, 10.0, "destroyed_%s" % object_data.display_name)
-	
-	print("💥 MapObject: %s 破坏，生成 %s 表面 (r=%.0f)" % [object_data.display_name, object_data.destruction_surface, object_data.destruction_surface_radius])
-	
-	# 立即在表面格上应用 AOE 标签触发 ReactionRule（如 oiled + fire → burning）
-	if not object_data.destruction_aoe_tags.is_empty():
-		for dx in range(-cell_radius, cell_radius + 1):
-			for dy in range(-cell_radius, cell_radius + 1):
-				var cell := Vector2i(center.x + dx, center.y + dy)
-				var dist := global_position.distance_to(Vector2(cell.x * 64 + 32, cell.y * 64 + 32))
-				if dist <= object_data.destruction_surface_radius:
-					sm.apply_tags(cell, object_data.destruction_aoe_tags, "aoe_%s" % object_data.display_name)
-
-
 func _remove_collision() -> void:
 	# 禁用物理阻挡体（StaticBody2D → CollisionShape2D）
 	var body := get_node_or_null("Body")
@@ -211,6 +176,14 @@ func _remove_collision() -> void:
 		for shape_child in body.get_children():
 			if shape_child is CollisionShape2D or shape_child is CollisionPolygon2D:
 				shape_child.set_deferred("disabled", true)
+	# 禁用 HitArea（防止已销毁物体继续被投射物命中）
+	var hit_area := get_node_or_null("HitArea")
+	if hit_area:
+		for shape_child in hit_area.get_children():
+			if shape_child is CollisionShape2D or shape_child is CollisionPolygon2D:
+				shape_child.set_deferred("disabled", true)
+		hit_area.set_deferred("monitoring", false)
+		hit_area.set_deferred("monitorable", false)
 	# 兼容旧结构：直接子节点的碰撞形状
 	for child in get_children():
 		if child is CollisionShape2D or child is CollisionPolygon2D:

@@ -12,6 +12,11 @@ enum Target {
 	ALL,           ## 广播
 }
 
+## ── 命令类型常量（domain-prefixed，调用方显式使用） ──
+const TYPE_DESTROYED       := "world/destroyed"
+const TYPE_SURFACE_CHANGE  := "simulation/surface_change"
+const TYPE_RESPAWN_REQUEST := "world/respawn_request"
+
 var type: String = ""           ## "HIT_REQUEST" / "DESTROYED" / "SURFACE_CHANGE" / "RESPAWN" / "CHUNK_LOAD"
 var source: String = ""         ## 发起 Runtime 名称
 var target: Target = Target.ALL ## 目标 Runtime

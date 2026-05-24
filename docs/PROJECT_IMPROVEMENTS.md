@@ -1,8 +1,26 @@
 # 项目改进点清单
 
 > 生成日期: 2026-05-24  
+> 最后更新: 2026-05-24  
 > 范围: 排除 `addons/` 与 `godot_state_charts_examples/`  
 > 目的: 记录当前项目结构、代码现状与 `docs/` 架构契约之间的差距，作为后续迭代输入。
+
+---
+
+## 完成进度
+
+| 条目 | 状态 |
+|------|:--:|
+| P0.1 CombatExecutor HP 权威 | ✅ |
+| P0.2 CommandBus 领域路由 | ✅ |
+| P0.3 WorldState/Respawn 生命周期 | ✅ |
+| P1.1 SimulationRuntime 调度收敛 | ✅ |
+| P1.2 物理层核对 | ✅ |
+| P1.3 Action Layer 统一 | ✅ |
+| P1.4 文档路径同步 | ⬜ |
+| P2.1 场景验证 | 🔄 burning_forest 有雏形 |
+| P2.2 README | ⬜ |
+| P2.3 坏资源/孤儿文件清理 | ✅ |
 
 ---
 
@@ -364,15 +382,15 @@ Action / NPC：
 
 ## 建议实施顺序
 
-1. 先修复坏资源引用和明显场景错误，保证项目可加载。
-2. 明确 CombatExecutor 是否真正负责扣血，并收敛所有直接 `take_damage()`。
-3. 补齐 CommandBus 的 target/domain 路由和最小命令集。
-4. 接通 MapObject 销毁、WorldState 更新、RespawnScheduler、SceneTree 表现同步。
-5. 完成 SimulationRuntime 对 WorldTime、SurfaceManager 注入、区域输入的收敛。
-6. 按物理层标准做一次全项目碰撞配置核对。
-7. 统一 Player/NPC/Enemy 的 Action 执行链，淘汰旧 `PlayerAction` 双轨。
-8. 修正文档路径、日期和 README 状态。
-9. 用小型地牢、村庄、野外热点三个场景验证内容生产能力。
+1. ✅ 修复坏资源引用和明显场景错误（P2.3）
+2. ✅ 明确 CombatExecutor 是否真正负责扣血（P0.1）
+3. ✅ 补齐 CommandBus 的 target/domain 路由（P0.2）
+4. ✅ 接通 MapObject 销毁、WorldState 更新、RespawnScheduler、SceneTree 表现同步（P0.3）
+5. ✅ 完成 SimulationRuntime 对 WorldTime、SurfaceManager 注入（P1.1）
+6. ✅ 按物理层标准做全项目碰撞配置核对（P1.2）
+7. ✅ 统一 Player/NPC/Enemy 的 Action 执行链（P1.3）
+8. ⬜ 修正文档路径、日期和 README 状态（P1.4 / P2.2）
+9. ⬜ 用小型地牢、村庄、野外热点验证（P2.1）
 
 ---
 

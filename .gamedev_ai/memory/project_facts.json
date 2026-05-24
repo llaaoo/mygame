@@ -971,5 +971,33 @@
 		"created": "2026-05-24T21:06:20",
 		"id": "fact_1779627980",
 		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "P0.2 完成：CommandBus 领域路由。RuntimeCommand 新增 TYPE_DESTROYED/TYPE_SURFACE_CHANGE/TYPE_RESPAWN_REQUEST 常量。CommandBus 订阅结构改为 Array[{target, callback}]，新增 subscribe_for_target() 支持定向路由。MapObject._on_destroyed() 改走 CommandBus 发射 TYPE_DESTROYED，删除了 _trigger_destruction_aoe() 和 _spawn_destruction_surface()。WorldRuntime 接收后转发 TYPE_SURFACE_CHANGE 到 SimulationRuntime。SimulationRuntime 新增 _on_surface_change_command handler 处理表面生成+AOE。空间索引 register/unregister 保留直接调用（基础设施例外）。",
+		"created": "2026-05-24T21:27:50",
+		"id": "fact_1779629270",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "P0.2 验证通过。MapObject 延迟注册修复（call_deferred 重试直到 GameRuntime._ready() 完成）。油桶 AOE 连锁完整验证：火球→摧毁桶1→CommandBus→WorldRuntime→TYPE_SURFACE_CHANGE→SimulationRuntime→表面oil生成+AOE伤害20→摧毁桶2→二次TYPE_SURFACE_CHANGE。MapObject._remove_collision() 现在同时禁用 Body+HitArea 防止已销毁物体被重复命中。",
+		"created": "2026-05-24T21:45:05",
+		"id": "fact_1779630305",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "P0.3 完成：WorldState/Respawn 生命周期闭环。MapObject 销毁时始终发射 TYPE_DESTROYED（含 respawn_time）。WorldRuntime 转发 TYPE_RESPAWN_REQUEST 到 SimulationRuntime。SimulationRuntime 订阅并 enqueue 到 RespawnScheduler。RespawnScheduler 倒计时到期后更新 WorldStateManager 为 INTACT。完整链路已验证：油桶 AOE 连锁 + 墙体重生排队。",
+		"created": "2026-05-24T21:56:44",
+		"id": "fact_1779631004",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "P0 全部完成并验证：P0.1 CombatExecutor.report_hit() 统管伤害（7源收敛+事件+扣血），P0.2 CommandBus 领域路由（TYPE_DESTROYED→TYPE_SURFACE_CHANGE→TYPE_RESPAWN_REQUEST，油桶AOE连锁验证），P0.3 WorldState/Respawn 闭环（TYPE_DESTROYED→TYPE_RESPAWN_REQUEST→RespawnScheduler→WorldStateManager+MapObject.restore_state，墙5秒重生验证）。MapObject._remove_collision() 同时禁用 Body+HitArea。_register_with_world_runtime 加重试。spatial_index 注入 surface_manager。CommandBus.subscribe_for_target 定向路由。",
+		"created": "2026-05-24T22:03:13",
+		"id": "fact_1779631393",
+		"source": "ai"
 	}
 ]

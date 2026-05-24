@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://wx74iv5pkp82"]
 
 [ext_resource type="PackedScene" uid="uid://dh2tkj6gryw1a" path="res://world/maps/overworld.tscn" id="1_ig7tw"]
+[ext_resource type="PackedScene" uid="uid://dbv2k2e21cmb7" path="res://world/object/oil_barrel.tscn" id="2_4c57u"]
 [ext_resource type="PackedScene" uid="uid://dcbumdieobptq" path="res://entities/enemy/enemy.tscn" id="2_272bh"]
 [ext_resource type="PackedScene" uid="uid://etuhwmvsawor" path="res://entities/player/player.tscn" id="2_h2yge"]
 [ext_resource type="Script" uid="uid://cgn2i161esv0a" path="res://gameplay/abilities/manager/skill_manager.gd" id="5_4c57u"]
@@ -50,6 +51,9 @@ func _setup_mouse_action(action_name: String, button: MouseButton) -> void:
 
 [node name="Overworld" parent="." unique_id=1549094242 instance=ExtResource("1_ig7tw")]
 
+[node name="OilBarrel" parent="Overworld" unique_id=638277641 instance=ExtResource("2_4c57u")]
+position = Vector2(-155, -645)
+
 [node name="Enemy1" parent="Overworld" unique_id=1874515091 instance=ExtResource("2_272bh")]
 position = Vector2(200, 0)
 max_hp = 100
@@ -61,6 +65,9 @@ max_hp = 100
 [node name="Enemy3" parent="Overworld" unique_id=843982397 instance=ExtResource("2_272bh")]
 position = Vector2(0, 200)
 max_hp = 100
+
+[node name="OilBarrel2" parent="Overworld" unique_id=104765449 instance=ExtResource("2_4c57u")]
+position = Vector2(-193, -645)
 
 [node name="Player" parent="." unique_id=87503594 instance=ExtResource("2_h2yge")]
 position = Vector2(7, -475)
