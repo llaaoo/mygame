@@ -796,5 +796,19 @@
 		"created": "2026-05-24T14:09:05",
 		"id": "fact_1779602945",
 		"source": "ai"
+	},
+	{
+		"category": "bug_fix",
+		"content": "NPC 移动锁定 Bug (2026-07): MoveToTask 中 NavigationAgent2D 在没有 navmesh 的地图上运行时，is_navigation_finished() 返回 false（永远在\"找路径\"），get_next_path_position() 返回 Agent 自身位置 → direction_to(self) = (0,0) → NPC 不动。修复：增加 `_agent.get_navigation_map().is_valid()` 检查，无导航地图时退化为直线移动。",
+		"created": "2026-05-24T15:21:11",
+		"id": "fact_1779607271",
+		"source": "ai"
+	},
+	{
+		"category": "bug_fix",
+		"content": "NPC 移动修复 (2025-07): NavigationAgent2D.get_navigation_map().is_valid() 在无 navmesh 时仍返回 true（默认地图总是有效），导致 get_next_path_position() 返回自身位置 → direction_to(self)=(0,0) → NPC 卡住。修复：增加 `next.distance_squared_to(_npc.global_position) > 1.0` 检查，路径点等于自身位置时退化为直线移动。",
+		"created": "2026-05-24T15:45:48",
+		"id": "fact_1779608748",
+		"source": "ai"
 	}
 ]
