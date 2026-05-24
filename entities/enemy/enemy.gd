@@ -26,9 +26,9 @@ const PRESETS: Array[Dictionary] = [
 
 ## ── 预设属性表（哨兵/士兵/坦克） ──
 const PRESET_STATS: Array[Dictionary] = [
-	{"strength": 5,  "intelligence": 5,  "agility": 15, "endurance": 5},   # 哨兵：高敏捷
-	{"strength": 10, "intelligence": 8,  "agility": 10, "endurance": 10},  # 士兵：均衡
-	{"strength": 15, "intelligence": 5,  "agility": 5,  "endurance": 15},  # 坦克：高力耐
+	{"strength": 5,  "intelligence": 5,  "agility": 15, "endurance": 5},
+	{"strength": 10, "intelligence": 8,  "agility": 10, "endurance": 10},
+	{"strength": 15, "intelligence": 5,  "agility": 5,  "endurance": 15},
 ]
 
 var enemy_color: Color = Color.RED
@@ -38,32 +38,27 @@ var enemy_name: String = "敌人"
 ## ── 运行时 ──
 var player: Player = null
 var attack_ready: bool = true
+var _attack_timer: float = 0.0
 
 signal died
 
 @onready var health_component: HealthComponent = $HealthComponent
 @onready var skill_manager: SkillManager = $SkillManager
 @onready var stats_component: StatsComponent = $StatsComponent
+@onready var state_chart: StateChart = $StateChart
 
 
 func _ready() -> void:
 	add_to_group("enemy")
-	# 碰撞形状
 	$CollisionShape2D.shape = load("res://entities/enemy/enemy_body_shape.tres")
-
-	# BuffManager（状态/减益接收）
 	_create_buff_manager()
-
-	# 应用预设属性
 	_apply_preset_stats(enemy_type)
-
-	# 生命值组件
 	health_component.setup($CollisionShape2D)
 	health_component.regen_rate = 0.0
 	health_component.died.connect(_on_died)
 	_apply_stats_to_health()
 
-	# 技能（archetype 驱动场景，SkillData 纯配置）
+	# 技能
 	var bolt_data := load("res://gameplay/abilities/data/shadow_bolt_data.tres") as SkillData
 	if bolt_data:
 		bolt_data.skill_type = SkillData.SkillType.PROJECTILE
@@ -77,14 +72,111 @@ func _ready() -> void:
 		skill_manager.pool.build()
 		skill_manager.equip_hand("right", bolt_data)
 
-	# 视觉
 	_apply_preset(enemy_type)
 	_apply_visuals()
 
-	# 状态机
-	_setup_state_machine()
+	# StateChart 在 _ready 中已由场景实例化，这里连接状态逻辑
+	_setup_state_chart()
 
 	call_deferred("_find_player")
+
+
+func _setup_state_chart() -> void:
+	var brain := state_chart.get_node("Brain") as CompoundState
+	if not brain:
+		return
+
+	var idle := brain.get_node("Idle") as AtomicState
+	var chase := brain.get_node("Chase") as AtomicState
+	var attack := brain.get_node("Attack") as AtomicState
+
+	# Idle 状态
+	idle.state_physics_processing.connect(_on_idle_physics)
+
+	# Chase 状态
+	chase.state_physics_processing.connect(_on_chase_physics)
+
+	# Attack 状态
+	attack.state_entered.connect(_on_attack_enter)
+	attack.state_physics_processing.connect(_on_attack_physics)
+
+
+func _on_idle_physics(_delta: float) -> void:
+	if not player or player.health_component.is_dead:
+		return
+	if distance_to_player() <= detect_range:
+		state_chart.send_event("player_detected")
+
+
+func _on_chase_physics(_delta: float) -> void:
+	if not player or player.health_component.is_dead:
+		state_chart.send_event("player_lost")
+		return
+
+	var dist := distance_to_player()
+
+	if dist <= attack_range:
+		state_chart.send_event("player_in_range")
+		return
+
+	if dist > detect_range * 1.5:
+		state_chart.send_event("player_lost")
+		return
+
+	if skill_manager and skill_manager.can_use("right"):
+		var dir := get_player_direction()
+		skill_manager.use_hand("right", self, dir)
+
+	var dir := get_player_direction()
+	velocity = dir * move_speed
+	move_and_slide()
+
+
+func _on_attack_enter() -> void:
+	_attack_timer = 0.0
+	velocity = Vector2.ZERO
+	_do_melee_attack()
+
+
+func _on_attack_physics(delta: float) -> void:
+	if not player or player.health_component.is_dead:
+		state_chart.send_event("player_lost")
+		return
+
+	_attack_timer += delta
+	var dist := distance_to_player()
+
+	if dist > attack_range * 1.5:
+		state_chart.send_event("player_out_of_range")
+		return
+
+	if _attack_timer >= attack_cooldown:
+		_attack_timer = 0.0
+		_do_melee_attack()
+
+
+func _do_melee_attack() -> void:
+	if not attack_ready or not player:
+		return
+	attack_ready = false
+
+	var trace := CombatDebugger.begin("melee_enemy", "敌人近战")
+	var exec_inst := CombatExecutor.instance
+	if exec_inst:
+		exec_inst.begin_hit_sequence()
+
+	CombatExecutor.report_hit(self, player, attack_damage, player.global_position, null, ["melee", "enemy"])
+	player.take_damage(attack_damage)
+
+	if trace:
+		trace.final_damage = attack_damage
+	if exec_inst:
+		exec_inst.end_hit_sequence()
+	if trace:
+		CombatDebugger.store(trace)
+
+	await get_tree().create_timer(attack_cooldown).timeout
+	attack_ready = true
 
 
 func _create_buff_manager() -> void:
@@ -109,7 +201,6 @@ func _apply_preset_stats(type_idx: int) -> void:
 
 
 func _apply_stats_to_health() -> void:
-	# HP 直接使用 @export max_hp，不叠加耐力加成（耐力加成仅对 Player 生效）
 	health_component.max_hp = max_hp
 	health_component.hp = health_component.max_hp
 	move_speed = move_speed + stats_component.move_speed_bonus
@@ -138,17 +229,6 @@ func _flash_damage() -> void:
 	spr.modulate = Color.WHITE
 	await get_tree().create_timer(0.1).timeout
 	spr.modulate = enemy_color
-
-
-## ── 状态机 ──
-
-func _setup_state_machine() -> void:
-	var sm = $StateMachine
-	if not sm.get_script():
-		return
-	for child in sm.get_children():
-		if child.has_method("enter") and child.get("entity") != self:
-			child.set("entity", self)
 
 
 func _find_player() -> void:
@@ -180,7 +260,6 @@ func take_damage(amount: int) -> void:
 
 
 func _on_died() -> void:
-	# 击杀奖励经验（副作用收敛到 CombatExecutor）
 	if player:
 		CombatExecutor.report_exp_bonus(player, 30 + stats_component.level * 10)
 	_spawn_drop()
@@ -200,36 +279,3 @@ func _spawn_drop() -> void:
 	var drop = drop_scene.instantiate()
 	get_tree().current_scene.add_child.call_deferred(drop)
 	drop.global_position = global_position
-
-
-## ── 攻击 ──
-
-func perform_attack() -> void:
-	if not attack_ready or not player:
-		return
-	attack_ready = false
-
-	# 敌人近战 trace
-	var trace := CombatDebugger.begin("melee_enemy", "敌人近战")
-
-	# 近战命中走 CombatExecutor 事件序列
-	var exec_inst := CombatExecutor.instance
-	if exec_inst:
-		exec_inst.begin_hit_sequence()
-
-	CombatExecutor.report_hit(self, player, attack_damage, player.global_position, null, ["melee", "enemy"])
-	player.take_damage(attack_damage)
-
-	# 写入 trace 最终伤害
-	if trace:
-		trace.final_damage = attack_damage
-
-	if exec_inst:
-		exec_inst.end_hit_sequence()
-
-	# 关闭敌人近战 trace
-	if trace:
-		CombatDebugger.store(trace)
-
-	await get_tree().create_timer(attack_cooldown).timeout
-	attack_ready = true

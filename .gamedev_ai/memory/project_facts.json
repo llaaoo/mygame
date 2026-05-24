@@ -691,5 +691,19 @@
 		"created": "2026-05-23T23:20:30",
 		"id": "fact_1779549630",
 		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "敌人状态机迁移到 godot_state_charts：StateChart → CompoundState \"Brain\" → AtomicState Idle/Chase/Attack（各含 enemy_idle/chase/attack.gd）。4 个 Transition：Idle→Chase(player_detected)、Chase→Idle(player_lost)、Chase→Attack(player_in_range)、Attack→Chase(player_out_of_range)。状态通过 state_physics_processing 信号驱动逻辑，通过 state_chart.send_event() 触发转换。旧 StateMachine 节点已移除，enemy.gd 精简",
+		"created": "2026-05-24T12:34:17",
+		"id": "fact_1779597257",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "敌人状态机改为在 enemy.gd 的 _setup_state_chart() 中通过 signal 连接驱动逻辑。StateChart/Brain/Idle/Chase/Attack 节点只挂 godot_state_charts 标准脚本（state_chart/compound_state/atomic_state），不含自定义脚本。所有 AI 逻辑收敛到 enemy.gd 的 _on_idle_physics/_on_chase_physics/_on_attack_enter/_on_attack_physics 四个回调中。Transition 的 to NodePath 需在 Godot 编辑器中手动验证（工具持久化后编辑器可能仍需刷新）",
+		"created": "2026-05-24T12:41:33",
+		"id": "fact_1779597693",
+		"source": "ai"
 	}
 ]

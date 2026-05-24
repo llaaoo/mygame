@@ -1,13 +1,13 @@
 [gd_scene format=3 uid="uid://dcbumdieobptq"]
 
 [ext_resource type="Script" uid="uid://dr4tuwps3ut87" path="res://entities/enemy/enemy.gd" id="1_d50e0"]
-[ext_resource type="Script" uid="uid://d14nf01ptg71j" path="res://entities/enemy/states/idle.gd" id="1_ksmh7"]
 [ext_resource type="Texture2D" uid="uid://ucd888rpepul" path="res://icon.svg" id="2_61ikd"]
-[ext_resource type="Script" uid="uid://bi7n28drvonhu" path="res://entities/enemy/states/chase.gd" id="2_im2q6"]
-[ext_resource type="Script" uid="uid://dfdg1os45xtxd" path="res://entities/enemy/states/attack.gd" id="3_3fvr7"]
-[ext_resource type="Script" uid="uid://cxndt4i7ah38r" path="res://core/state/state_machine.gd" id="3_721x4"]
+[ext_resource type="Script" uid="uid://couw105c3bde4" path="res://addons/godot_state_charts/state_chart.gd" id="6_d50e0"]
 [ext_resource type="Script" uid="uid://bina3ctxqpy1c" path="res://entities/components/health_component.gd" id="7_61ikd"]
+[ext_resource type="Script" uid="uid://jk2jm1g6q853" path="res://addons/godot_state_charts/compound_state.gd" id="7_721x4"]
+[ext_resource type="Script" uid="uid://cytafq8i1y8qm" path="res://addons/godot_state_charts/atomic_state.gd" id="8_a8fs5"]
 [ext_resource type="Script" uid="uid://cgn2i161esv0a" path="res://gameplay/abilities/manager/skill_manager.gd" id="8_eaj7m"]
+[ext_resource type="Script" uid="uid://cf1nsco3w0mf6" path="res://addons/godot_state_charts/transition.gd" id="9_4ohlc"]
 [ext_resource type="Script" uid="uid://d1uc57ucjrid5" path="res://entities/components/stats_component.gd" id="9_eaj7m"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_d50e0"]
@@ -26,18 +26,6 @@ texture = ExtResource("2_61ikd")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2058523350]
 shape = SubResource("CircleShape2D_d50e0")
 
-[node name="StateMachine" type="Node" parent="." unique_id=1285764006]
-script = ExtResource("3_721x4")
-
-[node name="Idle" type="Node" parent="StateMachine" unique_id=301918238]
-script = ExtResource("1_ksmh7")
-
-[node name="Chase" type="Node" parent="StateMachine" unique_id=1965437739]
-script = ExtResource("2_im2q6")
-
-[node name="Attack" type="Node" parent="StateMachine" unique_id=1145564447]
-script = ExtResource("3_3fvr7")
-
 [node name="HealthComponent" type="Node" parent="." unique_id=1102841421]
 script = ExtResource("7_61ikd")
 
@@ -46,3 +34,43 @@ script = ExtResource("8_eaj7m")
 
 [node name="StatsComponent" type="Node" parent="." unique_id=1297499443]
 script = ExtResource("9_eaj7m")
+
+[node name="StateChart" type="Node" parent="." unique_id=85180551]
+script = ExtResource("6_d50e0")
+
+[node name="Brain" type="Node" parent="StateChart" unique_id=110386322]
+script = ExtResource("7_721x4")
+initial_state = NodePath("Idle")
+
+[node name="Idle" type="Node" parent="StateChart/Brain" unique_id=988911422]
+script = ExtResource("8_a8fs5")
+
+[node name="ToChase" type="Node" parent="StateChart/Brain/Idle" unique_id=172596194]
+script = ExtResource("9_4ohlc")
+to = NodePath("../../Chase")
+event = &"player_detected"
+delay_in_seconds = "0.0"
+
+[node name="Chase" type="Node" parent="StateChart/Brain" unique_id=967757958]
+script = ExtResource("8_a8fs5")
+
+[node name="ToIdle" type="Node" parent="StateChart/Brain/Chase" unique_id=343521063]
+script = ExtResource("9_4ohlc")
+to = NodePath("../../Idle")
+event = &"player_lost"
+delay_in_seconds = "0.0"
+
+[node name="ToAttack" type="Node" parent="StateChart/Brain/Chase" unique_id=58101269]
+script = ExtResource("9_4ohlc")
+to = NodePath("../../Attack")
+event = &"player_in_range"
+delay_in_seconds = "0.0"
+
+[node name="Attack" type="Node" parent="StateChart/Brain" unique_id=1831420120]
+script = ExtResource("8_a8fs5")
+
+[node name="ToChase" type="Node" parent="StateChart/Brain/Attack" unique_id=727478374]
+script = ExtResource("9_4ohlc")
+to = NodePath("../../Chase")
+event = &"player_out_of_range"
+delay_in_seconds = "0.0"
