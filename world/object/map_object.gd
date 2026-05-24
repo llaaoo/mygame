@@ -82,6 +82,8 @@ func restore_state(data: Dictionary) -> void:
 	_state = data.get("state", "INTACT")
 	_respawn_timer = data.get("respawn_at", 0.0)
 	_apply_visual()
+	if _state == "INTACT":
+		_restore_collision()
 
 
 ## --- 内部 ---
@@ -167,6 +169,27 @@ func _get_world_runtime() -> WorldRuntime:
 	if gr:
 		return gr.get_world_runtime()
 	return null
+
+
+func _restore_collision() -> void:
+	# 恢复 Body 碰撞体
+	var body := get_node_or_null("Body")
+	if body:
+		for shape_child in body.get_children():
+			if shape_child is CollisionShape2D or shape_child is CollisionPolygon2D:
+				shape_child.set_deferred("disabled", false)
+	# 恢复 HitArea
+	var hit_area := get_node_or_null("HitArea")
+	if hit_area:
+		for shape_child in hit_area.get_children():
+			if shape_child is CollisionShape2D or shape_child is CollisionPolygon2D:
+				shape_child.set_deferred("disabled", false)
+		hit_area.set_deferred("monitoring", true)
+		hit_area.set_deferred("monitorable", true)
+	# 直接子节点的碰撞形状
+	for child in get_children():
+		if child is CollisionShape2D or child is CollisionPolygon2D:
+			child.set_deferred("disabled", false)
 
 
 func _remove_collision() -> void:
