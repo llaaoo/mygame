@@ -1,7 +1,7 @@
 extends CanvasLayer
 ## HUD — 血条 / MP条 / 技能条 / 属性概要 / 死亡画面
 
-@onready var death_screen: ColorRect = $DeathScreen
+var death_screen: Control = null
 
 var player: Player = null
 var health_bar: ProgressBar = null
@@ -14,6 +14,8 @@ var level_up_ui: LevelUpUI = null
 
 
 func _ready() -> void:
+	process_mode = Node.PROCESS_MODE_ALWAYS
+	layer = 100  # 确保在所有其他 CanvasLayer 之上
 	_build_ui()
 	var retry_btn = $DeathScreen/VBoxContainer/RetryButton
 	if retry_btn and not retry_btn.pressed.is_connected(_on_retry_pressed):
@@ -138,14 +140,61 @@ func _on_mp_changed(current_mp: int, max_mp: int) -> void:
 	mana_label.text = "%d / %d" % [current_mp, max_mp]
 
 
+var _death_active: bool = false
+
+
 func _on_player_died() -> void:
+	_death_active = true
+
+	# 隐藏所有其他 UI 层（QuestTracker 等可能遮挡死亡画面）
+	for child in get_tree().current_scene.get_children():
+		if child is CanvasLayer and child != self:
+			child.hide()
+
+	# 清除旧 DeathScreen
 	if death_screen:
-		death_screen.visible = true
+		death_screen.queue_free()
+
+	# 用 Button 替代 ColorRect——Button 100% 接收点击
+	var btn := Button.new()
+	btn.name = "DeathScreen"
+	btn.set_anchors_preset(Control.PRESET_FULL_RECT)
+	btn.flat = true
+	death_screen = btn
+	add_child(death_screen)
+	move_child(death_screen, get_child_count() - 1)
+
+	# 半透明黑色背景
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0, 0, 0, 0.7)
+	btn.add_theme_stylebox_override("normal", style)
+	btn.add_theme_stylebox_override("hover", style)
+	btn.add_theme_stylebox_override("pressed", style)
+
+	# 文字标签
+	var label := Label.new()
+	label.text = "💀 player died!\n\n[ Reload ]"
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.add_theme_color_override("font_color", Color.WHITE)
+	label.add_theme_font_size_override("font_size", 32)
+	label.set_anchors_preset(Control.PRESET_FULL_RECT)
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	btn.add_child(label)
+
+	# 点击任意位置 → 重载
+	btn.pressed.connect(_on_retry_pressed)
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if _death_active and event.is_pressed():
+		_on_retry_pressed()
 
 
 func _on_retry_pressed() -> void:
+	print("🔄 RELOAD CLICKED")
 	get_tree().paused = false
-	get_tree().reload_current_scene()
+	get_tree().change_scene_to_file("res://main.tscn")
 
 
 func _on_stat_changed(_stat_name: String, _new_value: int) -> void:

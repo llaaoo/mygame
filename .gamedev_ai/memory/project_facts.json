@@ -705,5 +705,54 @@
 		"created": "2026-05-24T12:41:33",
 		"id": "fact_1779597693",
 		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "任务系统设计已确定：1) 任务系统是\"监听世界状态+推进阶段\"的规则层，不控制世界；2) 结构: QuestData(.tres静态)→QuestRuntime(只读引用)→QuestStage→QuestObjective(Condition[]复用)；3) Objective不写类型枚举，用event_type+conditions组合（如ON_KILL+TagCondition+StatusCondition）；4) 任务完成→Action[]（GiveItem/OpenDoor/UnlockRegion），不是quest自己改世界；5) QuestManager极小：激活/保存/转发事件/推进阶段；6) 三阶段实现：P1基础目标(ON_KILL/ON_INTERACT/ON_ENTER_REGION)、P2奖励+UI+地图标记、P3分支+阵营+对话条件",
+		"created": "2026-05-24T12:51:20",
+		"id": "fact_1779598280",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "工程核心原则：所有系统只监听事件、只修改自己的状态、只通过Action改世界。禁止为了\"支持更多玩法\"新增更多Manager（QuestManager/DialogueManager/CutsceneManager/FactionManager/CrimeManager互相调用）。统一事件驱动世界已经正确，不要破坏这个模式",
+		"created": "2026-05-24T12:51:20",
+		"id": "fact_1779598280",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Quest系统工程收敛关键：1) QuestObjective不用enum，用类继承（KillObjective/InteractObjective等），每个覆写on_event()+is_completed()；2) QuestManager只做转发——for quest in active: quest.on_event(ev)，不认识任务类型；3) QuestRuntime是核心，持有QuestData(只读)+Stage+ObjectiveRuntime[]+状态(NOT_STARTED/ACTIVE/COMPLETED/FAILED)；4) Stage驱动——Quest→stages[]→objectives[]+rewards[]+next_stage；5) Reward不写死——GiveItemReward/OpenDoorReward/StartQuestReward每个覆写apply(target)；6) Quest与Dialogue不互相引用——Dialogue发ON_DIALOGUE_CHOICE事件，Quest监听；7) 禁止quest脚本（quest_001.gd/quest_002.gd），全部用.tres纯数据；8) 目录：gameplay/quest/{data/,runtime/,objectives/,rewards/,ui/} + content/quests/{main/,side/}",
+		"created": "2026-05-24T12:53:52",
+		"id": "fact_1779598432",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "架构终极收敛方向：EventBus同时驱动Quest、NPCBrain、TriggeredEffect三套系统监听同一事件流。Quest本质也是\"Condition+Counter\"的Triggered System。禁止做Quest Script DSL/可视化任务树/GOAP/JSON任务脚本/节点图——现有EventBus+Condition+Objective+Reward+Stage已足够Skyrim/Fallout/Witcher级别任务",
+		"created": "2026-05-24T12:53:52",
+		"id": "fact_1779598432",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Quest P1 已实现：1) QuestObjective 基类 (event_type/required_count/current)、KillObjective 子类 (ON_KILL+target_tag)、QuestStageData (objectives[])、QuestData (stages[])；2) QuestRuntime (持有data+_progress[]+state机 NOT_STARTED→ACTIVE→COMPLETED)；3) QuestManager (极小：_ready订阅CombatEventBus.ON_KILL→for active: q.on_event(ev)，不认识任务类型)；4) 示例任务 kill_enemies_quest.tres (击杀3个enemy) + player.gd 中自动启动；5) stages 暂用代码构建，后续改 .tres",
+		"created": "2026-05-24T12:58:39",
+		"id": "fact_1779598719",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Quest P2 完成：QuestTracker (CanvasLayer→Control→PanelContainer) 屏幕上方居中显示任务标题(金黄色)和进度(灰色\"2/3\")。QuestManager 信号 quest_started/quest_completed/quest_progress 驱动 UI 更新。任务完成显示\"✅ 任务完成\"2秒后自动隐藏。QuestTracker 需 CanvasLayer 而非 Control（否则随世界相机滚动）",
+		"created": "2026-05-24T13:13:38",
+		"id": "fact_1779599618",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Quest P3 完成：1) CombatEvent.Type 新增 ON_INTERACT；2) Player._try_interact 成功交互后 emit ON_INTERACT via CombatEventBus；3) InteractObjective (匹配 ON_INTERACT + target_tag)；4) QuestManager 同时订阅 ON_KILL + ON_INTERACT；5) 多阶段示例任务 \"清除威胁\"：阶段1 KillObjective(enemy×2)→阶段2 InteractObjective(villager×1)→阶段3 InteractObjective(chest×1)；6) QuestTracker 显示 \"阶段 N/M\" + 进度",
+		"created": "2026-05-24T13:17:10",
+		"id": "fact_1779599830",
+		"source": "ai"
 	}
 ]

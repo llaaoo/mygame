@@ -16,6 +16,7 @@ enum Type {
 	ON_HEAL,            ## 治疗
 	ON_DODGE,           ## 闪避
 	ON_CRIT,            ## 暴击
+	ON_INTERACT,        ## 玩家交互（按E）
 }
 
 ## ── 事件数据 ──

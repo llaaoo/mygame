@@ -2,3 +2,5 @@
 .godot/
 /android/
 .gamedev_ai/history
+/demo/
+/godot_state_charts_examples/

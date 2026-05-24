@@ -97,3 +97,4 @@ ARCHITECTURE.md (宪法 — 六层边界)
 | v1.6 | 2026-05 | PHYSICS_LAYERS.md — 物理层 11 层标准 |
 | v2.0 | 2026-05 | ARCHITECTURE.md — 六层边界模型 + 停止线 |
 | v2.1 | 2026-05 | Action Layer ✅ + WorldObject 7 种 ✅ + NPC 对话 ✅ + Dialogue Manager 集成 |
+| v2.2 | 2026-05 | Enemy StateChart 迁移 ✅ + Quest 系统设计 + 事件驱动统一架构 |

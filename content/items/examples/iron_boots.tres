@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="EquipmentData" format=3 uid="uid://c73q25tl8mfxr"]
+
+[ext_resource type="Script" uid="uid://cfiekyb706cd4" path="res://gameplay/inventory/data/equipment_data.gd" id="1_phd6h"]
+
+[resource]
+script = ExtResource("1_phd6h")
+slot_type = 3
+stat_modifiers = {
+"move_speed": 25.0
+}
+display_name = "铁靴"
+item_type = 1

@@ -1,6 +1,6 @@
 # 🏛️ 项目架构 — 六层边界与工程契约
 
-> **状态**: v2.1 进行中  
+> **状态**: v2.2  
 > **最后更新**: 2026-05-24  
 > **替换**: RUNTIME_TOPOLOGY.md (v1.0–v1.5)
 
@@ -14,9 +14,18 @@
 
 ---
 
-## 一、六层边界
+## 一、六层边界 + 事件总线
 
 ```
+                      CombatEventBus (唯一事件流)
+                     ┌──────────┼──────────┐
+                     ▼          ▼          ▼
+                  Quest     NPCBrain   TriggeredEffect
+                (Condition  (AI状态)    (Buff/反应)
+                 +Counter)
+                     │          │          │
+                     └──────────┼──────────┘
+                                │
                         PlayerInput
                              ↓
                      gameplay/action/
@@ -42,11 +51,20 @@
 | 层 | 职责 | 已实现 |
 |----|------|--------|
 | **core** | 引擎基础设施（状态机、事件总线、命令总线） | StateMachine, CombatEventBus, CombatExecutor, CommandBus |
-| **gameplay** | 游戏规则（Action、战斗、技能、状态、交互、背包） | Action Layer, 6种技能, Modifier管线, Buff系统, 交互框架 |
-| **entities** | Actor + 组件（Player/Enemy/NPC + 组件） | Player(5状态), Enemy(3种), NPC, 4个组件 |
+| **gameplay** | 游戏规则（Action、战斗、技能、状态、交互、背包、任务） | Action Layer, 6种技能, Modifier管线, Buff系统, 交互框架, Quest系统(设计中) |
+| **entities** | Actor + 组件（Player/Enemy/NPC + 组件） | Player(5状态), Enemy(StateChart), NPC(DialogueBalloon), 4个组件 |
 | **world** | 空间系统（地图、物体、传送门、表面、空间索引） | 7种WorldObject, 表面系统, 空间索引, 传送门 |
-| **content** | 纯数据 .tres（技能数据、物品、状态预设、视觉预设） | 技能.tres, 物品.tres, 状态.tres, 视觉.tres |
-| **ui** | HUD / 菜单 / 背包面板 / 技能栏 / 对话气球 | HUD, InventoryPanel, SkillBar, DialogueBalloon |
+| **content** | 纯数据 .tres（技能数据、物品、状态预设、视觉预设、任务配置） | 技能.tres, 物品.tres, 状态.tres, 视觉.tres, 任务.tres(规划中) |
+| **ui** | HUD / 菜单 / 背包面板 / 技能栏 / 对话气球 / 任务追踪 | HUD, InventoryPanel, SkillBar, DialogueBalloon, QuestTracker(规划中) |
+
+### 核心原则：事件驱动统一
+
+```
+World Event → EventBus → Quest / NPCBrain / TriggeredEffect
+```
+
+三套系统监听同一事件流。Quest 本质是 "Condition + Counter" 的 Triggered System。
+QuestManager 极小 — 只做 `for quest in active: quest.on_event(ev)`，不认识任务类型。
 
 ### 依赖方向（铁律）
 
@@ -58,7 +76,7 @@ core     ← 被所有层使用
 ui       → 只读所有层
 ```
 
-**禁止反向**：`gameplay` 不能依赖 `world`，`entities` 不能依赖 `content`。
+**禁止反向**。**禁止系统互相引用**（Quest ↔ Dialogue 通过 EventBus 通信，不直调）。
 
 ---
 
@@ -81,17 +99,38 @@ core/
 ```
 gameplay/
 ├── action/                          ← ✅ Action Layer
-│   └── player_action.gd             # 6 种 Type (纯数据 RefCounted)
+│   └── player_action.gd
 │
 ├── abilities/                       ← 技能系统
 │   ├── archetypes/
-│   ├── data/                        # SkillData + .tres
+│   ├── data/
 │   ├── manager/
-│   ├── registry/                    # SkillPool
-│   ├── runtime/                     # SkillExecutor, Projectile, PersistentAOE
-│   ├── modifiers/                   # FLAT→MULTIPLY→OVERRIDE→FINAL
+│   ├── registry/
+│   ├── runtime/
+│   ├── modifiers/
 │   ├── conditions/
 │   └── triggered_effect.gd
+│
+├── quest/                           ← 🔜 Quest 系统
+│   ├── data/
+│   │   ├── quest_data.gd
+│   │   ├── quest_stage.gd
+│   │   ├── objective.gd
+│   │   └── reward.gd
+│   ├── runtime/
+│   │   ├── quest_runtime.gd
+│   │   ├── objective_runtime.gd
+│   │   └── quest_manager.gd
+│   ├── objectives/
+│   │   ├── kill_objective.gd
+│   │   ├── interact_objective.gd
+│   │   └── reach_region_objective.gd
+│   ├── rewards/
+│   │   ├── give_item_reward.gd
+│   │   └── open_door_reward.gd
+│   └── ui/
+│       ├── quest_tracker.gd
+│       └── quest_journal.gd
 │
 ├── status/
 │   ├── buff.gd
@@ -108,17 +147,31 @@ gameplay/
     └── propagation_scheduler.gd
 ```
 
+### Quest 系统 — 设计中
+
+**核心约束**：
+- QuestManager 极小 — 只做 `for q in active: q.on_event(ev)`
+- Objective 不用 enum，用类继承（KillObjective / InteractObjective）
+- Reward 不用写死，用类继承（GiveItemReward / OpenDoorReward）
+- Quest 与 Dialogue 不互相引用，通过 EventBus 通信
+- Quest 配置全部用 .tres 纯数据，禁止 quest 脚本
+
+**数据流**：
+```
+CombatEventBus.on_event(ev)
+    → QuestManager._on_event(ev)
+    → for quest in active_quests:
+        quest.current_stage.objective.on_event(ev)
+        if objective.completed:
+            stage.complete → reward.apply() → next_stage
+```
+
 ### Action Layer — ✅ 已实现
 
 **数据流**：
 ```
 Input.xxx() → poll_actions() → PlayerAction[] → try_action(action) → StateMachine
 ```
-
-- `PlayerAction`：6 种 Type（MOVE / MELEE / CAST_PRESS / CAST_RELEASE / DODGE / INTERACT）
-- `poll_actions()`：每帧从 Input 生成 Action 数组（纯函数，无副作用）
-- `try_action()`：验证 + 路由到 StateMachine
-- 5 个 state（idle/move/attack/skill/dodge）统一调用 `entity.poll_actions()`
 
 ---
 
@@ -133,89 +186,21 @@ entities/
 │   └── stats_component.gd
 ├── player/
 │   ├── player.tscn
-│   ├── player.gd              # Action Layer + 交互 + 瞄准
-│   └── states/                # Idle/Move/Attack/Dodge/Skill
+│   ├── player.gd
+│   └── states/
 ├── enemy/
 │   ├── enemy.tscn
 │   ├── enemy.gd
-│   └── states/                # Idle/Chase/Attack
-├── npc/
 └── pickups/
-    ├── pickup.gd
-    ├── health_pickup.tscn
-    └── mana_pickup.tscn
 ```
 
-**坚持 Hybrid Component Architecture**，不纯 ECS。
+**Enemy 状态机**：已迁移到 godot_state_charts（StateChart → CompoundState "Brain" → AtomicState Idle/Chase/Attack）。
 
 ---
 
 ## 五、世界层 (world/)
 
-```
-world/
-├── maps/
-│   └── overworld.tscn
-├── object/                    ← WorldObject 体系 ✅
-│   ├── map_object.gd          # 基类（Damageable/Persistent/Taggable）
-│   ├── map_object_data.gd     # 纯数据 Resource
-│   ├── interactable.gd        # 交互接口（Callback 模式）
-│   ├── signal_receiver.gd     # 信号接收接口
-│   ├── switch.gd              # 开关（Interactable → target.receive_signal）
-│   ├── door.gd                # 门（MapObject + SignalReceiver）
-│   ├── chest.gd               # 宝箱（MapObject + Interactable + LootTable）
-│   ├── spike_trap.gd          # 地刺（Area2D, 周期性伤害）
-│   ├── pressure_plate.gd      # 压力板（Area2D, body进入→信号）
-│   ├── npc.gd                 # NPC（Interactable + DialogueBalloon）
-│   ├── dialogue_balloon.gd    # 自定义对话气球
-│   ├── npc_dialogue.gd        # 旧对话数据兼容
-│   ├── portal.gd              # 传送门
-│   ├── oil_barrel.tscn        # 油桶（爆炸+表面）
-│   ├── wooden_crate.tscn      # 木箱
-│   ├── breakable_wall.tscn    # 可破坏墙
-│   └── breakable_wall_data.tres
-├── doors/
-│   ├── door.tscn
-│   ├── door_data.tres
-│   └── door_shape.tres
-├── switches/
-│   ├── switch.tscn
-│   └── pressure_plate.tscn
-├── traps/
-│   ├── spike_trap.tscn
-│   └── trap_shape.tres
-├── loot/
-│   ├── chest.tscn
-│   ├── loot_table.gd
-│   └── loot_entry.gd
-├── npcs/
-│   ├── npc_villager.tscn
-│   └── villager_dialogue.tres
-├── portal.tscn
-├── world_runtime.gd
-├── world_spatial_index.gd
-└── world_state_manager.gd
-```
-
-### WorldObject 体系 ✅ 已实现
-
-**7 种 WorldObject**：
-
-| 类型 | 接口 | 说明 |
-|------|------|------|
-| OilBarrel | MapObject | 破坏连锁爆炸 + 表面生成 |
-| Door | MapObject + SignalReceiver | 开关驱动，可破坏 |
-| Switch | Interactable | 按E → 自动扫描兄弟节点发信号 |
-| Chest | MapObject + Interactable + LootTable | 按E → 随机掉落 |
-| SpikeTrap | Area2D | 进入后周期性伤害 |
-| PressurePlate | Area2D | body进入/离开 → 自动信号 |
-| NPC | Interactable + DialogueBalloon | 按E → 对话气球 |
-| BreakableWall | MapObject | 纯碰撞阻挡，可破坏 |
-
-**交互框架**：
-- `Interactable`：`set_callback(cb)` 模式（Godot 4 不支持 `obj.method = callable`）
-- `SignalReceiver`：`receive_signal(signal_id)` — Switch/PressurePlate 驱动 Door
-- 玩家按 E → `poll_actions()` 生成 INTERACT → `try_action()` → `_try_interact()` 扫描最近 Interactable
+已有 7 种 WorldObject（OilBarrel / Door / Switch / Chest / SpikeTrap / PressurePlate / NPC）+ BreakableWall。详见 [WORLD_CONTRACTS.md](./WORLD_CONTRACTS.md)。
 
 ---
 
@@ -225,88 +210,62 @@ world/
 content/
 ├── items/
 │   ├── player_inventory.tres
-│   └── examples/              # iron_helmet, leather_armor, iron_boots
-└── visuals/
-    ├── fire_visual.tres
-    ├── fire_aoe_visual.tres
-    ├── shadow_visual.tres
-    ├── ice_aoe_visual.tres
-    ├── projectile_visual_data.gd
-    └── aoe_visual_data.gd
+│   └── examples/
+├── visuals/
+│   ├── fire_visual.tres
+│   ├── shadow_visual.tres
+│   └── ...
+└── quests/                    ← 规划中
+    ├── main/
+    └── side/
 ```
 
 ### Content vs Gameplay — 最关键边界
 
 ```
 gameplay/abilities/runtime/   ← 「火球怎么飞」
+gameplay/quest/runtime/        ← 「任务怎么推进」
 content/visuals/               ← 「火球什么颜色」
-content/items/                 ← 「物品什么属性」
-```
-
-**Content 是纯数据，零运行时代码。**
-
----
-
-## 七、UI 层 (ui/)
-
-```
-ui/
-├── hud.tscn
-├── hud.gd
-├── inventory_panel.tscn
-└── (SkillBar, SkillPoolUI, DialogueBalloon 由代码构建)
+content/quests/                ← 「任务目标是什么」
 ```
 
 ---
 
-## 八、当前状态 & 下一阶段优先级
+## 七、当前状态 & 下一阶段优先级
 
 | 状态 | 任务 | 说明 |
 |:--:|------|------|
-| ✅ | **WorldObject 体系** | 7 种物体 + 交互框架 + 对话气球 |
-| ✅ | **Action Layer 收敛** | 5 state 统一走 poll_actions/try_action |
-| ✅ | **v2.0 目录迁移** | 六层目录对应关系已部署 |
-| 🔜 | **Region System** | 区域驱动世界（dungeon 关卡） |
-| 🔜 | **Loot Pipeline** | 掉落表 → 物品实例化链路 |
-| 🔜 | **Content Pipeline** | 快速量产 dungeon/野外/Boss 内容 |
+| ✅ | WorldObject 体系 | 7 种物体 + 交互框架 |
+| ✅ | Action Layer 收敛 | 5 state 统一走 poll_actions/try_action |
+| ✅ | Enemy StateChart 迁移 | godot_state_charts |
+| 🔜 | **Quest 系统 P1** | QuestData + QuestRuntime + Kill/Interact Objective |
+| 🔜 | Region System | 区域驱动世界 |
+| 🔜 | Quest 系统 P2 | Reward + Quest UI + 地图标记 |
 | ⚪ 不做 | 技能系统继续抽象 | 已经够了 |
-| ⚪ 不做 | 纯 ECS | Godot 不适合 |
+| ⚪ 不做 | Quest Script DSL | 用 .tres 纯数据 |
 
 ---
 
-## 九、停止线
+## 八、停止线
 
 **不要再扩展的方向**：
-- 新技能类型 / Modifier / Condition / GraphNode / 事件类型
-- 新表面状态（现有 5 个已覆盖所有需求）
-- AbilityNode / BehaviorTree / DSL（为了抽象而抽象）
+- 新技能类型 / Modifier / Condition / GraphNode
+- AbilityNode / BehaviorTree / DSL / Quest Script
+- Quest ↔ Dialogue 互相引用
 
 **应该投入的方向**：
-- 用现有积木搭可玩关卡（dungeon / 野外 / Boss 房）
-- Loot Pipeline（掉落表 → 物品实例化 → 背包）
-- Content Pipeline（设计师 2 小时配一个地牢）
+- Quest 系统 P1（纯数据驱动任务）
+- 用现有积木搭可玩关卡
+- Content Pipeline（设计师 2 小时配一个地牢 + 任务链）
 
 ---
 
-## 十、与下层文档的关系
-
-```
-ARCHITECTURE.md (本文档 — 最高级)
-    │
-    ├──► COMBAT_CONTRACTS.md (CombatRuntime 内部 12 条契约)
-    ├──► WORLD_CONTRACTS.md  (WorldRuntime 内部 9 条契约)
-    ├──► PHYSICS_LAYERS.md   (11 层物理标准)
-    └──► skill_architecture.md (技能内容生产方式)
-```
-
----
-
-## 十一、工程判断标准
+## 九、工程判断标准
 
 | 不是 | 而是 |
 |------|------|
 | 系统有多高级 | 能否低成本产出内容 |
 | 功能多少 | 三个验证场景是否通过 |
-| Modifier 数量 | 设计师能否 2 小时配一个地牢 |
+| 任务类型枚举多少 | 一个 .tres 配一个任务够不够快 |
 
-> **Runtime 是「怎么运行」，Content 是「有什么内容」。只要这条边界不混，项目后期就不会崩。**
+> **Runtime 是「怎么运行」，Content 是「有什么内容」。Quest 不是脚本，是数据。**

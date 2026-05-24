@@ -308,6 +308,9 @@ func _setup_event_bus() -> void:
 	# 战斗调试器
 	_setup_combat_debugger()
 
+	# QuestManager（接在 EventBus 之后）
+	_setup_quest_manager()
+
 
 func _register_triggered_effects(effect: TriggeredEffect) -> void:
 	effect.register()
@@ -378,6 +381,82 @@ func _setup_combat_debugger() -> void:
 	var debug_ui := CombatDebugUI.new()
 	debug_ui.name = "CombatDebugUI"
 	get_tree().current_scene.add_child.call_deferred(debug_ui)
+
+
+## ── Quest 系统 ──
+
+var quest_manager: QuestManager = null
+
+
+func _setup_quest_manager() -> void:
+	if quest_manager:
+		return
+	quest_manager = QuestManager.new()
+	quest_manager.name = "QuestManager"
+	get_tree().current_scene.add_child.call_deferred(quest_manager)
+
+	# 任务追踪 UI
+	var tracker := QuestTracker.new()
+	tracker.name = "QuestTracker"
+	get_tree().current_scene.add_child.call_deferred(tracker)
+	call_deferred("_setup_quest_tracker", tracker)
+
+	# 示例任务: 击杀 3 个敌人
+	call_deferred("_start_test_quest")
+
+
+func _setup_quest_tracker(tracker: QuestTracker) -> void:
+	tracker.setup(quest_manager)
+
+
+func _start_test_quest() -> void:
+	# 给 NPC 和宝箱打标签（供 InteractObjective 匹配）
+	_tag_quest_objects()
+
+	var data := load("res://content/quests/kill_enemies_quest.tres") as QuestData
+	if not data:
+		return
+
+	# 阶段 1: 击败 2 个敌人
+	var stage1 := QuestStageData.new()
+	stage1.stage_id = "hunt"
+	var obj1 := KillObjective.new()
+	obj1.target_tag = "enemy"
+	obj1.required_count = 2
+	obj1.track_from_start = false  # 击杀只在当前阶段计数
+	stage1.objectives.append(obj1)
+	data.stages.append(stage1)
+
+	# 阶段 2: 与村民对话
+	var stage2 := QuestStageData.new()
+	stage2.stage_id = "talk"
+	var obj2 := InteractObjective.new()
+	obj2.target_tag = "villager"
+	obj2.required_count = 1
+	stage2.objectives.append(obj2)
+	data.stages.append(stage2)
+
+	# 阶段 3: 打开宝箱
+	var stage3 := QuestStageData.new()
+	stage3.stage_id = "loot"
+	var obj3 := InteractObjective.new()
+	obj3.target_tag = "chest"
+	obj3.required_count = 1
+	stage3.objectives.append(obj3)
+	data.stages.append(stage3)
+
+	quest_manager.start_quest(data)
+
+
+func _tag_quest_objects() -> void:
+	# 给场景中的 NPC 和 Chest 加 quest 标签
+	for node in get_tree().get_nodes_in_group("interactable"):
+		if node.is_in_group("villager") or node.is_in_group("chest"):
+			continue
+		if node.name.begins_with("NPC"):
+			node.add_to_group("villager")
+		elif node.name.begins_with("Chest"):
+			node.add_to_group("chest")
 
 
 ## ── Action Layer ── 统一输入 → 意图 → 执行 ──
@@ -528,6 +607,10 @@ func _try_interact() -> void:
 		var interactable := nearest.get_node_or_null("Interactable") as Interactable
 		if interactable:
 			interactable.interact(self)
+			# 发射交互事件（供 Quest 等系统监听）
+			if CombatEventBus.instance:
+				var ev := CombatEvent.create(CombatEvent.Type.ON_INTERACT, self, nearest)
+				CombatEventBus.instance.emit(ev)
 
 
 ## ── 信号转发 ──

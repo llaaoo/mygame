@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="QuestData" format=3 uid="uid://i3uius1slaha"]
+
+[ext_resource type="Script" uid="uid://dhf7hidl0pv7d" path="res://gameplay/quest/data/quest_data.gd" id="1_kvhdh"]
+[ext_resource type="Script" uid="uid://ptvcx8j64iic" path="res://gameplay/quest/data/quest_stage.gd" id="2_mv1hw"]
+
+[resource]
+script = ExtResource("1_kvhdh")
+quest_id = "side_001"
+title = "清除威胁"
+description = "击败 3 个敌人"

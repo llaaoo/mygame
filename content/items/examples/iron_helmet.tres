@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="EquipmentData" format=3 uid="uid://caq0qlv6ohvl7"]
+
+[ext_resource type="Script" uid="uid://cfiekyb706cd4" path="res://gameplay/inventory/data/equipment_data.gd" id="1_m3uoe"]
+
+[resource]
+script = ExtResource("1_m3uoe")
+stat_modifiers = {
+"max_hp": 15.0
+}
+display_name = "铁头盔"
+item_type = 1

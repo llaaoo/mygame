@@ -37,11 +37,11 @@ I previously published an [add-on for importing Aseprite files](https://github.c
 - Adding recognition of source graphic files as images to Godot with all the standard features for importing them (for animated files, only the first frame will be imported).
 - Support for Aseprite (and LibreSprite), Krita, Pencil2D, Piskel and Pixelorama files. Other formats may be supported in the future.
 - Import files as:
-     - Atlas of sprites (sprite sheet) - texture with metadata;
-     - `SpriteFrames` resource to create your own `AnimatedSprite2D` and `AnimatedSprite3D` based on it;
-     - `PackedScene`'s with ready-to-use `Node`'s:
-         - `AnimatedSprite2D` and `AnimatedSprite3D`
-         - `Sprite2D`, `Sprite3D` and `TextureRect` animated with `AnimationPlayer`
+	 - Atlas of sprites (sprite sheet) - texture with metadata;
+	 - `SpriteFrames` resource to create your own `AnimatedSprite2D` and `AnimatedSprite3D` based on it;
+	 - `PackedScene`'s with ready-to-use `Node`'s:
+		 - `AnimatedSprite2D` and `AnimatedSprite3D`
+		 - `Sprite2D`, `Sprite3D` and `TextureRect` animated with `AnimationPlayer`
 - Several artifacts avoiding methods on the edges of sprites.
 - Grid-based and packaged layout options for sprite sheets.
 - Several node animation strategies with `AnimationPlayer`.
@@ -59,11 +59,11 @@ I previously published an [add-on for importing Aseprite files](https://github.c
 ## 💽 How to install
 
 1. Install it from [Godot Asset Library](https://godotengine.org/asset-library/asset/2025) or:
-    - Clone this repository or download its contents as an archive.
-    - Place the contents of the `addons` folder of the repository into the `addons` folder of your project.
+	- Clone this repository or download its contents as an archive.
+	- Place the contents of the `addons` folder of the repository into the `addons` folder of your project.
 1. Adjust the settings in `Editor Settings` -> `Importality`
-     - [Specify a directory for temporary files](https://github.com/nklbdev/godot-4-importality/wiki/about-temporary-files-and-ram_drives-(en)).
-     - Specify the command and its parameters to launch your editor in data export mode, if necessary. How to configure settings for your graphical application, see the corresponding article on the [wiki](https://github.com/nklbdev/godot-4-importality/wiki).
+	 - [Specify a directory for temporary files](https://github.com/nklbdev/godot-4-importality/wiki/about-temporary-files-and-ram_drives-(en)).
+	 - Specify the command and its parameters to launch your editor in data export mode, if necessary. How to configure settings for your graphical application, see the corresponding article on the [wiki](https://github.com/nklbdev/godot-4-importality/wiki).
 
 ## 👷 How to use
 
@@ -93,11 +93,11 @@ If you know how another graphics format works, or how to use the CLI of another 
 - Textual description of the format or CLI operation.
 - [Pull request](https://github.com/nklbdev/godot-4-importality/pulls) with new exporter.
 - A temporary or permanent license for paid software to be able to study it and create an exporter. For example for:
-     - [Adobe Photoshop](https://www.adobe.com/products/photoshop.html)
-     - [Adobe Animate](https://www.adobe.com/products/animate.html)
-     - [Adobe Character Animator](https://www.adobe.com/products/character-animator.html)
-     - [Affinity Photo](https://affinity.serif.com/photo)
-     - [Moho Debut](https://moho.lostmarble.com/products/moho-debut) / [Moho Pro](https://moho.lostmarble.com/products/moho-pro)
-     - [Toon Boom Harmony](https://www.toonboom.com/products/harmony)
-     - [PyxelEdit](https://pyxeledit.com)
-     - and others
+	 - [Adobe Photoshop](https://www.adobe.com/products/photoshop.html)
+	 - [Adobe Animate](https://www.adobe.com/products/animate.html)
+	 - [Adobe Character Animator](https://www.adobe.com/products/character-animator.html)
+	 - [Affinity Photo](https://affinity.serif.com/photo)
+	 - [Moho Debut](https://moho.lostmarble.com/products/moho-debut) / [Moho Pro](https://moho.lostmarble.com/products/moho-pro)
+	 - [Toon Boom Harmony](https://www.toonboom.com/products/harmony)
+	 - [PyxelEdit](https://pyxeledit.com)
+	 - and others
