@@ -15,18 +15,18 @@ func physics_update(delta: float) -> void:
 		return
 	attack_timer += delta
 
-	var actions: Array = entity.poll_actions()
+	var actions: Array = entity.poll_universal_actions()
 	var has_move := false
 
 	for action in actions:
-		match action.type:
-			PlayerAction.Type.MOVE:
+		match action.action_type:
+			Action.ActionType.MOVE:
 				has_move = true
 				entity.velocity = action.direction * entity.move_speed * 0.6
 				entity.move_and_slide()
 				entity.facing_direction = action.direction
-			PlayerAction.Type.DODGE:
-				entity.try_action(action)
+			Action.ActionType.DODGE:
+				entity.resolve_action(action)
 				return
 
 	if attack_timer >= attack_duration:

@@ -90,16 +90,66 @@ func _setup_state_chart() -> void:
 	var chase := brain.get_node("Chase") as AtomicState
 	var attack := brain.get_node("Attack") as AtomicState
 
-	# Idle 状态
 	idle.state_physics_processing.connect(_on_idle_physics)
-
-	# Chase 状态
 	chase.state_physics_processing.connect(_on_chase_physics)
-
-	# Attack 状态
 	attack.state_entered.connect(_on_attack_enter)
 	attack.state_physics_processing.connect(_on_attack_physics)
 
+
+## ── Action Layer ── Enemy 通过通用 Action 表达意图，与 Player/NPC 同构 ──
+
+## 产生当前上下文下的 Action 列表
+func poll_actions() -> Array[Action]:
+	var actions: Array[Action] = []
+
+	if not player or player.health_component.is_dead:
+		return actions
+
+	match _current_state_name():
+		"Chase":
+			# 向玩家移动
+			actions.append(Action.move(get_player_direction(), self))
+			# 远程施法（冷却允许时）
+			if skill_manager and skill_manager.can_use("right"):
+				actions.append(Action.cast("right", get_player_direction(), self))
+		"Attack":
+			# 近战攻击（冷却允许时）
+			if attack_ready and _attack_timer >= attack_cooldown:
+				actions.append(Action.melee(self))
+
+	return actions
+
+
+## 通用 Action 路由（与 Player.resolve_action 同构）
+## 执行前统一通过 ActionResolver 验证
+func resolve_action(action: Action) -> void:
+	# 统一验证（cooldown / mp / alive）
+	if not ActionResolver.validate(self, action):
+		return
+
+	match action.action_type:
+		Action.ActionType.MOVE:
+			velocity = action.direction * move_speed
+			move_and_slide()
+
+		Action.ActionType.CAST:
+			skill_manager.use_hand(action.skill_source, self, action.direction)
+
+		Action.ActionType.MELEE:
+			_do_melee_attack()
+
+
+func _current_state_name() -> String:
+	var brain := state_chart.get_node("Brain") as CompoundState
+	if not brain:
+		return ""
+	for child in brain.get_children():
+		if child is AtomicState and child.active:
+			return child.name
+	return ""
+
+
+## ── StateChart 状态处理器（只负责：1.环境感知 → 2.发送事件 → 3.调用 poll/resolve） ──
 
 func _on_idle_physics(_delta: float) -> void:
 	if not player or player.health_component.is_dead:
@@ -123,19 +173,15 @@ func _on_chase_physics(_delta: float) -> void:
 		state_chart.send_event("player_lost")
 		return
 
-	if skill_manager and skill_manager.can_use("right"):
-		var dir := get_player_direction()
-		skill_manager.use_hand("right", self, dir)
-
-	var dir := get_player_direction()
-	velocity = dir * move_speed
-	move_and_slide()
+	# 通过通用 Action 表达意图 + 执行
+	var actions := poll_actions()
+	for action in actions:
+		resolve_action(action)
 
 
 func _on_attack_enter() -> void:
 	_attack_timer = 0.0
 	velocity = Vector2.ZERO
-	_do_melee_attack()
 
 
 func _on_attack_physics(delta: float) -> void:
@@ -150,9 +196,11 @@ func _on_attack_physics(delta: float) -> void:
 		state_chart.send_event("player_out_of_range")
 		return
 
-	if _attack_timer >= attack_cooldown:
-		_attack_timer = 0.0
-		_do_melee_attack()
+	# 通过通用 Action 表达意图 + 执行
+	var actions := poll_actions()
+	for action in actions:
+		resolve_action(action)
+		_attack_timer = 0.0  # 攻击后重置计时器
 
 
 func _do_melee_attack() -> void:

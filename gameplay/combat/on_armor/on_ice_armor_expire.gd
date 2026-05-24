@@ -10,6 +10,9 @@ extends TriggeredEffect
 ## 消失时释放的技能路径（res://...）
 @export var unleash_skill_path: String = "res://gameplay/abilities/data/ice_explosion_data.tres"
 
+## 是否消耗 MP（默认 false：触发式效果是技能总包的一部分，已在施放 buff 时付费）
+@export var consume_mp: bool = false
+
 
 static func create_default() -> OnIceArmorExpire:
 	var effect := OnIceArmorExpire.new()
@@ -34,6 +37,12 @@ func _execute(ev: CombatEvent) -> void:
 	if not skill:
 		push_warning("[OnIceArmorExpire] 无法加载技能: %s" % unleash_skill_path)
 		return
+
+	# 可选 MP 消耗（默认 false：触发式效果已在施放 buff 时付费）
+	if consume_mp and skill.mp_cost > 0:
+		var mana := caster.get_node_or_null("ManaComponent") as ManaComponent
+		if mana and not mana.use_mp(skill.mp_cost):
+			return  # MP 不足，跳过
 
 	var executor := _find_executor(caster)
 	if not executor:

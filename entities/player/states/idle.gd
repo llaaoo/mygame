@@ -16,14 +16,14 @@ func physics_update(_delta: float) -> void:
 		entity.aiming_sources.clear()
 		entity.hide_aim()
 
-	var actions: Array = entity.poll_actions()
+	var actions: Array = entity.poll_universal_actions()
 
 	for action in actions:
-		match action.type:
-			PlayerAction.Type.MOVE:
+		match action.action_type:
+			Action.ActionType.MOVE:
 				transitioned.emit(self, "move")
 				return
-			PlayerAction.Type.INTERACT, PlayerAction.Type.DODGE, PlayerAction.Type.MELEE:
-				entity.try_action(action)
-			PlayerAction.Type.CAST_PRESS, PlayerAction.Type.CAST_RELEASE:
-				entity.try_action(action)
+			Action.ActionType.INTERACT, Action.ActionType.DODGE, Action.ActionType.MELEE:
+				entity.resolve_action(action)
+			Action.ActionType.CAST:
+				entity.resolve_action(action)

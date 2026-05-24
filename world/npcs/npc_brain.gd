@@ -27,16 +27,32 @@ func tick(_delta: float) -> void:
 	_execute_entry(entry)
 
 
+## 将日程条目转换为通用 Action（统一 Player/NPC/Enemy 的意图表达）
+func make_action(entry: ScheduleEntry) -> Action:
+	if not entry:
+		return Action.idle()
+	match entry.action_type:
+		"move":
+			return Action.move(MarkerRegistry.get_position(entry.target_marker) - _npc.global_position, _npc)
+		"idle":
+			return Action.idle()
+		"wander":
+			return Action.idle()  # P2 实现
+	return Action.idle()
+
+
 func _execute_entry(entry: ScheduleEntry) -> void:
 	if not entry:
 		return
-	match entry.action_type:
-		"move":
+	# 产生通用 Action（与 Player._poll_universal_actions 输出相同类型）
+	var action := make_action(entry)
+	match action.action_type:
+		Action.ActionType.MOVE:
 			_start_move(entry.target_marker)
-		"idle":
+		Action.ActionType.IDLE:
 			pass  # P1: 原地不动
-		"wander":
-			pass  # P2 实现
+		_:
+			pass  # P2 实现其他类型
 
 
 func _start_move(marker_id: String) -> void:

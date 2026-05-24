@@ -894,5 +894,26 @@
 		"created": "2026-05-24T16:28:44",
 		"id": "fact_1779611324",
 		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "P1 Action Layer 统一完成基础体系。新建 gameplay/action/action.gd — 通用 Action 类含 7 种 ActionType（IDLE/MOVE/MELEE/CAST/INTERACT/DODGE/USE_ITEM）+ 快捷静态构造。Player 5 个 State 全部迁移到 poll_universal_actions() + resolve_action()，使用 Action.ActionType 枚举。NPCBrain 新增 make_action() 将 ScheduleEntry 转换为 Action。旧 PlayerAction/poll_actions/try_action 保留为 @deprecated 向后兼容。下一步：Enemy StateChart 产生 Action、Boss Behavior 产生 Action、ActionResolver 统一验证。",
+		"created": "2026-05-24T16:51:36",
+		"id": "fact_1779612696",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Enemy StateChart 已接入统一 Action 体系。新增 poll_actions() 和 resolve_action()，与 Player/NPCBrain 同构。StateChart 状态处理器现在只负责：环境感知→发送事件→调用 poll/resolve。Chase 状态产生 MOVE+CAST Action，Attack 状态产生 MELEE Action。resolve_action 路由：MOVE→velocity+move_and_slide，CAST→skill_manager，MELEE→_do_melee_attack。Player/Enemy/NPCBrain 三者现在通过同一个 Action 类型表达意图。",
+		"created": "2026-05-24T16:56:18",
+		"id": "fact_1779612978",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "ActionResolver 完成。新建 gameplay/action/action_resolver.gd — RefCounted 纯计算节点，static validate(entity, action) → Result(ok, reason)。统一验证：存活检查、CAST 的 MP+冷却、MOVE 的 CharacterBody2D 检查。Player.resolve_action() 和 Enemy.resolve_action() 均已接入。新增 Action 类型只需在 ActionResolver 加一个 _validate_* 方法。",
+		"created": "2026-05-24T16:59:51",
+		"id": "fact_1779613191",
+		"source": "ai"
 	}
 ]

@@ -225,6 +225,8 @@ func _setup_skills() -> void:
 						skill.aoe_visual = load("res://content/visuals/ice_aoe_visual.tres")
 						skill.damage = 25
 						skill.damage_scaling = 0.8
+						skill.mp_cost = 20
+						skill.cooldown = 8.0
 						skill.tags = ["ice", "aoe"]
 				_skill_pool.add_skill(skill)
 
@@ -478,8 +480,109 @@ func _tag_quest_objects() -> void:
 
 
 ## ── Action Layer ── 统一输入 → 意图 → 执行 ──
+##
+## 双轨过渡:
+##   poll_actions()          → PlayerAction (旧, @deprecated)
+##   poll_universal_actions() → Action      (新, Player/NPC/Enemy 统一)
+##   try_action()            → PlayerAction (旧)
+##   resolve_action()        → Action      (新)
 
 const INTERACT_RANGE: float = 80.0
+
+
+## ── 新 API: 通用 Action ──
+
+## 每帧产生通用 Action 列表（Player/NPC/Enemy/Boss 共享此类型）
+func poll_universal_actions() -> Array[Action]:
+	if ui_blocked or health_component.is_dead:
+		return []
+
+	var actions: Array[Action] = []
+
+	# 移动
+	var input_dir := Input.get_vector("move_left", "move_right", "move_up", "move_down")
+	if input_dir.length() > 0.05:
+		actions.append(Action.move(input_dir, self))
+
+	# 闪避
+	if Input.is_action_just_pressed("dodge"):
+		actions.append(Action.dodge(input_dir if input_dir.length() > 0.1 else facing_direction, self))
+
+	# 近战（左键 = 无左手技能时直接近战）
+	if Input.is_action_just_pressed("attack") and not skill_manager.has_left_spell():
+		actions.append(Action.melee(self))
+
+	# 技能（左手/右手/快捷键1-4）
+	for pair in [["left", "attack"], ["right", "skill"]]:
+		_poll_universal_cast(actions, pair[0], pair[1])
+	for i in range(4):
+		_poll_universal_cast(actions, "slot_%d" % i, "skill_%d" % (i + 1))
+
+	# 交互
+	if Input.is_action_just_pressed("interact"):
+		actions.append(Action.interact(self))
+
+	return actions
+
+
+func _poll_universal_cast(actions: Array[Action], source: String, input_action: String) -> void:
+	if not _can_cast_source(source):
+		return
+	if Input.is_action_just_pressed(input_action):
+		var a := Action.cast(source, get_mouse_direction(), self)
+		a.skill_source = source  # CAST_PRESS
+		actions.append(a)
+	elif Input.is_action_just_released(input_action):
+		var a := Action.cast(source, get_mouse_direction(), self)
+		a.skill_source = source
+		a.params["release"] = true  # CAST_RELEASE
+		actions.append(a)
+
+
+## 通用 Action 路由（替代 try_action）
+## 执行前统一通过 ActionResolver 验证
+func resolve_action(action: Action) -> void:
+	# 统一验证（CAST 的验证在 CAST_RELEASE 分支内单独处理，CAST_PRESS 不验证）
+	if action.action_type != Action.ActionType.CAST:
+		if not ActionResolver.validate(self, action):
+			return
+
+	match action.action_type:
+		Action.ActionType.MELEE:
+			aiming_sources.clear()
+			hide_aim()
+			state_machine.transition_to("attack")
+
+		Action.ActionType.DODGE:
+			state_machine.transition_to("dodge")
+
+		Action.ActionType.INTERACT:
+			_try_interact()
+
+		Action.ActionType.CAST:
+			if action.params.get("release", false):
+				# CAST_RELEASE — 验证后才执行
+				if not ActionResolver.validate(self, action):
+					# MP/冷却不足，清除瞄准但不执行
+					aiming_sources.erase(action.skill_source)
+					if aiming_sources.is_empty():
+						hide_aim()
+					return
+				if aiming_sources.has(action.skill_source):
+					aiming_sources.erase(action.skill_source)
+					_cast_source(action.skill_source)
+					state_machine.transition_to("skill")
+				if aiming_sources.is_empty():
+					hide_aim()
+			else:
+				# CAST_PRESS — 总是显示瞄准（不验证 MP，让玩家看到后再判断）
+				aiming_sources[action.skill_source] = true
+				var skill := _get_skill_for_source(action.skill_source)
+				if skill:
+					show_aim(action.skill_source, skill)
+
+
+## ── 旧 API: PlayerAction (@deprecated, 保留向后兼容) ──
 
 ## 每帧从原始 Input 产生 Action 列表（供各 State 调用）
 func poll_actions() -> Array[PlayerAction]:
