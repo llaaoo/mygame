@@ -325,5 +325,5 @@ func _spawn_drop() -> void:
 	if not drop_scene:
 		return
 	var drop = drop_scene.instantiate()
-	get_tree().current_scene.add_child.call_deferred(drop)
+	get_parent().add_child.call_deferred(drop)
 	drop.global_position = global_position

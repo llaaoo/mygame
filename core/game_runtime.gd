@@ -88,6 +88,12 @@ func _setup_runtimes() -> void:
 	# === WorldTime 也归 GameRuntime 管理 ===
 	_setup_world_time()
 
+	# === SaveRuntime — F5 保存 / F9 读取 ===
+	if not has_node("SaveManager"):
+		var sv := SaveManager.new()
+		sv.name = "SaveManager"
+		add_child(sv)
+
 	print("🏛️ GameRuntime: 五大 Runtime 初始化完成")
 	print("   CommandBus       : %s" % ("✅" if command_bus else "❌"))
 	print("   CombatExecutor   : %s" % ("✅" if combat_executor else "❌"))

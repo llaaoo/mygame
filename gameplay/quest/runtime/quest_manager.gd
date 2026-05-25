@@ -65,3 +65,13 @@ func get_active_quests() -> Array[QuestRuntime]:
 
 func is_completed(quest_id: String) -> bool:
 	return _completed_quests.has(quest_id)
+
+
+## 设置已完成任务列表（供 SaveManager 恢复）
+func set_completed_quests(ids: Array[String]) -> void:
+	_completed_quests = ids.duplicate()
+
+
+## 获取已完成任务列表（供 SaveManager 序列化）
+func get_completed_quests() -> Array[String]:
+	return _completed_quests.duplicate()

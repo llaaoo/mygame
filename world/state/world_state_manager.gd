@@ -51,6 +51,16 @@ func get_state(object_id: String) -> Dictionary:
 	return _object_states.get(object_id, {})
 
 
+## 获取全部状态快照（供 SaveManager 序列化）
+func get_all_states() -> Dictionary:
+	return _object_states.duplicate()
+
+
+## 批量恢复状态（供 SaveManager 反序列化）
+func set_all_states(data: Dictionary) -> void:
+	_object_states = data.duplicate()
+
+
 ## 获取区域内所有状态
 func get_states_in_radius(pos: Vector2, radius: float, spatial_index: WorldSpatialIndex) -> Dictionary:
 	var result := {}
