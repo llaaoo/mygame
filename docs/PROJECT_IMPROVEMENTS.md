@@ -17,7 +17,7 @@
 | P1.1 SimulationRuntime 调度收敛 | ✅ |
 | P1.2 物理层核对 | ✅ |
 | P1.3 Action Layer 统一 | ✅ |
-| P1.4 文档路径同步 | ⬜ |
+| P1.4 文档路径同步 | ✅ |
 | P2.1 场景验证 | 🔄 burning_forest 有雏形 |
 | P2.2 README | ⬜ |
 | P2.3 坏资源/孤儿文件清理 | ✅ |

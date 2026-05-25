@@ -336,10 +336,91 @@ Projectile
 
 ---
 
-## 六、文件结构（最终收敛版）
+## 六、文件结构（v2.5 实际结构）
+
+> **迁移说明**: 原"最终收敛版"以 `res://runtime/` 为单根，实际演进为多根结构。  
+> `core/`（Runtime 基础设施）、`gameplay/`（战斗+技能+状态）、`world/`（WorldRuntime+地图）并行。
 
 ```
-res://runtime/
+res://core/                        ← Runtime 基础设施
+├── game_runtime.gd                # 顶层 GameRuntime
+├── command/
+│   ├── command_bus.gd             # RuntimeCommand 总线
+│   └── runtime_command.gd         # RuntimeCommand Resource
+├── event/
+│   ├── combat_event.gd
+│   ├── combat_event_bus.gd
+│   └── combat_scope.gd
+├── state/
+│   ├── state.gd
+│   └── state_machine.gd
+└── debug/
+    ├── combat_debugger.gd
+    ├── combat_debug_ui.gd
+    └── combat_trace.gd
+
+res://gameplay/                    ← 游戏逻辑
+├── abilities/                     ← 技能系统
+│   ├── archetypes/
+│   ├── data/                      # SkillData .tres
+│   ├── runtime/                   # SkillExecutor, Projectile, CastContext
+│   ├── manager/                   # SkillManager
+│   ├── registry/                  # SkillPool
+│   ├── loadout/                   # SkillLoadout
+│   └── effect_graph/
+├── combat/                        ← 战斗核心
+│   ├── combat_executor.gd
+│   ├── combat_phase.gd
+│   ├── triggered_effect.gd
+│   ├── modifiers/
+│   └── conditions/
+├── status/
+│   ├── buff.gd
+│   └── buff_manager.gd
+├── inventory/
+│   ├── inventory.gd
+│   └── equipment_manager.gd
+├── quest/
+│   ├── data/
+│   ├── runtime/
+│   └── objectives/
+├── interaction/
+│   ├── simulation_runtime.gd
+│   ├── surface_manager.gd
+│   ├── surface_scheduler.gd
+│   ├── propagation_scheduler.gd
+│   └── respawn_scheduler.gd
+└── action/
+    ├── action.gd
+    ├── action_resolver.gd
+    └── player_action.gd          ← @deprecated
+
+res://world/                       ← 世界层
+├── world_runtime.gd
+├── state/world_state_manager.gd
+├── spatial/world_spatial_index.gd
+├── object/
+│   ├── map_object.gd
+│   ├── map_object_data.gd
+│   ├── interactable.gd
+│   └── signal_receiver.gd
+├── time/world_time.gd
+├── npcs/
+│   ├── npc_brain.gd
+│   └── move_to_task.gd
+└── markers/
+
+## 六-B、依赖方向（铁律）
+
+```
+simulation/  ──→  world/ (通过 CommandBus)
+world/       ──→  combat/ (通过 CommandBus)
+combat/      ──→  (无依赖，纯计算)
+ui/          ──→  (只读所有 Runtime)
+save/        ──→  world/ + combat/ (只读状态)
+```
+
+**禁止反向**：`combat/` 不能依赖 `world/`，`world/` 不能依赖 `simulation/`。
 ├── game_runtime.gd              # 顶层 GameRuntime
 ├── command_bus.gd               # RuntimeCommand 总线 (预留)
 ├── runtime_command.gd           # RuntimeCommand Resource

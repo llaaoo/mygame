@@ -44,6 +44,8 @@ func tick(delta: float) -> void:
 
 
 func _get_damage_targets() -> Array[Node2D]:
+	if not is_inside_tree():
+		return []
 	var targets: Array[Node2D] = []
 	for group_name in ["player", "enemy"]:
 		for node in get_tree().get_nodes_in_group(group_name):

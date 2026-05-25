@@ -120,3 +120,4 @@ PROJECT_ANALYSIS.md (完整项目分析 — 架构评估 + 文件功能清单 + 
 | v2.3 | 2026-05 | Quest P1-P3 ✅ + NPC Schedule P1 ✅ + NPC 五层架构 + FSM 铁律 + Enemy/NPC 分离 |
 | v2.4 | 2026-05 | PROJECT_ANALYSIS.md — 全项目文件功能清单 + 架构评估 + P0/P1/P2 迭代建议 |
 | v2.5 | 2026-05 | P0 完成 + P1.1/P1.2/P1.3 完成 — CombatExecutor 权威、CommandBus 路由、Respawn 闭环、SimulationRuntime 收敛、物理层标准化、Action Layer 统一 |
+| v2.6 | 2026-05 | P1.4 完成 — COMBAT_CONTRACTS.md / skill_architecture.md / RUNTIME_TOPOLOGY.md 路径同步至实际目录结构 |

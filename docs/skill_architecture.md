@@ -53,10 +53,13 @@ Scene 数: < 10
 
 ## 当前架构 (v1.3)
 
-### 文件结构
+### 文件结构（v2.5 更新）
+
+> 旧路径: `res://skills/` → 新: `res://gameplay/abilities/`  
+> 旧路径: `res://runtime/combat/skills/` → 新: `res://gameplay/abilities/` + `res://gameplay/combat/`
 
 ```
-res://skills/
+res://gameplay/abilities/
 ├── archetypes/                    # Runtime 行为模板（< 10 个）
 │   ├── linear_projectile.tscn     # 直线投射物
 │   └── persistent_aoe.tscn        # 持久范围效果
@@ -64,24 +67,28 @@ res://skills/
 ├── data/                          # SkillData .tres（200+ 个）
 │   ├── fireball_data.tres
 │   ├── shadow_bolt_data.tres
-│   ├── flame_storm_data.tres
 │   └── ...
 │
-└── visuals/                       # 表现层 Resource (未来)
-    └── projectile_visual_data.gd
-
-res://runtime/combat/skills/
-├── runtime/
+├── runtime/                       # 运行时
 │   ├── skill_executor.gd          # _ARCHETYPE_SCENES 映射 + execute()
 │   ├── projectile.gd              # setup(skill, caster, dir) 驱动
 │   ├── skill_instance.gd          # 冷却包装
 │   └── cast_context.gd
-├── data/
-│   └── skill_data.gd              # 纯数据 Resource
+│
 ├── manager/
 │   └── skill_manager.gd
+│
+├── registry/                      # SkillPool
+├── loadout/                       # SkillLoadout
+└── visuals/                       # 表现层 Resource
+
+res://gameplay/combat/
+├── combat_executor.gd             # 唯一控制流入口
+├── combat_phase.gd                # 阶段锁
 ├── modifiers/                     # 伤害管线
-└── conditions/                    # 条件判断
+├── conditions/                    # 条件判断
+├── triggered_effect.gd
+└── effect_graph/                  # 效果图
 ```
 
 ### SkillData 关键字段
@@ -113,8 +120,8 @@ res://runtime/combat/skills/
 
 ```gdscript
 const _ARCHETYPE_SCENES := {
-    "linear_projectile": "res://skills/archetypes/linear_projectile.tscn",
-    "persistent_aoe":     "res://skills/archetypes/persistent_aoe.tscn",
+    "linear_projectile": "res://gameplay/abilities/archetypes/linear_projectile.tscn",
+    "persistent_aoe":     "res://gameplay/abilities/archetypes/persistent_aoe.tscn",
 }
 ```
 
