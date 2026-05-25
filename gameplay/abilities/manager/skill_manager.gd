@@ -4,7 +4,7 @@ extends Node
 ## 左手/右手 + 4 快捷键槽位
 ## 执行逻辑委托给 SkillExecutor
 
-const MAX_SLOTS := 4
+const MAX_SLOTS := 6
 
 ## ── 信号 ──
 signal hand_changed(hand: String)          ## "left" / "right"

@@ -18,6 +18,8 @@ var _on_kill_effect: OnKillBonusExp = null
 var _on_hit_effect: TriggeredEffect = null
 var _on_ice_expire: OnIceArmorExpire = null
 var _on_hit_fire_status: OnHitApplyStatus = null  ## 持有引用防 GC
+var _on_hit_ice_status: OnHitApplyStatus = null   ## 冰→冻结
+var _on_hit_poison_status: OnHitApplyStatus = null  ## 毒→中毒
 
 ## ── 信号（HUD 订阅） ──
 signal health_changed(current_hp: int, max_hp: int)
@@ -202,7 +204,7 @@ func _setup_skills() -> void:
 			fireball.tags = ["fire"]
 			_skill_pool.add_skill(fireball)
 
-	for sid in ["ice_armor", "flame_storm", "shadow_step", "ice_explosion"]:
+	for sid in ["ice_armor", "flame_storm", "shadow_step", "ice_explosion", "poison_cloud", "lightning_bolt"]:
 		if not _skill_pool.has_skill(sid):
 			var skill := load("res://gameplay/abilities/data/%s_data.tres" % sid) as SkillData
 			if skill:
@@ -228,6 +230,24 @@ func _setup_skills() -> void:
 						skill.mp_cost = 20
 						skill.cooldown = 8.0
 						skill.tags = ["ice", "aoe"]
+					"poison_cloud":
+						skill.archetype = "persistent_aoe"
+						skill.aoe_visual = load("res://content/visuals/poison_aoe_visual.tres")
+						skill.cast_distance = 200.0
+						skill.damage = 15
+						skill.damage_scaling = 0.6
+						skill.mp_cost = 25
+						skill.cooldown = 6.0
+						skill.tags = ["poison"]
+					"lightning_bolt":
+						skill.archetype = "linear_projectile"
+						skill.visual = load("res://content/visuals/lightning_visual.tres")
+						skill.projectile_speed = 600.0
+						skill.damage = 35
+						skill.damage_scaling = 1.2
+						skill.mp_cost = 15
+						skill.cooldown = 3.0
+						skill.tags = ["lightning"]
 				_skill_pool.add_skill(skill)
 
 	# 3. 构建索引
@@ -240,7 +260,7 @@ func _setup_skills() -> void:
 	var loadout := SkillLoadout.create(
 		"ice_armor",    # 左手
 		"fireball",     # 右手
-		["flame_storm", "shadow_step", "ice_explosion"]  # 快捷键 1/2/3
+		["flame_storm", "shadow_step", "ice_explosion", "poison_cloud", "lightning_bolt"]  # 快捷键 1-5
 	)
 	skill_manager.apply_loadout(loadout)
 
@@ -294,6 +314,14 @@ func _setup_event_bus() -> void:
 	# ON_HIT 火焰技能 → 挂 burning 状态
 	_on_hit_fire_status = OnHitApplyStatus.create("fire", "res://gameplay/abilities/data/burning.tres")
 	_register_triggered_effects(_on_hit_fire_status)
+
+	# ON_HIT 冰霜技能 → 挂 frozen 减速
+	_on_hit_ice_status = OnHitApplyStatus.create("ice", "res://gameplay/abilities/data/frozen.tres")
+	_register_triggered_effects(_on_hit_ice_status)
+
+	# ON_HIT 毒素技能 → 挂 poison DOT
+	_on_hit_poison_status = OnHitApplyStatus.create("poison", "res://gameplay/abilities/data/poison.tres")
+	_register_triggered_effects(_on_hit_poison_status)
 
 	# EffectGraph：ON_HIT 火焰技能
 	_register_graph_demo()

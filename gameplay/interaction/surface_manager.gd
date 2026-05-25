@@ -96,7 +96,11 @@ func get_entity_buffs(cell: Vector2i) -> Array[String]:
 ## 获取表面信息（代理）
 ## 实体-表面交互 tick（低频，每 0.5s 调用一次）
 func tick_entity_surface() -> void:
-	if not _surface_scheduler or not _spatial_index:
+	if not _surface_scheduler:
+		return
+	
+	var tree := get_tree()
+	if not tree:
 		return
 	
 	for cell: Vector2i in _surface_scheduler._active_surfaces:
@@ -104,16 +108,34 @@ func tick_entity_surface() -> void:
 		if buff_paths.is_empty():
 			continue
 		
-		var entities := _spatial_index.query_cell(cell)
-		for entity in entities:
-			var bm := entity.get_node_or_null("BuffManager") as BuffManager
-			if not bm:
-				continue
-			for path in buff_paths:
-				# 只对尚未拥有该状态的实体施加
-				var buff := load(path) as Buff
-				if buff and not bm.has_buff(buff.status_id):
-					bm.apply_buff(buff)
+		# 1. MapObject（空间索引）— 燃烧表面造成伤害
+		if _spatial_index:
+			for entity in _spatial_index.query_cell(cell):
+				_apply_surface_buffs(entity, buff_paths)
+				# 燃烧表面对 MapObject 造成火焰伤害（触发连锁）
+				var surf := _surface_scheduler.get_surface(cell)
+				if surf.get("state", "") == "burning" and entity.has_method("take_damage"):
+					CombatExecutor.report_hit(null, entity, 3, entity.global_position, null, ["fire"])
+		
+		# 2. Player + Enemy（距离检测）
+		var cell_center := Vector2(cell.x * 64 + 32, cell.y * 64 + 32)
+		for group_name in ["player", "enemy"]:
+			for entity in tree.get_nodes_in_group(group_name):
+				if not (entity is Node2D):
+					continue
+				if entity.global_position.distance_squared_to(cell_center) > 48 * 48:
+					continue
+				_apply_surface_buffs(entity, buff_paths)
+
+
+func _apply_surface_buffs(entity: Node, buff_paths: Array[String]) -> void:
+	var bm := entity.get_node_or_null("BuffManager") as BuffManager
+	if not bm:
+		return
+	for path in buff_paths:
+		var buff := load(path) as Buff
+		if buff and not bm.has_buff(buff.status_id):
+			bm.apply_buff(buff)
 
 
 func get_surface(cell: Vector2i) -> Dictionary:

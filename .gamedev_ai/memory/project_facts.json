@@ -999,5 +999,40 @@
 		"created": "2026-05-24T22:03:13",
 		"id": "fact_1779631393",
 		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "存档系统完成：二进制 Variant 格式 (store_var/get_var)，SaveData 类型化容器 (MetaData/PlayerData/WorldData/QuestSave)，F5 保存/F9 读取，版本校验 (VERSION=1)，加载时清理瞬态（投射物/死亡状态），冷却同步（_cooldowns + SkillInstance.current_cooldown），HUD 属性刷新，QuestManager 公开 API (get_completed_quests/set_completed_quests)。WorldStateManager 公开 get_all_states/set_all_states。",
+		"created": "2026-05-25T22:39:25",
+		"id": "fact_1779719965",
+		"source": "ai"
+	},
+	{
+		"category": "bug_fix",
+		"content": "PressurePlate 修复：场景中 CollisionShape2D 无 shape（同 SpikeTrap 根因），_ready() 编程创建 RectangleShape2D(64,32)。target NodePath 不持久化，_auto_find_target() 扫描兄弟节点 SignalReceiver 自动连线。敌方掉落物修复：get_tree().current_scene → get_parent()，掉落物归属当前区域。",
+		"created": "2026-05-25T22:39:32",
+		"id": "fact_1779719972",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "条件点燃系统：CombatExecutor._apply_damage 接收 tags 参数并通过 set_meta(\"_last_hit_tags\", tags) 传递给目标。MapObject._emit_destroyed_command 读取 _last_hit_tags——仅火系命中（has(\"fire\")）生成 fire AOE 标签，触发 oiled+fire→burning 反应链。冰爆摧毁油桶不燃烧。表面系统 tick_entity_surface 扩展：扫描 Player/Enemy（group 查找+距离检测），燃烧表面对 MapObject 造成 fire 标签伤害以触发连锁引爆。",
+		"created": "2026-05-25T22:39:39",
+		"id": "fact_1779719979",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "新增 Poison Cloud (AOE/poison/槽4) 和 Lightning Bolt (PROJECTILE/lightning/槽5) 两个纯数据驱动技能。MAX_SLOTS 4→6。poison→中毒 DOT 的 TriggeredEffect 注册。ice→frozen 减速的 OnHitApplyStatus 注册。poison_aoe_visual.tres 颜色需编辑器手动设绿。",
+		"created": "2026-05-25T22:39:46",
+		"id": "fact_1779719986",
+		"source": "ai"
+	},
+	{
+		"category": "bug_fix",
+		"content": "MapObject 重生碰撞修复：新增 _restore_collision() 方法，对称于 _remove_collision()，恢复 Body+HitArea 的 CollisionShape2D（disabled=false）和 HitArea 的 monitoring/monitorable。restore_state 中 state==INTACT 时调用。SpikeTrap 孤儿守卫：_get_damage_targets() 加 is_inside_tree() 检查，防止 Portal 切换区域时 get_tree() 返回 null 崩溃。",
+		"created": "2026-05-25T22:39:52",
+		"id": "fact_1779719992",
+		"source": "ai"
 	}
 ]

@@ -54,7 +54,7 @@ func _setup_mouse_action(action_name: String, button: MouseButton) -> void:
 [node name="Overworld" parent="." unique_id=1549094242 instance=ExtResource("1_ig7tw")]
 
 [node name="OilBarrel" parent="Overworld" unique_id=638277641 instance=ExtResource("2_4c57u")]
-position = Vector2(-155, -645)
+position = Vector2(-101, -644)
 
 [node name="Enemy1" parent="Overworld" unique_id=1874515091 instance=ExtResource("2_272bh")]
 position = Vector2(200, 0)

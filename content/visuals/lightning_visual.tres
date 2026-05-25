@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="ProjectileVisualData" format=3 uid="uid://b5plw3lhqptd0"]
+
+[ext_resource type="Script" uid="uid://dcuuctwrdmbja" path="res://gameplay/abilities/visuals/projectile_visual_data.gd" id="1_qs306"]
+
+[resource]
+script = ExtResource("1_qs306")
+color = Color(0, 0, 0, 1)
+scale = 0.12

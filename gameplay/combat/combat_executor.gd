@@ -56,16 +56,19 @@ func _exit_tree() -> void:
 static func report_hit(caster: Node2D, target: Node2D, damage: int, position: Vector2, skill: SkillData = null, tags: Array = []) -> void:
 	if not instance:
 		_emit_direct(CombatEvent.Type.ON_HIT, caster, target, {"damage": damage, "position": position, "tags": tags}, skill)
-		_apply_damage(target, damage)
+		_apply_damage(target, damage, tags)
 		return
 	instance._enforce_emit(CombatEvent.Type.ON_HIT, caster, target, {"damage": damage, "position": position, "tags": tags}, skill)
-	_apply_damage(target, damage)
+	_apply_damage(target, damage, tags)
 
 
 ## 内部：安全调用 Damageable.take_damage()
-static func _apply_damage(target: Node2D, amount: int) -> void:
+static func _apply_damage(target: Node2D, amount: int, tags: Array = []) -> void:
 	if amount <= 0:
 		return
+	# 存储命中标签（供 MapObject 判断破坏类型）
+	if not tags.is_empty() and "set_meta" in target:
+		target.set_meta("_last_hit_tags", tags)
 	if target and target.has_method("take_damage"):
 		target.take_damage(amount)
 

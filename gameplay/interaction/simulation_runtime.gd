@@ -235,6 +235,11 @@ func _on_surface_change_command(cmd: RuntimeCommand) -> void:
 	
 	# AOE 标签触发 ReactionRule（如 oiled + fire → burning）
 	if not aoe_tags.is_empty() and surface_radius > 0.0:
+		# 转换为 Array[String]（JSON 反序列化产生无类型 Array）
+		var typed_tags: Array[String] = []
+		for t in aoe_tags:
+			typed_tags.append(str(t))
+		
 		var cell_radius := ceili(surface_radius / 64.0) + 1
 		var center := Vector2i(floori(pos.x / 64), floori(pos.y / 64))
 		for dx in range(-cell_radius, cell_radius + 1):
@@ -242,7 +247,7 @@ func _on_surface_change_command(cmd: RuntimeCommand) -> void:
 				var cell := Vector2i(center.x + dx, center.y + dy)
 				var dist := pos.distance_to(Vector2(cell.x * 64 + 32, cell.y * 64 + 32))
 				if dist <= surface_radius:
-					_surface_manager.apply_tags(cell, aoe_tags, "aoe_%s" % display_name)
+					_surface_manager.apply_tags(cell, typed_tags, "aoe_%s" % display_name)
 	
 	# AOE 伤害
 	if aoe_radius > 0.0 and aoe_damage > 0 and _spatial_index:

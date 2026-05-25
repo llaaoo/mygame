@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="SkillData" format=3 uid="uid://bymp88qob5mqs"]
+
+[ext_resource type="Script" uid="uid://5yw1untw6sop" path="res://gameplay/abilities/data/skill_data.gd" id="1_5ewy6"]
+
+[resource]
+script = ExtResource("1_5ewy6")
+id = "lightning_bolt"
+display_name = "闪电箭"
+mp_cost = 15
+cooldown = 3.0
+damage = 35
+damage_scaling = 1.2
+archetype = "linear_projectile"
+projectile_speed = 600.0

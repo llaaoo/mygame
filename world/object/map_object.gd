@@ -22,6 +22,8 @@ func _ready() -> void:
 	_current_hp = object_data.max_hp
 	_apply_visual()
 	_register_with_world_runtime()
+
+
 	
 
 
@@ -135,6 +137,13 @@ func _emit_destroyed_command() -> void:
 	if not bus:
 		return
 	
+	# 条件点燃：仅火系伤害触发油桶 fire 标签
+	var aoe_tags: Array = object_data.destruction_aoe_tags.duplicate()
+	if aoe_tags.is_empty():
+		var hit_tags: Array = get_meta("_last_hit_tags", [])
+		if hit_tags.has("fire"):
+			aoe_tags = ["fire"]
+	
 	var cmd := RuntimeCommand.create(
 		RuntimeCommand.TYPE_DESTROYED,
 		object_data.display_name,
@@ -146,7 +155,7 @@ func _emit_destroyed_command() -> void:
 			"respawn_time": object_data.respawn_time,
 			"destruction_radius": object_data.destruction_radius,
 			"destruction_aoe_damage": object_data.destruction_aoe_damage,
-			"destruction_aoe_tags": object_data.destruction_aoe_tags,
+			"destruction_aoe_tags": aoe_tags,
 			"destruction_surface": object_data.destruction_surface,
 			"destruction_surface_radius": object_data.destruction_surface_radius,
 		}

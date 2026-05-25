@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="SkillData" format=3 uid="uid://sm1phsrsq425"]
+
+[ext_resource type="Script" uid="uid://5yw1untw6sop" path="res://gameplay/abilities/data/skill_data.gd" id="1_5nl74"]
+
+[resource]
+script = ExtResource("1_5nl74")
+id = "poison_cloud"
+display_name = "毒云"
+skill_type = 2
+mp_cost = 25
+cooldown = 6.0
+damage = 15
+damage_scaling = 0.6
+archetype = "persistent_aoe"
+aoe_radius = 120.0
+aoe_lifetime = 3.0
