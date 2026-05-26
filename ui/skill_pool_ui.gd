@@ -15,6 +15,7 @@ var _hint_label: Label = null
 
 
 func _ready() -> void:
+	layer = 130  # InventoryPanel=120，技能池面板在上
 	hide()
 	_build_ui()
 

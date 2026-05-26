@@ -7,7 +7,6 @@
 [ext_resource type="PackedScene" uid="uid://do1qa7x2r0b15" path="res://world/switches/pressure_plate.tscn" id="4_dg77c"]
 [ext_resource type="Script" uid="uid://cgn2i161esv0a" path="res://gameplay/abilities/manager/skill_manager.gd" id="5_4c57u"]
 [ext_resource type="PackedScene" uid="uid://tc5h73volrpp" path="res://ui/hud.tscn" id="5_7mycd"]
-[ext_resource type="Script" uid="uid://dbwnlql45crla" path="res://world/object/pressure_plate.gd" id="5_ycdy4"]
 [ext_resource type="Script" uid="uid://d1uc57ucjrid5" path="res://entities/components/stats_component.gd" id="6_efxa6"]
 [ext_resource type="Script" uid="uid://ca7adgccfaejq" path="res://core/game_runtime.gd" id="8_dg77c"]
 [ext_resource type="Script" uid="uid://d2dwn66h08hu2" path="res://world/world_runtime.gd" id="9_ycdy4"]
@@ -71,9 +70,8 @@ max_hp = 100
 [node name="OilBarrel2" parent="Overworld" unique_id=104765449 instance=ExtResource("2_4c57u")]
 position = Vector2(-193, -645)
 
-[node name="PressurePlate1" type="Area2D" parent="Overworld" unique_id=1933857937 instance=ExtResource("4_dg77c")]
+[node name="PressurePlate1" parent="Overworld" unique_id=1933857937 instance=ExtResource("4_dg77c")]
 position = Vector2(50, -380)
-script = ExtResource("5_ycdy4")
 
 [node name="Player" parent="." unique_id=87503594 instance=ExtResource("2_h2yge")]
 position = Vector2(7, -475)

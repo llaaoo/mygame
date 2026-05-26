@@ -12,7 +12,8 @@ extends Area2D
 var direction: Vector2 = Vector2.DOWN
 var caster: Node2D = null
 var _has_hit: bool = false
-var _needs_setup: bool = true  ## setup() 调用前不进入 _ready 逻辑
+var _needs_setup: bool = true
+var _surface_timer: float = 0.0  ## 表面交互节流
 
 
 ## 核心入口：SkillData 注入所有参数（替代子类覆写）
@@ -92,6 +93,12 @@ func set_direction(dir: Vector2) -> void:
 
 func _physics_process(delta: float) -> void:
 	global_position += direction * speed * delta
+	
+	# 表面交互：投射物经过的格子施加技能标签（火球路过 oiled → 点燃）
+	_surface_timer += delta
+	if _surface_timer >= 0.15:
+		_surface_timer -= 0.15
+		_apply_to_surface()
 
 
 func set_caster(c: Node2D) -> void:
@@ -133,6 +140,26 @@ func _on_area_entered(area: Area2D) -> void:
 		_emit_hit_event(target)
 		# report_hit() 内部已调用 take_damage()
 	queue_free()
+
+
+## 对当前所在格施加技能标签（仅交互非 dry 表面）
+func _apply_to_surface() -> void:
+	var skill := get_meta("skill_data", null) as SkillData
+	if not skill or skill.tags.is_empty():
+		return
+	var gr := GameRuntime.instance
+	if not gr: return
+	var sim := gr.get_simulation_runtime()
+	if not sim: return
+	var sm := sim.get_surface_manager()
+	if not sm: return
+	# 只对非 dry 表面交互（oiled/wet/frozen），不点燃干燥地面
+	var cell := Vector2i(floori(global_position.x / 64), floori(global_position.y / 64))
+	var surf := sm.get_surface(cell)
+	if surf.get("state", "dry") != "dry":
+		if sm.apply_tags(cell, skill.tags, skill.display_name):
+			_has_hit = true
+			queue_free()
 
 
 ## 发射 ON_HIT → CombatExecutor（唯一权威入口）

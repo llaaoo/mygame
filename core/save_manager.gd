@@ -137,12 +137,17 @@ func _collect_player() -> SaveData.PlayerData:
 			p.skill_left = sm.left_hand.data.get_id()
 		if sm.right_hand and sm.right_hand.data:
 			p.skill_right = sm.right_hand.data.get_id()
-		p.skill_slots.resize(4)
-		for i: int in range(4):
+		p.skill_slots.resize(6)
+		for i: int in range(6):
 			var inst: SkillInstance = sm.get_slot(i)
 			p.skill_slots[i] = inst.data.get_id() if inst and inst.data else ""
-		p.skill_cooldowns = sm._cooldowns.duplicate()
-
+		# 从 SkillInstance 直接读冷却（更可靠）
+		p.skill_cooldowns.clear()
+		if sm.left_hand:  p.skill_cooldowns["left"]   = sm.left_hand.current_cooldown
+		if sm.right_hand: p.skill_cooldowns["right"]  = sm.right_hand.current_cooldown
+		for i: int in range(6):
+			var inst: SkillInstance = sm.get_slot(i)
+			if inst: p.skill_cooldowns["slot_%d" % i] = inst.current_cooldown
 	return p
 
 
@@ -213,20 +218,21 @@ func _restore_player(p: SaveData.PlayerData) -> void:
 				sm.equip_hand("left", pool.get_skill(p.skill_left))
 			if not p.skill_right.is_empty():
 				sm.equip_hand("right", pool.get_skill(p.skill_right))
-			for i: int in range(mini(p.skill_slots.size(), 4)):
+			for i: int in range(mini(p.skill_slots.size(), 6)):
 				var sid: String = p.skill_slots[i]
 				if not sid.is_empty():
 					var skill := pool.get_skill(sid)
 					if skill:
 						sm.equip_slot(i, skill)
-			# 恢复冷却（同步 _cooldowns 字典 + SkillInstance.current_cooldown）
-			sm._cooldowns = p.skill_cooldowns.duplicate()
-			for key in sm._cooldowns:
-				var remaining: float = sm._cooldowns[key]
+			# 恢复冷却 — 直接从 SkillInstance 设值
+			for key: String in p.skill_cooldowns:
+				var remaining: float = p.skill_cooldowns[key]
 				var inst: SkillInstance = sm._find_instance(key)
 				if inst:
 					inst.current_cooldown = remaining
-				sm.cooldown_changed.emit(key, remaining, sm._get_cooldown_total(key))
+					sm._cooldowns[key] = remaining
+					sm.cooldown_changed.emit(key, remaining, sm._get_cooldown_total(key))
+
 
 
 func _restore_world(w: SaveData.WorldData) -> void:

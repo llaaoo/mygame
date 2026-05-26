@@ -1034,5 +1034,40 @@
 		"created": "2026-05-25T22:39:52",
 		"id": "fact_1779719992",
 		"source": "ai"
+	},
+	{
+		"category": "bug_fix",
+		"content": "UI 层级修复：InventoryPanel layer=120、SkillPoolUI layer=130，解决 QuestTracker(layer=110) 遮挡问题。完整层级：HUD(100) < QuestTracker(110) < InventoryPanel(120) < SkillPoolUI(130) < LevelUpUI(200)。",
+		"created": "2026-05-26T22:30:15",
+		"id": "fact_1779805815",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "闪电连锁 (OnHitChain)：新建 gameplay/combat/on_hit/on_hit_chain.gd，TriggeredEffect 子类。闪电命中→SkillTagCondition(\"lightning\")→搜索 120px 内最多 3 个敌人→60% 弹射伤害。MAX_CHAIN_LENGTH 5→10 防止连锁事件被防火墙拦截。",
+		"created": "2026-05-26T22:30:22",
+		"id": "fact_1779805822",
+		"source": "ai"
+	},
+	{
+		"category": "bug_fix",
+		"content": "冷却存档修复：_cooldowns 字典只在技能使用后才填充（空字典导致存档丢失冷却）。改为从 SkillInstance.current_cooldown 直接读/写——始终有值（未使用为 0.0）。保存端枚举所有槽位（left/right/slot_0~5），恢复端直接设 SkillInstance.current_cooldown 并同步 _cooldowns 字典。槽位数 4→6 对齐 MAX_SLOTS。",
+		"created": "2026-05-26T22:30:29",
+		"id": "fact_1779805829",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "条件点燃完整修复：CombatExecutor._apply_damage 通过 set_meta(\"_last_hit_tags\") 传递命中标签。MapObject._emit_destroyed_command 读取后立即 remove_meta 清除残留。Godot meta 存 StringName 非 String，需遍历 str() 转换后再 has(\"fire\")。仅火系命中时追加 aoe_tags=[\"fire\"] 并保留 AOE 伤害/半径；非火系清零。",
+		"created": "2026-05-26T22:53:39",
+		"id": "fact_1779807219",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "投射物-表面交互：Projectile._physics_process 每 0.15s 检查所在格表面状态。仅非 dry 表面（oiled/wet/frozen）触发 apply_tags。反应成功（如 oiled+fire→burning）时 queue_free 投射物。dry+fire→burning 仅由 PersistentAOE 触发，投射物不点燃干燥地面。",
+		"created": "2026-05-26T22:53:45",
+		"id": "fact_1779807225",
+		"source": "ai"
 	}
 ]

@@ -29,7 +29,7 @@ var _phase_violation_limit: int = 3           ## 连续违规上限（触发即�
 ## ── 深度限制（防爆炸） ──
 const MAX_EVENT_DEPTH: int = 3
 const MAX_GRAPH_DEPTH: int = 10
-const MAX_CHAIN_LENGTH: int = 5
+const MAX_CHAIN_LENGTH: int = 10
 
 ## ── 链式计数 ──
 var _chain_count: int = 0

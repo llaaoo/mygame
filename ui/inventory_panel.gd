@@ -41,6 +41,7 @@ const SLOT_NAMES: Dictionary = {
 
 
 func _ready() -> void:
+	layer = 120  # QuestTracker=110，装备面板在上
 	hide()
 	# 确保 GridContainer 配置（编辑器可能未保存）
 	_inv_grid.columns = columns

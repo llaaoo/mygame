@@ -20,6 +20,7 @@ var _on_ice_expire: OnIceArmorExpire = null
 var _on_hit_fire_status: OnHitApplyStatus = null  ## 持有引用防 GC
 var _on_hit_ice_status: OnHitApplyStatus = null   ## 冰→冻结
 var _on_hit_poison_status: OnHitApplyStatus = null  ## 毒→中毒
+var _on_hit_chain: OnHitChain = null                ## 闪电→连锁
 
 ## ── 信号（HUD 订阅） ──
 signal health_changed(current_hp: int, max_hp: int)
@@ -322,6 +323,10 @@ func _setup_event_bus() -> void:
 	# ON_HIT 毒素技能 → 挂 poison DOT
 	_on_hit_poison_status = OnHitApplyStatus.create("poison", "res://gameplay/abilities/data/poison.tres")
 	_register_triggered_effects(_on_hit_poison_status)
+
+	# ON_HIT 闪电技能 → 连锁弹射
+	_on_hit_chain = OnHitChain.create("lightning", 120.0, 3, 0.6)
+	_register_triggered_effects(_on_hit_chain)
 
 	# EffectGraph：ON_HIT 火焰技能
 	_register_graph_demo()

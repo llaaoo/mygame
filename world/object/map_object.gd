@@ -137,12 +137,26 @@ func _emit_destroyed_command() -> void:
 	if not bus:
 		return
 	
-	# 条件点燃：仅火系伤害触发油桶 fire 标签
+	# 条件引爆：仅火系伤害触发油桶 AOE + 燃烧
+	var hit_tags_raw: Array = get_meta("_last_hit_tags", [])
+	remove_meta("_last_hit_tags")
+	# Godot meta 可能存为 StringName，强制转 String
+	var hit_tags: Array[String] = []
+	for t in hit_tags_raw:
+		hit_tags.append(str(t))
+	var is_fire := hit_tags.has("fire")
+	
 	var aoe_tags: Array = object_data.destruction_aoe_tags.duplicate()
-	if aoe_tags.is_empty():
-		var hit_tags: Array = get_meta("_last_hit_tags", [])
-		if hit_tags.has("fire"):
-			aoe_tags = ["fire"]
+	var aoe_damage: int = object_data.destruction_aoe_damage
+	var aoe_radius: float = object_data.destruction_radius
+	
+	if is_fire:
+		if not aoe_tags.has("fire"):
+			aoe_tags.append("fire")
+	else:
+		aoe_tags = []
+		aoe_damage = 0
+		aoe_radius = 0.0
 	
 	var cmd := RuntimeCommand.create(
 		RuntimeCommand.TYPE_DESTROYED,
@@ -153,8 +167,8 @@ func _emit_destroyed_command() -> void:
 			"state_data": get_state(),
 			"position": global_position,
 			"respawn_time": object_data.respawn_time,
-			"destruction_radius": object_data.destruction_radius,
-			"destruction_aoe_damage": object_data.destruction_aoe_damage,
+			"destruction_radius": aoe_radius,
+			"destruction_aoe_damage": aoe_damage,
 			"destruction_aoe_tags": aoe_tags,
 			"destruction_surface": object_data.destruction_surface,
 			"destruction_surface_radius": object_data.destruction_surface_radius,
