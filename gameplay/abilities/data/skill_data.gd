@@ -10,6 +10,7 @@ enum SkillType {
 	BUFF,         ## 自身增益（护盾、加速）
 	AOE,          ## 范围效果（火雨、冰环）
 	DASH,         ## 位移（闪现、冲锋）
+	SUMMON,       ## 召唤（骷髅、元素、图腾）
 }
 
 ## ── 核心标识（纯数据） ──
@@ -64,6 +65,9 @@ enum SkillType {
 ## ── 位移专用 ──
 @export var dash_distance: float = 200.0
 @export var dash_speed: float = 800.0
+
+## ── 召唤专用 ──
+@export var summon_data: SummonData
 
 ## ── 效果列表（未来扩展） ──
 ## @export var effects: Array[Effect] = []

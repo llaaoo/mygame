@@ -121,6 +121,8 @@ func execute(skill: SkillData, context: CastContext) -> bool:
 			defer_store = ok
 		SkillData.SkillType.DASH:
 			ok = _execute_dash(skill, context)
+		SkillData.SkillType.SUMMON:
+			ok = _execute_summon(skill, context)
 
 	# ── EVENT 阶段（ON_CAST 必须在此阶段发射） ──
 	if exec_inst:
@@ -166,6 +168,7 @@ func _emit_event(type: CombatEvent.Type, source: Node2D, target: Node2D = null, 
 const _ARCHETYPE_SCENES := {
 	"linear_projectile": "res://gameplay/abilities/archetypes/linear_projectile.tscn",
 	"persistent_aoe": "res://gameplay/abilities/archetypes/persistent_aoe.tscn",
+	"summon_entity": "res://gameplay/abilities/archetypes/summon_entity.tscn",
 }
 
 
@@ -299,6 +302,46 @@ func _find_shadow_step_target(body: CharacterBody2D, direction: Vector2, max_dis
 	if best_target != Vector2.INF:
 		return best_target
 	return body.global_position + direction * max_dist
+
+
+## ── 召唤 ──
+
+func _execute_summon(skill: SkillData, ctx: CastContext) -> bool:
+	if not skill.summon_data:
+		push_warning("[SkillExecutor] 召唤技能缺少 summon_data: %s" % skill.display_name)
+		return false
+
+	var player := ctx.caster as Player
+	if not player:
+		push_warning("[SkillExecutor] 召唤技能只能由 Player 使用")
+		return false
+
+	var manager := player.get_node_or_null("SummonManager") as SummonManager
+	if not manager:
+		push_warning("[SkillExecutor] Player 缺少 SummonManager")
+		return false
+
+	if not manager.can_summon():
+		print("⚠️ [SkillExecutor] 召唤物已达上限 (%d)，无法召唤" % SummonManager.MAX_SUMMONS)
+		return false
+
+	var scene: PackedScene = load(_ARCHETYPE_SCENES["summon_entity"]) as PackedScene
+	if not scene:
+		return false
+
+	var instance := scene.instantiate() as SummonEntity
+	ctx.world.add_child(instance)
+
+	# 在玩家身后生成
+	var spawn_pos := ctx.caster.global_position - ctx.direction * 50.0
+	# 加一点随机偏移，多个召唤物不重叠
+	spawn_pos += Vector2(randf_range(-30, 30), randf_range(-30, 30))
+	instance.global_position = spawn_pos
+
+	instance.setup(skill.summon_data, player, manager)
+	instance.set_meta("skill_data", skill)
+
+	return true
 
 
 func _apply_dash_buff(skill: SkillData, caster: Node2D) -> void:

@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://fv7s2d5quu2s"]
+
+[ext_resource type="Script" uid="uid://gvyiqcs6oulp" path="res://gameplay/abilities/runtime/summon_entity.gd" id="1_8mo4n"]
+[ext_resource type="Script" uid="uid://bina3ctxqpy1c" path="res://entities/components/health_component.gd" id="1_x1ndw"]
+
+[node name="SummonEntity" type="CharacterBody2D" unique_id=1628689607]
+script = ExtResource("1_8mo4n")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=444611937]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1341342224]
+
+[node name="HealthComponent" type="Node" parent="." unique_id=606101569]
+script = ExtResource("1_x1ndw")

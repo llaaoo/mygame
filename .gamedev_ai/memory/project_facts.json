@@ -1069,5 +1069,54 @@
 		"created": "2026-05-26T22:53:45",
 		"id": "fact_1779807225",
 		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "召唤法术系统 v1.0 已完成。新增 SkillType.SUMMON (枚举值4)。架构：SummonData (content/summons/, 纯数据Resource) → SummonEntity (gameplay/abilities/archetypes/summon_entity.tscn, CharacterBody2D archetype) → SummonManager (Player子节点, 追踪活跃召唤物+监听CombatEventBus分发攻击/复仇指令)。AI优先级: 复仇(玩家受击来源) > 集火(玩家攻击目标) > 跟随。上限3个，达上限后技能不可用。生命周期: lifetime倒计时自动消失 + HP归零死亡。玩家死亡→clear_all()清空。切换区域跟随(因SummonManager是Player子节点)。",
+		"created": "2026-05-26T23:22:36",
+		"id": "fact_1779808956",
+		"source": "ai"
+	},
+	{
+		"category": "project_info",
+		"content": "召唤法术新增文件: content/summons/summon_data.gd (SummonData Resource), content/summons/skeleton_warrior.tres (示例召唤物数据), gameplay/abilities/archetypes/summon_entity.tscn (召唤物场景模板), gameplay/abilities/runtime/summon_entity.gd (SummonEntity AI脚本), gameplay/abilities/manager/summon_manager.gd (SummonManager), gameplay/abilities/data/summon_skeleton_data.tres (示例技能数据)。修改文件: skill_data.gd (+SUMMON枚举+summon_data字段), skill_executor.gd (+_execute_summon+archetype注册), player.gd (+SummonManager+死亡清理+summon_skeleton注册), skill_pool_ui.gd (+SUMMON图标/颜色+6槽位)。快捷键从4扩展到6。",
+		"created": "2026-05-26T23:22:36",
+		"id": "fact_1779808956",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "快捷键槽位设计决策：只有左右手 + 1-4 共4个快捷键槽位（对应 skill_1~skill_4 输入映射）。技能池(SkillPoolUI, K键)可容纳超过4个技能，但额外技能无键盘绑定，需通过UI手动装备到有限槽位。poll_universal_actions和poll_actions中均为range(4)。loadout的shortcuts数组长度=4。此设计防止快捷键无限膨胀。",
+		"created": "2026-05-26T23:36:39",
+		"id": "fact_1779809799",
+		"source": "ai"
+	},
+	{
+		"category": "bug_fix",
+		"content": "patch_script不可靠问题：本对话中多次出现patch_script返回\"Success: Patch queued\"但文件实际未修改的情况（summon_manager变量声明、_setup_summon_manager()调用、_ARCHETYPE_SCENES字典、SUMMON枚举、poll range(6)→(4)均需多次重试）。解决方案：每次patch后立即用read_file验证关键行，若未生效则用更精确的search_content重试。关键修改（变量声明、函数调用点、const字典、enum值）需优先验证。",
+		"created": "2026-05-26T23:36:39",
+		"id": "fact_1779809799",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "召唤物攻击走CombatExecutor.report_hit()统一入口（CONTRACT 0），标签[\"summon\",\"melee\"]。SummonManager通过CombatEventBus.subscribe监听ON_HIT（设定attack_target/revenge_target）和ON_KILL（清除死亡目标）。注意：subscribe需要event_type参数，不可省略。SummonManager._subscribe_events()用call_deferred延迟订阅，递归await等待CombatEventBus.instance就绪（与player._ensure_runtime_ready同模式）。",
+		"created": "2026-05-26T23:36:50",
+		"id": "fact_1779809810",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "SummonEntity作为archetype场景（res://gameplay/abilities/archetypes/summon_entity.tscn），遵循\"Scene=行为模型\"原则。结构：CharacterBody2D根 + Sprite2D + CollisionShape2D + HealthComponent。碰撞层：layer=ACTOR(2), mask=WORLD_STATIC|ACTOR(3)，与Enemy一致。HealthComponent.setup($CollisionShape2D)必须调用以注册SimulationRuntime统一tick。",
+		"created": "2026-05-26T23:36:50",
+		"id": "fact_1779809810",
+		"source": "ai"
+	},
+	{
+		"category": "bug_fix",
+		"content": "_execute_summon失败根因：_setup_summon_manager()未被_ready()调用，导致SummonManager不存在→player.get_node_or_null(\"SummonManager\")返回null→返回false（MP已消耗！）。教训：新增Node子节点时，必须确认_ready()中存在创建调用，且调用顺序在依赖它的逻辑之前（本例中_setup_summon_manager在_setup_skills之后、call_deferred之前，早于技能施放时机）。",
+		"created": "2026-05-26T23:36:50",
+		"id": "fact_1779809810",
+		"source": "ai"
 	}
 ]

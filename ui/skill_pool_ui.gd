@@ -351,4 +351,5 @@ func _type_color(t: int) -> Color:
 		SkillData.SkillType.BUFF:       return Color(0.3, 0.7, 1.0)
 		SkillData.SkillType.AOE:        return Color(1.0, 0.3, 0.3)
 		SkillData.SkillType.DASH:       return Color(0.3, 1.0, 0.5)
+		SkillData.SkillType.SUMMON:     return Color(0.7, 0.4, 1.0)
 	return Color.GRAY

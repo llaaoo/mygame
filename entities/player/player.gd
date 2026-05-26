@@ -110,6 +110,9 @@ func _ready() -> void:
 	sprite.z_as_relative = false
 	sprite.z_index = 10
 
+	# 召唤物管理器
+	_setup_summon_manager()
+
 	# 背包面板
 	call_deferred("_setup_inventory_panel")
 
@@ -205,7 +208,7 @@ func _setup_skills() -> void:
 			fireball.tags = ["fire"]
 			_skill_pool.add_skill(fireball)
 
-	for sid in ["ice_armor", "flame_storm", "shadow_step", "ice_explosion", "poison_cloud", "lightning_bolt"]:
+	for sid in ["ice_armor", "flame_storm", "shadow_step", "ice_explosion", "poison_cloud", "lightning_bolt", "summon_skeleton"]:
 		if not _skill_pool.has_skill(sid):
 			var skill := load("res://gameplay/abilities/data/%s_data.tres" % sid) as SkillData
 			if skill:
@@ -249,6 +252,14 @@ func _setup_skills() -> void:
 						skill.mp_cost = 15
 						skill.cooldown = 3.0
 						skill.tags = ["lightning"]
+					"summon_skeleton":
+						skill.archetype = "summon_entity"
+						skill.summon_data = load("res://content/summons/skeleton_warrior.tres") as SummonData
+						skill.mp_cost = 30
+						skill.cooldown = 8.0
+						skill.damage = 0
+						skill.damage_scaling = 0.0
+						skill.tags = ["summon", "shadow"]
 				_skill_pool.add_skill(skill)
 
 	# 3. 构建索引
@@ -261,7 +272,7 @@ func _setup_skills() -> void:
 	var loadout := SkillLoadout.create(
 		"ice_armor",    # 左手
 		"fireball",     # 右手
-		["flame_storm", "shadow_step", "ice_explosion", "poison_cloud", "lightning_bolt"]  # 快捷键 1-5
+		["flame_storm", "shadow_step", "ice_explosion", "poison_cloud"]  # 快捷键 1-4
 	)
 	skill_manager.apply_loadout(loadout)
 
@@ -439,6 +450,7 @@ func _setup_combat_debugger() -> void:
 ## WorldTime 现在由 GameRuntime 统一管理，Player 不再创建
 
 var quest_manager: QuestManager = null
+var summon_manager: SummonManager = null
 
 
 func _setup_quest_manager() -> void:
@@ -776,6 +788,9 @@ func _on_health_changed(current_hp: int, max_hp: int) -> void:
 func _on_died() -> void:
 	set_process(false)
 	set_physics_process(false)
+	# 清理所有召唤物
+	if summon_manager:
+		summon_manager.clear_all()
 	print("💀 玩家死亡！")
 	died.emit()
 
@@ -797,6 +812,18 @@ func _setup_state_machine() -> void:
 
 
 ## ── 背包 ──
+
+## ── 召唤物管理器 ──
+
+func _setup_summon_manager() -> void:
+	if has_node("SummonManager"):
+		summon_manager = $SummonManager as SummonManager
+		return
+	var sm := SummonManager.new()
+	sm.name = "SummonManager"
+	add_child(sm)
+	summon_manager = sm
+
 
 func _setup_inventory_panel() -> void:
 	var panel = get_tree().current_scene.get_node_or_null("InventoryPanel")
@@ -918,6 +945,7 @@ func _aim_color(skill_type: int) -> Color:
 		SkillData.SkillType.AOE:        return Color(1.0, 0.3, 0.1, 0.6)
 		SkillData.SkillType.DASH:       return Color(0.3, 1.0, 0.5, 0.6)
 		SkillData.SkillType.PROJECTILE: return Color(1.0, 0.5, 0.2, 0.7)
+		SkillData.SkillType.SUMMON:     return Color(0.7, 0.4, 1.0, 0.6)
 	return Color.WHITE
 
 

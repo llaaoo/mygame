@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="SummonData" format=3 uid="uid://bbrq2p6h8xl86"]
+
+[ext_resource type="Script" uid="uid://bwtf52pg8wf3p" path="res://content/summons/summon_data.gd" id="1_px518"]
+
+[resource]
+script = ExtResource("1_px518")
+summon_name = "骷髅战士"
+description = "召唤一个骷髅战士为你而战"
+max_hp = 40
+damage = 10
+speed = 100.0
+attack_range = 35.0
+attack_cooldown = 1.2
+lifetime = 25.0
+follow_distance = 70.0
+leash_distance = 450.0
