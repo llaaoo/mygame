@@ -240,7 +240,11 @@ func _execute_aoe(skill: SkillData, ctx: CastContext) -> bool:
 	
 	var instance := scene.instantiate() as Node2D
 	ctx.world.add_child(instance)
-	instance.global_position = ctx.caster.global_position + ctx.direction * skill.cast_distance
+	# 若指定了 target_position（如触发施法），直接放在目标位置
+	if ctx.target_position != Vector2.ZERO:
+		instance.global_position = ctx.target_position
+	else:
+		instance.global_position = ctx.caster.global_position + ctx.direction * skill.cast_distance
 	
 	if instance.has_method("setup"):
 		instance.setup(skill, ctx.caster)

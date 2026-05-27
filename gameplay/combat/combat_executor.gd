@@ -83,10 +83,16 @@ static func report_damage(target: Node2D, amount: int, remaining_hp: int) -> voi
 
 ## 报告击杀（替代 HealthComponent._emit_kill_event）
 static func report_kill(target: Node2D, overkill: int, position: Vector2) -> void:
+	# 读取 _last_hit_tags（由 _apply_damage 在 take_damage 前写入）
+	var tags: Array = []
+	if target and "get_meta" in target:
+		var raw = target.get_meta("_last_hit_tags", [])
+		if raw is Array:
+			tags = raw
 	if not instance:
-		_emit_direct(CombatEvent.Type.ON_KILL, null, target, {"overkill_damage": overkill, "position": position}, null)
+		_emit_direct(CombatEvent.Type.ON_KILL, null, target, {"overkill_damage": overkill, "position": position, "tags": tags}, null)
 		return
-	instance._enforce_emit(CombatEvent.Type.ON_KILL, null, target, {"overkill_damage": overkill, "position": position}, null)
+	instance._enforce_emit(CombatEvent.Type.ON_KILL, null, target, {"overkill_damage": overkill, "position": position, "tags": tags}, null)
 
 
 ## 报告施法（替代 SkillExecutor._emit_event）

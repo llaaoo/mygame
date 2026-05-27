@@ -94,6 +94,12 @@ func _setup_runtimes() -> void:
 		sv.name = "SaveManager"
 		add_child(sv)
 
+	# === 伤害数字生成器（监听 CombatEventBus → 浮动数字） ===
+	if not has_node("DamageNumberSpawner"):
+		var dns := DamageNumberSpawner.new()
+		dns.name = "DamageNumberSpawner"
+		add_child(dns)
+
 	print("🏛️ GameRuntime: 五大 Runtime 初始化完成")
 	print("   CommandBus       : %s" % ("✅" if command_bus else "❌"))
 	print("   CombatExecutor   : %s" % ("✅" if combat_executor else "❌"))

@@ -1118,5 +1118,47 @@
 		"created": "2026-05-26T23:36:50",
 		"id": "fact_1779809810",
 		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "敌人 AI 复仇机制 v1.0：Enemy 通过 CombatEventBus 订阅 ON_HIT 和 ON_KILL。被非玩家实体（召唤物/其他敌人/MapObject）伤害后→设_revenge_target=伤害来源。AI 优先级：_get_current_target()→有效复仇目标>玩家。复仇清除条件：复仇目标死亡(ON_KILL自动)、超出_leash_distance(500px)、目标无效(instance_valid+is_dead+health_component检查)。玩家伤害不设复仇（玩家是默认AI目标）。近战攻击目标从硬编码player改为_get_current_target()。get_player_direction/distance_to_player保留向后兼容但不再被核心AI调用。",
+		"created": "2026-05-27T21:05:39",
+		"id": "fact_1779887139",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "敌人近战溅射机制：_do_melee_attack() 主目标命中后，扫描 group(\"enemy\") 在 MELEE_SPLASH_RADIUS(40px) 内的其他敌人，造成攻击力×MELEE_SPLASH_DAMAGE(0.5) 的溅射伤害（标签[\"melee\",\"enemy\",\"splash\"]）。溅射触发 ON_HIT → 被击中敌人的复仇机制启动 → 敌人之间产生互殴链。此机制自然产生集群敌人的混战场面。",
+		"created": "2026-05-27T21:09:53",
+		"id": "fact_1779887393",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "浮动伤害数字系统 v1.0：DamageNumber (Node2D, res://ui/damage_number.gd) + DamageNumberSpawner (Node, res://ui/damage_number_spawner.gd)。Spawner 挂载到 GameRuntime，_ready() 中 call_deferred 订阅 CombatEventBus：ON_DAMAGE→红色伤害数字、ON_HEAL→绿色\"+N\"、ON_DODGE→灰色\"MISS\"、ON_CRIT→金色\"X!\"。数字动画：Tween 上浮50px (0.7s) + 0.55s后淡出→queue_free。位置加 ±12px 随机偏移防重叠。DamageNumber Node2D 添加到 get_tree().current_scene 确保 CanvasItem 渲染链正确。",
+		"created": "2026-05-27T21:46:29",
+		"id": "fact_1779889589",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "GenericTriggeredCast v1.0 (gameplay/combat/on_trigger/generic_triggered_cast.gd) — 通用事件→技能触发器，纯数据驱动。字段：cast_skill_id(技能池ID)、caster_mode(SELF/EVENT_SOURCE/EVENT_TARGET)、target_mode(SELF/EVENT_SOURCE/EVENT_TARGET/NEAREST_ENEMY/CASTER_POSITION)、consume_mp。配合 conditions[] 过滤事件。OnIceArmorExpire 已替换为此通用实现。player.gd 新增 _create_buff_expire_trigger() 和 _create_generic_trigger() 工厂方法。新增触发器只需：新建GenericTriggeredCast→设trigger_type+conditions+cast_skill_id→注册，零新类。",
+		"created": "2026-05-27T22:03:03",
+		"id": "fact_1779890583",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "通用触发施法系统完整闭环已验证：火球(ON_HIT, tags=[\"fire\"]) → 击杀 → report_kill 读取 _last_hit_tags 写入 ON_KILL data → SkillTagCondition fallback 检查 ev.data.tags → GenericTriggeredCast(PLAYER+EVENT_TARGET) → SkillExecutor._execute_aoe 识别 target_position→直接放AOE → 烈焰风暴在尸体位置生成 → 点燃地表。关键修复：1) report_kill 携带 _last_hit_tags 2) SkillTagCondition 增加 ev.data.tags fallback 3) CasterMode.PLAYER 模式 4) _execute_aoe 支持 target_position 直接放置。",
+		"created": "2026-05-27T22:16:54",
+		"id": "fact_1779891414",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "低血量触发器配置化 v1.0：LowHpTriggerData Resource (content/triggers/low_hp_trigger_data.gd) 纯数据定义 hp_threshold + cast_skill_id + target_mode + cooldown。GenericTriggeredCast.TargetMode 新增 ESCAPE(5) — 加权逃离方向（300px内敌人，1/dist权重，求和normalized）。Player._check_low_hp_shadow_step 改为遍历 _low_hp_triggers 数组，每个 trigger 独立冷却。DEFAULT_LOW_HP_TRIGGERS 中配置 [0.3, \"shadow_step\", ESCAPE, 15.0]。新增多触发器只需加一行数组条目。",
+		"created": "2026-05-27T22:41:18",
+		"id": "fact_1779892878",
+		"source": "ai"
 	}
 ]

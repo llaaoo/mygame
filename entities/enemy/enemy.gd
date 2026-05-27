@@ -39,6 +39,8 @@ var enemy_name: String = "敌人"
 var player: Player = null
 var attack_ready: bool = true
 var _attack_timer: float = 0.0
+var _revenge_target: Node2D = null       ## 复仇目标（谁打了我 → 我打谁）
+var _leash_distance: float = 500.0       ## 脱战距离
 
 signal died
 
@@ -78,7 +80,80 @@ func _ready() -> void:
 	# StateChart 在 _ready 中已由场景实例化，这里连接状态逻辑
 	_setup_state_chart()
 
+	# 订阅伤害事件（复仇机制）
+	call_deferred("_subscribe_revenge_events")
+
 	call_deferred("_find_player")
+
+
+## ── 复仇机制：监听 CombatEventBus ON_HIT / ON_KILL ──
+
+func _subscribe_revenge_events() -> void:
+	var bus := CombatEventBus.instance
+	if not bus:
+		await get_tree().process_frame
+		_subscribe_revenge_events()
+		return
+	bus.subscribe(CombatEvent.Type.ON_HIT, _on_got_hit)
+	bus.subscribe(CombatEvent.Type.ON_KILL, _on_target_killed)
+
+
+## 我被谁打了 → 设为复仇目标
+func _on_got_hit(ev: CombatEvent) -> void:
+	if ev.target != self:
+		return
+	# 不向自己复仇，不向已死/无效的来源复仇
+	if ev.source == self or not is_instance_valid(ev.source):
+		return
+	# 玩家打的不复仇（玩家是默认目标，走正常 AI）
+	if ev.source is Player:
+		return
+	# 召唤物打 → 复仇召唤物；其他敌人打 → 复仇那个敌人
+	_revenge_target = ev.source
+
+
+## 复仇目标死了 → 清空
+func _on_target_killed(ev: CombatEvent) -> void:
+	if ev.target == _revenge_target:
+		_revenge_target = null
+
+
+## 获取当前优先级最高的目标：复仇目标 > 玩家
+func _get_current_target() -> Node2D:
+	if _is_valid_target(_revenge_target):
+		return _revenge_target
+	if player and not player.health_component.is_dead:
+		return player
+	return null
+
+
+## 目标是否有效（非空、有效实例、未死、在脱战距离内）
+func _is_valid_target(target: Node2D) -> bool:
+	if not target or not is_instance_valid(target):
+		return false
+	if target.has_method("is_dead") and target.is_dead():
+		return false
+	if target.get("health_component") and target.health_component.is_dead:
+		return false
+	if global_position.distance_to(target.global_position) > _leash_distance:
+		return false
+	return true
+
+
+## 获取当前目标方向
+func get_target_direction() -> Vector2:
+	var target := _get_current_target()
+	if not target:
+		return Vector2.ZERO
+	return (target.global_position - global_position).normalized()
+
+
+## 到当前目标的距离
+func distance_to_target() -> float:
+	var target := _get_current_target()
+	if not target:
+		return INF
+	return global_position.distance_to(target.global_position)
 
 
 func _setup_state_chart() -> void:
@@ -102,16 +177,17 @@ func _setup_state_chart() -> void:
 func poll_actions() -> Array[Action]:
 	var actions: Array[Action] = []
 
-	if not player or player.health_component.is_dead:
+	var target := _get_current_target()
+	if not target:
 		return actions
 
 	match _current_state_name():
 		"Chase":
-			# 向玩家移动
-			actions.append(Action.move(get_player_direction(), self))
+			# 向目标移动
+			actions.append(Action.move(get_target_direction(), self))
 			# 远程施法（冷却允许时）
 			if skill_manager and skill_manager.can_use("right"):
-				actions.append(Action.cast("right", get_player_direction(), self))
+				actions.append(Action.cast("right", get_target_direction(), self))
 		"Attack":
 			# 近战攻击（冷却允许时）
 			if attack_ready and _attack_timer >= attack_cooldown:
@@ -152,25 +228,33 @@ func _current_state_name() -> String:
 ## ── StateChart 状态处理器（只负责：1.环境感知 → 2.发送事件 → 3.调用 poll/resolve） ──
 
 func _on_idle_physics(_delta: float) -> void:
-	if not player or player.health_component.is_dead:
+	var target := _get_current_target()
+	if not target:
 		return
-	if distance_to_player() <= detect_range:
+	if distance_to_target() <= detect_range:
 		state_chart.send_event("player_detected")
 
 
 func _on_chase_physics(_delta: float) -> void:
-	if not player or player.health_component.is_dead:
-		state_chart.send_event("player_lost")
+	var target := _get_current_target()
+	if not target:
+		# 无目标 → 回到 Idle（清除复仇，重新搜索玩家）
+		_revenge_target = null
+		if not player or player.health_component.is_dead:
+			state_chart.send_event("player_lost")
 		return
 
-	var dist := distance_to_player()
+	var dist := distance_to_target()
 
 	if dist <= attack_range:
 		state_chart.send_event("player_in_range")
 		return
 
-	if dist > detect_range * 1.5:
-		state_chart.send_event("player_lost")
+	if dist > _leash_distance:
+		# 复仇目标太远 → 放弃复仇
+		_revenge_target = null
+		if not player or player.health_component.is_dead:
+			state_chart.send_event("player_lost")
 		return
 
 	# 通过通用 Action 表达意图 + 执行
@@ -185,12 +269,14 @@ func _on_attack_enter() -> void:
 
 
 func _on_attack_physics(delta: float) -> void:
-	if not player or player.health_component.is_dead:
+	var target := _get_current_target()
+	if not target:
+		_revenge_target = null
 		state_chart.send_event("player_lost")
 		return
 
 	_attack_timer += delta
-	var dist := distance_to_player()
+	var dist := distance_to_target()
 
 	if dist > attack_range * 1.5:
 		state_chart.send_event("player_out_of_range")
@@ -203,8 +289,12 @@ func _on_attack_physics(delta: float) -> void:
 		_attack_timer = 0.0  # 攻击后重置计时器
 
 
+const MELEE_SPLASH_RADIUS: float = 40.0   ## 近战溅射半径
+const MELEE_SPLASH_DAMAGE: float = 0.5    ## 溅射伤害系数
+
 func _do_melee_attack() -> void:
-	if not attack_ready or not player:
+	var target := _get_current_target()
+	if not attack_ready or not target:
 		return
 	attack_ready = false
 
@@ -214,7 +304,19 @@ func _do_melee_attack() -> void:
 		exec_inst.begin_hit_sequence()
 
 	# report_hit() 内部已调用 take_damage()
-	CombatExecutor.report_hit(self, player, attack_damage, player.global_position, null, ["melee", "enemy"])
+	CombatExecutor.report_hit(self, target, attack_damage, target.global_position, null, ["melee", "enemy"])
+
+	# 溅射伤害：击中附近所有敌人（模拟互殴场景）
+	var splash_dmg := int(attack_damage * MELEE_SPLASH_DAMAGE)
+	if splash_dmg > 0:
+		for body in get_tree().get_nodes_in_group("enemy"):
+			if body == self or body == target:
+				continue
+			if not is_instance_valid(body):
+				continue
+			var dist := global_position.distance_to(body.global_position)
+			if dist <= MELEE_SPLASH_RADIUS:
+				CombatExecutor.report_hit(self, body, splash_dmg, body.global_position, null, ["melee", "enemy", "splash"])
 
 	if trace:
 		trace.final_damage = attack_damage

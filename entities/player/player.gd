@@ -16,7 +16,9 @@ var _skill_pool: SkillPool = null
 ## ── 持有 TriggeredEffect 引用以防 Resource GC ──
 var _on_kill_effect: OnKillBonusExp = null
 var _on_hit_effect: TriggeredEffect = null
-var _on_ice_expire: OnIceArmorExpire = null
+var _on_buff_expire_cast: GenericTriggeredCast = null  ## 通用：Buff过期→释放技能
+var _on_kill_fire_trigger: GenericTriggeredCast = null  ## 火系击杀→烈焰风暴
+
 var _on_hit_fire_status: OnHitApplyStatus = null  ## 持有引用防 GC
 var _on_hit_ice_status: OnHitApplyStatus = null   ## 冰→冻结
 var _on_hit_poison_status: OnHitApplyStatus = null  ## 毒→中毒
@@ -319,9 +321,17 @@ func _setup_event_bus() -> void:
 	_on_kill_effect = OnKillBonusExp.create_for_player(15)
 	_register_triggered_effects(_on_kill_effect)
 
-	# ON_STATUS_REMOVED 冰甲 → 冰爆
-	_on_ice_expire = OnIceArmorExpire.create_default()
-	_register_triggered_effects(_on_ice_expire)
+	# ON_STATUS_REMOVED 冰甲 → 冰爆（通用触发施法，纯数据驱动）
+	_on_buff_expire_cast = _create_buff_expire_trigger()
+	_register_triggered_effects(_on_buff_expire_cast)
+
+	# 示例：ON_KILL 火系击杀 → 烈焰风暴
+	_on_kill_fire_trigger = _create_generic_trigger(CombatEvent.Type.ON_KILL, "fire", "flame_storm")
+	_register_triggered_effects(_on_kill_fire_trigger)
+
+	# 低血量触发器（配置化，DEFAULT_LOW_HP_TRIGGERS 可扩展）
+	_setup_low_hp_triggers()
+	health_component.health_changed.connect(_check_low_hp_shadow_step)
 
 	# ON_HIT 火焰技能 → 挂 burning 状态
 	_on_hit_fire_status = OnHitApplyStatus.create("fire", "res://gameplay/abilities/data/burning.tres")
@@ -378,6 +388,88 @@ func _ensure_runtime_ready() -> void:
 func _register_triggered_effects(effect: TriggeredEffect) -> void:
 	effect.register()
 	print("⚡ 已注册触发效果: ", effect.get_script().get_global_name())
+
+
+## ── 通用触发施法 工厂方法 ──
+
+## 冰霜护盾过期 → 冰爆
+func _create_buff_expire_trigger() -> GenericTriggeredCast:
+	var trigger := GenericTriggeredCast.new()
+	trigger.trigger_type = CombatEvent.Type.ON_STATUS_REMOVED
+	trigger.scope_source = "skill"
+	trigger.max_recursion = 0
+	trigger.cast_skill_id = "ice_explosion"
+	trigger.caster_mode = GenericTriggeredCast.CasterMode.SELF
+	trigger.target_mode = GenericTriggeredCast.TargetMode.CASTER_POSITION
+	trigger.consume_mp = false
+
+	var cond := BuffNameCondition.new()
+	cond.required_buff_name = "冰霜护盾"
+	trigger.conditions = [cond]
+
+	return trigger
+
+
+## 低血量触发器（配置化 — 读取 LowHpTriggerData 列表）
+var _low_hp_triggers: Array[LowHpTriggerData] = []
+var _low_hp_cooldowns: Dictionary = {}  ## trigger → 剩余冷却秒数
+
+const DEFAULT_LOW_HP_TRIGGERS: Array = [
+	# hp_threshold, skill_id, target_mode, cooldown
+	[0.3, "shadow_step", 5, 15.0],  # 5 = TargetMode.ESCAPE
+]
+
+func _setup_low_hp_triggers() -> void:
+	for raw in DEFAULT_LOW_HP_TRIGGERS:
+		var t := LowHpTriggerData.new()
+		t.hp_threshold = raw[0]
+		t.cast_skill_id = raw[1]
+		t.target_mode = raw[2]
+		t.cooldown = raw[3]
+		_low_hp_triggers.append(t)
+		_low_hp_cooldowns[t] = 0.0
+
+func _check_low_hp_shadow_step(_current_hp: int, max_hp: int) -> void:
+	if health_component.is_dead:
+		return
+	var ratio := float(health_component.hp) / float(max_hp)
+	for trigger in _low_hp_triggers:
+		var cd: float = _low_hp_cooldowns.get(trigger, 0.0)
+		if cd > 0:
+			continue
+		if ratio >= trigger.hp_threshold:
+			continue
+		# 触发！
+		_low_hp_cooldowns[trigger] = trigger.cooldown
+
+		var gtc := GenericTriggeredCast.new()
+		gtc.cast_skill_id = trigger.cast_skill_id
+		gtc.caster_mode = GenericTriggeredCast.CasterMode.PLAYER
+		gtc.target_mode = trigger.target_mode
+		gtc.consume_mp = false
+
+		# 构造一个虚拟 ON_DAMAGE 事件触发
+		var ev := CombatEvent.create(CombatEvent.Type.ON_DAMAGE, null, self)
+		gtc._execute(ev)
+		print("🆘 [LowHP] 血量 %.0f%% → %s！" % [ratio * 100, trigger.cast_skill_id])
+
+
+## 通用模板：事件+标签→技能（复制此模板创建新触发器）
+func _create_generic_trigger(event_type: CombatEvent.Type, required_tag: String, skill_id: String) -> GenericTriggeredCast:
+	var trigger := GenericTriggeredCast.new()
+	trigger.trigger_type = event_type
+	trigger.scope_source = "skill"
+	trigger.max_recursion = 0
+	trigger.cast_skill_id = skill_id
+	trigger.caster_mode = GenericTriggeredCast.CasterMode.PLAYER
+	trigger.target_mode = GenericTriggeredCast.TargetMode.EVENT_TARGET
+	trigger.consume_mp = false
+
+	var cond := SkillTagCondition.new()
+	cond.required_skill_tag = required_tag
+	trigger.conditions = [cond]
+
+	return trigger
 
 
 ## 演示 EffectGraph：ON_HIT → 火焰技能分支
@@ -890,7 +982,13 @@ func _input(event: InputEvent) -> void:
 				cancel_aim = true
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
+	# 低血量触发器冷却递减
+	for trigger in _low_hp_cooldowns:
+		var cd: float = _low_hp_cooldowns[trigger]
+		if cd > 0:
+			_low_hp_cooldowns[trigger] = cd - delta
+
 	if not _aim_dot or not _aim_dot.visible:
 		return
 	if _aim_line.visible:
