@@ -100,6 +100,12 @@ func _setup_runtimes() -> void:
 		dns.name = "DamageNumberSpawner"
 		add_child(dns)
 
+	# === Boss 血条（顶部居中） ===
+	if not has_node("BossHPBar"):
+		var bar := BossHPBar.new()
+		bar.name = "BossHPBar"
+		add_child(bar)
+
 	print("🏛️ GameRuntime: 五大 Runtime 初始化完成")
 	print("   CommandBus       : %s" % ("✅" if command_bus else "❌"))
 	print("   CombatExecutor   : %s" % ("✅" if combat_executor else "❌"))

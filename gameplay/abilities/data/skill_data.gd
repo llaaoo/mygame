@@ -23,6 +23,9 @@ enum SkillType {
 ## ── 类型 & 标签 ──
 @export var skill_type: SkillType = SkillType.PROJECTILE
 @export var cast_type: String = ""               ## "instant" / "channel" / "charge" 等
+@export var charge_duration: float = 0.8         ## 蓄满所需秒数（仅 cast_type="charge"）
+@export var channel_mp_per_sec: float = 10.0     ## 每秒MP消耗（仅 cast_type="channel"）
+@export var channel_tick_interval: float = 0.3   ## 每次tick间隔（仅 cast_type="channel"）
 @export var tags: Array[String] = []             ## ["fire", "shadow", "melee"] 用于 modifier 匹配
 
 ## ── 消耗 & 冷却（纯数据） ──

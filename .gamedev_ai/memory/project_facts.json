@@ -1160,5 +1160,33 @@
 		"created": "2026-05-27T22:41:18",
 		"id": "fact_1779892878",
 		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "蓄力技能系统 v1.0：SkillData 新增 charge_duration（蓄满秒数）。CastContext 新增 charge_power（0~1蓄力倍率）。Player 蓄力状态机：CAST_PRESS 且 cast_type=\"charge\" → _begin_charge → _process 累加 _charge_power → 瞄准指示器随倍率缩放 → CAST_RELEASE → _cast_source → cast_slot_charged → SkillManager.use_slot_with_context → SkillExecutor 在 _execute_projectile/_aoe 中应用 charge_power（伤害×倍率，视觉缩放 0.4+0.6×倍率）。闪避取消蓄力。示例：蓄力火球（快捷键4，1.2s满蓄，最大伤害40→64含属性加成）。",
+		"created": "2026-05-28T22:56:41",
+		"id": "fact_1779980201",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "引导技能系统 v1.0：SkillData 新增 channel_mp_per_sec 和 channel_tick_interval。Player 引导状态机：CAST_PRESS 且 cast_type=\"channel\" → _begin_channel → _process 累加 _channel_timer → 到间隔 _channel_tick（通过 SkillExecutor.execute 每次释放 AOE/投射物，绕过冷却）→ 扣 MP → MP不足自动停止。松开键 → _cancel_channel。闪避打断。示例：冰风暴（快捷键2，每0.4s消耗6MP在鼠标位生成60px冰AoE）。三种施法类型完整：instant（火球）/ charge（蓄力火球）/ channel（冰风暴）。",
+		"created": "2026-05-28T23:02:19",
+		"id": "fact_1779980539",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Boss 系统数据驱动化 v1.1：BossData Resource (content/bosses/boss_data.gd) 纯数据配置 boss_name/HP/伤害/侦测/速度/颜色/缩放/phase_skills/active_skill/元素抗性/免疫组。boss.gd 通过 @export boss_data 读取，_ready() 中注入所有属性。一个 enemy.tscn 场景 + boss.gd 脚本 + .tres 数据 = 任意 Boss。示例：fire_lord.tres (HP400,火抗0.7,主动烈焰风暴,阶段50%烈焰风暴+25%冰甲+狂暴)。",
+		"created": "2026-05-29T00:09:56",
+		"id": "fact_1779984596",
+		"source": "ai"
+	},
+	{
+		"category": "architecture",
+		"content": "Boss 系统完整状态：BossData (.tres) 纯数据驱动 → boss.gd 读取配置 → enemy.tscn 场景模板。火焰领主已知属性：HP400/伤害25/侦测250/速度90/火抗70%(含burning DOT)/fire_immune组/阶段50%烈焰风暴+25%冰甲+狂暴。配置字段：boss_name/max_hp/attack_damage/detect_range/move_speed/color/scale/phase_skills/active_skill_id+interval/resists(元素抗性字典)/immune_groups。新增Boss只需建.tres+拖入场景+boss_data引用。",
+		"created": "2026-05-29T00:16:02",
+		"id": "fact_1779984962",
+		"source": "ai"
 	}
 ]

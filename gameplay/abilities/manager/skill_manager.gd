@@ -176,6 +176,23 @@ func use_slot(idx: int, caster: Node2D, direction: Vector2) -> bool:
 	return _execute(inst.data, "slot_%d" % idx, caster, direction)
 
 
+## 使用预构建 CastContext（蓄力等自定义参数）
+func use_hand_with_context(hand: String, caster: Node2D, ctx: CastContext) -> bool:
+	var inst: SkillInstance = left_hand if hand == "left" else right_hand
+	if not inst or not inst.data:
+		return false
+	return _execute_with_context(inst.data, hand, caster, ctx)
+
+
+func use_slot_with_context(idx: int, caster: Node2D, ctx: CastContext) -> bool:
+	if idx < 0 or idx >= MAX_SLOTS:
+		return false
+	var inst := _slots[idx]
+	if not inst or not inst.data:
+		return false
+	return _execute_with_context(inst.data, "slot_%d" % idx, caster, ctx)
+
+
 ## ── 内部执行（委托给 SkillExecutor） ──
 
 func _execute(skill: SkillData, source: String, caster: Node2D, direction: Vector2) -> bool:
@@ -210,6 +227,42 @@ func _execute(skill: SkillData, source: String, caster: Node2D, direction: Vecto
 		return false
 
 	# 触发冷却（POST 之后）
+	if inst:
+		inst.trigger_cooldown()
+	_cooldowns[source] = skill.cooldown
+	cooldown_changed.emit(source, skill.cooldown, skill.cooldown)
+	skill_used.emit(source, skill)
+	return true
+
+
+func _execute_with_context(skill: SkillData, source: String, caster: Node2D, ctx: CastContext) -> bool:
+	var exec_inst := CombatExecutor.instance
+	if exec_inst:
+		exec_inst.begin_cast_sequence()
+
+	var inst := _find_instance(source)
+	if inst and not inst.is_ready():
+		if exec_inst:
+			exec_inst.enter_phase(CombatPhase.Phase.IDLE)
+		return false
+
+	var mana := caster.get_node_or_null("ManaComponent") as ManaComponent
+	if mana and skill.mp_cost > 0 and not mana.use_mp(skill.mp_cost):
+		if exec_inst:
+			exec_inst.enter_phase(CombatPhase.Phase.IDLE)
+		return false
+
+	ctx.skill = skill
+	ctx.world = caster.get_tree().current_scene
+	var ok := executor.execute(skill, ctx)
+
+	if not ok:
+		if mana and skill.mp_cost > 0:
+			mana.restore_mp(skill.mp_cost)
+		if exec_inst:
+			exec_inst.enter_phase(CombatPhase.Phase.IDLE)
+		return false
+
 	if inst:
 		inst.trigger_cooldown()
 	_cooldowns[source] = skill.cooldown

@@ -48,6 +48,14 @@ var mana_component: ManaComponent = null
 ## ── 瞄准状态（跨状态保持） ──
 var aiming_sources: Dictionary = {}
 var cancel_aim: bool = false
+## ── 蓄力状态 ──
+var _charging_source: String = ""       ## 正在蓄力的槽位
+var _charge_power: float = 0.0          ## 当前蓄力倍率
+var _charge_skill: SkillData = null     ## 正在蓄力的技能数据
+## ── 引导状态 ──
+var _channeling_source: String = ""     ## 正在引导的槽位
+var _channel_skill: SkillData = null    ## 正在引导的技能
+var _channel_timer: float = 0.0         ## tick 累加器
 ## ── UI 面板打开时阻止游戏输入 ──
 var ui_blocked: bool = false
 ## ── 瞄准指示器 ──
@@ -120,6 +128,9 @@ func _ready() -> void:
 
 	# 技能池面板
 	call_deferred("_setup_skill_pool_ui")
+
+	# Boss 血条
+	call_deferred("_setup_boss_bar")
 
 
 ## ── 属性系统 ──
@@ -210,7 +221,7 @@ func _setup_skills() -> void:
 			fireball.tags = ["fire"]
 			_skill_pool.add_skill(fireball)
 
-	for sid in ["ice_armor", "flame_storm", "shadow_step", "ice_explosion", "poison_cloud", "lightning_bolt", "summon_skeleton"]:
+	for sid in ["ice_armor", "flame_storm", "shadow_step", "ice_explosion", "poison_cloud", "lightning_bolt", "summon_skeleton", "charged_fireball", "ice_storm"]:
 		if not _skill_pool.has_skill(sid):
 			var skill := load("res://gameplay/abilities/data/%s_data.tres" % sid) as SkillData
 			if skill:
@@ -262,6 +273,31 @@ func _setup_skills() -> void:
 						skill.damage = 0
 						skill.damage_scaling = 0.0
 						skill.tags = ["summon", "shadow"]
+					"charged_fireball":
+						skill.archetype = "linear_projectile"
+						skill.visual = load("res://content/visuals/fire_visual.tres")
+						skill.projectile_speed = 600.0
+						skill.damage = 40
+						skill.damage_scaling = 1.2
+						skill.mp_cost = 20
+						skill.cooldown = 3.0
+						skill.cast_type = "charge"
+						skill.charge_duration = 1.2
+						skill.tags = ["fire", "charge"]
+					"ice_storm":
+						skill.archetype = "persistent_aoe"
+						skill.aoe_visual = load("res://content/visuals/ice_aoe_visual.tres")
+						skill.cast_distance = 200.0
+						skill.damage = 12
+						skill.damage_scaling = 0.4
+						skill.mp_cost = 0
+						skill.cooldown = 0.0
+						skill.cast_type = "channel"
+						skill.channel_mp_per_sec = 15.0
+						skill.channel_tick_interval = 0.4
+						skill.aoe_radius = 60.0
+						skill.aoe_lifetime = 0.3
+						skill.tags = ["ice", "channel"]
 				_skill_pool.add_skill(skill)
 
 	# 3. 构建索引
@@ -274,7 +310,7 @@ func _setup_skills() -> void:
 	var loadout := SkillLoadout.create(
 		"ice_armor",    # 左手
 		"fireball",     # 右手
-		["flame_storm", "shadow_step", "ice_explosion", "poison_cloud"]  # 快捷键 1-4
+		["flame_storm", "ice_storm", "ice_explosion", "charged_fireball"]  # 快捷键 1-4
 	)
 	skill_manager.apply_loadout(loadout)
 
@@ -332,6 +368,9 @@ func _setup_event_bus() -> void:
 	# 低血量触发器（配置化，DEFAULT_LOW_HP_TRIGGERS 可扩展）
 	_setup_low_hp_triggers()
 	health_component.health_changed.connect(_check_low_hp_shadow_step)
+
+	# 技能熟练度系统（上古卷轴式）
+	_setup_mastery()
 
 	# ON_HIT 火焰技能 → 挂 burning 状态
 	_on_hit_fire_status = OnHitApplyStatus.create("fire", "res://gameplay/abilities/data/burning.tres")
@@ -543,6 +582,7 @@ func _setup_combat_debugger() -> void:
 
 var quest_manager: QuestManager = null
 var summon_manager: SummonManager = null
+var mastery_manager: SkillMasteryManager = null
 
 
 func _setup_quest_manager() -> void:
@@ -691,6 +731,10 @@ func resolve_action(action: Action) -> void:
 			state_machine.transition_to("attack")
 
 		Action.ActionType.DODGE:
+			_cancel_charge()
+			_cancel_channel()
+			aiming_sources.clear()
+			hide_aim()
 			state_machine.transition_to("dodge")
 
 		Action.ActionType.INTERACT:
@@ -699,6 +743,21 @@ func resolve_action(action: Action) -> void:
 		Action.ActionType.CAST:
 			if action.params.get("release", false):
 				# CAST_RELEASE — 验证后才执行
+				if _charging_source != "":
+					# 蓄力释放：取消蓄力，正常施放
+					aiming_sources.erase(action.skill_source)
+					_cast_source(action.skill_source)
+					state_machine.transition_to("skill")
+					if aiming_sources.is_empty():
+						hide_aim()
+					return
+				if _channeling_source != "":
+					# 引导松开：停止引导
+					_cancel_channel()
+					aiming_sources.erase(action.skill_source)
+					if aiming_sources.is_empty():
+						hide_aim()
+					return
 				if not ActionResolver.validate(self, action):
 					# MP/冷却不足，清除瞄准但不执行
 					aiming_sources.erase(action.skill_source)
@@ -712,11 +771,18 @@ func resolve_action(action: Action) -> void:
 				if aiming_sources.is_empty():
 					hide_aim()
 			else:
-				# CAST_PRESS — 总是显示瞄准（不验证 MP，让玩家看到后再判断）
+				# CAST_PRESS — 总是显示瞄准
 				aiming_sources[action.skill_source] = true
 				var skill := _get_skill_for_source(action.skill_source)
 				if skill:
-					show_aim(action.skill_source, skill)
+					# 蓄力技能：进入蓄力状态
+					if skill.cast_type == "charge":
+						_begin_charge(action.skill_source, skill)
+					# 引导技能：进入引导状态
+					elif skill.cast_type == "channel":
+						_begin_channel(action.skill_source, skill)
+					else:
+						show_aim(action.skill_source, skill)
 
 
 ## ── 旧 API: PlayerAction (@deprecated, 保留向后兼容) ──
@@ -831,11 +897,84 @@ func _get_skill_for_source(source: String) -> SkillData:
 
 
 func _cast_source(source: String) -> void:
+	# 蓄力技能释放时传递 charge_power
+	if _charge_skill and _charge_source_matches(source):
+		var charge := _charge_power
+		_cancel_charge()
+		match source:
+			"left", "right":
+				cast_hand_charged(source, charge)
+			_:
+				cast_slot_charged(source.trim_prefix("slot_").to_int(), charge)
+		return
 	match source:
 		"left", "right":
 			cast_hand(source)
 		_:
 			cast_slot(source.trim_prefix("slot_").to_int())
+
+
+func _charge_source_matches(source: String) -> bool:
+	return source == _charging_source or (
+		_charging_source.begins_with("slot_") and source.begins_with("slot_") and
+		_charging_source.trim_prefix("slot_").to_int() == source.trim_prefix("slot_").to_int())
+
+
+## ── 蓄力系统 ──
+
+func _begin_charge(source: String, skill: SkillData) -> void:
+	_charging_source = source
+	_charge_skill = skill
+	_charge_power = 0.0
+	show_aim(source, skill)
+	print("⏳ [Charge] 开始蓄力: %s (%.1fs 满蓄)" % [skill.display_name, skill.charge_duration])
+
+
+func _cancel_charge() -> void:
+	if _charging_source != "":
+		print("⏹️ [Charge] 取消蓄力: %s" % _charge_skill.display_name if _charge_skill else "?")
+	_charging_source = ""
+	_charge_skill = null
+	_charge_power = 0.0
+
+
+## ── 引导系统 ──
+
+func _begin_channel(source: String, skill: SkillData) -> void:
+	_channeling_source = source
+	_channel_skill = skill
+	_channel_timer = 0.0
+	show_aim(source, skill)
+	print("🌀 [Channel] 开始引导: %s (MP %.0f/s)" % [skill.display_name, skill.channel_mp_per_sec])
+
+
+func _cancel_channel() -> void:
+	if _channeling_source != "":
+		print("⏹️ [Channel] 停止引导: %s" % _channel_skill.display_name if _channel_skill else "?")
+	_channeling_source = ""
+	_channel_skill = null
+	_channel_timer = 0.0
+
+
+func _channel_tick() -> void:
+	if not _channel_skill:
+		return
+	# 引导每次 tick 直接释放技能（不经过冷却/蓄力逻辑）
+	var ctx := CastContext.simple(self, get_mouse_direction(), _channel_skill)
+	ctx.charge_power = 1.0
+	skill_manager.executor.execute(_channel_skill, ctx)
+
+
+func cast_hand_charged(hand: String, charge_power: float) -> bool:
+	var ctx := CastContext.simple(self, get_mouse_direction(), _get_skill_for_source(hand))
+	ctx.charge_power = charge_power
+	return skill_manager.use_hand_with_context(hand, self, ctx)
+
+
+func cast_slot_charged(idx: int, charge_power: float) -> bool:
+	var ctx := CastContext.simple(self, get_mouse_direction(), _get_skill_for_source("slot_%d" % idx))
+	ctx.charge_power = charge_power
+	return skill_manager.use_slot_with_context(idx, self, ctx)
 
 
 ## ── 交互键 ──
@@ -907,6 +1046,75 @@ func _setup_state_machine() -> void:
 
 ## ── 召唤物管理器 ──
 
+## ── 技能熟练度系统 ──
+
+func _setup_mastery() -> void:
+	mastery_manager = SkillMasteryManager.new()
+	mastery_manager.name = "MasteryManager"
+	add_child(mastery_manager)
+	mastery_manager.setup()
+
+	# 施法时加 XP
+	skill_manager.skill_used.connect(_on_skill_used_for_mastery)
+
+	# 命中时加 XP（按伤害）
+	if CombatEventBus.instance:
+		CombatEventBus.instance.subscribe(CombatEvent.Type.ON_HIT, _on_player_hit_for_mastery)
+		CombatEventBus.instance.subscribe(CombatEvent.Type.ON_KILL, _on_player_kill_for_mastery)
+
+
+func _on_skill_used_for_mastery(_source: String, skill: SkillData) -> void:
+	if mastery_manager:
+		mastery_manager.on_skill_cast(skill)
+
+
+func _on_player_hit_for_mastery(ev: CombatEvent) -> void:
+	if ev.source != self:
+		return
+	if not mastery_manager:
+		return
+	var school := SkillMastery.School.DESTRUCTION
+	if ev.skill:
+		school = _guess_school_from_skill(ev.skill)
+	elif ev.data.has("tags"):
+		var tags: Array = ev.data.get("tags", []) as Array
+		if "summon" in tags:
+			school = SkillMastery.School.CONJURATION
+		elif "shadow" in tags:
+			school = SkillMastery.School.ILLUSION
+	var damage: int = ev.data.get("damage", 0)
+	if damage > 0:
+		mastery_manager.on_deal_damage(school, damage)
+
+
+func _on_player_kill_for_mastery(ev: CombatEvent) -> void:
+	if ev.source != self:
+		return
+	if not mastery_manager:
+		return
+	var school := SkillMastery.School.DESTRUCTION
+	if ev.skill:
+		school = _guess_school_from_skill(ev.skill)
+	elif ev.data.has("tags"):
+		var tags: Array = ev.data.get("tags", []) as Array
+		if "summon" in tags:
+			school = SkillMastery.School.CONJURATION
+		elif "shadow" in tags:
+			school = SkillMastery.School.ILLUSION
+	mastery_manager.on_kill(school)
+
+
+func _guess_school_from_skill(skill: SkillData) -> SkillMastery.School:
+	var tags := skill.tags
+	if "summon" in tags:
+		return SkillMastery.School.CONJURATION
+	if "ice" in tags and skill.skill_type == SkillData.SkillType.BUFF:
+		return SkillMastery.School.ALTERATION
+	if "shadow" in tags and skill.skill_type == SkillData.SkillType.DASH:
+		return SkillMastery.School.ILLUSION
+	return SkillMastery.School.DESTRUCTION
+
+
 func _setup_summon_manager() -> void:
 	if has_node("SummonManager"):
 		summon_manager = $SummonManager as SummonManager
@@ -933,6 +1141,14 @@ func _setup_inventory_panel() -> void:
 		inventory_panel.setup(inventory, $EquipmentManager)
 		if debug_items:
 			_add_test_items()
+
+
+func _setup_boss_bar() -> void:
+	if get_tree().current_scene.get_node_or_null("BossHPBar"):
+		return
+	var bar := BossHPBar.new()
+	bar.name = "BossHPBar"
+	get_tree().current_scene.add_child.call_deferred(bar)
 
 
 func _setup_skill_pool_ui() -> void:
@@ -988,6 +1204,25 @@ func _process(delta: float) -> void:
 		var cd: float = _low_hp_cooldowns[trigger]
 		if cd > 0:
 			_low_hp_cooldowns[trigger] = cd - delta
+
+	# 蓄力累加
+	if _charging_source != "" and _charge_skill:
+		_charge_power = minf(1.0, _charge_power + delta / _charge_skill.charge_duration)
+		# 更新瞄准指示器大小反映蓄力进度
+		if _aim_dot and _aim_dot.visible:
+			_aim_dot.scale = Vector2(0.08, 0.08) * (0.5 + _charge_power * 1.0)
+
+	# 引导 tick
+	if _channeling_source != "" and _channel_skill:
+		_channel_timer += delta
+		if _channel_timer >= _channel_skill.channel_tick_interval:
+			_channel_timer -= _channel_skill.channel_tick_interval
+			# 消耗 MP
+			var mp_cost := int(_channel_skill.channel_mp_per_sec * _channel_skill.channel_tick_interval)
+			if mana_component and not mana_component.use_mp(mp_cost):
+				_cancel_channel()
+			else:
+				_channel_tick()
 
 	if not _aim_dot or not _aim_dot.visible:
 		return

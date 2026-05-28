@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="SkillData" format=3 uid="uid://b3whcc31e4dm4"]
+
+[ext_resource type="Script" uid="uid://5yw1untw6sop" path="res://gameplay/abilities/data/skill_data.gd" id="1_spyyv"]
+
+[resource]
+script = ExtResource("1_spyyv")
+id = "charged_fireball"
+display_name = "蓄力火球"
+cast_type = "charge"
+charge_duration = 1.2
+mp_cost = 20
+cooldown = 3.0
+damage = 40
+damage_scaling = 1.2
+archetype = "linear_projectile"
+projectile_speed = 600.0

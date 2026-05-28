@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SkillData" format=3 uid="uid://hhi7yxqlk77k"]
+
+[ext_resource type="Script" uid="uid://5yw1untw6sop" path="res://gameplay/abilities/data/skill_data.gd" id="1_mb888"]
+
+[resource]
+script = ExtResource("1_mb888")
+id = "ice_storm"
+display_name = "冰风暴"
+skill_type = 2
+cast_type = "channel"
+channel_mp_per_sec = 15.0
+channel_tick_interval = 0.4
+mp_cost = 0
+cooldown = 0.0
+damage = 12
+damage_scaling = 0.4
+archetype = "persistent_aoe"
+cast_distance = 200.0
+aoe_radius = 60.0
+aoe_lifetime = 0.3

@@ -9,6 +9,7 @@ var direction: Vector2 = Vector2.ZERO
 var target_position: Vector2 = Vector2.ZERO
 var world: Node = null
 var skill: SkillData = null
+var charge_power: float = 1.0          ## 蓄力倍率（0.0~1.0，1.0=满蓄）
 
 
 ## 快捷构造：仅需 caster + direction

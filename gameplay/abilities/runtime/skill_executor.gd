@@ -194,13 +194,22 @@ func _execute_projectile(skill: SkillData, ctx: CastContext) -> bool:
 	if instance is Projectile:
 		var proj := instance as Projectile
 		proj.setup(skill, ctx.caster, ctx.direction)
-		proj.damage = resolve_damage(skill, ctx)
+		var dmg := resolve_damage(skill, ctx)
+		if ctx.charge_power < 1.0:
+			dmg = maxi(1, int(dmg * ctx.charge_power))
+		proj.damage = dmg
 		proj.set_meta("skill_data", skill)
 		proj.set_meta("_combat_trace", CombatDebugger.active())
+		# 蓄力视觉：大小随倍率
+		if ctx.charge_power < 1.0:
+			proj.scale *= (0.4 + ctx.charge_power * 0.6)
 	elif instance.has_method("setup"):
 		instance.setup(skill, ctx.caster, ctx.direction)
 		if "damage" in instance:
-			instance.damage = resolve_damage(skill, ctx)
+			var dmg := resolve_damage(skill, ctx)
+			if ctx.charge_power < 1.0:
+				dmg = maxi(1, int(dmg * ctx.charge_power))
+			instance.damage = dmg
 		instance.set_meta("skill_data", skill)
 		instance.set_meta("_combat_trace", CombatDebugger.active())
 	
@@ -239,7 +248,8 @@ func _execute_aoe(skill: SkillData, ctx: CastContext) -> bool:
 		return false
 	
 	var instance := scene.instantiate() as Node2D
-	ctx.world.add_child(instance)
+	# call_deferred 防止在物理查询链中触发 "flushing queries" 错误
+	ctx.world.add_child.call_deferred(instance)
 	# 若指定了 target_position（如触发施法），直接放在目标位置
 	if ctx.target_position != Vector2.ZERO:
 		instance.global_position = ctx.target_position
@@ -250,12 +260,18 @@ func _execute_aoe(skill: SkillData, ctx: CastContext) -> bool:
 		instance.setup(skill, ctx.caster)
 	else:
 		if "damage" in instance:
-			instance.damage = resolve_damage(skill, ctx)
+			var dmg := resolve_damage(skill, ctx)
+			if ctx.charge_power < 1.0:
+				dmg = maxi(1, int(dmg * ctx.charge_power))
+			instance.damage = dmg
 		if instance.has_method("set_caster"):
 			instance.set_caster(ctx.caster)
 	
 	instance.set_meta("skill_data", skill)
 	instance.set_meta("_combat_trace", CombatDebugger.active())
+	# 蓄力视觉：AoE 大小随倍率
+	if ctx.charge_power < 1.0:
+		instance.scale *= (0.4 + ctx.charge_power * 0.6)
 	return true
 
 
@@ -334,7 +350,7 @@ func _execute_summon(skill: SkillData, ctx: CastContext) -> bool:
 		return false
 
 	var instance := scene.instantiate() as SummonEntity
-	ctx.world.add_child(instance)
+	ctx.world.add_child.call_deferred(instance)
 
 	# 在玩家身后生成
 	var spawn_pos := ctx.caster.global_position - ctx.direction * 50.0

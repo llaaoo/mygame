@@ -114,7 +114,7 @@ func tick_entity_surface() -> void:
 				_apply_surface_buffs(entity, buff_paths)
 				# 燃烧表面对 MapObject 造成火焰伤害（触发连锁）
 				var surf := _surface_scheduler.get_surface(cell)
-				if surf.get("state", "") == "burning" and entity.has_method("take_damage"):
+				if surf.get("state", "") == "burning" and entity.has_method("take_damage") and not entity.is_in_group("fire_immune"):
 					CombatExecutor.report_hit(null, entity, 3, entity.global_position, null, ["fire"])
 		
 		# 2. Player + Enemy（距离检测）
@@ -122,6 +122,8 @@ func tick_entity_surface() -> void:
 		for group_name in ["player", "enemy"]:
 			for entity in tree.get_nodes_in_group(group_name):
 				if not (entity is Node2D):
+					continue
+				if entity.is_in_group("fire_immune"):
 					continue
 				if entity.global_position.distance_squared_to(cell_center) > 48 * 48:
 					continue
@@ -134,7 +136,12 @@ func _apply_surface_buffs(entity: Node, buff_paths: Array[String]) -> void:
 		return
 	for path in buff_paths:
 		var buff := load(path) as Buff
-		if buff and not bm.has_buff(buff.status_id):
+		if not buff:
+			continue
+		# 火免实体跳过 burning
+		if buff.status_id == "burning" and entity.is_in_group("fire_immune"):
+			continue
+		if not bm.has_buff(buff.status_id):
 			bm.apply_buff(buff)
 
 

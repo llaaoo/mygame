@@ -1,0 +1,76 @@
+[gd_scene format=3 uid="uid://drgg78lq36vjw"]
+
+[ext_resource type="Script" uid="uid://bw2moic7vwkhy" path="res://entities/boss/boss.gd" id="1_qnrkc"]
+[ext_resource type="Script" uid="uid://bina3ctxqpy1c" path="res://entities/components/health_component.gd" id="1_t1jva"]
+[ext_resource type="Script" uid="uid://cgn2i161esv0a" path="res://gameplay/abilities/manager/skill_manager.gd" id="2_orcvn"]
+[ext_resource type="Texture2D" uid="uid://ucd888rpepul" path="res://icon.svg" id="2_r7vrm"]
+[ext_resource type="Script" uid="uid://d1uc57ucjrid5" path="res://entities/components/stats_component.gd" id="3_82xmu"]
+[ext_resource type="Shape2D" uid="uid://bl21c2dshwa6q" path="res://entities/enemy/enemy_body_shape.tres" id="3_tfkep"]
+[ext_resource type="Script" uid="uid://couw105c3bde4" path="res://addons/godot_state_charts/state_chart.gd" id="4_y1djv"]
+[ext_resource type="Script" uid="uid://jk2jm1g6q853" path="res://addons/godot_state_charts/compound_state.gd" id="5_0o6bn"]
+[ext_resource type="Script" uid="uid://cytafq8i1y8qm" path="res://addons/godot_state_charts/atomic_state.gd" id="6_sxiom"]
+[ext_resource type="Script" uid="uid://cf1nsco3w0mf6" path="res://addons/godot_state_charts/transition.gd" id="9_ndvc5"]
+
+[node name="FireLord" type="CharacterBody2D" unique_id=328935019]
+script = ExtResource("1_qnrkc")
+boss_name = "火焰领主"
+boss_color = Color(1, 0.25, 0.1, 1)
+max_hp = 400
+move_speed = 90.0
+detect_range = 250.0
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=61405835]
+scale = Vector2(0.8, 0.8)
+texture = ExtResource("2_r7vrm")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1735960387]
+shape = ExtResource("3_tfkep")
+
+[node name="HealthComponent" type="Node" parent="." unique_id=788228782]
+script = ExtResource("1_t1jva")
+
+[node name="SkillManager" type="Node" parent="." unique_id=926288570]
+script = ExtResource("2_orcvn")
+
+[node name="StatsComponent" type="Node" parent="." unique_id=1214835092]
+script = ExtResource("3_82xmu")
+
+[node name="StateChart" type="Node" parent="." unique_id=445996979]
+script = ExtResource("4_y1djv")
+
+[node name="Brain" type="Node" parent="StateChart" unique_id=1989814559]
+script = ExtResource("5_0o6bn")
+initial_state = NodePath("Idle")
+
+[node name="Idle" type="Node" parent="StateChart/Brain" unique_id=1304610472]
+script = ExtResource("6_sxiom")
+
+[node name="ToChase" type="Node" parent="StateChart/Brain/Idle" unique_id=1426785844]
+script = ExtResource("9_ndvc5")
+to = NodePath("../../Chase")
+event = &"player_detected"
+delay_in_seconds = "0.0"
+
+[node name="Chase" type="Node" parent="StateChart/Brain" unique_id=1486254841]
+script = ExtResource("6_sxiom")
+
+[node name="ToIdle" type="Node" parent="StateChart/Brain/Chase" unique_id=439279468]
+script = ExtResource("9_ndvc5")
+to = NodePath("../../Idle")
+event = &"player_lost"
+delay_in_seconds = "0.0"
+
+[node name="ToAttack" type="Node" parent="StateChart/Brain/Chase" unique_id=1467383651]
+script = ExtResource("9_ndvc5")
+to = NodePath("../../Attack")
+event = &"player_in_range"
+delay_in_seconds = "0.0"
+
+[node name="Attack" type="Node" parent="StateChart/Brain" unique_id=351493781]
+script = ExtResource("6_sxiom")
+
+[node name="ToChase2" type="Node" parent="StateChart/Brain/Attack" unique_id=1800657098]
+script = ExtResource("9_ndvc5")
+to = NodePath("../../Chase")
+event = &"player_out_of_range"
+delay_in_seconds = "0.0"

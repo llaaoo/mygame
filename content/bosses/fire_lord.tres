@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="BossData" format=3 uid="uid://dww7jdviv56le"]
+
+[ext_resource type="Script" uid="uid://8vyoc3y5obg7" path="res://content/bosses/boss_data.gd" id="1_xeduh"]
+
+[resource]
+script = ExtResource("1_xeduh")
+boss_name = "火焰领主"
+active_skill_id = "flame_storm"
+resists = {
+"fire": 0.7
+}
