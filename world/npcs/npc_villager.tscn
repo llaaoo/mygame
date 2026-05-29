@@ -2,9 +2,16 @@
 
 [ext_resource type="Script" uid="uid://b60vvl55geoeu" path="res://world/object/npc.gd" id="1_x82mo"]
 [ext_resource type="Texture2D" uid="uid://ucd888rpepul" path="res://icon.svg" id="2_cw1an"]
+[ext_resource type="Resource" uid="uid://d00pv08t6bmvd" path="res://world/npcs/villager_dialogue.tres" id="3_2kly8"]
+[ext_resource type="Resource" uid="uid://i3uius1slaha" path="res://content/quests/kill_enemies_quest.tres" id="4_qst01"]
 
 [node name="NPC" type="Node2D" unique_id=1103088156]
 script = ExtResource("1_x82mo")
+dialogue = ExtResource("3_2kly8")
+quest_data = ExtResource("4_qst01")
+quest_available_lines = Array[String](["Bandits are pressing close to the road.", "Clear them out, then report back to me."])
+quest_active_lines = Array[String](["The road is not safe yet.", "Come back after the enemies are gone."])
+quest_completed_lines = Array[String](["Good work.", "Take what you need from the supply chest."])
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=510844809]
 modulate = Color(0.3, 0.7, 1, 1)

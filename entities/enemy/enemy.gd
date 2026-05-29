@@ -102,14 +102,23 @@ func _subscribe_revenge_events() -> void:
 func _on_got_hit(ev: CombatEvent) -> void:
 	if ev.target != self:
 		return
-	# 不向自己复仇，不向已死/无效的来源复仇
 	if ev.source == self or not is_instance_valid(ev.source):
 		return
-	# 玩家打的不复仇（玩家是默认目标，走正常 AI）
 	if ev.source is Player:
 		return
-	# 召唤物打 → 复仇召唤物；其他敌人打 → 复仇那个敌人
+	if not _is_valid_revenge_source(ev):
+		return
 	_revenge_target = ev.source
+
+
+func _is_valid_revenge_source(ev: CombatEvent) -> bool:
+	var tags: Array = ev.data.get("tags", [])
+	if tags.has("trap") or tags.has("environment"):
+		return false
+	var source := ev.source
+	if not source or not is_instance_valid(source):
+		return false
+	return source.is_in_group("enemy") or source.is_in_group("summon")
 
 
 ## 复仇目标死了 → 清空

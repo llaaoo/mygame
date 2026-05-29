@@ -66,12 +66,17 @@ func _on_destroyed_command(cmd: RuntimeCommand) -> void:
 	# 重生倒计时 → 转发给 SimulationRuntime
 	var respawn_time: float = cmd.payload.get("respawn_time", -1.0)
 	if respawn_time > 0.0 and command_bus:
+		state_manager.update_state(object_id, {
+			"state": "RESPAWNING",
+			"respawn_at": respawn_time
+		})
 		var respawn_cmd := RuntimeCommand.create(
 			RuntimeCommand.TYPE_RESPAWN_REQUEST,
 			"WorldRuntime",
 			RuntimeCommand.Target.SIMULATION,
 			{
 				"object_id": object_id,
+				"object_path": cmd.payload.get("object_path", ""),
 				"respawn_time": respawn_time,
 			}
 		)

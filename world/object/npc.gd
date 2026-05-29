@@ -1,37 +1,31 @@
 class_name DialogueNPC
 extends Node2D
-## 对话 NPC — 按 E 对话 + Schedule 驱动日常行为
-##
-## 配置优先级:
-##   1. dialogue_resource — .dialogue 文件（编辑器创建）
-##   2. dialogue — NPCDialogue .tres（旧格式，运行时转换为 DialogueResource）
 
-
-@export var dialogue_resource: Resource = null       ## .dialogue 文件
-@export var dialogue: NPCDialogue = null             ## 旧格式兼容
-@export var schedule: NPCSchedule = null             ## 日程表（为 null 则原地不动）
-
+@export var dialogue_resource: Resource = null
+@export var dialogue: NPCDialogue = null
+@export var schedule: NPCSchedule = null
+@export var quest_data: QuestData = null
+@export var quest_available_lines: Array[String] = []
+@export var quest_active_lines: Array[String] = []
+@export var quest_completed_lines: Array[String] = []
 
 var _tick_count: int = 0
+var _dm_cache: Node = null
 
 
 func _ready() -> void:
 	add_to_group("interactable")
+	add_to_group("villager")
 	var interactable := Interactable.new()
 	interactable.name = "Interactable"
 	interactable.set_callback(_on_talk)
 	add_child(interactable)
 
-	# 禁用独立 _process，改为 SimulationRuntime 统一驱动
 	process_mode = Node.PROCESS_MODE_DISABLED
-
-	# 日程 Brain + Markers（全部延迟到树稳定后）
 	call_deferred("_setup_npc_schedule")
-	# 注册到 SimulationRuntime
 	call_deferred("_register_with_simulation")
 
 
-## 注册到 SimulationRuntime（统一 tick）
 func _register_with_simulation() -> void:
 	var gr := GameRuntime.instance
 	if not gr:
@@ -42,14 +36,10 @@ func _register_with_simulation() -> void:
 		call_deferred("_register_with_simulation")
 		return
 	sim.register_ticker(self)
-	print("📎 %s 已注册到 SimulationRuntime" % name)
 
 
-## 统一 tick 入口（由 SimulationRuntime 驱动，替代独立 _process）
 func tick(delta: float) -> void:
 	_tick_count += 1
-	if _tick_count == 1:
-		print("🟢 %s.tick 开始, schedule=%s, pos=%s" % [name, "有" if schedule else "无", position])
 	var brain := get_node_or_null("NPCBrain") as NPCBrain
 	if brain:
 		brain.tick(delta)
@@ -58,13 +48,54 @@ func tick(delta: float) -> void:
 		task.tick(delta)
 
 
-func _on_talk(_actor: Node2D) -> void:
+func _on_talk(actor: Node2D) -> void:
+	if _try_handle_quest(actor):
+		return
 	if dialogue and not dialogue.lines.is_empty():
 		_show_balloon(dialogue.lines, dialogue.npc_name)
 	elif dialogue_resource:
 		_show_from_dialogue_resource()
 	else:
 		_show_balloon(["..."], "")
+
+
+func _try_handle_quest(actor: Node2D) -> bool:
+	if quest_data == null:
+		return false
+	var qm := _get_quest_manager(actor)
+	if qm == null:
+		return false
+	if qm.is_completed(quest_data.quest_id):
+		_show_balloon(_lines_or_default(quest_completed_lines, ["You have done enough for now."]), _npc_display_name())
+		return true
+	if qm.is_active(quest_data.quest_id):
+		_show_balloon(_lines_or_default(quest_active_lines, ["Finish the work, then come back."]), _npc_display_name())
+		return true
+	var started := qm.start_quest(quest_data)
+	if started:
+		_show_balloon(_lines_or_default(quest_available_lines, ["Trouble is close. Clear it out and report back."]), _npc_display_name())
+	return started
+
+
+func _get_quest_manager(actor: Node2D) -> QuestManager:
+	if actor:
+		var qm := actor.get("quest_manager") as QuestManager
+		if qm != null:
+			return qm
+	var player := get_tree().get_first_node_in_group("player")
+	if player:
+		return player.get("quest_manager") as QuestManager
+	return null
+
+
+func _lines_or_default(lines: Array[String], fallback: Array[String]) -> Array[String]:
+	return lines if not lines.is_empty() else fallback
+
+
+func _npc_display_name() -> String:
+	if dialogue:
+		return dialogue.npc_name
+	return name
 
 
 func _show_balloon(lines: Array[String], npc_name: String) -> void:
@@ -79,9 +110,6 @@ func _show_from_dialogue_resource() -> void:
 	if not dm or not dialogue_resource:
 		return
 	dm.show_example_dialogue_balloon(dialogue_resource)
-
-
-var _dm_cache: Node = null
 
 
 func _get_dialogue_manager() -> Node:
@@ -144,31 +172,24 @@ func _create_default_schedule() -> NPCSchedule:
 
 func _create_test_markers() -> void:
 	if MarkerRegistry.has("forge") and MarkerRegistry.has("bed"):
-		print("📍 markers 已存在")
 		return
-	print("📍 创建测试 markers: forge + bed")
-
 	var parent := get_parent()
 	if not parent:
 		return
 
-	# Forge marker — 玩家出生点右侧
 	var forge := WorldMarker.new()
 	forge.name = "ForgeMarker"
 	forge.marker_id = "forge"
 	parent.add_child(forge)
 	forge.position = Vector2(400, -419)
 	MarkerRegistry.register(forge)
-	print("📍 forge global_pos=%s" % str(forge.global_position))
 
-	# Bed marker — 左侧 NPC 附近
 	var bed := WorldMarker.new()
 	bed.name = "BedMarker"
 	bed.marker_id = "bed"
 	parent.add_child(bed)
 	bed.position = Vector2(-550, -400)
 	MarkerRegistry.register(bed)
-	print("📍 bed global_pos=%s" % str(bed.global_position))
 
 
 func _resolve_dialogue_resource() -> Resource:

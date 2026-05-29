@@ -1,6 +1,7 @@
 # 📘 项目完整分析文档 — "Study" 项目
 
-> **生成日期**: 2026-07-14  
+> **生成日期**: 2026-05-30
+> **最后更新**: 2026-05-30
 > **引擎版本**: Godot 4.6.2 (stable) / GDScript 2.0  
 > **项目名称**: Study  
 > **排除分析**: `addons/`, `godot_state_charts_examples/`
@@ -469,9 +470,9 @@ res://
 
 **功能**:
 - `emit(cmd)` — 命令入队（最多 128 条，超限丢弃旧命令）
-- `subscribe(type, callback)` / `unsubscribe(type, callback)`
+- `subscribe(type, callback)` / `subscribe_for_target(type, target, callback)` / `unsubscribe(type, callback)`
 - `dispatch(max_per_tick=16)` — 每帧由 GameRuntime 驱动处理队列
-- **当前状态**: 设计完整但实际未启用（项目运行时主要依赖 CombatEventBus）
+- **当前状态**: 已启用。`MapObject -> WorldRuntime -> SimulationRuntime` 的销毁、表面变化和重生链路已通过 RuntimeCommand 路由。
 
 ---
 
@@ -483,6 +484,7 @@ res://
 
 **功能**:
 - 定义 6 种目标 Runtime：`COMBAT / WORLD / SIMULATION / UI / SAVE / ALL`
+- 定义领域命令：`world/destroyed`、`simulation/surface_change`、`world/respawn_request`
 - 携带 `type / source / target / payload / timestamp`
 - 提供 `static create()` 快捷构造
 
@@ -1314,20 +1316,30 @@ res://
 | ✅ **NPC 五层架构** | WorldTime→Brain→Task→Action→FSM 分离清晰 |
 | ✅ **文档超群** | 6 份详实文档覆盖所有架构层面 |
 
-### 13.2 当前核心问题：两套世界共存 🔴
+### 13.2 当前核心问题：文档与验证收敛 🟡
 
-> **经架构评审确认（2026-07-14）**：当前最危险的架构债务不是"缺系统"，而是**两套世界共存**。
+> **当前结论（2026-05-30）**：P0 Runtime 主权链路已经落地。当前最需要处理的是文档同步、验证固化和内容管道打磨。
 
 ```
-纸上架构（正确）:  GameRuntime → CommandBus → Combat/World/Simulation/UI/Save
-实际代码（残留）:  Node → 直接调用 Node（SceneTree 穿透 Runtime Boundary）
+当前主链: GameRuntime → CommandBus → WorldRuntime → SimulationRuntime
+战斗主链: 命中源 → CombatExecutor.report_hit() → CombatEventBus + Damageable.take_damage()
 ```
 
-**证据**: `map_object.gd` 硬编码路径 `Game/GameRuntime/WorldRuntime` — SceneTree 层级成为 Runtime 查找方式。
+**证据**:
 
-**后果**: 当 propagation + surface + NPC schedule + quest 全部开始互调时，Runtime Boundary 被穿透会导致系统缠死。规模小时共存，规模一大架构分裂。
+- `core/command/command_bus.gd` 已实现 `subscribe_for_target()` 和 target 过滤。
+- `world/object/map_object.gd` 已发出 `RuntimeCommand.TYPE_DESTROYED`。
+- `world/world_runtime.gd` 已接收 destroyed 并转发 `RuntimeCommand.TYPE_SURFACE_CHANGE` / `RuntimeCommand.TYPE_RESPAWN_REQUEST`。
+- `gameplay/interaction/simulation_runtime.gd` 已处理 surface change 与 respawn request。
+- `gameplay/combat/combat_executor.gd` 的 `report_hit()` 已负责事件与扣血。
 
-**解决方向**: 「Runtime 化迁移」三步走（见 §13.3）。
+**已确认完成的三条链路**:
+
+- 火球打爆油桶 -> 世界销毁命令 -> 表面生成/燃烧反应。
+- 玩家踩陷阱 -> `CombatExecutor.report_hit()` -> 玩家扣血。
+- 可重生 MapObject -> `WorldStateManager` / `RespawnScheduler` 闭环。
+
+**后续方向**: 不再重复设计 P0，而是修正文档、沉淀固定 smoke tests、补 README，并继续扩展综合内容场景。
 
 ---
 
@@ -1335,56 +1347,37 @@ res://
 
 | 问题 | 严重程度 | 说明 |
 |------|---------|------|
-| 🔴 **两套世界共存** | 致命 | 纸上 Runtime 架构 vs 实际直接调用并存 |
-| 🔴 **Runtime 未夺权** | 致命 | GameRuntime 计划为 autoload 但未真正成为 Runtime Root |
-| ⚠️ **物理层未迁移** | 中 | PHYSICS_LAYERS.md 定义了 11 层标准，但代码中仍用默认值 |
-| ⚠️ **CommandBus 未启用** | 中 | 设计完整但 Runtime 间仍走直接调用 |
-| ⚠️ **WorldRuntime 穿透** | 中 | `map_object.gd` 硬编码路径查找 WorldRuntime |
-| ⚠️ **Tick 分散** | 中 | BuffManager/NPCBrain 等各自独立 `_process()`，未归 SimulationRuntime 统一调度 |
-| ⚠️ **README 偏差** | 低 | README.md 是 Importality 插件说明 |
-| ⚠️ **部分文件重复** | 低 | `world/portal.tscn` / `world/portals/portal.tscn` 两处存在 |
+| ⚠️ **文档同步** | 高 | `PROJECT_ANALYSIS.md` / `PROJECT_IMPROVEMENTS.md` / `INDEX.md` 已校准，其他契约文档仍需持续核对 |
+| ⚠️ **Smoke tests 未沉淀** | 中 | 三条关键链路已手动确认，但尚未固化为测试清单/自动化 |
+| ⚠️ **Runtime 例外未文档化** | 中 | Player 输入、Projectile/Summon 物理循环是合理例外，但文档仍容易读成“全部统一 tick” |
+| ⚠️ **README 缺失** | 低 | 根目录没有当前项目入口说明 |
+| ⚠️ **综合内容场景不足** | 低 | 已完成关键冒烟链，仍可扩展小型地牢、村庄、野外热点验证 |
 
-### 13.3 推荐迭代路线（按优先级）— 经架构评审重新校准
+### 13.3 推荐迭代路线（按优先级）— 2026-05-30 校准
 
-> **评审结论**: Action Layer 统一是当前最关键的架构缺口，从 P2 提升至 P1。
-> 完成后 Player/Enemy/NPC/Boss 将共享统一 Action 体系，仅 Brain/Task/Available Actions 不同。
+> **评审结论**: P0/P1 主链已经完成。当前优先级转为文档同步、验证固化和内容管道打磨。
 
-#### 🔴 P0 — Runtime 化迁移（真正的 P1，3-5 天）
+#### ✅ P0 — Runtime 主权链路
 
-> **这是整个项目真正的分水岭：从 Node Project → Runtime Project。**
+- CombatExecutor HP 权威已完成。
+- CommandBus 领域路由已完成。
+- WorldState / Respawn 生命周期已完成。
+- 火球油桶、陷阱伤害、MapObject 重生三条链路已确认完成。
 
-**Step 1 — GameRuntime 成为 Runtime Root**:
-- GameRuntime 设为 autoload
-- 将 CombatRuntime / WorldRuntime / SimulationRuntime / CommandBus 全部挂入
-- 形成树：`GameRuntime → [CommandBus, CombatRuntime, WorldRuntime, SimulationRuntime, UIRuntime]`
+#### 🔄 P1 — 文档与测试收敛
 
-**Step 2 — 禁止 Runtime 直接调用，路由到 CommandBus**:
-- `map_object.gd` 不再硬编码路径查找 WorldRuntime → 改为 `CommandBus.emit(SURFACE_CHANGE_REQUEST)`
-- `HealthComponent._emit_damage_event()` 不再直接调 CombatEventBus → 通过 CombatExecutor（已做）
-- `MapObject._trigger_destruction_aoe()` 中的 WorldSpatialIndex 直接查询 → 改为 CommandBus 模式
-- `SurfaceManager.instance` 全局单例模式 → 改为通过 SimulationRuntime 访问
+1. 修正 `PROJECT_ANALYSIS.md`、`PROJECT_IMPROVEMENTS.md`、`INDEX.md` 中的旧结论和未来日期。
+2. 把三条已完成链路沉淀为固定 smoke test 清单。
+3. 文档化 Runtime 统一 tick 的例外：Player 输入、Projectile 物理、SummonEntity 物理。
+4. 补根目录 README，说明项目入口、运行方式、文档阅读顺序和验证方式。
 
-**Step 3 — SimulationRuntime 统一接管 Tick**:
-- BuffManager._process() → 改为 SimulationRuntime 低频 tick
-- NPCBrain._process() → 改为 SimulationRuntime 调度
-- 所有 Scheduler（Surface/Propagation/Respawn）不再独立 `_process()`
+#### 🟢 P2 — 内容管道 + 综合验证
 
-#### 🟡 P1 — 架构收敛（5-8 天）
-
-4. **物理层迁移**: 按 PHYSICS_LAYERS.md 标准配置所有节点 collision_layer/mask
-5. **Action Layer 统一** ⭐:
-   - 定义共享 Action 类型：`MoveAction / AttackAction / UseAction / CastAction / InteractAction`
-   - Player/NPC/Enemy 统一走 `Intent → Action → RuntimeRequest → RuntimeExecute`
-6. **CommandBus 领域分区（设计+实现）**:
-   - 引入 command domain 枚举
-   - 引入语义分层：`request/*` / `result/*` / `event/*`
-
-#### 🟢 P2 — 内容管道 + 验证（5-10 天）
-
-7. **场景 A 验证**: 小型地牢 — 门/开关/地刺/宝箱/油桶/surface/propagation/quest 联动
-8. **场景 B 验证**: 村庄 — NPC Schedule/Marker/Dialogue/Quest/Interact 协同
-9. **NPC Schedule P2**: WanderTask / SleepTask / WorkTask
-10. **Actor Scheduler**: tick_group("high"/"medium"/"low") 预算调度
+1. 小型地牢：门、开关、地刺、宝箱、油桶、surface、propagation、quest 联动。
+2. 村庄：NPC Schedule、Marker、Dialogue、Quest、Interact 协同。
+3. 野外热点：可破坏物阵列、油桶连锁、区域切换后状态恢复。
+4. NPC Schedule P2：WanderTask / SleepTask / WorkTask。
+5. Actor Scheduler：tick_group("high"/"medium"/"low") 预算调度。
 
 #### ⚪ 停止线 — 不要做的（含 UNBREAKABLE 规则）
 
@@ -1400,10 +1393,10 @@ res://
 
 该项目是一个**架构设计极为用心、文档非常完善**的动作 RPG 原型。核心战斗系统（CombatExecutor + Modifier 管线 + EffectGraph + EventBus）设计精良，契约体系严密。数据驱动的技能架构（Archetype 收敛）体现了优秀的工程判断力。
 
-当前项目处于"核心系统已完成，内容管道待填充"的阶段。主要差距在于：部分设计好的基础设施（CommandBus/SimulationRuntime/物理层）尚未完全落地，内容验证（地牢/城镇/野外三个场景）待完善。
+当前项目处于"核心 Runtime 主链已完成，内容管道和验证体系待打磨"的阶段。主要差距在于：文档仍有旧结论、关键链路尚未固化为自动化/半自动化验证、README 缺失，以及综合内容场景还需要继续扩展。
 
 **前进方向**: 不是增加更多系统，而是让现有系统协同运作，通过"场景 A/B/C 验证标准"证明架构能以低成本产出高质量内容。
 
 ---
 
-> **文档维护**: 本文档基于 2026-07-14 的代码快照生成。架构变更时请同步更新本文档及 docs/ 下的对应契约文件。
+> **文档维护**: 本文档基于 2026-05-30 的代码快照更新。架构变更时请同步更新本文档、`docs/PROJECT_IMPROVEMENTS.md` 及 docs/ 下的对应契约文件。

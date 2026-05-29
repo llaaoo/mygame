@@ -1,17 +1,36 @@
 class_name DialogueBalloon
 extends CanvasLayer
-## 极简对话气球 — 不依赖键盘焦点，点击或按任意键推进
 
+static var active: Node = null
+static var just_closed_frame: int = -1
 
 var _lines: Array[String] = []
 var _index: int = 0
 var _label: RichTextLabel
+var _ignore_input_until_msec: int = 0
+
+
+func _ready() -> void:
+	add_to_group("dialogue_balloon")
+	if active != null and is_instance_valid(active) and active != self:
+		active.queue_free()
+	active = self
+
+
+func _exit_tree() -> void:
+	if active == self:
+		active = null
 
 
 func show_text(lines: Array[String], npc_name: String = "") -> void:
 	_lines = lines
 	_index = 0
+	_ignore_input_until_msec = Time.get_ticks_msec() + 120
 	_setup_ui(npc_name)
+	_show_current_line()
+
+
+func advance() -> void:
 	_show_current_line()
 
 
@@ -38,7 +57,7 @@ func _setup_ui(npc_name: String) -> void:
 
 	var hint := Label.new()
 	hint.name = "Hint"
-	hint.text = "[ 点击或按任意键继续 ]"
+	hint.text = "[E / click to continue]"
 	hint.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
 	hint.offset_top = -20
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -49,6 +68,7 @@ func _setup_ui(npc_name: String) -> void:
 
 func _show_current_line() -> void:
 	if _index >= _lines.size():
+		just_closed_frame = Engine.get_process_frames()
 		queue_free()
 		return
 	_label.text = _lines[_index]
@@ -56,9 +76,8 @@ func _show_current_line() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if Time.get_ticks_msec() < _ignore_input_until_msec:
+		return
 	if event is InputEventMouseButton and event.is_pressed():
-		_show_current_line()
-		get_viewport().set_input_as_handled()
-	elif event is InputEventKey and event.is_pressed():
-		_show_current_line()
+		advance()
 		get_viewport().set_input_as_handled()

@@ -1,10 +1,53 @@
-[gd_resource type="Resource" script_class="QuestData" format=3 uid="uid://i3uius1slaha"]
+[gd_resource type="Resource" script_class="QuestData" load_steps=11 format=3 uid="uid://i3uius1slaha"]
 
 [ext_resource type="Script" uid="uid://dhf7hidl0pv7d" path="res://gameplay/quest/data/quest_data.gd" id="1_kvhdh"]
 [ext_resource type="Script" uid="uid://ptvcx8j64iic" path="res://gameplay/quest/data/quest_stage.gd" id="2_mv1hw"]
+[ext_resource type="Script" path="res://gameplay/quest/objectives/kill_objective.gd" id="3_kill"]
+[ext_resource type="Script" path="res://gameplay/quest/objectives/interact_objective.gd" id="4_interact"]
+
+[sub_resource type="Resource" id="KillObjective_hunt"]
+script = ExtResource("3_kill")
+required_count = 2
+description = "Defeat enemies"
+track_from_start = false
+target_tag = "enemy"
+
+[sub_resource type="Resource" id="QuestStage_hunt"]
+script = ExtResource("2_mv1hw")
+stage_id = "hunt"
+title = "Clear the road"
+objectives = Array[Resource]([SubResource("KillObjective_hunt")])
+
+[sub_resource type="Resource" id="InteractObjective_report"]
+script = ExtResource("4_interact")
+required_count = 1
+description = "Report to the villager"
+track_from_start = false
+target_tag = "villager"
+
+[sub_resource type="Resource" id="QuestStage_report"]
+script = ExtResource("2_mv1hw")
+stage_id = "report"
+title = "Return to town"
+objectives = Array[Resource]([SubResource("InteractObjective_report")])
+
+[sub_resource type="Resource" id="InteractObjective_loot"]
+script = ExtResource("4_interact")
+required_count = 1
+description = "Open the supply chest"
+track_from_start = false
+target_tag = "chest"
+
+[sub_resource type="Resource" id="QuestStage_loot"]
+script = ExtResource("2_mv1hw")
+stage_id = "loot"
+title = "Claim supplies"
+objectives = Array[Resource]([SubResource("InteractObjective_loot")])
 
 [resource]
 script = ExtResource("1_kvhdh")
 quest_id = "side_001"
-title = "清除威胁"
-description = "击败 3 个敌人"
+title = "Roadside Trouble"
+description = "A villager asks you to clear nearby enemies, report back, and claim supplies from the chest."
+stages = Array[Resource]([SubResource("QuestStage_hunt"), SubResource("QuestStage_report"), SubResource("QuestStage_loot")])
+reward_experience = 75

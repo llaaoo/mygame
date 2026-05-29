@@ -169,6 +169,7 @@ func _collect_quests() -> SaveData.QuestSave:
 	var qm: QuestManager = player.get("quest_manager")
 	if qm:
 		q.completed = qm.get_completed_quests()
+		q.active = qm.get_active_quest_states()
 	return q
 
 
@@ -250,6 +251,7 @@ func _restore_quests(q: SaveData.QuestSave) -> void:
 	var qm: QuestManager = player.get("quest_manager")
 	if qm:
 		qm.set_completed_quests(q.completed)
+		qm.restore_active_quests(q.active)
 
 
 ## ── 辅助 ──

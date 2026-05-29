@@ -598,51 +598,9 @@ func _setup_quest_manager() -> void:
 	get_tree().current_scene.add_child.call_deferred(tracker)
 	call_deferred("_setup_quest_tracker", tracker)
 
-	# 示例任务: 击杀 3 个敌人
-	call_deferred("_start_test_quest")
-
 
 func _setup_quest_tracker(tracker: QuestTracker) -> void:
 	tracker.setup(quest_manager)
-
-
-func _start_test_quest() -> void:
-	# 给 NPC 和宝箱打标签（供 InteractObjective 匹配）
-	_tag_quest_objects()
-
-	var data := load("res://content/quests/kill_enemies_quest.tres") as QuestData
-	if not data:
-		return
-
-	# 阶段 1: 击败 2 个敌人
-	var stage1 := QuestStageData.new()
-	stage1.stage_id = "hunt"
-	var obj1 := KillObjective.new()
-	obj1.target_tag = "enemy"
-	obj1.required_count = 2
-	obj1.track_from_start = false  # 击杀只在当前阶段计数
-	stage1.objectives.append(obj1)
-	data.stages.append(stage1)
-
-	# 阶段 2: 与村民对话
-	var stage2 := QuestStageData.new()
-	stage2.stage_id = "talk"
-	var obj2 := InteractObjective.new()
-	obj2.target_tag = "villager"
-	obj2.required_count = 1
-	stage2.objectives.append(obj2)
-	data.stages.append(stage2)
-
-	# 阶段 3: 打开宝箱
-	var stage3 := QuestStageData.new()
-	stage3.stage_id = "loot"
-	var obj3 := InteractObjective.new()
-	obj3.target_tag = "chest"
-	obj3.required_count = 1
-	stage3.objectives.append(obj3)
-	data.stages.append(stage3)
-
-	quest_manager.start_quest(data)
 
 
 func _tag_quest_objects() -> void:
@@ -988,6 +946,15 @@ func _register_interact_key() -> void:
 
 
 func _try_interact() -> void:
+	var balloon := DialogueBalloon.active
+	if balloon != null and is_instance_valid(balloon) and balloon.has_method("advance"):
+		balloon.advance()
+		get_viewport().set_input_as_handled()
+		return
+	if DialogueBalloon.just_closed_frame == Engine.get_process_frames():
+		get_viewport().set_input_as_handled()
+		return
+
 	var nearest: Node2D = null
 	var nearest_dist: float = INTERACT_RANGE
 

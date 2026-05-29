@@ -202,9 +202,10 @@ func _on_respawn_request_command(cmd: RuntimeCommand) -> void:
 	if not _respawn_scheduler:
 		return
 	var object_id: String = cmd.payload.get("object_id", "")
+	var object_path: String = cmd.payload.get("object_path", "")
 	var respawn_time: float = cmd.payload.get("respawn_time", 0.0)
 	if respawn_time > 0.0 and not object_id.is_empty():
-		_respawn_scheduler.enqueue(object_id, respawn_time)
+		_respawn_scheduler.enqueue(object_id, respawn_time, object_path)
 		print("⏱️ SimulationRuntime: 加入重生队列 %s (%.0fs)" % [object_id, respawn_time])
 
 
@@ -250,8 +251,8 @@ func _on_surface_change_command(cmd: RuntimeCommand) -> void:
 					_surface_manager.apply_tags(cell, typed_tags, "aoe_%s" % display_name)
 	
 	# AOE 伤害
-	if aoe_radius > 0.0 and aoe_damage > 0 and _spatial_index:
-		var targets: Array = _spatial_index.query_radius(pos, aoe_radius)
+	if aoe_radius > 0.0 and aoe_damage > 0:
+		var targets: Array = _collect_aoe_damage_targets(pos, aoe_radius)
 		var hit_count := 0
 		for t in targets:
 			if t.has_method("take_damage"):
@@ -259,6 +260,35 @@ func _on_surface_change_command(cmd: RuntimeCommand) -> void:
 				hit_count += 1
 		if hit_count > 0:
 			print("💥 SimulationRuntime: AOE 伤害 %d → %d 目标 (r=%.0f, tags=%s)" % [aoe_damage, hit_count, aoe_radius, aoe_tags])
+
+
+func _collect_aoe_damage_targets(pos: Vector2, radius: float) -> Array[Node2D]:
+	var result: Array[Node2D] = []
+	var seen: Dictionary = {}
+	if _spatial_index:
+		for target in _spatial_index.query_radius(pos, radius):
+			_add_aoe_target(result, seen, target, pos, radius)
+	var tree := get_tree()
+	if tree:
+		for group_name in ["player", "enemy", "summon"]:
+			for node in tree.get_nodes_in_group(group_name):
+				_add_aoe_target(result, seen, node, pos, radius)
+	return result
+
+
+func _add_aoe_target(result: Array[Node2D], seen: Dictionary, node: Node, pos: Vector2, radius: float) -> void:
+	if not (node is Node2D):
+		return
+	var target := node as Node2D
+	if not is_instance_valid(target) or not target.has_method("take_damage"):
+		return
+	var id := target.get_instance_id()
+	if seen.has(id):
+		return
+	if target.global_position.distance_to(pos) > radius:
+		return
+	seen[id] = true
+	result.append(target)
 
 
 func _to_string() -> String:

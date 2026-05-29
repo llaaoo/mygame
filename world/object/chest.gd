@@ -23,6 +23,7 @@ func _ready() -> void:
 		object_data = data
 	super._ready()
 	add_to_group("interactable")
+	add_to_group("chest")
 	# 注册 Interactable 接口
 	var interactable := Interactable.new()
 	interactable.name = "Interactable"
@@ -50,6 +51,22 @@ func _on_interact_chest(_actor: Node2D) -> void:
 
 	for drop in drops:
 		_spawn_item(drop.get("item_path", ""), drop.get("count", 1))
+
+
+func is_opened() -> bool:
+	return _opened
+
+
+func get_state() -> Dictionary:
+	var state := super.get_state()
+	state["opened"] = _opened
+	return state
+
+
+func restore_state(data: Dictionary) -> void:
+	super.restore_state(data)
+	_opened = data.get("opened", _state != "INTACT")
+	_apply_visual()
 
 
 func _spawn_item(item_path: String, count: int) -> void:

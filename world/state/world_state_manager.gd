@@ -39,8 +39,11 @@ func unregister(object_id: String) -> void:
 ## 更新状态（由 MapObject 调用）
 func update_state(object_id: String, state_data: Dictionary) -> void:
 	var old: String = _object_states.get(object_id, {}).get("state", "INTACT")
-	_object_states[object_id] = state_data
-	var new: String = state_data.get("state", "INTACT")
+	var next_state: Dictionary = _object_states.get(object_id, {}).duplicate()
+	for key in state_data:
+		next_state[key] = state_data[key]
+	_object_states[object_id] = next_state
+	var new: String = next_state.get("state", "INTACT")
 	
 	if old != new:
 		state_changed.emit(object_id, old, new)

@@ -18,7 +18,7 @@ func _ready() -> void:
 	if not object_data:
 		object_data = MapObjectData.new()
 		object_data.display_name = name
-	_object_id = str(get_instance_id())
+	_object_id = _build_object_id()
 	_current_hp = object_data.max_hp
 	_apply_visual()
 	_register_with_world_runtime()
@@ -72,6 +72,7 @@ func interact() -> void:
 func get_state() -> Dictionary:
 	return {
 		"id": _object_id,
+		"object_path": str(get_path()),
 		"state": _state,
 		"hp": _current_hp,
 		"max_hp": object_data.max_hp,
@@ -111,7 +112,6 @@ func _on_destroyed() -> void:
 		get_parent().add_child(loot)
 	
 	# 通过 CommandBus 异步路由到 WorldRuntime / SimulationRuntime（始终发射）
-	_emit_destroyed_command()
 	
 	# 重生倒计时
 	if object_data.respawn_time == -1.0:
@@ -124,6 +124,8 @@ func _on_destroyed() -> void:
 		_apply_visual()
 	
 	# 路径阻挡移除
+	_emit_destroyed_command()
+
 	if object_data.blocks_path:
 		_remove_collision()
 
@@ -164,6 +166,7 @@ func _emit_destroyed_command() -> void:
 		RuntimeCommand.Target.WORLD,
 		{
 			"object_id": _object_id,
+			"object_path": str(get_path()),
 			"state_data": get_state(),
 			"position": global_position,
 			"respawn_time": object_data.respawn_time,
@@ -175,6 +178,15 @@ func _emit_destroyed_command() -> void:
 		}
 	)
 	bus.emit(cmd)
+
+
+func _build_object_id() -> String:
+	var owner_node := owner if owner else get_tree().current_scene
+	if owner_node and not owner_node.scene_file_path.is_empty():
+		return "%s:%s" % [owner_node.scene_file_path, owner_node.get_path_to(self)]
+	if is_inside_tree():
+		return str(get_path())
+	return str(get_instance_id())
 
 
 func _register_with_world_runtime() -> void:

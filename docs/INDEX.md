@@ -1,6 +1,6 @@
 # 📚 项目文档索引
 
-> 版本: v2.4 | 最后更新: 2026-07-14
+> 版本: v2.7 | 最后更新: 2026-05-30
 
 ---
 
@@ -8,6 +8,8 @@
 
 ```
 PROJECT_ANALYSIS.md (完整项目分析 — 架构评估 + 文件功能清单 + 迭代建议)
+    │
+    ├── PROJECT_IMPROVEMENTS.md (当前改进点 — 已完成链路 + 剩余工作)
     │
     ├── ARCHITECTURE.md (宪法 — 六层边界)
     │       │
@@ -36,6 +38,20 @@ PROJECT_ANALYSIS.md (完整项目分析 — 架构评估 + 文件功能清单 + 
 - 分级迭代建议（P0/P1/P2 优先级 + 停止线）
 
 **何时阅读**: 新人入职、架构评审、迭代规划前。
+
+---
+
+### [PROJECT_IMPROVEMENTS.md](./PROJECT_IMPROVEMENTS.md)
+
+**回答的问题**: 当前哪些架构改进已经完成？还剩哪些文档、验证和工程卫生工作？
+
+**核心内容**:
+- P0/P1/P2 完成进度
+- 火球油桶、陷阱伤害、MapObject 重生三条已完成链路
+- 当前文档与测试待同步项
+- 后续实施顺序和停止线
+
+**何时阅读**: 接续改进工作、判断当前代码与旧文档冲突时。
 
 ---
 
@@ -91,6 +107,7 @@ PROJECT_ANALYSIS.md (完整项目分析 — 架构评估 + 文件功能清单 + 
 | 想做什么 | 读哪个 |
 |---------|--------|
 | 了解项目全貌 | PROJECT_ANALYSIS.md |
+| 查看当前已完成/待改进项 | PROJECT_IMPROVEMENTS.md |
 | 理解项目架构 | ARCHITECTURE.md |
 | 新增技能 | skill_architecture.md |
 | 新增 Modifier/Condition | COMBAT_CONTRACTS.md 扩展指南 |
@@ -102,6 +119,7 @@ PROJECT_ANALYSIS.md (完整项目分析 — 架构评估 + 文件功能清单 + 
 | 设置碰撞层/掩码 | PHYSICS_LAYERS.md |
 | 修复战斗 Bug | COMBAT_CONTRACTS.md 反模式速查 |
 | 修复世界 Bug | WORLD_CONTRACTS.md 反模式速查 |
+| 判断文档是否过时 | PROJECT_IMPROVEMENTS.md |
 
 ---
 
@@ -121,3 +139,4 @@ PROJECT_ANALYSIS.md (完整项目分析 — 架构评估 + 文件功能清单 + 
 | v2.4 | 2026-05 | PROJECT_ANALYSIS.md — 全项目文件功能清单 + 架构评估 + P0/P1/P2 迭代建议 |
 | v2.5 | 2026-05 | P0 完成 + P1.1/P1.2/P1.3 完成 — CombatExecutor 权威、CommandBus 路由、Respawn 闭环、SimulationRuntime 收敛、物理层标准化、Action Layer 统一 |
 | v2.6 | 2026-05 | P1.4 完成 — COMBAT_CONTRACTS.md / skill_architecture.md / RUNTIME_TOPOLOGY.md 路径同步至实际目录结构 |
+| v2.7 | 2026-05 | 文档校准至 2026-05-30 当前状态 — P0/P1 主链完成，三条冒烟链已确认，PROJECT_IMPROVEMENTS.md 纳入索引 |

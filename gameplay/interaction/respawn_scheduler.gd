@@ -15,9 +15,10 @@ func setup(state_mgr: WorldStateManager) -> void:
 	_world_state_manager = state_mgr
 
 
-func enqueue(object_id: String, respawn_at: float) -> void:
+func enqueue(object_id: String, respawn_at: float, object_path: String = "") -> void:
 	_respawn_queue.append({
 		"object_id": object_id,
+		"object_path": object_path,
 		"remaining": respawn_at
 	})
 
@@ -42,7 +43,7 @@ func tick(delta: float) -> void:
 					"respawn_at": 0.0
 				})
 			# 通知 MapObject 节点重生（表现层）
-			_restore_map_object(object_id)
+			_restore_map_object(object_id, entry.get("object_path", ""))
 			to_remove.append(i)
 	
 	# 倒序移除
@@ -51,9 +52,14 @@ func tick(delta: float) -> void:
 
 
 ## 通过 instance_id 找到 MapObject 节点并恢复其表现层状态
-func _restore_map_object(object_id: String) -> void:
-	var instance_id := object_id.to_int()
-	var obj := instance_from_id(instance_id) as MapObject
+func _restore_map_object(object_id: String, object_path: String = "") -> void:
+	var obj: MapObject = null
+	if not object_path.is_empty():
+		obj = get_node_or_null(NodePath(object_path)) as MapObject
+	if not obj and object_id.begins_with("/"):
+		obj = get_node_or_null(NodePath(object_id)) as MapObject
+	if not obj and object_id.is_valid_int():
+		obj = instance_from_id(object_id.to_int()) as MapObject
 	if obj and is_instance_valid(obj):
 		var state := _world_state_manager.get_state(object_id) if _world_state_manager else {}
 		obj.restore_state(state)

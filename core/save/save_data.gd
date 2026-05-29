@@ -112,13 +112,15 @@ class WorldData:
 
 class QuestSave:
 	var completed: Array[String] = []
+	var active: Array[Dictionary] = []
 
 	func serialize() -> Dictionary:
-		return {"completed": completed}
+		return {"completed": completed, "active": active}
 
 	static func deserialize(d: Dictionary) -> QuestSave:
 		var q := QuestSave.new()
 		q.completed = SaveData._string_array(d.get("completed", []))
+		q.active = d.get("active", []) as Array[Dictionary]
 		return q
 
 

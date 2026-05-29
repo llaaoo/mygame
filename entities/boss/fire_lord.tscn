@@ -12,6 +12,8 @@
 [ext_resource type="Script" uid="uid://cf1nsco3w0mf6" path="res://addons/godot_state_charts/transition.gd" id="9_ndvc5"]
 
 [node name="FireLord" type="CharacterBody2D" unique_id=328935019]
+collision_layer = 2
+collision_mask = 3
 script = ExtResource("1_qnrkc")
 boss_name = "火焰领主"
 boss_color = Color(1, 0.25, 0.1, 1)
