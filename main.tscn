@@ -1,14 +1,9 @@
 [gd_scene format=3 uid="uid://wx74iv5pkp82"]
 
 [ext_resource type="PackedScene" uid="uid://dh2tkj6gryw1a" path="res://world/maps/overworld.tscn" id="1_ig7tw"]
-[ext_resource type="PackedScene" uid="uid://dbv2k2e21cmb7" path="res://world/object/oil_barrel.tscn" id="2_4c57u"]
-[ext_resource type="PackedScene" uid="uid://dcbumdieobptq" path="res://entities/enemy/enemy.tscn" id="2_272bh"]
 [ext_resource type="PackedScene" uid="uid://etuhwmvsawor" path="res://entities/player/player.tscn" id="2_h2yge"]
-[ext_resource type="PackedScene" uid="uid://do1qa7x2r0b15" path="res://world/switches/pressure_plate.tscn" id="4_dg77c"]
-[ext_resource type="PackedScene" uid="uid://drgg78lq36vjw" path="res://entities/boss/fire_lord.tscn" id="4_ycdy4"]
 [ext_resource type="Script" uid="uid://cgn2i161esv0a" path="res://gameplay/abilities/manager/skill_manager.gd" id="5_4c57u"]
 [ext_resource type="PackedScene" uid="uid://tc5h73volrpp" path="res://ui/hud.tscn" id="5_7mycd"]
-[ext_resource type="Resource" uid="uid://dww7jdviv56le" path="res://content/bosses/fire_lord.tres" id="5_ycdy4"]
 [ext_resource type="Script" uid="uid://d1uc57ucjrid5" path="res://entities/components/stats_component.gd" id="6_efxa6"]
 [ext_resource type="Script" uid="uid://ca7adgccfaejq" path="res://core/game_runtime.gd" id="8_dg77c"]
 [ext_resource type="Script" uid="uid://d2dwn66h08hu2" path="res://world/world_runtime.gd" id="9_ycdy4"]
@@ -54,32 +49,8 @@ func _setup_mouse_action(action_name: String, button: MouseButton) -> void:
 
 [node name="Overworld" parent="." unique_id=1549094242 instance=ExtResource("1_ig7tw")]
 
-[node name="OilBarrel" parent="Overworld" unique_id=638277641 instance=ExtResource("2_4c57u")]
-position = Vector2(-101, -644)
-
-[node name="Enemy1" parent="Overworld" unique_id=1874515091 instance=ExtResource("2_272bh")]
-position = Vector2(200, 0)
-max_hp = 100
-
-[node name="Enemy2" parent="Overworld" unique_id=268381738 instance=ExtResource("2_272bh")]
-position = Vector2(-200, 0)
-max_hp = 100
-
-[node name="Enemy3" parent="Overworld" unique_id=843982397 instance=ExtResource("2_272bh")]
-position = Vector2(0, 200)
-max_hp = 100
-
-[node name="OilBarrel2" parent="Overworld" unique_id=104765449 instance=ExtResource("2_4c57u")]
-position = Vector2(-193, -645)
-
-[node name="FireLord" parent="Overworld" unique_id=328935019 instance=ExtResource("4_ycdy4")]
-boss_data = ExtResource("5_ycdy4")
-
-[node name="PressurePlate1" parent="Overworld" unique_id=1933857937 instance=ExtResource("4_dg77c")]
-position = Vector2(50, -380)
-
 [node name="Player" parent="." unique_id=87503594 instance=ExtResource("2_h2yge")]
-position = Vector2(7, -475)
+position = Vector2(-720, -430)
 debug_items = true
 
 [node name="SkillManager" type="Node" parent="Player" unique_id=1978715642]
@@ -92,33 +63,6 @@ script = ExtResource("6_efxa6")
 script = SubResource("GDScript_272bh")
 
 [node name="HUDLayer" parent="." unique_id=1720897277 instance=ExtResource("5_7mycd")]
-
-[node name="DeathScreen" type="ColorRect" parent="HUDLayer" unique_id=1789513381]
-visible = false
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0, 0, 0, 0.7)
-
-[node name="VBoxContainer" type="VBoxContainer" parent="HUDLayer/DeathScreen" unique_id=808890658]
-layout_mode = 0
-size_flags_horizontal = 4
-theme_override_constants/separation = 20
-
-[node name="DeathLabel" type="Label" parent="HUDLayer/DeathScreen/VBoxContainer" unique_id=911008989]
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 48
-text = "💀 player died!"
-horizontal_alignment = 1
-
-[node name="RetryButton" type="Button" parent="HUDLayer/DeathScreen/VBoxContainer" unique_id=1779251379]
-custom_minimum_size = Vector2(250, 50)
-layout_mode = 2
-theme_override_font_sizes/font_size = 24
-text = "Reload"
 
 [node name="GameRuntime" type="Node" parent="." unique_id=2108780999]
 script = ExtResource("8_dg77c")

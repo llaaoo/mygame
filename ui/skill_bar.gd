@@ -2,8 +2,8 @@ class_name SkillBar
 extends HBoxContainer
 ## 技能条 — 左手 [L] · 右手 [R] · 槽1 [1] · 槽2 [2] · 槽3 [3] · 槽4 [4]
 
-const SLOT_SIZE := Vector2(48, 48)
-const HAND_SIZE := Vector2(56, 48)
+const SLOT_SIZE := Vector2(42, 42)
+const HAND_SIZE := Vector2(48, 42)
 
 var _skill_manager: SkillManager = null
 var _panels: Array[PanelContainer] = []
@@ -69,7 +69,7 @@ func _add_item(source: String, label: String, size: Vector2) -> void:
 
 	var cd_label := Label.new()
 	cd_label.size = size
-	cd_label.add_theme_font_size_override("font_size", 14)
+	cd_label.add_theme_font_size_override("font_size", 13)
 	cd_label.add_theme_color_override("font_color", Color.WHITE)
 	cd_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	cd_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -78,7 +78,7 @@ func _add_item(source: String, label: String, size: Vector2) -> void:
 	_cd_labels.append(cd_label)
 
 	var bind_label := Label.new()
-	bind_label.add_theme_font_size_override("font_size", 9)
+	bind_label.add_theme_font_size_override("font_size", 8)
 	bind_label.add_theme_color_override("font_color", Color(1, 1, 1, 0.6))
 	bind_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	bind_label.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
@@ -156,11 +156,4 @@ func _on_cooldown(source: String, _remaining: float, _total: float) -> void:
 
 
 func _make_bg() -> StyleBoxFlat:
-	var sb := StyleBoxFlat.new()
-	sb.bg_color = Color(0.1, 0.1, 0.15, 0.85)
-	sb.border_width_left = 1; sb.border_width_right = 1
-	sb.border_width_top = 1; sb.border_width_bottom = 1
-	sb.border_color = Color(0.3, 0.3, 0.4, 1)
-	sb.corner_radius_top_left = 4; sb.corner_radius_top_right = 4
-	sb.corner_radius_bottom_left = 4; sb.corner_radius_bottom_right = 4
-	return sb
+	return GameUIStyle.slot_style(false)

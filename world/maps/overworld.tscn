@@ -1,70 +1,518 @@
 [gd_scene format=3 uid="uid://dh2tkj6gryw1a"]
 
-[ext_resource type="PackedScene" uid="uid://c7f3a0khd1ifa" path="res://world/doors/door.tscn" id="2_atiof"]
-[ext_resource type="PackedScene" uid="uid://k5ptb5a1wdwn" path="res://world/portal.tscn" id="3_i3mdx"]
-[ext_resource type="PackedScene" uid="uid://bd7xfxkmspack" path="res://world/switches/switch.tscn" id="3_v7wls"]
-[ext_resource type="PackedScene" uid="uid://cecvc7pwbeguq" path="res://world/loot/chest.tscn" id="5_ukkfe"]
-[ext_resource type="PackedScene" uid="uid://c24d5y8qltinq" path="res://world/traps/spike_trap.tscn" id="7_vy63c"]
-[ext_resource type="PackedScene" uid="uid://b5xmh76cbb2kq" path="res://world/object/breakable_wall.tscn" id="9_0ne8o"]
-[ext_resource type="PackedScene" uid="uid://c8wb0qe4p258t" path="res://world/npcs/npc_villager.tscn" id="11_848wx"]
-[ext_resource type="Resource" uid="uid://lt6105ynaour" path="res://world/object/breakable_wall_data.tres" id="11_t6jhl"]
+[ext_resource type="PackedScene" uid="uid://c7f3a0khd1ifa" path="res://world/doors/door.tscn" id="1_door"]
+[ext_resource type="PackedScene" uid="uid://bd7xfxkmspack" path="res://world/switches/switch.tscn" id="2_switch"]
+[ext_resource type="PackedScene" uid="uid://do1qa7x2r0b15" path="res://world/switches/pressure_plate.tscn" id="3_plate"]
+[ext_resource type="PackedScene" uid="uid://k5ptb5a1wdwn" path="res://world/portal.tscn" id="4_portal"]
+[ext_resource type="PackedScene" uid="uid://cecvc7pwbeguq" path="res://world/loot/chest.tscn" id="5_chest"]
+[ext_resource type="PackedScene" uid="uid://c24d5y8qltinq" path="res://world/traps/spike_trap.tscn" id="6_trap"]
+[ext_resource type="PackedScene" uid="uid://b5xmh76cbb2kq" path="res://world/object/breakable_wall.tscn" id="7_wall"]
+[ext_resource type="Resource" uid="uid://lt6105ynaour" path="res://world/object/breakable_wall_data.tres" id="8_wall_data"]
+[ext_resource type="PackedScene" uid="uid://c8wb0qe4p258t" path="res://world/npcs/npc_villager.tscn" id="9_npc"]
+[ext_resource type="PackedScene" uid="uid://dcbumdieobptq" path="res://entities/enemy/enemy.tscn" id="10_enemy"]
+[ext_resource type="PackedScene" uid="uid://dbv2k2e21cmb7" path="res://world/object/oil_barrel.tscn" id="11_barrel"]
 
-[sub_resource type="SegmentShape2D" id="SegmentShape2D_y0h06"]
+[sub_resource type="RectangleShape2D" id="WallOuterHorizontal"]
+size = Vector2(1800, 64)
 
-[sub_resource type="SegmentShape2D" id="SegmentShape2D_fmvh5"]
+[sub_resource type="RectangleShape2D" id="WallOuterVertical"]
+size = Vector2(64, 1160)
 
-[sub_resource type="SegmentShape2D" id="SegmentShape2D_8j7uc"]
+[sub_resource type="RectangleShape2D" id="WallCellHorizontal"]
+size = Vector2(420, 40)
 
-[sub_resource type="SegmentShape2D" id="SegmentShape2D_2yvwq"]
+[sub_resource type="RectangleShape2D" id="WallCellSouthLeft"]
+size = Vector2(300, 40)
 
-[node name="Overworld" type="Node2D" unique_id=1549094242]
+[sub_resource type="RectangleShape2D" id="WallCellSouthRight"]
+size = Vector2(40, 40)
 
-[node name="Ground" type="TileMapLayer" parent="." unique_id=1938388878]
+[sub_resource type="RectangleShape2D" id="WallCellVertical"]
+size = Vector2(40, 300)
 
-[node name="Walls" type="StaticBody2D" parent="." unique_id=2089885178]
+[sub_resource type="RectangleShape2D" id="WallRoomHorizontal"]
+size = Vector2(360, 36)
 
-[node name="WallTop" type="CollisionShape2D" parent="Walls" unique_id=517423054]
-position = Vector2(0, -760)
-shape = SubResource("SegmentShape2D_y0h06")
+[sub_resource type="RectangleShape2D" id="WallRoomVertical"]
+size = Vector2(36, 260)
 
-[node name="WallBottom" type="CollisionShape2D" parent="Walls" unique_id=1753584731]
-position = Vector2(0, 760)
-shape = SubResource("SegmentShape2D_fmvh5")
+[sub_resource type="RectangleShape2D" id="WallShortRoomVertical"]
+size = Vector2(36, 220)
 
-[node name="WallLeft" type="CollisionShape2D" parent="Walls" unique_id=190552398]
-position = Vector2(-1010, 0)
-shape = SubResource("SegmentShape2D_8j7uc")
+[sub_resource type="RectangleShape2D" id="WallLongRoomHorizontal"]
+size = Vector2(460, 36)
 
-[node name="WallRight" type="CollisionShape2D" parent="Walls" unique_id=642867725]
-position = Vector2(1010, 0)
-shape = SubResource("SegmentShape2D_2yvwq")
+[node name="Overworld" type="Node2D" unique_id=1644727157]
 
-[node name="GroundVisual" type="ColorRect" parent="." unique_id=1023583791]
-offset_left = -1000.0
-offset_top = -750.0
-offset_right = 1000.0
-offset_bottom = 750.0
-color = Color(0.2, 0.35, 0.15, 1)
+[node name="PrisonFloor" type="Node2D" parent="." unique_id=2138819060]
 
-[node name="Door1" parent="." unique_id=1615456958 instance=ExtResource("2_atiof")]
-position = Vector2(300, -419)
+[node name="StoneBase" type="ColorRect" parent="PrisonFloor" unique_id=1751291011]
+offset_left = -900.0
+offset_top = -580.0
+offset_right = 900.0
+offset_bottom = 580.0
+color = Color(0.14, 0.15, 0.16, 1)
 
-[node name="Switch1" parent="." unique_id=77349399 instance=ExtResource("3_v7wls")]
-position = Vector2(220, -419)
+[node name="MainCorridor" type="ColorRect" parent="PrisonFloor" unique_id=1273128688]
+offset_left = -810.0
+offset_top = -120.0
+offset_right = 760.0
+offset_bottom = 120.0
+color = Color(0.23, 0.23, 0.22, 1)
 
-[node name="Portal" parent="." unique_id=1763517635 instance=ExtResource("3_i3mdx")]
-position = Vector2(742, -393)
+[node name="CellWingFloor" type="ColorRect" parent="PrisonFloor" unique_id=1448544304]
+offset_left = -820.0
+offset_top = -520.0
+offset_right = -370.0
+offset_bottom = -140.0
+color = Color(0.18, 0.19, 0.2, 1)
+
+[node name="GuardOfficeFloor" type="ColorRect" parent="PrisonFloor" unique_id=264760388]
+offset_left = -310.0
+offset_top = -520.0
+offset_right = 90.0
+offset_bottom = -170.0
+color = Color(0.2, 0.18, 0.15, 1)
+
+[node name="ArmoryFloor" type="ColorRect" parent="PrisonFloor" unique_id=922688565]
+offset_left = 140.0
+offset_top = -520.0
+offset_right = 500.0
+offset_bottom = -170.0
+color = Color(0.18, 0.18, 0.19, 1)
+
+[node name="MessHallFloor" type="ColorRect" parent="PrisonFloor" unique_id=959104647]
+offset_left = -800.0
+offset_top = 170.0
+offset_right = -320.0
+offset_bottom = 520.0
+color = Color(0.2, 0.18, 0.14, 1)
+
+[node name="InfirmaryFloor" type="ColorRect" parent="PrisonFloor" unique_id=994875398]
+offset_left = -260.0
+offset_top = 180.0
+offset_right = 130.0
+offset_bottom = 520.0
+color = Color(0.16, 0.2, 0.2, 1)
+
+[node name="InterrogationFloor" type="ColorRect" parent="PrisonFloor" unique_id=1945122022]
+offset_left = 190.0
+offset_top = 180.0
+offset_right = 540.0
+offset_bottom = 520.0
+color = Color(0.17, 0.15, 0.15, 1)
+
+[node name="StorageFloor" type="ColorRect" parent="PrisonFloor" unique_id=113372559]
+offset_left = 560.0
+offset_top = -520.0
+offset_right = 820.0
+offset_bottom = 120.0
+color = Color(0.18, 0.16, 0.13, 1)
+
+[node name="ExitFloor" type="ColorRect" parent="PrisonFloor" unique_id=1204983336]
+offset_left = 560.0
+offset_top = 170.0
+offset_right = 820.0
+offset_bottom = 520.0
+color = Color(0.14, 0.18, 0.17, 1)
+
+[node name="PrisonWalls" type="StaticBody2D" parent="." unique_id=58798493]
+
+[node name="NorthWall" type="CollisionShape2D" parent="PrisonWalls" unique_id=713008279]
+position = Vector2(0, -600)
+shape = SubResource("WallOuterHorizontal")
+
+[node name="SouthWall" type="CollisionShape2D" parent="PrisonWalls" unique_id=1405881503]
+position = Vector2(0, 600)
+shape = SubResource("WallOuterHorizontal")
+
+[node name="WestWall" type="CollisionShape2D" parent="PrisonWalls" unique_id=247009581]
+position = Vector2(-930, 0)
+shape = SubResource("WallOuterVertical")
+
+[node name="EastWall" type="CollisionShape2D" parent="PrisonWalls" unique_id=1569578627]
+position = Vector2(930, 0)
+shape = SubResource("WallOuterVertical")
+
+[node name="CellNorthWall" type="CollisionShape2D" parent="PrisonWalls" unique_id=211266059]
+position = Vector2(-595, -520)
+shape = SubResource("WallCellHorizontal")
+
+[node name="CellSouthWallLeft" type="CollisionShape2D" parent="PrisonWalls" unique_id=1996831251]
+position = Vector2(-670, -140)
+shape = SubResource("WallCellSouthLeft")
+
+[node name="CellSouthWallRight" type="CollisionShape2D" parent="PrisonWalls" unique_id=1973787821]
+position = Vector2(-390, -140)
+shape = SubResource("WallCellSouthRight")
+
+[node name="CellWestWall" type="CollisionShape2D" parent="PrisonWalls" unique_id=363182728]
+position = Vector2(-820, -330)
+shape = SubResource("WallCellVertical")
+
+[node name="CellEastWall" type="CollisionShape2D" parent="PrisonWalls" unique_id=700796711]
+position = Vector2(-370, -330)
+shape = SubResource("WallCellVertical")
+
+[node name="GuardOfficeNorthWall" type="CollisionShape2D" parent="PrisonWalls" unique_id=1161717294]
+position = Vector2(-110, -520)
+shape = SubResource("WallRoomHorizontal")
+
+[node name="GuardOfficeWestWall" type="CollisionShape2D" parent="PrisonWalls" unique_id=1218596432]
+position = Vector2(-310, -345)
+shape = SubResource("WallRoomVertical")
+
+[node name="GuardOfficeEastWall" type="CollisionShape2D" parent="PrisonWalls" unique_id=1129255580]
+position = Vector2(90, -345)
+shape = SubResource("WallRoomVertical")
+
+[node name="ArmoryNorthWall" type="CollisionShape2D" parent="PrisonWalls" unique_id=185480276]
+position = Vector2(320, -520)
+shape = SubResource("WallRoomHorizontal")
+
+[node name="ArmoryEastWall" type="CollisionShape2D" parent="PrisonWalls" unique_id=1565683620]
+position = Vector2(500, -345)
+shape = SubResource("WallRoomVertical")
+
+[node name="MessHallWestWall" type="CollisionShape2D" parent="PrisonWalls" unique_id=1049898108]
+position = Vector2(-800, 345)
+shape = SubResource("WallShortRoomVertical")
+
+[node name="MessHallSouthWall" type="CollisionShape2D" parent="PrisonWalls" unique_id=1066001032]
+position = Vector2(-560, 520)
+shape = SubResource("WallLongRoomHorizontal")
+
+[node name="InfirmarySouthWall" type="CollisionShape2D" parent="PrisonWalls" unique_id=1472877774]
+position = Vector2(-65, 520)
+shape = SubResource("WallRoomHorizontal")
+
+[node name="InterrogationEastWall" type="CollisionShape2D" parent="PrisonWalls" unique_id=1370813677]
+position = Vector2(540, 350)
+shape = SubResource("WallShortRoomVertical")
+
+[node name="PrisonProps" type="Node2D" parent="." unique_id=330778734]
+
+[node name="CellBarsTop" type="ColorRect" parent="PrisonProps" unique_id=1814401904]
+offset_left = -760.0
+offset_top = -165.0
+offset_right = -430.0
+offset_bottom = -150.0
+color = Color(0.07, 0.08, 0.09, 1)
+
+[node name="CellBarA" type="ColorRect" parent="PrisonProps" unique_id=475305798]
+offset_left = -730.0
+offset_top = -320.0
+offset_right = -716.0
+offset_bottom = -145.0
+color = Color(0.06, 0.07, 0.08, 1)
+
+[node name="CellBarB" type="ColorRect" parent="PrisonProps" unique_id=353598019]
+offset_left = -660.0
+offset_top = -320.0
+offset_right = -646.0
+offset_bottom = -145.0
+color = Color(0.06, 0.07, 0.08, 1)
+
+[node name="CellBarC" type="ColorRect" parent="PrisonProps" unique_id=2062431614]
+offset_left = -590.0
+offset_top = -320.0
+offset_right = -576.0
+offset_bottom = -145.0
+color = Color(0.06, 0.07, 0.08, 1)
+
+[node name="CellBarD" type="ColorRect" parent="PrisonProps" unique_id=907985757]
+offset_left = -520.0
+offset_top = -320.0
+offset_right = -506.0
+offset_bottom = -145.0
+color = Color(0.06, 0.07, 0.08, 1)
+
+[node name="CellBed" type="ColorRect" parent="PrisonProps" unique_id=951082173]
+offset_left = -775.0
+offset_top = -485.0
+offset_right = -600.0
+offset_bottom = -395.0
+color = Color(0.22, 0.16, 0.12, 1)
+
+[node name="CellBlanket" type="ColorRect" parent="PrisonProps" unique_id=1417936263]
+offset_left = -750.0
+offset_top = -465.0
+offset_right = -630.0
+offset_bottom = -415.0
+color = Color(0.22, 0.34, 0.5, 1)
+
+[node name="MessTableA" type="ColorRect" parent="PrisonProps" unique_id=939387789]
+offset_left = -735.0
+offset_top = 285.0
+offset_right = -380.0
+offset_bottom = 330.0
+color = Color(0.27, 0.19, 0.1, 1)
+
+[node name="MessTableB" type="ColorRect" parent="PrisonProps" unique_id=2078278054]
+offset_left = -735.0
+offset_top = 390.0
+offset_right = -380.0
+offset_bottom = 435.0
+color = Color(0.27, 0.19, 0.1, 1)
+
+[node name="InfirmaryBed" type="ColorRect" parent="PrisonProps" unique_id=1655129910]
+offset_left = -210.0
+offset_top = 300.0
+offset_right = 40.0
+offset_bottom = 380.0
+color = Color(0.2, 0.32, 0.34, 1)
+
+[node name="InterrogationTable" type="ColorRect" parent="PrisonProps" unique_id=860723588]
+offset_left = 280.0
+offset_top = 315.0
+offset_right = 455.0
+offset_bottom = 395.0
+color = Color(0.23, 0.13, 0.1, 1)
+
+[node name="StorageCrateA" type="ColorRect" parent="PrisonProps" unique_id=660964739]
+offset_left = 620.0
+offset_top = -455.0
+offset_right = 700.0
+offset_bottom = -375.0
+color = Color(0.29, 0.2, 0.1, 1)
+
+[node name="StorageCrateB" type="ColorRect" parent="PrisonProps" unique_id=854541929]
+offset_left = 710.0
+offset_top = -455.0
+offset_right = 790.0
+offset_bottom = -375.0
+color = Color(0.25, 0.17, 0.09, 1)
+
+[node name="StorageCrateC" type="ColorRect" parent="PrisonProps" unique_id=607100841]
+offset_left = 670.0
+offset_top = -360.0
+offset_right = 750.0
+offset_bottom = -280.0
+color = Color(0.22, 0.15, 0.08, 1)
+
+[node name="CellBucket" type="ColorRect" parent="PrisonProps" unique_id=942626669]
+offset_left = -525.0
+offset_top = -475.0
+offset_right = -490.0
+offset_bottom = -430.0
+color = Color(0.09, 0.1, 0.11, 1)
+
+[node name="CellScratchMarks" type="ColorRect" parent="PrisonProps" unique_id=1253281913]
+offset_left = -440.0
+offset_top = -490.0
+offset_right = -392.0
+offset_bottom = -482.0
+color = Color(0.42, 0.38, 0.3, 1)
+
+[node name="GuardDesk" type="ColorRect" parent="PrisonProps" unique_id=1305727113]
+offset_left = -255.0
+offset_top = -420.0
+offset_right = -70.0
+offset_bottom = -350.0
+color = Color(0.25, 0.16, 0.09, 1)
+
+[node name="KeyRack" type="ColorRect" parent="PrisonProps" unique_id=1125553662]
+offset_left = -10.0
+offset_top = -480.0
+offset_right = 55.0
+offset_bottom = -445.0
+color = Color(0.5, 0.38, 0.12, 1)
+
+[node name="WeaponRack" type="ColorRect" parent="PrisonProps" unique_id=1600535452]
+offset_left = 195.0
+offset_top = -470.0
+offset_right = 455.0
+offset_bottom = -430.0
+color = Color(0.12, 0.12, 0.13, 1)
+
+[node name="ArmoryBladeA" type="ColorRect" parent="PrisonProps" unique_id=205217565]
+offset_left = 230.0
+offset_top = -505.0
+offset_right = 240.0
+offset_bottom = -390.0
+color = Color(0.6, 0.62, 0.58, 1)
+
+[node name="ArmoryBladeB" type="ColorRect" parent="PrisonProps" unique_id=217697562]
+offset_left = 305.0
+offset_top = -505.0
+offset_right = 315.0
+offset_bottom = -390.0
+color = Color(0.6, 0.62, 0.58, 1)
+
+[node name="MedicalCabinet" type="ColorRect" parent="PrisonProps" unique_id=1663103284]
+offset_left = 55.0
+offset_top = 245.0
+offset_right = 105.0
+offset_bottom = 350.0
+color = Color(0.32, 0.36, 0.35, 1)
+
+[node name="DrainGrate" type="ColorRect" parent="PrisonProps" unique_id=748093381]
+offset_left = 655.0
+offset_top = 255.0
+offset_right = 735.0
+offset_bottom = 280.0
+color = Color(0.06, 0.08, 0.08, 1)
+
+[node name="TorchA" type="ColorRect" parent="PrisonProps" unique_id=1778695500]
+offset_left = -350.0
+offset_top = -95.0
+offset_right = -320.0
+offset_bottom = -35.0
+color = Color(0.8, 0.42, 0.12, 1)
+
+[node name="TorchB" type="ColorRect" parent="PrisonProps" unique_id=1785725309]
+offset_left = 400.0
+offset_top = -95.0
+offset_right = 430.0
+offset_bottom = -35.0
+color = Color(0.8, 0.42, 0.12, 1)
+
+[node name="BloodStain" type="ColorRect" parent="PrisonProps" unique_id=209683093]
+offset_left = 375.0
+offset_top = 410.0
+offset_right = 445.0
+offset_bottom = 435.0
+color = Color(0.32, 0.03, 0.03, 1)
+
+[node name="TileSeamHorizontalA" type="ColorRect" parent="PrisonProps" unique_id=387775275]
+offset_left = -860.0
+offset_top = -5.0
+offset_right = 825.0
+offset_bottom = 3.0
+color = Color(0.11, 0.12, 0.12, 1)
+
+[node name="TileSeamHorizontalB" type="ColorRect" parent="PrisonProps" unique_id=542962840]
+offset_left = -860.0
+offset_top = -250.0
+offset_right = 825.0
+offset_bottom = -242.0
+color = Color(0.11, 0.12, 0.12, 1)
+
+[node name="TileSeamHorizontalC" type="ColorRect" parent="PrisonProps" unique_id=1021542127]
+offset_left = -860.0
+offset_top = 245.0
+offset_right = 825.0
+offset_bottom = 253.0
+color = Color(0.11, 0.12, 0.12, 1)
+
+[node name="TileSeamVerticalA" type="ColorRect" parent="PrisonProps" unique_id=952641976]
+offset_left = -520.0
+offset_top = -555.0
+offset_right = -512.0
+offset_bottom = 550.0
+color = Color(0.11, 0.12, 0.12, 1)
+
+[node name="TileSeamVerticalB" type="ColorRect" parent="PrisonProps" unique_id=597560868]
+offset_left = -40.0
+offset_top = -555.0
+offset_right = -32.0
+offset_bottom = 550.0
+color = Color(0.11, 0.12, 0.12, 1)
+
+[node name="TileSeamVerticalC" type="ColorRect" parent="PrisonProps" unique_id=599699515]
+offset_left = 440.0
+offset_top = -555.0
+offset_right = 448.0
+offset_bottom = 550.0
+color = Color(0.11, 0.12, 0.12, 1)
+
+[node name="CellLabel" type="Label" parent="PrisonProps" unique_id=1790713587]
+offset_left = -792.0
+offset_top = -550.0
+offset_right = -610.0
+offset_bottom = -518.0
+text = "PLAYER CELL"
+
+[node name="GuardOfficeLabel" type="Label" parent="PrisonProps" unique_id=1559541635]
+offset_left = -285.0
+offset_top = -550.0
+offset_right = -85.0
+offset_bottom = -518.0
+text = "GUARD OFFICE"
+
+[node name="ArmoryLabel" type="Label" parent="PrisonProps" unique_id=1696651364]
+offset_left = 175.0
+offset_top = -550.0
+offset_right = 310.0
+offset_bottom = -518.0
+text = "ARMORY"
+
+[node name="MessHallLabel" type="Label" parent="PrisonProps" unique_id=1496923575]
+offset_left = -770.0
+offset_top = 135.0
+offset_right = -610.0
+offset_bottom = 167.0
+text = "MESS HALL"
+
+[node name="InfirmaryLabel" type="Label" parent="PrisonProps" unique_id=578811845]
+offset_left = -230.0
+offset_top = 145.0
+offset_right = -70.0
+offset_bottom = 177.0
+text = "INFIRMARY"
+
+[node name="InterrogationLabel" type="Label" parent="PrisonProps" unique_id=1522770798]
+offset_left = 220.0
+offset_top = 145.0
+offset_right = 435.0
+offset_bottom = 177.0
+text = "INTERROGATION"
+
+[node name="StorageLabel" type="Label" parent="PrisonProps" unique_id=8922708]
+offset_left = 595.0
+offset_top = -550.0
+offset_right = 760.0
+offset_bottom = -518.0
+text = "STORAGE"
+
+[node name="ExitLabel" type="Label" parent="PrisonProps" unique_id=191889231]
+offset_left = 590.0
+offset_top = 145.0
+offset_right = 755.0
+offset_bottom = 177.0
+text = "LOWER GATE"
+
+[node name="PrisonGameplay" type="Node2D" parent="." unique_id=344892541]
+
+[node name="CellDoor" parent="PrisonGameplay" unique_id=1696785108 instance=ExtResource("1_door")]
+position = Vector2(-450, -165)
+
+[node name="CellLever" parent="PrisonGameplay" unique_id=1442883368 instance=ExtResource("2_switch")]
+position = Vector2(-705, -245)
+target = NodePath("../CellDoor")
+
+[node name="WardDoor" parent="PrisonGameplay" unique_id=1447817064 instance=ExtResource("1_door")]
+position = Vector2(520, 0)
+
+[node name="GuardPressurePlate" parent="PrisonGameplay" unique_id=669147525 instance=ExtResource("3_plate")]
+position = Vector2(170, 0)
+target = NodePath("../WardDoor")
+
+[node name="ContrabandChest" parent="PrisonGameplay" unique_id=1909834463 instance=ExtResource("5_chest")]
+position = Vector2(325, -395)
+
+[node name="SpikeTrap_Corridor" parent="PrisonGameplay" unique_id=659126458 instance=ExtResource("6_trap")]
+position = Vector2(-60, 0)
+
+[node name="CrackedWall" parent="PrisonGameplay" unique_id=701053702 instance=ExtResource("7_wall")]
+position = Vector2(545, -250)
+object_data = ExtResource("8_wall_data")
+
+[node name="PrisonerNPC" parent="PrisonGameplay" unique_id=2037999742 instance=ExtResource("9_npc")]
+position = Vector2(-555, -255)
+
+[node name="ExitGate" parent="PrisonGameplay" unique_id=1744594001 instance=ExtResource("4_portal")]
+position = Vector2(720, 350)
 target_path = "res://world/regions/burning_forest/burning_forest.tscn"
 
-[node name="Chest1" parent="." unique_id=1568131560 instance=ExtResource("5_ukkfe")]
-position = Vector2(-150, -419)
+[node name="Guard_A" parent="PrisonGameplay" unique_id=722832490 instance=ExtResource("10_enemy")]
+position = Vector2(-120, -40)
 
-[node name="SpikeTrap1" parent="." unique_id=1007731522 instance=ExtResource("7_vy63c")]
-position = Vector2(0, -380)
+[node name="Guard_B" parent="PrisonGameplay" unique_id=980790716 instance=ExtResource("10_enemy")]
+position = Vector2(280, -245)
 
-[node name="BreakableWall1" parent="." unique_id=1567625591 instance=ExtResource("9_0ne8o")]
-position = Vector2(-300, -419)
-object_data = ExtResource("11_t6jhl")
+[node name="Guard_C" parent="PrisonGameplay" unique_id=1320447511 instance=ExtResource("10_enemy")]
+position = Vector2(640, 60)
 
-[node name="NPC1" parent="." unique_id=1103088156 instance=ExtResource("11_848wx")]
-position = Vector2(-500, -419)
+[node name="OilBarrel_Storage" parent="PrisonGameplay" unique_id=412697406 instance=ExtResource("11_barrel")]
+position = Vector2(735, -245)

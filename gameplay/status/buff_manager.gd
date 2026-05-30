@@ -1,5 +1,7 @@
 class_name BuffManager
 extends Node
+
+signal buffs_changed
 ## Buff 管理器 — 挂载到 Player 节点，管理所有激活的 Buff
 ##
 ## 装备、技能、消耗品等任何系统都通过 BuffManager 施加/移除效果
@@ -113,6 +115,7 @@ func apply_buff(buff: Buff) -> void:
 					if cur < existing.max_stacks:
 						_stacks[existing] = cur + 1
 						_buff_remaining[existing] = existing.duration
+						buffs_changed.emit()
 						print("🟡 BuffManager: %s 层数 %d→%d" % [existing.display_name, cur, cur + 1])
 						return
 					return  # 满层不叠加
@@ -131,6 +134,7 @@ func apply_buff(buff: Buff) -> void:
 	
 	CombatExecutor.report_status_applied(get_parent(), buff)
 	_record_buff_trace("BUFF", buff)
+	buffs_changed.emit()
 	print("🟢 BuffManager: 施加 %s (%.1fs)" % [buff.display_name, buff.duration])
 
 
@@ -148,6 +152,7 @@ func remove_buff(buff: Buff) -> void:
 	# 发射 ON_STATUS_REMOVED（可能触发 TriggeredEffect → SkillExecutor → 新 trace）
 	CombatExecutor.report_status_removed(get_parent(), buff)
 
+	buffs_changed.emit()
 	print("🔴 BuffManager: 移除 %s" % buff.display_name)
 
 
@@ -189,6 +194,27 @@ func get_stack_count(status_id_str: String) -> int:
 	return _stacks.get(buff, 0)
 
 
+func get_active_buff_entries() -> Array:
+	var result: Array = []
+	for active_buff in _active_buffs:
+		var remaining: float = _buff_remaining.get(active_buff, 0.0)
+		var duration := maxf(active_buff.duration, 0.0)
+		var progress := 1.0
+		if duration > 0.0:
+			progress = clampf(remaining / duration, 0.0, 1.0)
+		result.append({
+			"name": active_buff.display_name if not active_buff.display_name.is_empty() else active_buff.status_id,
+			"status_id": active_buff.status_id,
+			"icon": active_buff.icon,
+			"remaining": remaining,
+			"duration": duration,
+			"progress": progress,
+			"stacks": _stacks.get(active_buff, 1),
+			"description": active_buff.describe(),
+		})
+	return result
+
+
 ## 内部：按 status_id 查找已有的 Buff 实例
 func _find_by_status(sid: String) -> Buff:
 	for buff in _active_buffs:
@@ -206,3 +232,4 @@ func clear_all() -> void:
 	_active_buffs.clear()
 	_buff_remaining.clear()
 	_stacks.clear()
+	buffs_changed.emit()

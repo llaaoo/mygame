@@ -19,6 +19,7 @@ var player: Player = null
 ## ── 信号 ──
 signal summon_added(entity: SummonEntity)
 signal summon_removed(entity: SummonEntity)
+signal summons_changed
 
 
 func _ready() -> void:
@@ -54,6 +55,7 @@ func register(entity: SummonEntity) -> void:
 		return
 	active_summons.append(entity)
 	summon_added.emit(entity)
+	summons_changed.emit()
 	print("👻 [SummonManager] 召唤物加入: %s (%d/%d)" % [entity.summon_name, active_summons.size(), MAX_SUMMONS])
 
 
@@ -62,6 +64,7 @@ func unregister(entity: SummonEntity) -> void:
 	if idx >= 0:
 		active_summons.remove_at(idx)
 		summon_removed.emit(entity)
+		summons_changed.emit()
 		print("💀 [SummonManager] 召唤物离开: %s (%d/%d)" % [entity.summon_name, active_summons.size(), MAX_SUMMONS])
 
 
@@ -72,6 +75,7 @@ func clear_all() -> void:
 	active_summons.clear()
 	attack_target = null
 	revenge_target = null
+	summons_changed.emit()
 
 
 ## ── 事件处理 ──
