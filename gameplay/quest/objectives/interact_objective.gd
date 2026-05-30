@@ -23,3 +23,6 @@ func on_stage_activated(tree: SceneTree) -> void:
 		if node.has_method("is_opened") and node.is_opened():
 			current = required_count
 			return
+		if node.has_method("is_activated") and node.is_activated():
+			current = required_count
+			return

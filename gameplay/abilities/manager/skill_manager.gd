@@ -226,11 +226,12 @@ func _execute(skill: SkillData, source: String, caster: Node2D, direction: Vecto
 			exec_inst.enter_phase(CombatPhase.Phase.IDLE)
 		return false
 
-	# 触发冷却（POST 之后）
+	var cooldown := _get_effective_cooldown(skill, caster)
 	if inst:
-		inst.trigger_cooldown()
-	_cooldowns[source] = skill.cooldown
-	cooldown_changed.emit(source, skill.cooldown, skill.cooldown)
+		inst.total_cooldown = cooldown
+		inst.current_cooldown = cooldown
+	_cooldowns[source] = cooldown
+	cooldown_changed.emit(source, cooldown, cooldown)
 	skill_used.emit(source, skill)
 	return true
 
@@ -263,10 +264,12 @@ func _execute_with_context(skill: SkillData, source: String, caster: Node2D, ctx
 			exec_inst.enter_phase(CombatPhase.Phase.IDLE)
 		return false
 
+	var cooldown := _get_effective_cooldown(skill, caster)
 	if inst:
-		inst.trigger_cooldown()
-	_cooldowns[source] = skill.cooldown
-	cooldown_changed.emit(source, skill.cooldown, skill.cooldown)
+		inst.total_cooldown = cooldown
+		inst.current_cooldown = cooldown
+	_cooldowns[source] = cooldown
+	cooldown_changed.emit(source, cooldown, cooldown)
 	skill_used.emit(source, skill)
 	return true
 
@@ -286,8 +289,19 @@ func _find_instance(source: String) -> SkillInstance:
 func _get_cooldown_total(source: String) -> float:
 	var inst := _find_instance(source)
 	if inst and inst.data:
-		return inst.data.cooldown
+		return inst.total_cooldown if inst.total_cooldown > 0.0 else inst.data.cooldown
 	return 1.0
+
+
+func _get_effective_cooldown(skill: SkillData, caster: Node2D) -> float:
+	var cooldown := skill.cooldown
+	var player := caster as Player
+	if not player or not player.mastery_manager:
+		return cooldown
+	var modifier := player.mastery_manager.get_modifier_value("cooldown.%s" % skill.get_id())
+	for tag in skill.tags:
+		modifier += player.mastery_manager.get_modifier_value("cooldown.%s" % tag)
+	return maxf(0.1, cooldown * (1.0 + modifier))
 
 
 ## ── 初始化（兼容旧 API） ──

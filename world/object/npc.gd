@@ -4,6 +4,7 @@ extends Node2D
 @export var dialogue_resource: Resource = null
 @export var dialogue: NPCDialogue = null
 @export var schedule: NPCSchedule = null
+@export var enable_schedule: bool = true
 @export var quest_data: QuestData = null
 @export var quest_available_lines: Array[String] = []
 @export var quest_active_lines: Array[String] = []
@@ -125,6 +126,8 @@ func _get_dialogue_manager() -> Node:
 
 
 func _setup_npc_schedule() -> void:
+	if not enable_schedule:
+		return
 	if not schedule:
 		schedule = _create_default_schedule()
 	_create_test_markers()

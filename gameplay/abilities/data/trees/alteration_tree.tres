@@ -1,0 +1,52 @@
+[gd_resource type="Resource" script_class="SkillTreeData" format=3]
+
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_tree_data.gd" id="1_tree"]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_perk_data.gd" id="2_perk"]
+
+[sub_resource type="Resource" id="Perk_GuardedSkin" script=ExtResource("2_perk")]
+perk_id = "alteration_guarded_skin"
+school = 3
+display_name = "护体织层"
+description = "冰甲持续时间提升 50%。"
+required_level = 5
+modifier_bonuses = {
+"buff.ice_armor.duration": 0.5
+}
+
+[sub_resource type="Resource" id="Perk_Shatter" script=ExtResource("2_perk")]
+perk_id = "alteration_shatter"
+school = 3
+display_name = "碎冰回响"
+description = "冰霜护盾结束时自动释放冰爆。"
+required_level = 10
+prerequisite_ids = ["alteration_guarded_skin"]
+trigger_event = 7
+trigger_skill_id = "ice_explosion"
+trigger_required_buff_name = "ice_armor"
+
+[sub_resource type="Resource" id="Perk_StoneStride" script=ExtResource("2_perk")]
+perk_id = "alteration_stone_stride"
+school = 3
+display_name = "石肤步伐"
+description = "位移类技能冷却缩短 15%。"
+required_level = 20
+prerequisite_ids = ["alteration_shatter"]
+modifier_bonuses = {
+"cooldown.shadow_step": -0.15
+}
+
+[sub_resource type="Resource" id="Perk_FrozenEdge" script=ExtResource("2_perk")]
+perk_id = "alteration_frozen_edge"
+school = 3
+display_name = "凝锋"
+description = "冻结目标受到的冰系伤害额外提升 15%。"
+required_level = 30
+prerequisite_ids = ["alteration_stone_stride"]
+modifier_bonuses = {
+"damage.ice": 0.15
+}
+
+[resource]
+script = ExtResource("1_tree")
+school = 3
+perks = [SubResource("Perk_GuardedSkin"), SubResource("Perk_Shatter"), SubResource("Perk_StoneStride"), SubResource("Perk_FrozenEdge")]

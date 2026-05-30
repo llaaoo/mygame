@@ -357,14 +357,6 @@ func _setup_event_bus() -> void:
 	_on_kill_effect = OnKillBonusExp.create_for_player(15)
 	_register_triggered_effects(_on_kill_effect)
 
-	# ON_STATUS_REMOVED 冰甲 → 冰爆（通用触发施法，纯数据驱动）
-	_on_buff_expire_cast = _create_buff_expire_trigger()
-	_register_triggered_effects(_on_buff_expire_cast)
-
-	# 示例：ON_KILL 火系击杀 → 烈焰风暴
-	_on_kill_fire_trigger = _create_generic_trigger(CombatEvent.Type.ON_KILL, "fire", "flame_storm")
-	_register_triggered_effects(_on_kill_fire_trigger)
-
 	# 低血量触发器（配置化，DEFAULT_LOW_HP_TRIGGERS 可扩展）
 	_setup_low_hp_triggers()
 	health_component.health_changed.connect(_check_low_hp_shadow_step)
@@ -1019,7 +1011,8 @@ func _setup_mastery() -> void:
 	mastery_manager = SkillMasteryManager.new()
 	mastery_manager.name = "MasteryManager"
 	add_child(mastery_manager)
-	mastery_manager.setup()
+	mastery_manager.setup(self)
+	mastery_manager.perk_unlocked.connect(_on_perk_unlocked)
 
 	# 施法时加 XP
 	skill_manager.skill_used.connect(_on_skill_used_for_mastery)
@@ -1028,6 +1021,48 @@ func _setup_mastery() -> void:
 	if CombatEventBus.instance:
 		CombatEventBus.instance.subscribe(CombatEvent.Type.ON_HIT, _on_player_hit_for_mastery)
 		CombatEventBus.instance.subscribe(CombatEvent.Type.ON_KILL, _on_player_kill_for_mastery)
+	_rebuild_perk_triggers()
+
+
+func _rebuild_perk_triggers() -> void:
+	if not mastery_manager:
+		return
+	if _on_buff_expire_cast:
+		_on_buff_expire_cast.unregister()
+		_on_buff_expire_cast = null
+	if _on_kill_fire_trigger:
+		_on_kill_fire_trigger.unregister()
+		_on_kill_fire_trigger = null
+	for perk in mastery_manager.get_unlocked_trigger_perks():
+		var trigger := mastery_manager.build_trigger_effect(perk)
+		if not trigger:
+			continue
+		match perk.perk_id:
+			"alteration_shatter":
+				_on_buff_expire_cast = trigger
+			"destruction_firestorm":
+				_on_kill_fire_trigger = trigger
+			_:
+				pass
+		_register_triggered_effects(trigger)
+
+
+func _on_perk_unlocked(_school: int, perk_id: String) -> void:
+	if not mastery_manager:
+		return
+	var perk := mastery_manager.get_perk(perk_id)
+	if not perk:
+		return
+	var trigger := mastery_manager.build_trigger_effect(perk)
+	if trigger:
+		match perk.perk_id:
+			"alteration_shatter":
+				_on_buff_expire_cast = trigger
+			"destruction_firestorm":
+				_on_kill_fire_trigger = trigger
+			_:
+				pass
+		_register_triggered_effects(trigger)
 
 
 func _on_skill_used_for_mastery(_source: String, skill: SkillData) -> void:

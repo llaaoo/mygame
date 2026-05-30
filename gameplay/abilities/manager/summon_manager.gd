@@ -47,7 +47,13 @@ func _subscribe_events() -> void:
 ## ── 公共接口 ──
 
 func can_summon() -> bool:
-	return active_summons.size() < MAX_SUMMONS
+	return active_summons.size() < get_max_summons()
+
+
+func get_max_summons() -> int:
+	if player and player.mastery_manager:
+		return MAX_SUMMONS + int(player.mastery_manager.get_modifier_value("summon.max_count"))
+	return MAX_SUMMONS
 
 
 func register(entity: SummonEntity) -> void:
@@ -56,7 +62,7 @@ func register(entity: SummonEntity) -> void:
 	active_summons.append(entity)
 	summon_added.emit(entity)
 	summons_changed.emit()
-	print("👻 [SummonManager] 召唤物加入: %s (%d/%d)" % [entity.summon_name, active_summons.size(), MAX_SUMMONS])
+	print("👻 [SummonManager] 召唤物加入: %s (%d/%d)" % [entity.summon_name, active_summons.size(), get_max_summons()])
 
 
 func unregister(entity: SummonEntity) -> void:
@@ -65,7 +71,7 @@ func unregister(entity: SummonEntity) -> void:
 		active_summons.remove_at(idx)
 		summon_removed.emit(entity)
 		summons_changed.emit()
-		print("💀 [SummonManager] 召唤物离开: %s (%d/%d)" % [entity.summon_name, active_summons.size(), MAX_SUMMONS])
+		print("💀 [SummonManager] 召唤物离开: %s (%d/%d)" % [entity.summon_name, active_summons.size(), get_max_summons()])
 
 
 func clear_all() -> void:

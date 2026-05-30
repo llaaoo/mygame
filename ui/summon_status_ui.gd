@@ -61,7 +61,7 @@ func _refresh() -> void:
 
 	var summons := _manager.active_summons
 	visible = not summons.is_empty()
-	_count_label.text = "Summons %d/%d" % [summons.size(), SummonManager.MAX_SUMMONS]
+	_count_label.text = "Summons %d/%d" % [summons.size(), _manager.get_max_summons()]
 
 	for summon in summons:
 		if is_instance_valid(summon):

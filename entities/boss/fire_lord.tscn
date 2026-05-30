@@ -15,8 +15,6 @@
 collision_layer = 2
 collision_mask = 3
 script = ExtResource("1_qnrkc")
-boss_name = "火焰领主"
-boss_color = Color(1, 0.25, 0.1, 1)
 max_hp = 400
 move_speed = 90.0
 detect_range = 250.0

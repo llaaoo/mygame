@@ -24,6 +24,7 @@ static var instance: GameRuntime = null
 var world_runtime: WorldRuntime = null
 var simulation_runtime: SimulationRuntime = null
 var command_bus: CommandBus = null
+var region_runtime: RegionRuntime = null
 
 ## CombatExecutor / CombatEventBus 由 GameRuntime 统一创建（Player 不再越权创建）
 var combat_executor: CombatExecutor = null
@@ -94,6 +95,13 @@ func _setup_runtimes() -> void:
 		sv.name = "SaveManager"
 		add_child(sv)
 
+	if has_node("RegionRuntime"):
+		region_runtime = $RegionRuntime as RegionRuntime
+	else:
+		region_runtime = RegionRuntime.new()
+		region_runtime.name = "RegionRuntime"
+		add_child(region_runtime)
+
 	# === 伤害数字生成器（监听 CombatEventBus → 浮动数字） ===
 	if not has_node("DamageNumberSpawner"):
 		var dns := DamageNumberSpawner.new()
@@ -161,6 +169,10 @@ func get_simulation_runtime() -> SimulationRuntime:
 
 func get_command_bus() -> CommandBus:
 	return command_bus
+
+
+func get_region_runtime() -> RegionRuntime:
+	return region_runtime
 
 
 func get_combat_executor() -> CombatExecutor:

@@ -162,5 +162,14 @@ func get_object_count() -> int:
 	return _object_count
 
 
+func get_all_objects() -> Array[MapObject]:
+	var result: Array[MapObject] = []
+	for cell in _grid.keys():
+		for obj: MapObject in _grid[cell]:
+			if is_instance_valid(obj):
+				result.append(obj)
+	return result
+
+
 func _to_string() -> String:
 	return "WorldSpatialIndex(cells=%d, objects=%d)" % [_grid.size(), _object_count]

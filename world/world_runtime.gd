@@ -53,6 +53,17 @@ func unregister_object(obj: MapObject) -> void:
 	state_manager.unregister(obj.get_object_id())
 
 
+func prepare_region_swap() -> void:
+	spatial_index.clear()
+
+
+func restore_registered_objects() -> void:
+	for obj: MapObject in spatial_index.get_all_objects():
+		var state := state_manager.get_state(obj.get_object_id())
+		if not state.is_empty():
+			obj.restore_state(state)
+
+
 ## --- CommandBus 订阅 ---
 
 func _on_destroyed_command(cmd: RuntimeCommand) -> void:

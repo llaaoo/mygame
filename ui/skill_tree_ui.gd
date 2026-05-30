@@ -26,6 +26,10 @@ func setup(player: Player) -> void:
 		_mastery_manager.mastery_leveled.connect(_on_mastery_leveled)
 	if not _mastery_manager.character_leveled.is_connected(_on_character_level):
 		_mastery_manager.character_leveled.connect(_on_character_level)
+	if not _mastery_manager.perk_points_changed.is_connected(_on_perk_points_changed):
+		_mastery_manager.perk_points_changed.connect(_on_perk_points_changed)
+	if not _mastery_manager.perk_unlocked.is_connected(_on_perk_unlocked):
+		_mastery_manager.perk_unlocked.connect(_on_perk_unlocked)
 	_refresh()
 
 
@@ -63,17 +67,15 @@ func _set_ui_blocked(blocked: bool) -> void:
 
 func _build_ui() -> void:
 	var dim := ColorRect.new()
-	dim.name = "Dim"
 	dim.color = Color(0, 0, 0, 0.58)
 	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(dim)
 
 	_panel = PanelContainer.new()
-	_panel.name = "Panel"
-	_panel.anchor_left = 0.08
-	_panel.anchor_right = 0.92
+	_panel.anchor_left = 0.06
+	_panel.anchor_right = 0.94
 	_panel.anchor_top = 0.08
-	_panel.anchor_bottom = 0.90
+	_panel.anchor_bottom = 0.92
 	_panel.add_theme_stylebox_override("panel", GameUIStyle.panel_style(0.96, 6))
 	add_child(_panel)
 
@@ -103,7 +105,7 @@ func _build_ui() -> void:
 	header.add_child(_level_label)
 
 	var hint := Label.new()
-	hint.text = "M closes. Schools advance through use; milestones show current build goals."
+	hint.text = "每个学派每 5 级获得 1 点 perk。触发型连锁效果已转入对应学派树。"
 	GameUIStyle.apply_label(hint, 11, GameUIStyle.TEXT_MUTED)
 	vbox.add_child(hint)
 
@@ -129,7 +131,7 @@ func _refresh() -> void:
 
 func _make_school_column(mastery: SkillMastery) -> Control:
 	var panel := PanelContainer.new()
-	panel.custom_minimum_size = Vector2(170, 360)
+	panel.custom_minimum_size = Vector2(220, 420)
 	panel.add_theme_stylebox_override("panel", GameUIStyle.slot_style(mastery.level >= 5))
 
 	var vbox := VBoxContainer.new()
@@ -142,11 +144,11 @@ func _make_school_column(mastery: SkillMastery) -> Control:
 	GameUIStyle.apply_label(title, 14, GameUIStyle.GOLD)
 	vbox.add_child(title)
 
-	var level := Label.new()
-	level.text = "Lv.%d" % mastery.level
-	level.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	GameUIStyle.apply_label(level, 20, GameUIStyle.TEXT_MAIN)
-	vbox.add_child(level)
+	var info := Label.new()
+	info.text = "Lv.%d  |  Points %d" % [mastery.level, mastery.perk_points]
+	info.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	GameUIStyle.apply_label(info, 12, GameUIStyle.TEXT_MAIN)
+	vbox.add_child(info)
 
 	var progress := ProgressBar.new()
 	progress.custom_minimum_size = Vector2(0, 8)
@@ -163,24 +165,66 @@ func _make_school_column(mastery: SkillMastery) -> Control:
 	GameUIStyle.apply_label(xp, 10, GameUIStyle.TEXT_MUTED)
 	vbox.add_child(xp)
 
-	var milestones := [5, 10, 20, 40]
-	for milestone in milestones:
-		vbox.add_child(_make_milestone(mastery, milestone))
+	for perk in _mastery_manager.get_perks_for_school(mastery.school):
+		vbox.add_child(_make_perk_card(perk))
 
 	return panel
 
 
-func _make_milestone(mastery: SkillMastery, required_level: int) -> Control:
-	var row := PanelContainer.new()
-	row.custom_minimum_size = Vector2(0, 44)
-	row.add_theme_stylebox_override("panel", GameUIStyle.slot_style(mastery.level >= required_level))
+func _make_perk_card(perk: SkillPerkData) -> Control:
+	var unlocked := _mastery_manager.has_perk(perk.perk_id)
+	var can_unlock := _mastery_manager.can_unlock_perk(perk.perk_id)
 
-	var label := Label.new()
-	label.text = "Lv.%d  %s" % [required_level, _milestone_text(mastery.school, required_level)]
-	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	GameUIStyle.apply_label(label, 10, GameUIStyle.TEXT_MAIN if mastery.level >= required_level else GameUIStyle.TEXT_MUTED)
-	row.add_child(label)
-	return row
+	var panel := PanelContainer.new()
+	panel.custom_minimum_size = Vector2(0, 78)
+	panel.add_theme_stylebox_override("panel", GameUIStyle.slot_style(unlocked))
+
+	var margin := MarginContainer.new()
+	margin.add_theme_constant_override("margin_left", 8)
+	margin.add_theme_constant_override("margin_right", 8)
+	margin.add_theme_constant_override("margin_top", 6)
+	margin.add_theme_constant_override("margin_bottom", 6)
+	panel.add_child(margin)
+
+	var vbox := VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 4)
+	margin.add_child(vbox)
+
+	var top := HBoxContainer.new()
+	vbox.add_child(top)
+
+	var title := Label.new()
+	title.text = "Lv.%d %s" % [perk.required_level, perk.display_name]
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	GameUIStyle.apply_label(title, 11, GameUIStyle.TEXT_MAIN if unlocked or can_unlock else GameUIStyle.TEXT_MUTED)
+	top.add_child(title)
+
+	var state := Label.new()
+	state.text = "Unlocked" if unlocked else ("Ready" if can_unlock else "Locked")
+	GameUIStyle.apply_label(state, 10, GameUIStyle.GOLD if unlocked or can_unlock else GameUIStyle.TEXT_MUTED)
+	top.add_child(state)
+
+	var desc := Label.new()
+	desc.text = perk.description
+	desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	GameUIStyle.apply_label(desc, 10, GameUIStyle.TEXT_MUTED if not unlocked else GameUIStyle.TEXT_MAIN)
+	vbox.add_child(desc)
+
+	if not unlocked:
+		var button := Button.new()
+		button.text = "Unlock"
+		button.disabled = not can_unlock
+		button.pressed.connect(_unlock_perk.bind(perk.perk_id))
+		vbox.add_child(button)
+
+	return panel
+
+
+func _unlock_perk(perk_id: String) -> void:
+	if not _mastery_manager:
+		return
+	if _mastery_manager.unlock_perk(perk_id):
+		_refresh()
 
 
 func _school_display_name(school: int) -> String:
@@ -215,22 +259,6 @@ func _school_color(school: int) -> Color:
 			return GameUIStyle.GOLD
 
 
-func _milestone_text(school: int, required_level: int) -> String:
-	match school:
-		SkillMastery.School.DESTRUCTION:
-			return "More reliable damage" if required_level < 20 else "Elemental pressure"
-		SkillMastery.School.CONJURATION:
-			return "Stronger summons" if required_level < 20 else "Longer command uptime"
-		SkillMastery.School.RESTORATION:
-			return "Recovery efficiency" if required_level < 20 else "Emergency sustain"
-		SkillMastery.School.ALTERATION:
-			return "Better protection" if required_level < 20 else "Control resistance"
-		SkillMastery.School.ILLUSION:
-			return "Mobility control" if required_level < 20 else "Threat redirection"
-		_:
-			return "Specialization"
-
-
 func _on_mastery_changed(_skill_id: String, _school: int, _xp_amount: float, _level: int, _progress: float) -> void:
 	if visible:
 		_refresh()
@@ -242,3 +270,13 @@ func _on_mastery_leveled(_skill_id: String, _school: int, _new_level: int) -> vo
 
 func _on_character_level(_new_level: int) -> void:
 	_refresh()
+
+
+func _on_perk_points_changed(_school: int, _points: int) -> void:
+	if visible:
+		_refresh()
+
+
+func _on_perk_unlocked(_school: int, _perk_id: String) -> void:
+	if visible:
+		_refresh()

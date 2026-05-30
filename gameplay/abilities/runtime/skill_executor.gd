@@ -54,6 +54,7 @@ func resolve_damage(skill: SkillData, ctx: CastContext) -> int:
 	_apply_stage(dc, DamageModifier.Stage.FINAL, trace)
 
 	var result := maxi(1, dc.final_damage)
+	result = _apply_mastery_damage_bonuses(result, skill, ctx.caster)
 
 	if trace:
 		trace.final_damage = result
@@ -227,6 +228,7 @@ func _execute_buff(skill: SkillData, ctx: CastContext) -> bool:
 	var buff := skill.buff_resource.duplicate() as Buff
 	if skill.buff_duration > 0:
 		buff.duration = skill.buff_duration
+	buff.duration = _get_buff_duration_with_mastery(buff, ctx.caster)
 	buff_manager.apply_buff(buff)
 	# trace 由 BuffManager.apply_buff 统一记录
 	return true
@@ -358,7 +360,7 @@ func _execute_summon(skill: SkillData, ctx: CastContext) -> bool:
 	spawn_pos += Vector2(randf_range(-30, 30), randf_range(-30, 30))
 	instance.global_position = spawn_pos
 
-	instance.setup(skill.summon_data, player, manager)
+	instance.setup(_build_scaled_summon_data(skill.summon_data, player), player, manager)
 	instance.set_meta("skill_data", skill)
 
 	return true
@@ -428,6 +430,39 @@ func remove_modifiers_of_class(class_name_str: String) -> void:
 				to_remove.append(mod)
 		for mod in to_remove:
 			modifiers_by_stage[stage].erase(mod)
+
+
+func _apply_mastery_damage_bonuses(base_damage: int, skill: SkillData, caster: Node2D) -> int:
+	var player := caster as Player
+	if not player or not player.mastery_manager:
+		return base_damage
+	var multiplier := 1.0 + player.mastery_manager.get_modifier_value("damage.all")
+	for tag in skill.tags:
+		multiplier += player.mastery_manager.get_modifier_value("damage.%s" % tag)
+	return maxi(1, int(round(base_damage * multiplier)))
+
+
+func _get_buff_duration_with_mastery(buff: Buff, caster: Node2D) -> float:
+	var player := caster as Player
+	if not player or not player.mastery_manager:
+		return buff.duration
+	var delta := player.mastery_manager.get_modifier_value("buff.duration.all")
+	if not buff.status_id.is_empty():
+		delta += player.mastery_manager.get_modifier_value("buff.%s.duration" % buff.status_id)
+	return maxf(0.0, buff.duration * (1.0 + delta))
+
+
+func _build_scaled_summon_data(base_data: SummonData, caster: Player) -> SummonData:
+	if not caster or not caster.mastery_manager:
+		return base_data
+	var data := base_data.duplicate(true) as SummonData
+	var hp_bonus := caster.mastery_manager.get_modifier_value("summon.hp_multiplier")
+	var damage_bonus := caster.mastery_manager.get_modifier_value("summon.damage_multiplier")
+	var duration_bonus := caster.mastery_manager.get_modifier_value("summon.duration_multiplier")
+	data.max_hp = int(round(base_data.max_hp * (1.0 + hp_bonus)))
+	data.damage = int(round(base_data.damage * (1.0 + damage_bonus)))
+	data.lifetime = base_data.lifetime * (1.0 + duration_bonus)
+	return data
 
 
 ## 清空所有 modifier（切换场景/重置用）

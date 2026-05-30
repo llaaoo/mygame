@@ -27,6 +27,10 @@ func _on_interact(_actor: Node2D) -> void:
 	_update_visual()
 
 
+func is_activated() -> bool:
+	return _is_on
+
+
 func _send_signal(signal_id: String) -> void:
 	var receiver := _find_receiver()
 	if receiver:

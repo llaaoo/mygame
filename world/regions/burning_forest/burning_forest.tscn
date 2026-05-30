@@ -6,9 +6,15 @@
 [ext_resource type="PackedScene" uid="uid://dbv2k2e21cmb7" path="res://world/object/oil_barrel.tscn" id="7_gi7vb"]
 [ext_resource type="PackedScene" uid="uid://dcbumdieobptq" path="res://entities/enemy/enemy.tscn" id="9_yy20m"]
 [ext_resource type="PackedScene" uid="uid://bwp88vxjs1mk4" path="res://world/object/ice_wall.tscn" id="11_r26f1"]
+[ext_resource type="Script" uid="uid://bn4gb27832dt0" path="res://world/markers/world_marker.gd" id="12_world_marker"]
 
 [node name="BurningForest" type="Node2D" unique_id=1812620355]
 script = ExtResource("1_65ljx")
+
+[node name="EntryMarker" type="Node2D" parent="."]
+position = Vector2(100, 0)
+script = ExtResource("12_world_marker")
+marker_id = "burning_forest_entry"
 
 [node name="Camp_Crate1" parent="." unique_id=1472283687 instance=ExtResource("2_b87ip")]
 position = Vector2(-50, 0)

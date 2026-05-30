@@ -1,0 +1,53 @@
+[gd_resource type="Resource" script_class="SkillTreeData" format=3]
+
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_tree_data.gd" id="1_tree"]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_perk_data.gd" id="2_perk"]
+
+[sub_resource type="Resource" id="Perk_Stability" script=ExtResource("2_perk")]
+perk_id = "restoration_stability"
+school = 2
+display_name = "稳态"
+description = "所有增益持续时间提升 20%。"
+required_level = 5
+modifier_bonuses = {
+"buff.duration.all": 0.2
+}
+
+[sub_resource type="Resource" id="Perk_Mending" script=ExtResource("2_perk")]
+perk_id = "restoration_mending"
+school = 2
+display_name = "复原"
+description = "恢复类技能冷却缩短 10%。"
+required_level = 10
+prerequisite_ids = ["restoration_stability"]
+modifier_bonuses = {
+"cooldown.heal": -0.1
+}
+
+[sub_resource type="Resource" id="Perk_Cleanse" script=ExtResource("2_perk")]
+perk_id = "restoration_cleanse"
+school = 2
+display_name = "净化"
+description = "燃烧与中毒持续时间缩短 35%。"
+required_level = 20
+prerequisite_ids = ["restoration_mending"]
+modifier_bonuses = {
+"status.burning_duration": -0.35,
+"status.poison_duration": -0.35
+}
+
+[sub_resource type="Resource" id="Perk_Reserve" script=ExtResource("2_perk")]
+perk_id = "restoration_reserve"
+school = 2
+display_name = "储备"
+description = "全局法术伤害与治疗效率提升 8%。"
+required_level = 30
+prerequisite_ids = ["restoration_cleanse"]
+modifier_bonuses = {
+"damage.all": 0.08
+}
+
+[resource]
+script = ExtResource("1_tree")
+school = 2
+perks = [SubResource("Perk_Stability"), SubResource("Perk_Mending"), SubResource("Perk_Cleanse"), SubResource("Perk_Reserve")]

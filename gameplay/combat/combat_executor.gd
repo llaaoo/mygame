@@ -343,6 +343,7 @@ static func report_status_applied(target: Node2D, buff: Buff) -> void:
 static func report_status_removed(target: Node2D, buff: Buff) -> void:
 	var data := {
 		"buff_name": buff.display_name,
+		"status_id": buff.status_id,
 		"effect": buff.describe(),
 	}
 	if not instance:

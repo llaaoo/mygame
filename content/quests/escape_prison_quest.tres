@@ -1,0 +1,50 @@
+[gd_resource type="Resource" script_class="QuestData" format=3 uid="uid://ba1gdcymy4mu5"]
+
+[ext_resource type="Script" uid="uid://dhf7hidl0pv7d" path="res://gameplay/quest/data/quest_data.gd" id="1_quest"]
+[ext_resource type="Script" uid="uid://ptvcx8j64iic" path="res://gameplay/quest/data/quest_stage.gd" id="2_stage"]
+[ext_resource type="Script" uid="uid://cyi6msen5jpus" path="res://gameplay/quest/data/objective.gd" id="3_objective"]
+[ext_resource type="Script" uid="uid://3isqxofgehto" path="res://gameplay/quest/objectives/interact_objective.gd" id="4_interact"]
+[ext_resource type="Script" uid="uid://g7sf8gtho6j0" path="res://gameplay/quest/objectives/kill_objective.gd" id="5_kill"]
+
+[sub_resource type="Resource" id="InteractObjective_cell_lever"]
+script = ExtResource("4_interact")
+target_tag = "cell_lever"
+description = "Pull the cell lever"
+track_from_start = false
+
+[sub_resource type="Resource" id="QuestStage_cell"]
+script = ExtResource("2_stage")
+stage_id = "open_cell"
+title = "Open the cell"
+objectives = Array[ExtResource("3_objective")]([SubResource("InteractObjective_cell_lever")])
+
+[sub_resource type="Resource" id="InteractObjective_supply"]
+script = ExtResource("4_interact")
+target_tag = "escape_supply"
+description = "Open the storage chest"
+track_from_start = false
+
+[sub_resource type="Resource" id="QuestStage_supply"]
+script = ExtResource("2_stage")
+stage_id = "find_supplies"
+title = "Find supplies"
+objectives = Array[ExtResource("3_objective")]([SubResource("InteractObjective_supply")])
+
+[sub_resource type="Resource" id="KillObjective_guard"]
+script = ExtResource("5_kill")
+target_tag = "prison_guard"
+description = "Defeat a guard"
+
+[sub_resource type="Resource" id="QuestStage_guard"]
+script = ExtResource("2_stage")
+stage_id = "thin_patrol"
+title = "Thin the patrol"
+objectives = Array[ExtResource("3_objective")]([SubResource("KillObjective_guard")])
+
+[resource]
+script = ExtResource("1_quest")
+quest_id = "escape_prison_001"
+title = "Escape the Cell"
+description = "A prisoner points you toward the first opening: pull the cell lever, raid the storage chest, defeat a guard, and use the lower gate."
+stages = Array[ExtResource("2_stage")]([SubResource("QuestStage_cell"), SubResource("QuestStage_supply"), SubResource("QuestStage_guard")])
+reward_experience = 50

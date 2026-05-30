@@ -1,0 +1,52 @@
+[gd_resource type="Resource" script_class="SkillTreeData" format=3]
+
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_tree_data.gd" id="1_tree"]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_perk_data.gd" id="2_perk"]
+
+[sub_resource type="Resource" id="Perk_ExtraSlot" script=ExtResource("2_perk")]
+perk_id = "conjuration_extra_slot"
+school = 1
+display_name = "并行契约"
+description = "召唤上限 +1。"
+required_level = 5
+modifier_bonuses = {
+"summon.max_count": 1.0
+}
+
+[sub_resource type="Resource" id="Perk_IronPact" script=ExtResource("2_perk")]
+perk_id = "conjuration_iron_pact"
+school = 1
+display_name = "铁誓"
+description = "召唤物生命提升 25%。"
+required_level = 10
+prerequisite_ids = ["conjuration_extra_slot"]
+modifier_bonuses = {
+"summon.hp_multiplier": 0.25
+}
+
+[sub_resource type="Resource" id="Perk_BattleDrum" script=ExtResource("2_perk")]
+perk_id = "conjuration_battle_drum"
+school = 1
+display_name = "战鼓"
+description = "召唤物伤害提升 25%。"
+required_level = 20
+prerequisite_ids = ["conjuration_iron_pact"]
+modifier_bonuses = {
+"summon.damage_multiplier": 0.25
+}
+
+[sub_resource type="Resource" id="Perk_LongService" script=ExtResource("2_perk")]
+perk_id = "conjuration_long_service"
+school = 1
+display_name = "长役"
+description = "召唤持续时间提升 50%。"
+required_level = 30
+prerequisite_ids = ["conjuration_battle_drum"]
+modifier_bonuses = {
+"summon.duration_multiplier": 0.5
+}
+
+[resource]
+script = ExtResource("1_tree")
+school = 1
+perks = [SubResource("Perk_ExtraSlot"), SubResource("Perk_IronPact"), SubResource("Perk_BattleDrum"), SubResource("Perk_LongService")]

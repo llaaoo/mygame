@@ -1,0 +1,53 @@
+[gd_resource type="Resource" script_class="SkillTreeData" format=3]
+
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_tree_data.gd" id="1_tree"]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_perk_data.gd" id="2_perk"]
+
+[sub_resource type="Resource" id="Perk_Scorch" script=ExtResource("2_perk")]
+perk_id = "destruction_scorch"
+school = 0
+display_name = "余烬加深"
+description = "火焰系伤害提升 15%。"
+required_level = 5
+modifier_bonuses = {
+"damage.fire": 0.15
+}
+
+[sub_resource type="Resource" id="Perk_Firestorm" script=ExtResource("2_perk")]
+perk_id = "destruction_firestorm"
+school = 0
+display_name = "焚灭余烬"
+description = "火焰击杀后自动引爆烈焰风暴。"
+required_level = 10
+prerequisite_ids = ["destruction_scorch"]
+trigger_event = 3
+trigger_skill_id = "flame_storm"
+trigger_required_tag = "fire"
+
+[sub_resource type="Resource" id="Perk_StormWeb" script=ExtResource("2_perk")]
+perk_id = "destruction_storm_web"
+school = 0
+display_name = "雷网"
+description = "闪电链额外弹射 2 次。"
+required_level = 20
+prerequisite_ids = ["destruction_firestorm"]
+modifier_bonuses = {
+"chain.lightning_bounces": 2.0
+}
+
+[sub_resource type="Resource" id="Perk_DeepFreeze" script=ExtResource("2_perk")]
+perk_id = "destruction_deepfreeze"
+school = 0
+display_name = "霜蚀"
+description = "冰系伤害提升 12%，冻结持续时间提升 50%。"
+required_level = 30
+prerequisite_ids = ["destruction_storm_web"]
+modifier_bonuses = {
+"damage.ice": 0.12,
+"status.frozen_duration": 0.5
+}
+
+[resource]
+script = ExtResource("1_tree")
+school = 0
+perks = [SubResource("Perk_Scorch"), SubResource("Perk_Firestorm"), SubResource("Perk_StormWeb"), SubResource("Perk_DeepFreeze")]

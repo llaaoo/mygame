@@ -1,78 +1,71 @@
 extends Area2D
 class_name Portal
-## 场景传送门 — 玩家进入时切换到目标场景
-
 
 @export var target_path: String = ""
-@export var target_label: String = "进入"
-@export var is_region: bool = true   ## 默认区域模式（保留 GameRuntime/Player/HUD），false=全场景替换
+@export var target_label: String = "Enter"
+@export var is_region: bool = true
+@export var target_marker_id: String = ""
+@export var locked: bool = false
+@export var locked_label: String = "Locked"
 
 
 func _ready() -> void:
 	monitoring = true
 	body_entered.connect(_on_body_entered)
+	_update_visual()
 	if target_path.is_empty():
-		push_warning("Portal: 未设置 target_path")
+		push_warning("Portal: target_path is empty")
 
 
 func _on_body_entered(body: Node2D) -> void:
 	if not body.is_in_group("player"):
 		return
+	if locked:
+		print("Portal locked: %s" % locked_label)
+		return
 	if target_path.is_empty():
 		return
 
-	print("🚪 Portal: %s → %s" % [target_label, target_path])
+	print("Portal: %s -> %s" % [target_label, target_path])
 
 	if is_region:
 		_do_region_transition()
-	else:
-		var packed := load(target_path) as PackedScene
-		if packed:
-			get_tree().change_scene_to_packed(packed)
+		return
+
+	var packed := load(target_path) as PackedScene
+	if packed:
+		get_tree().change_scene_to_packed(packed)
+
+
+func lock(message: String = "") -> void:
+	locked = true
+	if not message.is_empty():
+		locked_label = message
+	_update_visual()
+
+
+func unlock() -> void:
+	locked = false
+	_update_visual()
+
+
+func is_locked() -> bool:
+	return locked
 
 
 func _do_region_transition() -> void:
-	var packed := load(target_path) as PackedScene
-	if not packed:
-		push_error("Portal: 无法加载场景: %s" % target_path)
+	var gr := GameRuntime.instance
+	if not gr or not gr.get_region_runtime():
+		push_error("Portal: RegionRuntime unavailable")
 		return
-
-	# ⚠️ 物理回调中不能直接改树。抓牢所有引用 → 用 lambda 闭包延迟执行
-	var game_root: Node = get_tree().current_scene
-	var current_region: Node = _find_region_node(game_root)
-	var target: String = target_path
-
-	if not current_region:
-		push_error("Portal: 找不到可替换的区域节点")
-		return
-
-	# Lambda 闭包：在 _on_body_entered 中捕获所有引用，延迟到空闲时执行
-	var do_it := func():
-		if not is_instance_valid(game_root) or not is_instance_valid(current_region):
-			push_error("Portal: 节点已失效，放弃传送")
-			return
-
-		game_root.set_meta("saved_region", current_region)
-		game_root.remove_child(current_region)
-
-		var new_region := packed.instantiate()
-		game_root.add_child(new_region)
-
-		var player := game_root.get_node_or_null("Player") as Node2D
-		if player:
-			player.global_position = Vector2(100, 0)
-
-		print("🗺️ Portal: %s 已加载" % target)
-
-	do_it.call_deferred()
+	gr.get_region_runtime().ensure_region(target_path, target_marker_id)
 
 
-func _find_region_node(root: Node) -> Node:
-	for child in root.get_children():
-		if child.name in ["Overworld", "BurningForest"]:
-			if child != root.get_node_or_null("GameRuntime"):
-				return child
-	for child in root.get_children():
-		if child is Node2D and child.name not in ["Player", "GameRuntime", "HUDLayer", "InputSetup"]:
-			return child
-	return null
+func _update_visual() -> void:
+	var sprite := get_node_or_null("Sprite2D") as Sprite2D
+	if sprite:
+		sprite.modulate = Color(0.35, 0.35, 0.38, 1.0) if locked else Color(0.2, 0.95, 0.55, 1.0)
+
+	var label := get_node_or_null("Label") as Label
+	if label:
+		label.text = locked_label if locked else target_label

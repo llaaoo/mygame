@@ -12,4 +12,4 @@ func evaluate(ctx: Dictionary) -> bool:
 	var ev: CombatEvent = ctx.get("event", null)
 	if not ev:
 		return false
-	return ev.data.get("buff_name", "") == required_buff_name
+	return ev.data.get("buff_name", "") == required_buff_name or ev.data.get("status_id", "") == required_buff_name

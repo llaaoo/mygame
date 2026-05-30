@@ -1,0 +1,52 @@
+[gd_resource type="Resource" script_class="SkillTreeData" format=3]
+
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_tree_data.gd" id="1_tree"]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_perk_data.gd" id="2_perk"]
+
+[sub_resource type="Resource" id="Perk_Slipstream" script=ExtResource("2_perk")]
+perk_id = "illusion_slipstream"
+school = 4
+display_name = "影流"
+description = "位移类技能冷却缩短 12%。"
+required_level = 5
+modifier_bonuses = {
+"cooldown.shadow_step": -0.12
+}
+
+[sub_resource type="Resource" id="Perk_Predator" script=ExtResource("2_perk")]
+perk_id = "illusion_predator"
+school = 4
+display_name = "捕猎者"
+description = "暗影技能伤害提升 18%。"
+required_level = 10
+prerequisite_ids = ["illusion_slipstream"]
+modifier_bonuses = {
+"damage.shadow": 0.18
+}
+
+[sub_resource type="Resource" id="Perk_Misdirect" script=ExtResource("2_perk")]
+perk_id = "illusion_misdirect"
+school = 4
+display_name = "误导"
+description = "敌人脱战前会更久地搜索你。"
+required_level = 20
+prerequisite_ids = ["illusion_predator"]
+modifier_bonuses = {
+"status.illusion_pressure": 1.0
+}
+
+[sub_resource type="Resource" id="Perk_Afterimage" script=ExtResource("2_perk")]
+perk_id = "illusion_afterimage"
+school = 4
+display_name = "残像"
+description = "闪避后下一次暗影技能额外提升 20% 伤害。"
+required_level = 30
+prerequisite_ids = ["illusion_misdirect"]
+modifier_bonuses = {
+"damage.shadow": 0.2
+}
+
+[resource]
+script = ExtResource("1_tree")
+school = 4
+perks = [SubResource("Perk_Slipstream"), SubResource("Perk_Predator"), SubResource("Perk_Misdirect"), SubResource("Perk_Afterimage")]
