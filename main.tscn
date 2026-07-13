@@ -8,6 +8,7 @@
 [ext_resource type="Script" uid="uid://ca7adgccfaejq" path="res://core/game_runtime.gd" id="8_dg77c"]
 [ext_resource type="Script" uid="uid://d2dwn66h08hu2" path="res://world/world_runtime.gd" id="9_ycdy4"]
 [ext_resource type="Script" uid="uid://8ghdd2c772lv" path="res://gameplay/interaction/simulation_runtime.gd" id="10_w48qg"]
+[ext_resource type="Script" uid="uid://c0v6ealvnnji1" path="res://gameplay/run/run_manager.gd" id="11_run"]
 
 [sub_resource type="GDScript" id="GDScript_272bh"]
 script/source = "extends Node
@@ -72,3 +73,6 @@ script = ExtResource("9_ycdy4")
 
 [node name="SimulationRuntime" type="Node" parent="GameRuntime" unique_id=752857783]
 script = ExtResource("10_w48qg")
+
+[node name="RunManager" type="Node" parent="." unique_id=1852905512]
+script = ExtResource("11_run")
