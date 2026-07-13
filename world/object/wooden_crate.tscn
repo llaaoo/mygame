@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://nkf4o3flqs3g" path="res://world/object/map_object.gd" id="1_1hwat"]
 [ext_resource type="Resource" uid="uid://bbv747nnx5etb" path="res://world/object/wooden_crate_data.tres" id="2_ywd2k"]
-[ext_resource type="Texture2D" uid="uid://ucd888rpepul" path="res://icon.svg" id="3_ywd2k"]
+[ext_resource type="Texture2D" path="res://content/art/placeholders/wooden_crate_marker.png" id="3_ywd2k"]
 [ext_resource type="Shape2D" uid="uid://bli18lj54nqc6" path="res://world/object/barrel_shape.tres" id="4_x2ji4"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_x2ji4"]
@@ -19,8 +19,7 @@ collision_mask = 0
 shape = SubResource("CircleShape2D_x2ji4")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=78603464]
-modulate = Color(0.6, 0.45, 0.2, 1)
-scale = Vector2(0.6, 0.6)
+scale = Vector2(1, 1)
 texture = ExtResource("3_ywd2k")
 
 [node name="HitArea" type="Area2D" parent="." unique_id=844175200]

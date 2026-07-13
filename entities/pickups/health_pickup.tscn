@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://bj2nc5oex3rku"]
 
 [ext_resource type="Script" uid="uid://chxom8puvw874" path="res://entities/pickups/health_pickup.gd" id="1_e688c"]
-[ext_resource type="Texture2D" uid="uid://ucd888rpepul" path="res://icon.svg" id="2_w0ydi"]
+[ext_resource type="Texture2D" path="res://content/art/placeholders/health_pickup.png" id="2_w0ydi"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_w0ydi"]
 radius = 30.0
@@ -10,8 +10,7 @@ radius = 30.0
 script = ExtResource("1_e688c")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=727380388]
-modulate = Color(0.2, 1, 0.3, 1)
-scale = Vector2(0.3, 0.3)
+scale = Vector2(1, 1)
 texture = ExtResource("2_w0ydi")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=232458602]

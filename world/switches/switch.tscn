@@ -1,18 +1,23 @@
 [gd_scene format=3 uid="uid://bd7xfxkmspack"]
 
-[ext_resource type="Texture2D" uid="uid://ucd888rpepul" path="res://icon.svg" id="1_2nh6d"]
 [ext_resource type="Script" uid="uid://b5vgnnljevxc1" path="res://world/object/switch.gd" id="1_r1gsy"]
+[ext_resource type="Texture2D" uid="uid://dan40u00wwocv" path="res://content/art/prison/prison_sucai/24_floor_lever.png" id="2_r1gsy"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_xdpq1"]
+radius = 30.016663
 
 [node name="Switch" type="Node2D" unique_id=77349399]
 script = ExtResource("1_r1gsy")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=441943214]
-modulate = Color(1, 0, 0, 1)
-scale = Vector2(0.15, 0.15)
-texture = ExtResource("1_2nh6d")
+position = Vector2(1, -1)
+scale = Vector2(0.47, 0.3636363)
+texture = ExtResource("2_r1gsy")
 
 [node name="InteractionArea" type="Area2D" parent="." unique_id=84271913]
 collision_layer = 0
 collision_mask = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="InteractionArea" unique_id=1545456756]
+position = Vector2(1, 4)
+shape = SubResource("CircleShape2D_xdpq1")
