@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://b5fgdlpuricni" path="res://world/object/spike_trap.gd" id="1_twutp"]
 [ext_resource type="Shape2D" uid="uid://dh4i8g8u5dc6" path="res://world/traps/trap_shape.tres" id="2_oktx0"]
-[ext_resource type="Texture2D" uid="uid://ucd888rpepul" path="res://icon.svg" id="2_snoxh"]
+[ext_resource type="Texture2D" path="res://content/art/placeholders/spike_trap_marker.png" id="2_snoxh"]
 
 [node name="SpikeTrap" type="Area2D" unique_id=1007731522]
 script = ExtResource("1_twutp")
@@ -11,6 +11,5 @@ script = ExtResource("1_twutp")
 shape = ExtResource("2_oktx0")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1428133407]
-modulate = Color(0.8, 0.1, 0.1, 1)
-scale = Vector2(0.4, 0.13)
+scale = Vector2(1, 1)
 texture = ExtResource("2_snoxh")

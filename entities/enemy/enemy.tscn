@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://dcbumdieobptq"]
 
 [ext_resource type="Script" uid="uid://dr4tuwps3ut87" path="res://entities/enemy/enemy.gd" id="1_d50e0"]
-[ext_resource type="Texture2D" uid="uid://ucd888rpepul" path="res://icon.svg" id="2_61ikd"]
+[ext_resource type="Texture2D" path="res://content/art/placeholders/enemy_marker.png" id="2_61ikd"]
 [ext_resource type="Script" uid="uid://couw105c3bde4" path="res://addons/godot_state_charts/state_chart.gd" id="6_d50e0"]
 [ext_resource type="Script" uid="uid://bina3ctxqpy1c" path="res://entities/components/health_component.gd" id="7_61ikd"]
 [ext_resource type="Script" uid="uid://jk2jm1g6q853" path="res://addons/godot_state_charts/compound_state.gd" id="7_721x4"]
@@ -19,8 +19,7 @@ collision_mask = 3
 script = ExtResource("1_d50e0")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=549220085]
-modulate = Color(0.5, 0.2, 0.7, 1)
-scale = Vector2(0.3, 0.3)
+scale = Vector2(1, 1)
 texture = ExtResource("2_61ikd")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2058523350]

@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://nkf4o3flqs3g" path="res://world/object/map_object.gd" id="1_41f3i"]
 [ext_resource type="Resource" uid="uid://cu6xgovt5lodd" path="res://world/object/wooden_fence_data.tres" id="2_gue5g"]
-[ext_resource type="Texture2D" uid="uid://ucd888rpepul" path="res://icon.svg" id="3_gue5g"]
+[ext_resource type="Texture2D" path="res://content/art/placeholders/wooden_fence_marker.png" id="3_gue5g"]
 [ext_resource type="Shape2D" uid="uid://bli18lj54nqc6" path="res://world/object/barrel_shape.tres" id="4_vclfn"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_vclfn"]
@@ -19,8 +19,7 @@ collision_mask = 0
 shape = SubResource("CircleShape2D_vclfn")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1241838998]
-modulate = Color(0.5, 0.35, 0.15, 1)
-scale = Vector2(1.2, 0.3)
+scale = Vector2(1, 1)
 texture = ExtResource("3_gue5g")
 
 [node name="HitArea" type="Area2D" parent="." unique_id=153500325]

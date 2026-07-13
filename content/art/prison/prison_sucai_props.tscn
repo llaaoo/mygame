@@ -1,0 +1,481 @@
+[gd_scene format=3]
+
+[ext_resource type="Texture2D" path="res://content/art/prison/prison_sucai/10_cell_bars_wide.png" id="1"]
+[ext_resource type="Texture2D" path="res://content/art/prison/prison_sucai/14_prison_bed.png" id="2"]
+[ext_resource type="Texture2D" path="res://content/art/prison/prison_sucai/15_wood_table_large.png" id="3"]
+[ext_resource type="Texture2D" path="res://content/art/prison/prison_sucai/16_crate_large.png" id="4"]
+[ext_resource type="Texture2D" path="res://content/art/prison/prison_sucai/17_crate_tall.png" id="5"]
+[ext_resource type="Texture2D" path="res://content/art/prison/prison_sucai/18_wall_torch.png" id="6"]
+[ext_resource type="Texture2D" path="res://content/art/prison/prison_sucai/19_key_rack.png" id="7"]
+[ext_resource type="Texture2D" path="res://content/art/prison/prison_sucai/20_bucket_metal.png" id="8"]
+[ext_resource type="Texture2D" path="res://content/art/prison/prison_sucai/21_wood_stool.png" id="9"]
+[ext_resource type="Texture2D" path="res://content/art/prison/prison_sucai/22_blood_splatter.png" id="10"]
+[ext_resource type="Texture2D" path="res://content/art/prison/prison_sucai/23_drain_grate.png" id="11"]
+[ext_resource type="Texture2D" path="res://content/art/prison/prison_sucai/25_treasure_chest.png" id="12"]
+[ext_resource type="Texture2D" path="res://content/art/prison/prison_sucai/27_weapon_rack.png" id="13"]
+[ext_resource type="Texture2D" path="res://content/art/prison/prison_sucai/29_stone_plaque.png" id="14"]
+[ext_resource type="Texture2D" path="res://content/art/prison/prison_sucai/31_hanging_lantern.png" id="15"]
+[ext_resource type="Texture2D" path="res://content/art/prison/prison_sucai/32_wall_banners.png" id="16"]
+[ext_resource type="Texture2D" path="res://content/art/prison/prison_sucai/33_wall_shackles.png" id="17"]
+[ext_resource type="Texture2D" path="res://content/art/prison/prison_sucai/34_cell_door_small.png" id="18"]
+[ext_resource type="Texture2D" path="res://content/art/prison/prison_sucai/35_cell_door_heavy.png" id="19"]
+[ext_resource type="Texture2D" path="res://content/art/prison/prison_sucai/36_cell_window_bars.png" id="20"]
+[ext_resource type="Texture2D" path="res://content/art/prison/prison_sucai/37_wall_sconce.png" id="21"]
+[ext_resource type="Texture2D" path="res://content/art/prison/prison_sucai/38_wall_mirror.png" id="22"]
+[ext_resource type="Texture2D" path="res://content/art/prison/prison_sucai/39_desk_records.png" id="23"]
+[ext_resource type="Texture2D" path="res://content/art/prison/prison_sucai/40_bookshelf_tall.png" id="24"]
+[ext_resource type="Texture2D" path="res://content/art/prison/prison_sucai/41_spear_rack.png" id="25"]
+[ext_resource type="Texture2D" path="res://content/art/prison/prison_sucai/42_wall_window_lit.png" id="26"]
+[ext_resource type="Texture2D" path="res://content/art/prison/prison_sucai/43_side_table_candle.png" id="27"]
+[ext_resource type="Texture2D" path="res://content/art/prison/prison_sucai/44_cabinet_drawers.png" id="28"]
+[ext_resource type="Texture2D" path="res://content/art/prison/prison_sucai/45_rug_blue_gold.png" id="29"]
+
+[node name="PrisonSucaiProps" type="Node2D"]
+
+[node name="CellBed" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(-785, -500)
+scale = Vector2(0.58, 0.58)
+texture = ExtResource("2")
+centered = false
+
+[node name="CellBucket" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(-535, -470)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("8")
+centered = false
+
+[node name="CellBars" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(-748, -326)
+scale = Vector2(1.02, 1.02)
+texture = ExtResource("1")
+centered = false
+
+[node name="CellTorchA" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(-352, -100)
+scale = Vector2(0.54, 0.54)
+texture = ExtResource("6")
+centered = false
+
+[node name="CellTorchB" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(398, -100)
+scale = Vector2(0.54, 0.54)
+texture = ExtResource("6")
+centered = false
+
+[node name="OfficeWindow" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(-180, -520)
+scale = Vector2(0.8, 0.8)
+texture = ExtResource("26")
+centered = false
+
+[node name="OfficeDesk" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(-265, -430)
+scale = Vector2(0.7, 0.7)
+texture = ExtResource("23")
+centered = false
+
+[node name="OfficeKeyRack" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(4, -484)
+scale = Vector2(0.4, 0.4)
+texture = ExtResource("7")
+centered = false
+
+[node name="OfficeCabinet" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(12, -430)
+scale = Vector2(0.54, 0.54)
+texture = ExtResource("28")
+centered = false
+
+[node name="OfficeBookshelf" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(-4, -310)
+scale = Vector2(0.48, 0.48)
+texture = ExtResource("24")
+centered = false
+
+[node name="ArmoryWeaponRack" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(188, -486)
+scale = Vector2(0.96, 0.96)
+texture = ExtResource("13")
+centered = false
+
+[node name="ArmorySpearRack" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(325, -472)
+scale = Vector2(0.76, 0.76)
+texture = ExtResource("25")
+centered = false
+
+[node name="ArmoryLantern" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(438, -446)
+scale = Vector2(0.74, 0.74)
+texture = ExtResource("15")
+centered = false
+
+[node name="StorageCrateA" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(620, -455)
+scale = Vector2(0.58, 0.58)
+texture = ExtResource("4")
+centered = false
+
+[node name="StorageCrateB" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(710, -455)
+scale = Vector2(0.58, 0.58)
+texture = ExtResource("4")
+centered = false
+
+[node name="StorageCrateTall" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(676, -352)
+scale = Vector2(0.56, 0.56)
+texture = ExtResource("5")
+centered = false
+
+[node name="StorageChest" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(575, -312)
+scale = Vector2(0.74, 0.74)
+texture = ExtResource("12")
+centered = false
+
+[node name="StorageLantern" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(742, -520)
+scale = Vector2(0.72, 0.72)
+texture = ExtResource("15")
+centered = false
+
+[node name="StorageBookshelf" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(584, -228)
+scale = Vector2(0.52, 0.52)
+texture = ExtResource("24")
+centered = false
+
+[node name="SolitaryDoorA" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(-1222, -690)
+scale = Vector2(0.66, 0.66)
+texture = ExtResource("18")
+centered = false
+
+[node name="SolitaryDoorB" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(-1222, -485)
+scale = Vector2(0.66, 0.66)
+texture = ExtResource("18")
+centered = false
+
+[node name="SolitaryShackles" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(-1110, -664)
+scale = Vector2(0.72, 0.72)
+texture = ExtResource("17")
+centered = false
+
+[node name="SolitaryBucket" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(-1102, -455)
+scale = Vector2(0.48, 0.48)
+texture = ExtResource("8")
+centered = false
+
+[node name="SolitaryWindow" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(-938, -696)
+scale = Vector2(0.72, 0.72)
+texture = ExtResource("20")
+centered = false
+
+[node name="ChapelRug" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(-228, -744)
+scale = Vector2(0.84, 0.84)
+texture = ExtResource("29")
+centered = false
+
+[node name="ChapelBanners" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(-74, -764)
+scale = Vector2(0.76, 0.76)
+texture = ExtResource("16")
+centered = false
+
+[node name="ChapelPlaque" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(-165, -724)
+scale = Vector2(0.62, 0.62)
+texture = ExtResource("14")
+centered = false
+
+[node name="ChapelCandleTable" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(-14, -710)
+scale = Vector2(0.72, 0.72)
+texture = ExtResource("27")
+centered = false
+
+[node name="ChapelMirrorShrine" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(78, -726)
+scale = Vector2(0.72, 0.72)
+texture = ExtResource("22")
+centered = false
+
+[node name="YardBanner" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(812, -778)
+scale = Vector2(0.84, 0.84)
+texture = ExtResource("16")
+centered = false
+
+[node name="YardTorchA" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(648, -777)
+scale = Vector2(0.56, 0.56)
+texture = ExtResource("6")
+centered = false
+
+[node name="YardTorchB" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(1070, -777)
+scale = Vector2(0.56, 0.56)
+texture = ExtResource("6")
+centered = false
+
+[node name="MessTableA" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(-735, 266)
+scale = Vector2(0.68, 0.68)
+texture = ExtResource("3")
+centered = false
+
+[node name="MessTableB" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(-735, 370)
+scale = Vector2(0.68, 0.68)
+texture = ExtResource("3")
+centered = false
+
+[node name="MessStoolA" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(-780, 350)
+scale = Vector2(0.72, 0.72)
+texture = ExtResource("9")
+centered = false
+
+[node name="MessStoolB" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(-470, 350)
+scale = Vector2(0.72, 0.72)
+texture = ExtResource("9")
+centered = false
+
+[node name="MessStoolC" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(-780, 456)
+scale = Vector2(0.72, 0.72)
+texture = ExtResource("9")
+centered = false
+
+[node name="MessStoolD" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(-470, 456)
+scale = Vector2(0.72, 0.72)
+texture = ExtResource("9")
+centered = false
+
+[node name="ArchiveShelfA" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(-1202, 224)
+scale = Vector2(0.56, 0.56)
+texture = ExtResource("24")
+centered = false
+
+[node name="ArchiveShelfB" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(-1068, 224)
+scale = Vector2(0.56, 0.56)
+texture = ExtResource("24")
+centered = false
+
+[node name="ArchiveDesk" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(-1210, 486)
+scale = Vector2(0.62, 0.62)
+texture = ExtResource("23")
+centered = false
+
+[node name="ArchiveCabinet" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(-928, 492)
+scale = Vector2(0.68, 0.68)
+texture = ExtResource("28")
+centered = false
+
+[node name="ArchiveLantern" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(-962, 238)
+scale = Vector2(0.78, 0.78)
+texture = ExtResource("15")
+centered = false
+
+[node name="ArchiveBookcase" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(-898, 220)
+scale = Vector2(0.48, 0.48)
+texture = ExtResource("24")
+centered = false
+
+[node name="InfirmaryBed" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(-225, 252)
+scale = Vector2(0.58, 0.58)
+texture = ExtResource("2")
+centered = false
+
+[node name="InfirmaryCabinet" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(38, 246)
+scale = Vector2(0.54, 0.54)
+texture = ExtResource("28")
+centered = false
+
+[node name="InfirmarySideTable" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(-8, 382)
+scale = Vector2(0.66, 0.66)
+texture = ExtResource("27")
+centered = false
+
+[node name="InfirmaryLantern" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(120, 250)
+scale = Vector2(0.74, 0.74)
+texture = ExtResource("15")
+centered = false
+
+[node name="InterrogationTable" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(248, 300)
+scale = Vector2(0.62, 0.62)
+texture = ExtResource("3")
+centered = false
+
+[node name="InterrogationStool" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(470, 360)
+scale = Vector2(0.74, 0.74)
+texture = ExtResource("9")
+centered = false
+
+[node name="InterrogationShackles" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(418, 176)
+scale = Vector2(0.78, 0.78)
+texture = ExtResource("17")
+centered = false
+
+[node name="InterrogationBlood" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(356, 388)
+scale = Vector2(0.82, 0.82)
+texture = ExtResource("10")
+centered = false
+
+[node name="InterrogationSconce" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(485, 178)
+scale = Vector2(0.72, 0.72)
+texture = ExtResource("21")
+centered = false
+
+[node name="MainDrain" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(640, 232)
+scale = Vector2(0.62, 0.62)
+texture = ExtResource("11")
+centered = false
+
+[node name="SewerDrainA" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(318, 618)
+scale = Vector2(0.62, 0.62)
+texture = ExtResource("11")
+centered = false
+
+[node name="SewerDrainB" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(748, 618)
+scale = Vector2(0.62, 0.62)
+texture = ExtResource("11")
+centered = false
+
+[node name="SewerLanternA" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(482, 604)
+scale = Vector2(0.76, 0.76)
+texture = ExtResource("15")
+centered = false
+
+[node name="SewerLanternB" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(924, 604)
+scale = Vector2(0.76, 0.76)
+texture = ExtResource("15")
+centered = false
+
+[node name="SewerWindow" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(1030, 602)
+scale = Vector2(0.7, 0.7)
+texture = ExtResource("20")
+centered = false
+
+[node name="ExitDoorVisual" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(1090, 512)
+scale = Vector2(0.72, 0.72)
+texture = ExtResource("19")
+centered = false
+
+[node name="CacheChest" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(1028, -330)
+scale = Vector2(0.76, 0.76)
+texture = ExtResource("12")
+centered = false
+
+[node name="CacheCrate" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(1130, -420)
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("5")
+centered = false
+
+[node name="CacheBookshelf" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(904, -482)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("24")
+centered = false
+
+[node name="CacheLantern" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(1132, -302)
+scale = Vector2(0.76, 0.76)
+texture = ExtResource("15")
+centered = false

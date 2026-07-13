@@ -1185,7 +1185,7 @@ func _setup_aim_indicator() -> void:
 
 	_aim_dot = Sprite2D.new()
 	_aim_dot.name = "AimDot"
-	_aim_dot.texture = load("res://icon.svg")
+	_aim_dot.texture = load("res://content/art/placeholders/aim_dot.png")
 	_aim_dot.scale = Vector2(0.08, 0.08)
 	_aim_dot.modulate = Color(1, 1, 1, 0.6)
 	_aim_dot.z_index = 20

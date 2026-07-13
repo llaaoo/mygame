@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://dlxwbw2lqyy0"]
 
 [ext_resource type="Script" uid="uid://c7ki5hoxcogg" path="res://gameplay/abilities/runtime/projectile.gd" id="1_3ottr"]
-[ext_resource type="Texture2D" uid="uid://ucd888rpepul" path="res://icon.svg" id="2_uwg17"]
+[ext_resource type="Texture2D" path="res://content/art/placeholders/projectile_marker.png" id="2_uwg17"]
 
 [node name="LinearProjectile" type="Area2D" unique_id=712696047]
 script = ExtResource("1_3ottr")

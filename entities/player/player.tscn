@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://cfww8gxoetv4q" path="res://entities/player/states/idle.gd" id="1_symyc"]
 [ext_resource type="Resource" uid="uid://ci1ivpfultrb2" path="res://content/items/player_inventory.tres" id="2_7thud"]
 [ext_resource type="Script" uid="uid://4nugo7eloomy" path="res://entities/player/states/move.gd" id="2_abrql"]
-[ext_resource type="Texture2D" uid="uid://ucd888rpepul" path="res://icon.svg" id="2_qiwj3"]
+[ext_resource type="Texture2D" path="res://content/art/placeholders/player_marker.png" id="2_qiwj3"]
 [ext_resource type="Script" uid="uid://cxndt4i7ah38r" path="res://core/state/state_machine.gd" id="3_26q78"]
 [ext_resource type="Script" uid="uid://cqka051ddjpnn" path="res://entities/player/states/attack.gd" id="3_sglur"]
 [ext_resource type="Shape2D" uid="uid://dy61grgsbtxoj" path="res://entities/player/player_shape.tres" id="4_afbqv"]

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bklqavx17pgg4"
-path="res://.godot/imported/prison_tileset_concept.png-93c1e73c48947964363b4ad0bf875cba.ctex"
+uid="uid://y4gd7qiq5fil"
+path="res://.godot/imported/33_wall_shackles.png-fdd564f384fbf5f1539fb9b5bb7319de.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://content/art/prison/prison_tileset_concept.png"
-dest_files=["res://.godot/imported/prison_tileset_concept.png-93c1e73c48947964363b4ad0bf875cba.ctex"]
+source_file="res://content/art/prison/prison_sucai/33_wall_shackles.png"
+dest_files=["res://.godot/imported/33_wall_shackles.png-fdd564f384fbf5f1539fb9b5bb7319de.ctex"]
 
 [params]
 

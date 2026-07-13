@@ -75,8 +75,8 @@ func setup(p_data: SummonData, p_player: Player, p_manager: SummonManager) -> vo
 	if p_data.texture:
 		_sprite.texture = p_data.texture
 	else:
-		# Fallback: 使用 icon.svg 作为占位
-		_sprite.texture = preload("res://icon.svg")
+		# Fallback: 使用静态占位贴图，避免依赖项目默认图标
+		_sprite.texture = preload("res://content/art/placeholders/enemy_marker.png")
 	_sprite.modulate = _color
 	_sprite.scale = Vector2(_scale, _scale)
 	_sprite.z_index = 9

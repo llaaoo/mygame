@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://wx74iv5pkp82"]
 
-[ext_resource type="PackedScene" uid="uid://dh2tkj6gryw1a" path="res://world/maps/overworld.tscn" id="1_ig7tw"]
+[ext_resource type="PackedScene" uid="uid://cnjupundp1yt6" path="res://world/maps/overworld.tscn" id="1_ig7tw"]
 [ext_resource type="PackedScene" uid="uid://etuhwmvsawor" path="res://entities/player/player.tscn" id="2_h2yge"]
 [ext_resource type="Script" uid="uid://cgn2i161esv0a" path="res://gameplay/abilities/manager/skill_manager.gd" id="5_4c57u"]
 [ext_resource type="PackedScene" uid="uid://tc5h73volrpp" path="res://ui/hud.tscn" id="5_7mycd"]

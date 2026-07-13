@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://be8pno66twns2"]
 
 [ext_resource type="Script" uid="uid://b5vgnnljevxc1" path="res://world/object/switch.gd" id="1_a30ji"]
-[ext_resource type="Texture2D" uid="uid://ucd888rpepul" path="res://icon.svg" id="2_ptmfc"]
+[ext_resource type="Texture2D" path="res://content/art/placeholders/lever_marker.png" id="2_ptmfc"]
 
 [node name="Switch" type="Node2D" unique_id=3842662]
 script = ExtResource("1_a30ji")

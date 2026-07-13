@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://bw2moic7vwkhy" path="res://entities/boss/boss.gd" id="1_qnrkc"]
 [ext_resource type="Script" uid="uid://bina3ctxqpy1c" path="res://entities/components/health_component.gd" id="1_t1jva"]
 [ext_resource type="Script" uid="uid://cgn2i161esv0a" path="res://gameplay/abilities/manager/skill_manager.gd" id="2_orcvn"]
-[ext_resource type="Texture2D" uid="uid://ucd888rpepul" path="res://icon.svg" id="2_r7vrm"]
+[ext_resource type="Texture2D" path="res://content/art/placeholders/boss_marker.png" id="2_r7vrm"]
 [ext_resource type="Script" uid="uid://d1uc57ucjrid5" path="res://entities/components/stats_component.gd" id="3_82xmu"]
 [ext_resource type="Shape2D" uid="uid://bl21c2dshwa6q" path="res://entities/enemy/enemy_body_shape.tres" id="3_tfkep"]
 [ext_resource type="Script" uid="uid://couw105c3bde4" path="res://addons/godot_state_charts/state_chart.gd" id="4_y1djv"]
