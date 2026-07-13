@@ -11,6 +11,8 @@ PROJECT_ANALYSIS.md (完整项目分析 — 架构评估 + 文件功能清单 + 
     │
     ├── PROJECT_IMPROVEMENTS.md (当前改进点 — 已完成链路 + 剩余工作)
     │
+    ├── ROGUELITE_PIVOT_PLAN.md (新方向 — 短局制 roguelite 转型规划)
+    │
     ├── ARCHITECTURE.md (宪法 — 六层边界)
     │       │
     │       ├── COMBAT_CONTRACTS.md (战斗内部 12 条契约)
@@ -22,6 +24,8 @@ PROJECT_ANALYSIS.md (完整项目分析 — 架构评估 + 文件功能清单 + 
 ```
 
 每份文档回答不同层级的问题。从上往下读，逐层深入。
+
+> 当前产品方向已从传统 ARPG 转为短局制动作 roguelite。后续玩法规划优先阅读 `ROGUELITE_PIVOT_PLAN.md`，旧 RPG / NPC / Quest 扩展建议仅作为历史上下文。
 
 ---
 
@@ -52,6 +56,21 @@ PROJECT_ANALYSIS.md (完整项目分析 — 架构评估 + 文件功能清单 + 
 - 后续实施顺序和停止线
 
 **何时阅读**: 接续改进工作、判断当前代码与旧文档冲突时。
+
+---
+
+### [ROGUELITE_PIVOT_PLAN.md](./ROGUELITE_PIVOT_PLAN.md)
+
+**回答的问题**: 项目如何从传统 ARPG 转为 roguelite？哪些系统保留、改造、冻结？第一阶段怎么落地？
+
+**核心内容**:
+- 新游戏循环：营地 → 地牢 run → 房间遭遇 → 三选一奖励 → Boss → 结算。
+- 保留 CombatExecutor / SkillData / MapObject / Surface / Enemy / UI 等核心资产。
+- 冻结 NPC 日程、传统任务、传统背包装备和大地图持久化。
+- 新增 `run / rooms / rewards` 三个模块边界。
+- 第一阶段验收标准：最小可玩 run 闭环、复用资产验证、构筑感验证。
+
+**何时阅读**: 任何新功能、重构、内容制作或优先级判断之前。
 
 ---
 
@@ -107,6 +126,7 @@ PROJECT_ANALYSIS.md (完整项目分析 — 架构评估 + 文件功能清单 + 
 | 想做什么 | 读哪个 |
 |---------|--------|
 | 了解项目全貌 | PROJECT_ANALYSIS.md |
+| 了解新 roguelite 方向 | ROGUELITE_PIVOT_PLAN.md |
 | 查看当前已完成/待改进项 | PROJECT_IMPROVEMENTS.md |
 | 理解项目架构 | ARCHITECTURE.md |
 | 新增技能 | skill_architecture.md |

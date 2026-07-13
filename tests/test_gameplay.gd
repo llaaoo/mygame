@@ -17,7 +17,8 @@ func _init() -> void:
 
 	var game = main_scene.instantiate()
 	root.add_child(game)
-	await get_tree().process_frame
+	current_scene = game
+	await process_frame
 
 	# 查找玩家
 	var player = game.get_node_or_null("Player")
@@ -84,5 +85,5 @@ func _init() -> void:
 	print("=".repeat(60))
 
 	# 清理
-	await get_tree().create_timer(1.0).timeout
+	await create_timer(1.0).timeout
 	quit(0)
