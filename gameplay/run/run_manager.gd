@@ -59,6 +59,8 @@ var _room_origin := ARENA_CENTER
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	meta.load_from_disk()
+	if SaveManager.instance:
+		SaveManager.instance.register_section("roguelite_meta", meta)
 	call_deferred("_bootstrap")
 
 

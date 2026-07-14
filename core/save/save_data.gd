@@ -146,14 +146,16 @@ class Root:
 	var player: PlayerData
 	var world: WorldData
 	var quest: QuestSave
+	var extensions: Dictionary = {}
 
 	func serialize() -> Dictionary:
 		return {
-			"version": 1,
+			"version": 2,
 			"meta": meta.serialize(),
 			"player": player.serialize(),
 			"world": world.serialize(),
 			"quest": quest.serialize(),
+			"extensions": extensions,
 		}
 
 	static func deserialize(data: Dictionary) -> Root:
@@ -162,4 +164,5 @@ class Root:
 		root.player = PlayerData.deserialize(data.get("player", {}))
 		root.world = WorldData.deserialize(data.get("world", {}))
 		root.quest = QuestSave.deserialize(data.get("quest", {}))
+		root.extensions = data.get("extensions", {}) as Dictionary
 		return root

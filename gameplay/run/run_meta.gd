@@ -1,7 +1,7 @@
 class_name RunMeta
 extends RefCounted
 
-const SAVE_PATH := "user://roguelite_meta.save"
+const LEGACY_SAVE_PATH := "user://roguelite_meta.save"
 const MAX_STARTING_BONUS_STEPS := 8
 const MAX_UPGRADE_RANK := 6
 
@@ -14,9 +14,9 @@ var focus_rank: int = 0
 
 
 func load_from_disk() -> void:
-	if not FileAccess.file_exists(SAVE_PATH):
+	if not FileAccess.file_exists(LEGACY_SAVE_PATH):
 		return
-	var file := FileAccess.open(SAVE_PATH, FileAccess.READ)
+	var file := FileAccess.open(LEGACY_SAVE_PATH, FileAccess.READ)
 	if not file:
 		return
 	var parsed: Variant = JSON.parse_string(file.get_as_text())
@@ -30,6 +30,28 @@ func load_from_disk() -> void:
 	focus_rank = clampi(int(parsed.get("focus_rank", 0)), 0, MAX_UPGRADE_RANK)
 
 
+func serialize_save_data() -> Dictionary:
+	return {
+		"cinders": cinders,
+		"total_runs": total_runs,
+		"clears": clears,
+		"best_room": best_room,
+		"vitality_rank": vitality_rank,
+		"focus_rank": focus_rank,
+	}
+
+
+func deserialize_save_data(data: Dictionary) -> void:
+	if data.is_empty():
+		return
+	cinders = maxi(0, int(data.get("cinders", 0)))
+	total_runs = maxi(0, int(data.get("total_runs", 0)))
+	clears = maxi(0, int(data.get("clears", 0)))
+	best_room = maxi(0, int(data.get("best_room", 0)))
+	vitality_rank = clampi(int(data.get("vitality_rank", 0)), 0, MAX_UPGRADE_RANK)
+	focus_rank = clampi(int(data.get("focus_rank", 0)), 0, MAX_UPGRADE_RANK)
+
+
 func finish_run(completed_rooms: int, cleared: bool) -> int:
 	var earned := maxi(0, completed_rooms) * 2
 	if cleared:
@@ -38,7 +60,7 @@ func finish_run(completed_rooms: int, cleared: bool) -> int:
 	total_runs += 1
 	best_room = maxi(best_room, completed_rooms)
 	cinders += earned
-	_save_to_disk()
+	_persist()
 	return earned
 
 
@@ -69,20 +91,16 @@ func purchase_upgrade(upgrade_id: String) -> bool:
 		vitality_rank += 1
 	else:
 		focus_rank += 1
-	_save_to_disk()
+	_persist()
 	return true
 
 
-func _save_to_disk() -> void:
-	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
+func _persist() -> void:
+	if SaveManager.instance:
+		SaveManager.instance.save_game(SaveManager.instance.active_slot)
+		return
+	var file := FileAccess.open(LEGACY_SAVE_PATH, FileAccess.WRITE)
 	if not file:
 		push_warning("[RunMeta] Failed to save roguelite progress.")
 		return
-	file.store_string(JSON.stringify({
-		"cinders": cinders,
-		"total_runs": total_runs,
-		"clears": clears,
-		"best_room": best_room,
-		"vitality_rank": vitality_rank,
-		"focus_rank": focus_rank,
-	}))
+	file.store_string(JSON.stringify(serialize_save_data()))

@@ -1,11 +1,35 @@
 class_name SaveManager
 extends Node
 
-const VERSION: int = 1
+const VERSION: int = 2
+
+static var instance: SaveManager
+
+var active_slot: int = 1
+var _sections: Dictionary = {}
 
 
 func _ready() -> void:
+	instance = self
 	process_mode = Node.PROCESS_MODE_ALWAYS
+
+
+func _exit_tree() -> void:
+	if instance == self:
+		instance = null
+
+
+func register_section(section_id: String, provider: Variant) -> void:
+	if section_id.is_empty() or provider == null:
+		return
+	if not provider.has_method("serialize_save_data") or not provider.has_method("deserialize_save_data"):
+		push_warning("SaveManager: section '%s' is missing persistence methods." % section_id)
+		return
+	_sections[section_id] = provider
+
+
+func unregister_section(section_id: String) -> void:
+	_sections.erase(section_id)
 
 
 func _input(event: InputEvent) -> void:
@@ -18,11 +42,13 @@ func _input(event: InputEvent) -> void:
 
 
 func save_game(slot: int) -> void:
+	active_slot = slot
 	var root := SaveData.Root.new()
 	root.meta = _collect_meta()
 	root.player = _collect_player()
 	root.world = _collect_world()
 	root.quest = _collect_quests()
+	root.extensions = _collect_extensions()
 
 	var data: Dictionary = root.serialize()
 	var path := _path(slot)
@@ -50,10 +76,8 @@ func load_game(slot: int) -> void:
 		push_error("SaveManager: corrupted save data")
 		return
 
-	var raw := data as Dictionary
-	var version: int = raw.get("version", 0)
-	if version != VERSION:
-		push_error("SaveManager: unsupported version %d" % version)
+	var raw := _migrate(data as Dictionary)
+	if raw.is_empty():
 		return
 
 	_cleanup_transient()
@@ -63,6 +87,7 @@ func load_game(slot: int) -> void:
 	await _restore_region(root.meta)
 	_restore_player(root.player)
 	_restore_quests(root.quest)
+	_restore_extensions(root.extensions)
 	print("SaveManager: loaded %s" % path)
 
 
@@ -179,6 +204,43 @@ func _collect_quests() -> SaveData.QuestSave:
 		q.completed = qm.get_completed_quests()
 		q.active = qm.get_active_quest_states()
 	return q
+
+
+func _collect_extensions() -> Dictionary:
+	var data: Dictionary = {}
+	for section_id: String in _sections:
+		var provider: Variant = _sections[section_id]
+		if is_instance_valid(provider) or provider is RefCounted:
+			var section_data: Variant = provider.call("serialize_save_data")
+			if section_data is Dictionary:
+				data[section_id] = section_data
+	return data
+
+
+func _restore_extensions(data: Dictionary) -> void:
+	for section_id: String in _sections:
+		var provider: Variant = _sections[section_id]
+		if not (is_instance_valid(provider) or provider is RefCounted):
+			continue
+		provider.call("deserialize_save_data", data.get(section_id, {}))
+
+
+func _migrate(raw: Dictionary) -> Dictionary:
+	var data := raw.duplicate(true)
+	var version: int = int(data.get("version", 1))
+	if version > VERSION:
+		push_error("SaveManager: save version %d is newer than supported version %d." % [version, VERSION])
+		return {}
+	while version < VERSION:
+		match version:
+			1:
+				data["extensions"] = data.get("extensions", {})
+				version = 2
+				data["version"] = version
+			_:
+				push_error("SaveManager: no migration from version %d." % version)
+				return {}
+	return data
 
 
 func _restore_player(p: SaveData.PlayerData) -> void:
