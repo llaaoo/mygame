@@ -5,17 +5,23 @@
 [ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/power.tres" id="3"]
 [ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/area.tres" id="4"]
 [ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/efficiency.tres" id="5"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/synergies/steam_burst.tres" id="6"]
 
 [resource]
 script = ExtResource("1")
 id = "ice_storm"
 display_name = "冰风暴"
+icon_atlas_index = 9
 description = "持续引导冰风暴，快速生成短暂的寒冰区域。"
+mechanics = "引导施法；法力效率与范围强化决定持续压制能力。"
 skill_type = 2
 cast_type = "channel"
 channel_mp_per_sec = 15.0
 channel_tick_interval = 0.4
 tags = ["ice", "aoe", "channel"]
+school = 3
+tier = 3
+role = "引导压制"
 mp_cost = 0
 cooldown = 0.1
 damage = 12
@@ -26,3 +32,4 @@ cast_distance = 200.0
 aoe_radius = 60.0
 aoe_lifetime = 0.3
 upgrades = [ExtResource("3"), ExtResource("4"), ExtResource("5")]
+synergies = [ExtResource("6")]

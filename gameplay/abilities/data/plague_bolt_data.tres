@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="1"]
+[ext_resource type="Resource" path="res://content/visuals/poison_visual.tres" id="2"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/piercing.tres" id="3"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/cadence.tres" id="4"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/power.tres" id="5"]
+
+[resource]
+script = ExtResource("1")
+id = "plague_bolt"
+display_name = "疫病穿刺"
+icon_atlas_index = 17
+description = "发射可穿透多个目标的浓缩疫病箭。"
+mechanics = "低伤高穿透；快速给一排敌人施加中毒，为火焰和暗影联动铺垫。"
+tier = 2
+role = "状态铺场"
+tags = ["poison", "projectile", "piercing"]
+mp_cost = 14
+cooldown = 2.8
+damage = 18
+damage_scaling = 0.55
+archetype = "linear_projectile"
+visual = ExtResource("2")
+projectile_color = Color(0.45, 1, 0.18, 1)
+projectile_speed = 640.0
+projectile_pierce = 2
+upgrades = [ExtResource("3"), ExtResource("4"), ExtResource("5")]

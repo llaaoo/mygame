@@ -5,12 +5,17 @@
 [ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/power.tres" id="3"]
 [ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/cadence.tres" id="4"]
 [ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/reach.tres" id="5"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/synergies/steam_burst.tres" id="6"]
 
 [resource]
 script = ExtResource("1")
 id = "frost_lance"
 display_name = "寒霜枪"
+icon_atlas_index = 6
 description = "发射高速冰枪，对潮湿表面施加冻结反应。"
+mechanics = "高速点杀与冻结启动；命中燃烧目标触发蒸汽爆裂。"
+school = 3
+role = "高速控制"
 tags = ["ice", "projectile"]
 mp_cost = 13
 cooldown = 2.4
@@ -20,3 +25,4 @@ archetype = "linear_projectile"
 visual = ExtResource("2")
 projectile_speed = 820.0
 upgrades = [ExtResource("3"), ExtResource("4"), ExtResource("5")]
+synergies = [ExtResource("6")]

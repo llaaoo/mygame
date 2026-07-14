@@ -187,34 +187,33 @@ func _execute_projectile(skill: SkillData, ctx: CastContext) -> bool:
 	if not scene:
 		push_warning("[SkillExecutor] 无可用 archetype 场景: %s" % skill.archetype)
 		return false
-	
+
+	var count := maxi(1, skill.projectile_count)
+	var damage := resolve_damage(skill, ctx)
+	if ctx.charge_power < 1.0:
+		damage = maxi(1, int(damage * ctx.charge_power))
+	for i in range(count):
+		var direction := ctx.direction.normalized()
+		if count > 1 and skill.projectile_spread_degrees > 0.0:
+			var ratio := float(i) / float(count - 1) - 0.5
+			direction = direction.rotated(deg_to_rad(skill.projectile_spread_degrees) * ratio)
+		_spawn_projectile(scene, skill, ctx, direction, damage, i == 0)
+	return true
+
+
+func _spawn_projectile(scene: PackedScene, skill: SkillData, ctx: CastContext, direction: Vector2, damage: int, owns_trace: bool) -> void:
 	var instance := scene.instantiate() as Node2D
 	ctx.world.add_child(instance)
-	instance.global_position = ctx.caster.global_position + ctx.direction * skill.cast_distance
-	
-	if instance is Projectile:
-		var proj := instance as Projectile
-		proj.setup(skill, ctx.caster, ctx.direction)
-		var dmg := resolve_damage(skill, ctx)
-		if ctx.charge_power < 1.0:
-			dmg = maxi(1, int(dmg * ctx.charge_power))
-		proj.damage = dmg
-		proj.set_meta("skill_data", skill)
-		proj.set_meta("_combat_trace", CombatDebugger.active())
-		# 蓄力视觉：大小随倍率
-		if ctx.charge_power < 1.0:
-			proj.scale *= (0.4 + ctx.charge_power * 0.6)
-	elif instance.has_method("setup"):
-		instance.setup(skill, ctx.caster, ctx.direction)
-		if "damage" in instance:
-			var dmg := resolve_damage(skill, ctx)
-			if ctx.charge_power < 1.0:
-				dmg = maxi(1, int(dmg * ctx.charge_power))
-			instance.damage = dmg
-		instance.set_meta("skill_data", skill)
+	instance.global_position = ctx.caster.global_position + direction * skill.cast_distance
+	if instance.has_method("setup"):
+		instance.setup(skill, ctx.caster, direction)
+	if "damage" in instance:
+		instance.damage = damage
+	instance.set_meta("skill_data", skill)
+	if owns_trace:
 		instance.set_meta("_combat_trace", CombatDebugger.active())
-	
-	return true
+	if ctx.charge_power < 1.0:
+		instance.scale *= (0.4 + ctx.charge_power * 0.6)
 
 
 ## ── Buff ──
@@ -260,6 +259,11 @@ func _execute_aoe(skill: SkillData, ctx: CastContext) -> bool:
 	
 	if instance.has_method("setup"):
 		instance.setup(skill, ctx.caster)
+		if "damage" in instance:
+			var resolved_damage := resolve_damage(skill, ctx)
+			if ctx.charge_power < 1.0:
+				resolved_damage = maxi(1, int(resolved_damage * ctx.charge_power))
+			instance.damage = resolved_damage
 	else:
 		if "damage" in instance:
 			var dmg := resolve_damage(skill, ctx)

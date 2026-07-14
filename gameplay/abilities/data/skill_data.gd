@@ -18,7 +18,12 @@ enum SkillType {
 @export var skill_id: String = ""                 ## @deprecated 用 id 代替，保留兼容
 @export var display_name: String = "未命名技能"
 @export var icon: Texture2D
+@export_range(-1, 29, 1) var icon_atlas_index: int = -1
 @export_multiline var description: String = ""
+@export_multiline var mechanics: String = ""
+@export var school: SkillMastery.School = SkillMastery.School.DESTRUCTION
+@export_range(1, 5, 1) var tier: int = 1
+@export var role: String = "伤害"
 
 ## ── 类型 & 标签 ──
 @export var skill_type: SkillType = SkillType.PROJECTILE
@@ -53,6 +58,11 @@ enum SkillType {
 @export var projectile_scene: PackedScene        ## @deprecated 用 archetype + SkillExecutor 统一加载
 @export var projectile_speed: float = 500.0
 @export var cast_distance: float = 30.0          ## 生成偏移
+@export_range(1, 12, 1) var projectile_count: int = 1
+@export var projectile_spread_degrees: float = 0.0
+@export_range(0, 8, 1) var projectile_pierce: int = 0
+@export var projectile_lifetime: float = 3.0
+@export var homing_strength: float = 0.0
 
 ## ── Buff 专用 ──
 @export var buff_resource: Buff                  ## Buff 资源（.tres）
@@ -64,6 +74,8 @@ enum SkillType {
 @export var aoe_color: Color = Color.WHITE       ## AoE 视觉颜色
 @export var aoe_scale: float = 1.0               ## AoE 视觉缩放
 @export var aoe_lifetime: float = 0.6            ## AoE 持续时间
+@export var aoe_tick_interval: float = 0.0
+@export_range(1, 30, 1) var aoe_max_hits_per_target: int = 1
 
 ## ── 位移专用 ──
 @export var dash_distance: float = 200.0
@@ -75,6 +87,7 @@ enum SkillType {
 ## ── 局内强化 ──
 ## 使用 Resource 数组以保持 .tres 配置兼容；元素应为 SkillUpgrade。
 @export var upgrades: Array[Resource] = []
+@export var synergies: Array[Resource] = []
 
 ## ── 效果列表（未来扩展） ──
 ## @export var effects: Array[Effect] = []

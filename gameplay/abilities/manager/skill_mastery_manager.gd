@@ -24,6 +24,7 @@ const TREE_RESOURCE_PATHS := {
 
 var _masteries: Dictionary = {}
 var _trees: Dictionary = {}
+var _tree_resources: Dictionary = {}
 var _unlocked_perks: Dictionary = {}
 var _character_level: int = 1
 var _total_mastery_levels: int = 0
@@ -75,6 +76,37 @@ func get_perks_for_school(school: SkillMastery.School) -> Array[SkillPerkData]:
 	for perk in _trees.get(school, []):
 		result.append(perk as SkillPerkData)
 	return result
+
+
+func get_tree_data(school: SkillMastery.School) -> SkillTreeData:
+	return _tree_resources.get(school, null) as SkillTreeData
+
+
+func get_spells_for_school(school: SkillMastery.School) -> Array[SkillData]:
+	var result: Array[SkillData] = []
+	var player := _owner_entity as Player
+	if not player or not player.skill_manager or not player.skill_manager.pool:
+		return result
+	for skill in player.skill_manager.pool.skills:
+		if skill and skill.school == school:
+			result.append(skill)
+	result.sort_custom(func(a: SkillData, b: SkillData):
+		if a.tier == b.tier:
+			return a.display_name < b.display_name
+		return a.tier < b.tier
+	)
+	return result
+
+
+func get_spell_unlock_level(skill: SkillData) -> int:
+	if not skill:
+		return 1
+	return [1, 5, 10, 20, 30][clampi(skill.tier - 1, 0, 4)]
+
+
+func is_spell_unlocked(skill: SkillData) -> bool:
+	var mastery := get_mastery(skill.school) if skill else null
+	return mastery != null and mastery.level >= get_spell_unlock_level(skill)
 
 
 func get_unlocked_perks_for_school(school: SkillMastery.School) -> Array[String]:
@@ -292,16 +324,7 @@ func _recompute_totals() -> void:
 
 
 func _guess_school(skill: SkillData) -> SkillMastery.School:
-	var tags := skill.tags
-	if "summon" in tags:
-		return SkillMastery.School.CONJURATION
-	if "ice" in tags and skill.skill_type == SkillData.SkillType.BUFF:
-		return SkillMastery.School.ALTERATION
-	if "shadow" in tags and skill.skill_type == SkillData.SkillType.DASH:
-		return SkillMastery.School.ILLUSION
-	if "heal" in tags or "holy" in tags:
-		return SkillMastery.School.RESTORATION
-	return SkillMastery.School.DESTRUCTION
+	return skill.school
 
 
 func _find_perk(perk_id: String) -> SkillPerkData:
@@ -317,6 +340,7 @@ func _load_tree_for_school(school: SkillMastery.School) -> Array[SkillPerkData]:
 	if not path.is_empty():
 		var tree_resource: Resource = load(path)
 		if tree_resource and "perks" in tree_resource:
+			_tree_resources[school] = tree_resource
 			var perks: Array[SkillPerkData] = []
 			for perk in tree_resource.get("perks"):
 				var perk_resource := perk as SkillPerkData

@@ -9,7 +9,7 @@ var _level_label: Label = null
 
 
 func _ready() -> void:
-	layer = 135
+	layer = 165
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	hide()
 	_build_ui()
@@ -95,7 +95,7 @@ func _build_ui() -> void:
 	vbox.add_child(header)
 
 	var title := Label.new()
-	title.text = "Mastery Tree"
+	title.text = "法术精通树"
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	GameUIStyle.apply_label(title, 22, GameUIStyle.GOLD)
 	header.add_child(title)
@@ -124,14 +124,14 @@ func _refresh() -> void:
 		return
 	for child in _content.get_children():
 		child.queue_free()
-	_level_label.text = "Character Lv.%d" % _mastery_manager.get_character_level()
+	_level_label.text = "角色 Lv.%d" % _mastery_manager.get_character_level()
 	for mastery in _mastery_manager.get_all_masteries():
 		_content.add_child(_make_school_column(mastery))
 
 
 func _make_school_column(mastery: SkillMastery) -> Control:
 	var panel := PanelContainer.new()
-	panel.custom_minimum_size = Vector2(220, 420)
+	panel.custom_minimum_size = Vector2(238, 620)
 	panel.add_theme_stylebox_override("panel", GameUIStyle.slot_style(mastery.level >= 5))
 
 	var vbox := VBoxContainer.new()
@@ -139,13 +139,14 @@ func _make_school_column(mastery: SkillMastery) -> Control:
 	panel.add_child(vbox)
 
 	var title := Label.new()
-	title.text = _school_display_name(mastery.school)
+	var tree_data := _mastery_manager.get_tree_data(mastery.school)
+	title.text = tree_data.display_name if tree_data else _school_display_name(mastery.school)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	GameUIStyle.apply_label(title, 14, GameUIStyle.GOLD)
 	vbox.add_child(title)
 
 	var info := Label.new()
-	info.text = "Lv.%d  |  Points %d" % [mastery.level, mastery.perk_points]
+	info.text = "Lv.%d  |  节点点数 %d" % [mastery.level, mastery.perk_points]
 	info.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	GameUIStyle.apply_label(info, 12, GameUIStyle.TEXT_MAIN)
 	vbox.add_child(info)
@@ -165,10 +166,48 @@ func _make_school_column(mastery: SkillMastery) -> Control:
 	GameUIStyle.apply_label(xp, 10, GameUIStyle.TEXT_MUTED)
 	vbox.add_child(xp)
 
+	var spell_header := Label.new()
+	spell_header.text = "法术目录"
+	GameUIStyle.apply_label(spell_header, 11, GameUIStyle.GOLD)
+	vbox.add_child(spell_header)
+	for skill in _mastery_manager.get_spells_for_school(mastery.school):
+		vbox.add_child(_make_spell_row(skill))
+
+	var perk_header := Label.new()
+	perk_header.text = "精通节点"
+	GameUIStyle.apply_label(perk_header, 11, GameUIStyle.GOLD)
+	vbox.add_child(perk_header)
+
 	for perk in _mastery_manager.get_perks_for_school(mastery.school):
 		vbox.add_child(_make_perk_card(perk))
 
 	return panel
+
+
+func _make_spell_row(skill: SkillData) -> Control:
+	var unlocked := _mastery_manager.is_spell_unlocked(skill)
+	var row := HBoxContainer.new()
+	row.custom_minimum_size = Vector2(0, 30)
+	row.add_theme_constant_override("separation", 6)
+	var icon := TextureRect.new()
+	icon.custom_minimum_size = Vector2(26, 26)
+	icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	icon.texture = SkillIconCatalog.get_icon(skill)
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.modulate = Color.WHITE if unlocked else Color(0.38, 0.4, 0.45, 0.75)
+	row.add_child(icon)
+	var name_label := Label.new()
+	name_label.text = skill.display_name
+	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	GameUIStyle.apply_label(name_label, 10, GameUIStyle.TEXT_MAIN if unlocked else GameUIStyle.TEXT_MUTED)
+	row.add_child(name_label)
+	var level_label := Label.new()
+	level_label.text = "T%d / Lv.%d" % [skill.tier, _mastery_manager.get_spell_unlock_level(skill)]
+	GameUIStyle.apply_label(level_label, 9, GameUIStyle.GOLD if unlocked else GameUIStyle.TEXT_MUTED)
+	row.add_child(level_label)
+	row.tooltip_text = "%s\n%s\n%s" % [skill.description, skill.mechanics, skill.role]
+	return row
 
 
 func _make_perk_card(perk: SkillPerkData) -> Control:
@@ -200,7 +239,7 @@ func _make_perk_card(perk: SkillPerkData) -> Control:
 	top.add_child(title)
 
 	var state := Label.new()
-	state.text = "Unlocked" if unlocked else ("Ready" if can_unlock else "Locked")
+	state.text = "已激活" if unlocked else ("可激活" if can_unlock else "未解锁")
 	GameUIStyle.apply_label(state, 10, GameUIStyle.GOLD if unlocked or can_unlock else GameUIStyle.TEXT_MUTED)
 	top.add_child(state)
 
@@ -212,7 +251,7 @@ func _make_perk_card(perk: SkillPerkData) -> Control:
 
 	if not unlocked:
 		var button := Button.new()
-		button.text = "Unlock"
+		button.text = "激活节点"
 		button.disabled = not can_unlock
 		button.pressed.connect(_unlock_perk.bind(perk.perk_id))
 		vbox.add_child(button)
@@ -230,17 +269,17 @@ func _unlock_perk(perk_id: String) -> void:
 func _school_display_name(school: int) -> String:
 	match school:
 		SkillMastery.School.DESTRUCTION:
-			return "Destruction"
+			return "毁灭学派"
 		SkillMastery.School.CONJURATION:
-			return "Conjuration"
+			return "召唤学派"
 		SkillMastery.School.RESTORATION:
-			return "Restoration"
+			return "恢复学派"
 		SkillMastery.School.ALTERATION:
-			return "Alteration"
+			return "变化学派"
 		SkillMastery.School.ILLUSION:
-			return "Illusion"
+			return "幻术学派"
 		_:
-			return "Unknown"
+			return "未知学派"
 
 
 func _school_color(school: int) -> Color:

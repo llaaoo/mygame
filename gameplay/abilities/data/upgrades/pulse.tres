@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="SkillUpgrade" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_upgrade.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "pulse"
+display_name = "脉冲回响"
+description = "区域额外命中 1 次，脉冲间隔缩短 15%，单次伤害降低 10%。"
+branch = "频次"
+max_rank = 3
+modifiers = {
+"aoe_max_hits.flat": 1.0,
+"aoe_tick_interval.multiplier": -0.15,
+"damage.multiplier": -0.1
+}

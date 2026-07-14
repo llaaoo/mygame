@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="SkillSynergyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_synergy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "conduction"
+display_name = "导电"
+description = "闪电命中潮湿目标时造成 45% 额外伤害。"
+required_target_status = "wet"
+bonus_damage_ratio = 0.45
+bonus_tags = ["lightning", "reaction"]

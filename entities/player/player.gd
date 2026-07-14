@@ -18,6 +18,20 @@ const PLAYER_SKILL_IDS: Array[String] = [
 	"storm_field",
 	"venom_burst",
 	"arcane_dash",
+	"cinder_volley",
+	"solar_spear",
+	"magma_pool",
+	"glacial_orb",
+	"blizzard",
+	"thunder_orb",
+	"static_nova",
+	"plague_bolt",
+	"miasma_ring",
+	"tidal_orb",
+	"phase_blink",
+	"summon_wisp",
+	"summon_golem",
+	"radiant_aegis",
 ]
 
 ## ── 移动基础值（最终速度 = 基础 + 敏捷加成） ──
@@ -41,7 +55,9 @@ var _on_kill_fire_trigger: GenericTriggeredCast = null  ## 火系击杀→烈焰
 var _on_hit_fire_status: OnHitApplyStatus = null  ## 持有引用防 GC
 var _on_hit_ice_status: OnHitApplyStatus = null   ## 冰→冻结
 var _on_hit_poison_status: OnHitApplyStatus = null  ## 毒→中毒
+var _on_hit_water_status: OnHitApplyStatus = null   ## 水→潮湿
 var _on_hit_chain: OnHitChain = null                ## 闪电→连锁
+var _synergy_resolver: SkillSynergyResolver = null
 
 ## ── 信号（HUD 订阅） ──
 signal health_changed(current_hp: int, max_hp: int)
@@ -135,7 +151,8 @@ func _ready() -> void:
 
 	# 视觉
 	if sprite and sprite.texture:
-		sprite.scale = Vector2(0.5, 0.5)
+		sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		sprite.scale = Vector2(0.24, 0.24)
 	sprite.z_as_relative = false
 	sprite.z_index = 10
 
@@ -241,7 +258,7 @@ func _setup_skills() -> void:
 	var loadout := SkillLoadout.create(
 		"ice_armor",    # 左手
 		"fireball",     # 右手
-		["flame_storm", "ice_storm", "ice_explosion", "charged_fireball"]  # 快捷键 1-4
+		["lightning_bolt", "poison_cloud", "frost_lance", "shadow_bolt"]  # 快捷键 1-4
 	)
 	skill_manager.apply_loadout(loadout)
 
@@ -307,9 +324,18 @@ func _setup_event_bus() -> void:
 	_on_hit_poison_status = OnHitApplyStatus.create("poison", "res://gameplay/abilities/data/poison.tres")
 	_register_triggered_effects(_on_hit_poison_status)
 
+	# ON_HIT 水系技能 → 挂 wet，供闪电和冰系联动
+	_on_hit_water_status = OnHitApplyStatus.create("water", "res://gameplay/abilities/data/wet.tres")
+	_register_triggered_effects(_on_hit_water_status)
+
 	# ON_HIT 闪电技能 → 连锁弹射
 	_on_hit_chain = OnHitChain.create("lightning", 120.0, 3, 0.6)
 	_register_triggered_effects(_on_hit_chain)
+
+	_synergy_resolver = SkillSynergyResolver.new()
+	_synergy_resolver.name = "SkillSynergyResolver"
+	add_child(_synergy_resolver)
+	_synergy_resolver.setup(self)
 
 	# EffectGraph：ON_HIT 火焰技能
 	_register_graph_demo()
@@ -1038,14 +1064,7 @@ func _on_player_kill_for_mastery(ev: CombatEvent) -> void:
 
 
 func _guess_school_from_skill(skill: SkillData) -> SkillMastery.School:
-	var tags := skill.tags
-	if "summon" in tags:
-		return SkillMastery.School.CONJURATION
-	if "ice" in tags and skill.skill_type == SkillData.SkillType.BUFF:
-		return SkillMastery.School.ALTERATION
-	if "shadow" in tags and skill.skill_type == SkillData.SkillType.DASH:
-		return SkillMastery.School.ILLUSION
-	return SkillMastery.School.DESTRUCTION
+	return skill.school
 
 
 func _setup_summon_manager() -> void:

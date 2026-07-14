@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="1"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/mobility.tres" id="2"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/cadence.tres" id="3"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/efficiency.tres" id="4"]
+
+[resource]
+script = ExtResource("1")
+id = "phase_blink"
+display_name = "相位闪现"
+icon_atlas_index = 23
+description = "瞬间穿过长距离，以较高冷却换取脱离包围。"
+mechanics = "长距离高速位移；与暗影步的攻击增益方向不同，专注生存。"
+skill_type = 3
+school = 4
+tier = 3
+role = "紧急脱离"
+tags = ["shadow", "arcane", "dash"]
+mp_cost = 22
+cooldown = 7.0
+damage = 0
+damage_scaling = 0.0
+dash_distance = 360.0
+dash_speed = 2200.0
+upgrades = [ExtResource("2"), ExtResource("3"), ExtResource("4")]

@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="1"]
+[ext_resource type="Resource" path="res://content/visuals/miasma_ring_visual.tres" id="2"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/power.tres" id="3"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/area.tres" id="4"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/pulse.tres" id="5"]
+
+[resource]
+script = ExtResource("1")
+id = "miasma_ring"
+display_name = "瘴气环"
+icon_atlas_index = 19
+description = "在自身周围维持一圈跟随施法位置的致命瘴气。"
+mechanics = "长持续多段伤害；持续给近身敌人叠加中毒。"
+skill_type = 2
+tier = 4
+role = "近身持续"
+tags = ["poison", "aoe", "aura"]
+mp_cost = 36
+cooldown = 10.0
+damage = 10
+damage_scaling = 0.3
+archetype = "persistent_aoe"
+aoe_visual = ExtResource("2")
+cast_distance = 0.0
+aoe_radius = 125.0
+aoe_lifetime = 5.0
+aoe_tick_interval = 0.75
+aoe_max_hits_per_target = 7
+upgrades = [ExtResource("3"), ExtResource("4"), ExtResource("5")]

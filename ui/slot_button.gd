@@ -29,6 +29,10 @@ const RARITY_COLORS: Array[Color] = [
 const RARITY_NAMES: Array[String] = ["普通", "稀有", "史诗", "传说"]
 
 
+func _ready() -> void:
+	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+
+
 func set_item_data(data: ItemData) -> void:
 	item_data = data
 	if data:

@@ -48,5 +48,10 @@ modifier_bonuses = {
 
 [resource]
 script = ExtResource("1_tree")
+tree_id = "conjuration"
+display_name = "召唤学派"
+description = "签订亡灵、元素与石灵契约，以不同定位的仆从构筑战斗阵线。"
 school = 1
+accent_color = Color(0.74, 0.58, 0.9, 1)
+skill_ids = ["summon_skeleton", "summon_wisp", "summon_golem"]
 perks = [SubResource("Perk_ExtraSlot"), SubResource("Perk_IronPact"), SubResource("Perk_BattleDrum"), SubResource("Perk_LongService")]

@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="1"]
+[ext_resource type="Resource" path="res://content/visuals/blizzard_visual.tres" id="2"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/power.tres" id="3"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/area.tres" id="4"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/pulse.tres" id="5"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/synergies/steam_burst.tres" id="6"]
+
+[resource]
+script = ExtResource("1")
+id = "blizzard"
+display_name = "白灾暴雪"
+icon_atlas_index = 11
+description = "在大范围内持续降下冰刃。"
+mechanics = "大范围多段伤害；快速冻结群体，适合接火焰融化。"
+skill_type = 2
+school = 3
+tier = 4
+role = "群体控制"
+tags = ["ice", "aoe", "storm"]
+mp_cost = 42
+cooldown = 11.0
+damage = 11
+damage_scaling = 0.35
+archetype = "persistent_aoe"
+aoe_visual = ExtResource("2")
+cast_distance = 190.0
+aoe_radius = 150.0
+aoe_lifetime = 4.2
+aoe_tick_interval = 0.7
+aoe_max_hits_per_target = 6
+upgrades = [ExtResource("3"), ExtResource("4"), ExtResource("5")]
+synergies = [ExtResource("6")]

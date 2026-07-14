@@ -48,5 +48,10 @@ modifier_bonuses = {
 
 [resource]
 script = ExtResource("1_tree")
+tree_id = "illusion"
+display_name = "幻术学派"
+description = "利用暗影投射和相位位移保持距离，并与毒素形成暗蚀联动。"
 school = 4
+accent_color = Color(0.72, 0.42, 0.86, 1)
+skill_ids = ["shadow_bolt", "shadow_step", "phase_blink"]
 perks = [SubResource("Perk_Slipstream"), SubResource("Perk_Predator"), SubResource("Perk_Misdirect"), SubResource("Perk_Afterimage")]

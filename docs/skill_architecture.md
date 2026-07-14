@@ -1,6 +1,6 @@
 # 技能系统架构设计文档
 
-> 版本: v1.5 | 日期: 2026-05-23
+> 版本: v2.0 | 日期: 2026-07-14
 >
 > **文档层级**: 本文档定义**技能内容生产**方式。Runtime 间边界见 [RUNTIME_TOPOLOGY](./RUNTIME_TOPOLOGY.md)，战斗内部契约见 [COMBAT_CONTRACTS](./COMBAT_CONTRACTS.md)，世界模拟契约见 [WORLD_CONTRACTS](./WORLD_CONTRACTS.md)。
 
@@ -51,7 +51,7 @@ Scene 数: < 10
 
 ---
 
-## 当前架构 (v1.3)
+## 当前架构 (v2.0)
 
 ### 文件结构（v2.5 更新）
 
@@ -67,12 +67,16 @@ res://gameplay/abilities/
 ├── data/                          # SkillData .tres（200+ 个）
 │   ├── fireball_data.tres
 │   ├── shadow_bolt_data.tres
-│   └── ...
+│   ├── synergies/                 # 跨法术联动配置
+│   ├── trees/                     # 五系法术目录与精通节点
+│   ├── upgrades/                  # 可复用强化方向
+│   └── ...                        # 当前共 30 个法术
 │
 ├── runtime/                       # 运行时
 │   ├── skill_executor.gd          # _ARCHETYPE_SCENES 映射 + execute()
 │   ├── projectile.gd              # setup(skill, caster, dir) 驱动
 │   ├── skill_instance.gd          # 冷却包装
+│   ├── skill_synergy_resolver.gd  # 状态条件与额外伤害联动
 │   └── cast_context.gd
 │
 ├── manager/
@@ -104,6 +108,22 @@ res://gameplay/combat/
 @export var cooldown: float
 @export var mp_cost: int
 
+# 展示与精通树
+@export var icon_atlas_index: int
+@export var description: String
+@export var mechanics: String
+@export var school: SkillMastery.School
+@export var tier: int
+@export var role: String
+
+# 投射物与持续范围行为
+@export var projectile_count: int
+@export var projectile_spread_degrees: float
+@export var projectile_pierce: int
+@export var homing_strength: float
+@export var aoe_tick_interval: float
+@export var aoe_max_hits_per_target: int
+
 # 视觉（未来收敛为 ProjectileVisualData）
 @export var projectile_color: Color
 @export var projectile_scale: float
@@ -117,11 +137,12 @@ res://gameplay/combat/
 
 # 局内强化（SkillUpgrade .tres）
 @export var upgrades: Array[Resource]
+@export var synergies: Array[Resource]
 ```
 
 ### 局内强化与运行时副本
 
-每个 `SkillUpgrade` 仍是纯配置资源，包含强化 ID、分支、最大等级、前置条件、附加标签和 `modifiers` 字典。当前支持伤害、冷却、法力、引导消耗、投射物速度、施法距离、AoE 半径/持续时间、Buff 持续时间、位移和召唤物属性。
+每个 `SkillUpgrade` 仍是纯配置资源，包含强化 ID、分支、最大等级、前置条件、附加标签和 `modifiers` 字典。当前还支持多重投射、散射、贯穿、追踪、飞行时间、AoE 脉冲间隔和单目标命中次数，因此数量、穿透、追踪、频次可以和威力、效率等通用方向自由组合。
 
 ```gdscript
 # gameplay/abilities/data/upgrades/power.tres
@@ -140,7 +161,32 @@ modifiers = {
 
 1. 创建 `<skill_id>_data.tres`，完整配置 archetype、visual、tags 和 upgrades。
 2. 将 ID 加入 `Player.PLAYER_SKILL_IDS` 以注册到玩家技能池。
-3. 需要作为局内新技能奖励时，在 `RunManager.SKILL_REWARDS` 添加一条数据。
+3. 将 ID 加入 `RunManager.SKILL_REWARD_IDS`；奖励名称、定位和机制说明直接从 `SkillData` 读取。
+4. 将 ID 登记到对应 `trees/<school>_tree.tres`，并保证 `school`、`tier` 与目录一致。
+
+### 五系法术目录（30）
+
+| 学派 | 法术 |
+|------|------|
+| 毁灭（15） | 火球术、余烬齐射、日耀长枪、熔岩池、余烬球、烈焰风暴、闪电箭、雷鸣球、雷暴领域、静电新星、毒云、疫病穿刺、剧毒爆发、瘴气环、蓄力火球 |
+| 召唤（3） | 召唤骷髅、召唤余烬精灵、召唤苔岩魔像 |
+| 恢复（2） | 潮汐灵球、辉光圣盾 |
+| 变化（7） | 寒霜枪、冰河之眼、冰霜护盾、冰风暴、冰爆、白灾暴雪、奥术突进 |
+| 幻术（3） | 暗影弹、暗影步、相位闪现 |
+
+技能树以学派精通等级解锁法术：T1/Lv.1、T2/Lv.5、T3/Lv.10、T4/Lv.20、T5/Lv.30。`SkillTreeUI` 同时展示法术图标、层级、解锁等级、精通经验和可购买节点；`SkillPoolUI` 允许浏览全部法术，但只允许装备已解锁法术。
+
+### 状态联动
+
+`SkillSynergyData` 是纯配置资源，由 `SkillSynergyResolver` 订阅 `CombatEventBus.ON_HIT` 后执行。额外伤害统一通过 `CombatExecutor.report_bonus_damage()`，状态消耗通过目标 `BuffManager`，不会绕过战斗权威入口。
+
+当前内置联动：
+
+- 融化：火焰命中冻结目标，造成额外伤害并消耗冻结。
+- 蒸汽爆裂：冰或水命中燃烧目标，造成额外伤害并扑灭燃烧。
+- 导电：闪电命中潮湿目标，造成额外伤害。
+- 毒焰引爆：火焰命中中毒目标，造成高额额外伤害并消耗中毒。
+- 腐影：暗影命中中毒目标，造成可重复触发的额外伤害。
 
 ### SkillExecutor._ARCHETYPE_SCENES
 

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="SkillSynergyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_synergy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "melt"
+display_name = "融化"
+description = "火焰命中冻结目标时造成 60% 额外伤害并移除冻结。"
+required_target_status = "frozen"
+bonus_damage_ratio = 0.6
+consume_target_status = true
+bonus_tags = ["fire", "reaction"]

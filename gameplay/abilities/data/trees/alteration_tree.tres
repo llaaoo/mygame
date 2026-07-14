@@ -48,5 +48,10 @@ modifier_bonuses = {
 
 [resource]
 script = ExtResource("1_tree")
+tree_id = "alteration"
+display_name = "变化学派"
+description = "以冰霜塑形、护盾和奥术位移控制战场，擅长冻结后再由火焰融解。"
 school = 3
+accent_color = Color(0.38, 0.68, 0.95, 1)
+skill_ids = ["frost_lance", "glacial_orb", "ice_armor", "ice_storm", "ice_explosion", "blizzard", "arcane_dash"]
 perks = [SubResource("Perk_GuardedSkin"), SubResource("Perk_Shatter"), SubResource("Perk_StoneStride"), SubResource("Perk_FrozenEdge")]

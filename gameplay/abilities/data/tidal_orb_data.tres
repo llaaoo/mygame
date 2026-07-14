@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="1"]
+[ext_resource type="Resource" path="res://content/visuals/tidal_visual.tres" id="2"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/seeker.tres" id="3"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/efficiency.tres" id="4"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/piercing.tres" id="5"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/synergies/steam_burst.tres" id="6"]
+
+[resource]
+script = ExtResource("1")
+id = "tidal_orb"
+display_name = "潮汐灵球"
+icon_atlas_index = 25
+description = "追踪敌人的水元素球，命中后施加潮湿。"
+mechanics = "低伤辅助投射物；潮湿可被闪电导电或被冰霜冻结。"
+school = 2
+tier = 2
+role = "联动启动"
+tags = ["water", "projectile", "homing"]
+mp_cost = 12
+cooldown = 3.2
+damage = 15
+damage_scaling = 0.4
+archetype = "linear_projectile"
+visual = ExtResource("2")
+projectile_speed = 380.0
+projectile_lifetime = 4.0
+homing_strength = 2.5
+upgrades = [ExtResource("3"), ExtResource("4"), ExtResource("5")]
+synergies = [ExtResource("6")]

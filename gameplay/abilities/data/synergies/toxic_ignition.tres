@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="SkillSynergyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_synergy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "toxic_ignition"
+display_name = "毒焰引爆"
+description = "火焰命中中毒目标时造成 75% 额外伤害并消耗中毒。"
+required_target_status = "poison"
+bonus_damage_ratio = 0.75
+consume_target_status = true
+cooldown = 0.2
+bonus_tags = ["fire", "poison", "reaction"]

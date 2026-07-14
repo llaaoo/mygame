@@ -105,8 +105,9 @@ func _refresh_idx(idx: int) -> void:
 			skill = inst.data if inst else null
 
 	var icon := _icons[idx]
-	if skill and skill.icon:
-		icon.texture = skill.icon
+	if skill:
+		icon.texture = SkillIconCatalog.get_icon(skill)
+		icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 		icon.modulate = Color(1, 1, 1, 1)
 	elif skill:
 		icon.texture = null

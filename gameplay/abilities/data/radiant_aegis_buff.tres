@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="Buff" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://gameplay/status/buff.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+buff_id = "radiant_aegis"
+display_name = "辉光圣盾"
+status_id = "radiant_aegis"
+duration = 8.0
+tick_interval = 1.5
+stat_modifiers = {
+"max_hp": 20.0
+}
+tick_heal = 6

@@ -37,6 +37,10 @@ func _ready() -> void:
 		enemy_color = boss_data.color
 		enemy_name = boss_data.boss_name
 	_apply_visuals()
+	$Sprite2D.texture = load("res://content/art/pixel/actors/boss.tres") as Texture2D
+	$Sprite2D.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	$Sprite2D.modulate = Color.WHITE
+	$Sprite2D.scale = Vector2(0.32, 0.32)
 
 	# 免疫组
 	for group_name in boss_data.immune_groups:
@@ -80,19 +84,6 @@ func _setup_boss_skills() -> void:
 			continue
 		var skill := load("res://gameplay/abilities/data/%s_data.tres" % sid) as SkillData
 		if skill:
-			match sid:
-				"flame_storm":
-					skill.archetype = "persistent_aoe"
-					skill.aoe_visual = load("res://content/visuals/fire_aoe_visual.tres")
-					skill.cast_distance = 0.0
-					skill.tags = ["fire"]
-				"ice_armor":
-					skill.buff_resource = load("res://gameplay/abilities/data/ice_armor_buff.tres") as Buff
-					skill.tags = ["ice"]
-				"ice_explosion":
-					skill.archetype = "persistent_aoe"
-					skill.aoe_visual = load("res://content/visuals/ice_aoe_visual.tres")
-					skill.tags = ["ice", "aoe"]
 			skill_manager.pool.add_skill(skill)
 
 	skill_manager.pool.build()

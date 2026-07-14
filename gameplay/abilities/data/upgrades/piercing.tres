@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="SkillUpgrade" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_upgrade.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "piercing"
+display_name = "贯穿"
+description = "额外贯穿 1 个目标，飞行时间提高 15%。"
+branch = "穿透"
+max_rank = 3
+modifiers = {
+"projectile_lifetime.multiplier": 0.15,
+"projectile_pierce.flat": 1.0
+}

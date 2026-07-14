@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="SkillSynergyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_synergy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "shadow_decay"
+display_name = "腐影"
+description = "暗影命中中毒目标时造成 40% 额外伤害，不消耗中毒。"
+required_target_status = "poison"
+bonus_damage_ratio = 0.4
+cooldown = 0.15
+bonus_tags = ["shadow", "poison", "reaction"]

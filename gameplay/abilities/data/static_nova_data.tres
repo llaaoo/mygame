@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="1"]
+[ext_resource type="Resource" path="res://content/visuals/static_nova_visual.tres" id="2"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/power.tres" id="3"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/area.tres" id="4"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/pulse.tres" id="5"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/synergies/conduction.tres" id="6"]
+
+[resource]
+script = ExtResource("1")
+id = "static_nova"
+display_name = "静电新星"
+icon_atlas_index = 15
+description = "从自身释放三次快速扩散的电弧脉冲。"
+mechanics = "贴身多段范围伤害；潮湿敌人受到导电额外伤害。"
+skill_type = 2
+tier = 2
+role = "近身清场"
+tags = ["lightning", "aoe", "nova"]
+mp_cost = 19
+cooldown = 5.5
+damage = 16
+damage_scaling = 0.5
+archetype = "persistent_aoe"
+aoe_visual = ExtResource("2")
+cast_distance = 0.0
+aoe_radius = 170.0
+aoe_lifetime = 1.1
+aoe_tick_interval = 0.35
+aoe_max_hits_per_target = 3
+upgrades = [ExtResource("3"), ExtResource("4"), ExtResource("5")]
+synergies = [ExtResource("6")]

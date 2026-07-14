@@ -10,9 +10,13 @@
 script = ExtResource("1")
 id = "ice_armor"
 display_name = "冰霜护盾"
+icon_atlas_index = 8
 description = "凝聚寒冰护盾，临时提高生命值上限。"
+mechanics = "防御增益；护盾结束可通过变化系节点自动触发冰爆。"
 skill_type = 1
 tags = ["ice", "buff"]
+school = 3
+role = "防御增益"
 mp_cost = 25
 cooldown = 12.0
 damage = 0

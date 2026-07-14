@@ -15,7 +15,10 @@ extends Resource
 ## damage.flat, damage.multiplier, damage_scaling.flat,
 ## cooldown.multiplier, mp_cost.multiplier, channel_mp_per_sec.multiplier, range.multiplier,
 ## projectile_speed.multiplier, cast_distance.multiplier,
+## projectile_count.flat, projectile_spread.flat, projectile_pierce.flat,
+## projectile_lifetime.multiplier, homing_strength.flat,
 ## visual_scale.multiplier, aoe_radius.multiplier, aoe_lifetime.multiplier,
+## aoe_tick_interval.multiplier, aoe_max_hits.flat,
 ## buff_duration.multiplier, dash_distance.multiplier, dash_speed.multiplier,
 ## summon_hp.multiplier, summon_damage.multiplier, summon_duration.multiplier.
 @export var modifiers: Dictionary = {}
@@ -58,6 +61,16 @@ func _apply_modifier(skill: SkillData, key: String, amount: float, rank: int) ->
 			skill.projectile_speed = maxf(1.0, skill.projectile_speed * multiplier)
 		"cast_distance.multiplier":
 			skill.cast_distance = maxf(0.0, skill.cast_distance * multiplier)
+		"projectile_count.flat":
+			skill.projectile_count = clampi(skill.projectile_count + int(round(amount * rank)), 1, 12)
+		"projectile_spread.flat":
+			skill.projectile_spread_degrees = maxf(0.0, skill.projectile_spread_degrees + amount * rank)
+		"projectile_pierce.flat":
+			skill.projectile_pierce = clampi(skill.projectile_pierce + int(round(amount * rank)), 0, 8)
+		"projectile_lifetime.multiplier":
+			skill.projectile_lifetime = maxf(0.1, skill.projectile_lifetime * multiplier)
+		"homing_strength.flat":
+			skill.homing_strength = maxf(0.0, skill.homing_strength + amount * rank)
 		"visual_scale.multiplier":
 			if skill.visual:
 				skill.visual.scale = maxf(0.01, skill.visual.scale * multiplier)
@@ -69,6 +82,10 @@ func _apply_modifier(skill: SkillData, key: String, amount: float, rank: int) ->
 			skill.aoe_lifetime = maxf(0.05, skill.aoe_lifetime * multiplier)
 			if skill.aoe_visual:
 				skill.aoe_visual.lifetime = maxf(0.05, skill.aoe_visual.lifetime * multiplier)
+		"aoe_tick_interval.multiplier":
+			skill.aoe_tick_interval = maxf(0.05, skill.aoe_tick_interval * multiplier)
+		"aoe_max_hits.flat":
+			skill.aoe_max_hits_per_target = clampi(skill.aoe_max_hits_per_target + int(round(amount * rank)), 1, 30)
 		"buff_duration.multiplier":
 			skill.buff_duration = maxf(0.0, skill.buff_duration * multiplier)
 		"dash_distance.multiplier":

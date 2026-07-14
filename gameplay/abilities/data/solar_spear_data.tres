@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="1"]
+[ext_resource type="Resource" path="res://content/visuals/fire_visual.tres" id="2"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/power.tres" id="3"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/piercing.tres" id="4"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/reach.tres" id="5"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/synergies/melt.tres" id="6"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/synergies/toxic_ignition.tres" id="7"]
+
+[resource]
+script = ExtResource("1")
+id = "solar_spear"
+display_name = "日耀长枪"
+icon_atlas_index = 2
+description = "投出高速圣火长枪，天然贯穿多个敌人。"
+mechanics = "高伤直线穿透；冻结和中毒目标都会触发强力反应。"
+tier = 4
+role = "精英处决"
+tags = ["fire", "holy", "projectile", "piercing"]
+mp_cost = 32
+cooldown = 7.0
+damage = 70
+damage_scaling = 1.5
+archetype = "linear_projectile"
+visual = ExtResource("2")
+projectile_speed = 980.0
+projectile_pierce = 2
+upgrades = [ExtResource("3"), ExtResource("4"), ExtResource("5")]
+synergies = [ExtResource("6"), ExtResource("7")]

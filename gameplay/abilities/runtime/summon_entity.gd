@@ -79,6 +79,7 @@ func setup(p_data: SummonData, p_player: Player, p_manager: SummonManager) -> vo
 		_sprite.texture = preload("res://content/art/placeholders/enemy_marker.png")
 	_sprite.modulate = _color
 	_sprite.scale = Vector2(_scale, _scale)
+	_sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	_sprite.z_index = 9
 
 	# 生命值

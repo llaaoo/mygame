@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="SkillUpgrade" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_upgrade.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "multishot"
+display_name = "分裂施法"
+description = "额外发射 1 枚投射物，散射角增加 10 度，单发伤害降低 10%。"
+branch = "数量"
+max_rank = 2
+modifiers = {
+"damage.multiplier": -0.1,
+"projectile_count.flat": 1.0,
+"projectile_spread.flat": 10.0
+}

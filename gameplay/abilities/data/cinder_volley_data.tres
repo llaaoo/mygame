@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="1"]
+[ext_resource type="Resource" path="res://content/visuals/fire_visual.tres" id="2"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/multishot.tres" id="3"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/cadence.tres" id="4"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/power.tres" id="5"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/synergies/toxic_ignition.tres" id="6"]
+
+[resource]
+script = ExtResource("1")
+id = "cinder_volley"
+display_name = "余烬齐射"
+icon_atlas_index = 1
+description = "同时扇形发射四枚低伤火弹，近距离可集中命中。"
+mechanics = "多发散射；可点出更多弹体，适合触发燃烧与毒焰引爆。"
+tier = 2
+role = "近距爆发"
+tags = ["fire", "projectile", "volley"]
+mp_cost = 20
+cooldown = 4.0
+damage = 13
+damage_scaling = 0.45
+archetype = "linear_projectile"
+visual = ExtResource("2")
+projectile_speed = 560.0
+projectile_count = 4
+projectile_spread_degrees = 28.0
+upgrades = [ExtResource("3"), ExtResource("4"), ExtResource("5")]
+synergies = [ExtResource("6")]

@@ -5,12 +5,17 @@
 [ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/power.tres" id="3"]
 [ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/cadence.tres" id="4"]
 [ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/reach.tres" id="5"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/synergies/melt.tres" id="6"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/synergies/toxic_ignition.tres" id="7"]
 
 [resource]
 script = ExtResource("1")
 id = "fireball"
 display_name = "火球术"
+icon_atlas_index = 0
 description = "发射一枚稳定的火焰弹，点燃油面并造成火焰伤害。"
+mechanics = "基础火焰投射物；可融化冻结或引爆中毒目标。"
+role = "稳定输出"
 tags = ["fire", "projectile"]
 mp_cost = 15
 cooldown = 2.0
@@ -20,3 +25,4 @@ archetype = "linear_projectile"
 visual = ExtResource("2")
 projectile_speed = 500.0
 upgrades = [ExtResource("3"), ExtResource("4"), ExtResource("5")]
+synergies = [ExtResource("6"), ExtResource("7")]

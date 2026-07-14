@@ -94,6 +94,14 @@ func has_buff(buff_name: String) -> bool:
 	return false
 
 
+func remove_status(status_id: String) -> bool:
+	var buff := _find_by_status(status_id)
+	if not buff:
+		return false
+	remove_buff(buff)
+	return true
+
+
 func get_active_statuses() -> Array[String]:
 	var result: Array[String] = []
 	for buff in _active_buffs:

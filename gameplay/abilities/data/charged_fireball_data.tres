@@ -5,12 +5,18 @@
 [ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/power.tres" id="3"]
 [ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/cadence.tres" id="4"]
 [ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/reach.tres" id="5"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/synergies/melt.tres" id="6"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/synergies/toxic_ignition.tres" id="7"]
 
 [resource]
 script = ExtResource("1")
 id = "charged_fireball"
 display_name = "蓄力火球"
+icon_atlas_index = 22
 description = "蓄力后释放高威力火球；提前释放会降低伤害和体积。"
+mechanics = "蓄力倍率影响伤害和体积；适合作为元素反应终结技。"
+tier = 3
+role = "蓄力爆发"
 cast_type = "charge"
 charge_duration = 1.2
 tags = ["fire", "projectile", "charge"]
@@ -22,3 +28,4 @@ archetype = "linear_projectile"
 visual = ExtResource("2")
 projectile_speed = 600.0
 upgrades = [ExtResource("3"), ExtResource("4"), ExtResource("5")]
+synergies = [ExtResource("6"), ExtResource("7")]

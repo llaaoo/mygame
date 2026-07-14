@@ -24,9 +24,15 @@ enum AIRole { MELEE, RANGED, HYBRID }
 		_apply_preset(value)
 
 const PRESETS: Array[Dictionary] = [
-	{"name": "哨兵", "color": Color(0.3, 0.9, 0.3, 1.0), "scale": Vector2(0.25, 0.25)},
-	{"name": "士兵", "color": Color(0.8, 0.25, 0.25, 1.0), "scale": Vector2(0.4, 0.4)},
-	{"name": "重兵", "color": Color(0.6, 0.2, 0.7, 1.0), "scale": Vector2(0.55, 0.55)},
+	{"name": "哨兵", "scale": Vector2(0.24, 0.24)},
+	{"name": "士兵", "scale": Vector2(0.26, 0.26)},
+	{"name": "重兵", "scale": Vector2(0.3, 0.3)},
+]
+
+const PRESET_TEXTURE_PATHS: Array[String] = [
+	"res://content/art/pixel/actors/enemy_scout.tres",
+	"res://content/art/pixel/actors/enemy_soldier.tres",
+	"res://content/art/pixel/actors/enemy_brute.tres",
 ]
 
 const PRESET_STATS: Array[Dictionary] = [
@@ -82,12 +88,6 @@ func _setup_ranged_skill() -> void:
 	var bolt_data := load("res://gameplay/abilities/data/shadow_bolt_data.tres") as SkillData
 	if not bolt_data:
 		return
-	bolt_data.skill_type = SkillData.SkillType.PROJECTILE
-	bolt_data.archetype = "linear_projectile"
-	bolt_data.visual = load("res://content/visuals/shadow_visual.tres")
-	bolt_data.projectile_speed = 250.0
-	bolt_data.damage = 10
-	bolt_data.damage_scaling = 0.6
 	skill_manager.pool = SkillPool.new()
 	skill_manager.pool.add_skill(bolt_data)
 	skill_manager.pool.build()
@@ -448,21 +448,24 @@ func _apply_preset(type_idx: int) -> void:
 		return
 	var preset := PRESETS[type_idx]
 	enemy_name = preset["name"]
-	enemy_color = preset["color"]
+	enemy_color = Color.WHITE
 	enemy_scale = preset["scale"]
 
 
 func _apply_visuals() -> void:
-	var spr := $Sprite2D
-	spr.modulate = enemy_color
+	var spr := $Sprite2D as Sprite2D
+	if enemy_type >= 0 and enemy_type < PRESET_TEXTURE_PATHS.size():
+		spr.texture = load(PRESET_TEXTURE_PATHS[enemy_type]) as Texture2D
+	spr.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	spr.modulate = Color.WHITE
 	spr.scale = enemy_scale
 
 
 func _flash_damage() -> void:
 	var spr := $Sprite2D
-	spr.modulate = Color.WHITE
+	spr.modulate = Color(1.0, 0.35, 0.35, 1.0)
 	await get_tree().create_timer(0.1).timeout
-	spr.modulate = enemy_color
+	spr.modulate = Color.WHITE
 
 
 func _find_player() -> void:

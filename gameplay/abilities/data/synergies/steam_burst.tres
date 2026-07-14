@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="SkillSynergyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_synergy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "steam_burst"
+display_name = "蒸汽爆裂"
+description = "冰或水命中燃烧目标时造成 50% 额外伤害并扑灭燃烧。"
+required_target_status = "burning"
+bonus_damage_ratio = 0.5
+consume_target_status = true
+bonus_tags = ["water", "reaction"]

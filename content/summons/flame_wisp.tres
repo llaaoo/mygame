@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="SummonData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://content/summons/summon_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://content/art/pixel/actors/wisp.tres" id="2_texture"]
+
+[resource]
+script = ExtResource("1")
+summon_name = "余烬精灵"
+description = "高速远程精灵，生命较低但攻击频繁。"
+max_hp = 24
+damage = 9
+speed = 155.0
+attack_range = 150.0
+attack_cooldown = 0.7
+lifetime = 22.0
+texture = ExtResource("2_texture")
+color = Color(1, 1, 1, 1)
+scale = 0.2

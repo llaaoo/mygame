@@ -15,16 +15,12 @@ const CHEST_SCENE := preload("res://world/loot/chest.tscn")
 const SPIKE_TRAP_SCENE := preload("res://world/traps/spike_trap.tscn")
 const RUN_META_SCRIPT := preload("res://gameplay/run/run_meta.gd")
 
-const SKILL_REWARDS: Array[Dictionary] = [
-	{"id": "skill_lightning", "title": "闪电箭", "description": "将闪电箭装入一个快捷槽。", "type": "skill", "skill_id": "lightning_bolt"},
-	{"id": "skill_poison", "title": "毒云", "description": "将毒云装入一个快捷槽。", "type": "skill", "skill_id": "poison_cloud"},
-	{"id": "skill_summon", "title": "召唤骷髅", "description": "将召唤骷髅装入一个快捷槽。", "type": "skill", "skill_id": "summon_skeleton"},
-	{"id": "skill_charge", "title": "蓄力火球", "description": "将蓄力火球装入一个快捷槽。", "type": "skill", "skill_id": "charged_fireball"},
-	{"id": "skill_frost_lance", "title": "寒霜枪", "description": "获得高速冰霜投射物。", "type": "skill", "skill_id": "frost_lance"},
-	{"id": "skill_ember_orb", "title": "余烬球", "description": "获得缓慢而高伤的火焰核心。", "type": "skill", "skill_id": "ember_orb"},
-	{"id": "skill_storm_field", "title": "雷暴领域", "description": "获得持续闪电范围技能。", "type": "skill", "skill_id": "storm_field"},
-	{"id": "skill_venom_burst", "title": "剧毒爆发", "description": "获得大范围毒素爆发。", "type": "skill", "skill_id": "venom_burst"},
-	{"id": "skill_arcane_dash", "title": "奥术突进", "description": "获得短冷却的纯位移技能。", "type": "skill", "skill_id": "arcane_dash"},
+const SKILL_REWARD_IDS: Array[String] = [
+	"fireball", "cinder_volley", "solar_spear", "magma_pool", "ember_orb", "flame_storm",
+	"lightning_bolt", "thunder_orb", "storm_field", "static_nova", "poison_cloud", "plague_bolt",
+	"venom_burst", "miasma_ring", "charged_fireball", "summon_skeleton", "summon_wisp", "summon_golem",
+	"tidal_orb", "radiant_aegis", "frost_lance", "glacial_orb", "ice_armor", "ice_storm",
+	"ice_explosion", "blizzard", "arcane_dash", "shadow_bolt", "shadow_step", "phase_blink",
 ]
 
 const STAT_REWARDS: Array[Dictionary] = [
@@ -468,7 +464,7 @@ func _enter_reward_state() -> void:
 
 func _roll_rewards() -> Array[Dictionary]:
 	var pool: Array[Dictionary] = []
-	for skill_reward in SKILL_REWARDS:
+	for skill_reward in _build_skill_discovery_rewards():
 		if not state.rewards_taken.has(str(skill_reward.get("id", ""))):
 			pool.append(skill_reward)
 	pool.append_array(STAT_REWARDS)
@@ -498,6 +494,24 @@ func _roll_rewards() -> Array[Dictionary]:
 		choices.append(reward)
 		chosen_ids.append(reward_id)
 	return choices
+
+
+func _build_skill_discovery_rewards() -> Array[Dictionary]:
+	var rewards: Array[Dictionary] = []
+	for skill_id in SKILL_REWARD_IDS:
+		var skill := load("res://gameplay/abilities/data/%s_data.tres" % skill_id) as SkillData
+		if not skill:
+			continue
+		if _player and _player.mastery_manager and not _player.mastery_manager.is_spell_unlocked(skill):
+			continue
+		rewards.append({
+			"id": "skill_%s" % skill_id,
+			"title": skill.display_name,
+			"description": "%s\n%s" % [skill.role, skill.mechanics],
+			"type": "skill",
+			"skill_id": skill_id,
+		})
+	return rewards
 
 
 func _build_skill_upgrade_rewards() -> Array[Dictionary]:

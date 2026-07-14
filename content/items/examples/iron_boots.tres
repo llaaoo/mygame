@@ -1,9 +1,15 @@
-[gd_resource type="Resource" script_class="EquipmentData" format=3 uid="uid://c73q25tl8mfxr"]
+[gd_resource type="Resource" script_class="EquipmentData" load_steps=3 format=3 uid="uid://c73q25tl8mfxr"]
 
 [ext_resource type="Script" uid="uid://cfiekyb706cd4" path="res://gameplay/inventory/data/equipment_data.gd" id="1_phd6h"]
+[ext_resource type="Texture2D" path="res://content/art/pixel/items/boots.tres" id="2_icon"]
 
 [resource]
 script = ExtResource("1_phd6h")
+id = "iron_boots"
+icon = ExtResource("2_icon")
+description = "加装金属护片的行军靴，稳定步伐并提高移动速度。"
+rarity = 1
+sell_price = 20
 slot_type = 3
 stat_modifiers = {
 "move_speed": 25.0

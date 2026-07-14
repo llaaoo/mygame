@@ -49,5 +49,10 @@ modifier_bonuses = {
 
 [resource]
 script = ExtResource("1_tree")
+tree_id = "destruction"
+display_name = "毁灭学派"
+description = "操纵火焰、闪电与毒素，围绕燃烧、潮湿和中毒构筑连锁爆发。"
 school = 0
+accent_color = Color(0.94, 0.32, 0.16, 1)
+skill_ids = ["fireball", "cinder_volley", "solar_spear", "magma_pool", "ember_orb", "flame_storm", "lightning_bolt", "thunder_orb", "storm_field", "static_nova", "poison_cloud", "plague_bolt", "venom_burst", "miasma_ring", "charged_fireball"]
 perks = [SubResource("Perk_Scorch"), SubResource("Perk_Firestorm"), SubResource("Perk_StormWeb"), SubResource("Perk_DeepFreeze")]

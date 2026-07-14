@@ -14,6 +14,9 @@ var caster: Node2D = null
 var _has_hit: bool = false
 var _needs_setup: bool = true
 var _surface_timer: float = 0.0  ## 表面交互节流
+var _remaining_pierces: int = 0
+var _homing_strength: float = 0.0
+var _hit_targets: Dictionary = {}
 
 
 ## 核心入口：SkillData 注入所有参数（替代子类覆写）
@@ -24,8 +27,10 @@ func setup(skill: SkillData, caster_node: Node2D, dir: Vector2) -> void:
 	
 	# SkillData 驱动数值
 	speed = skill.projectile_speed
-	damage = skill.projectile_speed  ## 会被 SkillExecutor 覆写为 resolve_damage()
-	lifetime = 3.0
+	damage = skill.damage  ## 会被 SkillExecutor 覆写为 resolve_damage()
+	lifetime = skill.projectile_lifetime
+	_remaining_pierces = skill.projectile_pierce
+	_homing_strength = skill.homing_strength
 	
 	# SkillData.visual 优先，fallback 到旧字段
 	var spr = $Sprite2D
@@ -92,6 +97,7 @@ func set_direction(dir: Vector2) -> void:
 
 
 func _physics_process(delta: float) -> void:
+	_apply_homing(delta)
 	global_position += direction * speed * delta
 	
 	# 表面交互：投射物经过的格子施加技能标签（火球路过 oiled → 点燃）
@@ -99,6 +105,25 @@ func _physics_process(delta: float) -> void:
 	if _surface_timer >= 0.15:
 		_surface_timer -= 0.15
 		_apply_to_surface()
+
+
+func _apply_homing(delta: float) -> void:
+	if _homing_strength <= 0.0 or not is_instance_valid(caster):
+		return
+	var target_group := "enemy" if caster.is_in_group("player") or caster.is_in_group("summon") else "player"
+	var nearest: Node2D = null
+	var nearest_distance := 320.0
+	for candidate in get_tree().get_nodes_in_group(target_group):
+		if not candidate is Node2D or _hit_targets.has(candidate.get_instance_id()):
+			continue
+		var distance := global_position.distance_to(candidate.global_position)
+		if distance < nearest_distance:
+			nearest = candidate
+			nearest_distance = distance
+	if nearest:
+		var desired := global_position.direction_to(nearest.global_position)
+		direction = direction.lerp(desired, clampf(_homing_strength * delta, 0.0, 1.0)).normalized()
+		rotation = direction.angle()
 
 
 func set_caster(c: Node2D) -> void:
@@ -117,11 +142,15 @@ func _on_body_entered(body: Node2D) -> void:
 		return
 	if not is_instance_valid(caster) or not is_instance_valid(body):
 		return
+	if _hit_targets.has(body.get_instance_id()):
+		return
 	if body.has_method("take_damage"):
-		_has_hit = true
+		_hit_targets[body.get_instance_id()] = true
 		_emit_hit_event(body)
-		# report_hit() 内部已调用 take_damage()
-	queue_free()
+		_finish_or_pierce()
+	else:
+		_has_hit = true
+		queue_free()
 
 
 func _on_area_entered(area: Area2D) -> void:
@@ -136,9 +165,21 @@ func _on_area_entered(area: Area2D) -> void:
 	# 检查 area 自身或 owner（如 MapObject 的 HitArea → MapObject 有 take_damage）
 	var target: Node2D = area if area.has_method("take_damage") else (area.owner if area.owner and area.owner.has_method("take_damage") else null)
 	if target:
-		_has_hit = true
+		if _hit_targets.has(target.get_instance_id()):
+			return
+		_hit_targets[target.get_instance_id()] = true
 		_emit_hit_event(target)
-		# report_hit() 内部已调用 take_damage()
+		_finish_or_pierce()
+	elif area.collision_layer & 1:
+		_has_hit = true
+		queue_free()
+
+
+func _finish_or_pierce() -> void:
+	if _remaining_pierces > 0:
+		_remaining_pierces -= 1
+		return
+	_has_hit = true
 	queue_free()
 
 

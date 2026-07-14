@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="1"]
+[ext_resource type="Resource" path="res://content/visuals/magma_pool_visual.tres" id="2"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/power.tres" id="3"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/area.tres" id="4"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/pulse.tres" id="5"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/synergies/melt.tres" id="6"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/synergies/toxic_ignition.tres" id="7"]
+
+[resource]
+script = ExtResource("1")
+id = "magma_pool"
+display_name = "熔岩池"
+icon_atlas_index = 3
+description = "在前方制造持续喷涌的熔岩区域。"
+mechanics = "周期区域伤害；适合控制通道并连续触发元素反应。"
+skill_type = 2
+tier = 3
+role = "区域封锁"
+tags = ["fire", "aoe", "ground"]
+mp_cost = 30
+cooldown = 8.0
+damage = 14
+damage_scaling = 0.45
+archetype = "persistent_aoe"
+aoe_visual = ExtResource("2")
+cast_distance = 170.0
+aoe_radius = 110.0
+aoe_lifetime = 4.0
+aoe_tick_interval = 0.8
+aoe_max_hits_per_target = 5
+upgrades = [ExtResource("3"), ExtResource("4"), ExtResource("5")]
+synergies = [ExtResource("6"), ExtResource("7")]

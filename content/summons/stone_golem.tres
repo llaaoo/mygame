@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="SummonData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://content/summons/summon_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://content/art/pixel/actors/golem.tres" id="2_texture"]
+
+[resource]
+script = ExtResource("1")
+summon_name = "苔岩魔像"
+description = "缓慢坚固的近战召唤物，能承担大量伤害。"
+max_hp = 110
+damage = 18
+speed = 72.0
+attack_range = 48.0
+attack_cooldown = 1.8
+lifetime = 32.0
+texture = ExtResource("2_texture")
+color = Color(1, 1, 1, 1)
+scale = 0.3

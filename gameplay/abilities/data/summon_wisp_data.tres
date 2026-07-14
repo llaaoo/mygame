@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="1"]
+[ext_resource type="Resource" path="res://content/summons/flame_wisp.tres" id="2"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/command.tres" id="3"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/cadence.tres" id="4"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/efficiency.tres" id="5"]
+
+[resource]
+script = ExtResource("1")
+id = "summon_wisp"
+display_name = "召唤余烬精灵"
+icon_atlas_index = 28
+description = "召唤高速远程余烬精灵，频繁骚扰敌人。"
+mechanics = "低生命、高攻速召唤物；适合与骷髅或魔像组成混编队伍。"
+skill_type = 4
+school = 1
+tier = 2
+role = "远程召唤"
+tags = ["summon", "fire"]
+mp_cost = 24
+cooldown = 7.0
+damage = 0
+damage_scaling = 0.0
+archetype = "summon_entity"
+summon_data = ExtResource("2")
+upgrades = [ExtResource("3"), ExtResource("4"), ExtResource("5")]

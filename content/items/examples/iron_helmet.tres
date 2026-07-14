@@ -1,9 +1,15 @@
-[gd_resource type="Resource" script_class="EquipmentData" format=3 uid="uid://caq0qlv6ohvl7"]
+[gd_resource type="Resource" script_class="EquipmentData" load_steps=3 format=3 uid="uid://caq0qlv6ohvl7"]
 
 [ext_resource type="Script" uid="uid://cfiekyb706cd4" path="res://gameplay/inventory/data/equipment_data.gd" id="1_m3uoe"]
+[ext_resource type="Texture2D" path="res://content/art/pixel/items/helmet.tres" id="2_icon"]
 
 [resource]
 script = ExtResource("1_m3uoe")
+id = "iron_helmet"
+icon = ExtResource("2_icon")
+description = "旧王国卫兵使用的铁盔。厚重，但能显著提高生存能力。"
+rarity = 1
+sell_price = 18
 stat_modifiers = {
 "max_hp": 15.0
 }

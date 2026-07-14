@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="1"]
+[ext_resource type="Resource" path="res://content/visuals/lightning_visual.tres" id="2"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/seeker.tres" id="3"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/power.tres" id="4"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/cadence.tres" id="5"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/synergies/conduction.tres" id="6"]
+
+[resource]
+script = ExtResource("1")
+id = "thunder_orb"
+display_name = "雷鸣球"
+icon_atlas_index = 13
+description = "自动追猎附近敌人的雷电核心。"
+mechanics = "强追踪；与潮湿联动，并触发现有闪电连锁。"
+tier = 3
+role = "自动索敌"
+tags = ["lightning", "projectile", "homing"]
+mp_cost = 23
+cooldown = 5.2
+damage = 38
+damage_scaling = 1.0
+archetype = "linear_projectile"
+visual = ExtResource("2")
+projectile_speed = 390.0
+projectile_lifetime = 4.0
+homing_strength = 3.2
+upgrades = [ExtResource("3"), ExtResource("4"), ExtResource("5")]
+synergies = [ExtResource("6")]

@@ -1,16 +1,21 @@
-[gd_resource type="Resource" script_class="SkillData" load_steps=6 format=3]
+[gd_resource type="Resource" script_class="SkillData" load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="1"]
 [ext_resource type="Resource" path="res://content/visuals/shadow_visual.tres" id="2"]
 [ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/power.tres" id="3"]
 [ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/cadence.tres" id="4"]
 [ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/reach.tres" id="5"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/synergies/shadow_decay.tres" id="6"]
 
 [resource]
 script = ExtResource("1")
 id = "shadow_bolt"
 display_name = "暗影弹"
 description = "低消耗地发射暗影能量，适合持续压制。"
+icon_atlas_index = 20
+mechanics = "命中中毒目标会触发暗蚀额外伤害，适合与毒系法术交替施放。"
+school = 4
+role = "低耗连射 / 暗蚀触发"
 tags = ["shadow", "projectile"]
 mp_cost = 8
 cooldown = 1.5
@@ -21,3 +26,4 @@ visual = ExtResource("2")
 projectile_speed = 400.0
 cast_distance = 25.0
 upgrades = [ExtResource("3"), ExtResource("4"), ExtResource("5")]
+synergies = [ExtResource("6")]

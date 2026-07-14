@@ -12,10 +12,11 @@ var _skill_grid: GridContainer = null
 var _equip_slots: Array[PanelContainer] = []
 var _equip_sources: Array[String] = []  ## "left","right","slot_0",...
 var _hint_label: Label = null
+var _detail_box: VBoxContainer = null
 
 
 func _ready() -> void:
-	layer = 130  # InventoryPanel=120，技能池面板在上
+	layer = 160  # 高于 RunOverlay(140)，避免房间目标遮挡面板
 	hide()
 	_build_ui()
 
@@ -64,7 +65,8 @@ func _build_ui() -> void:
 
 	_panel = Panel.new()
 	_panel.anchor_left = 0.15; _panel.anchor_right = 0.85
-	_panel.anchor_top = 0.1; _panel.anchor_bottom = 0.9
+	_panel.anchor_top = 0.04; _panel.anchor_bottom = 0.96
+	_panel.clip_contents = true
 	_panel.add_theme_stylebox_override("panel", _make_panel_bg())
 	add_child(_panel)
 
@@ -86,7 +88,7 @@ func _build_ui() -> void:
 	main_hbox.add_child(left_vbox)
 
 	var title := Label.new()
-	title.text = "📖 技能池"
+	title.text = "技能编组"
 	title.add_theme_font_size_override("font_size", 22)
 	title.add_theme_color_override("font_color", Color.WHITE)
 	left_vbox.add_child(title)
@@ -110,14 +112,29 @@ func _build_ui() -> void:
 
 	# ── 右侧：双手 + 快捷键槽 ──
 	var right_vbox := VBoxContainer.new()
+	right_vbox.custom_minimum_size = Vector2(260, 0)
 	right_vbox.add_theme_constant_override("separation", 6)
 	main_hbox.add_child(right_vbox)
 
-	right_vbox.add_child(_make_section_label("🖐️ 双手"))
+	var detail_panel := PanelContainer.new()
+	detail_panel.custom_minimum_size = Vector2(260, 155)
+	detail_panel.add_theme_stylebox_override("panel", _make_slot_bg())
+	right_vbox.add_child(detail_panel)
+	var detail_margin := MarginContainer.new()
+	detail_margin.add_theme_constant_override("margin_left", 10)
+	detail_margin.add_theme_constant_override("margin_right", 10)
+	detail_margin.add_theme_constant_override("margin_top", 8)
+	detail_margin.add_theme_constant_override("margin_bottom", 8)
+	detail_panel.add_child(detail_margin)
+	_detail_box = VBoxContainer.new()
+	_detail_box.add_theme_constant_override("separation", 4)
+	detail_margin.add_child(_detail_box)
+
+	right_vbox.add_child(_make_section_label("双手法术"))
 	_add_equip_slot(right_vbox, "left", "左手")
 	_add_equip_slot(right_vbox, "right", "右手")
 
-	right_vbox.add_child(_make_section_label("⌨️ 快捷键"))
+	right_vbox.add_child(_make_section_label("快捷法术"))
 	for i in range(4):
 		_add_equip_slot(right_vbox, "slot_%d" % i, "键 %d" % (i + 1))
 
@@ -132,7 +149,7 @@ func _make_section_label(text: String) -> Label:
 
 func _add_equip_slot(parent: Control, source: String, label: String) -> void:
 	var panel := PanelContainer.new()
-	panel.custom_minimum_size = Vector2(200, 40)
+	panel.custom_minimum_size = Vector2(200, 34)
 	panel.add_theme_stylebox_override("panel", _make_slot_bg())
 	panel.set_meta("display_label", label)
 	parent.add_child(panel)
@@ -186,6 +203,9 @@ func _on_slot_clicked(event: InputEvent, source: String) -> void:
 
 
 func _equip(source: String, skill: SkillData) -> void:
+	if not _is_skill_unlocked(skill):
+		_hint_label.text = "%s 需要 %s Lv.%d" % [skill.display_name, _school_name(skill.school), _unlock_level(skill)]
+		return
 	match source:
 		"left":  _skill_manager.equip_hand("left", skill)
 		"right": _skill_manager.equip_hand("right", skill)
@@ -216,6 +236,80 @@ func _on_skill_upgraded(_source: String, _skill: SkillData, _upgrade_id: String,
 func _refresh_all() -> void:
 	_refresh_grid()
 	_refresh_equip_slots()
+	_refresh_detail()
+
+
+func _refresh_detail() -> void:
+	if not _detail_box:
+		return
+	for child in _detail_box.get_children():
+		child.queue_free()
+	var heading := Label.new()
+	heading.text = _selected_skill.display_name if _selected_skill else "法术详情"
+	GameUIStyle.apply_label(heading, 16, GameUIStyle.GOLD)
+	_detail_box.add_child(heading)
+	if not _selected_skill:
+		var empty := Label.new()
+		empty.text = "选择一个法术查看完整数值。"
+		GameUIStyle.apply_label(empty, 10, GameUIStyle.TEXT_MUTED)
+		_detail_box.add_child(empty)
+		return
+	if not _is_skill_unlocked(_selected_skill):
+		var locked := Label.new()
+		locked.text = "未解锁 · %s Lv.%d" % [_school_name(_selected_skill.school), _unlock_level(_selected_skill)]
+		GameUIStyle.apply_label(locked, 10, Color(0.94, 0.5, 0.32, 1.0))
+		_detail_box.add_child(locked)
+	var desc := Label.new()
+	desc.text = _selected_skill.description
+	desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	GameUIStyle.apply_label(desc, 10, GameUIStyle.TEXT_MAIN)
+	_detail_box.add_child(desc)
+	var stats := Label.new()
+	stats.text = _format_skill_stats(_selected_skill)
+	stats.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	GameUIStyle.apply_label(stats, 10, GameUIStyle.TEXT_MUTED)
+	_detail_box.add_child(stats)
+	if not _selected_skill.mechanics.is_empty():
+		var mechanics := Label.new()
+		mechanics.text = _selected_skill.mechanics
+		mechanics.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		GameUIStyle.apply_label(mechanics, 10, Color(0.64, 0.82, 0.92, 1.0))
+		_detail_box.add_child(mechanics)
+	var build := Label.new()
+	var branches: Array[String] = []
+	for upgrade in _selected_skill.upgrades:
+		if upgrade:
+			branches.append(str(upgrade.get("branch")))
+	var synergy_names: Array[String] = []
+	for synergy in _selected_skill.synergies:
+		if synergy:
+			synergy_names.append(str(synergy.get("display_name")))
+	build.text = "强化: %s\n联动: %s" % [", ".join(branches), ", ".join(synergy_names) if not synergy_names.is_empty() else "无"]
+	build.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	GameUIStyle.apply_label(build, 9, GameUIStyle.TEXT_MUTED)
+	_detail_box.add_child(build)
+
+
+func _format_skill_stats(skill: SkillData) -> String:
+	var lines: Array[String] = [
+		"%s · T%d · %s" % [_type_name(skill.skill_type), skill.tier, skill.role],
+		"伤害 %d  |  法力 %d  |  冷却 %.1fs" % [skill.damage, skill.mp_cost, skill.cooldown],
+	]
+	match skill.skill_type:
+		SkillData.SkillType.PROJECTILE:
+			lines.append("弹速 %.0f  |  数量 %d  |  穿透 %d" % [skill.projectile_speed, skill.projectile_count, skill.projectile_pierce])
+		SkillData.SkillType.AOE:
+			var radius := skill.aoe_visual.radius if skill.aoe_visual else skill.aoe_radius
+			var lifetime := skill.aoe_visual.lifetime if skill.aoe_visual else skill.aoe_lifetime
+			lines.append("半径 %.0f  |  持续 %.1fs  |  命中 %d" % [radius, lifetime, skill.aoe_max_hits_per_target])
+		SkillData.SkillType.BUFF:
+			lines.append("持续 %.1fs" % skill.buff_duration)
+		SkillData.SkillType.DASH:
+			lines.append("距离 %.0f  |  速度 %.0f" % [skill.dash_distance, skill.dash_speed])
+		SkillData.SkillType.SUMMON:
+			if skill.summon_data:
+				lines.append("召唤生命 %d  |  伤害 %d  |  存在 %.0fs" % [skill.summon_data.max_hp, skill.summon_data.damage, skill.summon_data.lifetime])
+	return "\n".join(lines)
 
 
 func _refresh_grid() -> void:
@@ -230,6 +324,7 @@ func _refresh_grid() -> void:
 
 
 func _make_skill_card(skill: SkillData) -> PanelContainer:
+	var unlocked := _is_skill_unlocked(skill)
 	var card := PanelContainer.new()
 	card.custom_minimum_size = Vector2(90, 110)
 	card.add_theme_stylebox_override("panel", _make_card_bg(skill == _selected_skill))
@@ -240,9 +335,11 @@ func _make_skill_card(skill: SkillData) -> PanelContainer:
 
 	var icon := TextureRect.new()
 	icon.custom_minimum_size = Vector2(40, 40)
-	if skill.icon: icon.texture = skill.icon
+	icon.texture = SkillIconCatalog.get_icon(skill)
+	icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.modulate = Color.WHITE if unlocked else Color(0.34, 0.36, 0.4, 0.78)
 	icon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	vbox.add_child(icon)
 
@@ -254,7 +351,7 @@ func _make_skill_card(skill: SkillData) -> PanelContainer:
 	vbox.add_child(nm)
 
 	var tp := Label.new()
-	tp.text = "%s · %d 路" % [_type_name(skill.skill_type), skill.upgrades.size()]
+	tp.text = "%s · %s" % [_type_name(skill.skill_type), "%d 路" % skill.upgrades.size() if unlocked else "Lv.%d" % _unlock_level(skill)]
 	tp.add_theme_font_size_override("font_size", 9)
 	tp.add_theme_color_override("font_color", _type_color(skill.skill_type))
 	tp.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -262,6 +359,7 @@ func _make_skill_card(skill: SkillData) -> PanelContainer:
 
 	card.gui_input.connect(_on_card_clicked.bind(skill))
 	card.mouse_filter = Control.MOUSE_FILTER_STOP
+	card.tooltip_text = "%s\n%s\n%s" % [skill.description, skill.mechanics, "已解锁" if unlocked else "%s Lv.%d 解锁" % [_school_name(skill.school), _unlock_level(skill)]]
 	return card
 
 
@@ -297,7 +395,8 @@ func _refresh_equip_slots() -> void:
 		var display_label := str(panel.get_meta("display_label", ""))
 
 		if skill:
-			if skill.icon: tex.texture = skill.icon; tex.modulate = Color(1,1,1,1)
+			var skill_icon := SkillIconCatalog.get_icon(skill)
+			if skill_icon: tex.texture = skill_icon; tex.modulate = Color(1,1,1,1)
 			else: tex.texture = null; tex.modulate = Color(1,1,1,0.3)
 			name_lbl.text = skill.display_name
 			var total_ranks := 0
@@ -352,11 +451,32 @@ func _make_slot_bg(color_override := Color(0.12, 0.12, 0.18, 0.9)) -> StyleBoxFl
 
 func _type_name(t: int) -> String:
 	match t:
-		SkillData.SkillType.PROJECTILE: return "🎯"
-		SkillData.SkillType.BUFF:       return "🛡️"
-		SkillData.SkillType.AOE:        return "💥"
-		SkillData.SkillType.DASH:       return "💨"
-	return "?"
+		SkillData.SkillType.PROJECTILE: return "投射"
+		SkillData.SkillType.BUFF:       return "增益"
+		SkillData.SkillType.AOE:        return "范围"
+		SkillData.SkillType.DASH:       return "位移"
+		SkillData.SkillType.SUMMON:     return "召唤"
+	return "法术"
+
+
+func _is_skill_unlocked(skill: SkillData) -> bool:
+	var player := get_tree().get_first_node_in_group("player") as Player
+	return not player or not player.mastery_manager or player.mastery_manager.is_spell_unlocked(skill)
+
+
+func _unlock_level(skill: SkillData) -> int:
+	var player := get_tree().get_first_node_in_group("player") as Player
+	return player.mastery_manager.get_spell_unlock_level(skill) if player and player.mastery_manager else 1
+
+
+func _school_name(school: int) -> String:
+	match school:
+		SkillMastery.School.DESTRUCTION: return "毁灭"
+		SkillMastery.School.CONJURATION: return "召唤"
+		SkillMastery.School.RESTORATION: return "恢复"
+		SkillMastery.School.ALTERATION: return "变化"
+		SkillMastery.School.ILLUSION: return "幻术"
+	return "精通"
 
 
 func _type_color(t: int) -> Color:

@@ -4,7 +4,10 @@ const SKILL_IDS: Array[String] = [
 	"fireball", "ice_armor", "flame_storm", "shadow_step", "ice_explosion",
 	"poison_cloud", "lightning_bolt", "summon_skeleton", "charged_fireball",
 	"ice_storm", "shadow_bolt", "frost_lance", "ember_orb", "storm_field",
-	"venom_burst", "arcane_dash",
+	"venom_burst", "arcane_dash", "cinder_volley", "solar_spear", "magma_pool",
+	"glacial_orb", "blizzard", "thunder_orb", "static_nova", "plague_bolt",
+	"miasma_ring", "tidal_orb", "phase_blink", "summon_wisp", "summon_golem",
+	"radiant_aegis",
 ]
 
 

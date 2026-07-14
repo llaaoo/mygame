@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="SkillUpgrade" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_upgrade.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "seeker"
+display_name = "追猎轨迹"
+description = "追踪强度提高，弹速略微降低。"
+branch = "追踪"
+max_rank = 3
+modifiers = {
+"homing_strength.flat": 1.4,
+"projectile_speed.multiplier": -0.05
+}

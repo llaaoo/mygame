@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="1"]
+[ext_resource type="Resource" path="res://content/visuals/frost_visual.tres" id="2"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/seeker.tres" id="3"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/piercing.tres" id="4"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/power.tres" id="5"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/synergies/steam_burst.tres" id="6"]
+
+[resource]
+script = ExtResource("1")
+id = "glacial_orb"
+display_name = "冰河之眼"
+icon_atlas_index = 7
+description = "缓慢追踪敌人的冰霜核心，可贯穿一个目标。"
+mechanics = "追踪与穿透；稳定施加冻结，并能扑灭燃烧触发蒸汽爆裂。"
+school = 3
+tier = 2
+role = "追踪控制"
+tags = ["ice", "projectile", "homing"]
+mp_cost = 18
+cooldown = 4.5
+damage = 32
+damage_scaling = 0.9
+archetype = "linear_projectile"
+visual = ExtResource("2")
+projectile_speed = 310.0
+projectile_pierce = 1
+projectile_lifetime = 4.5
+homing_strength = 2.2
+upgrades = [ExtResource("3"), ExtResource("4"), ExtResource("5")]
+synergies = [ExtResource("6")]

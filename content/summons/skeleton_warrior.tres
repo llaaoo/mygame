@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="SummonData" format=3 uid="uid://bbrq2p6h8xl86"]
+[gd_resource type="Resource" script_class="SummonData" load_steps=3 format=3 uid="uid://bbrq2p6h8xl86"]
 
 [ext_resource type="Script" uid="uid://bwtf52pg8wf3p" path="res://content/summons/summon_data.gd" id="1_px518"]
+[ext_resource type="Texture2D" path="res://content/art/pixel/actors/skeleton.tres" id="2_texture"]
 
 [resource]
 script = ExtResource("1_px518")
@@ -12,5 +13,8 @@ speed = 100.0
 attack_range = 35.0
 attack_cooldown = 1.2
 lifetime = 25.0
+texture = ExtResource("2_texture")
+color = Color(1, 1, 1, 1)
+scale = 0.24
 follow_distance = 70.0
 leash_distance = 450.0

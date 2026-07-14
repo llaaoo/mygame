@@ -1,9 +1,15 @@
-[gd_resource type="Resource" script_class="EquipmentData" format=3 uid="uid://dfnb1gfqime5h"]
+[gd_resource type="Resource" script_class="EquipmentData" load_steps=3 format=3 uid="uid://dfnb1gfqime5h"]
 
 [ext_resource type="Script" uid="uid://cfiekyb706cd4" path="res://gameplay/inventory/data/equipment_data.gd" id="1_h3a77"]
+[ext_resource type="Texture2D" path="res://content/art/pixel/items/armor.tres" id="2_icon"]
 
 [resource]
 script = ExtResource("1_h3a77")
+id = "leather_armor"
+icon = ExtResource("2_icon")
+description = "用多层硬化皮革缝制的轻甲，兼顾防护与活动空间。"
+rarity = 1
+sell_price = 24
 slot_type = 1
 stat_modifiers = {
 "max_hp": 25.0

@@ -5,12 +5,18 @@
 [ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/power.tres" id="3"]
 [ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/cadence.tres" id="4"]
 [ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/reach.tres" id="5"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/synergies/melt.tres" id="6"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/synergies/toxic_ignition.tres" id="7"]
 
 [resource]
 script = ExtResource("1")
 id = "ember_orb"
 display_name = "余烬球"
+icon_atlas_index = 4
 description = "发射缓慢但沉重的火焰核心，适合封锁狭窄通道。"
+mechanics = "慢速高伤；强化射程后能成为稳定的走位压迫工具。"
+tier = 3
+role = "重型投射物"
 tags = ["fire", "projectile", "heavy"]
 mp_cost = 24
 cooldown = 4.2
@@ -20,3 +26,4 @@ archetype = "linear_projectile"
 visual = ExtResource("2")
 projectile_speed = 330.0
 upgrades = [ExtResource("3"), ExtResource("4"), ExtResource("5")]
+synergies = [ExtResource("6"), ExtResource("7")]

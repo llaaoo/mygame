@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="1"]
+[ext_resource type="Resource" path="res://content/summons/stone_golem.tres" id="2"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/command.tres" id="3"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/cadence.tres" id="4"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/efficiency.tres" id="5"]
+
+[resource]
+script = ExtResource("1")
+id = "summon_golem"
+display_name = "召唤苔岩魔像"
+icon_atlas_index = 29
+description = "召唤坚固的苔岩魔像阻挡敌人。"
+mechanics = "高生命低机动召唤物；与余烬精灵形成前后排组合。"
+skill_type = 4
+school = 1
+tier = 4
+role = "前排召唤"
+tags = ["summon", "earth", "tank"]
+mp_cost = 44
+cooldown = 14.0
+damage = 0
+damage_scaling = 0.0
+archetype = "summon_entity"
+summon_data = ExtResource("2")
+upgrades = [ExtResource("3"), ExtResource("4"), ExtResource("5")]

@@ -49,5 +49,10 @@ modifier_bonuses = {
 
 [resource]
 script = ExtResource("1_tree")
+tree_id = "restoration"
+display_name = "恢复学派"
+description = "通过潮汐与辉光提供防护，同时为冰霜和闪电联动创造潮湿条件。"
 school = 2
+accent_color = Color(0.34, 0.82, 0.84, 1)
+skill_ids = ["tidal_orb", "radiant_aegis"]
 perks = [SubResource("Perk_Stability"), SubResource("Perk_Mending"), SubResource("Perk_Cleanse"), SubResource("Perk_Reserve")]

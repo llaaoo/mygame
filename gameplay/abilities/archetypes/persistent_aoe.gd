@@ -9,12 +9,18 @@ extends Area2D
 
 var caster: Node2D = null
 var _needs_setup: bool = true
+var _tick_interval: float = 0.0
+var _tick_elapsed: float = 0.0
+var _max_hits_per_target: int = 1
+var _hit_counts: Dictionary = {}
 
 
 ## 核心入口：SkillData 注入所有参数
 func setup(skill: SkillData, caster_node: Node2D) -> void:
 	caster = caster_node
 	damage = skill.damage  ## 会被 SkillExecutor 覆写为 resolve_damage()
+	_tick_interval = skill.aoe_tick_interval
+	_max_hits_per_target = skill.aoe_max_hits_per_target
 	
 	# skill.aoe_visual 优先，fallback 到旧字段
 	if skill.aoe_visual:
@@ -26,9 +32,11 @@ func setup(skill: SkillData, caster_node: Node2D) -> void:
 			spr.scale = Vector2(vis.scale, vis.scale)
 		var shape_node = $CollisionShape2D
 		if shape_node:
-			var shape = shape_node.shape
-			if shape and shape is CircleShape2D:
-				shape.radius = vis.radius
+			var shape := shape_node.shape as CircleShape2D
+			if not shape:
+				shape = CircleShape2D.new()
+				shape_node.shape = shape
+			shape.radius = vis.radius
 	else:
 		# @deprecated fallback
 		lifetime = skill.aoe_lifetime
@@ -38,9 +46,11 @@ func setup(skill: SkillData, caster_node: Node2D) -> void:
 			spr.scale = Vector2(skill.aoe_scale, skill.aoe_scale)
 		var shape_node = $CollisionShape2D
 		if shape_node:
-			var shape = shape_node.shape
-			if shape and shape is CircleShape2D:
-				shape.radius = skill.aoe_radius
+			var shape := shape_node.shape as CircleShape2D
+			if not shape:
+				shape = CircleShape2D.new()
+				shape_node.shape = shape
+			shape.radius = skill.aoe_radius
 	
 	
 	# 表面交互：AoE 生成 → 设置所在格表面状态
@@ -92,20 +102,39 @@ func set_caster(c: Node2D) -> void:
 	caster = c
 
 
-func _on_body_entered(body: Node2D) -> void:
-	if body == caster:
+func _physics_process(delta: float) -> void:
+	if _tick_interval <= 0.0:
 		return
-	if body.has_method("take_damage"):
-		_emit_hit_event(body)
-		# report_hit() 内部已调用 take_damage()
+	_tick_elapsed += delta
+	if _tick_elapsed < _tick_interval:
+		return
+	_tick_elapsed -= _tick_interval
+	for body in get_overlapping_bodies():
+		_try_hit(body)
+	for area in get_overlapping_areas():
+		var target := area if area.has_method("take_damage") else area.owner
+		_try_hit(target)
+
+
+func _on_body_entered(body: Node2D) -> void:
+	_try_hit(body)
 
 
 func _on_area_entered(area: Area2D) -> void:
 	# 检测 Area2D 子节点（如 MapObject 的 HitArea）
 	var owner := area.owner
-	if owner and owner.has_method("take_damage"):
-		_emit_hit_event(owner)
-		# report_hit() 内部已调用 take_damage()
+	_try_hit(owner)
+
+
+func _try_hit(target: Node) -> void:
+	if not target or target == caster or not target.has_method("take_damage"):
+		return
+	var target_id := target.get_instance_id()
+	var hits := int(_hit_counts.get(target_id, 0))
+	if hits >= _max_hits_per_target:
+		return
+	_hit_counts[target_id] = hits + 1
+	_emit_hit_event(target as Node2D)
 
 
 func _emit_hit_event(target: Node2D) -> void:

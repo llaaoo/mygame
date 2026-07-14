@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="AOEVisualData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://gameplay/abilities/visuals/aoe_visual_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+color = Color(1, 0.22, 0.04, 0.9)
+scale = 1.25
+radius = 110.0
+lifetime = 4.0

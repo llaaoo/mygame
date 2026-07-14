@@ -1,16 +1,20 @@
-[gd_resource type="Resource" script_class="SkillData" load_steps=6 format=3]
+[gd_resource type="Resource" script_class="SkillData" load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="1"]
 [ext_resource type="Resource" path="res://content/visuals/lightning_visual.tres" id="2"]
 [ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/power.tres" id="3"]
 [ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/cadence.tres" id="4"]
 [ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/reach.tres" id="5"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/synergies/conduction.tres" id="6"]
 
 [resource]
 script = ExtResource("1")
 id = "lightning_bolt"
 display_name = "闪电箭"
 description = "发射高速闪电，对潮湿表面产生元素反应。"
+icon_atlas_index = 12
+mechanics = "命中潮湿目标触发感电，造成额外伤害并可被雷场持续放大。"
+role = "高速点杀 / 感电起手"
 tags = ["lightning", "projectile"]
 mp_cost = 15
 cooldown = 3.0
@@ -20,3 +24,4 @@ archetype = "linear_projectile"
 visual = ExtResource("2")
 projectile_speed = 700.0
 upgrades = [ExtResource("3"), ExtResource("4"), ExtResource("5")]
+synergies = [ExtResource("6")]
