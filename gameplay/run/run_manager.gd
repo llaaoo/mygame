@@ -1,7 +1,7 @@
 class_name RunManager
 extends Node
 
-const NORMAL_ROOM_COUNT := 3
+const NORMAL_ROOM_COUNT := 4
 const REWARD_CHOICES := 3
 const ARENA_CENTER := Vector2(6000, 6000)
 const ARENA_SIZE := Vector2(1120, 720)
@@ -13,6 +13,7 @@ const OIL_BARREL_SCENE := preload("res://world/object/oil_barrel.tscn")
 const CRATE_SCENE := preload("res://world/object/wooden_crate.tscn")
 const CHEST_SCENE := preload("res://world/loot/chest.tscn")
 const SPIKE_TRAP_SCENE := preload("res://world/traps/spike_trap.tscn")
+const RUN_META_SCRIPT := preload("res://gameplay/run/run_meta.gd")
 
 const SKILL_REWARDS: Array[Dictionary] = [
 	{"id": "skill_lightning", "title": "闪电箭", "description": "将闪电箭装入一个快捷槽。", "type": "skill", "skill_id": "lightning_bolt"},
@@ -28,7 +29,15 @@ const STAT_REWARDS: Array[Dictionary] = [
 	{"id": "damage", "title": "锐化武器", "description": "近战伤害 +5。", "type": "damage", "amount": 5},
 ]
 
+const RELIC_REWARDS: Array[Dictionary] = [
+	{"id": "relic_firebrand", "title": "余烬指环", "description": "火焰技能伤害 +25%。", "type": "relic", "relic_id": "firebrand"},
+	{"id": "relic_stormcoil", "title": "风暴线圈", "description": "闪电技能伤害 +25%。", "type": "relic", "relic_id": "stormcoil"},
+	{"id": "relic_iron_heart", "title": "铁心护符", "description": "最大生命 +30，并恢复生命。", "type": "relic", "relic_id": "iron_heart"},
+]
+
 var state := RunState.new()
+var meta = RUN_META_SCRIPT.new()
+var persist_meta: bool = true
 var _rng := RandomNumberGenerator.new()
 var _player: Player = null
 var _scene_root: Node = null
@@ -36,8 +45,10 @@ var _room_root: Node2D = null
 var _alive_enemies: Array[Node] = []
 var _overlay_layer: CanvasLayer = null
 var _reward_panel: Control = null
+var _pause_panel: Control = null
 var _status_label: Label = null
 var _objective_label: Label = null
+var _meta_label: Label = null
 var _progress_labels: Array[Label] = []
 var _exit_area: Area2D = null
 var _exit_label: Label = null
@@ -47,7 +58,17 @@ var _room_origin := ARENA_CENTER
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	meta.load_from_disk()
 	call_deferred("_bootstrap")
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if not event.is_action_pressed("ui_cancel"):
+		return
+	if state.status not in [RunState.Status.RUNNING, RunState.Status.BOSS]:
+		return
+	_toggle_pause()
+	get_viewport().set_input_as_handled()
 
 
 func _bootstrap() -> void:
@@ -66,12 +87,16 @@ func _bootstrap() -> void:
 
 
 func _start_run() -> void:
+	get_tree().paused = false
+	_clear_pause_panel()
 	_rng.seed = Time.get_ticks_msec()
 	state.start(_rng.seed)
 	_room_origin = ARENA_CENTER
 	_player.global_position = _room_origin
 	_player.ui_blocked = false
+	_apply_meta_starting_bonus()
 	_remove_existing_encounter_actors()
+	_update_meta_display()
 	_spawn_normal_room()
 
 
@@ -97,20 +122,25 @@ func _spawn_normal_room() -> void:
 	_spawn_room_props(room_type)
 	_spawn_room_exit(false)
 
-	var count := 3 + state.room_index
+	var is_elite_room := room_type == "elite"
+	var count := 2 if is_elite_room else 3 + state.room_index
 	var radius := 230.0 + float(state.room_index) * 35.0
 	for i in range(count):
 		var enemy := ENEMY_SCENE.instantiate() as Enemy
 		enemy.name = "RunEnemy_%d_%d" % [state.room_index + 1, i + 1]
-		enemy.enemy_type = mini((i + state.room_index) % 3, 2)
+		enemy.enemy_type = 2 if is_elite_room else mini((i + state.room_index) % 3, 2)
 		if state.room_index >= 1 and i == count - 1:
 			enemy.enemy_type = 2
+		if is_elite_room:
+			enemy.max_hp = 90 + i * 20
+			enemy.attack_damage = 18 + i * 3
+			enemy.move_speed = 145.0
 		_room_root.add_child(enemy)
 		var angle := TAU * float(i) / float(count)
 		enemy.global_position = _room_origin + Vector2(cos(angle), sin(angle)) * radius
 		_track_enemy(enemy)
 
-	_show_status("房间 %d/%d" % [state.room_index + 1, NORMAL_ROOM_COUNT])
+	_show_status("精英房" if is_elite_room else "房间 %d/%d" % [state.room_index + 1, NORMAL_ROOM_COUNT])
 	_show_objective("清除全部敌人，打开出口。")
 	_update_progress()
 
@@ -145,8 +175,10 @@ func _normal_room_type(index: int) -> String:
 			return "barracks"
 		1:
 			return "traps"
-		_:
+		2:
 			return "explosive"
+		_:
+			return "elite"
 
 
 func _rebuild_room(room_type: String) -> void:
@@ -186,6 +218,9 @@ func _build_floor(room_type: String) -> void:
 		"explosive":
 			base_color = Color(0.13, 0.10, 0.08, 1.0)
 			accent = Color(0.36, 0.20, 0.12, 1.0)
+		"elite":
+			base_color = Color(0.11, 0.075, 0.13, 1.0)
+			accent = Color(0.48, 0.22, 0.48, 1.0)
 		"boss":
 			base_color = Color(0.12, 0.07, 0.06, 1.0)
 			accent = Color(0.48, 0.15, 0.08, 1.0)
@@ -265,6 +300,8 @@ func _room_name(room_type: String) -> String:
 			return "机关走廊"
 		"explosive":
 			return "油桶库房"
+		"elite":
+			return "重卫刑场"
 		"boss":
 			return "熔火审判厅"
 	return "未知房间"
@@ -287,6 +324,11 @@ func _spawn_room_props(room_type: String) -> void:
 			_spawn_barrel(Vector2(310, -170))
 			_spawn_crate(Vector2(-250, -180))
 			_spawn_chest(Vector2(420, 230))
+		"elite":
+			_spawn_barrel(Vector2(-130, 0))
+			_spawn_trap(Vector2(70, -190))
+			_spawn_trap(Vector2(70, 190))
+			_spawn_chest(Vector2(410, 0))
 		"boss":
 			_spawn_barrel(Vector2(-60, -210))
 			_spawn_barrel(Vector2(80, 210))
@@ -421,6 +463,13 @@ func _roll_rewards() -> Array[Dictionary]:
 	var pool: Array[Dictionary] = []
 	pool.append_array(SKILL_REWARDS)
 	pool.append_array(STAT_REWARDS)
+	for relic in RELIC_REWARDS:
+		if not state.relic_ids.has(str(relic.get("relic_id", ""))):
+			pool.append(relic)
+	if _normal_room_type(state.room_index) == "elite":
+		for relic in RELIC_REWARDS:
+			if not state.relic_ids.has(str(relic.get("relic_id", ""))):
+				pool.append(relic)
 	var choices: Array[Dictionary] = []
 	while choices.size() < REWARD_CHOICES and not pool.is_empty():
 		var idx := _rng.randi_range(0, pool.size() - 1)
@@ -516,6 +565,46 @@ func _apply_reward(reward: Dictionary) -> void:
 		"damage":
 			if _player.combat_component:
 				_player.combat_component.attack_damage += int(reward.get("amount", 0))
+		"relic":
+			_apply_relic(str(reward.get("relic_id", "")))
+	_update_meta_display()
+
+
+func _apply_relic(relic_id: String) -> void:
+	if relic_id.is_empty() or state.relic_ids.has(relic_id):
+		return
+	state.record_relic(relic_id)
+	match relic_id:
+		"firebrand":
+			_add_tag_multiplier(["fire"], 1.25)
+		"stormcoil":
+			_add_tag_multiplier(["lightning"], 1.25)
+		"iron_heart":
+			var health := _player.health_component
+			health.max_hp += 30
+			_player.heal(30)
+
+
+func _add_tag_multiplier(tags: Array[String], multiplier: float) -> void:
+	if not _player or not _player.skill_manager or not _player.skill_manager.executor:
+		return
+	var modifier := TagMultiplierModifier.new()
+	modifier.required_tags = tags
+	modifier.multiplier = multiplier
+	_player.skill_manager.executor.add_modifier(modifier)
+
+
+func _apply_meta_starting_bonus() -> void:
+	if not _player:
+		return
+	var health_bonus: int = meta.starting_health_bonus()
+	if health_bonus > 0:
+		_player.health_component.max_hp += health_bonus
+		_player.heal(health_bonus)
+	var mana_bonus: int = meta.starting_mana_bonus()
+	if mana_bonus > 0 and _player.mana_component:
+		_player.mana_component.max_mp += mana_bonus
+		_player.restore_mp(mana_bonus)
 
 
 func _apply_skill_reward(skill_id: String) -> void:
@@ -568,19 +657,23 @@ func _first_reward_slot() -> int:
 
 func _complete_run() -> void:
 	state.status = RunState.Status.CLEARED
+	var cinders: int = _finish_meta_run(true)
+	_update_meta_display()
 	if _player:
 		_player.ui_blocked = true
 	_show_status("Run 通关")
 	_show_objective("你击败了火焰领主。")
-	_show_result_panel("通关", "你完成了这次地牢探索。", "重新开始")
+	_show_result_panel("通关", "你完成了这次地牢探索。\n获得 %d 余烬。" % cinders, "重新开始")
 
 
 func _on_player_died() -> void:
 	if state.status == RunState.Status.CLEARED or state.status == RunState.Status.FAILED:
 		return
 	state.status = RunState.Status.FAILED
+	var cinders: int = _finish_meta_run(false)
+	_update_meta_display()
 	_show_status("Run 失败")
-	_show_result_panel("失败", "本次探索结束。", "重新开始")
+	_show_result_panel("失败", "本次探索结束。\n带回 %d 余烬。" % cinders, "重新开始")
 
 
 func _show_result_panel(title_text: String, body_text: String, button_text: String) -> void:
@@ -622,6 +715,39 @@ func _show_result_panel(title_text: String, body_text: String, button_text: Stri
 	body.add_theme_font_size_override("font_size", 16)
 	box.add_child(body)
 
+	var upgrades := HBoxContainer.new()
+	upgrades.alignment = BoxContainer.ALIGNMENT_CENTER
+	upgrades.add_theme_constant_override("separation", 10)
+	box.add_child(upgrades)
+
+	var vitality := Button.new()
+	vitality.custom_minimum_size = Vector2(190, 54)
+	upgrades.add_child(vitality)
+
+	var focus := Button.new()
+	focus.custom_minimum_size = Vector2(190, 54)
+	upgrades.add_child(focus)
+
+	var refresh_upgrades := func() -> void:
+		vitality.text = "生命强化 %d/%d\n%d 余烬" % [meta.vitality_rank, RUN_META_SCRIPT.MAX_UPGRADE_RANK, meta.upgrade_cost("vitality")]
+		focus.text = "法力强化 %d/%d\n%d 余烬" % [meta.focus_rank, RUN_META_SCRIPT.MAX_UPGRADE_RANK, meta.upgrade_cost("focus")]
+		vitality.disabled = not meta.can_upgrade("vitality")
+		focus.disabled = not meta.can_upgrade("focus")
+	refresh_upgrades.call()
+
+	vitality.pressed.connect(func() -> void:
+		if meta.purchase_upgrade("vitality"):
+			body.text = "%s\n生命强化将在下一局生效。" % body_text
+			refresh_upgrades.call()
+			_update_meta_display()
+	)
+	focus.pressed.connect(func() -> void:
+		if meta.purchase_upgrade("focus"):
+			body.text = "%s\n法力强化将在下一局生效。" % body_text
+			refresh_upgrades.call()
+			_update_meta_display()
+	)
+
 	var restart := Button.new()
 	restart.text = button_text
 	restart.custom_minimum_size = Vector2(0, 44)
@@ -632,6 +758,74 @@ func _show_result_panel(title_text: String, body_text: String, button_text: Stri
 
 	_reward_panel = dim
 	_overlay_layer.add_child(dim)
+
+
+func _toggle_pause() -> void:
+	if _pause_panel and is_instance_valid(_pause_panel):
+		get_tree().paused = false
+		_clear_pause_panel()
+		return
+	get_tree().paused = true
+
+	var dim := ColorRect.new()
+	dim.name = "RunPauseDim"
+	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	dim.color = Color(0, 0, 0, 0.52)
+	dim.process_mode = Node.PROCESS_MODE_ALWAYS
+
+	var panel := PanelContainer.new()
+	panel.name = "RunPausePanel"
+	panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	panel.custom_minimum_size = Vector2(360, 230)
+	panel.position = Vector2(-180, -115)
+	panel.process_mode = Node.PROCESS_MODE_ALWAYS
+	panel.add_theme_stylebox_override("panel", _panel_style(Color(0.055, 0.06, 0.075, 0.98), Color(0.48, 0.62, 0.74, 0.72), 2))
+	dim.add_child(panel)
+
+	var margin := MarginContainer.new()
+	margin.add_theme_constant_override("margin_left", 22)
+	margin.add_theme_constant_override("margin_right", 22)
+	margin.add_theme_constant_override("margin_top", 20)
+	margin.add_theme_constant_override("margin_bottom", 20)
+	panel.add_child(margin)
+
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 12)
+	margin.add_child(box)
+
+	var title := Label.new()
+	title.text = "暂停"
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.add_theme_font_size_override("font_size", 28)
+	title.modulate = Color(0.92, 0.94, 0.97, 1.0)
+	box.add_child(title)
+
+	var resume := Button.new()
+	resume.text = "继续"
+	resume.custom_minimum_size = Vector2(0, 42)
+	resume.pressed.connect(_toggle_pause)
+	box.add_child(resume)
+
+	var abandon := Button.new()
+	abandon.text = "放弃本局"
+	abandon.custom_minimum_size = Vector2(0, 42)
+	abandon.pressed.connect(_abandon_run)
+	box.add_child(abandon)
+
+	_pause_panel = dim
+	_overlay_layer.add_child(dim)
+
+
+func _abandon_run() -> void:
+	if state.status not in [RunState.Status.RUNNING, RunState.Status.BOSS]:
+		return
+	get_tree().paused = false
+	_clear_pause_panel()
+	state.status = RunState.Status.FAILED
+	var cinders: int = _finish_meta_run(false)
+	_update_meta_display()
+	_show_status("Run 放弃")
+	_show_result_panel("本局结束", "你带回了 %d 余烬。" % cinders, "重新开始")
 
 
 func _create_overlay() -> void:
@@ -684,6 +878,12 @@ func _create_overlay() -> void:
 	_objective_label.modulate = Color(0.86, 0.88, 0.90, 0.95)
 	box.add_child(_objective_label)
 
+	_meta_label = Label.new()
+	_meta_label.add_theme_font_size_override("font_size", 12)
+	_meta_label.modulate = Color(0.62, 0.72, 0.78, 0.95)
+	box.add_child(_meta_label)
+	_update_meta_display()
+
 
 func _show_status(text: String) -> void:
 	if _status_label:
@@ -706,10 +906,31 @@ func _update_progress() -> void:
 			label.modulate = Color(0.55, 0.57, 0.60, 0.7)
 
 
+func _update_meta_display() -> void:
+	if not _meta_label:
+		return
+	var relics := "无"
+	if not state.relic_ids.is_empty():
+		relics = ", ".join(state.relic_ids)
+	_meta_label.text = "余烬 %d | 通关 %d | 遗物 %s | 常驻 HP %d MP %d" % [meta.cinders, meta.clears, relics, meta.vitality_rank, meta.focus_rank]
+
+
+func _finish_meta_run(cleared: bool) -> int:
+	if not persist_meta:
+		return state.completed_rooms * 2 + (10 if cleared else 0)
+	return meta.finish_run(state.completed_rooms, cleared)
+
+
 func _clear_reward_panel() -> void:
 	if _reward_panel and is_instance_valid(_reward_panel):
 		_reward_panel.queue_free()
 	_reward_panel = null
+
+
+func _clear_pause_panel() -> void:
+	if _pause_panel and is_instance_valid(_pause_panel):
+		_pause_panel.queue_free()
+	_pause_panel = null
 
 
 func _rect_poly(center: Vector2, size: Vector2, color: Color) -> Polygon2D:

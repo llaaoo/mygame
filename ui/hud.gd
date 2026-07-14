@@ -213,6 +213,10 @@ func _on_mp_changed(current_mp: int, max_mp: int) -> void:
 
 
 func _on_player_died() -> void:
+	var scene := get_tree().current_scene
+	var run_manager := scene.get_node_or_null("RunManager") as RunManager if scene else null
+	if run_manager and run_manager.state.status in [RunState.Status.RUNNING, RunState.Status.BOSS, RunState.Status.REWARD]:
+		return
 	_death_active = true
 	for child in get_tree().current_scene.get_children():
 		if child is CanvasLayer and child != self:

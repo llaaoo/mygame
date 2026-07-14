@@ -19,13 +19,25 @@ func _init() -> void:
 		push_error("RunManager missing")
 		quit(1)
 		return
+	run_manager.persist_meta = false
 
 	if run_manager.state.status != RunState.Status.RUNNING:
 		push_error("Run did not start")
 		quit(1)
 		return
 
-	for i in range(3):
+	run_manager._toggle_pause()
+	if not paused or not run_manager._pause_panel:
+		push_error("Pause overlay did not open")
+		quit(1)
+		return
+	run_manager._toggle_pause()
+	if paused or run_manager._pause_panel:
+		push_error("Pause overlay did not close")
+		quit(1)
+		return
+
+	for i in range(RunManager.NORMAL_ROOM_COUNT):
 		run_manager._alive_enemies.clear()
 		run_manager._check_room_clear()
 		await process_frame
@@ -45,6 +57,20 @@ func _init() -> void:
 
 	if run_manager.state.status != RunState.Status.BOSS:
 		push_error("Boss room did not start")
+		quit(1)
+		return
+	if not run_manager._room_root.get_node_or_null("RunBoss_FireLord"):
+		push_error("Boss room did not instantiate Fire Lord")
+		quit(1)
+		return
+
+	run_manager._apply_relic("firebrand")
+	if not run_manager.state.relic_ids.has("firebrand"):
+		push_error("Relic was not recorded")
+		quit(1)
+		return
+	if run_manager._player.skill_manager.executor.modifiers_by_stage[DamageModifier.Stage.MULTIPLY].is_empty():
+		push_error("Relic did not register a damage modifier")
 		quit(1)
 		return
 

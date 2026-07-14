@@ -4,3 +4,4 @@
 .gamedev_ai/history
 /demo/
 /godot_state_charts_examples/
+/addons/limboai/bin/~*.dll
