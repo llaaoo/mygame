@@ -11,6 +11,7 @@ static var instance: SurfaceManager = null
 ## 依赖注入
 var _surface_scheduler: SurfaceScheduler = null
 var _spatial_index: WorldSpatialIndex = null
+var _propagation_scheduler: PropagationScheduler = null
 
 ## ReactionRule 表（按 required_state 索引，加速查找）
 var _reactions: Dictionary = {}  ## String(state) → Array[SurfaceReaction]
@@ -25,9 +26,10 @@ func _exit_tree() -> void:
 		instance = null
 
 
-func setup(scheduler: SurfaceScheduler, spatial: WorldSpatialIndex) -> void:
+func setup(scheduler: SurfaceScheduler, spatial: WorldSpatialIndex, propagation: PropagationScheduler = null) -> void:
 	_surface_scheduler = scheduler
 	_spatial_index = spatial
+	_propagation_scheduler = propagation
 
 
 ## 注册 ReactionRule
@@ -61,6 +63,9 @@ func apply_tags(cell: Vector2i, tags: Array[String], source: String = "") -> boo
 func _apply_reaction(cell: Vector2i, rule: SurfaceReaction, tags: Array[String], source: String) -> void:
 	# 更新表面状态
 	_surface_scheduler.set_surface(cell, rule.result_state, rule.result_duration, source)
+	if rule.spread_to_neighbors and _propagation_scheduler:
+		for neighbor in _neighbor_cells(cell):
+			_propagation_scheduler.enqueue(cell, neighbor, rule.spread_damage, 1, rule.spread_tags)
 	
 	print("🧪 Surface: %s + %s → %s (%.1fs) [%s]" % [rule.required_state, tags, rule.result_state, rule.result_duration, source])
 	
@@ -73,6 +78,10 @@ func _apply_reaction(cell: Vector2i, rule: SurfaceReaction, tags: Array[String],
 				var buff := load(rule.entity_status_path) as Buff
 				if buff:
 					bm.apply_buff(buff)
+
+
+func _neighbor_cells(cell: Vector2i) -> Array[Vector2i]:
+	return [cell + Vector2i.LEFT, cell + Vector2i.RIGHT, cell + Vector2i.UP, cell + Vector2i.DOWN]
 
 
 ## 获取 cell 上实体应受的 Buff 路径列表（供 InteractionSystem tick 使用）

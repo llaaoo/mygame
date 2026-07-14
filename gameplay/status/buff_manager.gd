@@ -52,6 +52,8 @@ func apply_buff(buff: Buff) -> void:
 				var current: int = int(_stacks.get(stacked, 1))
 				if current < stacked.max_stacks:
 					_stacks[stacked] = current + 1
+					# Attribute and speed effects must scale with intensity stacks too.
+					stacked.apply_to(get_parent())
 				_refresh_buff(stacked, stacked.duration)
 				buffs_changed.emit()
 				return
@@ -73,7 +75,9 @@ func apply_buff(buff: Buff) -> void:
 func remove_buff(buff: Buff) -> void:
 	if not buff or buff not in _active_buffs:
 		return
-	buff.remove_from(get_parent())
+	var stacks: int = int(_stacks.get(buff, 1))
+	for _stack in range(stacks):
+		buff.remove_from(get_parent())
 	_active_buffs.erase(buff)
 	_buff_remaining.erase(buff)
 	_stacks.erase(buff)
@@ -153,6 +157,8 @@ func restore_state(entries: Array[Dictionary]) -> void:
 		if runtime_buff.duration > 0.0:
 			_buff_remaining[runtime_buff] = float(entry.get("remaining", runtime_buff.duration))
 		_stacks[runtime_buff] = int(entry.get("stacks", 1))
+		for _stack in range(maxi(0, _stacks[runtime_buff] - 1)):
+			runtime_buff.apply_to(get_parent())
 		if runtime_buff.tick_interval > 0.0:
 			_tick_elapsed[runtime_buff] = float(entry.get("tick_elapsed", 0.0))
 

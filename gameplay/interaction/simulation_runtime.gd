@@ -45,7 +45,7 @@ func setup_dependencies(spatial_index: WorldSpatialIndex, state_manager: WorldSt
 	# SurfaceManager 作为外观层
 	_surface_manager = SurfaceManager.new()
 	_surface_manager.name = "SurfaceManager"
-	_surface_manager.setup(_surface_scheduler, spatial_index)
+	_surface_manager.setup(_surface_scheduler, spatial_index, _propagation_scheduler)
 	add_child(_surface_manager)
 	
 	# 注册默认 ReactionRule
