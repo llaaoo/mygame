@@ -461,7 +461,9 @@ func _enter_reward_state() -> void:
 
 func _roll_rewards() -> Array[Dictionary]:
 	var pool: Array[Dictionary] = []
-	pool.append_array(SKILL_REWARDS)
+	for skill_reward in SKILL_REWARDS:
+		if not state.rewards_taken.has(str(skill_reward.get("id", ""))):
+			pool.append(skill_reward)
 	pool.append_array(STAT_REWARDS)
 	for relic in RELIC_REWARDS:
 		if not state.relic_ids.has(str(relic.get("relic_id", ""))):
@@ -471,10 +473,15 @@ func _roll_rewards() -> Array[Dictionary]:
 			if not state.relic_ids.has(str(relic.get("relic_id", ""))):
 				pool.append(relic)
 	var choices: Array[Dictionary] = []
+	var chosen_ids: Array[String] = []
 	while choices.size() < REWARD_CHOICES and not pool.is_empty():
 		var idx := _rng.randi_range(0, pool.size() - 1)
 		var reward: Dictionary = pool.pop_at(idx)
+		var reward_id := str(reward.get("id", ""))
+		if chosen_ids.has(reward_id):
+			continue
 		choices.append(reward)
+		chosen_ids.append(reward_id)
 	return choices
 
 

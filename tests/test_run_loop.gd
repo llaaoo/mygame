@@ -52,6 +52,14 @@ func _init() -> void:
 			push_error("Room %d produced no rewards" % (i + 1))
 			quit(1)
 			return
+		var reward_ids: Array[String] = []
+		for reward in choices:
+			var reward_id := str(reward.get("id", ""))
+			if reward_ids.has(reward_id):
+				push_error("Room %d produced duplicate reward cards" % (i + 1))
+				quit(1)
+				return
+			reward_ids.append(reward_id)
 		run_manager._on_reward_selected(choices[0])
 		await process_frame
 

@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://c24d5y8qltinq"]
 
 [ext_resource type="Script" uid="uid://b5fgdlpuricni" path="res://world/object/spike_trap.gd" id="1_twutp"]
-[ext_resource type="Shape2D" uid="uid://dh4i8g8u5dc6" path="res://world/traps/trap_shape.tres" id="2_oktx0"]
+[ext_resource type="Shape2D" path="res://world/traps/trap_shape.tres" id="2_oktx0"]
 [ext_resource type="Texture2D" path="res://content/art/placeholders/spike_trap_marker.png" id="2_snoxh"]
 
 [node name="SpikeTrap" type="Area2D" unique_id=1007731522]

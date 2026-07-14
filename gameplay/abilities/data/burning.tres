@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="Buff" format=3 uid="uid://bkapqttcs8wwn"]
 
-[ext_resource type="Script" uid="uid://c2ye4olqmm32c" path="res://gameplay/status/buff.gd" id="1_k5jbb"]
+[ext_resource type="Script" path="res://gameplay/status/buff.gd" id="1_k5jbb"]
 
 [resource]
 script = ExtResource("1_k5jbb")
