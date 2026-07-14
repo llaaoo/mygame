@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="SkillUpgrade" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_upgrade.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "duration"
+display_name = "持久塑形"
+description = "增益持续时间提高 30%。"
+branch = "持续"
+max_rank = 3
+modifiers = {
+"buff_duration.multiplier": 0.3
+}

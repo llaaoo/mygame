@@ -54,6 +54,7 @@ class PlayerData:
 	var skill_right: String = ""
 	var skill_slots: Array[String] = []
 	var skill_cooldowns: Dictionary = {}
+	var skill_upgrade_state: Dictionary = {}
 	var mastery_state: Dictionary = {}
 	var buff_state: Array[Dictionary] = []
 
@@ -77,6 +78,7 @@ class PlayerData:
 			"skill_right": skill_right,
 			"skill_slots": skill_slots,
 			"skill_cooldowns": skill_cooldowns,
+			"skill_upgrade_state": skill_upgrade_state,
 			"mastery_state": mastery_state,
 			"buff_state": buff_state,
 		}
@@ -102,6 +104,7 @@ class PlayerData:
 		player.skill_right = data.get("skill_right", "")
 		player.skill_slots = SaveData._string_array(data.get("skill_slots", []))
 		player.skill_cooldowns = data.get("skill_cooldowns", {})
+		player.skill_upgrade_state = data.get("skill_upgrade_state", {})
 		player.mastery_state = data.get("mastery_state", {})
 		player.buff_state = data.get("buff_state", []) as Array[Dictionary]
 		return player

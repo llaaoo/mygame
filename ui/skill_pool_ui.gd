@@ -30,6 +30,7 @@ func setup(pool: SkillPool, sm: SkillManager) -> void:
 	_skill_manager = sm
 	sm.hand_changed.connect(_on_hand_changed)
 	sm.slot_changed.connect(_on_slot_changed)
+	sm.skill_upgraded.connect(_on_skill_upgraded)
 
 
 func toggle() -> void:
@@ -133,6 +134,7 @@ func _add_equip_slot(parent: Control, source: String, label: String) -> void:
 	var panel := PanelContainer.new()
 	panel.custom_minimum_size = Vector2(200, 40)
 	panel.add_theme_stylebox_override("panel", _make_slot_bg())
+	panel.set_meta("display_label", label)
 	parent.add_child(panel)
 	_equip_slots.append(panel)
 	_equip_sources.append(source)
@@ -205,6 +207,10 @@ func _on_slot_changed(_idx: int) -> void:
 	if visible: _refresh_all()
 
 
+func _on_skill_upgraded(_source: String, _skill: SkillData, _upgrade_id: String, _rank: int) -> void:
+	if visible: _refresh_all()
+
+
 ## ── 刷新 ──
 
 func _refresh_all() -> void:
@@ -248,7 +254,7 @@ func _make_skill_card(skill: SkillData) -> PanelContainer:
 	vbox.add_child(nm)
 
 	var tp := Label.new()
-	tp.text = _type_name(skill.skill_type)
+	tp.text = "%s · %d 路" % [_type_name(skill.skill_type), skill.upgrades.size()]
 	tp.add_theme_font_size_override("font_size", 9)
 	tp.add_theme_color_override("font_color", _type_color(skill.skill_type))
 	tp.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -270,32 +276,40 @@ func _refresh_equip_slots() -> void:
 		var src := _equip_sources[i]
 		var panel := _equip_slots[i]
 		var skill: SkillData = null
+		var inst: SkillInstance = null
 		match src:
 			"left":
 				if _skill_manager.left_hand:
-					skill = _skill_manager.left_hand.data
+					inst = _skill_manager.left_hand
 			"right":
 				if _skill_manager.right_hand:
-					skill = _skill_manager.right_hand.data
+					inst = _skill_manager.right_hand
 			_:
-				var inst := _skill_manager.get_slot(src.trim_prefix("slot_").to_int())
-				if inst:
-					skill = inst.data
+				inst = _skill_manager.get_slot(src.trim_prefix("slot_").to_int())
+		if inst:
+			skill = inst.data
 
 		var hbox := panel.get_child(0) as HBoxContainer
 		var tex := hbox.get_node("Icon") as TextureRect
 		var vbox := hbox.get_child(1) as VBoxContainer
 		var name_lbl := vbox.get_node("Name") as Label
+		var sub_lbl := vbox.get_node("Sub") as Label
+		var display_label := str(panel.get_meta("display_label", ""))
 
 		if skill:
 			if skill.icon: tex.texture = skill.icon; tex.modulate = Color(1,1,1,1)
 			else: tex.texture = null; tex.modulate = Color(1,1,1,0.3)
 			name_lbl.text = skill.display_name
+			var total_ranks := 0
+			for rank in inst.upgrade_ranks.values():
+				total_ranks += int(rank)
+			sub_lbl.text = "%s | 强化 %d" % [display_label, total_ranks]
 		else:
 			tex.texture = null; tex.modulate = Color(1,1,1,0.1)
 			name_lbl.text = "空"
+			sub_lbl.text = display_label
 
-		if _selected_skill and skill == _selected_skill:
+		if _selected_skill and skill and skill.get_id() == _selected_skill.get_id():
 			panel.add_theme_stylebox_override("panel", _make_slot_bg(Color(0.3, 0.5, 0.3)))
 		else:
 			panel.add_theme_stylebox_override("panel", _make_slot_bg())

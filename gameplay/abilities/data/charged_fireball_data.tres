@@ -1,16 +1,24 @@
-[gd_resource type="Resource" script_class="SkillData" format=3 uid="uid://b3whcc31e4dm4"]
+[gd_resource type="Resource" script_class="SkillData" load_steps=6 format=3]
 
-[ext_resource type="Script" uid="uid://5yw1untw6sop" path="res://gameplay/abilities/data/skill_data.gd" id="1_spyyv"]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="1"]
+[ext_resource type="Resource" path="res://content/visuals/fire_visual.tres" id="2"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/power.tres" id="3"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/cadence.tres" id="4"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/reach.tres" id="5"]
 
 [resource]
-script = ExtResource("1_spyyv")
+script = ExtResource("1")
 id = "charged_fireball"
 display_name = "蓄力火球"
+description = "蓄力后释放高威力火球；提前释放会降低伤害和体积。"
 cast_type = "charge"
 charge_duration = 1.2
+tags = ["fire", "projectile", "charge"]
 mp_cost = 20
 cooldown = 3.0
 damage = 40
 damage_scaling = 1.2
 archetype = "linear_projectile"
+visual = ExtResource("2")
 projectile_speed = 600.0
+upgrades = [ExtResource("3"), ExtResource("4"), ExtResource("5")]

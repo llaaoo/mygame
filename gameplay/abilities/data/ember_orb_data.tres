@@ -1,22 +1,22 @@
 [gd_resource type="Resource" script_class="SkillData" load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="1"]
-[ext_resource type="Resource" path="res://content/visuals/lightning_visual.tres" id="2"]
+[ext_resource type="Resource" path="res://content/visuals/ember_visual.tres" id="2"]
 [ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/power.tres" id="3"]
 [ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/cadence.tres" id="4"]
 [ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/reach.tres" id="5"]
 
 [resource]
 script = ExtResource("1")
-id = "lightning_bolt"
-display_name = "闪电箭"
-description = "发射高速闪电，对潮湿表面产生元素反应。"
-tags = ["lightning", "projectile"]
-mp_cost = 15
-cooldown = 3.0
-damage = 35
-damage_scaling = 1.2
+id = "ember_orb"
+display_name = "余烬球"
+description = "发射缓慢但沉重的火焰核心，适合封锁狭窄通道。"
+tags = ["fire", "projectile", "heavy"]
+mp_cost = 24
+cooldown = 4.2
+damage = 58
+damage_scaling = 1.35
 archetype = "linear_projectile"
 visual = ExtResource("2")
-projectile_speed = 700.0
+projectile_speed = 330.0
 upgrades = [ExtResource("3"), ExtResource("4"), ExtResource("5")]

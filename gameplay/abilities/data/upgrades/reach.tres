@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="SkillUpgrade" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_upgrade.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "reach"
+display_name = "远射"
+description = "弹体速度提高 25%，生成距离提高 15%。"
+branch = "射程"
+max_rank = 3
+modifiers = {
+"cast_distance.multiplier": 0.15,
+"projectile_speed.multiplier": 0.25
+}

@@ -1,6 +1,25 @@
 extends CharacterBody2D
 class_name Player
 
+const PLAYER_SKILL_IDS: Array[String] = [
+	"fireball",
+	"ice_armor",
+	"flame_storm",
+	"shadow_step",
+	"ice_explosion",
+	"poison_cloud",
+	"lightning_bolt",
+	"summon_skeleton",
+	"charged_fireball",
+	"ice_storm",
+	"shadow_bolt",
+	"frost_lance",
+	"ember_orb",
+	"storm_field",
+	"venom_burst",
+	"arcane_dash",
+]
+
 ## ── 移动基础值（最终速度 = 基础 + 敏捷加成） ──
 @export var base_move_speed: float = 300.0
 
@@ -202,103 +221,15 @@ func restore_mp(amount: int) -> void:
 ## ── 技能初始化 ──
 
 func _setup_skills() -> void:
-	# 1. 加载技能池（注册表）
-	_skill_pool = load("res://gameplay/abilities/registry/player_skill_pool.tres") as SkillPool
-	if not _skill_pool:
-		_skill_pool = SkillPool.new()
-
-	# 2. 确保所有技能在池中（纯数据，archetype 驱动场景加载）
-	if not _skill_pool.has_skill("fireball"):
-		var fireball := load("res://gameplay/abilities/data/fireball_data.tres") as SkillData
-		if fireball:
-			fireball.archetype = "linear_projectile"
-			fireball.visual = load("res://content/visuals/fire_visual.tres")
-			fireball.projectile_speed = 500.0
-			fireball.damage = 25
-			fireball.damage_scaling = 1.0
-			fireball.mp_cost = 15
-			fireball.skill_type = SkillData.SkillType.PROJECTILE
-			fireball.tags = ["fire"]
-			_skill_pool.add_skill(fireball)
-
-	for sid in ["ice_armor", "flame_storm", "shadow_step", "ice_explosion", "poison_cloud", "lightning_bolt", "summon_skeleton", "charged_fireball", "ice_storm"]:
-		if not _skill_pool.has_skill(sid):
-			var skill := load("res://gameplay/abilities/data/%s_data.tres" % sid) as SkillData
-			if skill:
-				match sid:
-					"ice_armor":
-						skill.buff_resource = load("res://gameplay/abilities/data/ice_armor_buff.tres") as Buff
-						skill.tags = ["ice"]
-					"flame_storm":
-						skill.archetype = "persistent_aoe"
-						skill.aoe_visual = load("res://content/visuals/fire_aoe_visual.tres")
-						skill.cast_distance = 150.0
-						skill.damage = 30
-						skill.damage_scaling = 1.2
-						skill.tags = ["fire"]
-					"shadow_step":
-						skill.buff_resource = load("res://gameplay/abilities/data/shadow_step_buff.tres") as Buff
-						skill.tags = ["shadow"]
-					"ice_explosion":
-						skill.archetype = "persistent_aoe"
-						skill.aoe_visual = load("res://content/visuals/ice_aoe_visual.tres")
-						skill.damage = 25
-						skill.damage_scaling = 0.8
-						skill.mp_cost = 20
-						skill.cooldown = 8.0
-						skill.tags = ["ice", "aoe"]
-					"poison_cloud":
-						skill.archetype = "persistent_aoe"
-						skill.aoe_visual = load("res://content/visuals/poison_aoe_visual.tres")
-						skill.cast_distance = 200.0
-						skill.damage = 15
-						skill.damage_scaling = 0.6
-						skill.mp_cost = 25
-						skill.cooldown = 6.0
-						skill.tags = ["poison"]
-					"lightning_bolt":
-						skill.archetype = "linear_projectile"
-						skill.visual = load("res://content/visuals/lightning_visual.tres")
-						skill.projectile_speed = 600.0
-						skill.damage = 35
-						skill.damage_scaling = 1.2
-						skill.mp_cost = 15
-						skill.cooldown = 3.0
-						skill.tags = ["lightning"]
-					"summon_skeleton":
-						skill.archetype = "summon_entity"
-						skill.summon_data = load("res://content/summons/skeleton_warrior.tres") as SummonData
-						skill.mp_cost = 30
-						skill.cooldown = 8.0
-						skill.damage = 0
-						skill.damage_scaling = 0.0
-						skill.tags = ["summon", "shadow"]
-					"charged_fireball":
-						skill.archetype = "linear_projectile"
-						skill.visual = load("res://content/visuals/fire_visual.tres")
-						skill.projectile_speed = 600.0
-						skill.damage = 40
-						skill.damage_scaling = 1.2
-						skill.mp_cost = 20
-						skill.cooldown = 3.0
-						skill.cast_type = "charge"
-						skill.charge_duration = 1.2
-						skill.tags = ["fire", "charge"]
-					"ice_storm":
-						skill.archetype = "persistent_aoe"
-						skill.aoe_visual = load("res://content/visuals/ice_aoe_visual.tres")
-						skill.cast_distance = 200.0
-						skill.damage = 12
-						skill.damage_scaling = 0.4
-						skill.mp_cost = 0
-						skill.cooldown = 0.0
-						skill.cast_type = "channel"
-						skill.channel_mp_per_sec = 15.0
-						skill.channel_tick_interval = 0.4
-						skill.aoe_radius = 60.0
-						skill.aoe_lifetime = 0.3
-						skill.tags = ["ice", "channel"]
-				_skill_pool.add_skill(skill)
+	var pool_template := load("res://gameplay/abilities/registry/player_skill_pool.tres") as SkillPool
+	_skill_pool = pool_template.duplicate(true) as SkillPool if pool_template else SkillPool.new()
+	_skill_pool.build()
+	for skill_id in PLAYER_SKILL_IDS:
+		if _skill_pool.has_skill(skill_id):
+			continue
+		var skill := load("res://gameplay/abilities/data/%s_data.tres" % skill_id) as SkillData
+		if skill:
+			_skill_pool.add_skill(skill)
 
 	# 3. 构建索引
 	_skill_pool.build()

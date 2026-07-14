@@ -1,24 +1,25 @@
 [gd_resource type="Resource" script_class="SkillData" load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="1"]
-[ext_resource type="Resource" path="res://content/visuals/ice_aoe_visual.tres" id="2"]
+[ext_resource type="Resource" path="res://content/visuals/venom_burst_visual.tres" id="2"]
 [ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/power.tres" id="3"]
 [ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/area.tres" id="4"]
 [ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/cadence.tres" id="5"]
 
 [resource]
 script = ExtResource("1")
-id = "ice_explosion"
-display_name = "冰爆"
-description = "在自身周围引爆寒气，对近身敌人造成冰霜伤害。"
+id = "venom_burst"
+display_name = "剧毒爆发"
+description = "引爆短暂的大范围毒雾，以持续时间换取爆发覆盖。"
 skill_type = 2
-tags = ["ice", "aoe"]
-mp_cost = 20
-cooldown = 8.0
-damage = 25
-damage_scaling = 0.8
+tags = ["poison", "aoe", "burst"]
+mp_cost = 21
+cooldown = 5.0
+damage = 36
+damage_scaling = 1.0
 archetype = "persistent_aoe"
 aoe_visual = ExtResource("2")
-cast_distance = 0.0
-aoe_radius = 120.0
+cast_distance = 125.0
+aoe_radius = 155.0
+aoe_lifetime = 0.9
 upgrades = [ExtResource("3"), ExtResource("4"), ExtResource("5")]

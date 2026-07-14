@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="SkillUpgrade" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_upgrade.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "power"
+display_name = "过载"
+description = "伤害提高 20%，弹体体积略微增大。"
+branch = "威力"
+max_rank = 3
+modifiers = {
+"damage.multiplier": 0.2,
+"visual_scale.multiplier": 0.05
+}

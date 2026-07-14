@@ -1,10 +1,22 @@
-[gd_resource type="Resource" script_class="SkillData" format=3 uid="uid://dmgnkdauisshl"]
+[gd_resource type="Resource" script_class="SkillData" load_steps=6 format=3]
 
-[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="1_jc26y"]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="1"]
+[ext_resource type="Resource" path="res://content/visuals/fire_visual.tres" id="2"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/power.tres" id="3"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/cadence.tres" id="4"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/reach.tres" id="5"]
 
 [resource]
-script = ExtResource("1_jc26y")
+script = ExtResource("1")
 id = "fireball"
-skill_id = "fireball"
 display_name = "火球术"
+description = "发射一枚稳定的火焰弹，点燃油面并造成火焰伤害。"
+tags = ["fire", "projectile"]
 mp_cost = 15
+cooldown = 2.0
+damage = 25
+damage_scaling = 1.0
+archetype = "linear_projectile"
+visual = ExtResource("2")
+projectile_speed = 500.0
+upgrades = [ExtResource("3"), ExtResource("4"), ExtResource("5")]

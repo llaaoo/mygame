@@ -53,6 +53,7 @@ func _init() -> void:
 			quit(1)
 			return
 		var reward_ids: Array[String] = []
+		var has_skill_upgrade := false
 		for reward in choices:
 			var reward_id := str(reward.get("id", ""))
 			if reward_ids.has(reward_id):
@@ -60,6 +61,12 @@ func _init() -> void:
 				quit(1)
 				return
 			reward_ids.append(reward_id)
+			if reward.get("type", "") == "skill_upgrade":
+				has_skill_upgrade = true
+		if not has_skill_upgrade:
+			push_error("Room %d did not offer a skill upgrade" % (i + 1))
+			quit(1)
+			return
 		run_manager._on_reward_selected(choices[0])
 		await process_frame
 

@@ -1,15 +1,23 @@
-[gd_resource type="Resource" script_class="SkillData" format=3 uid="uid://ckr35mhvy6j1c"]
+[gd_resource type="Resource" script_class="SkillData" load_steps=6 format=3]
 
-[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="1_xn0o6"]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="1"]
+[ext_resource type="Resource" path="res://content/visuals/shadow_visual.tres" id="2"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/power.tres" id="3"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/cadence.tres" id="4"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/reach.tres" id="5"]
 
 [resource]
-script = ExtResource("1_xn0o6")
+script = ExtResource("1")
 id = "shadow_bolt"
-skill_id = "shadow_bolt"
 display_name = "暗影弹"
+description = "低消耗地发射暗影能量，适合持续压制。"
+tags = ["shadow", "projectile"]
 mp_cost = 8
 cooldown = 1.5
-damage = 10
+damage = 14
 damage_scaling = 0.6
-projectile_speed = 250.0
+archetype = "linear_projectile"
+visual = ExtResource("2")
+projectile_speed = 400.0
 cast_distance = 25.0
+upgrades = [ExtResource("3"), ExtResource("4"), ExtResource("5")]

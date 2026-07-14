@@ -20,6 +20,11 @@ const SKILL_REWARDS: Array[Dictionary] = [
 	{"id": "skill_poison", "title": "毒云", "description": "将毒云装入一个快捷槽。", "type": "skill", "skill_id": "poison_cloud"},
 	{"id": "skill_summon", "title": "召唤骷髅", "description": "将召唤骷髅装入一个快捷槽。", "type": "skill", "skill_id": "summon_skeleton"},
 	{"id": "skill_charge", "title": "蓄力火球", "description": "将蓄力火球装入一个快捷槽。", "type": "skill", "skill_id": "charged_fireball"},
+	{"id": "skill_frost_lance", "title": "寒霜枪", "description": "获得高速冰霜投射物。", "type": "skill", "skill_id": "frost_lance"},
+	{"id": "skill_ember_orb", "title": "余烬球", "description": "获得缓慢而高伤的火焰核心。", "type": "skill", "skill_id": "ember_orb"},
+	{"id": "skill_storm_field", "title": "雷暴领域", "description": "获得持续闪电范围技能。", "type": "skill", "skill_id": "storm_field"},
+	{"id": "skill_venom_burst", "title": "剧毒爆发", "description": "获得大范围毒素爆发。", "type": "skill", "skill_id": "venom_burst"},
+	{"id": "skill_arcane_dash", "title": "奥术突进", "description": "获得短冷却的纯位移技能。", "type": "skill", "skill_id": "arcane_dash"},
 ]
 
 const STAT_REWARDS: Array[Dictionary] = [
@@ -474,8 +479,16 @@ func _roll_rewards() -> Array[Dictionary]:
 		for relic in RELIC_REWARDS:
 			if not state.relic_ids.has(str(relic.get("relic_id", ""))):
 				pool.append(relic)
+	var upgrade_rewards := _build_skill_upgrade_rewards()
 	var choices: Array[Dictionary] = []
 	var chosen_ids: Array[String] = []
+	# Every room offers at least one build-defining upgrade while options remain.
+	if not upgrade_rewards.is_empty():
+		var guaranteed_idx := _rng.randi_range(0, upgrade_rewards.size() - 1)
+		var guaranteed: Dictionary = upgrade_rewards.pop_at(guaranteed_idx)
+		choices.append(guaranteed)
+		chosen_ids.append(str(guaranteed.get("id", "")))
+	pool.append_array(upgrade_rewards)
 	while choices.size() < REWARD_CHOICES and not pool.is_empty():
 		var idx := _rng.randi_range(0, pool.size() - 1)
 		var reward: Dictionary = pool.pop_at(idx)
@@ -485,6 +498,31 @@ func _roll_rewards() -> Array[Dictionary]:
 		choices.append(reward)
 		chosen_ids.append(reward_id)
 	return choices
+
+
+func _build_skill_upgrade_rewards() -> Array[Dictionary]:
+	var rewards: Array[Dictionary] = []
+	if not _player or not _player.skill_manager:
+		return rewards
+	var sources: Array[String] = ["left", "right"]
+	for i in range(SkillManager.MAX_SLOTS):
+		sources.append("slot_%d" % i)
+	for source in sources:
+		var inst := _player.skill_manager.get_instance(source)
+		if not inst or not inst.data:
+			continue
+		for upgrade in inst.get_available_upgrades():
+			var upgrade_id := str(upgrade.get("id"))
+			var next_rank := inst.get_upgrade_rank(upgrade_id) + 1
+			rewards.append({
+				"id": "upgrade_%s_%s_%d" % [source, upgrade_id, next_rank],
+				"title": "%s · %s %d" % [inst.data.display_name, str(upgrade.get("display_name")), next_rank],
+				"description": "%s方向\n%s" % [str(upgrade.get("branch")), str(upgrade.get("description"))],
+				"type": "skill_upgrade",
+				"source": source,
+				"upgrade_id": upgrade_id,
+			})
+	return rewards
 
 
 func _show_reward_panel(choices: Array[Dictionary]) -> void:
@@ -556,6 +594,8 @@ func _apply_reward(reward: Dictionary) -> void:
 	match reward.get("type", ""):
 		"skill":
 			_apply_skill_reward(str(reward.get("skill_id", "")))
+		"skill_upgrade":
+			_player.skill_manager.upgrade_source(str(reward.get("source", "")), str(reward.get("upgrade_id", "")))
 		"heal":
 			_player.heal(int(reward.get("amount", 0)))
 		"max_hp":
@@ -622,7 +662,6 @@ func _apply_skill_reward(skill_id: String) -> void:
 	var skill := load("res://gameplay/abilities/data/%s_data.tres" % skill_id) as SkillData
 	if not skill:
 		return
-	_configure_reward_skill(skill_id, skill)
 	var pool := _player.skill_manager.pool
 	if not pool:
 		pool = SkillPool.new()
@@ -634,34 +673,13 @@ func _apply_skill_reward(skill_id: String) -> void:
 	_player.skill_manager.equip_slot(slot, skill)
 
 
-func _configure_reward_skill(skill_id: String, skill: SkillData) -> void:
-	match skill_id:
-		"lightning_bolt":
-			skill.archetype = "linear_projectile"
-			skill.visual = load("res://content/visuals/lightning_visual.tres")
-			skill.tags = ["lightning"]
-		"poison_cloud":
-			skill.archetype = "persistent_aoe"
-			skill.aoe_visual = load("res://content/visuals/poison_aoe_visual.tres")
-			skill.tags = ["poison"]
-		"summon_skeleton":
-			skill.archetype = "summon_entity"
-			skill.summon_data = load("res://content/summons/skeleton_warrior.tres") as SummonData
-			skill.tags = ["summon", "shadow"]
-		"charged_fireball":
-			skill.archetype = "linear_projectile"
-			skill.visual = load("res://content/visuals/fire_visual.tres")
-			skill.cast_type = "charge"
-			skill.tags = ["fire", "charge"]
-
-
 func _first_reward_slot() -> int:
 	if not _player or not _player.skill_manager:
 		return 0
-	for i in range(4):
+	for i in range(SkillManager.MAX_SLOTS):
 		if _player.skill_manager.get_slot(i) == null:
 			return i
-	return state.completed_rooms % 4
+	return state.completed_rooms % SkillManager.MAX_SLOTS
 
 
 func _complete_run() -> void:

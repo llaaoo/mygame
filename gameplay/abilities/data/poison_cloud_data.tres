@@ -1,16 +1,25 @@
-[gd_resource type="Resource" script_class="SkillData" format=3 uid="uid://sm1phsrsq425"]
+[gd_resource type="Resource" script_class="SkillData" load_steps=6 format=3]
 
-[ext_resource type="Script" uid="uid://5yw1untw6sop" path="res://gameplay/abilities/data/skill_data.gd" id="1_5nl74"]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="1"]
+[ext_resource type="Resource" path="res://content/visuals/poison_aoe_visual.tres" id="2"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/power.tres" id="3"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/area.tres" id="4"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/cadence.tres" id="5"]
 
 [resource]
-script = ExtResource("1_5nl74")
+script = ExtResource("1")
 id = "poison_cloud"
 display_name = "毒云"
+description = "在前方释放持久毒云，使区域内敌人承受毒素伤害。"
 skill_type = 2
+tags = ["poison", "aoe"]
 mp_cost = 25
 cooldown = 6.0
 damage = 15
 damage_scaling = 0.6
 archetype = "persistent_aoe"
+aoe_visual = ExtResource("2")
+cast_distance = 200.0
 aoe_radius = 120.0
 aoe_lifetime = 3.0
+upgrades = [ExtResource("3"), ExtResource("4"), ExtResource("5")]

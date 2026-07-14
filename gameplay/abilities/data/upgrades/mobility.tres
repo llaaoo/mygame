@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="SkillUpgrade" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_upgrade.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "mobility"
+display_name = "相位增幅"
+description = "位移距离提高 18%，位移速度提高 12%。"
+branch = "机动"
+max_rank = 3
+modifiers = {
+"dash_distance.multiplier": 0.18,
+"dash_speed.multiplier": 0.12
+}

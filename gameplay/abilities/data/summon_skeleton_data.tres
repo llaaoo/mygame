@@ -1,14 +1,22 @@
-[gd_resource type="Resource" script_class="SkillData" format=3 uid="uid://dpae4gt628dnu"]
+[gd_resource type="Resource" script_class="SkillData" load_steps=6 format=3]
 
-[ext_resource type="Script" uid="uid://5yw1untw6sop" path="res://gameplay/abilities/data/skill_data.gd" id="1_3vrxm"]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="1"]
+[ext_resource type="Resource" path="res://content/summons/skeleton_warrior.tres" id="2"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/command.tres" id="3"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/cadence.tres" id="4"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/efficiency.tres" id="5"]
 
 [resource]
-script = ExtResource("1_3vrxm")
+script = ExtResource("1")
 id = "summon_skeleton"
 display_name = "召唤骷髅"
+description = "召唤一名骷髅战士追随并攻击附近敌人。"
 skill_type = 4
+tags = ["summon", "shadow"]
 mp_cost = 30
 cooldown = 8.0
 damage = 0
 damage_scaling = 0.0
 archetype = "summon_entity"
+summon_data = ExtResource("2")
+upgrades = [ExtResource("3"), ExtResource("4"), ExtResource("5")]

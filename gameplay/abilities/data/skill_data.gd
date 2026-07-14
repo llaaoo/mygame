@@ -72,6 +72,10 @@ enum SkillType {
 ## ── 召唤专用 ──
 @export var summon_data: SummonData
 
+## ── 局内强化 ──
+## 使用 Resource 数组以保持 .tres 配置兼容；元素应为 SkillUpgrade。
+@export var upgrades: Array[Resource] = []
+
 ## ── 效果列表（未来扩展） ──
 ## @export var effects: Array[Effect] = []
 
@@ -85,3 +89,27 @@ enum SkillType {
 ## 获取有效 id（兼容 skill_id 旧代码）
 func get_id() -> String:
 	return id if not id.is_empty() else skill_id
+
+
+func get_upgrade(upgrade_id: String) -> Resource:
+	for upgrade in upgrades:
+		if upgrade and str(upgrade.get("id")) == upgrade_id:
+			return upgrade
+	return null
+
+
+func create_runtime_variant(applied_ranks: Dictionary = {}) -> SkillData:
+	var runtime := duplicate(true) as SkillData
+	# External resources are shared by default. Duplicate every resource an upgrade may mutate.
+	if runtime.visual:
+		runtime.visual = runtime.visual.duplicate(true) as ProjectileVisualData
+	if runtime.aoe_visual:
+		runtime.aoe_visual = runtime.aoe_visual.duplicate(true) as AOEVisualData
+	if runtime.summon_data:
+		runtime.summon_data = runtime.summon_data.duplicate(true) as SummonData
+	for upgrade_id in applied_ranks:
+		var upgrade := get_upgrade(str(upgrade_id))
+		if upgrade and upgrade.has_method("apply_to"):
+			var rank := clampi(int(applied_ranks[upgrade_id]), 0, int(upgrade.get("max_rank")))
+			upgrade.apply_to(runtime, rank)
+	return runtime

@@ -114,7 +114,33 @@ res://gameplay/combat/
 
 # 标签（Modifier 匹配）
 @export var tags: Array[String]         # ["fire", "shadow", "aoe"]
+
+# 局内强化（SkillUpgrade .tres）
+@export var upgrades: Array[Resource]
 ```
+
+### 局内强化与运行时副本
+
+每个 `SkillUpgrade` 仍是纯配置资源，包含强化 ID、分支、最大等级、前置条件、附加标签和 `modifiers` 字典。当前支持伤害、冷却、法力、引导消耗、投射物速度、施法距离、AoE 半径/持续时间、Buff 持续时间、位移和召唤物属性。
+
+```gdscript
+# gameplay/abilities/data/upgrades/power.tres
+id = "power"
+branch = "威力"
+max_rank = 3
+modifiers = {
+    "damage.multiplier": 0.2,
+    "visual_scale.multiplier": 0.05,
+}
+```
+
+强化只应用到 `SkillInstance.data` 的深复制运行时变体。`SkillInstance.base_data` 始终指向原始 `.tres`，因此同一技能在不同槽位可以拥有不同构筑，且不会污染资源缓存或下一局。`SkillManager.serialize_skill_state()` 保存槽位、技能 ID 和强化等级，现有版本化存档会自动持久化并恢复该状态。
+
+局内奖励由 `RunManager` 从当前已装备技能的可用强化动态生成，每个房间在仍有可选强化时至少提供一张强化卡。新增技能只需：
+
+1. 创建 `<skill_id>_data.tres`，完整配置 archetype、visual、tags 和 upgrades。
+2. 将 ID 加入 `Player.PLAYER_SKILL_IDS` 以注册到玩家技能池。
+3. 需要作为局内新技能奖励时，在 `RunManager.SKILL_REWARDS` 添加一条数据。
 
 ### SkillExecutor._ARCHETYPE_SCENES
 

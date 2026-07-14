@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="SkillUpgrade" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_upgrade.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "cadence"
+display_name = "迅捷咏唱"
+description = "冷却缩短 15%，法力消耗提高 8%。"
+branch = "频率"
+max_rank = 3
+modifiers = {
+"channel_mp_per_sec.multiplier": 0.08,
+"cooldown.multiplier": -0.15,
+"mp_cost.multiplier": 0.08
+}

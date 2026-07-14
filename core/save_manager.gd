@@ -176,6 +176,7 @@ func _collect_player() -> SaveData.PlayerData:
 			var slot_inst: SkillInstance = sm.get_slot(i)
 			if slot_inst:
 				p.skill_cooldowns["slot_%d" % i] = slot_inst.current_cooldown
+		p.skill_upgrade_state = sm.serialize_skill_state()
 	if player.mastery_manager:
 		p.mastery_state = player.mastery_manager.serialize_state()
 	var buff_manager := player.get_node_or_null("BuffManager") as BuffManager
@@ -297,6 +298,8 @@ func _restore_player(p: SaveData.PlayerData) -> void:
 				var skill := pool.get_skill(sid)
 				if skill:
 					sm.equip_slot(i, skill)
+			if not p.skill_upgrade_state.is_empty():
+				sm.restore_skill_state(p.skill_upgrade_state)
 			for key: String in p.skill_cooldowns:
 				var remaining: float = p.skill_cooldowns[key]
 				var inst: SkillInstance = sm._find_instance(key)

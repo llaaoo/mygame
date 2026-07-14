@@ -1,18 +1,24 @@
-[gd_resource type="Resource" script_class="SkillData" format=3 uid="uid://d0spcf341tnhy"]
+[gd_resource type="Resource" script_class="SkillData" load_steps=6 format=3]
 
-[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="1_jt4iv"]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="1"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/shadow_step_buff.tres" id="2"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/mobility.tres" id="3"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/duration.tres" id="4"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/upgrades/cadence.tres" id="5"]
 
 [resource]
-script = ExtResource("1_jt4iv")
+script = ExtResource("1")
 id = "shadow_step"
-skill_id = "shadow_step"
 display_name = "暗影步"
-description = "化身影子闪现到目标方向，3秒内近战伤害翻倍"
+description = "穿向目标方向，并在短时间内提高近战伤害。"
 skill_type = 3
+tags = ["shadow", "dash", "buff"]
 mp_cost = 20
 cooldown = 6.0
 damage = 0
 damage_scaling = 0.0
+buff_resource = ExtResource("2")
 buff_duration = 3.0
 dash_distance = 250.0
 dash_speed = 1000.0
+upgrades = [ExtResource("3"), ExtResource("4"), ExtResource("5")]

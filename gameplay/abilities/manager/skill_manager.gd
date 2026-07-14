@@ -11,6 +11,7 @@ signal hand_changed(hand: String)          ## "left" / "right"
 signal slot_changed(slot_index: int)
 signal cooldown_changed(source: String, remaining: float, total: float)
 signal skill_used(source: String, skill: SkillData)
+signal skill_upgraded(source: String, skill: SkillData, upgrade_id: String, rank: int)
 
 ## ── 核心依赖 ──
 var pool: SkillPool = null                 ## 技能池（ID索引）
@@ -136,6 +137,50 @@ func get_slot(idx: int) -> SkillInstance:
 	if idx < 0 or idx >= MAX_SLOTS:
 		return null
 	return _slots[idx]
+
+
+func get_instance(source: String) -> SkillInstance:
+	return _find_instance(source)
+
+
+func get_upgrade_options(source: String) -> Array[Resource]:
+	var inst := _find_instance(source)
+	return inst.get_available_upgrades() if inst else []
+
+
+func upgrade_source(source: String, upgrade_id: String) -> bool:
+	var inst := _find_instance(source)
+	if not inst or not inst.apply_upgrade(upgrade_id):
+		return false
+	_cooldowns[source] = inst.current_cooldown
+	skill_upgraded.emit(source, inst.data, upgrade_id, inst.get_upgrade_rank(upgrade_id))
+	return true
+
+
+func serialize_skill_state() -> Dictionary:
+	var result := {}
+	for source in _all_sources():
+		var inst := _find_instance(source)
+		if inst:
+			result[source] = inst.serialize_state()
+	return result
+
+
+func restore_skill_state(saved_state: Dictionary) -> void:
+	if not pool:
+		return
+	for source in saved_state:
+		var entry: Dictionary = saved_state[source] if saved_state[source] is Dictionary else {}
+		var skill := pool.get_skill(str(entry.get("skill_id", "")))
+		if not skill:
+			continue
+		if source == "left" or source == "right":
+			equip_hand(source, skill)
+		elif source.begins_with("slot_"):
+			equip_slot(source.trim_prefix("slot_").to_int(), skill)
+		var inst := _find_instance(source)
+		if inst:
+			inst.restore_upgrades(entry.get("upgrades", {}))
 
 
 func has_left_spell() -> bool:
@@ -278,10 +323,19 @@ func _find_instance(source: String) -> SkillInstance:
 	match source:
 		"left":  return left_hand
 		"right": return right_hand
+	if not source.begins_with("slot_"):
+		return null
 	var idx := source.trim_prefix("slot_").to_int()
 	if idx >= 0 and idx < MAX_SLOTS:
 		return _slots[idx]
 	return null
+
+
+func _all_sources() -> Array[String]:
+	var sources: Array[String] = ["left", "right"]
+	for i in range(MAX_SLOTS):
+		sources.append("slot_%d" % i)
+	return sources
 
 
 ## ── 冷却内部 ──

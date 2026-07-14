@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="SkillUpgrade" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_upgrade.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "area"
+display_name = "扩张领域"
+description = "作用半径提高 22%，持续时间提高 12%。"
+branch = "范围"
+max_rank = 3
+modifiers = {
+"aoe_lifetime.multiplier": 0.12,
+"aoe_radius.multiplier": 0.22
+}

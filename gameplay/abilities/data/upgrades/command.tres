@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="SkillUpgrade" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_upgrade.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "command"
+display_name = "亡灵统御"
+description = "召唤物生命提高 25%，伤害提高 18%，存在时间提高 15%。"
+branch = "统御"
+max_rank = 3
+modifiers = {
+"summon_damage.multiplier": 0.18,
+"summon_duration.multiplier": 0.15,
+"summon_hp.multiplier": 0.25
+}
