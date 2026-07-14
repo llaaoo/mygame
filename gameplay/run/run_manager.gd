@@ -693,8 +693,8 @@ func _show_result_panel(title_text: String, body_text: String, button_text: Stri
 	var panel := PanelContainer.new()
 	panel.name = "RunResultPanel"
 	panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
-	panel.custom_minimum_size = Vector2(460, 250)
-	panel.position = Vector2(-230, -125)
+	panel.custom_minimum_size = Vector2(500, 360)
+	panel.position = Vector2(-250, -180)
 	panel.add_theme_stylebox_override("panel", _panel_style(Color(0.055, 0.06, 0.075, 0.96), Color(0.82, 0.64, 0.32, 0.75), 2))
 	dim.add_child(panel)
 
