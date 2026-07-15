@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="EquipmentData" load_steps=3 format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/equipment_data.gd" id="1"]
+[ext_resource type="Resource" path="res://content/items/affixes/brutal.tres" id="2"]
+[resource]
+script = ExtResource("1")
+id = "midas_gauntlet"
+display_name = "鎏金破城手"
+description = "关节处的配重让每次挥击都像攻城锤。"
+item_type = 1
+rarity = 3
+sell_price = 90
+slot_type = 4
+item_level = 17
+icon_atlas_index = 14
+stat_modifiers = {"attack_damage": 12.0}
+combat_modifiers = {"damage.all": 0.05}
+affixes = Array[ExtResource("2")]([ExtResource("2")])

@@ -4,3 +4,4 @@
 
 [resource]
 script = ExtResource("1_10r6d")
+capacity = 30

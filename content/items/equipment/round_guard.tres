@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="EquipmentData" load_steps=3 format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/equipment_data.gd" id="1"]
+[ext_resource type="Resource" path="res://content/items/affixes/warded.tres" id="2"]
+[resource]
+script = ExtResource("1")
+id = "round_guard"
+display_name = "佣兵圆盾"
+description = "伤痕累累，但每一道都说明它挡住了攻击。"
+item_type = 1
+rarity = 1
+sell_price = 28
+slot_type = 5
+item_level = 5
+icon_atlas_index = 25
+stat_modifiers = {"max_hp": 14.0}
+combat_modifiers = {"damage_reduction": 0.03}
+affixes = Array[ExtResource("2")]([ExtResource("2")])

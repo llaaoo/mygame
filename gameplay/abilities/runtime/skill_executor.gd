@@ -438,11 +438,21 @@ func remove_modifiers_of_class(class_name_str: String) -> void:
 
 func _apply_mastery_damage_bonuses(base_damage: int, skill: SkillData, caster: Node2D) -> int:
 	var player := caster as Player
-	if not player or not player.mastery_manager:
+	if not player:
 		return base_damage
-	var multiplier := 1.0 + player.mastery_manager.get_modifier_value("damage.all")
-	for tag in skill.tags:
-		multiplier += player.mastery_manager.get_modifier_value("damage.%s" % tag)
+	var multiplier := 1.0
+	if player.mastery_manager:
+		multiplier += player.mastery_manager.get_modifier_value("damage.all")
+		for tag in skill.tags:
+			multiplier += player.mastery_manager.get_modifier_value("damage.%s" % tag)
+	var equipment := player.get_node_or_null("EquipmentManager") as EquipmentManager
+	if equipment:
+		multiplier += equipment.get_modifier_value("damage.all")
+		for tag in skill.tags:
+			multiplier += equipment.get_modifier_value("damage.%s" % tag)
+		var crit_chance := clampf(equipment.get_modifier_value("crit_chance"), 0.0, 1.0)
+		if crit_chance > 0.0 and randf() < crit_chance:
+			multiplier *= 1.5 + equipment.get_modifier_value("crit_damage")
 	return maxi(1, int(round(base_damage * multiplier)))
 
 

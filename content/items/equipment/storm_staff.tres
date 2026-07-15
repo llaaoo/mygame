@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="EquipmentData" load_steps=3 format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/equipment_data.gd" id="1"]
+[ext_resource type="Resource" path="res://content/items/affixes/precise.tres" id="2"]
+[resource]
+script = ExtResource("1")
+id = "storm_staff"
+display_name = "紫电引雷杖"
+description = "水晶内的电弧总在寻找下一个出口。"
+item_type = 3
+rarity = 4
+sell_price = 164
+slot_type = 6
+item_level = 26
+icon_atlas_index = 22
+stat_modifiers = {"max_mana": 28.0}
+combat_modifiers = {"damage.lightning": 0.22, "cooldown.lightning": -0.12, "crit_chance": 0.08}
+affixes = Array[ExtResource("2")]([ExtResource("2")])
+special_effect_text = "过载：闪电法术具有更高伤害、暴击率与施放频率。"

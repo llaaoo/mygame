@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="EquipmentData" load_steps=4 format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/equipment_data.gd" id="1"]
+[ext_resource type="Resource" path="res://content/items/sets/cinder_arcanist.tres" id="2"]
+[ext_resource type="Resource" path="res://content/items/affixes/precise.tres" id="3"]
+[resource]
+script = ExtResource("1")
+id = "cinder_amulet"
+display_name = "熔核护符"
+description = "宝石中的裂纹像熔岩一样缓慢流动。"
+item_type = 1
+rarity = 3
+sell_price = 88
+slot_type = 7
+item_level = 16
+icon_atlas_index = 33
+combat_modifiers = {"damage.fire": 0.1, "crit_chance": 0.04}
+affixes = Array[ExtResource("3")]([ExtResource("3")])
+set_data = ExtResource("2")

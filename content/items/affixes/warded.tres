@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="EquipmentAffixData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/equipment_affix_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "warded"
+display_name = "护佑"
+description = "降低受到的伤害。"
+combat_modifiers = {"damage_reduction": 0.03}
+tags = Array[String](["defense"])

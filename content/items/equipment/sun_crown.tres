@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="EquipmentData" load_steps=3 format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/equipment_data.gd" id="1"]
+[ext_resource type="Resource" path="res://content/items/affixes/stalwart.tres" id="2"]
+[resource]
+script = ExtResource("1")
+id = "sun_crown"
+display_name = "无昼王冠"
+description = "失落王朝最后的太阳仍困在红宝石中。"
+item_type = 1
+rarity = 4
+sell_price = 190
+slot_type = 0
+item_level = 30
+icon_atlas_index = 34
+stat_modifiers = {"max_hp": 24.0, "max_mana": 24.0}
+combat_modifiers = {"damage.all": 0.12, "healing_received": 0.12}
+affixes = Array[ExtResource("2")]([ExtResource("2")])
+special_effect_text = "王权：所有法术伤害和受到的治疗提高 12%。"

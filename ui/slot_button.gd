@@ -1,58 +1,63 @@
 class_name SlotButton
 extends Button
-## 通用槽位按钮 — 支持拖拽 (drag-and-drop) + 富文本提示 (tooltip)
-##
-## 用于背包格子和纸娃娃装备槽
 
-## 槽位角色
 enum SlotRole { INVENTORY, EQUIPMENT }
 
 signal slot_dropped(target: SlotButton, data: Dictionary)
 
-## 槽位角色 (库存/装备)
 var slot_role: SlotRole = SlotRole.INVENTORY
-## 槽位 ID：背包索引 (0-19) 或装备槽类型 (EquipmentData.SlotType)
 var slot_id: int = -1
+var item_data: ItemData
 
-## 当前物品数据
-var item_data: ItemData = null
-
-## 品质颜色映射
 const RARITY_COLORS: Array[Color] = [
-	Color.WHITE,           # 0: 普通
-	Color(0.3, 0.5, 1.0),  # 1: 稀有 (蓝)
-	Color(0.7, 0.2, 1.0),  # 2: 史诗 (紫)
-	Color(1.0, 0.65, 0.0), # 3: 传说 (橙)
+	Color(0.72, 0.76, 0.8),
+	Color(0.25, 0.72, 0.42),
+	Color(0.25, 0.55, 1.0),
+	Color(0.72, 0.3, 0.95),
+	Color(1.0, 0.62, 0.12),
 ]
-
-## 品质名称
-const RARITY_NAMES: Array[String] = ["普通", "稀有", "史诗", "传说"]
+const RARITY_NAMES: Array[String] = ["普通", "精良", "稀有", "史诗", "传说"]
+const STAT_NAMES := {
+	"max_hp": "最大生命",
+	"max_mana": "最大魔能",
+	"attack_damage": "近战伤害",
+	"move_speed": "移动速度",
+}
+const COMBAT_NAMES := {
+	"damage.all": "全部法术伤害",
+	"damage.fire": "火焰伤害",
+	"damage.ice": "寒冰伤害",
+	"damage.lightning": "闪电伤害",
+	"damage.poison": "毒素伤害",
+	"damage.shadow": "暗影伤害",
+	"damage.summon": "召唤伤害",
+	"cooldown.all": "全局冷却",
+	"mana_cost.all": "魔能消耗",
+	"damage_reduction": "伤害减免",
+	"healing_received": "受到的治疗",
+	"crit_chance": "暴击率",
+	"crit_damage": "暴击伤害",
+}
 
 
 func _ready() -> void:
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	_apply_rarity_style(0)
 
 
 func set_item_data(data: ItemData) -> void:
 	item_data = data
-	if data:
-		# 设置 tooltip_text 触发 Godot 内置 tooltip 系统
-		tooltip_text = " "
-		# 视觉更新
-		var rarity = clampi(data.rarity, 0, 3)
-		modulate = RARITY_COLORS[rarity]
-		if data.icon:
-			icon = data.icon
-			expand_icon = true
-			text = ""
-		else:
-			icon = null
-			text = data.display_name[0]
-	else:
-		tooltip_text = ""
-		icon = null
-		text = ""
-		modulate = Color.WHITE
+	if not data:
+		set_empty_placeholder("")
+		return
+	tooltip_text = " "
+	var display_icon := data.icon
+	if data is EquipmentData:
+		display_icon = (data as EquipmentData).get_icon_texture()
+	icon = display_icon
+	expand_icon = display_icon != null
+	text = "" if display_icon else data.display_name.left(1)
+	_apply_rarity_style(data.rarity)
 
 
 func set_empty_placeholder(txt: String) -> void:
@@ -60,131 +65,124 @@ func set_empty_placeholder(txt: String) -> void:
 	tooltip_text = ""
 	icon = null
 	text = txt
-	modulate = Color.WHITE
+	_apply_rarity_style(0, true)
 
 
-## ── 自定义富文本 Tooltip ──
+static func get_rarity_color(rarity: int) -> Color:
+	return RARITY_COLORS[clampi(rarity, 0, RARITY_COLORS.size() - 1)]
+
+
+func _apply_rarity_style(rarity: int, empty: bool = false) -> void:
+	var color := get_rarity_color(rarity)
+	var normal := _slot_style(Color(0.075, 0.085, 0.1, 0.97), color if not empty else Color(0.24, 0.27, 0.32))
+	var hover := _slot_style(Color(0.12, 0.14, 0.17, 1.0), color.lightened(0.18))
+	add_theme_stylebox_override("normal", normal)
+	add_theme_stylebox_override("hover", hover)
+	add_theme_stylebox_override("pressed", hover)
+	add_theme_color_override("font_color", Color(0.72, 0.75, 0.8) if empty else color)
+
 
 func _make_custom_tooltip(_for_text: String) -> Control:
-	if item_data == null:
+	if not item_data:
 		return null
-
 	var panel := PanelContainer.new()
-	panel.add_theme_stylebox_override("panel", _create_tooltip_stylebox())
-
+	panel.add_theme_stylebox_override("panel", _tooltip_style())
 	var margin := MarginContainer.new()
-	margin.add_theme_constant_override("margin_left", 10)
-	margin.add_theme_constant_override("margin_top", 8)
-	margin.add_theme_constant_override("margin_right", 10)
-	margin.add_theme_constant_override("margin_bottom", 8)
+	for side in ["left", "top", "right", "bottom"]:
+		margin.add_theme_constant_override("margin_%s" % side, 12)
 	panel.add_child(margin)
-
 	var vbox := VBoxContainer.new()
-	vbox.add_theme_constant_override("separation", 4)
+	vbox.custom_minimum_size = Vector2(280, 0)
+	vbox.add_theme_constant_override("separation", 5)
 	margin.add_child(vbox)
 
-	# 物品名称（品质色）
-	var name_label := Label.new()
-	name_label.text = item_data.display_name
-	var rarity = clampi(item_data.rarity, 0, 3)
-	name_label.add_theme_color_override("font_color", RARITY_COLORS[rarity])
-	name_label.add_theme_font_size_override("font_size", 16)
-	vbox.add_child(name_label)
+	var rarity := clampi(item_data.rarity, 0, RARITY_NAMES.size() - 1)
+	_add_label(vbox, item_data.display_name, 17, get_rarity_color(rarity))
+	_add_label(vbox, RARITY_NAMES[rarity], 11, get_rarity_color(rarity).darkened(0.05))
 
-	# 品质标签（非普通时显示）
-	if rarity > 0:
-		var rarity_label := Label.new()
-		rarity_label.text = "⭐ " + RARITY_NAMES[rarity]
-		rarity_label.add_theme_color_override("font_color", RARITY_COLORS[rarity])
-		rarity_label.add_theme_font_size_override("font_size", 12)
-		vbox.add_child(rarity_label)
-
-	# 装备属性
 	if item_data is EquipmentData:
 		var eq := item_data as EquipmentData
-		var stats_text := _format_stats(eq)
-		if stats_text:
-			var stats_label := Label.new()
-			stats_label.text = stats_text
-			stats_label.add_theme_color_override("font_color", Color(0.3, 1.0, 0.3))
-			stats_label.add_theme_font_size_override("font_size", 13)
-			vbox.add_child(stats_label)
+		_add_label(vbox, "%s  |  物品等级 %d  |  战力 %d" % [EquipmentManager.slot_name(eq.slot_type), eq.item_level, eq.get_effective_power_score()], 11, Color(0.62, 0.67, 0.74))
+		_add_separator(vbox)
+		for line in _equipment_stat_lines(eq):
+			_add_label(vbox, line, 12, Color(0.4, 0.92, 0.58))
+		if eq.set_data:
+			_add_label(vbox, "套装：%s" % eq.set_data.display_name, 12, eq.set_data.theme_color)
+		for affix_name in eq.get_affix_names():
+			_add_label(vbox, "◆ %s" % affix_name, 11, Color(0.62, 0.78, 1.0))
+		if not eq.special_effect_text.is_empty():
+			_add_label(vbox, eq.special_effect_text, 11, Color(1.0, 0.76, 0.32), true)
 
-	# 描述
 	if not item_data.description.is_empty():
-		var desc_label := Label.new()
-		desc_label.text = item_data.description
-		desc_label.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
-		desc_label.add_theme_font_size_override("font_size", 11)
-		desc_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		desc_label.custom_minimum_size = Vector2(200, 0)
-		vbox.add_child(desc_label)
-
-	# 操作提示
-	var hint_label := Label.new()
-	hint_label.text = "拖拽以移动/装备"
-	hint_label.add_theme_color_override("font_color", Color(0.5, 0.5, 0.5))
-	hint_label.add_theme_font_size_override("font_size", 10)
-	vbox.add_child(hint_label)
-
+		_add_separator(vbox)
+		_add_label(vbox, item_data.description, 11, Color(0.68, 0.7, 0.74), true)
 	return panel
 
 
-func _format_stats(eq: EquipmentData) -> String:
+func _equipment_stat_lines(eq: EquipmentData) -> Array[String]:
 	var lines: Array[String] = []
-	for s in eq.stat_modifiers:
-		lines.append("+%s %s" % [eq.stat_modifiers[s], s])
-	for s in eq.stat_multipliers:
-		lines.append("+%d%% %s" % [eq.stat_multipliers[s] * 100, s])
-	return "\n".join(lines)
+	for stat in eq.get_combined_stat_modifiers():
+		var value := float(eq.get_combined_stat_modifiers()[stat])
+		lines.append("%s%g %s" % ["+" if value >= 0 else "", value, STAT_NAMES.get(stat, stat)])
+	for stat in eq.get_combined_stat_multipliers():
+		var value := float(eq.get_combined_stat_multipliers()[stat]) * 100.0
+		lines.append("%s%g%% %s" % ["+" if value >= 0 else "", value, STAT_NAMES.get(stat, stat)])
+	for key in eq.get_combined_combat_modifiers():
+		var value := float(eq.get_combined_combat_modifiers()[key]) * 100.0
+		lines.append("%s%g%% %s" % ["+" if value >= 0 else "", value, COMBAT_NAMES.get(key, key)])
+	return lines
 
 
-func _create_tooltip_stylebox() -> StyleBoxFlat:
-	var sb := StyleBoxFlat.new()
-	sb.bg_color = Color(0.08, 0.08, 0.12, 0.95)
-	sb.border_width_left = 1
-	sb.border_width_right = 1
-	sb.border_width_top = 1
-	sb.border_width_bottom = 1
-	sb.border_color = Color(0.3, 0.3, 0.4, 1)
-	sb.corner_radius_top_left = 6
-	sb.corner_radius_top_right = 6
-	sb.corner_radius_bottom_left = 6
-	sb.corner_radius_bottom_right = 6
-	sb.content_margin_left = 2
-	sb.content_margin_right = 2
-	sb.content_margin_top = 2
-	sb.content_margin_bottom = 2
-	return sb
+func _add_label(parent: Control, value: String, size: int, color: Color, wrap: bool = false) -> void:
+	var label := Label.new()
+	label.text = value
+	label.add_theme_font_size_override("font_size", size)
+	label.add_theme_color_override("font_color", color)
+	if wrap:
+		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	parent.add_child(label)
 
 
-## ── 拖拽系统 ──
+func _add_separator(parent: Control) -> void:
+	var separator := HSeparator.new()
+	separator.modulate = Color(0.4, 0.43, 0.5, 0.45)
+	parent.add_child(separator)
+
+
+func _slot_style(background: Color, border: Color) -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = background
+	style.border_color = border
+	style.set_border_width_all(2)
+	style.set_corner_radius_all(4)
+	style.content_margin_left = 4
+	style.content_margin_right = 4
+	style.content_margin_top = 4
+	style.content_margin_bottom = 4
+	return style
+
+
+func _tooltip_style() -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.035, 0.04, 0.052, 0.98)
+	style.border_color = get_rarity_color(item_data.rarity).darkened(0.18)
+	style.set_border_width_all(2)
+	style.set_corner_radius_all(4)
+	return style
+
 
 func _get_drag_data(_at_position: Vector2) -> Variant:
-	if item_data == null:
+	if not item_data:
 		return null
-
-	# 幽灵效果：拖动中的源槽位半透明
-	modulate.a = 0.3
-
-	# 创建拖动预览
-	var preview := Label.new()
-	preview.text = text if not icon else ""
-	if icon:
-		# Label 不支持 icon，创建简化预览
-		preview.text = item_data.display_name[0]
-	preview.add_theme_font_size_override("font_size", 18)
-	preview.add_theme_color_override("font_color", RARITY_COLORS[clampi(item_data.rarity, 0, 3)])
+	modulate.a = 0.35
+	var preview := TextureRect.new()
+	preview.texture = icon
+	preview.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	preview.custom_minimum_size = Vector2(52, 52)
-	preview.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	preview.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	preview.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	preview.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	set_drag_preview(preview)
-
-	return {
-		"slot_id": slot_id,
-		"slot_role": slot_role,
-		"item": item_data,
-	}
+	return {"slot_id": slot_id, "slot_role": slot_role, "item": item_data}
 
 
 func _can_drop_data(_at_position: Vector2, data: Variant) -> bool:
@@ -197,6 +195,4 @@ func _drop_data(_at_position: Vector2, data: Variant) -> void:
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_DRAG_END:
-		# 拖拽结束，恢复透明度
-		if item_data:
-			modulate.a = 1.0
+		modulate.a = 1.0

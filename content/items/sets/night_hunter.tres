@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="EquipmentSetData" load_steps=5 format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/equipment_set_data.gd" id="1"]
+[ext_resource type="Script" path="res://gameplay/inventory/data/equipment_set_bonus.gd" id="2"]
+[sub_resource type="Resource" id="Bonus2"]
+script = ExtResource("2")
+required_pieces = 2
+description = "移动速度 +20"
+stat_modifiers = {"move_speed": 20.0}
+[sub_resource type="Resource" id="Bonus4"]
+script = ExtResource("2")
+required_pieces = 4
+description = "暴击率 +10%，暴击伤害 +25%"
+combat_modifiers = {"crit_chance": 0.1, "crit_damage": 0.25}
+[sub_resource type="Resource" id="Bonus6"]
+script = ExtResource("2")
+required_pieces = 6
+description = "暗影伤害 +20%，全局冷却 -8%"
+combat_modifiers = {"damage.shadow": 0.2, "cooldown.all": -0.08}
+[resource]
+script = ExtResource("1")
+id = "night_hunter"
+display_name = "夜行猎手"
+theme_color = Color(0.58, 0.4, 0.92, 1)
+bonuses = Array[ExtResource("2")]([SubResource("Bonus2"), SubResource("Bonus4"), SubResource("Bonus6")])

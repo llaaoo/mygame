@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="EquipmentData" load_steps=3 format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/equipment_data.gd" id="1"]
+[ext_resource type="Resource" path="res://content/items/affixes/focused.tres" id="2"]
+[resource]
+script = ExtResource("1")
+id = "grave_grimoire"
+display_name = "亡者名册"
+description = "每召来一名亡者，书页便自行多出一行。"
+item_type = 1
+rarity = 3
+sell_price = 102
+slot_type = 5
+item_level = 19
+icon_atlas_index = 26
+stat_modifiers = {"max_mana": 18.0}
+combat_modifiers = {"damage.summon": 0.2, "cooldown.summon": -0.1, "mana_cost.summon": -0.08}
+affixes = Array[ExtResource("2")]([ExtResource("2")])
+special_effect_text = "点名：召唤法术的伤害、冷却和消耗同时获得改善。"

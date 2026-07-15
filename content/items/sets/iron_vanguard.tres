@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="EquipmentSetData" load_steps=5 format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/equipment_set_data.gd" id="1"]
+[ext_resource type="Script" path="res://gameplay/inventory/data/equipment_set_bonus.gd" id="2"]
+[sub_resource type="Resource" id="Bonus2"]
+script = ExtResource("2")
+required_pieces = 2
+description = "最大生命 +20"
+stat_modifiers = {"max_hp": 20.0}
+[sub_resource type="Resource" id="Bonus3"]
+script = ExtResource("2")
+required_pieces = 3
+description = "受到的伤害降低 8%"
+combat_modifiers = {"damage_reduction": 0.08}
+[sub_resource type="Resource" id="Bonus5"]
+script = ExtResource("2")
+required_pieces = 5
+description = "近战伤害 +15，全部法术伤害 +10%"
+stat_modifiers = {"attack_damage": 15.0}
+combat_modifiers = {"damage.all": 0.1}
+[resource]
+script = ExtResource("1")
+id = "iron_vanguard"
+display_name = "铁壁先锋"
+theme_color = Color(0.72, 0.8, 0.9, 1)
+bonuses = Array[ExtResource("2")]([SubResource("Bonus2"), SubResource("Bonus3"), SubResource("Bonus5")])

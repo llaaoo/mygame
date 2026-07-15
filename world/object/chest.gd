@@ -9,6 +9,8 @@ extends MapObject
 
 
 @export var loot_table: LootTable
+@export_range(0, 4, 1) var min_equipment_rarity: int = 0
+@export_range(0, 4, 1) var max_equipment_rarity: int = 3
 
 var _opened: bool = false
 
@@ -45,9 +47,13 @@ func _on_interact_chest(_actor: Node2D) -> void:
 	if loot_table:
 		drops = loot_table.roll()
 
-	# fallback: 无掉落表或空表时至少掉一个血包
+	# 没有专属掉落表时，从全局装备目录生成一件战利品。
 	if drops.is_empty():
-		drops.append({"item_path": "res://entities/pickups/health_pickup.tscn", "count": 1})
+		var equipment := EquipmentCatalog.roll_random(max_equipment_rarity, min_equipment_rarity)
+		if equipment:
+			drops.append({"item_path": equipment.resource_path, "count": 1})
+		else:
+			drops.append({"item_path": "res://entities/pickups/health_pickup.tscn", "count": 1})
 
 	for drop in drops:
 		_spawn_item(drop.get("item_path", ""), drop.get("count", 1))
@@ -72,23 +78,31 @@ func restore_state(data: Dictionary) -> void:
 func _spawn_item(item_path: String, count: int) -> void:
 	if item_path.is_empty():
 		return
-	var item := load(item_path)
-	if not item:
+	var item_resource := load(item_path)
+	if not item_resource:
 		push_warning("[Chest] 无法加载物品: %s" % item_path)
 		return
 
-	# 生成掉落物节点
-	var pickup_scene := load("res://entities/pickups/health_pickup.tscn") as PackedScene
-	if not pickup_scene:
-		return
-
-	for i in range(count):
-		var pickup := pickup_scene.instantiate()
+	if item_resource is ItemData:
+		var pickup_scene := load("res://entities/pickups/item_pickup.tscn") as PackedScene
+		if not pickup_scene:
+			return
+		var pickup := pickup_scene.instantiate() as ItemPickup
+		pickup.setup(item_resource as ItemData, count)
 		pickup.global_position = global_position + Vector2(
 			randf_range(-20, 20),
 			randf_range(-20, 20)
 		)
 		get_parent().add_child(pickup)
+		return
+
+	if item_resource is PackedScene:
+		for i in range(count):
+			var pickup := (item_resource as PackedScene).instantiate() as Node2D
+			if not pickup:
+				continue
+			pickup.global_position = global_position + Vector2(randf_range(-20, 20), randf_range(-20, 20))
+			get_parent().add_child(pickup)
 
 
 func _apply_visual() -> void:

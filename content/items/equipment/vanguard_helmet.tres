@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="EquipmentData" load_steps=4 format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/equipment_data.gd" id="1"]
+[ext_resource type="Resource" path="res://content/items/sets/iron_vanguard.tres" id="2"]
+[ext_resource type="Resource" path="res://content/items/affixes/stalwart.tres" id="3"]
+[resource]
+script = ExtResource("1")
+id = "vanguard_helmet"
+display_name = "先锋覆面盔"
+description = "旧军团以整块寒铁锻成的重盔。"
+item_type = 1
+rarity = 2
+sell_price = 42
+slot_type = 0
+item_level = 8
+icon_atlas_index = 0
+equipment_tags = Array[String](["armor", "vanguard"])
+stat_modifiers = {"max_hp": 14.0}
+affixes = Array[ExtResource("3")]([ExtResource("3")])
+set_data = ExtResource("2")

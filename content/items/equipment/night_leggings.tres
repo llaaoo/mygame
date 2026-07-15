@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="EquipmentData" load_steps=4 format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/equipment_data.gd" id="1"]
+[ext_resource type="Resource" path="res://content/items/sets/night_hunter.tres" id="2"]
+[ext_resource type="Resource" path="res://content/items/affixes/swift.tres" id="3"]
+[resource]
+script = ExtResource("1")
+id = "night_leggings"
+display_name = "夜路绑腿"
+description = "猎人用旧地图夹在护膝里分散冲击。"
+item_type = 1
+rarity = 2
+sell_price = 45
+slot_type = 2
+item_level = 10
+icon_atlas_index = 15
+stat_modifiers = {"move_speed": 10.0}
+affixes = Array[ExtResource("3")]([ExtResource("3")])
+set_data = ExtResource("2")

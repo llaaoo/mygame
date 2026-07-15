@@ -30,12 +30,16 @@ func _init() -> void:
 	root.player.skill_upgrade_state = {
 		"slot_0": {"skill_id": "fireball", "upgrades": {"power": 2, "cadence": 1}},
 	}
+	root.player.equipment_items = [{"path": "res://content/items/equipment/vanguard_helmet.tres", "slot": 0}]
 	root.world = SaveData.WorldData.new()
 	root.quest = SaveData.QuestSave.new()
 	root.extensions = {"roguelite_meta": meta.serialize_save_data()}
 	var restored := SaveData.Root.deserialize(root.serialize())
 	if restored.player.skill_upgrade_state != root.player.skill_upgrade_state:
 		_fail("skill upgrade state did not round-trip")
+		return
+	if restored.player.equipment_items != root.player.equipment_items:
+		_fail("equipment state did not round-trip")
 		return
 	var restored_meta = RUN_META_SCRIPT.new()
 	restored_meta.deserialize_save_data(restored.extensions.get("roguelite_meta", {}))

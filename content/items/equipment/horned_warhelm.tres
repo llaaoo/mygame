@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="EquipmentData" load_steps=3 format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/equipment_data.gd" id="1"]
+[ext_resource type="Resource" path="res://content/items/affixes/brutal.tres" id="2"]
+[resource]
+script = ExtResource("1")
+id = "horned_warhelm"
+display_name = "裂角战盔"
+description = "沉重牛角迫使佩戴者迎面冲锋。"
+item_type = 1
+rarity = 1
+sell_price = 30
+slot_type = 0
+item_level = 6
+icon_atlas_index = 1
+stat_modifiers = {"attack_damage": 3.0, "max_hp": 8.0}
+affixes = Array[ExtResource("2")]([ExtResource("2")])

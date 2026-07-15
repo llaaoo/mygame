@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="EquipmentData" load_steps=4 format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/equipment_data.gd" id="1"]
+[ext_resource type="Resource" path="res://content/items/sets/iron_vanguard.tres" id="2"]
+[ext_resource type="Resource" path="res://content/items/affixes/warded.tres" id="3"]
+[resource]
+script = ExtResource("1")
+id = "vanguard_shield"
+display_name = "先锋狮鹫盾"
+description = "盾面宽阔，足以挡住狭窄甬道。"
+item_type = 1
+rarity = 3
+sell_price = 82
+slot_type = 5
+item_level = 15
+icon_atlas_index = 24
+stat_modifiers = {"max_hp": 22.0}
+combat_modifiers = {"damage_reduction": 0.06}
+affixes = Array[ExtResource("3")]([ExtResource("3")])
+set_data = ExtResource("2")

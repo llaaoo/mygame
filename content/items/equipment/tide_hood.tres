@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="EquipmentData" load_steps=3 format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/equipment_data.gd" id="1"]
+[ext_resource type="Resource" path="res://content/items/affixes/focused.tres" id="2"]
+[resource]
+script = ExtResource("1")
+id = "tide_hood"
+display_name = "潮汐风帽"
+description = "潮声会在施法间隙提醒呼吸节奏。"
+item_type = 1
+rarity = 2
+sell_price = 54
+slot_type = 0
+item_level = 11
+icon_atlas_index = 4
+combat_modifiers = {"damage.water": 0.14, "cooldown.water": -0.08}
+affixes = Array[ExtResource("2")]([ExtResource("2")])
+special_effect_text = "潮律：水系法术伤害提高且冷却缩短。"

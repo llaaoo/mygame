@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="EquipmentAffixData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/equipment_affix_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "swift"
+display_name = "迅捷"
+description = "提高移动速度。"
+stat_modifiers = {"move_speed": 14.0}
+tags = Array[String](["mobility"])

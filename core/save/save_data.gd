@@ -50,6 +50,7 @@ class PlayerData:
 	var agility: int = 10
 	var endurance: int = 10
 	var inventory_items: Array[Dictionary] = []
+	var equipment_items: Array[Dictionary] = []
 	var skill_left: String = ""
 	var skill_right: String = ""
 	var skill_slots: Array[String] = []
@@ -74,6 +75,7 @@ class PlayerData:
 			"agility": agility,
 			"endurance": endurance,
 			"inventory_items": inventory_items,
+			"equipment_items": equipment_items,
 			"skill_left": skill_left,
 			"skill_right": skill_right,
 			"skill_slots": skill_slots,
@@ -100,6 +102,7 @@ class PlayerData:
 		player.agility = data.get("agility", 10)
 		player.endurance = data.get("endurance", 10)
 		player.inventory_items = data.get("inventory_items", []) as Array[Dictionary]
+		player.equipment_items = data.get("equipment_items", []) as Array[Dictionary]
 		player.skill_left = data.get("skill_left", "")
 		player.skill_right = data.get("skill_right", "")
 		player.skill_slots = SaveData._string_array(data.get("skill_slots", []))

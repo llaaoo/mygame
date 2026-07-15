@@ -9,6 +9,8 @@ extends Resource
 
 
 @export var entries: Array[LootEntry] = []
+@export_range(1, 10, 1) var min_rolls: int = 1
+@export_range(1, 10, 1) var max_rolls: int = 1
 
 
 ## 执行一次随机掉落，返回 [{item_path, count}, ...]
@@ -24,12 +26,20 @@ func roll() -> Array[Dictionary]:
 		return []
 
 	var result: Array[Dictionary] = []
-	for entry in entries:
-		if entry.weight <= 0:
-			continue
-		if randf() < float(entry.weight) / float(total_weight):
-			var count := randi_range(entry.min_count, entry.max_count)
+	var roll_count := randi_range(mini(min_rolls, max_rolls), maxi(min_rolls, max_rolls))
+	for _roll in range(roll_count):
+		var ticket := randi_range(1, total_weight)
+		var selected: LootEntry
+		for entry in entries:
+			if entry.weight <= 0:
+				continue
+			ticket -= entry.weight
+			if ticket <= 0:
+				selected = entry
+				break
+		if selected:
+			var count := randi_range(selected.min_count, selected.max_count)
 			if count > 0:
-				result.append({"item_path": entry.item_path, "count": count})
+				result.append({"item_path": selected.item_path, "count": count})
 
 	return result

@@ -1,29 +1,83 @@
 class_name EquipmentData
 extends ItemData
-## 装备数据 — 继承 ItemData，添加装备专属属性
-##
-## 每个装备实例是一个 .tres 文件
 
-## 装备槽位类型
 enum SlotType {
-	HEAD,         ## 头部
-	CHEST,        ## 胸部
-	LEGS,         ## 腿部
-	FEET,         ## 足部
-	HANDS,        ## 手部
-	LEFT_HAND,    ## 左手（副手）
-	RIGHT_HAND,   ## 右手（主手）
+	HEAD,
+	CHEST,
+	LEGS,
+	FEET,
+	HANDS,
+	LEFT_HAND,
+	RIGHT_HAND,
+	AMULET,
+	RING,
 }
 
-## 所属槽位
 @export var slot_type: SlotType = SlotType.HEAD
-
-## 属性加成（在 BuffManager 中应用）
-## 格式: { "max_hp": 20, "atk": 5, "move_speed": 10 }
+@export_range(1, 100, 1) var item_level: int = 1
+@export var power_score: int = 0
+@export var icon_atlas_index: int = -1
+@export var equipment_tags: Array[String] = []
 @export var stat_modifiers: Dictionary = {}
-
-## 百分比属性加成（如 {"atk": 0.1} = +10% 攻击力）
 @export var stat_multipliers: Dictionary = {}
-
-## 装备时激活的特殊 Buff（可选，PackedScene of Buff）
+@export var combat_modifiers: Dictionary = {}
+@export var affixes: Array[EquipmentAffixData] = []
+@export var set_data: EquipmentSetData
+@export_multiline var special_effect_text: String = ""
 @export var on_equip_buff: PackedScene
+
+
+func get_icon_texture() -> Texture2D:
+	if icon:
+		return icon
+	return EquipmentIconCatalog.get_icon_by_index(icon_atlas_index)
+
+
+func get_combined_stat_modifiers() -> Dictionary:
+	var result := stat_modifiers.duplicate(true)
+	for affix in affixes:
+		if affix:
+			_merge_numbers(result, affix.stat_modifiers)
+	return result
+
+
+func get_combined_stat_multipliers() -> Dictionary:
+	var result := stat_multipliers.duplicate(true)
+	for affix in affixes:
+		if affix:
+			_merge_numbers(result, affix.stat_multipliers)
+	return result
+
+
+func get_combined_combat_modifiers() -> Dictionary:
+	var result := combat_modifiers.duplicate(true)
+	for affix in affixes:
+		if affix:
+			_merge_numbers(result, affix.combat_modifiers)
+	return result
+
+
+func get_effective_power_score() -> int:
+	if power_score > 0:
+		return power_score
+	var score := item_level * 3 + rarity * 12
+	for value in get_combined_stat_modifiers().values():
+		score += int(absf(float(value)))
+	for value in get_combined_stat_multipliers().values():
+		score += int(absf(float(value)) * 100.0)
+	for value in get_combined_combat_modifiers().values():
+		score += int(absf(float(value)) * 100.0)
+	return maxi(1, score)
+
+
+func get_affix_names() -> Array[String]:
+	var names: Array[String] = []
+	for affix in affixes:
+		if affix:
+			names.append(affix.display_name)
+	return names
+
+
+static func _merge_numbers(target: Dictionary, source: Dictionary) -> void:
+	for key in source:
+		target[key] = float(target.get(key, 0.0)) + float(source[key])

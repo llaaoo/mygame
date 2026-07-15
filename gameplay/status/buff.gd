@@ -103,6 +103,14 @@ func _apply_stat(entity: Node, stat_name: String, amount: float) -> void:
 			combat.attack_damage += amt
 		return
 
+	if stat_name == "max_mana":
+		var mana := entity.get_node_or_null("ManaComponent") as ManaComponent
+		if mana:
+			mana.max_mp += amt
+			mana.mp = clampi(mana.mp + amt, 0, mana.max_mp)
+			mana.mp_changed.emit(mana.mp, mana.max_mp)
+		return
+
 	if stat_name in entity:
 		entity.set(stat_name, entity.get(stat_name) + amt)
 

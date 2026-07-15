@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="EquipmentData" load_steps=3 format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/equipment_data.gd" id="1"]
+[ext_resource type="Resource" path="res://content/items/affixes/stalwart.tres" id="2"]
+[resource]
+script = ExtResource("1")
+id = "grave_mace"
+display_name = "墓门晨星"
+description = "钉锤来自一扇不该被打开的墓门。"
+item_type = 3
+rarity = 3
+sell_price = 92
+slot_type = 6
+item_level = 17
+icon_atlas_index = 20
+stat_modifiers = {"attack_damage": 15.0, "max_hp": 12.0}
+combat_modifiers = {"damage.poison": 0.1, "damage.shadow": 0.1}
+affixes = Array[ExtResource("2")]([ExtResource("2")])

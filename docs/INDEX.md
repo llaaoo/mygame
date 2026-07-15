@@ -1,6 +1,6 @@
 # 📚 项目文档索引
 
-> 版本: v2.7 | 最后更新: 2026-05-30
+> 版本: v2.8 | 最后更新: 2026-07-15
 
 ---
 
@@ -18,7 +18,8 @@ PROJECT_ANALYSIS.md (完整项目分析 — 架构评估 + 文件功能清单 + 
     │       ├── COMBAT_CONTRACTS.md (战斗内部 12 条契约)
     │       ├── WORLD_CONTRACTS.md (世界内部 9 条契约)
     │       ├── PHYSICS_LAYERS.md (物理层 11 层标准)
-    │       └── skill_architecture.md (技能内容生产方式)
+    │       ├── skill_architecture.md (技能内容生产方式)
+    │       └── equipment_system.md (装备、词缀、套装与存档)
     │
     └── RUNTIME_TOPOLOGY.md (运行时拓扑 — 五大 Runtime 边界)
 ```
@@ -66,7 +67,7 @@ PROJECT_ANALYSIS.md (完整项目分析 — 架构评估 + 文件功能清单 + 
 **核心内容**:
 - 新游戏循环：营地 → 地牢 run → 房间遭遇 → 三选一奖励 → Boss → 结算。
 - 保留 CombatExecutor / SkillData / MapObject / Surface / Enemy / UI 等核心资产。
-- 冻结 NPC 日程、传统任务、传统背包装备和大地图持久化。
+- 冻结 NPC 日程、传统任务和大地图持久化；装备改造为高影响的局内构筑系统。
 - 新增 `run / rooms / rewards` 三个模块边界。
 - 第一阶段验收标准：最小可玩 run 闭环、复用资产验证、构筑感验证。
 
@@ -118,6 +119,14 @@ PROJECT_ANALYSIS.md (完整项目分析 — 架构评估 + 文件功能清单 + 
 **回答的问题**: 新增一个技能要改几个文件？
 
 **何时阅读**: 新增技能前。理解"Scene ≠ 技能身份"原则时。
+
+---
+
+### [equipment_system.md](./equipment_system.md)
+
+**回答的问题**: 如何配置装备、词缀、套装阈值、战斗修正、掉落和装备存档？
+
+**何时阅读**: 新增装备、调整构筑平衡或修改装备存档时。
 
 ---
 

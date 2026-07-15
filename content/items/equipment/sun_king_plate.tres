@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="EquipmentData" load_steps=3 format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/equipment_data.gd" id="1"]
+[ext_resource type="Resource" path="res://content/items/affixes/warded.tres" id="2"]
+[resource]
+script = ExtResource("1")
+id = "sun_king_plate"
+display_name = "日王金甲"
+description = "铠甲并非纯金，而是被凝固的日光覆盖。"
+item_type = 1
+rarity = 4
+sell_price = 180
+slot_type = 1
+item_level = 28
+icon_atlas_index = 7
+stat_modifiers = {"max_hp": 42.0}
+stat_multipliers = {"max_hp": 0.1}
+combat_modifiers = {"damage_reduction": 0.08, "healing_received": 0.15}
+affixes = Array[ExtResource("2")]([ExtResource("2")])
+special_effect_text = "日冕：生命上限与受到的治疗同时提高。"

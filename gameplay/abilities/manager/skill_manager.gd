@@ -254,8 +254,9 @@ func _execute(skill: SkillData, source: String, caster: Node2D, direction: Vecto
 		return false
 
 	# MP 检查
+	var mana_cost := _get_effective_mana_cost(skill, caster)
 	var mana := caster.get_node_or_null("ManaComponent") as ManaComponent
-	if mana and skill.mp_cost > 0 and not mana.use_mp(skill.mp_cost):
+	if mana and mana_cost > 0 and not mana.use_mp(mana_cost):
 		if exec_inst:
 			exec_inst.enter_phase(CombatPhase.Phase.IDLE)
 		return false
@@ -265,8 +266,8 @@ func _execute(skill: SkillData, source: String, caster: Node2D, direction: Vecto
 	var ok := executor.execute(skill, ctx)
 
 	if not ok:
-		if mana and skill.mp_cost > 0:
-			mana.restore_mp(skill.mp_cost)
+		if mana and mana_cost > 0:
+			mana.restore_mp(mana_cost)
 		if exec_inst:
 			exec_inst.enter_phase(CombatPhase.Phase.IDLE)
 		return false
@@ -292,8 +293,9 @@ func _execute_with_context(skill: SkillData, source: String, caster: Node2D, ctx
 			exec_inst.enter_phase(CombatPhase.Phase.IDLE)
 		return false
 
+	var mana_cost := _get_effective_mana_cost(skill, caster)
 	var mana := caster.get_node_or_null("ManaComponent") as ManaComponent
-	if mana and skill.mp_cost > 0 and not mana.use_mp(skill.mp_cost):
+	if mana and mana_cost > 0 and not mana.use_mp(mana_cost):
 		if exec_inst:
 			exec_inst.enter_phase(CombatPhase.Phase.IDLE)
 		return false
@@ -303,8 +305,8 @@ func _execute_with_context(skill: SkillData, source: String, caster: Node2D, ctx
 	var ok := executor.execute(skill, ctx)
 
 	if not ok:
-		if mana and skill.mp_cost > 0:
-			mana.restore_mp(skill.mp_cost)
+		if mana and mana_cost > 0:
+			mana.restore_mp(mana_cost)
 		if exec_inst:
 			exec_inst.enter_phase(CombatPhase.Phase.IDLE)
 		return false
@@ -350,12 +352,31 @@ func _get_cooldown_total(source: String) -> float:
 func _get_effective_cooldown(skill: SkillData, caster: Node2D) -> float:
 	var cooldown := skill.cooldown
 	var player := caster as Player
-	if not player or not player.mastery_manager:
+	if not player:
 		return cooldown
-	var modifier := player.mastery_manager.get_modifier_value("cooldown.%s" % skill.get_id())
-	for tag in skill.tags:
-		modifier += player.mastery_manager.get_modifier_value("cooldown.%s" % tag)
+	var modifier := 0.0
+	if player.mastery_manager:
+		modifier += player.mastery_manager.get_modifier_value("cooldown.%s" % skill.get_id())
+		for tag in skill.tags:
+			modifier += player.mastery_manager.get_modifier_value("cooldown.%s" % tag)
+	var equipment := player.get_node_or_null("EquipmentManager") as EquipmentManager
+	if equipment:
+		modifier += equipment.get_modifier_value("cooldown.all")
+		modifier += equipment.get_modifier_value("cooldown.%s" % skill.get_id())
+		for tag in skill.tags:
+			modifier += equipment.get_modifier_value("cooldown.%s" % tag)
 	return maxf(0.1, cooldown * (1.0 + modifier))
+
+
+func _get_effective_mana_cost(skill: SkillData, caster: Node2D) -> int:
+	var player := caster as Player
+	if not player:
+		return skill.mp_cost
+	var equipment := player.get_node_or_null("EquipmentManager") as EquipmentManager
+	var modifier := equipment.get_modifier_value("mana_cost.all") if equipment else 0.0
+	for tag in skill.tags:
+		modifier += equipment.get_modifier_value("mana_cost.%s" % tag) if equipment else 0.0
+	return maxi(0, int(round(skill.mp_cost * (1.0 + modifier))))
 
 
 ## ── 初始化（兼容旧 API） ──

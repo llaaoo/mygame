@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="EquipmentData" load_steps=4 format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/equipment_data.gd" id="1"]
+[ext_resource type="Resource" path="res://content/items/sets/cinder_arcanist.tres" id="2"]
+[ext_resource type="Resource" path="res://content/items/affixes/focused.tres" id="3"]
+[resource]
+script = ExtResource("1")
+id = "cinder_staff"
+display_name = "灼心法杖"
+description = "杖首封存着一枚永不熄灭的红晶。"
+item_type = 3
+rarity = 3
+sell_price = 92
+slot_type = 6
+item_level = 17
+icon_atlas_index = 23
+stat_modifiers = {"max_mana": 20.0}
+combat_modifiers = {"damage.fire": 0.14, "mana_cost.fire": -0.06}
+affixes = Array[ExtResource("3")]([ExtResource("3")])
+set_data = ExtResource("2")
+special_effect_text = "燃素回路：显著强化火焰法术并降低其消耗。"

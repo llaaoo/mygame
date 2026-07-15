@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="EquipmentData" load_steps=3 format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/equipment_data.gd" id="1"]
+[ext_resource type="Resource" path="res://content/items/affixes/brutal.tres" id="2"]
+[resource]
+script = ExtResource("1")
+id = "headsman_axe"
+display_name = "断罪双刃斧"
+description = "两侧刃口分别刻着罪名与判词。"
+item_type = 3
+rarity = 2
+sell_price = 64
+slot_type = 6
+item_level = 13
+icon_atlas_index = 19
+stat_modifiers = {"attack_damage": 14.0}
+combat_modifiers = {"crit_damage": 0.2}
+affixes = Array[ExtResource("2")]([ExtResource("2")])

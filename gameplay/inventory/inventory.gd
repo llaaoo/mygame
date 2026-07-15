@@ -3,15 +3,23 @@ extends Resource
 ## 背包系统 — 可存储任意 ItemData + 数量的网格
 
 ## 背包容量
-@export var capacity: int = 20
+@export var capacity: int = 20:
+	set(value):
+		capacity = maxi(1, value)
+		_resize_slots()
 
 ## 物品槽位数组（索引 → {item: ItemData, quantity: int}）
 var _slots: Array[Dictionary] = []
 
 
 func _init() -> void:
+	_resize_slots()
+
+
+func _resize_slots() -> void:
+	var old_size := _slots.size()
 	_slots.resize(capacity)
-	for i in range(capacity):
+	for i in range(old_size, capacity):
 		_slots[i] = {"item": null, "quantity": 0}
 
 

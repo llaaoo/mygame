@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="EquipmentData" load_steps=3 format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/equipment_data.gd" id="1"]
+[ext_resource type="Resource" path="res://content/items/affixes/focused.tres" id="2"]
+[resource]
+script = ExtResource("1")
+id = "pilgrim_robe"
+display_name = "星路朝圣袍"
+description = "蓝色缝线记录着一条已经消失的星路。"
+item_type = 1
+rarity = 2
+sell_price = 62
+slot_type = 1
+item_level = 12
+icon_atlas_index = 9
+stat_modifiers = {"max_mana": 22.0, "move_speed": 8.0}
+combat_modifiers = {"mana_cost.all": -0.05}
+affixes = Array[ExtResource("2")]([ExtResource("2")])

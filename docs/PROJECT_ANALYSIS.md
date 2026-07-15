@@ -48,7 +48,7 @@
 | 事件系统 | ✅ 完成 | CombatEventBus + CombatExecutor 唯一写入口 |
 | 效果图 | ✅ 完成 | EffectGraph（序列/分支/条件门节点） |
 | Buff/状态 | ✅ 完成 | status_id + 叠加规则 + DOT/HOT + 减速 |
-| 装备系统 | ✅ 完成 | 7 槽位 + 纸娃娃拖拽 UI |
+| 装备系统 | ✅ 扩展 | 9 槽位 + 词缀 + 套装阈值 + 30 件配置化装备 |
 | 背包系统 | ✅ 完成 | 网格背包 + 堆叠 |
 | 属性/升级 | ✅ 完成 | STR/INT/AGI/END + 属性点分配 |
 | Quest 任务 | ✅ 完成 | 多阶段 + KillObjective + InteractObjective |
@@ -176,7 +176,7 @@ res://
 │   │   └── buff_manager.gd            # Buff 管理器（施加/过期/叠加）
 │   ├── inventory/
 │   │   ├── inventory.gd               # 背包 Resource
-│   │   ├── equipment_manager.gd       # 装备管理器（7槽位）
+│   │   ├── equipment_manager.gd       # 装备管理器（9槽位、词缀与套装汇总）
 │   │   └── data/
 │   │       ├── item_data.gd           # ItemData Resource
 │   │       └── equipment_data.gd      # EquipmentData Resource
@@ -785,7 +785,7 @@ res://
 **继承**: `Node`
 
 **功能**:
-- 7 个装备槽位：`Head / Chest / Legs / Feet / Hands / LeftHand / RightHand`
+- 9 个装备槽位：`Head / Chest / Legs / Feet / Hands / LeftHand / RightHand / Amulet / Ring`
 - `equip(equipment)` / `unequip(slot)` → 自动通过 BuffManager 施加/移除属性
 - 装备属性以 `duration=0`（永久）的 Buff 形式施加
 
@@ -1195,7 +1195,7 @@ res://
 **功能**:
 - I 键切换打开/关闭
 - 网格背包（5 列）+ 纸娃娃装备面板
-- 7 个装备槽位按钮（替换场景中普通 Button 为 SlotButton）
+- 9 个装备槽位按钮（替换场景中普通 Button 为 SlotButton）
 - 拖拽支持：背包↔装备、装备↔装备、背包↔背包
 - 类型校验：装备拖到装备槽时检查 slot_type 兼容性
 

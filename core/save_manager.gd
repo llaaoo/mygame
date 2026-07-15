@@ -1,7 +1,7 @@
 class_name SaveManager
 extends Node
 
-const VERSION: int = 2
+const VERSION: int = 3
 
 static var instance: SaveManager
 
@@ -135,6 +135,10 @@ func _collect_player() -> SaveData.PlayerData:
 	if player.mana_component:
 		p.mp = player.mana_component.mp
 		p.max_mp = player.mana_component.max_mp
+	var equipment := player.get_node_or_null("EquipmentManager") as EquipmentManager
+	if equipment:
+		p.max_hp -= int(equipment.get_applied_stat_modifier("max_hp"))
+		p.max_mp -= int(equipment.get_applied_stat_modifier("max_mana"))
 
 	var sc := player.stats_component
 	if sc:
@@ -156,6 +160,10 @@ func _collect_player() -> SaveData.PlayerData:
 					"quantity": slot.quantity,
 					"slot": i,
 				})
+	if equipment:
+		for item in equipment.get_all_equipped():
+			if item and not item.resource_path.is_empty():
+				p.equipment_items.append({"path": item.resource_path, "slot": int(item.slot_type)})
 
 	var sm := player.skill_manager as SkillManager
 	if sm:
@@ -238,6 +246,12 @@ func _migrate(raw: Dictionary) -> Dictionary:
 				data["extensions"] = data.get("extensions", {})
 				version = 2
 				data["version"] = version
+			2:
+				var player_data: Dictionary = data.get("player", {})
+				player_data["equipment_items"] = player_data.get("equipment_items", [])
+				data["player"] = player_data
+				version = 3
+				data["version"] = version
 			_:
 				push_error("SaveManager: no migration from version %d." % version)
 				return {}
@@ -248,6 +262,9 @@ func _restore_player(p: SaveData.PlayerData) -> void:
 	var player := _get_player()
 	if not player:
 		return
+	var equipment := player.get_node_or_null("EquipmentManager") as EquipmentManager
+	if equipment:
+		equipment.clear_all()
 
 	player.global_position = p.position
 
@@ -314,6 +331,19 @@ func _restore_player(p: SaveData.PlayerData) -> void:
 	var buff_manager := player.get_node_or_null("BuffManager") as BuffManager
 	if buff_manager:
 		buff_manager.restore_state(p.buff_state)
+
+	# Equipment is rebuilt after ordinary buffs because restore_state() clears runtime buffs first.
+	if equipment:
+		for entry: Dictionary in p.equipment_items:
+			var item := load(str(entry.get("path", ""))) as EquipmentData
+			if item:
+				equipment.equip(item)
+		if player.health_component:
+			player.health_component.hp = clampi(p.hp, 1, player.health_component.max_hp)
+			player.health_changed.emit(player.health_component.hp, player.health_component.max_hp)
+		if player.mana_component:
+			player.mana_component.mp = clampi(p.mp, 0, player.mana_component.max_mp)
+			player.mp_changed.emit(player.mana_component.mp, player.mana_component.max_mp)
 
 
 func _restore_world(w: SaveData.WorldData) -> void:

@@ -1113,13 +1113,16 @@ func _setup_skill_pool_ui() -> void:
 func _add_test_items() -> void:
 	if not inventory:
 		return
-	var helmet = load("res://content/items/examples/iron_helmet.tres")
-	var armor = load("res://content/items/examples/leather_armor.tres")
-	var boots = load("res://content/items/examples/iron_boots.tres")
-	inventory.add_item(helmet, 1)
-	inventory.add_item(armor, 1)
-	inventory.add_item(boots, 1)
-	print("🎒 测试装备已添加到背包")
+	var showcase_ids: Array[String] = [
+		"vanguard_helmet", "vanguard_cuirass", "vanguard_greaves",
+		"vanguard_gauntlets", "vanguard_shield", "cinder_staff",
+		"cinder_amulet", "night_blade", "night_ring", "chronoglass",
+	]
+	for item_id in showcase_ids:
+		var item := EquipmentCatalog.get_by_id(item_id)
+		if item and inventory.get_item_count(item) == 0:
+			inventory.add_item(item)
+	print("🎒 装备展示内容已添加到背包")
 
 
 ## ── 瞄准指示器 ──
@@ -1266,8 +1269,12 @@ func cast_slot(idx: int) -> bool:
 
 
 func take_damage(amount: int) -> void:
-	health_component.take_damage(amount)
+	var equipment := get_node_or_null("EquipmentManager") as EquipmentManager
+	var reduction := clampf(equipment.get_modifier_value("damage_reduction"), 0.0, 0.75) if equipment else 0.0
+	health_component.take_damage(maxi(1, int(round(amount * (1.0 - reduction)))))
 
 
 func heal(amount: int) -> void:
-	health_component.heal(amount)
+	var equipment := get_node_or_null("EquipmentManager") as EquipmentManager
+	var multiplier := 1.0 + (equipment.get_modifier_value("healing_received") if equipment else 0.0)
+	health_component.heal(maxi(0, int(round(amount * multiplier))))

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="EquipmentData" load_steps=3 format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/equipment_data.gd" id="1"]
+[ext_resource type="Resource" path="res://content/items/affixes/focused.tres" id="2"]
+[resource]
+script = ExtResource("1")
+id = "tide_staff"
+display_name = "深蓝潮杖"
+description = "杖首水珠不会落下，也不会蒸发。"
+item_type = 3
+rarity = 3
+sell_price = 94
+slot_type = 6
+item_level = 18
+icon_atlas_index = 21
+stat_modifiers = {"max_mana": 24.0}
+combat_modifiers = {"damage.water": 0.18, "damage.ice": 0.08, "mana_cost.water": -0.08}
+affixes = Array[ExtResource("2")]([ExtResource("2")])

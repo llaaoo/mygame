@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="EquipmentData" load_steps=3 format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/equipment_data.gd" id="1"]
+[ext_resource type="Resource" path="res://content/items/sets/night_hunter.tres" id="2"]
+[resource]
+script = ExtResource("1")
+id = "night_gloves"
+display_name = "无声手套"
+description = "掌心覆着细密倒刺，能稳稳扣住武器。"
+item_type = 1
+rarity = 2
+sell_price = 48
+slot_type = 4
+item_level = 9
+icon_atlas_index = 12
+stat_modifiers = {"attack_damage": 3.0}
+combat_modifiers = {"crit_chance": 0.04}
+set_data = ExtResource("2")

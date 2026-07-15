@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="EquipmentData" load_steps=4 format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/equipment_data.gd" id="1"]
+[ext_resource type="Resource" path="res://content/items/sets/night_hunter.tres" id="2"]
+[ext_resource type="Resource" path="res://content/items/affixes/brutal.tres" id="3"]
+[resource]
+script = ExtResource("1")
+id = "night_blade"
+display_name = "月蚀短刃"
+description = "刃面只在月光下显出银线。"
+item_type = 3
+rarity = 3
+sell_price = 86
+slot_type = 6
+item_level = 16
+icon_atlas_index = 18
+stat_modifiers = {"attack_damage": 10.0}
+combat_modifiers = {"damage.shadow": 0.12, "crit_damage": 0.15}
+affixes = Array[ExtResource("3")]([ExtResource("3")])
+set_data = ExtResource("2")

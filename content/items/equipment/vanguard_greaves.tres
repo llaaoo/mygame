@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="EquipmentData" load_steps=3 format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/equipment_data.gd" id="1"]
+[ext_resource type="Resource" path="res://content/items/sets/iron_vanguard.tres" id="2"]
+[resource]
+script = ExtResource("1")
+id = "vanguard_greaves"
+display_name = "先锋链甲腿铠"
+description = "层叠锁甲让防护与行动保持平衡。"
+item_type = 1
+rarity = 2
+sell_price = 48
+slot_type = 2
+item_level = 9
+icon_atlas_index = 16
+stat_modifiers = {"max_hp": 18.0, "move_speed": 6.0}
+set_data = ExtResource("2")
