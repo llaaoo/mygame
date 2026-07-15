@@ -8,7 +8,7 @@ var _quest_manager: QuestManager = null
 
 
 func _ready() -> void:
-	layer = 110
+	layer = GameUIStyle.LAYER_TRACKER
 
 
 func setup(mgr: QuestManager) -> void:
@@ -26,34 +26,27 @@ func _build_ui() -> void:
 	add_child(root)
 
 	_panel = PanelContainer.new()
-	_panel.set_anchors_preset(Control.PRESET_CENTER_TOP)
-	_panel.offset_top = 120
+	_panel.anchor_left = 1.0
+	_panel.anchor_right = 1.0
+	_panel.offset_left = -310
+	_panel.offset_right = -12
+	_panel.offset_top = 232
+	_panel.offset_bottom = 304
 	root.add_child(_panel)
 
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0, 0, 0, 0.7)
-	style.corner_radius_top_left = 4
-	style.corner_radius_top_right = 4
-	style.corner_radius_bottom_left = 4
-	style.corner_radius_bottom_right = 4
-	style.content_margin_left = 16
-	style.content_margin_right = 16
-	style.content_margin_top = 8
-	style.content_margin_bottom = 8
-	_panel.add_theme_stylebox_override("panel", style)
+	_panel.add_theme_stylebox_override("panel", GameUIStyle.panel_style(0.90, 5, GameUIStyle.ACCENT))
 
 	var vbox := VBoxContainer.new()
 	_panel.add_child(vbox)
 
 	_title_label = Label.new()
-	_title_label.text = "Quest"
-	_title_label.add_theme_font_size_override("font_size", 16)
-	_title_label.add_theme_color_override("font_color", Color(1, 0.85, 0.3))
+	_title_label.text = "当前目标"
+	GameUIStyle.apply_label(_title_label, 13, GameUIStyle.GOLD)
 	vbox.add_child(_title_label)
 
 	_progress_label = Label.new()
-	_progress_label.add_theme_font_size_override("font_size", 12)
-	_progress_label.add_theme_color_override("font_color", Color(0.8, 0.8, 0.8))
+	_progress_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	GameUIStyle.apply_label(_progress_label, 11, GameUIStyle.TEXT_MAIN)
 	vbox.add_child(_progress_label)
 
 
@@ -68,7 +61,7 @@ func _on_quest_started(quest_id: String) -> void:
 
 func _on_quest_completed(_quest_id: String) -> void:
 	if _quest_manager.get_active_quests().is_empty():
-		_title_label.text = "Quest completed"
+		_title_label.text = "目标完成"
 		_progress_label.text = ""
 		var timer := get_tree().create_timer(2.0)
 		timer.timeout.connect(hide)

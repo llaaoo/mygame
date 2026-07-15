@@ -9,7 +9,7 @@ var _boss: Boss = null
 
 
 func _ready() -> void:
-	layer = 90
+	layer = GameUIStyle.LAYER_BOSS
 	add_to_group("boss_bar")
 	_build_ui()
 	hide()
@@ -18,12 +18,13 @@ func _ready() -> void:
 func _build_ui() -> void:
 	_panel = PanelContainer.new()
 	_panel.name = "BossPanel"
-	_panel.anchor_left = 0.34
-	_panel.anchor_right = 0.66
-	_panel.anchor_top = 0.025
-	_panel.anchor_bottom = 0.025
-	_panel.offset_bottom = 46
-	_panel.add_theme_stylebox_override("panel", GameUIStyle.panel_style(0.72, 4))
+	_panel.anchor_left = 0.29
+	_panel.anchor_right = 0.71
+	_panel.anchor_top = 0.0
+	_panel.anchor_bottom = 0.0
+	_panel.offset_top = 90
+	_panel.offset_bottom = 138
+	_panel.add_theme_stylebox_override("panel", GameUIStyle.panel_style(0.91, 4, GameUIStyle.DANGER))
 	add_child(_panel)
 
 	var margin := MarginContainer.new()
@@ -44,7 +45,7 @@ func _build_ui() -> void:
 	_name_label = Label.new()
 	_name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	GameUIStyle.apply_label(_name_label, 14, GameUIStyle.GOLD)
+	GameUIStyle.apply_label(_name_label, 13, GameUIStyle.TEXT_MAIN)
 	top.add_child(_name_label)
 
 	_hp_label = Label.new()
@@ -54,12 +55,11 @@ func _build_ui() -> void:
 	top.add_child(_hp_label)
 
 	_hp_bar = ProgressBar.new()
-	_hp_bar.custom_minimum_size = Vector2(0, 9)
+	_hp_bar.custom_minimum_size = Vector2(0, 10)
 	_hp_bar.show_percentage = false
 	_hp_bar.max_value = 1.0
 	_hp_bar.value = 1.0
-	_hp_bar.add_theme_stylebox_override("background", GameUIStyle.bar_bg())
-	_hp_bar.add_theme_stylebox_override("fill", GameUIStyle.bar_fill(Color(0.82, 0.18, 0.14, 1.0)))
+	GameUIStyle.apply_progress(_hp_bar, GameUIStyle.DANGER, 10)
 	vbox.add_child(_hp_bar)
 
 

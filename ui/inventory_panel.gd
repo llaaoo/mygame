@@ -30,16 +30,29 @@ const SLOT_BUTTON_MAP := {
 
 
 func _ready() -> void:
-	layer = 170
+	layer = GameUIStyle.LAYER_MODAL
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	add_to_group("modal_ui")
 	hide()
+	_background.color = GameUIStyle.modal_backdrop()
+	_panel.add_theme_stylebox_override("panel", GameUIStyle.panel_style(0.985, 6, GameUIStyle.BORDER_STRONG))
 	_inv_grid.columns = columns
 	_setup_equip_buttons()
+	_apply_theme()
+	_add_close_button()
 
 
 func _input(event: InputEvent) -> void:
-	if event is InputEventKey and event.keycode == KEY_I and event.pressed and not event.echo:
+	if not event is InputEventKey or not event.pressed or event.echo:
+		return
+	if visible and event.keycode == KEY_ESCAPE:
+		close()
+		get_viewport().set_input_as_handled()
+	elif event.keycode == KEY_I:
+		if get_tree().paused and not visible:
+			return
 		toggle()
+		get_viewport().set_input_as_handled()
 
 
 func setup(inv: Inventory, manager: EquipmentManager) -> void:
@@ -57,23 +70,40 @@ func toggle() -> void:
 
 
 func open() -> void:
-	_set_ui_blocked(true)
 	_refresh_all()
 	show()
 	_background.show()
+	GameUIStyle.begin_modal(self)
 
 
 func close() -> void:
-	_set_ui_blocked(false)
 	hide()
 	_background.hide()
+	GameUIStyle.end_modal(self)
 
 
-func _set_ui_blocked(blocked: bool) -> void:
-	get_tree().paused = blocked
-	var player := get_tree().get_first_node_in_group("player")
-	if player:
-		player.set("ui_blocked", blocked)
+func _apply_theme() -> void:
+	var equip_title := _panel.get_node("Margin/Main/EquipmentSection/EquipTitle") as Label
+	var inv_title := _panel.get_node("Margin/Main/InventorySection/InvTitle") as Label
+	GameUIStyle.apply_title(equip_title, 21)
+	GameUIStyle.apply_title(inv_title, 21)
+	GameUIStyle.apply_label(_summary, 12, GameUIStyle.TEXT_MAIN)
+	GameUIStyle.apply_label(_sets, 11, GameUIStyle.TEXT_MUTED)
+
+
+func _add_close_button() -> void:
+	var close_button := Button.new()
+	close_button.name = "CloseButton"
+	close_button.text = "×"
+	close_button.tooltip_text = "关闭"
+	close_button.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	close_button.offset_left = -52
+	close_button.offset_top = 12
+	close_button.offset_right = -14
+	close_button.offset_bottom = 50
+	GameUIStyle.apply_button(close_button, GameUIStyle.DANGER)
+	close_button.pressed.connect(close)
+	_panel.add_child(close_button)
 
 
 func _setup_equip_buttons() -> void:

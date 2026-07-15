@@ -11,6 +11,7 @@ var _ignore_input_until_msec: int = 0
 
 
 func _ready() -> void:
+	layer = GameUIStyle.LAYER_CRITICAL
 	add_to_group("dialogue_balloon")
 	if active != null and is_instance_valid(active) and active != self:
 		active.queue_free()
@@ -35,35 +36,53 @@ func advance() -> void:
 
 
 func _setup_ui(npc_name: String) -> void:
-	var bg := ColorRect.new()
+	var dim := ColorRect.new()
+	dim.name = "DialogueDim"
+	dim.color = Color(0, 0, 0, 0.18)
+	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(dim)
+
+	var bg := PanelContainer.new()
 	bg.name = "BG"
-	bg.color = Color(0.05, 0.05, 0.1, 0.92)
-	bg.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
-	bg.offset_top = -120
-	bg.offset_bottom = 0
+	bg.anchor_left = 0.12
+	bg.anchor_right = 0.88
+	bg.anchor_top = 1.0
+	bg.anchor_bottom = 1.0
+	bg.offset_top = -154
+	bg.offset_bottom = -18
+	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	bg.add_theme_stylebox_override("panel", GameUIStyle.panel_style(0.98, 6, GameUIStyle.BORDER_STRONG))
 	add_child(bg)
+
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 5)
+	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	bg.add_child(box)
+	if not npc_name.is_empty():
+		var speaker := Label.new()
+		speaker.text = npc_name
+		speaker.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		GameUIStyle.apply_label(speaker, 13, GameUIStyle.GOLD)
+		box.add_child(speaker)
 
 	_label = RichTextLabel.new()
 	_label.name = "Text"
-	_label.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_label.offset_left = 20
-	_label.offset_top = 10
-	_label.offset_right = -20
-	_label.offset_bottom = -30
+	_label.custom_minimum_size = Vector2(0, 68)
+	_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_label.fit_content = true
 	_label.bbcode_enabled = true
-	_label.add_theme_font_size_override("normal_font_size", 16)
-	bg.add_child(_label)
+	_label.add_theme_font_size_override("normal_font_size", 15)
+	_label.add_theme_color_override("default_color", GameUIStyle.TEXT_MAIN)
+	box.add_child(_label)
 
 	var hint := Label.new()
 	hint.name = "Hint"
-	hint.text = "[E / click to continue]"
-	hint.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
-	hint.offset_top = -20
-	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	hint.add_theme_color_override("font_color", Color(0.5, 0.5, 0.5))
-	hint.add_theme_font_size_override("font_size", 11)
-	bg.add_child(hint)
+	hint.text = "继续  ›"
+	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	GameUIStyle.apply_label(hint, 11, GameUIStyle.TEXT_MUTED)
+	box.add_child(hint)
 
 
 func _show_current_line() -> void:

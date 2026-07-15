@@ -34,18 +34,7 @@ func _setup_ui() -> void:
 	_panel.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(_panel)
 
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.05, 0.05, 0.08, 0.92)
-	style.border_width_left = 2
-	style.border_width_right = 2
-	style.border_width_top = 2
-	style.border_width_bottom = 2
-	style.border_color = Color(0.3, 0.6, 1.0, 0.5)
-	style.corner_radius_top_left = 6
-	style.corner_radius_top_right = 6
-	style.corner_radius_bottom_left = 6
-	style.corner_radius_bottom_right = 6
-	_panel.add_theme_stylebox_override("panel", style)
+	_panel.add_theme_stylebox_override("panel", GameUIStyle.panel_style(0.97, 5, GameUIStyle.ACCENT))
 
 	var vbox := VBoxContainer.new()
 	vbox.add_theme_constant_override("separation", 4)
@@ -53,9 +42,8 @@ func _setup_ui() -> void:
 
 	# 标题
 	var title := Label.new()
-	title.text = "⚔️ Combat Debugger"
-	title.add_theme_font_size_override("font_size", 14)
-	title.add_theme_color_override("font_color", Color(0.3, 0.8, 1.0))
+	title.text = "COMBAT TRACE"
+	GameUIStyle.apply_label(title, 13, GameUIStyle.ACCENT)
 	vbox.add_child(title)
 
 	# 内容
@@ -72,17 +60,20 @@ func _setup_ui() -> void:
 	vbox.add_child(hbox)
 
 	var refresh_btn := Button.new()
-	refresh_btn.text = "🔄 Refresh"
+	refresh_btn.text = "刷新"
+	GameUIStyle.apply_button(refresh_btn, GameUIStyle.ACCENT)
 	refresh_btn.pressed.connect(_refresh)
 	hbox.add_child(refresh_btn)
 
 	var clear_btn := Button.new()
-	clear_btn.text = "🗑️ Clear"
+	clear_btn.text = "清空"
+	GameUIStyle.apply_button(clear_btn, GameUIStyle.DANGER)
 	clear_btn.pressed.connect(_on_clear)
 	hbox.add_child(clear_btn)
 
 	var toggle_trace_btn := Button.new()
-	toggle_trace_btn.text = "⏯️ Toggle Trace"
+	toggle_trace_btn.text = "切换记录"
+	GameUIStyle.apply_button(toggle_trace_btn, GameUIStyle.GOLD)
 	toggle_trace_btn.pressed.connect(_on_toggle_trace)
 	hbox.add_child(toggle_trace_btn)
 

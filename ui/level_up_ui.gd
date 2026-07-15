@@ -27,19 +27,22 @@ var _stat_rows: Dictionary = {}
 
 const STAT_NAMES: Array[String] = ["strength", "intelligence", "agility", "endurance"]
 const STAT_DISPLAY: Dictionary = {
-	"strength":     {"icon": "💪", "name": "力量"},
-	"intelligence": {"icon": "🧠", "name": "智力"},
-	"agility":      {"icon": "🏃", "name": "敏捷"},
-	"endurance":    {"icon": "🛡️", "name": "耐力"},
+	"strength":     {"icon": "力", "name": "力量"},
+	"intelligence": {"icon": "智", "name": "智力"},
+	"agility":      {"icon": "敏", "name": "敏捷"},
+	"endurance":    {"icon": "耐", "name": "耐力"},
 }
 
 
 func _ready() -> void:
 	hide()
-	layer = 200  # 高于 HUD(100)，确保不被遮挡
+	layer = GameUIStyle.LAYER_CRITICAL
+	process_mode = Node.PROCESS_MODE_ALWAYS
+	add_to_group("modal_ui")
 	# Background 必须拦截点击，防止穿透到游戏
 	_background.mouse_filter = Control.MOUSE_FILTER_STOP
 	_setup_stat_rows()
+	_apply_theme()
 	_confirm_button.pressed.connect(_on_confirm_pressed)
 
 
@@ -78,11 +81,30 @@ func _setup_stat_rows() -> void:
 		_stat_rows[stat_name]["minus_btn"].pressed.connect(_on_minus.bind(stat_name))
 
 
+func _apply_theme() -> void:
+	_background.color = GameUIStyle.modal_backdrop(0.76)
+	_panel.add_theme_stylebox_override("panel", GameUIStyle.panel_style(0.99, 6, GameUIStyle.BORDER_STRONG))
+	GameUIStyle.apply_title(_level_label, 24)
+	GameUIStyle.apply_label(_points_label, 14, GameUIStyle.ACCENT)
+	GameUIStyle.apply_button(_confirm_button, GameUIStyle.SUCCESS)
+	_derived_label.add_theme_color_override("default_color", GameUIStyle.TEXT_MUTED)
+	for stat_name in STAT_NAMES:
+		var row = _stat_rows.get(stat_name)
+		if not row:
+			continue
+		GameUIStyle.apply_button(row["minus_btn"], GameUIStyle.DANGER)
+		GameUIStyle.apply_button(row["plus_btn"], GameUIStyle.SUCCESS)
+		var row_node := row["value_label"].get_parent() as HBoxContainer
+		var icon_label := row_node.get_node("IconLabel") as Label
+		icon_label.text = STAT_DISPLAY[stat_name]["icon"]
+		GameUIStyle.apply_label(icon_label, 13, GameUIStyle.GOLD)
+
+
 ## ── 升级回调 ──
 
 func _on_level_up(new_level: int) -> void:
 	_pending.clear()
-	_level_label.text = "🎉 升级！ Lv.%d" % new_level
+	_level_label.text = "等级提升 · Lv.%d" % new_level
 	_refresh_all()
 	_show_with_effect()
 
@@ -90,8 +112,8 @@ func _on_level_up(new_level: int) -> void:
 ## ── 显示 / 隐藏 ──
 
 func _show_with_effect() -> void:
-	_set_ui_blocked(true)
 	show()
+	GameUIStyle.begin_modal(self)
 
 	# 重置特效元素
 	_effect_flash.modulate.a = 0.7
@@ -120,12 +142,16 @@ func _show_with_effect() -> void:
 
 
 func _hide() -> void:
-	_set_ui_blocked(false)
 	var tween := create_tween()
 	tween.set_parallel(true)
 	tween.tween_property(_panel, "modulate:a", 0.0, 0.2)
 	tween.tween_property(_panel, "scale", Vector2(0.9, 0.9), 0.2)
-	tween.tween_callback(hide).set_delay(0.2)
+	tween.tween_callback(_finish_hide).set_delay(0.2)
+
+
+func _finish_hide() -> void:
+	hide()
+	GameUIStyle.end_modal(self)
 
 
 ## ── 按钮回调 ──
@@ -226,7 +252,7 @@ func _refresh_derived_preview() -> void:
 	var magic_dmg: int = i * 2
 	var speed_bonus: float = a * 3.0
 
-	var lines: Array[String] = ["━━ 派生属性预览 ━━"]
+	var lines: Array[String] = ["[color=#969ea8]派生属性预览[/color]"]
 
 	# 对比当前值
 	var cur_hp: int = stats_component.endurance * 5
@@ -235,24 +261,24 @@ func _refresh_derived_preview() -> void:
 	var cur_speed: float = stats_component.agility * 3.0
 
 	if hp_bonus != cur_hp:
-		lines.append("❤️ 生命加成: %d → %s" % [cur_hp, _colored(hp_bonus, cur_hp)])
+		lines.append("生命加成  %d → %s" % [cur_hp, _colored(hp_bonus, cur_hp)])
 	else:
-		lines.append("❤️ 生命加成: %d" % hp_bonus)
+		lines.append("生命加成  %d" % hp_bonus)
 
 	if phys_dmg != cur_phys:
-		lines.append("⚔️ 物理伤害: %d → %s" % [cur_phys, _colored(phys_dmg, cur_phys)])
+		lines.append("物理伤害  %d → %s" % [cur_phys, _colored(phys_dmg, cur_phys)])
 	else:
-		lines.append("⚔️ 物理伤害: %d" % phys_dmg)
+		lines.append("物理伤害  %d" % phys_dmg)
 
 	if magic_dmg != cur_magic:
-		lines.append("🔮 魔法伤害: %d → %s" % [cur_magic, _colored(magic_dmg, cur_magic)])
+		lines.append("魔法伤害  %d → %s" % [cur_magic, _colored(magic_dmg, cur_magic)])
 	else:
-		lines.append("🔮 魔法伤害: %d" % magic_dmg)
+		lines.append("魔法伤害  %d" % magic_dmg)
 
 	if speed_bonus != cur_speed:
-		lines.append("💨 移速加成: %.0f → %s" % [cur_speed, _colored_float(speed_bonus, cur_speed)])
+		lines.append("移速加成  %.0f → %s" % [cur_speed, _colored_float(speed_bonus, cur_speed)])
 	else:
-		lines.append("💨 移速加成: %.0f" % speed_bonus)
+		lines.append("移速加成  %.0f" % speed_bonus)
 
 	_derived_label.clear()
 	for line in lines:
@@ -269,8 +295,3 @@ func _colored_float(new_val: float, old_val: float) -> String:
 	if new_val > old_val:
 		return "[color=#4dff4d]%.0f[/color]" % new_val
 	return "%.0f" % new_val
-
-
-func _set_ui_blocked(blocked: bool) -> void:
-	var p = get_tree().get_first_node_in_group("player")
-	if p: p.set("ui_blocked", blocked)

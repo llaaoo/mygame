@@ -9,8 +9,8 @@ var _refresh_accum: float = 0.0
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	visible = false
-	add_theme_stylebox_override("panel", GameUIStyle.panel_style(0.78, 5))
-	custom_minimum_size = Vector2(210, 0)
+	add_theme_stylebox_override("panel", GameUIStyle.panel_style(0.88, 5))
+	custom_minimum_size = Vector2(214, 0)
 
 	var margin := MarginContainer.new()
 	margin.add_theme_constant_override("margin_left", 8)
@@ -111,7 +111,7 @@ func _format_name(entry: Dictionary) -> String:
 	if stacks > 1:
 		label += " x%d" % stacks
 	if remaining > 0.0:
-		label += "  %.0fs" % remaining
+		label += "  %.1fs" % remaining
 	return label
 
 

@@ -545,14 +545,14 @@ func _show_reward_panel(choices: Array[Dictionary]) -> void:
 	var dim := ColorRect.new()
 	dim.name = "RewardDim"
 	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
-	dim.color = Color(0, 0, 0, 0.48)
+	dim.color = GameUIStyle.modal_backdrop(0.76)
 
 	var panel := PanelContainer.new()
 	panel.name = "RunRewardPanel"
 	panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
-	panel.custom_minimum_size = Vector2(760, 320)
-	panel.position = Vector2(-380, -160)
-	panel.add_theme_stylebox_override("panel", _panel_style(Color(0.055, 0.06, 0.075, 0.96), Color(0.82, 0.64, 0.32, 0.75), 2))
+	panel.custom_minimum_size = Vector2(820, 350)
+	panel.position = Vector2(-410, -175)
+	panel.add_theme_stylebox_override("panel", GameUIStyle.panel_style(0.99, 6, GameUIStyle.BORDER_STRONG))
 	dim.add_child(panel)
 
 	var margin := MarginContainer.new()
@@ -569,8 +569,7 @@ func _show_reward_panel(choices: Array[Dictionary]) -> void:
 	var title := Label.new()
 	title.text = "选择奖励"
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.add_theme_font_size_override("font_size", 28)
-	title.modulate = Color(0.95, 0.82, 0.52, 1.0)
+	GameUIStyle.apply_title(title, 26)
 	root.add_child(title)
 
 	var row := HBoxContainer.new()
@@ -579,10 +578,12 @@ func _show_reward_panel(choices: Array[Dictionary]) -> void:
 
 	for reward in choices:
 		var btn := Button.new()
-		btn.custom_minimum_size = Vector2(230, 190)
+		btn.custom_minimum_size = Vector2(246, 210)
+		btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		btn.text = "%s\n\n%s" % [reward.get("title", "奖励"), reward.get("description", "")]
 		btn.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		btn.add_theme_font_size_override("font_size", 16)
+		GameUIStyle.apply_button(btn, _reward_accent(str(reward.get("type", ""))))
+		btn.add_theme_font_size_override("font_size", 14)
 		btn.pressed.connect(_on_reward_selected.bind(reward))
 		row.add_child(btn)
 
@@ -722,14 +723,14 @@ func _show_result_panel(title_text: String, body_text: String, button_text: Stri
 	var dim := ColorRect.new()
 	dim.name = "RunResultDim"
 	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
-	dim.color = Color(0, 0, 0, 0.56)
+	dim.color = GameUIStyle.modal_backdrop(0.78)
 
 	var panel := PanelContainer.new()
 	panel.name = "RunResultPanel"
 	panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
-	panel.custom_minimum_size = Vector2(500, 360)
-	panel.position = Vector2(-250, -180)
-	panel.add_theme_stylebox_override("panel", _panel_style(Color(0.055, 0.06, 0.075, 0.96), Color(0.82, 0.64, 0.32, 0.75), 2))
+	panel.custom_minimum_size = Vector2(520, 370)
+	panel.position = Vector2(-260, -185)
+	panel.add_theme_stylebox_override("panel", GameUIStyle.panel_style(0.99, 6, GameUIStyle.BORDER_STRONG))
 	dim.add_child(panel)
 
 	var margin := MarginContainer.new()
@@ -746,14 +747,13 @@ func _show_result_panel(title_text: String, body_text: String, button_text: Stri
 	var title := Label.new()
 	title.text = title_text
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.add_theme_font_size_override("font_size", 30)
-	title.modulate = Color(0.95, 0.82, 0.52, 1.0)
+	GameUIStyle.apply_title(title, 28)
 	box.add_child(title)
 
 	var body := Label.new()
 	body.text = body_text
 	body.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	body.add_theme_font_size_override("font_size", 16)
+	GameUIStyle.apply_label(body, 14, GameUIStyle.TEXT_MAIN)
 	box.add_child(body)
 
 	var upgrades := HBoxContainer.new()
@@ -763,10 +763,12 @@ func _show_result_panel(title_text: String, body_text: String, button_text: Stri
 
 	var vitality := Button.new()
 	vitality.custom_minimum_size = Vector2(190, 54)
+	GameUIStyle.apply_button(vitality, GameUIStyle.HEALTH)
 	upgrades.add_child(vitality)
 
 	var focus := Button.new()
 	focus.custom_minimum_size = Vector2(190, 54)
+	GameUIStyle.apply_button(focus, GameUIStyle.MANA)
 	upgrades.add_child(focus)
 
 	var refresh_upgrades := func() -> void:
@@ -792,6 +794,7 @@ func _show_result_panel(title_text: String, body_text: String, button_text: Stri
 	var restart := Button.new()
 	restart.text = button_text
 	restart.custom_minimum_size = Vector2(0, 44)
+	GameUIStyle.apply_button(restart, GameUIStyle.GOLD)
 	restart.pressed.connect(func() -> void:
 		get_tree().change_scene_to_file("res://main.tscn")
 	)
@@ -811,16 +814,16 @@ func _toggle_pause() -> void:
 	var dim := ColorRect.new()
 	dim.name = "RunPauseDim"
 	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
-	dim.color = Color(0, 0, 0, 0.52)
+	dim.color = GameUIStyle.modal_backdrop(0.72)
 	dim.process_mode = Node.PROCESS_MODE_ALWAYS
 
 	var panel := PanelContainer.new()
 	panel.name = "RunPausePanel"
 	panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
-	panel.custom_minimum_size = Vector2(360, 230)
-	panel.position = Vector2(-180, -115)
+	panel.custom_minimum_size = Vector2(380, 220)
+	panel.position = Vector2(-190, -110)
 	panel.process_mode = Node.PROCESS_MODE_ALWAYS
-	panel.add_theme_stylebox_override("panel", _panel_style(Color(0.055, 0.06, 0.075, 0.98), Color(0.48, 0.62, 0.74, 0.72), 2))
+	panel.add_theme_stylebox_override("panel", GameUIStyle.panel_style(0.99, 6, GameUIStyle.ACCENT))
 	dim.add_child(panel)
 
 	var margin := MarginContainer.new()
@@ -837,19 +840,20 @@ func _toggle_pause() -> void:
 	var title := Label.new()
 	title.text = "暂停"
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.add_theme_font_size_override("font_size", 28)
-	title.modulate = Color(0.92, 0.94, 0.97, 1.0)
+	GameUIStyle.apply_title(title, 26)
 	box.add_child(title)
 
 	var resume := Button.new()
 	resume.text = "继续"
 	resume.custom_minimum_size = Vector2(0, 42)
+	GameUIStyle.apply_button(resume, GameUIStyle.SUCCESS)
 	resume.pressed.connect(_toggle_pause)
 	box.add_child(resume)
 
 	var abandon := Button.new()
 	abandon.text = "放弃本局"
 	abandon.custom_minimum_size = Vector2(0, 42)
+	GameUIStyle.apply_button(abandon, GameUIStyle.DANGER)
 	abandon.pressed.connect(_abandon_run)
 	box.add_child(abandon)
 
@@ -872,18 +876,18 @@ func _abandon_run() -> void:
 func _create_overlay() -> void:
 	_overlay_layer = CanvasLayer.new()
 	_overlay_layer.name = "RunOverlay"
-	_overlay_layer.layer = 140
+	_overlay_layer.layer = GameUIStyle.LAYER_RUN
 	add_child(_overlay_layer)
 
 	var top := PanelContainer.new()
 	top.name = "RunTopPanel"
 	top.anchor_left = 0.5
 	top.anchor_right = 0.5
-	top.offset_left = -310
-	top.offset_right = 310
-	top.offset_top = 16
-	top.offset_bottom = 96
-	top.add_theme_stylebox_override("panel", _panel_style(Color(0.04, 0.045, 0.055, 0.86), Color(0.50, 0.45, 0.34, 0.5), 1))
+	top.offset_left = -260
+	top.offset_right = 260
+	top.offset_top = 8
+	top.offset_bottom = 82
+	top.add_theme_stylebox_override("panel", GameUIStyle.panel_style(0.91, 5, GameUIStyle.BORDER_STRONG))
 	_overlay_layer.add_child(top)
 
 	var margin := MarginContainer.new()
@@ -903,25 +907,23 @@ func _create_overlay() -> void:
 
 	_status_label = Label.new()
 	_status_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_status_label.add_theme_font_size_override("font_size", 18)
-	_status_label.modulate = Color(0.95, 0.82, 0.52, 1.0)
+	GameUIStyle.apply_label(_status_label, 16, GameUIStyle.GOLD)
 	header.add_child(_status_label)
 
 	for i in range(NORMAL_ROOM_COUNT + 1):
 		var pip := Label.new()
 		pip.text = "●"
-		pip.add_theme_font_size_override("font_size", 16)
+		pip.add_theme_font_size_override("font_size", 12)
 		header.add_child(pip)
 		_progress_labels.append(pip)
 
 	_objective_label = Label.new()
-	_objective_label.add_theme_font_size_override("font_size", 13)
-	_objective_label.modulate = Color(0.86, 0.88, 0.90, 0.95)
+	GameUIStyle.apply_label(_objective_label, 12, GameUIStyle.TEXT_MAIN)
 	box.add_child(_objective_label)
 
 	_meta_label = Label.new()
-	_meta_label.add_theme_font_size_override("font_size", 12)
-	_meta_label.modulate = Color(0.62, 0.72, 0.78, 0.95)
+	_meta_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	GameUIStyle.apply_label(_meta_label, 10, GameUIStyle.TEXT_MUTED)
 	box.add_child(_meta_label)
 	_update_meta_display()
 
@@ -988,12 +990,14 @@ func _rect_poly(center: Vector2, size: Vector2, color: Color) -> Polygon2D:
 
 
 func _panel_style(bg: Color, border: Color, border_width: int) -> StyleBoxFlat:
-	var style := StyleBoxFlat.new()
+	var style := GameUIStyle.panel_style(bg.a, 6, border, border_width)
 	style.bg_color = bg
-	style.border_color = border
-	style.set_border_width_all(border_width)
-	style.corner_radius_top_left = 6
-	style.corner_radius_top_right = 6
-	style.corner_radius_bottom_left = 6
-	style.corner_radius_bottom_right = 6
 	return style
+
+
+func _reward_accent(reward_type: String) -> Color:
+	match reward_type:
+		"skill", "skill_upgrade": return GameUIStyle.ACCENT
+		"relic": return Color(0.68, 0.43, 0.82, 1.0)
+		"stat": return GameUIStyle.SUCCESS
+		_: return GameUIStyle.GOLD

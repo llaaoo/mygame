@@ -1,6 +1,6 @@
 class_name SkillPoolUI
 extends CanvasLayer
-## 技能池 — K 键。左手/右手 + 4 快捷键槽位
+## 技能池 — 左手/右手 + 6 快捷键槽位
 
 var _skill_pool: SkillPool = null
 var _skill_manager: SkillManager = null
@@ -16,14 +16,24 @@ var _detail_box: VBoxContainer = null
 
 
 func _ready() -> void:
-	layer = 160  # 高于 RunOverlay(140)，避免房间目标遮挡面板
+	layer = GameUIStyle.LAYER_MODAL
+	process_mode = Node.PROCESS_MODE_ALWAYS
+	add_to_group("modal_ui")
 	hide()
 	_build_ui()
 
 
 func _input(event: InputEvent) -> void:
-	if event is InputEventKey and event.keycode == KEY_K and event.pressed:
+	if not event is InputEventKey or not event.pressed or event.echo:
+		return
+	if visible and event.keycode == KEY_ESCAPE:
+		close()
+		get_viewport().set_input_as_handled()
+	elif event.keycode == KEY_K:
+		if get_tree().paused and not visible:
+			return
 		toggle()
+		get_viewport().set_input_as_handled()
 
 
 func setup(pool: SkillPool, sm: SkillManager) -> void:
@@ -40,32 +50,27 @@ func toggle() -> void:
 
 
 func open() -> void:
-	_set_ui_blocked(true)
 	_refresh_all()
 	show()
+	GameUIStyle.begin_modal(self)
 
 
 func close() -> void:
-	_set_ui_blocked(false)
 	_selected_skill = null
 	hide()
-
-
-func _set_ui_blocked(blocked: bool) -> void:
-	var p = get_tree().get_first_node_in_group("player")
-	if p: p.set("ui_blocked", blocked)
+	GameUIStyle.end_modal(self)
 
 
 func _build_ui() -> void:
 	_background = ColorRect.new()
-	_background.color = Color(0, 0, 0, 0.6)
+	_background.color = GameUIStyle.modal_backdrop()
 	_background.anchor_right = 1.0
 	_background.anchor_bottom = 1.0
 	add_child(_background)
 
 	_panel = Panel.new()
-	_panel.anchor_left = 0.15; _panel.anchor_right = 0.85
-	_panel.anchor_top = 0.04; _panel.anchor_bottom = 0.96
+	_panel.anchor_left = 0.08; _panel.anchor_right = 0.92
+	_panel.anchor_top = 0.055; _panel.anchor_bottom = 0.945
 	_panel.clip_contents = true
 	_panel.add_theme_stylebox_override("panel", _make_panel_bg())
 	add_child(_panel)
@@ -87,11 +92,21 @@ func _build_ui() -> void:
 	left_vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	main_hbox.add_child(left_vbox)
 
+	var header := HBoxContainer.new()
+	header.add_theme_constant_override("separation", 8)
+	left_vbox.add_child(header)
 	var title := Label.new()
 	title.text = "技能编组"
-	title.add_theme_font_size_override("font_size", 22)
-	title.add_theme_color_override("font_color", Color.WHITE)
-	left_vbox.add_child(title)
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	GameUIStyle.apply_title(title, 22)
+	header.add_child(title)
+	var close_button := Button.new()
+	close_button.text = "×"
+	close_button.tooltip_text = "关闭"
+	close_button.custom_minimum_size = Vector2(38, 38)
+	GameUIStyle.apply_button(close_button, GameUIStyle.DANGER)
+	close_button.pressed.connect(close)
+	header.add_child(close_button)
 
 	var scroll := ScrollContainer.new()
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -105,19 +120,18 @@ func _build_ui() -> void:
 	scroll.add_child(_skill_grid)
 
 	_hint_label = Label.new()
-	_hint_label.text = "选技能 → 左键槽位装备 | 右键槽位卸载 | K 关闭"
-	_hint_label.add_theme_font_size_override("font_size", 12)
-	_hint_label.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6))
+	_hint_label.text = "法术库与当前战斗编组"
+	GameUIStyle.apply_label(_hint_label, 11, GameUIStyle.TEXT_MUTED)
 	left_vbox.add_child(_hint_label)
 
 	# ── 右侧：双手 + 快捷键槽 ──
 	var right_vbox := VBoxContainer.new()
-	right_vbox.custom_minimum_size = Vector2(260, 0)
-	right_vbox.add_theme_constant_override("separation", 6)
+	right_vbox.custom_minimum_size = Vector2(285, 0)
+	right_vbox.add_theme_constant_override("separation", 4)
 	main_hbox.add_child(right_vbox)
 
 	var detail_panel := PanelContainer.new()
-	detail_panel.custom_minimum_size = Vector2(260, 155)
+	detail_panel.custom_minimum_size = Vector2(285, 118)
 	detail_panel.add_theme_stylebox_override("panel", _make_slot_bg())
 	right_vbox.add_child(detail_panel)
 	var detail_margin := MarginContainer.new()
@@ -135,21 +149,20 @@ func _build_ui() -> void:
 	_add_equip_slot(right_vbox, "right", "右手")
 
 	right_vbox.add_child(_make_section_label("快捷法术"))
-	for i in range(4):
+	for i in range(6):
 		_add_equip_slot(right_vbox, "slot_%d" % i, "键 %d" % (i + 1))
 
 
 func _make_section_label(text: String) -> Label:
 	var lbl := Label.new()
 	lbl.text = text
-	lbl.add_theme_font_size_override("font_size", 14)
-	lbl.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
+	GameUIStyle.apply_section_label(lbl)
 	return lbl
 
 
 func _add_equip_slot(parent: Control, source: String, label: String) -> void:
 	var panel := PanelContainer.new()
-	panel.custom_minimum_size = Vector2(200, 34)
+	panel.custom_minimum_size = Vector2(220, 30)
 	panel.add_theme_stylebox_override("panel", _make_slot_bg())
 	panel.set_meta("display_label", label)
 	parent.add_child(panel)
@@ -162,7 +175,7 @@ func _add_equip_slot(parent: Control, source: String, label: String) -> void:
 
 	var icon := TextureRect.new()
 	icon.name = "Icon"
-	icon.custom_minimum_size = Vector2(28, 28)
+	icon.custom_minimum_size = Vector2(24, 24)
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	hbox.add_child(icon)
@@ -173,14 +186,12 @@ func _add_equip_slot(parent: Control, source: String, label: String) -> void:
 
 	var name_lbl := Label.new()
 	name_lbl.name = "Name"
-	name_lbl.add_theme_font_size_override("font_size", 13)
-	name_lbl.add_theme_color_override("font_color", Color.WHITE)
+	GameUIStyle.apply_label(name_lbl, 12, GameUIStyle.TEXT_MAIN)
 	info.add_child(name_lbl)
 
 	var sub_lbl := Label.new()
 	sub_lbl.name = "Sub"
-	sub_lbl.add_theme_font_size_override("font_size", 10)
-	sub_lbl.add_theme_color_override("font_color", Color(0.5, 0.5, 0.5))
+	GameUIStyle.apply_label(sub_lbl, 9, GameUIStyle.TEXT_MUTED)
 	sub_lbl.text = label
 	info.add_child(sub_lbl)
 
@@ -326,7 +337,7 @@ func _refresh_grid() -> void:
 func _make_skill_card(skill: SkillData) -> PanelContainer:
 	var unlocked := _is_skill_unlocked(skill)
 	var card := PanelContainer.new()
-	card.custom_minimum_size = Vector2(90, 110)
+	card.custom_minimum_size = Vector2(96, 106)
 	card.add_theme_stylebox_override("panel", _make_card_bg(skill == _selected_skill))
 
 	var vbox := VBoxContainer.new()
@@ -345,8 +356,7 @@ func _make_skill_card(skill: SkillData) -> PanelContainer:
 
 	var nm := Label.new()
 	nm.text = skill.display_name
-	nm.add_theme_font_size_override("font_size", 12)
-	nm.add_theme_color_override("font_color", Color.WHITE)
+	GameUIStyle.apply_label(nm, 11, GameUIStyle.TEXT_MAIN)
 	nm.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	vbox.add_child(nm)
 
@@ -417,35 +427,17 @@ func _refresh_equip_slots() -> void:
 ## ── 样式 ──
 
 func _make_panel_bg() -> StyleBoxFlat:
-	var sb := StyleBoxFlat.new()
-	sb.bg_color = Color(0.08, 0.08, 0.14, 0.95)
-	sb.border_width_left = 2; sb.border_width_right = 2
-	sb.border_width_top = 2; sb.border_width_bottom = 2
-	sb.border_color = Color(0.4, 0.4, 0.5, 1)
-	sb.corner_radius_top_left = 8; sb.corner_radius_top_right = 8
-	sb.corner_radius_bottom_left = 8; sb.corner_radius_bottom_right = 8
-	return sb
+	return GameUIStyle.panel_style(0.985, 6, GameUIStyle.BORDER_STRONG, 1)
 
 
 func _make_card_bg(selected: bool = false) -> StyleBoxFlat:
-	var sb := StyleBoxFlat.new()
-	sb.bg_color = Color(0.2, 0.3, 0.2, 1) if selected else Color(0.15, 0.15, 0.2, 0.9)
-	sb.border_width_left = 1; sb.border_width_right = 1
-	sb.border_width_top = 1; sb.border_width_bottom = 1
-	sb.border_color = Color(0.5, 0.8, 0.5, 1) if selected else Color(0.25, 0.25, 0.35, 1)
-	sb.corner_radius_top_left = 4; sb.corner_radius_top_right = 4
-	sb.corner_radius_bottom_left = 4; sb.corner_radius_bottom_right = 4
-	return sb
+	return GameUIStyle.surface_style(selected, 4)
 
 
 func _make_slot_bg(color_override := Color(0.12, 0.12, 0.18, 0.9)) -> StyleBoxFlat:
-	var sb := StyleBoxFlat.new()
-	sb.bg_color = color_override
-	sb.border_width_left = 1; sb.border_width_right = 1
-	sb.border_width_top = 1; sb.border_width_bottom = 1
-	sb.border_color = Color(0.3, 0.3, 0.4, 1)
-	sb.corner_radius_top_left = 4; sb.corner_radius_top_right = 4
-	sb.corner_radius_bottom_left = 4; sb.corner_radius_bottom_right = 4
+	var sb := GameUIStyle.surface_style(false, 4)
+	if color_override != Color(0.12, 0.12, 0.18, 0.9):
+		sb.bg_color = color_override
 	return sb
 
 

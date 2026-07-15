@@ -11,6 +11,8 @@ var _world: Node = null
 func _ready() -> void:
 	# 伤害数字必须渲染在 CanvasItem 下（Node2D 不能直接挂在纯 Node 下）
 	_world = get_tree().current_scene
+	if not _world:
+		_world = get_parent()
 	call_deferred("_subscribe")
 
 
@@ -31,7 +33,7 @@ func _subscribe() -> void:
 ## ── 事件处理 ──
 
 func _on_damage(ev: CombatEvent) -> void:
-	if not ev.target or not is_instance_valid(ev.target):
+	if not _world or not ev.target or not is_instance_valid(ev.target):
 		return
 	var amount: int = ev.data.get("damage", 0)
 	if amount <= 0:
@@ -41,7 +43,7 @@ func _on_damage(ev: CombatEvent) -> void:
 
 
 func _on_heal(ev: CombatEvent) -> void:
-	if not ev.target or not is_instance_valid(ev.target):
+	if not _world or not ev.target or not is_instance_valid(ev.target):
 		return
 	var amount: int = ev.data.get("amount", 0)
 	if amount <= 0:
@@ -51,14 +53,14 @@ func _on_heal(ev: CombatEvent) -> void:
 
 
 func _on_dodge(ev: CombatEvent) -> void:
-	if not ev.target or not is_instance_valid(ev.target):
+	if not _world or not ev.target or not is_instance_valid(ev.target):
 		return
 	var pos: Vector2 = ev.target.global_position if "global_position" in ev.target else Vector2.ZERO
 	DamageNumber.spawn_miss(_world, pos)
 
 
 func _on_crit(ev: CombatEvent) -> void:
-	if not ev.target or not is_instance_valid(ev.target):
+	if not _world or not ev.target or not is_instance_valid(ev.target):
 		return
 	var amount: int = ev.data.get("damage", 0)
 	if amount <= 0:

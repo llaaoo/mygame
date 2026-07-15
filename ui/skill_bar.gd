@@ -1,9 +1,9 @@
 class_name SkillBar
 extends HBoxContainer
-## 技能条 — 左手 [L] · 右手 [R] · 槽1 [1] · 槽2 [2] · 槽3 [3] · 槽4 [4]
+## 技能条 — 双手施法与六个快捷施法槽。
 
-const SLOT_SIZE := Vector2(42, 42)
-const HAND_SIZE := Vector2(48, 42)
+const SLOT_SIZE := Vector2(46, 46)
+const HAND_SIZE := Vector2(50, 46)
 
 var _skill_manager: SkillManager = null
 var _panels: Array[PanelContainer] = []
@@ -31,8 +31,8 @@ func _build() -> void:
 	_add_item("left", "L", HAND_SIZE)
 	# 右手
 	_add_item("right", "R", HAND_SIZE)
-	# 快捷键 1-4
-	for i in range(4):
+	# 快捷键 1-6
+	for i in range(6):
 		_add_item("slot_%d" % i, str(i + 1), SLOT_SIZE)
 
 	_refresh_all()
@@ -43,7 +43,7 @@ func _add_item(source: String, label: String, size: Vector2) -> void:
 
 	var panel := PanelContainer.new()
 	panel.custom_minimum_size = size
-	panel.add_theme_stylebox_override("panel", _make_bg())
+	panel.add_theme_stylebox_override("panel", GameUIStyle.slot_style(source in ["left", "right"]))
 	add_child(panel)
 	_panels.append(panel)
 
@@ -62,7 +62,7 @@ func _add_item(source: String, label: String, size: Vector2) -> void:
 
 	var mask := ColorRect.new()
 	mask.size = Vector2(size.x, 0)
-	mask.color = Color(0, 0, 0, 0.6)
+	mask.color = Color(0.01, 0.015, 0.02, 0.76)
 	mask.visible = false
 	inner.add_child(mask)
 	_masks.append(mask)
@@ -78,8 +78,8 @@ func _add_item(source: String, label: String, size: Vector2) -> void:
 	_cd_labels.append(cd_label)
 
 	var bind_label := Label.new()
-	bind_label.add_theme_font_size_override("font_size", 8)
-	bind_label.add_theme_color_override("font_color", Color(1, 1, 1, 0.6))
+	bind_label.add_theme_font_size_override("font_size", 9)
+	bind_label.add_theme_color_override("font_color", GameUIStyle.TEXT_MUTED)
 	bind_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	bind_label.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
 	bind_label.size = Vector2(size.x - 2, size.y - 2)
@@ -109,9 +109,6 @@ func _refresh_idx(idx: int) -> void:
 		icon.texture = SkillIconCatalog.get_icon(skill)
 		icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 		icon.modulate = Color(1, 1, 1, 1)
-	elif skill:
-		icon.texture = null
-		icon.modulate = Color(1, 1, 1, 0.5)
 	else:
 		icon.texture = null
 		icon.modulate = Color(1, 1, 1, 0.12)
@@ -154,7 +151,3 @@ func _on_cooldown(source: String, _remaining: float, _total: float) -> void:
 		if _sources[i] == source:
 			_update_cooldown(i)
 			return
-
-
-func _make_bg() -> StyleBoxFlat:
-	return GameUIStyle.slot_style(false)

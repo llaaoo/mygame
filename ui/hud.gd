@@ -20,7 +20,8 @@ var _death_active: bool = false
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	layer = 100
+	layer = GameUIStyle.LAYER_HUD
+	add_to_group("hud_ui")
 	_build_ui()
 	await get_tree().process_frame
 	_connect_player()
@@ -46,12 +47,12 @@ func _build_status_panel(root: Control) -> void:
 	panel.name = "StatusPanel"
 	panel.anchor_left = 0.0
 	panel.anchor_top = 0.0
-	panel.offset_left = 0
-	panel.offset_top = 0
-	panel.offset_right = 285
-	panel.offset_bottom = 102
-	panel.custom_minimum_size = Vector2(285, 102)
-	panel.add_theme_stylebox_override("panel", GameUIStyle.panel_style(0.76, 5))
+	panel.offset_left = 4
+	panel.offset_top = 4
+	panel.offset_right = 264
+	panel.offset_bottom = 98
+	panel.custom_minimum_size = Vector2(260, 94)
+	panel.add_theme_stylebox_override("panel", GameUIStyle.panel_style(0.88, 5))
 	root.add_child(panel)
 
 	var vbox := VBoxContainer.new()
@@ -63,9 +64,9 @@ func _build_status_panel(root: Control) -> void:
 	vbox.add_child(title_row)
 
 	var title := Label.new()
-	title.text = "Player"
+	title.text = "探索者"
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	GameUIStyle.apply_label(title, 13, GameUIStyle.GOLD)
+	GameUIStyle.apply_label(title, 14, GameUIStyle.GOLD)
 	title_row.add_child(title)
 
 	stats_label = Label.new()
@@ -89,9 +90,9 @@ func _build_right_stack(root: Control) -> void:
 	stack.anchor_left = 1.0
 	stack.anchor_right = 1.0
 	stack.anchor_top = 0.0
-	stack.offset_left = -225
-	stack.offset_right = 0
-	stack.offset_top = 0
+	stack.offset_left = -218
+	stack.offset_right = -4
+	stack.offset_top = 4
 	stack.offset_bottom = 220
 	stack.add_theme_constant_override("separation", 6)
 	root.add_child(stack)
@@ -109,11 +110,11 @@ func _build_skill_bar(root: Control) -> void:
 	var panel := PanelContainer.new()
 	panel.name = "SkillBarPanel"
 	panel.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-	panel.offset_left = -176
-	panel.offset_right = 176
-	panel.offset_top = -62
-	panel.offset_bottom = -14
-	panel.add_theme_stylebox_override("panel", GameUIStyle.panel_style(0.76, 6))
+	panel.offset_left = -224
+	panel.offset_right = 224
+	panel.offset_top = -82
+	panel.offset_bottom = -12
+	panel.add_theme_stylebox_override("panel", GameUIStyle.panel_style(0.90, 6))
 	root.add_child(panel)
 
 	skill_bar = SkillBar.new()
@@ -147,12 +148,11 @@ func _add_resource_row(parent: VBoxContainer, label_text: String, bar: ProgressB
 
 func _make_bar(color: Color) -> ProgressBar:
 	var bar := ProgressBar.new()
-	bar.custom_minimum_size = Vector2(0, 10)
+	bar.custom_minimum_size = Vector2(0, 11)
 	bar.show_percentage = false
 	bar.max_value = 100
 	bar.value = 100
-	bar.add_theme_stylebox_override("background", GameUIStyle.bar_bg())
-	bar.add_theme_stylebox_override("fill", GameUIStyle.bar_fill(color))
+	GameUIStyle.apply_progress(bar, color, 11)
 	return bar
 
 
@@ -240,7 +240,7 @@ func _on_player_died() -> void:
 	btn.add_theme_stylebox_override("pressed", style)
 
 	var label := Label.new()
-	label.text = "You died\n\nClick or press any key to reload"
+	label.text = "战斗结束\n\n按任意键重新开始"
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	GameUIStyle.apply_label(label, 30, Color.WHITE)

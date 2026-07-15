@@ -10,8 +10,8 @@ var _refresh_accum: float = 0.0
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	visible = false
-	custom_minimum_size = Vector2(210, 0)
-	add_theme_stylebox_override("panel", GameUIStyle.panel_style(0.78, 5))
+	custom_minimum_size = Vector2(214, 0)
+	add_theme_stylebox_override("panel", GameUIStyle.panel_style(0.88, 5))
 
 	var margin := MarginContainer.new()
 	margin.add_theme_constant_override("margin_left", 8)
@@ -61,7 +61,7 @@ func _refresh() -> void:
 
 	var summons := _manager.active_summons
 	visible = not summons.is_empty()
-	_count_label.text = "Summons %d/%d" % [summons.size(), _manager.get_max_summons()]
+	_count_label.text = "召唤单位  %d / %d" % [summons.size(), _manager.get_max_summons()]
 
 	for summon in summons:
 		if is_instance_valid(summon):

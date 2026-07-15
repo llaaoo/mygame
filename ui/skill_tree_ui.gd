@@ -9,8 +9,9 @@ var _level_label: Label = null
 
 
 func _ready() -> void:
-	layer = 165
+	layer = GameUIStyle.LAYER_MODAL
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	add_to_group("modal_ui")
 	hide()
 	_build_ui()
 
@@ -34,10 +35,16 @@ func setup(player: Player) -> void:
 
 
 func _input(event: InputEvent) -> void:
-	if event is InputEventKey and event.keycode == KEY_M and event.pressed and not event.echo:
-		toggle()
-	if visible and event is InputEventKey and event.keycode == KEY_ESCAPE and event.pressed:
+	if not event is InputEventKey or not event.pressed or event.echo:
+		return
+	if visible and event.keycode == KEY_ESCAPE:
 		close()
+		get_viewport().set_input_as_handled()
+	elif event.keycode == KEY_M:
+		if get_tree().paused and not visible:
+			return
+		toggle()
+		get_viewport().set_input_as_handled()
 
 
 func toggle() -> void:
@@ -50,33 +57,28 @@ func toggle() -> void:
 func open() -> void:
 	if not _mastery_manager:
 		return
-	_set_ui_blocked(true)
 	_refresh()
 	show()
+	GameUIStyle.begin_modal(self)
 
 
 func close() -> void:
-	_set_ui_blocked(false)
 	hide()
-
-
-func _set_ui_blocked(blocked: bool) -> void:
-	if _player:
-		_player.ui_blocked = blocked
+	GameUIStyle.end_modal(self)
 
 
 func _build_ui() -> void:
 	var dim := ColorRect.new()
-	dim.color = Color(0, 0, 0, 0.58)
+	dim.color = GameUIStyle.modal_backdrop()
 	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(dim)
 
 	_panel = PanelContainer.new()
-	_panel.anchor_left = 0.06
-	_panel.anchor_right = 0.94
-	_panel.anchor_top = 0.08
-	_panel.anchor_bottom = 0.92
-	_panel.add_theme_stylebox_override("panel", GameUIStyle.panel_style(0.96, 6))
+	_panel.anchor_left = 0.035
+	_panel.anchor_right = 0.965
+	_panel.anchor_top = 0.055
+	_panel.anchor_bottom = 0.945
+	_panel.add_theme_stylebox_override("panel", GameUIStyle.panel_style(0.985, 6, GameUIStyle.BORDER_STRONG))
 	add_child(_panel)
 
 	var margin := MarginContainer.new()
@@ -103,6 +105,14 @@ func _build_ui() -> void:
 	_level_label = Label.new()
 	GameUIStyle.apply_label(_level_label, 13, GameUIStyle.TEXT_MAIN)
 	header.add_child(_level_label)
+
+	var close_button := Button.new()
+	close_button.text = "×"
+	close_button.tooltip_text = "关闭"
+	close_button.custom_minimum_size = Vector2(38, 38)
+	GameUIStyle.apply_button(close_button, GameUIStyle.DANGER)
+	close_button.pressed.connect(close)
+	header.add_child(close_button)
 
 	var hint := Label.new()
 	hint.text = "每个学派每 5 级获得 1 点 perk。触发型连锁效果已转入对应学派树。"
@@ -131,7 +141,7 @@ func _refresh() -> void:
 
 func _make_school_column(mastery: SkillMastery) -> Control:
 	var panel := PanelContainer.new()
-	panel.custom_minimum_size = Vector2(238, 620)
+	panel.custom_minimum_size = Vector2(198, 0)
 	panel.add_theme_stylebox_override("panel", GameUIStyle.slot_style(mastery.level >= 5))
 
 	var vbox := VBoxContainer.new()
