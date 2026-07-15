@@ -26,6 +26,25 @@ func _init() -> void:
 		quit(1)
 		return
 
+	var initial_max_hp: int = run_manager._player.health_component.max_hp
+	var initial_max_mp: int = run_manager._player.mana_component.max_mp
+	run_manager.start_run_with_seed(1337)
+	await process_frame
+	if run_manager.state.seed != 1337 or run_manager.state.room_plan.size() != RunManager.NORMAL_ROOM_COUNT:
+		push_error("Seeded run did not persist its generated room plan")
+		quit(1)
+		return
+	if run_manager._player.health_component.max_hp != initial_max_hp \
+			or run_manager._player.mana_component.max_mp != initial_max_mp:
+		push_error("Restarting a seeded run reapplied permanent starting bonuses")
+		quit(1)
+		return
+	var room_summary := run_manager.get_current_room_summary()
+	if room_summary.get("template_id", "").is_empty() or int(room_summary.get("enemy_count", 0)) <= 0:
+		push_error("Generated room summary is incomplete")
+		quit(1)
+		return
+
 	run_manager._toggle_pause()
 	if not paused or not run_manager._pause_panel:
 		push_error("Pause overlay did not open")

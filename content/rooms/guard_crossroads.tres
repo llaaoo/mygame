@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="RunRoomTemplate" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://gameplay/rooms/run_room_template.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+template_id = "guard_crossroads"
+display_name = "禁卫十字岗"
+room_types = PackedStringArray("barracks", "elite")
+weight = 1.0
+arena_size = Vector2(1160, 700)
+pattern = "crossroads"
+prop_budget = 2
+hazard_budget = 1

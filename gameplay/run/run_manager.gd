@@ -4,7 +4,6 @@ extends Node
 const NORMAL_ROOM_COUNT := 4
 const REWARD_CHOICES := 3
 const ARENA_CENTER := Vector2(6000, 6000)
-const ARENA_SIZE := Vector2(1120, 720)
 const WALL_THICKNESS := 36.0
 
 const ENEMY_SCENE := preload("res://entities/enemy/enemy.tscn")
@@ -14,6 +13,11 @@ const CRATE_SCENE := preload("res://world/object/wooden_crate.tscn")
 const CHEST_SCENE := preload("res://world/loot/chest.tscn")
 const SPIKE_TRAP_SCENE := preload("res://world/traps/spike_trap.tscn")
 const RUN_META_SCRIPT := preload("res://gameplay/run/run_meta.gd")
+const ROOM_GENERATOR_SCRIPT := preload("res://gameplay/rooms/run_room_generator.gd")
+const PILLAR_TEXTURE := preload("res://content/art/prison/prison_sucai/29_stone_plaque.png")
+const BARRICADE_TEXTURE := preload("res://content/art/prison/prison_sucai/15_wood_table_large.png")
+const STACK_TEXTURE := preload("res://content/art/prison/prison_sucai/16_crate_large.png")
+const WALL_TEXTURE := preload("res://content/art/prison/prison_sucai/10_cell_bars_wide.png")
 
 const SKILL_REWARD_IDS: Array[String] = [
 	"fireball", "cinder_volley", "solar_spear", "magma_pool", "ember_orb", "flame_storm",
@@ -40,6 +44,9 @@ var state := RunState.new()
 var meta = RUN_META_SCRIPT.new()
 var persist_meta: bool = true
 var _rng := RandomNumberGenerator.new()
+var _room_generator = ROOM_GENERATOR_SCRIPT.new()
+var _room_plan: Array = []
+var _current_layout: RefCounted = null
 var _player: Player = null
 var _scene_root: Node = null
 var _room_root: Node2D = null
@@ -55,6 +62,7 @@ var _exit_area: Area2D = null
 var _exit_label: Label = null
 var _exit_visual: Polygon2D = null
 var _room_origin := ARENA_CENTER
+var _meta_bonus_applied: bool = false
 
 
 func _ready() -> void:
@@ -90,17 +98,49 @@ func _bootstrap() -> void:
 
 
 func _start_run() -> void:
+	start_run_with_seed(Time.get_ticks_msec())
+
+
+func start_run_with_seed(run_seed: int) -> void:
 	get_tree().paused = false
 	_clear_pause_panel()
-	_rng.seed = Time.get_ticks_msec()
+	_rng.seed = run_seed
 	state.start(_rng.seed)
+	_room_plan = _room_generator.generate_run(state.seed, NORMAL_ROOM_COUNT)
+	state.room_plan.clear()
+	for layout in _room_plan:
+		state.room_plan.append({
+			"seed": layout.seed,
+			"room_type": layout.room_type,
+			"template_id": layout.template_id,
+			"display_name": layout.display_name,
+		})
 	_room_origin = ARENA_CENTER
 	_player.global_position = _room_origin
 	_player.ui_blocked = false
-	_apply_meta_starting_bonus()
+	if not _meta_bonus_applied:
+		_apply_meta_starting_bonus()
+		_meta_bonus_applied = true
 	_remove_existing_encounter_actors()
 	_update_meta_display()
 	_spawn_normal_room()
+
+
+func get_current_room_summary() -> Dictionary:
+	if not _current_layout:
+		return {}
+	return {
+		"run_seed": state.seed,
+		"room_seed": _current_layout.seed,
+		"room_index": state.room_index,
+		"room_type": _current_layout.room_type,
+		"template_id": _current_layout.template_id,
+		"display_name": _current_layout.display_name,
+		"arena_size": _current_layout.arena_size,
+		"obstacle_count": _current_layout.obstacles.size(),
+		"prop_count": _current_layout.props.size(),
+		"enemy_count": _current_layout.enemy_offsets.size(),
+	}
 
 
 func _remove_existing_encounter_actors() -> void:
@@ -116,18 +156,18 @@ func _remove_existing_encounter_actors() -> void:
 func _spawn_normal_room() -> void:
 	state.status = RunState.Status.RUNNING
 	_clear_reward_panel()
+	var room_type := _normal_room_type(state.room_index)
+	_current_layout = _layout_for_room(state.room_index, room_type)
 	if _player:
 		_player.ui_blocked = false
-		_player.global_position = _room_origin + Vector2(-360, 0)
+		_player.global_position = _room_origin + _current_layout.entry_offset
 
-	var room_type := _normal_room_type(state.room_index)
-	_rebuild_room(room_type)
-	_spawn_room_props(room_type)
-	_spawn_room_exit(false)
+	_rebuild_room(_current_layout)
+	_spawn_room_content(_current_layout)
+	_spawn_room_exit(false, _current_layout.exit_offset)
 
 	var is_elite_room := room_type == "elite"
-	var count := 2 if is_elite_room else 3 + state.room_index
-	var radius := 230.0 + float(state.room_index) * 35.0
+	var count: int = _current_layout.enemy_offsets.size()
 	for i in range(count):
 		var enemy := ENEMY_SCENE.instantiate() as Enemy
 		enemy.name = "RunEnemy_%d_%d" % [state.room_index + 1, i + 1]
@@ -139,11 +179,10 @@ func _spawn_normal_room() -> void:
 			enemy.attack_damage = 18 + i * 3
 			enemy.move_speed = 145.0
 		_room_root.add_child(enemy)
-		var angle := TAU * float(i) / float(count)
-		enemy.global_position = _room_origin + Vector2(cos(angle), sin(angle)) * radius
+		enemy.global_position = _room_origin + _current_layout.enemy_offsets[i]
 		_track_enemy(enemy)
 
-	_show_status("精英房" if is_elite_room else "房间 %d/%d" % [state.room_index + 1, NORMAL_ROOM_COUNT])
+	_show_status("%s · %s" % ["精英房" if is_elite_room else "房间 %d/%d" % [state.room_index + 1, NORMAL_ROOM_COUNT], _current_layout.display_name])
 	_show_objective("清除全部敌人，打开出口。")
 	_update_progress()
 
@@ -151,28 +190,31 @@ func _spawn_normal_room() -> void:
 func _spawn_boss_room() -> void:
 	state.status = RunState.Status.BOSS
 	_clear_reward_panel()
+	_current_layout = _room_generator.generate_room(state.seed, NORMAL_ROOM_COUNT, "boss")
 	if _player:
 		_player.ui_blocked = false
-		_player.global_position = _room_origin + Vector2(-360, 0)
+		_player.global_position = _room_origin + _current_layout.entry_offset
 
-	_rebuild_room("boss")
-	_spawn_room_props("boss")
-	_spawn_room_exit(false)
+	_rebuild_room(_current_layout)
+	_spawn_room_content(_current_layout)
+	_spawn_room_exit(false, _current_layout.exit_offset)
 
 	var boss := BOSS_SCENE.instantiate() as Boss
 	boss.name = "RunBoss_FireLord"
 	if not boss.boss_data:
 		boss.boss_data = load("res://content/bosses/fire_lord.tres") as BossData
 	_room_root.add_child(boss)
-	boss.global_position = _room_origin + Vector2(300, 0)
+	boss.global_position = _room_origin + _current_layout.boss_offset
 	boss.add_to_group("boss")
 	_track_enemy(boss)
-	_show_status("Boss 房")
+	_show_status("Boss 房 · %s" % _current_layout.display_name)
 	_show_objective("击败火焰领主。")
 	_update_progress()
 
 
 func _normal_room_type(index: int) -> String:
+	if index >= 0 and index < _room_plan.size():
+		return _room_plan[index].room_type
 	match index:
 		0:
 			return "barracks"
@@ -184,18 +226,25 @@ func _normal_room_type(index: int) -> String:
 			return "elite"
 
 
-func _rebuild_room(room_type: String) -> void:
+func _layout_for_room(index: int, room_type: String) -> RefCounted:
+	if index >= 0 and index < _room_plan.size():
+		return _room_plan[index]
+	return _room_generator.generate_room(state.seed, index, room_type)
+
+
+func _rebuild_room(layout: RefCounted) -> void:
 	if _room_root and is_instance_valid(_room_root):
 		_unregister_room_map_objects(_room_root)
 		_room_root.queue_free()
 
 	_room_root = Node2D.new()
-	_room_root.name = "RunArena_%s_%d" % [room_type, state.room_index + 1]
+	_room_root.name = "RunArena_%s_%d" % [layout.template_id, state.room_index + 1]
 	_scene_root.add_child(_room_root)
 
-	_build_floor(room_type)
-	_build_walls()
-	_build_room_title(room_type)
+	_build_floor(layout)
+	_build_walls(layout.arena_size)
+	for i in range(layout.obstacles.size()):
+		_add_room_obstacle(layout.obstacles[i], i)
 
 
 func _unregister_room_map_objects(root: Node) -> void:
@@ -208,10 +257,10 @@ func _unregister_room_map_objects(root: Node) -> void:
 		_unregister_room_map_objects(child)
 
 
-func _build_floor(room_type: String) -> void:
+func _build_floor(layout: RefCounted) -> void:
 	var base_color := Color(0.10, 0.11, 0.13, 1.0)
 	var accent := Color(0.25, 0.29, 0.33, 1.0)
-	match room_type:
+	match layout.room_type:
 		"barracks":
 			base_color = Color(0.12, 0.12, 0.15, 1.0)
 			accent = Color(0.29, 0.25, 0.20, 1.0)
@@ -228,42 +277,55 @@ func _build_floor(room_type: String) -> void:
 			base_color = Color(0.12, 0.07, 0.06, 1.0)
 			accent = Color(0.48, 0.15, 0.08, 1.0)
 
-	var floor := _rect_poly(_room_origin, ARENA_SIZE, base_color)
+	var floor := _rect_poly(_room_origin, layout.arena_size, base_color)
 	floor.name = "Floor"
 	floor.z_index = -120
 	_room_root.add_child(floor)
 
-	for x in range(-4, 5):
+	for patch_data in layout.floor_patches:
+		var patch_position: Vector2 = patch_data.get("position", Vector2.ZERO)
+		var patch_size: Vector2 = patch_data.get("size", Vector2(48, 32))
+		var tone: float = patch_data.get("tone", 0.1)
+		var patch := _rect_poly(_room_origin + patch_position, patch_size, base_color.lerp(accent, tone))
+		patch.z_index = -118
+		_room_root.add_child(patch)
+
+	var half: Vector2 = layout.arena_size * 0.5
+	var columns: int = maxi(1, int(layout.arena_size.x / 112.0))
+	var column_half: int = floori(columns / 2.0)
+	for x in range(-column_half, column_half + 1):
 		var line := Line2D.new()
 		line.width = 2.0
 		line.default_color = Color(accent.r, accent.g, accent.b, 0.35)
 		line.z_index = -115
-		var px := _room_origin.x + float(x) * 128.0
+		var px := _room_origin.x + float(x) * 112.0
 		line.points = PackedVector2Array([
-			Vector2(px, _room_origin.y - ARENA_SIZE.y * 0.5),
-			Vector2(px, _room_origin.y + ARENA_SIZE.y * 0.5),
+			Vector2(px, _room_origin.y - half.y),
+			Vector2(px, _room_origin.y + half.y),
 		])
 		_room_root.add_child(line)
 
-	for y in range(-2, 3):
+	var rows: int = maxi(1, int(layout.arena_size.y / 112.0))
+	var row_half: int = floori(rows / 2.0)
+	for y in range(-row_half, row_half + 1):
 		var line := Line2D.new()
 		line.width = 2.0
 		line.default_color = Color(accent.r, accent.g, accent.b, 0.35)
 		line.z_index = -115
-		var py := _room_origin.y + float(y) * 128.0
+		var py := _room_origin.y + float(y) * 112.0
 		line.points = PackedVector2Array([
-			Vector2(_room_origin.x - ARENA_SIZE.x * 0.5, py),
-			Vector2(_room_origin.x + ARENA_SIZE.x * 0.5, py),
+			Vector2(_room_origin.x - half.x, py),
+			Vector2(_room_origin.x + half.x, py),
 		])
 		_room_root.add_child(line)
 
 
-func _build_walls() -> void:
-	var half := ARENA_SIZE * 0.5
-	_add_wall("NorthWall", _room_origin + Vector2(0, -half.y - WALL_THICKNESS * 0.5), Vector2(ARENA_SIZE.x + WALL_THICKNESS * 2.0, WALL_THICKNESS))
-	_add_wall("SouthWall", _room_origin + Vector2(0, half.y + WALL_THICKNESS * 0.5), Vector2(ARENA_SIZE.x + WALL_THICKNESS * 2.0, WALL_THICKNESS))
-	_add_wall("WestWall", _room_origin + Vector2(-half.x - WALL_THICKNESS * 0.5, 0), Vector2(WALL_THICKNESS, ARENA_SIZE.y))
-	_add_wall("EastWall", _room_origin + Vector2(half.x + WALL_THICKNESS * 0.5, 0), Vector2(WALL_THICKNESS, ARENA_SIZE.y))
+func _build_walls(arena_size: Vector2) -> void:
+	var half := arena_size * 0.5
+	_add_wall("NorthWall", _room_origin + Vector2(0, -half.y - WALL_THICKNESS * 0.5), Vector2(arena_size.x + WALL_THICKNESS * 2.0, WALL_THICKNESS))
+	_add_wall("SouthWall", _room_origin + Vector2(0, half.y + WALL_THICKNESS * 0.5), Vector2(arena_size.x + WALL_THICKNESS * 2.0, WALL_THICKNESS))
+	_add_wall("WestWall", _room_origin + Vector2(-half.x - WALL_THICKNESS * 0.5, 0), Vector2(WALL_THICKNESS, arena_size.y))
+	_add_wall("EastWall", _room_origin + Vector2(half.x + WALL_THICKNESS * 0.5, 0), Vector2(WALL_THICKNESS, arena_size.y))
 
 
 func _add_wall(name_str: String, pos: Vector2, size: Vector2) -> void:
@@ -285,58 +347,69 @@ func _add_wall(name_str: String, pos: Vector2, size: Vector2) -> void:
 	body.add_child(visual)
 
 
-func _build_room_title(room_type: String) -> void:
-	var label := Label.new()
-	label.name = "RoomTitle"
-	label.position = _room_origin + Vector2(-520, -330)
-	label.text = _room_name(room_type)
-	label.add_theme_font_size_override("font_size", 26)
-	label.modulate = Color(0.95, 0.82, 0.52, 0.9)
-	_room_root.add_child(label)
+func _add_room_obstacle(spec: Dictionary, index: int) -> void:
+	var position_offset: Vector2 = spec.get("position", Vector2.ZERO)
+	var obstacle_size: Vector2 = spec.get("size", Vector2(64, 64))
+	var kind := str(spec.get("kind", "wall"))
+	var body := StaticBody2D.new()
+	body.name = "RoomObstacle_%02d_%s" % [index + 1, kind]
+	body.collision_layer = 1
+	body.collision_mask = 0
+	body.global_position = _room_origin + position_offset
+	_room_root.add_child(body)
+
+	var collision := CollisionShape2D.new()
+	var rect := RectangleShape2D.new()
+	rect.size = obstacle_size
+	collision.shape = rect
+	body.add_child(collision)
+
+	var colors := {
+		"pillar": Color(0.16, 0.17, 0.19, 1.0),
+		"barricade": Color(0.20, 0.16, 0.12, 1.0),
+		"stack": Color(0.18, 0.14, 0.10, 1.0),
+		"wall": Color(0.12, 0.13, 0.15, 1.0),
+	}
+	var obstacle_color: Color = colors.get(kind, colors.wall)
+	var shadow := _rect_poly(Vector2(5, 7), obstacle_size + Vector2(8, 8), Color(0.01, 0.012, 0.016, 0.48))
+	shadow.z_index = -42
+	body.add_child(shadow)
+	var visual := _rect_poly(Vector2.ZERO, obstacle_size, obstacle_color)
+	visual.z_index = -40
+	body.add_child(visual)
+	var cap := _rect_poly(Vector2(0, -obstacle_size.y * 0.34), Vector2(obstacle_size.x - 8, maxf(6.0, obstacle_size.y * 0.18)), obstacle_color.lightened(0.16))
+	cap.z_index = -39
+	body.add_child(cap)
+
+	var texture_by_kind := {
+		"pillar": PILLAR_TEXTURE,
+		"barricade": BARRICADE_TEXTURE,
+		"stack": STACK_TEXTURE,
+		"wall": WALL_TEXTURE,
+	}
+	var texture := texture_by_kind.get(kind) as Texture2D
+	if texture:
+		var sprite := Sprite2D.new()
+		sprite.texture = texture
+		sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		var texture_size := texture.get_size()
+		sprite.scale = Vector2(
+			(obstacle_size.x + 16.0) / texture_size.x,
+			(obstacle_size.y + 18.0) / texture_size.y
+		)
+		sprite.position.y = -5.0
+		sprite.z_index = -37
+		body.add_child(sprite)
 
 
-func _room_name(room_type: String) -> String:
-	match room_type:
-		"barracks":
-			return "牢房营区"
-		"traps":
-			return "机关走廊"
-		"explosive":
-			return "油桶库房"
-		"elite":
-			return "重卫刑场"
-		"boss":
-			return "熔火审判厅"
-	return "未知房间"
-
-
-func _spawn_room_props(room_type: String) -> void:
-	match room_type:
-		"barracks":
-			_spawn_crate(Vector2(-80, -180))
-			_spawn_crate(Vector2(110, 170))
-			_spawn_chest(Vector2(430, -230))
-		"traps":
-			_spawn_trap(Vector2(-40, -90))
-			_spawn_trap(Vector2(170, 110))
-			_spawn_crate(Vector2(-250, 180))
-			_spawn_chest(Vector2(410, 220))
-		"explosive":
-			_spawn_barrel(Vector2(-20, -120))
-			_spawn_barrel(Vector2(150, 60))
-			_spawn_barrel(Vector2(310, -170))
-			_spawn_crate(Vector2(-250, -180))
-			_spawn_chest(Vector2(420, 230))
-		"elite":
-			_spawn_barrel(Vector2(-130, 0))
-			_spawn_trap(Vector2(70, -190))
-			_spawn_trap(Vector2(70, 190))
-			_spawn_chest(Vector2(410, 0))
-		"boss":
-			_spawn_barrel(Vector2(-60, -210))
-			_spawn_barrel(Vector2(80, 210))
-			_spawn_trap(Vector2(230, -210))
-			_spawn_trap(Vector2(230, 210))
+func _spawn_room_content(layout: RefCounted) -> void:
+	for prop in layout.props:
+		var offset: Vector2 = prop.get("position", Vector2.ZERO)
+		match str(prop.get("kind", "crate")):
+			"barrel": _spawn_barrel(offset)
+			"trap": _spawn_trap(offset)
+			"chest": _spawn_chest(offset)
+			_: _spawn_crate(offset)
 
 
 func _spawn_barrel(offset: Vector2) -> void:
@@ -363,10 +436,10 @@ func _spawn_trap(offset: Vector2) -> void:
 	node.global_position = _room_origin + offset
 
 
-func _spawn_room_exit(unlocked: bool) -> void:
+func _spawn_room_exit(unlocked: bool, offset: Vector2 = Vector2(500, 0)) -> void:
 	_exit_area = Area2D.new()
 	_exit_area.name = "RunExit"
-	_exit_area.global_position = _room_origin + Vector2(500, 0)
+	_exit_area.global_position = _room_origin + offset
 	_exit_area.monitoring = true
 	_exit_area.collision_layer = 2048
 	_exit_area.collision_mask = 2

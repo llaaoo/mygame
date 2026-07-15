@@ -22,8 +22,8 @@ func _build_ui() -> void:
 	_panel.anchor_right = 0.71
 	_panel.anchor_top = 0.0
 	_panel.anchor_bottom = 0.0
-	_panel.offset_top = 90
-	_panel.offset_bottom = 138
+	_panel.offset_top = 116
+	_panel.offset_bottom = 164
 	_panel.add_theme_stylebox_override("panel", GameUIStyle.panel_style(0.91, 4, GameUIStyle.DANGER))
 	add_child(_panel)
 

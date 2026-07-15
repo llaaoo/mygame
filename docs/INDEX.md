@@ -12,6 +12,7 @@ PROJECT_ANALYSIS.md (完整项目分析 — 架构评估 + 文件功能清单 + 
     ├── PROJECT_IMPROVEMENTS.md (当前改进点 — 已完成链路 + 剩余工作)
     │
     ├── ROGUELITE_PIVOT_PLAN.md (新方向 — 短局制 roguelite 转型规划)
+    ├── MAP_GENERATION.md (地图生成 — seed、模板、布局约束与扩展方式)
     │
     ├── ARCHITECTURE.md (宪法 — 六层边界)
     │       │
@@ -69,6 +70,7 @@ PROJECT_ANALYSIS.md (完整项目分析 — 架构评估 + 文件功能清单 + 
 - 保留 CombatExecutor / SkillData / MapObject / Surface / Enemy / UI 等核心资产。
 - 冻结 NPC 日程、传统任务和大地图持久化；装备改造为高影响的局内构筑系统。
 - 新增 `run / rooms / rewards` 三个模块边界。
+- 地图生成实现见 `MAP_GENERATION.md`，包含可复现 seed、模板池和可达性约束。
 - 第一阶段验收标准：最小可玩 run 闭环、复用资产验证、构筑感验证。
 
 **何时阅读**: 任何新功能、重构、内容制作或优先级判断之前。

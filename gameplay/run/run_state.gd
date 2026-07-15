@@ -17,6 +17,7 @@ var completed_rooms: int = 0
 var rewards_taken: Array[String] = []
 var relic_ids: Array[String] = []
 var active_reward_choices: Array[Dictionary] = []
+var room_plan: Array[Dictionary] = []
 
 
 func start(new_seed: int) -> void:
@@ -26,6 +27,7 @@ func start(new_seed: int) -> void:
 	rewards_taken.clear()
 	relic_ids.clear()
 	active_reward_choices.clear()
+	room_plan.clear()
 	status = Status.RUNNING
 
 

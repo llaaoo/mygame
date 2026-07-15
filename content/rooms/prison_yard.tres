@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="RunRoomTemplate" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://gameplay/rooms/run_room_template.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+template_id = "prison_yard"
+display_name = "沉降庭院"
+room_types = PackedStringArray("barracks", "traps", "explosive")
+weight = 1.2
+arena_size = Vector2(1120, 720)
+pattern = "pillars"
+prop_budget = 3
+hazard_budget = 1

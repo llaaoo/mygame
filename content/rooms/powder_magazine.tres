@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="RunRoomTemplate" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://gameplay/rooms/run_room_template.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+template_id = "powder_magazine"
+display_name = "黑火药库"
+room_types = PackedStringArray("explosive", "traps")
+weight = 1.2
+arena_size = Vector2(1200, 680)
+pattern = "split"
+prop_budget = 4
+hazard_budget = 2

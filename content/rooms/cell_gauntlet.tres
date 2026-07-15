@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="RunRoomTemplate" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://gameplay/rooms/run_room_template.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+template_id = "cell_gauntlet"
+display_name = "断锁回廊"
+room_types = PackedStringArray("traps", "barracks")
+weight = 1.1
+arena_size = Vector2(1080, 760)
+pattern = "gauntlet"
+prop_budget = 2
+hazard_budget = 3
