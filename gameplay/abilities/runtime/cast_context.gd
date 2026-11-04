@@ -7,9 +7,13 @@ var caster: Node2D = null
 var target: Node2D = null
 var direction: Vector2 = Vector2.ZERO
 var target_position: Vector2 = Vector2.ZERO
+var has_target_position: bool = false
 var world: Node = null
 var skill: SkillData = null
 var charge_power: float = 1.0          ## 蓄力倍率（0.0~1.0，1.0=满蓄）
+var batch: SkillExecutionBatch
+var family_id := ""
+var empower := false
 
 
 ## 快捷构造：仅需 caster + direction
@@ -29,6 +33,7 @@ static func targeted(caster: Node2D, target: Node2D, skill: SkillData) -> CastCo
 	ctx.target = target
 	ctx.direction = (target.global_position - caster.global_position).normalized()
 	ctx.target_position = target.global_position
+	ctx.has_target_position = true
 	ctx.skill = skill
 	ctx.world = caster.get_tree().current_scene
 	return ctx
@@ -40,6 +45,7 @@ static func at_position(caster: Node2D, position: Vector2, skill: SkillData) -> 
 	ctx.caster = caster
 	ctx.direction = (position - caster.global_position).normalized()
 	ctx.target_position = position
+	ctx.has_target_position = true
 	ctx.skill = skill
 	ctx.world = caster.get_tree().current_scene
 	return ctx

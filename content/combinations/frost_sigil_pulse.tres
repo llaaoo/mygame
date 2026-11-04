@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="CombinationRecipe" load_steps=3 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/combinations/combination_recipe.gd" id="1"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/frost_ring_result.tres" id="2"]
+[resource]
+script = ExtResource("1")
+id = "frost_sigil_pulse"
+trigger_action_id = "pulse"
+required_field_type = "frost"
+result_skill = ExtResource("2")
+mana_cost = 12
+cooldown = 3.0

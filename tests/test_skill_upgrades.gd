@@ -46,11 +46,12 @@ func _init() -> void:
 		return
 
 	var pool := SkillPool.new()
-	pool.add_skill(fireball)
+	var equippable := load("res://gameplay/abilities/data/shadow_bolt_data.tres") as SkillData
+	pool.add_skill(equippable)
 	var manager := SkillManager.new()
 	manager._slots.resize(SkillManager.MAX_SLOTS)
 	manager.pool = pool
-	manager.equip_slot(0, fireball)
+	manager.equip_slot(0, equippable)
 	manager.upgrade_source("slot_0", "power")
 	var manager_state := manager.serialize_skill_state()
 	var restored_manager := SkillManager.new()

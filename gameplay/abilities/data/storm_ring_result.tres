@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=6 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="1"]
+[ext_resource type="Script" path="res://gameplay/abilities/visuals/aoe_visual_data.gd" id="2"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/synergies/conduction.tres" id="3"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/synergies/static_overload.tres" id="4"]
+[sub_resource type="Resource" id="Visual"]
+script = ExtResource("2")
+color = Color(0.8, 0.6, 1, 0.9)
+radius = 115.0
+scale = 1.2
+lifetime = 0.5
+[resource]
+script = ExtResource("1")
+id = "storm_ring"
+display_name = "雷环"
+combination_only = true
+description = "雷阵＋震荡：以法阵为中心释放范围雷击，可令潮湿地面带电，命中潮湿目标额外45%伤害。"
+mechanics = "13 MP + 法阵一次触发。"
+role = "范围导电"
+icon_atlas_index = 17
+skill_type = 2
+tags = ["lightning", "aoe", "combination"]
+mp_cost = 13
+cooldown = 3.0
+damage = 19
+damage_scaling = 0.5
+archetype = "persistent_aoe"
+ignites_dry_surface = false
+aoe_visual = SubResource("Visual")
+synergies = [ExtResource("3"), ExtResource("4")]

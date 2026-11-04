@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=4 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="1"]
+[ext_resource type="Script" path="res://gameplay/status/buff.gd" id="2"]
+[sub_resource type="Resource" id="Buff"]
+script = ExtResource("2")
+buff_id = "ember_focus"
+status_id = "ember_focus"
+display_name = "余烬战意"
+exclusive_group = "sigil_attunement"
+duration = 10.0
+speed_multiplier = 1.0
+stat_modifiers = {"attack_damage": 8}
+attack_tags = ["fire"]
+spell_tags = ["fire"]
+spell_damage_multiplier = 1.2
+can_empower = true
+empower_name = "燃尽余烬"
+empower_damage_multiplier = 1.6
+empower_mana_cost = 3
+empower_radius_bonus = 36.0
+empower_surface = "burning"
+empower_surface_radius = 90.0
+empower_surface_duration = 4.0
+[resource]
+script = ExtResource("1")
+id = "ember_focus"
+display_name = "余烬战意"
+combination_only = true
+description = "火阵内凝神：10秒内近战攻击力+8并附带火焰命中，普通火焰施法伤害+20%且保留恩赐。按住Shift施放火焰动作会消耗余烬：本次伤害+60%，火球留下燃烧区，火花/喷发扩大并铺火，额外3 MP。失去持续增益，地面火焰也会伤害自己。"
+mechanics = "10 MP；持续 10.0 秒。"
+role = "增益触发"
+icon_atlas_index = 17
+skill_type = 1
+tags = ["buff", "combination"]
+mp_cost = 10
+cooldown = 4.0
+buff_resource = SubResource("Buff")
+buff_duration = 10.0

@@ -214,6 +214,12 @@ func _on_slot_clicked(event: InputEvent, source: String) -> void:
 
 
 func _equip(source: String, skill: SkillData) -> void:
+	if skill.combination_only:
+		_hint_label.text = _combination_description(skill)
+		return
+	if not _skill_manager.knows_action(skill):
+		_hint_label.text = "尚未掌握：%s。探索遗迹寻找记录。" % skill.display_name
+		return
 	if not _is_skill_unlocked(skill):
 		_hint_label.text = "%s 需要 %s Lv.%d" % [skill.display_name, _school_name(skill.school), _unlock_level(skill)]
 		return
@@ -268,6 +274,10 @@ func _refresh_detail() -> void:
 	if not _is_skill_unlocked(_selected_skill):
 		var locked := Label.new()
 		locked.text = "未解锁 · %s Lv.%d" % [_school_name(_selected_skill.school), _unlock_level(_selected_skill)]
+		if _skill_manager and not _skill_manager.knows_action(_selected_skill):
+			locked.text = "尚未掌握 · 探索寻找技能记录"
+		if _selected_skill.combination_only:
+			locked.text = _combination_description(_selected_skill)
 		GameUIStyle.apply_label(locked, 10, Color(0.94, 0.5, 0.32, 1.0))
 		_detail_box.add_child(locked)
 	var desc := Label.new()
@@ -330,6 +340,13 @@ func _refresh_grid() -> void:
 		return
 	for skill in _skill_pool.skills:
 		if not skill: continue
+		if _skill_manager.restrict_actions and not _skill_manager.knows_action(skill):
+			var visible_result := false
+			for recipe in _skill_manager.combinations.recipes:
+				if recipe.result_skill.get_id() == skill.get_id() and _skill_manager.combinations.learned_recipes.has(recipe.id):
+					visible_result = true
+			if not visible_result:
+				continue
 		var card := _make_skill_card(skill)
 		_skill_grid.add_child(card)
 
@@ -362,6 +379,8 @@ func _make_skill_card(skill: SkillData) -> PanelContainer:
 
 	var tp := Label.new()
 	tp.text = "%s · %s" % [_type_name(skill.skill_type), "%d 路" % skill.upgrades.size() if unlocked else "Lv.%d" % _unlock_level(skill)]
+	if skill.combination_only:
+		tp.text = "组合结果"
 	tp.add_theme_font_size_override("font_size", 9)
 	tp.add_theme_color_override("font_color", _type_color(skill.skill_type))
 	tp.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -370,6 +389,8 @@ func _make_skill_card(skill: SkillData) -> PanelContainer:
 	card.gui_input.connect(_on_card_clicked.bind(skill))
 	card.mouse_filter = Control.MOUSE_FILTER_STOP
 	card.tooltip_text = "%s\n%s\n%s" % [skill.description, skill.mechanics, "已解锁" if unlocked else "%s Lv.%d 解锁" % [_school_name(skill.school), _unlock_level(skill)]]
+	if skill.combination_only:
+		card.tooltip_text = skill.description
 	return card
 
 
@@ -451,7 +472,19 @@ func _type_name(t: int) -> String:
 	return "法术"
 
 
+func _combination_description(skill: SkillData) -> String:
+	if _skill_manager and _skill_manager.combinations:
+		for recipe in _skill_manager.combinations.recipes:
+			if recipe.result_skill.get_id() == skill.get_id():
+				var trigger: SkillData = _skill_pool.get_skill(recipe.trigger_action_id)
+				return "组合结果：%s + %s → %s" % [recipe.condition_label(), trigger.display_name if trigger else recipe.trigger_action_id, skill.display_name]
+	return "组合结果，不能直接装备"
+
 func _is_skill_unlocked(skill: SkillData) -> bool:
+	if _skill_manager and not _skill_manager.knows_action(skill):
+		return false
+	if skill.combination_only:
+		return false
 	var player := get_tree().get_first_node_in_group("player") as Player
 	return not player or not player.mastery_manager or player.mastery_manager.is_spell_unlocked(skill)
 

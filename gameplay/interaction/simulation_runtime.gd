@@ -91,8 +91,8 @@ func _register_default_reactions() -> void:
 	wet_fire.rule_id = "wet_fire"
 	wet_fire.required_state = "wet"
 	wet_fire.required_tags = ["fire"]
-	wet_fire.result_state = "dry"
-	wet_fire.result_duration = 0.0
+	wet_fire.result_state = "steam"
+	wet_fire.result_duration = 3.0
 	_surface_manager.register_reaction(wet_fire)
 	
 	# burning + ice → dry（灭火）
@@ -132,6 +132,14 @@ func _register_default_reactions() -> void:
 	dry_ice.result_duration = 4.0
 	dry_ice.entity_status_path = "res://gameplay/abilities/data/frozen.tres"
 	_surface_manager.register_reaction(dry_ice)
+	for spec in [["wet", "lightning", "electrified", 5.0], ["frozen", "fire", "wet", 5.0], ["dry", "water", "wet", 12.0], ["electrified", "ice", "frozen", 4.0], ["poisoned", "fire", "burning", 6.0], ["poisoned", "water", "wet", 8.0], ["poisoned", "ice", "frozen", 4.0], ["wet", "poison", "poisoned", 8.0]]:
+		var reaction := SurfaceReaction.new()
+		reaction.rule_id = str(spec[0]) + "_" + str(spec[1])
+		reaction.required_state = str(spec[0])
+		reaction.required_tags = [str(spec[1])]
+		reaction.result_state = str(spec[2])
+		reaction.result_duration = float(spec[3])
+		_surface_manager.register_reaction(reaction)
 
 
 ## ── 实体 Tick 注册 ──
@@ -173,7 +181,7 @@ func _tick_entities(delta: float) -> void:
 	# 倒序遍历以支持 tick 中安全删除
 	for i in range(_entity_tickers.size() - 1, -1, -1):
 		var ticker := _entity_tickers[i]
-		if not is_instance_valid(ticker):
+		if not is_instance_valid(ticker) or not ticker.is_inside_tree():
 			_entity_tickers.remove_at(i)
 			continue
 		if ticker.has_method("tick"):

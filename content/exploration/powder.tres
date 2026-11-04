@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ExplorationRegionData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/exploration/exploration_region_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "powder"
+title = "黑火药库"
+description = "利用油桶制造环境反应，也可绕开危险逐个击破。北侧排水支路有寒霜记录。"
+room_type = "explosive"
+seed = 20261107
+encounters = Array[Dictionary]([{"role": 0, "hp": 42, "pos": Vector2(200, -110)}, {"role": 1, "hp": 32, "pos": Vector2(350, 130)}])
+discoveries = Array[Dictionary]([{"id": "powder_supply", "title": "守卫补给", "text": "恢复生命和法力。油桶的火焰也会伤害你；先观察站位再引燃。每个补给只能领取一次。", "heal": true, "pos": Vector2(-350, 180)}, {"id": "powder_charcoal", "title": "火药研磨残料", "pos": Vector2(-300, -200), "materials": {"charcoal": 5}, "text": "取得施法原料。返回营地工作台可加工，M查看库存。此处只搜刮一次，休息与重置遭遇都不会重新发放。"}])
+exits = Array[Dictionary]([{"target": "yard", "title": "返回外院", "pos": Vector2(-480, 0), "requires_clear": false}, {"target": "gate", "title": "前往重卫关隘", "pos": Vector2(480, 0), "requires_clear": true}, {"target": "drain", "title": "支路：排水回廊", "pos": Vector2(0, -300), "requires_clear": true}])

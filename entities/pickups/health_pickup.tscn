@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bj2nc5oex3rku"]
 
-[ext_resource type="Script" uid="uid://chxom8puvw874" path="res://entities/pickups/health_pickup.gd" id="1_e688c"]
+[ext_resource type="Script" uid="uid://dsced0fvd0ny7" path="res://entities/pickups/health_pickup.gd" id="1_e688c"]
 [ext_resource type="Texture2D" path="res://content/art/placeholders/health_pickup.png" id="2_w0ydi"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_w0ydi"]

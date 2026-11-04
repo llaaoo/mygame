@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=4 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="1"]
+[ext_resource type="Script" path="res://gameplay/abilities/visuals/aoe_visual_data.gd" id="2"]
+[sub_resource type="Resource" id="Visual"]
+script = ExtResource("2")
+color = Color(0.3, 0.95, 0.85, 0.8)
+radius = 135.0
+scale = 1.35
+lifetime = 0.55
+[resource]
+script = ExtResource("1")
+id = "guard_release"
+display_name = "守护爆破"
+combination_only = true
+description = "共鸣护盾＋震荡：立即消耗护盾，向自身周围释放范围爆破，不消耗法阵。"
+mechanics = "8 MP。"
+role = "回响范围攻击"
+icon_atlas_index = 17
+skill_type = 2
+tags = ["arcane", "echo", "ward_release", "aoe"]
+mp_cost = 8
+cooldown = 2.0
+damage = 24
+damage_scaling = 0.7
+archetype = "persistent_aoe"
+aoe_visual = SubResource("Visual")
+ignites_dry_surface = false
+cast_distance = 0.0

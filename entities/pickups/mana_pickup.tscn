@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://yx4rgoeq45o8"]
 
-[ext_resource type="Script" uid="uid://fasbhx6yoft2" path="res://entities/pickups/mana_pickup.gd" id="1_kpvpu"]
+[ext_resource type="Script" uid="uid://dnn603mwxgyle" path="res://entities/pickups/mana_pickup.gd" id="1_kpvpu"]
 [ext_resource type="Texture2D" path="res://content/art/placeholders/mana_pickup.png" id="2_61715"]
-[ext_resource type="Shape2D" uid="uid://b3fojs2r5x30j" path="res://pickups/mana_pickup_shape.tres" id="3_61715"]
+[ext_resource type="Shape2D" uid="uid://b3fojs2r5x30j" path="res://entities/pickups/mana_pickup_shape.tres" id="3_61715"]
 
 [node name="ManaPickup" type="Area2D" unique_id=1795329497]
 script = ExtResource("1_kpvpu")

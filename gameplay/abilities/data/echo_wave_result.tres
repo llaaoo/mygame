@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=4 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="1"]
+[ext_resource type="Script" path="res://gameplay/abilities/visuals/aoe_visual_data.gd" id="2"]
+[sub_resource type="Resource" id="Visual"]
+script = ExtResource("2")
+color = Color(0.3, 0.95, 0.85, 0.8)
+radius = 115.0
+scale = 1.15
+lifetime = 1.45
+[resource]
+script = ExtResource("1")
+id = "echo_wave"
+display_name = "回响脉冲"
+combination_only = true
+description = "回响印记＋震荡：自身周围脉冲，持续期间对每个目标最多造成三次伤害。"
+mechanics = "14 MP。"
+role = "回响范围攻击"
+icon_atlas_index = 17
+skill_type = 2
+tags = ["arcane", "echo", "aoe"]
+mp_cost = 14
+cooldown = 2.0
+damage = 9
+damage_scaling = 0.25
+archetype = "persistent_aoe"
+aoe_visual = SubResource("Visual")
+ignites_dry_surface = false
+cast_distance = 0.0
+aoe_tick_interval = 0.55
+aoe_max_hits_per_target = 3

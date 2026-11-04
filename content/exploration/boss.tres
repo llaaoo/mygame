@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ExplorationRegionData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/exploration/exploration_region_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "boss"
+title = "熔炉大厅"
+description = "击败火焰领主，解除监狱封锁。准备动作有风险，先闪避再布阵。"
+room_type = "boss"
+seed = 20261110
+encounters = Array[Dictionary]([{"boss": true, "hp": 280, "pos": Vector2(200, 0)}])
+discoveries = Array[Dictionary]([])
+exits = Array[Dictionary]([{"target": "gate", "title": "退回关隘", "pos": Vector2(-480, 0), "requires_clear": false}, {"target": "camp", "title": "完成探索，返回营地", "pos": Vector2(480, 0), "requires_clear": true}])

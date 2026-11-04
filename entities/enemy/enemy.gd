@@ -57,6 +57,8 @@ var _returning_home: bool = false
 var _patrol_index: int = 0
 var _patrol_wait_remaining: float = 0.0
 var _suspicion_timer: float = 0.0
+var _attack_ready_remaining := 0.0
+var _flash_tween: Tween
 
 signal died
 
@@ -413,8 +415,13 @@ func _do_melee_attack() -> void:
 	if trace:
 		CombatDebugger.store(trace)
 
-	await get_tree().create_timer(attack_cooldown).timeout
-	attack_ready = true
+	_attack_ready_remaining = attack_cooldown
+
+func _process(delta: float) -> void:
+	if not attack_ready:
+		_attack_ready_remaining = maxf(0, _attack_ready_remaining - delta)
+		if _attack_ready_remaining == 0:
+			attack_ready = true
 
 
 func _create_buff_manager() -> void:
@@ -464,8 +471,10 @@ func _apply_visuals() -> void:
 func _flash_damage() -> void:
 	var spr := $Sprite2D
 	spr.modulate = Color(1.0, 0.35, 0.35, 1.0)
-	await get_tree().create_timer(0.1).timeout
-	spr.modulate = Color.WHITE
+	if _flash_tween and _flash_tween.is_valid():
+		_flash_tween.kill()
+	_flash_tween = create_tween()
+	_flash_tween.tween_property(spr, "modulate", Color.WHITE, 0.1)
 
 
 func _find_player() -> void:

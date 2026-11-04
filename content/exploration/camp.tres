@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ExplorationRegionData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/exploration/exploration_region_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "camp"
+title = "余烬营地"
+description = "阅读路标后出发。鼠标左键近战，右键火花，空格闪避，E交互，J日志，Esc暂停。"
+room_type = "barracks"
+seed = 20261104
+encounters = Array[Dictionary]([])
+discoveries = Array[Dictionary]([{"id": "camp_guide", "title": "远征者手记", "text": "火花本身只影响近处。真正的法术来自条件：寻找监狱外院的火阵铭刻记录。死亡返回营地，已学知识和清理进度保留。", "pos": Vector2(-200, -160)}, {"id": "material_handbook", "title": "施法材料手册", "text": "已掌握水引：前方制造水域、灭火并令敌人潮湿（默认4）。已掌握泼洒树脂：消耗树脂制剂铺油，需在K中编组。领取初始原料和成品。按M给基础动作配置可选素材；营地工作台可加工。灰延长火/霜法阵，树脂强化火球，霜盐强化冰霜，雷晶粉维持雷阵或强化雷矢。基础火/霜不强制带料。", "pos": Vector2(-220, 200), "actions": ["water_call", "oil_flask"], "materials": {"charcoal": 4, "sap": 6, "crystal": 6, "ash": 2, "resin": 2, "frost_salt": 2, "storm_dust": 3}}])
+exits = Array[Dictionary]([{"target": "yard", "title": "进入监狱外院", "pos": Vector2(480, 0), "requires_clear": false}])

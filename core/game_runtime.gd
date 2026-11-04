@@ -43,8 +43,14 @@ func _ready() -> void:
 		instance = self
 	_setup_runtimes()
 
+func _exit_tree() -> void:
+	if instance == self:
+		instance = null
+
 
 func _process(delta: float) -> void:
+	if get_tree().paused:
+		return
 	# 1. 分发 CommandBus 队列
 	if command_bus:
 		command_bus.dispatch()

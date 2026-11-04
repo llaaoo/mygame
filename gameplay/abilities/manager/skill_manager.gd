@@ -1,7 +1,7 @@
 class_name SkillManager
 extends Node
 ## 技能管理器 — 纯运行态，描述"怎么装备"
-## 左手/右手 + 4 快捷键槽位
+## 左手/右手 + 6 快捷键槽位
 ## 执行逻辑委托给 SkillExecutor
 
 const MAX_SLOTS := 6
@@ -16,6 +16,12 @@ signal skill_upgraded(source: String, skill: SkillData, upgrade_id: String, rank
 ## ── 核心依赖 ──
 var pool: SkillPool = null                 ## 技能池（ID索引）
 var executor: SkillExecutor = null         ## 执行器（计算+执行）
+var combinations: FireCombinationController
+var restrict_actions := false
+var known_actions: Dictionary = {}
+
+func knows_action(skill: SkillData) -> bool:
+	return skill != null and (not restrict_actions or known_actions.has(skill.get_id()))
 
 ## ── 左右手（SkillInstance 包装） ──
 var left_hand: SkillInstance = null
@@ -37,6 +43,9 @@ func _ready() -> void:
 		executor = SkillExecutor.new()
 		executor.name = "SkillExecutor"
 		add_child(executor)
+	combinations = FireCombinationController.new()
+	combinations.name = "FireCombinations"
+	add_child(combinations)
 	# 禁用独立 _process，改为 SimulationRuntime 统一驱动
 	process_mode = Node.PROCESS_MODE_DISABLED
 	call_deferred("_register_with_simulation")
@@ -95,6 +104,10 @@ func apply_loadout(loadout: SkillLoadout) -> void:
 ## ── 装备管理 ──
 
 func equip_hand(hand: String, skill: SkillData) -> void:
+	if skill and not knows_action(skill):
+		return
+	if skill and skill.combination_only:
+		return
 	var inst := SkillInstance.new(skill) if skill else null
 	match hand:
 		"left":  left_hand = inst
@@ -116,6 +129,10 @@ func unequip_hand(hand: String) -> SkillData:
 
 
 func equip_slot(idx: int, skill: SkillData) -> void:
+	if skill and not knows_action(skill):
+		return
+	if skill and skill.combination_only:
+		return
 	if idx < 0 or idx >= MAX_SLOTS:
 		return
 	_slots[idx] = SkillInstance.new(skill) if skill else null
@@ -192,10 +209,17 @@ func has_right_spell() -> bool:
 
 
 func can_use(source: String) -> bool:
+	var inst := _find_instance(source)
+	if combinations and inst and combinations.handles(inst.data):
+		return get_cooldown(source) <= 0.0
 	return _cooldowns.get(source, 0.0) <= 0.0
 
 
 func get_cooldown(source: String) -> float:
+	var inst := _find_instance(source)
+	if combinations and inst and combinations.handles(inst.data):
+		var result := combinations.preview(inst.data, get_parent(), Input.is_key_pressed(KEY_SHIFT))
+		return combinations.remaining_cooldown(result, inst.data.get_id())
 	return _cooldowns.get(source, 0.0)
 
 
@@ -241,6 +265,16 @@ func use_slot_with_context(idx: int, caster: Node2D, ctx: CastContext) -> bool:
 ## ── 内部执行（委托给 SkillExecutor） ──
 
 func _execute(skill: SkillData, source: String, caster: Node2D, direction: Vector2) -> bool:
+	if not knows_action(skill):
+		return false
+	if skill.combination_only:
+		return false
+	if combinations and combinations.handles(skill):
+		var context := CastContext.simple(caster, direction, skill)
+		context.empower = Input.is_key_pressed(KEY_SHIFT)
+		return combinations.start(skill, caster, context, source)
+	if combinations and not combinations.pending.is_empty():
+		return false
 	# ── INPUT 阶段（阶段机门控） ──
 	var exec_inst := CombatExecutor.instance
 	if exec_inst:
@@ -283,6 +317,15 @@ func _execute(skill: SkillData, source: String, caster: Node2D, direction: Vecto
 
 
 func _execute_with_context(skill: SkillData, source: String, caster: Node2D, ctx: CastContext) -> bool:
+	if not knows_action(skill):
+		return false
+	if skill.combination_only:
+		return false
+	if combinations and combinations.handles(skill):
+		ctx.empower = ctx.empower or Input.is_key_pressed(KEY_SHIFT)
+		return combinations.start(skill, caster, ctx, source)
+	if combinations and not combinations.pending.is_empty():
+		return false
 	var exec_inst := CombatExecutor.instance
 	if exec_inst:
 		exec_inst.begin_cast_sequence()
@@ -344,6 +387,9 @@ func _all_sources() -> Array[String]:
 
 func _get_cooldown_total(source: String) -> float:
 	var inst := _find_instance(source)
+	if combinations and inst and combinations.handles(inst.data):
+		var plan := combinations.preview(inst.data, get_parent(), Input.is_key_pressed(KEY_SHIFT))
+		return maxf(inst.data.cooldown, float(plan.cooldown))
 	if inst and inst.data:
 		return inst.total_cooldown if inst.total_cooldown > 0.0 else inst.data.cooldown
 	return 1.0
@@ -369,14 +415,18 @@ func _get_effective_cooldown(skill: SkillData, caster: Node2D) -> float:
 
 
 func _get_effective_mana_cost(skill: SkillData, caster: Node2D) -> int:
+	return effective_mana_cost(skill, caster, skill.mp_cost)
+
+
+func effective_mana_cost(skill: SkillData, caster: Node2D, base_cost: int) -> int:
 	var player := caster as Player
 	if not player:
-		return skill.mp_cost
+		return base_cost
 	var equipment := player.get_node_or_null("EquipmentManager") as EquipmentManager
 	var modifier := equipment.get_modifier_value("mana_cost.all") if equipment else 0.0
 	for tag in skill.tags:
 		modifier += equipment.get_modifier_value("mana_cost.%s" % tag) if equipment else 0.0
-	return maxi(0, int(round(skill.mp_cost * (1.0 + modifier))))
+	return maxi(0, int(round(base_cost * (1.0 + modifier))))
 
 
 ## ── 初始化（兼容旧 API） ──

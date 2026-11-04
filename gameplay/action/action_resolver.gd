@@ -59,7 +59,9 @@ static func _validate_cast(entity: Node2D, action: Action) -> bool:
 			skill = inst.data if inst else null
 
 	if skill and skill.mp_cost > 0:
-		if mana.mp < skill.mp_cost:
+		if sm.combinations and sm.combinations.handles(skill):
+			return sm.combinations.preview(skill, entity).ready
+		if mana.mp < sm.effective_mana_cost(skill, entity, skill.mp_cost):
 			return false
 
 	if not sm.can_use(action.skill_source):

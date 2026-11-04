@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=3 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="1"]
+[ext_resource type="Resource" path="res://content/visuals/echo_visual.tres" id="2"]
+[resource]
+script = ExtResource("1")
+id = "echo_barrage"
+display_name = "回响三重矢"
+combination_only = true
+description = "回响印记＋火花：三发扇形奥术飞矢，消耗一次印记。回响墨可让每发穿透一个目标。"
+mechanics = "12 MP + 消耗回响印记。"
+role = "回响投射物"
+icon_atlas_index = 17
+tags = ["arcane", "echo", "projectile"]
+mp_cost = 12
+cooldown = 2.0
+damage = 15
+damage_scaling = 0.45
+archetype = "linear_projectile"
+visual = ExtResource("2")
+projectile_speed = 560.0
+projectile_lifetime = 1.8
+projectile_count = 3
+projectile_spread_degrees = 18.0
+projectile_pierce = 0

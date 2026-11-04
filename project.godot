@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Study"
-run/main_scene="res://main.tscn"
+run/main_scene="res://mvp.tscn"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
 
@@ -21,6 +21,10 @@ DialogueManager="*uid://c3rodes2l3gxb"
 
 [display]
 
+window/size/viewport_width=1152
+window/size/viewport_height=648
+window/size/min_width=960
+window/size/min_height=600
 window/stretch/mode="canvas_items"
 
 [editor_plugins]

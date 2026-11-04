@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="SkillData" load_steps=6 format=3]
+[gd_resource type="Resource" script_class="SkillData" load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="1"]
 [ext_resource type="Resource" path="res://content/visuals/fire_visual.tres" id="2"]
@@ -8,16 +8,19 @@
 [ext_resource type="Resource" path="res://gameplay/abilities/data/synergies/melt.tres" id="6"]
 [ext_resource type="Resource" path="res://gameplay/abilities/data/synergies/toxic_ignition.tres" id="7"]
 
+[ext_resource type="Resource" path="res://gameplay/abilities/data/synergies/vaporize.tres" id="NewReaction"]
+
 [resource]
 script = ExtResource("1")
 id = "fireball"
 display_name = "火球术"
+combination_only = true
 icon_atlas_index = 0
-description = "发射一枚稳定的火焰弹，点燃油面并造成火焰伤害。"
-mechanics = "基础火焰投射物；可融化冻结或引爆中毒目标。"
+description = "在自己的火阵内使用火花，沿瞄准方向释放火球。不能直接装备或释放。"
+mechanics = "组合结果：火阵 + 火花；可融化冻结或引爆中毒目标。"
 role = "稳定输出"
 tags = ["fire", "projectile"]
-mp_cost = 15
+mp_cost = 12
 cooldown = 2.0
 damage = 25
 damage_scaling = 1.0
@@ -25,4 +28,4 @@ archetype = "linear_projectile"
 visual = ExtResource("2")
 projectile_speed = 500.0
 upgrades = [ExtResource("3"), ExtResource("4"), ExtResource("5")]
-synergies = [ExtResource("6"), ExtResource("7")]
+synergies = [ExtResource("NewReaction"), ExtResource("6"), ExtResource("7")]

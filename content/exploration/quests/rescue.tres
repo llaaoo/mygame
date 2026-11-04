@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ExplorationQuestData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/exploration/exploration_quest_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "rescue"
+title = "失联的测绘员"
+description = "清理军械档案室，救出测绘员，再回营地报告。"
+required_claims = PackedStringArray("cartographer_rescued")
+required_clears = PackedStringArray("archive")
+attribute_points = 1

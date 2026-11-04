@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="CastingMaterialData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/materials/casting_material_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "ward_powder"
+title = "守护粉"
+description = "延长凝神增益与共鸣护盾4秒，额外2 MP；不强化回响印记。"
+result_ids = PackedStringArray("focus", "resonant_guard", "ember_focus", "frost_stride", "static_focus")
+extra_mana = 2
+buff_duration_bonus = 4.0

@@ -12,6 +12,7 @@ var _masks: Array[ColorRect] = []
 var _bind_labels: Array[Label] = []
 var _cd_labels: Array[Label] = []
 var _sources: Array[String] = []  ## "left", "right", "slot_0", ...
+var _combination_hint: Label
 
 
 func setup(sm: SkillManager) -> void:
@@ -36,6 +37,49 @@ func _build() -> void:
 		_add_item("slot_%d" % i, str(i + 1), SLOT_SIZE)
 
 	_refresh_all()
+	_combination_hint = Label.new()
+	_combination_hint.set_as_top_level(true)
+	_combination_hint.size = Vector2(440, 68)
+	_combination_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_combination_hint.add_theme_font_size_override("font_size", 12)
+	_combination_hint.add_theme_color_override("font_color", Color(1, 0.75, 0.4))
+	_combination_hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_combination_hint)
+
+
+func _process(_delta: float) -> void:
+	if not _skill_manager or not _skill_manager.combinations or not is_instance_valid(_combination_hint):
+		return
+	var controller := _skill_manager.combinations
+	var ignite := _skill_manager.pool.get_skill("ignite") if _skill_manager.pool else null
+	if not ignite:
+		_combination_hint.hide()
+		return
+	var plan := controller.preview(ignite, _skill_manager.get_parent(), Input.is_key_pressed(KEY_SHIFT))
+	var action_name := "火花"
+	if not controller.pending.is_empty():
+		plan = controller.pending
+		action_name = plan.action.display_name
+	var text := "%s → %s · %d MP" % [action_name, plan.effect_label, plan.cost]
+	if not plan.material_costs.is_empty():
+		text += " · " + controller.supplies.describe_cost(plan.material_costs)
+	var boon_hint := controller.boon_hint(plan)
+	if not boon_hint.is_empty():
+		text += "\n" + boon_hint
+	if not controller.pending.is_empty():
+		text += "\n准备：%s · %.1fs" % [controller.pending.effect_label, maxf(0, controller.pending.remaining)]
+	elif not controller.last_message.is_empty():
+		text += "\n" + controller.last_message
+	elif not plan.ready:
+		text += "\n" + plan.reason
+	_combination_hint.text = text
+	_combination_hint.global_position = global_position + Vector2(0, -68)
+	for i in range(_sources.size()):
+		_update_cooldown(i)
+		var instance := _skill_manager.get_instance(_sources[i])
+		if instance and controller.handles(instance.data):
+			var preview := controller.preview(instance.data, _skill_manager.get_parent(), Input.is_key_pressed(KEY_SHIFT))
+			_panels[i].tooltip_text = "%s → %s · %d MP\n%s\n%s\n%s" % [instance.data.display_name, preview.effect_label, preview.cost, controller.supplies.describe_cost(preview.material_costs) if not preview.material_costs.is_empty() else "无材料消耗", controller.boon_hint(preview), preview.reason if not preview.ready else preview.skill.description]
 
 
 func _add_item(source: String, label: String, size: Vector2) -> void:
@@ -113,7 +157,8 @@ func _refresh_idx(idx: int) -> void:
 		icon.texture = null
 		icon.modulate = Color(1, 1, 1, 0.12)
 	
-	_bind_labels[idx].visible = (skill == null)
+	_bind_labels[idx].visible = true
+	_panels[idx].tooltip_text = "%s\n%s" % [skill.display_name, skill.description] if skill else "空槽"
 	_update_cooldown(idx)
 
 

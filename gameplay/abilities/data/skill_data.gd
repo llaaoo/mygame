@@ -17,6 +17,7 @@ enum SkillType {
 @export var id: String = ""                       ## 唯一标识符（推荐使用）
 @export var skill_id: String = ""                 ## @deprecated 用 id 代替，保留兼容
 @export var display_name: String = "未命名技能"
+@export var combination_only: bool = false  ## Result effect; not an equippable player action.
 @export var icon: Texture2D
 @export_range(-1, 29, 1) var icon_atlas_index: int = -1
 @export_multiline var description: String = ""
@@ -36,6 +37,8 @@ enum SkillType {
 ## ── 消耗 & 冷却（纯数据） ──
 @export var mp_cost: int = 10
 @export var cooldown: float = 2.0
+@export var required_material: String = ""
+@export var material_amount: int = 1
 
 ## ── 伤害 & 缩放（纯数据，计算交给 SkillExecutor） ──
 @export var damage: int = 25                     ## 基础伤害
@@ -75,6 +78,11 @@ enum SkillType {
 @export var aoe_scale: float = 1.0               ## AoE 视觉缩放
 @export var aoe_lifetime: float = 0.6            ## AoE 持续时间
 @export var aoe_tick_interval: float = 0.0
+@export var ignites_dry_surface: bool = true  ## Some bursts only react with existing material surfaces.
+@export var creates_surface: String = ""
+@export var impact_surface: String = ""
+@export var surface_radius: float = 80.0
+@export var surface_duration: float = 8.0
 @export_range(1, 30, 1) var aoe_max_hits_per_target: int = 1
 
 ## ── 位移专用 ──

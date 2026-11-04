@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=5 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="1"]
+[ext_resource type="Resource" path="res://content/visuals/storm_visual.tres" id="2"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/synergies/conduction.tres" id="3"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/synergies/static_overload.tres" id="4"]
+[resource]
+script = ExtResource("1")
+id = "storm_bolt"
+display_name = "雷矢"
+combination_only = true
+description = "雷阵＋火花：发出雷矢并连锁近敌。命中潮湿目标额外45%伤害；雷息期间额外35%。可用雷晶粉改成三发散射。"
+mechanics = "11 MP + 法阵一次触发。"
+role = "雷电连锁"
+icon_atlas_index = 17
+tags = ["lightning", "projectile", "combination"]
+mp_cost = 11
+cooldown = 2.2
+damage = 20
+damage_scaling = 0.7
+archetype = "linear_projectile"
+visual = ExtResource("2")
+projectile_speed = 700.0
+projectile_lifetime = 1.5
+synergies = [ExtResource("3"), ExtResource("4")]

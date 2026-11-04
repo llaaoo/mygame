@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=4 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="1"]
+[ext_resource type="Script" path="res://gameplay/status/buff.gd" id="2"]
+[sub_resource type="Resource" id="Buff"]
+script = ExtResource("2")
+buff_id = "echo_mark"
+display_name = "回响印记"
+duration = 12.0
+status_id = "echo_ready"
+exclusive_group = "echo_preparation"
+[resource]
+script = ExtResource("1")
+id = "echo_mark"
+display_name = "回响铭印"
+combination_only = false
+description = "消耗回响墨1，获得持续12秒的一次性印记。接下来火花/震荡/凝神/水引/毒雾会转化为回响法术；用K编组。"
+mechanics = "6 MP；持续12.0秒。"
+role = "准备与支援"
+icon_atlas_index = 17
+skill_type = 1
+tags = ["arcane", "buff"]
+mp_cost = 6
+cooldown = 1.5
+buff_resource = SubResource("Buff")
+buff_duration = 12.0
+required_material = "echo_ink"

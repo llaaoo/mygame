@@ -40,5 +40,9 @@ func _execute(ev: CombatEvent) -> void:
 		push_warning("[OnHitApplyStatus] 无法加载: %s" % status_buff_path)
 		return
 	
-	buff_manager.apply_buff(buff)
+	if required_skill_tag in ["water", "ice"]:
+		buff_manager.remove_status("burning")
+	if required_skill_tag == "water":
+		buff_manager.remove_status("poison")
+	buff_manager.apply_buff(buff.duplicate(true))
 	print("🔥 [OnHitApplyStatus] %s → %s 挂 %s" % [ev.source.name if ev.source else "?", target.name, buff.display_name])

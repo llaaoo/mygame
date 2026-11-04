@@ -13,10 +13,15 @@ var _tick_interval: float = 0.0
 var _tick_elapsed: float = 0.0
 var _max_hits_per_target: int = 1
 var _hit_counts: Dictionary = {}
+var _hit_windows: Dictionary = {}
+var _hit_window := 0
+var _skill: SkillData
+var _remaining_life := 0.0
 
 
 ## 核心入口：SkillData 注入所有参数
 func setup(skill: SkillData, caster_node: Node2D) -> void:
+	_skill = skill
 	caster = caster_node
 	damage = skill.damage  ## 会被 SkillExecutor 覆写为 resolve_damage()
 	_tick_interval = skill.aoe_tick_interval
@@ -32,7 +37,8 @@ func setup(skill: SkillData, caster_node: Node2D) -> void:
 			spr.scale = Vector2(vis.scale, vis.scale)
 		var shape_node = $CollisionShape2D
 		if shape_node:
-			var shape := shape_node.shape as CircleShape2D
+			var shape := shape_node.shape.duplicate() as CircleShape2D if shape_node.shape else null
+			shape_node.shape = shape
 			if not shape:
 				shape = CircleShape2D.new()
 				shape_node.shape = shape
@@ -46,7 +52,8 @@ func setup(skill: SkillData, caster_node: Node2D) -> void:
 			spr.scale = Vector2(skill.aoe_scale, skill.aoe_scale)
 		var shape_node = $CollisionShape2D
 		if shape_node:
-			var shape := shape_node.shape as CircleShape2D
+			var shape := shape_node.shape.duplicate() as CircleShape2D if shape_node.shape else null
+			shape_node.shape = shape
 			if not shape:
 				shape = CircleShape2D.new()
 				shape_node.shape = shape
@@ -54,13 +61,15 @@ func setup(skill: SkillData, caster_node: Node2D) -> void:
 	
 	
 	# 表面交互：AoE 生成 → 设置所在格表面状态
-	_apply_surface(skill)
+	# Surface reactions run in _ready at the final world position.
 	
 	_needs_setup = false
 
 
 ## 根据技能标签在 AoE 所在格设置表面状态
 func _apply_surface(skill: SkillData) -> void:
+	if not skill:
+		return
 	# 通过 GameRuntime → SimulationRuntime → SurfaceManager 访问（不再用全局单例）
 	var gr := GameRuntime.instance
 	if not gr:
@@ -71,11 +80,12 @@ func _apply_surface(skill: SkillData) -> void:
 	var sm := sim.get_surface_manager()
 	if not sm:
 		return
-	var cell := Vector2i(floori(global_position.x / 64), floori(global_position.y / 64))
-	sm.apply_tags(cell, skill.tags, skill.display_name)
+	var radius := skill.aoe_visual.radius if skill.aoe_visual else skill.aoe_radius
+	sm.apply_area(global_position, radius, skill.tags, skill.display_name, skill.creates_surface, skill.surface_duration, skill.ignites_dry_surface)
 
 
 func _ready() -> void:
+	_apply_surface(_skill)
 	# 碰撞层：AoE 是 HITBOX，检测 ACTOR + HURTBOX
 	collision_layer = 4   # HITBOX
 	collision_mask = 10   # ACTOR(2) | HURTBOX(8)
@@ -90,7 +100,9 @@ func _ready() -> void:
 	body_entered.connect(_on_body_entered)
 	area_entered.connect(_on_area_entered)
 
-	await get_tree().create_timer(lifetime).timeout
+	_remaining_life = lifetime
+
+func _expire() -> void:
 	if has_meta("_combat_trace"):
 		var trace := get_meta("_combat_trace") as CombatTrace
 		if trace:
@@ -103,17 +115,22 @@ func set_caster(c: Node2D) -> void:
 
 
 func _physics_process(delta: float) -> void:
+	_remaining_life -= delta
+	if _remaining_life <= 0:
+		_expire()
+		return
 	if _tick_interval <= 0.0:
 		return
 	_tick_elapsed += delta
 	if _tick_elapsed < _tick_interval:
 		return
 	_tick_elapsed -= _tick_interval
+	_hit_window += 1
 	for body in get_overlapping_bodies():
-		_try_hit(body)
+		_try_hit(body, true)
 	for area in get_overlapping_areas():
 		var target := area if area.has_method("take_damage") else area.owner
-		_try_hit(target)
+		_try_hit(target, true)
 
 
 func _on_body_entered(body: Node2D) -> void:
@@ -123,17 +140,21 @@ func _on_body_entered(body: Node2D) -> void:
 func _on_area_entered(area: Area2D) -> void:
 	# 检测 Area2D 子节点（如 MapObject 的 HitArea）
 	var owner := area.owner
-	_try_hit(owner)
+	_try_hit(area if area.has_method("take_damage") else owner)
 
 
-func _try_hit(target: Node) -> void:
+func _try_hit(target: Node, from_tick: bool = false) -> void:
 	if not target or target == caster or not target.has_method("take_damage"):
 		return
 	var target_id := target.get_instance_id()
 	var hits := int(_hit_counts.get(target_id, 0))
 	if hits >= _max_hits_per_target:
 		return
+	# Body and Hurtbox callbacks share one hit window; later hits come from ticks.
+	if (hits > 0 and not from_tick) or int(_hit_windows.get(target_id, -1)) == _hit_window:
+		return
 	_hit_counts[target_id] = hits + 1
+	_hit_windows[target_id] = _hit_window
 	_emit_hit_event(target as Node2D)
 
 
@@ -144,7 +165,7 @@ func _emit_hit_event(target: Node2D) -> void:
 	if CombatExecutor.instance:
 		CombatExecutor.instance.begin_hit_sequence()
 
-	CombatExecutor.report_hit(caster, target, damage, global_position, skill, tags)
+	CombatExecutor.report_hit(caster, target, damage, global_position, skill, tags, str(get_meta("execution_family", "")))
 
 	if has_meta("_combat_trace"):
 		var trace := get_meta("_combat_trace") as CombatTrace

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ExplorationRegionData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/exploration/exploration_region_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "drain"
+title = "排水回廊"
+description = "学会霜阵应对高速守卫；北侧机房有范围寒霜记录与旧水路阀门。"
+room_type = "traps"
+seed = 20261108
+encounters = Array[Dictionary]([{"role": 0, "hp": 30, "speed": 150, "pos": Vector2(200, -100)}, {"role": 0, "hp": 30, "speed": 150, "pos": Vector2(330, 160)}])
+discoveries = Array[Dictionary]([{"id": "frost_knowledge", "title": "寒霜铭刻记录", "text": "已掌握霜阵（3）。霜阵内使用同一个火花会产生寒霜弹，命中减速并冻结潮湿表面。不同类型法阵可以叠放，同类重建只更新自己；重叠处同一个动作可触发多个结果，费用相加。", "actions": ["frost_sigil"], "recipes": ["frost_sigil_spark"], "pos": Vector2(-350, 180)}, {"id": "drain_crystals", "title": "回廊结晶苔", "pos": Vector2(-300, -200), "materials": {"crystal": 6}, "text": "取得施法原料。返回营地工作台可加工，M查看库存。此处只搜刮一次，休息与重置遭遇都不会重新发放。"}, {"id": "venom_knowledge", "title": "毒理记录：雾与孢子", "requires_clear": true, "pos": Vector2(100, -220), "text": "学会毒雾（K编组），6 MP和毒性萃取1制造10秒毒区。水引冲洗毒区并解除中毒；火球可引爆中毒目标，冰霜可用于减速留人。回响印记＋毒雾变为穿透孢子，仍消耗毒性萃取。M给冰霜触发配置毒性萃取，还可同时施加冻结与中毒。", "actions": ["venom_mist"], "recipes": ["echo_venom"], "materials": {"venom_extract": 5, "charcoal": 3, "sap": 4}}])
+exits = Array[Dictionary]([{"target": "powder", "title": "返回火药库", "pos": Vector2(-480, 0), "requires_clear": false}, {"target": "cistern", "title": "深层支路：蓄水机房", "pos": Vector2(0, -300), "requires_clear": true}])
+spell_objects = Array[Dictionary]([{"id": "magic.thermal_cache", "title": "热冲击封匣", "pos": Vector2(260, 240), "routes": [["ice", "fire"], ["water", "lightning"]], "hint": "封印有两条破解路线：先冰霜冷却，再用火焰冲击；或者先用水引浸湿，再用雷击激活导槽。纯近战无法打开。跨区后未完成的步骤重置；解开后取得晶砂4、霜盐1。", "materials": {"crystal": 4, "frost_salt": 1}}, {"id": "magic.toxic_still", "title": "毒性蒸馏器", "pos": Vector2(-80, 240), "routes": [["poison", "fire"]], "hint": "先以毒雾或毒性冰霜注入毒性，再用火焰激活蒸馏器。奖励毒性萃取2、树液3。", "materials": {"venom_extract": 2, "sap": 3}}])

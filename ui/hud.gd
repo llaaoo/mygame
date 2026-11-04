@@ -192,6 +192,8 @@ func _connect_player() -> void:
 
 
 func _setup_skill_tree_ui() -> void:
+	if player and player.exploration_mode:
+		return
 	if skill_tree_ui:
 		return
 	skill_tree_ui = SkillTreeUI.new()
@@ -214,6 +216,8 @@ func _on_mp_changed(current_mp: int, max_mp: int) -> void:
 
 func _on_player_died() -> void:
 	var scene := get_tree().current_scene
+	if scene and scene.has_method("get_active_region"):
+		return # Exploration owns recovery and its modal UI.
 	var run_manager := scene.get_node_or_null("RunManager") as RunManager if scene else null
 	if run_manager and run_manager.state.status in [RunState.Status.RUNNING, RunState.Status.BOSS, RunState.Status.REWARD]:
 		return
@@ -272,6 +276,8 @@ func _on_level_up(new_level: int) -> void:
 
 
 func _setup_level_up_ui() -> void:
+	if player and player.exploration_mode:
+		return
 	if level_up_ui:
 		return
 	var lui_scene := load("res://ui/level_up_ui.tscn") as PackedScene

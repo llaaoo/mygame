@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=4 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="1"]
+[ext_resource type="Script" path="res://gameplay/status/buff.gd" id="2"]
+[sub_resource type="Resource" id="Buff"]
+script = ExtResource("2")
+buff_id = "static_focus"
+status_id = "static_focus"
+display_name = "雷息"
+exclusive_group = "sigil_attunement"
+duration = 9.0
+speed_multiplier = 1.15
+spell_tags = ["lightning"]
+can_empower = true
+empower_name = "雷息过载"
+empower_damage_multiplier = 1.9
+empower_mana_cost = 3
+empower_radius_bonus = 48.0
+empower_projectile_count = 3
+empower_projectile_spread = 24.0
+[resource]
+script = ExtResource("1")
+id = "static_focus"
+display_name = "雷息"
+combination_only = true
+description = "雷阵内凝神：9秒内移速+15%，恩赐存在时雷矢/雷环命中额外35%伤害。按住Shift施放雷电动作会消耗雷息：本次伤害+90%，雷矢变为三发散射、雷环半径+48，额外3 MP；之后失去持续收益。"
+mechanics = "10 MP + 法阵一次触发。"
+role = "连锁增益"
+icon_atlas_index = 17
+skill_type = 1
+tags = ["buff", "lightning", "combination"]
+mp_cost = 10
+cooldown = 4.0
+buff_resource = SubResource("Buff")
+buff_duration = 9.0

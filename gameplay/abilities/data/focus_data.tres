@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=4 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="1"]
+[ext_resource type="Script" path="res://gameplay/status/buff.gd" id="2"]
+[sub_resource type="Resource" id="Buff"]
+script = ExtResource("2")
+buff_id = "focus"
+display_name = "凝神"
+exclusive_group = "sigil_attunement"
+duration = 5.0
+speed_multiplier = 1.08
+stat_modifiers = {}
+[resource]
+script = ExtResource("1")
+id = "focus"
+display_name = "凝神"
+combination_only = false
+description = "短暂稳定呼吸，移动速度提高8%；在法阵中会转化为更强的增益。"
+mechanics = "4 MP；持续 5.0 秒。"
+role = "增益触发"
+icon_atlas_index = 17
+skill_type = 1
+tags = ["buff", "combination"]
+mp_cost = 4
+cooldown = 4.0
+buff_resource = SubResource("Buff")
+buff_duration = 5.0

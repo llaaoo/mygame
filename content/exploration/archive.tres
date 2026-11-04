@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ExplorationRegionData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/exploration/exploration_region_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "archive"
+title = "军械档案室"
+description = "清理守卫，解救测绘员；北侧静默祈堂藏有增益组合。"
+room_type = "barracks"
+seed = 20261106
+encounters = Array[Dictionary]([{"role": 0, "hp": 32, "pos": Vector2(220, -120)}, {"role": 0, "hp": 32, "pos": Vector2(300, -80)}, {"role": 1, "hp": 28, "pos": Vector2(380, 160)}])
+discoveries = Array[Dictionary]([{"id": "pulse_knowledge", "title": "震荡与焰环", "text": "已掌握震荡（1）。阵外是近身能量冲击；火阵内变成以法阵为中心的范围喷发。与火球共用两次法阵资源，群敌近身时再选择使用。", "actions": ["pulse"], "recipes": ["fire_sigil_pulse"], "pos": Vector2(-350, 180)}, {"id": "cartographer_rescued", "title": "被困的测绘员艾妲", "kind": "person", "hide_when_claimed": true, "requires_clear": true, "text": "艾妲：谢谢！我沿着你清理的道路返回营地。在档案室北侧的祈堂里，凝神可以借法阵化为增益；水路尽头的机房还能改变熔炉的力量。回来找我交付营地委托吧。", "pos": Vector2(-350, -180)}])
+exits = Array[Dictionary]([{"target": "yard", "title": "返回外院", "pos": Vector2(-480, 0), "requires_clear": false}, {"target": "sanctum", "title": "深层支路：静默祈堂", "pos": Vector2(0, -300), "requires_clear": true}])
+spell_objects = Array[Dictionary]([{"id": "magic.charged_crystal", "title": "沉眠导能晶簇", "pos": Vector2(260, 240), "routes": [["lightning"]], "hint": "晶簇只对雷电共鸣。解开取得雷晶粉2、晶砂2。先探索排水回廊尽头的机房，学习雷阵。", "materials": {"storm_dust": 2, "crystal": 2}}])

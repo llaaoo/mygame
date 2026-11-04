@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="CombinationRecipe" load_steps=3 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/combinations/combination_recipe.gd" id="1"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/guard_release_result.tres" id="2"]
+[resource]
+script = ExtResource("1")
+id = "guard_pulse"
+trigger_action_id = "pulse"
+required_caster_status = "resonant_guard"
+consume_caster_status = true
+requires_empower = true
+result_skill = ExtResource("2")
+mana_cost = 8
+cooldown = 2.0
+priority = 40

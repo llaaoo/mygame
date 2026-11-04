@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=5 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="1"]
+[ext_resource type="Script" path="res://gameplay/abilities/visuals/aoe_visual_data.gd" id="2"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/synergies/deep_freeze.tres" id="NewReaction"]
+
+[sub_resource type="Resource" id="Visual"]
+script = ExtResource("2")
+color = Color(0.25, 0.8, 1, 0.9)
+radius = 125.0
+scale = 1.3
+lifetime = 0.65
+
+[resource]
+script = ExtResource("1")
+id = "frost_ring"
+display_name = "寒霜新星"
+combination_only = true
+description = "霜阵内使用震荡，在法阵周围造成范围冰霜伤害与减速，为后续铭刻争取时间。"
+mechanics = "霜阵 + 震荡；12 MP，消耗一次法阵触发。"
+role = "范围控制"
+icon_atlas_index = 6
+skill_type = 2
+tags = ["ice", "aoe", "combination"]
+mp_cost = 12
+cooldown = 3.0
+damage = 18
+damage_scaling = 0.5
+archetype = "persistent_aoe"
+ignites_dry_surface = false
+aoe_visual = SubResource("Visual")
+synergies = [ExtResource("NewReaction")]

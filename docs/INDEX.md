@@ -1,6 +1,6 @@
 # 📚 项目文档索引
 
-> 版本: v2.8 | 最后更新: 2026-07-15
+> 版本: v3.0 | 最后更新: 2026-11-04
 
 ---
 
@@ -11,7 +11,14 @@ PROJECT_ANALYSIS.md (完整项目分析 — 架构评估 + 文件功能清单 + 
     │
     ├── PROJECT_IMPROVEMENTS.md (当前改进点 — 已完成链路 + 剩余工作)
     │
-    ├── ROGUELITE_PIVOT_PLAN.md (新方向 — 短局制 roguelite 转型规划)
+    ├── EXPLORATION_COMBINATION_DESIGN.md (当前方向 — 探索与条件组合战斗方案)
+    ├── CONDITIONAL_COMBAT_TECHNICAL_PLAN.md (技术落地 — 架构能力核对、组件边界与迭代批次)
+    ├── FIRE_SIGIL_PROTOTYPE.md (已实现原型 — 火阵＋火花触发火球、试玩和测试)
+    ├── BUFF_CASTING_DESIGN.md (恩赐取舍 — 持续收益、资格、保留增益、主动消费与材料联动)
+    ├── OUTWARD_INTERACTION_REVIEW.md (当前迭代准则 — 复用工具、空间条件、用途转换与世界反馈)
+    ├── CASTING_MATERIALS_DESIGN.md (当前实装 — 法术联动、施法材料、营地加工与世界机关)
+    ├── MVP_RELEASE.md (当前可运行版本 — 九区域、15配方、回响与毒性、七种材料、营地委托、世界交互与验证)
+    ├── ROGUELITE_PIVOT_PLAN.md (历史方向 — roguelite 转型与试验场参考)
     ├── MAP_GENERATION.md (地图生成 — seed、模板、布局约束与扩展方式)
     │
     ├── ARCHITECTURE.md (宪法 — 六层边界)
@@ -27,11 +34,67 @@ PROJECT_ANALYSIS.md (完整项目分析 — 架构评估 + 文件功能清单 + 
 
 每份文档回答不同层级的问题。从上往下读，逐层深入。
 
-> 当前产品方向已从传统 ARPG 转为短局制动作 roguelite。后续玩法规划优先阅读 `ROGUELITE_PIVOT_PLAN.md`，旧 RPG / NPC / Quest 扩展建议仅作为历史上下文。
+> 当前设计重点：探索获得知识、配方、技能与装备；自由搭配；世界反馈；优先完善条件组合。后续玩法规划先阅读 `EXPLORATION_COMBINATION_DESIGN.md`。该文档是尚未实现的新设计基线；现有房间制 roguelite 保留作战斗试验场，旧规划及架构文档中的产品范围和状态需结合当前代码核对。
+
+> 当前开发优先级：先跑通技能与条件组合的公共流程，再扩展素材、生存制造和装备。素材首版现已实装，范围与后续扩展见 `CASTING_MATERIALS_DESIGN.md`。
+
+> 默认入口已更新为 `mvp.tscn`，当前交付范围与验证边界见 `MVP_RELEASE.md`；旧 `main.tscn` 保留为回归场景。启动与操作见根目录 README。
 
 ---
 
 ## 文档概要
+
+### [BUFF_CASTING_DESIGN.md](./BUFF_CASTING_DESIGN.md)
+
+对照Outward的Discipline/Rage与恩赐消费，定义普通施法保留、Shift显式消费的选择，以及实际形态、材料叠加和资源回滚。
+
+---
+
+### [OUTWARD_INTERACTION_REVIEW.md](./OUTWARD_INTERACTION_REVIEW.md)
+
+核对Outward公开技能数据，解释本轮如何把现有法阵、准备、近战、材料与地面连接起来，以及验证规则和继续迭代的判断标准。
+
+---
+
+### [MVP_RELEASE.md](./MVP_RELEASE.md)
+
+当前探索 MVP 的区域、技能组合、进度与存档语义、模块分工及验证限制。先阅读根目录 README 试玩，再对照本文开展后续迭代。
+
+---
+
+### [CASTING_MATERIALS_DESIGN.md](./CASTING_MATERIALS_DESIGN.md)
+
+当前法术联动、回响连续准备、七种施法素材、加工与消耗规则、地面反应和六处法术机关；列出首版实现范围与后续生存制造边界。
+
+---
+
+### [CONDITIONAL_COMBAT_TECHNICAL_PLAN.md](./CONDITIONAL_COMBAT_TECHNICAL_PLAN.md)
+
+**回答的问题**：当前架构能否支持探索与条件组合设计，需要新增和迭代哪些能力？
+
+**核心内容**：
+- 基于当前代码的覆盖矩阵，区分可复用、部分满足和缺失。
+- 配方解析、个人动作会话、法阵、武器准备、防御、能力知识与固定奖励的归属。
+- 现有施法、Buff、事件、装备、世界状态、区域与存档组件的改造清单。
+- 分批交付顺序、行为回归与内容校验；新增接口均为规划，尚未实现。
+
+**何时阅读**：实施当前方案、修改公共接口或评估开发依赖之前。
+
+---
+
+### [EXPLORATION_COMBINATION_DESIGN.md](./EXPLORATION_COMBINATION_DESIGN.md)
+
+**回答的问题**：探索、自由成长和条件组合战斗如何形成一个可实现的 2D 动作 RPG？
+
+**核心内容**：
+- 探索奖励、已学能力、装备配置和临时条件的边界。
+- 法阵与武器附魔两套体系，六个主动配方及判定、消耗、中断、冲突规则。
+- Buff、世界反应、敌人窗口、装备取舍、知识日志和存档设计。
+- 首个监狱区域样板、对现有代码的复用方式、实施顺序与验收门槛。
+
+**何时阅读**：当前产品设计、玩法实现、内容扩展与优先级讨论之前。文中规划不等于已有实现。
+
+---
 
 ### [PROJECT_ANALYSIS.md](./PROJECT_ANALYSIS.md)
 
@@ -73,7 +136,7 @@ PROJECT_ANALYSIS.md (完整项目分析 — 架构评估 + 文件功能清单 + 
 - 地图生成实现见 `MAP_GENERATION.md`，包含可复现 seed、模板池和可达性约束。
 - 第一阶段验收标准：最小可玩 run 闭环、复用资产验证、构筑感验证。
 
-**何时阅读**: 任何新功能、重构、内容制作或优先级判断之前。
+**何时阅读**: 理解历史转型、现有 run 流程或维护可选房间试验场时。当前产品规划优先阅读 `EXPLORATION_COMBINATION_DESIGN.md`。
 
 ---
 
@@ -137,7 +200,12 @@ PROJECT_ANALYSIS.md (完整项目分析 — 架构评估 + 文件功能清单 + 
 | 想做什么 | 读哪个 |
 |---------|--------|
 | 了解项目全貌 | PROJECT_ANALYSIS.md |
-| 了解新 roguelite 方向 | ROGUELITE_PIVOT_PLAN.md |
+| 了解当前产品方向与条件组合方案 | EXPLORATION_COMBINATION_DESIGN.md |
+| 运行当前 MVP、了解已实现内容与验证边界 | MVP_RELEASE.md |
+| 判断架构是否满足新方案、安排技术迭代 | CONDITIONAL_COMBAT_TECHNICAL_PLAN.md |
+| 试玩/验证已经实现的火阵组合 | FIRE_SIGIL_PROTOTYPE.md |
+| 查看后续施法素材与生存制造设计 | CASTING_MATERIALS_DESIGN.md |
+| 了解历史 roguelite 转型与试验场 | ROGUELITE_PIVOT_PLAN.md |
 | 查看当前已完成/待改进项 | PROJECT_IMPROVEMENTS.md |
 | 理解项目架构 | ARCHITECTURE.md |
 | 新增技能 | skill_architecture.md |
@@ -171,3 +239,4 @@ PROJECT_ANALYSIS.md (完整项目分析 — 架构评估 + 文件功能清单 + 
 | v2.5 | 2026-05 | P0 完成 + P1.1/P1.2/P1.3 完成 — CombatExecutor 权威、CommandBus 路由、Respawn 闭环、SimulationRuntime 收敛、物理层标准化、Action Layer 统一 |
 | v2.6 | 2026-05 | P1.4 完成 — COMBAT_CONTRACTS.md / skill_architecture.md / RUNTIME_TOPOLOGY.md 路径同步至实际目录结构 |
 | v2.7 | 2026-05 | 文档校准至 2026-05-30 当前状态 — P0/P1 主链完成，三条冒烟链已确认，PROJECT_IMPROVEMENTS.md 纳入索引 |
+| v3.0 | 2026-11-04 | 新增探索与条件组合战斗设计基线；旧 roguelite 规划保留为历史与试验场参考，尚未改变玩法代码 |

@@ -1,6 +1,8 @@
 class_name RunManager
 extends Node
 
+@export var enabled: bool = true
+
 const NORMAL_ROOM_COUNT := 4
 const REWARD_CHOICES := 3
 const ARENA_CENTER := Vector2(6000, 6000)
@@ -66,6 +68,9 @@ var _meta_bonus_applied: bool = false
 
 
 func _ready() -> void:
+	if not enabled:
+		set_process_unhandled_input(false)
+		return
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	meta.load_from_disk()
 	if SaveManager.instance:
@@ -574,6 +579,8 @@ func _build_skill_discovery_rewards() -> Array[Dictionary]:
 	for skill_id in SKILL_REWARD_IDS:
 		var skill := load("res://gameplay/abilities/data/%s_data.tres" % skill_id) as SkillData
 		if not skill:
+			continue
+		if skill.combination_only:
 			continue
 		if _player and _player.mastery_manager and not _player.mastery_manager.is_spell_unlocked(skill):
 			continue

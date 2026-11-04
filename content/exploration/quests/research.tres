@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ExplorationQuestData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/exploration/exploration_quest_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "research"
+title = "失落的组合研究"
+description = "收齐火、霜、震荡、新星与凝神记录，完成两处深层支区。"
+required_claims = PackedStringArray("fire_knowledge", "pulse_knowledge", "frost_knowledge", "nova_knowledge", "focus_knowledge")
+required_clears = PackedStringArray("cistern", "sanctum")
+attribute_points = 2

@@ -1,0 +1,261 @@
+extends "res://tests/test_exploration_mvp.gd"
+
+class SpellTarget extends CharacterBody2D:
+	var damage_taken := 0
+	var move_speed := 100.0
+	func take_damage(amount: int) -> void:
+		damage_taken += amount
+
+var sm: SkillManager
+var controller: FireCombinationController
+var supplies: CastingSupplies
+
+func _dummy(offset: Vector2, enemy_group: bool = false) -> SpellTarget:
+	var target := SpellTarget.new()
+	target.collision_layer = 2
+	target.collision_mask = 0
+	var collider := CollisionShape2D.new()
+	var shape := CircleShape2D.new()
+	shape.radius = 12
+	collider.shape = shape
+	target.add_child(collider)
+	var buffs := BuffManager.new()
+	buffs.name = "BuffManager"
+	target.add_child(buffs)
+	target.position = game.player.position + offset
+	game.region_root.add_child(target)
+	if enemy_group:
+		target.add_to_group("enemy")
+	return target
+
+func _cast(slot: int, direction := Vector2.RIGHT) -> void:
+	var action := sm.get_slot(slot).data
+	_check(sm.use_slot(slot, game.player, direction), "Cast rejected: " + action.get_id() + " / " + controller.last_message)
+	await create_timer(0.95 if action.get_id().ends_with("_sigil") else 0.7).timeout
+
+func _sandbox() -> void:
+	await _travel("camp")
+	game.player.global_position = Vector2(12000, 12000)
+	game.player.mana_component.max_mp = 300
+	game.player.mana_component.mp = 300
+	game.player.mana_component.mp_regen_rate = 0
+	game.player.health_component.regen_rate = 0
+
+func _cell(point: Vector2) -> Vector2i:
+	return Vector2i(floori(point.x / 64), floori(point.y / 64))
+
+func _puzzle(id: String) -> SpellWorldObject:
+	for node in game.region_root.get_children():
+		if node is SpellWorldObject and node.spec.id == id:
+			return node
+	return null
+
+func _run() -> void:
+	game = load("res://mvp.tscn").instantiate()
+	root.add_child(game)
+	current_scene = game
+	await _frames(10)
+	game.ui.close_modal()
+	sm = game.player.skill_manager
+	controller = sm.combinations
+	supplies = controller.supplies
+	await _interact("施法材料手册")
+	game.ui.close_modal()
+	_check(sm.known_actions.has("water_call") and sm.known_actions.has("oil_flask") and supplies.count("resin") == 2, "Handbook did not grant utility spells/materials")
+	var initial := supplies.serialize()
+	await _interact("施法材料手册")
+	game.ui.close_modal()
+	_check(initial == supplies.serialize(), "Handbook duplicated material grants")
+	_check(supplies.craft("ash") and supplies.count("charcoal") == 3 and supplies.count("ash") == 3, "Camp craft costs incorrect")
+	var previous := supplies.serialize()
+	_check(not supplies.craft("unknown") and previous == supplies.serialize(), "Invalid craft changed inventory")
+	game.workshop.show_materials()
+	_check(paused and is_instance_valid(game.ui.modal), "Material configuration UI missing")
+	game.ui.close_modal()
+	await _travel("yard")
+	await _interact("火阵铭刻记录")
+	game.ui.close_modal()
+	await _clear_encounter()
+	var puzzle := _puzzle("magic.bramble_cache")
+	game.player.global_position = puzzle.position - Vector2(40, 0)
+	await _cast(5)
+	_check(puzzle.completed and game.progress.claims.has(puzzle.spec.id), "Real spark did not open bramble cache")
+	var cache_count := supplies.count("sap")
+	await _travel("archive")
+	await _interact("震荡与焰环")
+	game.ui.close_modal()
+	await _clear_encounter()
+	await _travel("sanctum")
+	await _clear_encounter()
+	await _interact("凝神碑")
+	game.ui.close_modal()
+	await _travel("drain")
+	await _interact("寒霜铭刻记录")
+	game.ui.close_modal()
+	await _clear_encounter()
+	await _travel("cistern")
+	await _clear_encounter()
+	await _interact("寒霜新星试验记录")
+	game.ui.close_modal()
+	await _interact("雷阵与导电实验记录")
+	game.ui.close_modal()
+	_check(game.progress.recipes.size() == 9 and sm.known_actions.has("storm_sigil"), "Storm exploration grants missing")
+
+	# Optional placement reagent: pure preview, cancellation, final deduction.
+	await _sandbox()
+	supplies.configure("fire_sigil", "ash")
+	var ash := supplies.count("ash")
+	for i in range(20):
+		var preview := controller.preview(sm.get_slot(4).data, game.player)
+		_check(preview.cost == 10 and preview.field_bonus == 10, "Ash preview incorrect")
+	_check(supplies.count("ash") == ash, "Preview consumed reagent")
+	_check(sm.use_slot(4, game.player, Vector2.RIGHT), "Ash preparation failed")
+	game.player.position += Vector2(30, 0)
+	await create_timer(0.2).timeout
+	_check(controller.pending.is_empty() and supplies.count("ash") == ash and game.player.mana_component.mp == 300, "Cancelled placement consumed resources")
+	await create_timer(0.35).timeout
+	await _cast(4)
+	_check(controller.field.remaining > 24 and controller.field.charges == 2 and supplies.count("ash") == ash - 1 and game.player.mana_component.mp == 290, "Ash placement effect/cost incorrect")
+	var base := load("res://gameplay/abilities/data/fire_sigil_data.tres") as SkillData
+	_check(base.mp_cost == 8, "Material altered shared skill template")
+
+	# Resin consumes on release, leaves a real burning surface on physics impact.
+	supplies.configure("ignite", "resin")
+	var resin := supplies.count("resin")
+	var target := _dummy(Vector2(150, 0))
+	await _cast(5)
+	_check(supplies.count("resin") == resin - 1 and game.player.mana_component.mp == 274, "Resin fireball costs incorrect")
+	var surfaces := GameRuntime.instance.get_simulation_runtime().get_surface_manager()
+	_check(target.damage_taken > 0 and surfaces.get_surface(_cell(target.position)).get("state") == "burning", "Resin fireball failed physical damage/impact surface")
+	_check((load("res://gameplay/abilities/data/fireball_data.tres") as SkillData).impact_surface.is_empty(), "Material variant leaked into shared fireball")
+	await _sandbox()
+	# Reconfigure during preparation: cancel rather than silently use another result.
+	await _cast(4)
+	var mana := game.player.mana_component.mp
+	resin = supplies.count("resin")
+	_check(sm.use_slot(5, game.player, Vector2.RIGHT), "Reconfiguration test failed to start")
+	supplies.configure("ignite", "")
+	await create_timer(0.4).timeout
+	_check(supplies.count("resin") == resin and game.player.mana_component.mp == mana and controller.field.charges == 2, "Changed material plan consumed resources")
+	await _sandbox()
+	# Stock disappearing during preparation cannot consume mana or create a field.
+	ash = supplies.count("ash")
+	_check(sm.use_slot(4, game.player, Vector2.RIGHT), "Stock revalidation did not start")
+	supplies.pay({"ash": ash})
+	await create_timer(1.0).timeout
+	_check(not is_instance_valid(controller.field) and game.player.mana_component.mp == 300, "Missing final material consumed mana or made a field")
+	_check(not sm.use_slot(4, game.player, Vector2.RIGHT), "Insufficient selected reagent silently fell back")
+	supplies.configure("fire_sigil", "")
+	await create_timer(0.35).timeout
+	await _cast(4)
+	_check(game.player.mana_component.mp == 292, "Explicit basic spell failed without materials")
+
+	# Water is harmless, extinguishes targets and creates actual wet simulation cells.
+	await _sandbox()
+	var wet_target := _dummy(Vector2(120, 0), true)
+	var chained := _dummy(Vector2(180, 0), true)
+	wet_target.get_node("BuffManager").apply_buff(load("res://gameplay/abilities/data/burning.tres").duplicate(true))
+	await _cast(3)
+	_check(wet_target.damage_taken == 0 and wet_target.get_node("BuffManager").has_buff("wet") and not wet_target.get_node("BuffManager").has_buff("burning"), "Water did damage or failed to wet/extinguish target")
+	_check(surfaces.get_surface(_cell(wet_target.position)).get("state") == "wet", "Water failed to create wet surface")
+	sm.equip_slot(4, sm.pool.get_skill("storm_sigil"))
+	var dust := supplies.count("storm_dust")
+	await _cast(4)
+	_check(controller.field.field_type == "storm" and supplies.count("storm_dust") == dust - 1, "Storm placement failed required reagent deduction")
+	await _cast(1)
+	_check(game.player.get_node("BuffManager").has_buff("static_focus"), "Storm focus did not grant static focus")
+	var expected := sm.executor.resolve_damage(sm.pool.get_skill("storm_bolt"), CastContext.simple(game.player, Vector2.RIGHT, sm.pool.get_skill("storm_bolt")))
+	await _cast(5)
+	_check(wet_target.damage_taken >= int(expected * 1.7) and chained.damage_taken > 0, "Wet conduction/static focus/chain failed")
+	_check(surfaces.get_surface(_cell(wet_target.position)).get("state") == "electrified", "Lightning did not electrify water")
+	await create_timer(0.7).timeout
+	_check(wet_target.get_node("BuffManager").has_buff("shocked"), "Electrified surface did not apply hazard status")
+	await _sandbox()
+	await _cast(4)
+	supplies.configure("ignite", "storm_dust")
+	dust = supplies.count("storm_dust")
+	await _cast(5)
+	_check(supplies.count("storm_dust") == dust - 1 and get_nodes_in_group("projectile").size() == 3, "Storm dust did not create three projectiles for one cost")
+	await _sandbox()
+	supplies.configure("ignite", "")
+	await _cast(4)
+	var side := _dummy(Vector2(-70, 0))
+	await _cast(0)
+	_check(side.damage_taken > 0, "Storm pulse failed radial physics damage")
+
+	# Frost salt pierces targets without mutating the original; wet -> ice -> fire melts.
+	await _sandbox()
+	sm.equip_slot(4, sm.pool.get_skill("fire_sigil"))
+	supplies.configure("ignite", "frost_salt")
+	var first := _dummy(Vector2(110, 0))
+	var second := _dummy(Vector2(190, 0))
+	await _cast(2)
+	var salt := supplies.count("frost_salt")
+	await _cast(5)
+	_check(first.damage_taken > 0 and second.damage_taken > 0 and supplies.count("frost_salt") == salt - 1, "Frost salt did not pierce two real targets")
+	_check(sm.pool.get_skill("frost_bolt").projectile_pierce == 0, "Frost salt mutated base projectile")
+	supplies.configure("pulse", "frost_salt")
+	var edge := _dummy(Vector2(0, 145))
+	await _cast(0)
+	_check(edge.damage_taken > 0 and sm.pool.get_skill("frost_ring").aoe_visual.radius == 125, "Frost salt radius bonus failed physics or mutated template")
+	supplies.configure("pulse", "")
+	await _sandbox()
+	supplies.configure("ignite", "")
+	var frozen_target := _dummy(Vector2(120, 0))
+	await _cast(3)
+	await _cast(2)
+	await _cast(5)
+	_check(frozen_target.get_node("BuffManager").has_buff("frozen") and not frozen_target.get_node("BuffManager").has_buff("wet"), "Water/frost reaction did not consume wet status")
+	var before_melt := frozen_target.damage_taken
+	await _cast(4)
+	await create_timer(sm.get_cooldown("slot_5") + 0.1).timeout
+	await _cast(5)
+	_check(frozen_target.damage_taken > before_melt and not frozen_target.get_node("BuffManager").has_buff("frozen"), "Fire failed to melt frozen target")
+
+	# Mandatory resin, oil/fire terrain, and two-step world puzzle with real AoE hits.
+	await _sandbox()
+	sm.equip_slot(3, sm.pool.get_skill("oil_flask"))
+	resin = supplies.count("resin")
+	await _cast(3)
+	var oil_point := game.player.position + Vector2(120, 0)
+	_check(supplies.count("resin") == resin - 1 and surfaces.get_surface(_cell(oil_point)).get("state") == "oiled", "Oil cast missing cost or terrain")
+	await _cast(4)
+	await _cast(5)
+	_check(surfaces.get_surface(_cell(oil_point)).get("state") == "burning", "Fire did not ignite prepared oil")
+	mana = game.player.mana_component.mp
+	_check(not sm.use_slot(3, game.player, Vector2.RIGHT) and game.player.mana_component.mp == mana, "Required resin shortage consumed mana or cast oil")
+	await _travel("drain")
+	puzzle = _puzzle("magic.thermal_cache")
+	game.player.global_position = puzzle.position - Vector2(20, 0)
+	# The executor path is used to isolate puzzle steps from field placement obstacles.
+	var ctx := CastContext.at_position(game.player, puzzle.position, sm.pool.get_skill("frost_ring"))
+	ctx.world = game.region_root
+	sm.executor.execute(sm.pool.get_skill("frost_ring"), ctx)
+	await create_timer(0.15).timeout
+	_check(not puzzle.completed and puzzle._steps[0] == 1, "First spell incorrectly completed two-step seal")
+	ctx = CastContext.at_position(game.player, puzzle.position, sm.pool.get_skill("fire_sigil_burst"))
+	ctx.world = game.region_root
+	sm.executor.execute(sm.pool.get_skill("fire_sigil_burst"), ctx)
+	await create_timer(0.15).timeout
+	_check(puzzle.completed and game.progress.claims.has(puzzle.spec.id), "Ice/fire sequence failed world seal")
+	await _travel("yard")
+	_check(_puzzle("magic.bramble_cache").completed and supplies.count("sap") == cache_count, "Solved world cache repeated reward")
+	await _travel("camp")
+	supplies.configure("ignite", "resin")
+	var saved := supplies.serialize()
+	_check(SaveManager.instance.save_game(2), "Spell material save failed")
+	game.queue_free()
+	current_scene = null
+	await _frames(5)
+	game = load("res://mvp.tscn").instantiate()
+	root.add_child(game)
+	current_scene = game
+	await _frames(10)
+	game.ui.close_modal()
+	_check(game.player.skill_manager.combinations.supplies.serialize() == saved and game.progress.recipes.size() == 9 and game.progress.claims.has("magic.thermal_cache"), "Spell supplies/configuration/puzzles did not restore from disk")
+	game.queue_free()
+	current_scene = null
+	await _frames(5)
+	if errors.is_empty():
+		print("Spell materials passed: nine recipes, utility, reactions, reagent transactions, crafting, physics modifiers, world puzzles and persistence")
+	call_deferred("quit", 0 if errors.is_empty() else 1)

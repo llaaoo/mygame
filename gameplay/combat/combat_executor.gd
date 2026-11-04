@@ -33,6 +33,7 @@ const MAX_CHAIN_LENGTH: int = 10
 
 ## ── 链式计数 ──
 var _chain_count: int = 0
+var _current_family := ""
 
 ## ── TriggeredEffect 冷却表（所有权上交） ──
 ## key = TriggeredEffect Resource, value = last_trigger_time (float)
@@ -53,13 +54,23 @@ func _exit_tree() -> void:
 
 ## 报告命中 — 唯一伤害入口（事件 + 扣血）
 ## 所有命中源（Projectile/AoE/近战/陷阱/DOT）只能通过此方法造成伤害
-static func report_hit(caster: Node2D, target: Node2D, damage: int, position: Vector2, skill: SkillData = null, tags: Array = []) -> void:
+static func report_hit(caster: Node2D, target: Node2D, damage: int, position: Vector2, skill: SkillData = null, tags: Array = [], family_id: String = "") -> void:
+	var health := target.get_node_or_null("HealthComponent") as HealthComponent if is_instance_valid(target) else null
+	if health:
+		health.begin_hit_group(family_id)
 	if not instance:
 		_emit_direct(CombatEvent.Type.ON_HIT, caster, target, {"damage": damage, "position": position, "tags": tags}, skill)
 		_apply_damage(target, damage, tags)
+		if is_instance_valid(health):
+			health.end_hit_group()
 		return
+	var previous_family := instance._current_family
+	instance._current_family = family_id
 	instance._enforce_emit(CombatEvent.Type.ON_HIT, caster, target, {"damage": damage, "position": position, "tags": tags}, skill)
 	_apply_damage(target, damage, tags)
+	if is_instance_valid(health):
+		health.end_hit_group()
+	instance._current_family = previous_family
 
 
 ## 内部：安全调用 Damageable.take_damage()
@@ -270,7 +281,14 @@ func _apply_bonus_damage(source: Node2D, target: Node2D, amount: int, skill: Ski
 	# 安全检查：目标已死则跳过
 	if "hp" in target and target.hp <= 0:
 		return
+	if not tags.is_empty():
+		target.set_meta("_last_hit_tags", tags)
+	var health := target.get_node_or_null("HealthComponent") as HealthComponent
+	if health:
+		health.begin_hit_group(_current_family)
 	target.take_damage(amount)
+	if is_instance_valid(health):
+		health.end_hit_group()
 
 	var trace := CombatDebugger.active()
 	if trace:

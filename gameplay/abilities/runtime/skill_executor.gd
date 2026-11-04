@@ -34,6 +34,8 @@ var modifiers: Array[DamageModifier]:
 ## 流程：DamageContext → FLAT → MULTIPLY → OVERRIDE → FINAL → return
 
 func resolve_damage(skill: SkillData, ctx: CastContext) -> int:
+	if skill.damage <= 0 and skill.damage_scaling <= 0.0:
+		return 0 # Utility spells still emit hits/statuses without damaging their targets.
 	var dc := DamageContext.from_cast(skill, ctx)
 	var trace := CombatDebugger.active()
 
@@ -130,7 +132,10 @@ func execute(skill: SkillData, context: CastContext) -> bool:
 		exec_inst.enter_phase(CombatPhase.Phase.EVENT)
 
 	if ok:
-		_emit_event(CombatEvent.Type.ON_CAST, context.caster, context.target, skill)
+		if context.batch:
+			context.batch.casts.append({"caster": context.caster, "target": context.target, "skill": skill})
+		else:
+			_emit_event(CombatEvent.Type.ON_CAST, context.caster, context.target, skill)
 
 	# ── POST 阶段 ──
 	if exec_inst:
@@ -156,6 +161,26 @@ func execute(skill: SkillData, context: CastContext) -> bool:
 		exec_inst.enter_phase(CombatPhase.Phase.IDLE)
 
 	return ok
+
+func commit_batch(batch: SkillExecutionBatch) -> void:
+	var runtime := CombatExecutor.instance
+	if runtime:
+		runtime.enter_phase(CombatPhase.Phase.MODIFIER)
+		runtime.enter_phase(CombatPhase.Phase.EFFECT)
+	for entry in batch.nodes:
+		entry.world.add_child.call_deferred(entry.node)
+	for entry in batch.buffs:
+		entry.manager.apply_buff(entry.buff)
+	if runtime:
+		runtime.enter_phase(CombatPhase.Phase.EVENT)
+	for entry in batch.casts:
+		_emit_event(CombatEvent.Type.ON_CAST, entry.caster, entry.target, entry.skill)
+	if runtime:
+		runtime.enter_phase(CombatPhase.Phase.POST)
+		runtime.enter_phase(CombatPhase.Phase.IDLE)
+	batch.nodes.clear()
+	batch.buffs.clear()
+	batch.casts.clear()
 
 
 ## 发射战斗事件 → CombatExecutor（唯一权威入口）
@@ -203,17 +228,23 @@ func _execute_projectile(skill: SkillData, ctx: CastContext) -> bool:
 
 func _spawn_projectile(scene: PackedScene, skill: SkillData, ctx: CastContext, direction: Vector2, damage: int, owns_trace: bool) -> void:
 	var instance := scene.instantiate() as Node2D
-	ctx.world.add_child(instance)
-	instance.global_position = ctx.caster.global_position + direction * skill.cast_distance
 	if instance.has_method("setup"):
 		instance.setup(skill, ctx.caster, direction)
 	if "damage" in instance:
 		instance.damage = damage
 	instance.set_meta("skill_data", skill)
+	instance.set_meta("execution_family", ctx.family_id)
 	if owns_trace:
 		instance.set_meta("_combat_trace", CombatDebugger.active())
 	if ctx.charge_power < 1.0:
 		instance.scale *= (0.4 + ctx.charge_power * 0.6)
+	# Configure lifetime and ownership before _ready starts the lifetime timer.
+	var spawn_position := ctx.caster.global_position + direction * skill.cast_distance
+	instance.position = ctx.world.to_local(spawn_position) if ctx.world is Node2D else spawn_position
+	if ctx.batch:
+		ctx.batch.nodes.append({"node": instance, "world": ctx.world})
+	else:
+		ctx.world.add_child(instance)
 
 
 ## ── Buff ──
@@ -228,7 +259,10 @@ func _execute_buff(skill: SkillData, ctx: CastContext) -> bool:
 	if skill.buff_duration > 0:
 		buff.duration = skill.buff_duration
 	buff.duration = _get_buff_duration_with_mastery(buff, ctx.caster)
-	buff_manager.apply_buff(buff)
+	if ctx.batch:
+		ctx.batch.buffs.append({"manager": buff_manager, "buff": buff})
+	else:
+		buff_manager.apply_buff(buff)
 	# trace 由 BuffManager.apply_buff 统一记录
 	return true
 
@@ -250,12 +284,16 @@ func _execute_aoe(skill: SkillData, ctx: CastContext) -> bool:
 	
 	var instance := scene.instantiate() as Node2D
 	# call_deferred 防止在物理查询链中触发 "flushing queries" 错误
-	ctx.world.add_child.call_deferred(instance)
-	# 若指定了 target_position（如触发施法），直接放在目标位置
-	if ctx.target_position != Vector2.ZERO:
-		instance.global_position = ctx.target_position
+	if ctx.batch:
+		ctx.batch.nodes.append({"node": instance, "world": ctx.world})
 	else:
-		instance.global_position = ctx.caster.global_position + ctx.direction * skill.cast_distance
+		ctx.world.add_child.call_deferred(instance)
+	# 若指定了 target_position（如触发施法），直接放在目标位置
+	if ctx.has_target_position or ctx.target_position != Vector2.ZERO:
+		instance.position = ctx.world.to_local(ctx.target_position) if ctx.world is Node2D else ctx.target_position
+	else:
+		var spawn_position := ctx.caster.global_position + ctx.direction * skill.cast_distance
+		instance.position = ctx.world.to_local(spawn_position) if ctx.world is Node2D else spawn_position
 	
 	if instance.has_method("setup"):
 		instance.setup(skill, ctx.caster)
@@ -274,6 +312,7 @@ func _execute_aoe(skill: SkillData, ctx: CastContext) -> bool:
 			instance.set_caster(ctx.caster)
 	
 	instance.set_meta("skill_data", skill)
+	instance.set_meta("execution_family", ctx.family_id)
 	instance.set_meta("_combat_trace", CombatDebugger.active())
 	# 蓄力视觉：AoE 大小随倍率
 	if ctx.charge_power < 1.0:

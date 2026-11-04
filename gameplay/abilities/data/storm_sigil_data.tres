@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "storm_sigil"
+display_name = "铭刻雷阵"
+description = "雷晶粉维持的法阵。雷阵＋火花释放雷矢，＋震荡产生雷环，＋凝神获得雷息。用K调整技能编组。"
+mechanics = "9 MP + 雷晶粉1；准备0.8秒，持续15秒，两次触发；同类重建更新，不同类型可叠放。"
+role = "雷电准备"
+icon_atlas_index = 17
+skill_type = 1
+tags = ["lightning", "field"]
+mp_cost = 9
+cooldown = 8.0
+required_material = "storm_dust"

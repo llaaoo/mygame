@@ -45,6 +45,7 @@ var _skill_pool: SkillPool = null
 
 ## ── 调试 ──
 @export var debug_items: bool = false
+@export var exploration_mode: bool = false
 
 ## ── 持有 TriggeredEffect 引用以防 Resource GC ──
 var _on_kill_effect: OnKillBonusExp = null
@@ -108,6 +109,13 @@ var state_machine: Node
 func _enter_tree() -> void:
 	# 必须在 _ready 之前注册，否则第一帧 _input 可能触发 Missing action 错误
 	_register_interact_key()
+	for i in range(4, SkillManager.MAX_SLOTS):
+		var action_name := "skill_%d" % (i + 1)
+		if not InputMap.has_action(action_name):
+			InputMap.add_action(action_name)
+			var event := InputEventKey.new()
+			event.physical_keycode = KEY_5 + i - 4
+			InputMap.action_add_event(action_name, event)
 
 
 func _ready() -> void:
@@ -197,7 +205,9 @@ func _apply_stats() -> void:
 		health_component.max_hp += new_hp - _last_stat_hp
 		mana_component.max_mp += new_mp - _last_stat_mp
 		combat_component.attack_damage += new_dmg - _last_stat_dmg
-		move_speed += new_speed - _last_stat_speed
+		var buffs := get_node_or_null("BuffManager") as BuffManager
+		var speed_multiplier := buffs.get_speed_multiplier() if buffs else 1.0
+		move_speed += (new_speed - _last_stat_speed) * speed_multiplier
 
 	health_component.hp = clampi(health_component.hp, 1, health_component.max_hp)
 	mana_component.mp = clampi(mana_component.mp, 0, mana_component.max_mp)
@@ -252,15 +262,25 @@ func _setup_skills() -> void:
 	_skill_pool.build()
 
 	# 4. 注入 pool 到 skill_manager（供 loadout 使用）
+	for action_id in ["fire_sigil", "ignite"]:
+		_skill_pool.add_skill(load("res://gameplay/abilities/data/%s_data.tres" % action_id) as SkillData)
 	skill_manager.pool = _skill_pool
 
 	# 5. 应用装备映射表
 	var loadout := SkillLoadout.create(
 		"ice_armor",    # 左手
-		"fireball",     # 右手
-		["lightning_bolt", "poison_cloud", "frost_lance", "shadow_bolt"]  # 快捷键 1-4
+		"ignite",       # 右手基础火花；火球由火阵组合产生
+		["lightning_bolt", "poison_cloud", "frost_lance", "shadow_bolt", "fire_sigil", "ignite"]
 	)
 	skill_manager.apply_loadout(loadout)
+	if exploration_mode:
+		skill_manager.restrict_actions = true
+		skill_manager.known_actions = {"ignite": true}
+		skill_manager.unequip_hand("left")
+		for i in range(SkillManager.MAX_SLOTS):
+			skill_manager.unequip_slot(i)
+		skill_manager.equip_slot(5, _skill_pool.get_skill("ignite"))
+		skill_manager.combinations.learned_recipes.clear()
 
 	# 6. 注入 Modifier Pipeline（伤害不是算出来的，是一层层改出来的）
 	_setup_damage_modifiers()
@@ -408,6 +428,8 @@ const DEFAULT_LOW_HP_TRIGGERS: Array = [
 ]
 
 func _setup_low_hp_triggers() -> void:
+	if exploration_mode:
+		return
 	for raw in DEFAULT_LOW_HP_TRIGGERS:
 		var t := LowHpTriggerData.new()
 		t.hp_threshold = raw[0]
@@ -462,6 +484,8 @@ func _create_generic_trigger(event_type: CombatEvent.Type, required_tag: String,
 
 ## 演示 EffectGraph：ON_HIT → 火焰技能分支
 func _register_graph_demo() -> void:
+	if exploration_mode:
+		return
 	# 条件1: 技能必须是火焰标签
 	var fire_cond := SkillTagCondition.new()
 	fire_cond.required_skill_tag = "fire"
@@ -596,10 +620,10 @@ func poll_universal_actions() -> Array[Action]:
 	if Input.is_action_just_pressed("attack") and not skill_manager.has_left_spell():
 		actions.append(Action.melee(self))
 
-	# 技能（左手/右手/快捷键1-4）
+	# 技能（左手/右手/快捷键1-6）
 	for pair in [["left", "attack"], ["right", "skill"]]:
 		_poll_universal_cast(actions, pair[0], pair[1])
-	for i in range(4):
+	for i in range(SkillManager.MAX_SLOTS):
 		_poll_universal_cast(actions, "slot_%d" % i, "skill_%d" % (i + 1))
 
 	# 交互
@@ -633,11 +657,15 @@ func resolve_action(action: Action) -> void:
 
 	match action.action_type:
 		Action.ActionType.MELEE:
+			if skill_manager.combinations:
+				skill_manager.combinations.cancel("近战：准备取消")
 			aiming_sources.clear()
 			hide_aim()
 			state_machine.transition_to("attack")
 
 		Action.ActionType.DODGE:
+			if skill_manager.combinations:
+				skill_manager.combinations.cancel("闪避：准备取消")
 			_cancel_charge()
 			_cancel_channel()
 			aiming_sources.clear()
@@ -1192,6 +1220,8 @@ func _process(delta: float) -> void:
 func show_aim(_source: String, skill: SkillData) -> void:
 	if not skill or not _aim_line or not _aim_dot:
 		return
+	if skill_manager.combinations and skill_manager.combinations.handles(skill):
+		skill = skill_manager.combinations.preview(skill, self, Input.is_key_pressed(KEY_SHIFT)).skill
 
 	var color := _aim_color(skill.skill_type)
 

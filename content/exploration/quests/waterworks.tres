@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ExplorationQuestData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/exploration/exploration_quest_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "waterworks"
+title = "重启水路"
+description = "清理蓄水机房并决定旧阀门的用途，再回营地报告。"
+required_claims = PackedStringArray("waterworks_choice")
+required_clears = PackedStringArray("cistern")
+attribute_points = 2

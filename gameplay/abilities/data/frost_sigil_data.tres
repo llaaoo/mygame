@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "frost_sigil"
+display_name = "铭刻霜阵"
+description = "在脚下铭刻霜阵，站在阵内使用火花触发寒霜弹。"
+mechanics = "8 MP；准备 0.8 秒；持续 15 秒；两次触发；移动或受伤中断。"
+school = 3
+role = "战场准备"
+icon_atlas_index = 6
+skill_type = 1
+tags = ["ice", "field"]
+mp_cost = 8
+cooldown = 8.0

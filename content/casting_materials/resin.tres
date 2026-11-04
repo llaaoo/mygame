@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CastingMaterialData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/materials/casting_material_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "resin"
+title = "树脂制剂"
+description = "强化火球：飞行减慢20%，命中留下半径80的6秒燃烧区，额外4 MP。"
+result_ids = PackedStringArray("fireball")
+extra_mana = 4
+projectile_speed_multiplier = 0.8
+impact_surface = "burning"
+impact_radius = 80.0
+impact_duration = 6.0

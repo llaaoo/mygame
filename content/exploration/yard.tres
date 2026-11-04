@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ExplorationRegionData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/exploration/exploration_region_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "yard"
+title = "监狱外院"
+description = "找到入口旁的火阵记录，清除守卫后探索前路。火阵内火花会变为火球。"
+room_type = "barracks"
+seed = 20261105
+encounters = Array[Dictionary]([{"role": 0, "hp": 35, "pos": Vector2(220, -110)}, {"role": 0, "hp": 35, "pos": Vector2(340, 140)}])
+discoveries = Array[Dictionary]([{"id": "fire_knowledge", "title": "火阵铭刻记录", "text": "已掌握火阵。按5铭刻，阵内使用右键或6火花发出火球；阵外仍是近距离火花。火阵仅有两次触发量，注意留出准备窗口。", "actions": ["fire_sigil"], "recipes": ["fire_sigil_fireball"], "pos": Vector2(-350, 180)}])
+exits = Array[Dictionary]([{"target": "camp", "title": "返回营地", "pos": Vector2(-480, 0), "requires_clear": false}, {"target": "powder", "title": "前往火药库", "pos": Vector2(480, 0), "requires_clear": true}, {"target": "archive", "title": "支路：军械档案", "pos": Vector2(0, -300), "requires_clear": true}])
+spell_objects = Array[Dictionary]([{"id": "magic.bramble_cache", "title": "荆棘药箱", "pos": Vector2(0, 240), "routes": [["fire"]], "hint": "荆棘缠住药箱。火焰能烧开外壳，阵外火花也可以。解开可取得树液3、炭屑2。", "materials": {"sap": 3, "charcoal": 2}}])

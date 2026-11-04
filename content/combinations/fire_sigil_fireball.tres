@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="CombinationRecipe" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://gameplay/abilities/combinations/combination_recipe.gd" id="1"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/fireball_data.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = "fire_sigil_fireball"
+trigger_action_id = "ignite"
+required_field_type = "fire"
+result_skill = ExtResource("2")
+mana_cost = 12
+cooldown = 2.0
+preparation = 0.25

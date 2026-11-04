@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="CastingMaterialData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/materials/casting_material_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "echo_ink"
+title = "回响墨"
+description = "回响铭印的必需媒介；也可让回响三重矢每发穿透1个目标，额外3 MP。"
+result_ids = PackedStringArray("echo_barrage")
+extra_mana = 3
+pierce_bonus = 1

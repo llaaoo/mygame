@@ -17,6 +17,8 @@ var _surface_timer: float = 0.0  ## 表面交互节流
 var _remaining_pierces: int = 0
 var _homing_strength: float = 0.0
 var _hit_targets: Dictionary = {}
+var _remaining_life := 0.0
+var _impact_applied := false
 
 
 ## 核心入口：SkillData 注入所有参数（替代子类覆写）
@@ -71,7 +73,9 @@ func _ready() -> void:
 	add_to_group("projectile")
 
 	# 自动销毁
-	await get_tree().create_timer(lifetime).timeout
+	_remaining_life = lifetime
+
+func _expire() -> void:
 	if has_meta("_combat_trace"):
 		var trace := get_meta("_combat_trace") as CombatTrace
 		if trace:
@@ -97,6 +101,10 @@ func set_direction(dir: Vector2) -> void:
 
 
 func _physics_process(delta: float) -> void:
+	_remaining_life -= delta
+	if _remaining_life <= 0:
+		_expire()
+		return
 	_apply_homing(delta)
 	global_position += direction * speed * delta
 	
@@ -142,14 +150,28 @@ func _on_body_entered(body: Node2D) -> void:
 		return
 	if not is_instance_valid(caster) or not is_instance_valid(body):
 		return
-	if _hit_targets.has(body.get_instance_id()):
+	# Static bodies such as an oil barrel's Body belong to a Damageable root.
+	# Resolve that root before treating the body as an indestructible wall.
+	var target: Node2D = body if body.has_method("take_damage") else null
+	if not target and body.owner is Node2D and body.owner.has_method("take_damage"):
+		target = body.owner
+	if not target and body.get_parent() is MapObject:
+		target = body.get_parent()
+	if target == caster:
 		return
-	if body.has_method("take_damage"):
-		_hit_targets[body.get_instance_id()] = true
-		_emit_hit_event(body)
+	if target and caster.is_in_group("enemy") and target.is_in_group("enemy"):
+		return
+	if target and caster.is_in_group("player") and target.is_in_group("player"):
+		return
+	if target and _hit_targets.has(target.get_instance_id()):
+		return
+	if target:
+		_hit_targets[target.get_instance_id()] = true
+		_emit_hit_event(target)
 		_finish_or_pierce()
 	else:
 		_has_hit = true
+		_apply_impact_surface()
 		queue_free()
 
 
@@ -176,6 +198,7 @@ func _on_area_entered(area: Area2D) -> void:
 
 
 func _finish_or_pierce() -> void:
+	_apply_impact_surface()
 	if _remaining_pierces > 0:
 		_remaining_pierces -= 1
 		return
@@ -198,13 +221,22 @@ func _apply_to_surface() -> void:
 	var cell := Vector2i(floori(global_position.x / 64), floori(global_position.y / 64))
 	var surf := sm.get_surface(cell)
 	if surf.get("state", "dry") != "dry":
-		if sm.apply_tags(cell, skill.tags, skill.display_name):
-			_has_hit = true
-			queue_free()
+		sm.apply_tags(cell, skill.tags, skill.display_name)
+
+func _apply_impact_surface() -> void:
+	var skill := get_meta("skill_data", null) as SkillData
+	if _impact_applied or not skill or skill.impact_surface.is_empty():
+		return
+	_impact_applied = true
+	var sim := GameRuntime.instance.get_simulation_runtime() if GameRuntime.instance else null
+	if sim:
+		sim.get_surface_manager().apply_area(global_position, skill.surface_radius, skill.tags, skill.display_name, skill.impact_surface, skill.surface_duration)
 
 
 ## 发射 ON_HIT → CombatExecutor（唯一权威入口）
 func _emit_hit_event(target: Node2D) -> void:
+	# A nearby impact may happen before the first travel sampling interval.
+	_apply_to_surface()
 	var skill := get_meta("skill_data", null) as SkillData
 	var tags: Array[String] = skill.tags if skill else []
 
@@ -212,7 +244,7 @@ func _emit_hit_event(target: Node2D) -> void:
 	if CombatExecutor.instance:
 		CombatExecutor.instance.begin_hit_sequence()
 
-	CombatExecutor.report_hit(caster, target, damage, global_position, skill, tags)
+	CombatExecutor.report_hit(caster, target, damage, global_position, skill, tags, str(get_meta("execution_family", "")))
 
 	# 关闭技能 trace（ON_HIT 事件已由 _enforce_emit → _record_trace_event 记录）
 	if has_meta("_combat_trace"):

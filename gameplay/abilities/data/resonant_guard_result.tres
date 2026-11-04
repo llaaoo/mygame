@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=4 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="1"]
+[ext_resource type="Script" path="res://gameplay/status/buff.gd" id="2"]
+[sub_resource type="Resource" id="Buff"]
+script = ExtResource("2")
+buff_id = "resonant_guard"
+display_name = "共鸣护盾"
+duration = 8.0
+status_id = "resonant_guard"
+exclusive_group = "sigil_attunement"
+damage_taken_multiplier = 0.6
+[resource]
+script = ExtResource("1")
+id = "resonant_guard"
+display_name = "共鸣护盾"
+combination_only = true
+description = "回响印记＋凝神：8秒内承受伤害降低40%。与其他凝神增益互斥；普通震荡保留护盾，按住Shift使用震荡才消耗护盾释放守护爆破。"
+mechanics = "10 MP；持续8.0秒。"
+role = "准备与支援"
+icon_atlas_index = 17
+skill_type = 1
+tags = ["arcane", "buff"]
+mp_cost = 10
+cooldown = 1.5
+buff_resource = SubResource("Buff")
+buff_duration = 8.0
+required_material = ""

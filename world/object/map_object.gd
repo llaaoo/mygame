@@ -7,6 +7,7 @@ signal destroyed(object_id: String)
 signal damaged(object_id: String, hp_remaining: int, hp_max: int)
 
 @export var object_data: MapObjectData
+@export var persistent_id: String = ""
 
 var _object_id: String
 var _current_hp: int
@@ -181,6 +182,8 @@ func _emit_destroyed_command() -> void:
 
 
 func _build_object_id() -> String:
+	if not persistent_id.is_empty():
+		return persistent_id
 	var owner_node := owner if owner else get_tree().current_scene
 	if owner_node and not owner_node.scene_file_path.is_empty():
 		return "%s:%s" % [owner_node.scene_file_path, owner_node.get_path_to(self)]

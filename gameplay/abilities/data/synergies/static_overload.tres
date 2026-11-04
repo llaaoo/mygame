@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="SkillSynergyData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_synergy_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "static_overload"
+display_name = "雷息共鸣"
+description = "雷息期间，雷矢或雷环命中额外造成35%伤害。"
+required_target_status = ""
+required_caster_status = "static_focus"
+bonus_damage_ratio = 0.35
+consume_target_status = false
+bonus_tags = ["reaction", "static_overload"]

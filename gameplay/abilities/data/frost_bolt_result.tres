@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=4 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="1"]
+[ext_resource type="Resource" path="res://content/visuals/frost_visual.tres" id="2"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/synergies/deep_freeze.tres" id="NewReaction"]
+
+[resource]
+script = ExtResource("1")
+id = "frost_bolt"
+display_name = "寒霜弹"
+combination_only = true
+description = "霜阵内使用火花触发；冰霜命中施加减速。"
+mechanics = "霜阵 + 火花；10 MP。"
+school = 3
+role = "远程控制"
+icon_atlas_index = 6
+tags = ["ice", "projectile", "combination"]
+mp_cost = 10
+cooldown = 2.2
+damage = 22
+damage_scaling = 0.7
+archetype = "linear_projectile"
+visual = ExtResource("2")
+projectile_speed = 620.0
+projectile_lifetime = 1.8
+synergies = [ExtResource("NewReaction")]

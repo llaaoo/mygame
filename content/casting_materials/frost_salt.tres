@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="CastingMaterialData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/materials/casting_material_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "frost_salt"
+title = "霜盐"
+description = "寒霜弹额外穿透1个目标；寒霜新星半径+30，额外2 MP。"
+result_ids = PackedStringArray("frost_bolt", "frost_ring")
+extra_mana = 2
+pierce_bonus = 1
+radius_bonus = 30.0

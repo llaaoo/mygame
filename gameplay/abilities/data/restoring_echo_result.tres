@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=4 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="1"]
+[ext_resource type="Script" path="res://gameplay/status/buff.gd" id="2"]
+[sub_resource type="Resource" id="Buff"]
+script = ExtResource("2")
+buff_id = "restoring_echo"
+display_name = "回响复苏"
+duration = 4.3
+status_id = "restoring_echo"
+exclusive_group = "echo_restoration"
+tick_interval = 1.0
+tick_heal = 6
+[resource]
+script = ExtResource("1")
+id = "restoring_echo"
+display_name = "回响复苏"
+combination_only = true
+description = "回响印记＋水引：短时持续恢复，每秒6点生命，共4次，至多24点。替代本次铺水，不能复活。"
+mechanics = "9 MP；持续4.3秒。"
+role = "准备与支援"
+icon_atlas_index = 17
+skill_type = 1
+tags = ["arcane", "buff"]
+mp_cost = 9
+cooldown = 1.5
+buff_resource = SubResource("Buff")
+buff_duration = 4.3
+required_material = ""

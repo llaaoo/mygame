@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="SkillSynergyData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_synergy_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "vaporize"
+display_name = "蒸发"
+description = "火球命中潮湿目标时额外造成30%伤害，并消耗潮湿。"
+required_target_status = "wet"
+required_caster_status = ""
+bonus_damage_ratio = 0.3
+consume_target_status = true
+bonus_tags = ["reaction", "vaporize"]

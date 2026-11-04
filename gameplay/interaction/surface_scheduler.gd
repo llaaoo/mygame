@@ -25,7 +25,7 @@ func tick(delta: float) -> void:
 
 
 func set_surface(cell: Vector2i, state: String, duration: float, source: String = "") -> void:
-	if _active_surfaces.size() >= MAX_SURFACE_CELLS:
+	if not _active_surfaces.has(cell) and _active_surfaces.size() >= MAX_SURFACE_CELLS:
 		return
 	
 	_active_surfaces[cell] = {
@@ -60,9 +60,9 @@ func _expire_cell(cell: Vector2i) -> void:
 	# 自然迁移规则
 	match state:
 		"burning":
-			_active_surfaces[cell] = {"state": "dry", "remaining": 0.0, "source": "expiry"}
-		"frozen":
-			_active_surfaces[cell] = {"state": "wet", "remaining": 0.0, "source": "expiry"}
+			_active_surfaces.erase(cell)
+		"frozen", "electrified", "steam":
+			_active_surfaces[cell] = {"state": "wet", "remaining": 4.0, "source": "expiry"}
 		"wet", "oiled":
 			_active_surfaces.erase(cell)  # 回到 dry（默认）
 		_:

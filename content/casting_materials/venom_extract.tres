@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="CastingMaterialData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/materials/casting_material_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "venom_extract"
+title = "毒性萃取"
+description = "毒雾的必需媒介；可给寒霜弹/寒霜新星附加中毒，额外3 MP。"
+result_ids = PackedStringArray("frost_bolt", "frost_ring")
+extra_mana = 3
+added_tags = ["poison"]

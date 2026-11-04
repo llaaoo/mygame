@@ -7,6 +7,7 @@ var _active_buffs: Array[Buff] = []
 var _buff_remaining: Dictionary = {}
 var _stacks: Dictionary = {}
 var _tick_elapsed: Dictionary = {}
+var _status_versions: Dictionary = {}
 
 
 func _ready() -> void:
@@ -36,6 +37,7 @@ func tick(delta: float) -> void:
 func apply_buff(buff: Buff) -> void:
 	if not buff:
 		return
+	_touch_status(buff.status_id)
 
 	if not buff.exclusive_group.is_empty():
 		_remove_by_exclusive_group(buff.exclusive_group)
@@ -75,6 +77,7 @@ func apply_buff(buff: Buff) -> void:
 func remove_buff(buff: Buff) -> void:
 	if not buff or buff not in _active_buffs:
 		return
+	_touch_status(buff.status_id)
 	var stacks: int = int(_stacks.get(buff, 1))
 	for _stack in range(stacks):
 		buff.remove_from(get_parent())
@@ -93,6 +96,53 @@ func has_buff(buff_name: String) -> bool:
 			return true
 	return false
 
+func _touch_status(id: String) -> void:
+	if not id.is_empty():
+		_status_versions[id] = status_version(id) + 1
+
+func status_version(id: String) -> int:
+	return int(_status_versions.get(id, 0))
+
+func capture_status(id: String) -> Dictionary:
+	var buff := _find_by_status(id)
+	if not buff:
+		return {}
+	return {"buff": buff.duplicate(true), "remaining": _buff_remaining.get(buff, buff.duration), "stacks": _stacks.get(buff, 1), "elapsed": _tick_elapsed.get(buff, 0.0)}
+
+func restore_status_snapshot(snapshot: Dictionary) -> void:
+	if snapshot.is_empty():
+		return
+	var buff: Buff = snapshot.buff
+	apply_buff(buff)
+	if buff.duration > 0:
+		_buff_remaining[buff] = snapshot.remaining
+	_stacks[buff] = int(snapshot.stacks)
+	for i in range(maxi(0, int(snapshot.stacks) - 1)):
+		buff.apply_to(get_parent())
+	if buff.tick_interval > 0:
+		_tick_elapsed[buff] = snapshot.elapsed
+
+func get_damage_taken_multiplier() -> float:
+	var result := 1.0
+	for buff in _active_buffs:
+		result *= pow(buff.damage_taken_multiplier, int(_stacks.get(buff, 1)))
+	return clampf(result, 0.1, 4.0)
+
+func get_attack_tags() -> Array[String]:
+	var tags: Array[String] = []
+	for buff in _active_buffs:
+		for tag in buff.attack_tags:
+			if tag not in tags:
+				tags.append(tag)
+	return tags
+
+func get_spell_boons() -> Array[Buff]:
+	var result: Array[Buff] = []
+	for buff in _active_buffs:
+		if not buff.spell_tags.is_empty() and not buff.status_id.is_empty():
+			result.append(buff)
+	return result
+
 
 func remove_status(status_id: String) -> bool:
 	var buff := _find_by_status(status_id)
@@ -107,6 +157,12 @@ func get_active_statuses() -> Array[String]:
 	for buff in _active_buffs:
 		if not buff.status_id.is_empty():
 			result.append(buff.status_id)
+	return result
+
+func get_speed_multiplier() -> float:
+	var result := 1.0
+	for buff in _active_buffs:
+		result *= pow(buff.speed_multiplier, int(_stacks.get(buff, 1)))
 	return result
 
 
@@ -172,15 +228,8 @@ func restore_state(entries: Array[Dictionary]) -> void:
 
 
 func clear_all() -> void:
-	for buff in _active_buffs:
-		buff.remove_from(get_parent())
-		CombatExecutor.report_status_removed(get_parent(), buff)
-		_record_buff_trace("BUFF_REMOVE", buff)
-	_active_buffs.clear()
-	_buff_remaining.clear()
-	_stacks.clear()
-	_tick_elapsed.clear()
-	buffs_changed.emit()
+	for buff in _active_buffs.duplicate():
+		remove_buff(buff)
 
 
 func _expire_buffs(delta: float) -> void:

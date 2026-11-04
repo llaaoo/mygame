@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ExplorationRegionData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/exploration/exploration_region_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "cistern"
+title = "蓄水机房"
+description = "清理混合守卫，取回寒霜新星记录，决定水路流向。"
+room_type = "barracks"
+seed = 20261111
+encounters = Array[Dictionary]([{"role": 0, "hp": 48, "speed": 135, "pos": Vector2(150, -90)}, {"role": 0, "hp": 48, "speed": 135, "pos": Vector2(290, 100)}, {"role": 1, "hp": 32, "pos": Vector2(370, -50)}])
+discoveries = Array[Dictionary]([{"id": "nova_knowledge", "title": "寒霜新星试验记录", "text": "已学会霜阵＋震荡：寒霜新星。12 MP，消耗一次法阵触发，在法阵周围造成冰霜伤害并减速。若尚未学会震荡，回外院的军械档案室补全基础动作。", "requires_clear": true, "recipes": ["frost_sigil_pulse"], "pos": Vector2(-350, 180)}, {"id": "storm_knowledge", "title": "雷阵与导电实验记录", "text": "已掌握雷阵。每次铭刻需要9 MP和雷晶粉1；雷阵＋火花＝雷矢（11 MP），＋震荡＝雷环（13 MP），＋凝神＝雷息（10 MP）。先用水引令目标潮湿，可强化雷击并使水面带电。用K把雷阵编入快捷槽；M可将火花配置雷晶粉，雷矢会变成三发散射。", "pos": Vector2(-350, -180), "requires_clear": true, "actions": ["storm_sigil"], "recipes": ["storm_sigil_spark", "storm_sigil_pulse", "storm_sigil_focus"], "materials": {"storm_dust": 3, "crystal": 3}}])
+events = Array[Dictionary]([{"id": "waterworks_choice", "title": "旧水路控制阀", "text": "两条旧管道只剩一组完好的水泵。把水引向熔炉，可以削弱领主；引向魔力导管，则能改善整场远征的法力续航。", "pos": Vector2(0, -180), "choices": [{"id": "cooling", "title": "冷却熔炉", "text": "下一次生成的火焰领主生命由280降为210，火焰抗性由30%降为10%。"}, {"id": "conduit", "title": "魔力导流", "text": "下一次进入区域后，法力回复由3提高为5 MP/秒。领主保持原有强度。"}]}])
+exits = Array[Dictionary]([{"target": "drain", "title": "返回排水回廊", "pos": Vector2(-480, 0), "requires_clear": false}])

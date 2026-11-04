@@ -63,6 +63,8 @@ func apply_tags(cell: Vector2i, tags: Array[String], source: String = "") -> boo
 func _apply_reaction(cell: Vector2i, rule: SurfaceReaction, tags: Array[String], source: String) -> void:
 	# 更新表面状态
 	_surface_scheduler.set_surface(cell, rule.result_state, rule.result_duration, source)
+	if rule.required_state == "wet" and rule.result_state == "electrified":
+		_conduct_connected_water(cell, rule.result_duration, source)
 	if rule.spread_to_neighbors and _propagation_scheduler:
 		for neighbor in _neighbor_cells(cell):
 			_propagation_scheduler.enqueue(cell, neighbor, rule.spread_damage, 1, rule.spread_tags)
@@ -83,6 +85,21 @@ func _apply_reaction(cell: Vector2i, rule: SurfaceReaction, tags: Array[String],
 func _neighbor_cells(cell: Vector2i) -> Array[Vector2i]:
 	return [cell + Vector2i.LEFT, cell + Vector2i.RIGHT, cell + Vector2i.UP, cell + Vector2i.DOWN]
 
+func _conduct_connected_water(origin: Vector2i, duration: float, source: String) -> void:
+	# One bounded world reaction; damage remains in the existing status tick path.
+	var queue: Array[Vector2i] = [origin]
+	var visited: Dictionary = {origin: true}
+	while not queue.is_empty() and visited.size() < 48:
+		var current: Vector2i = queue.pop_front()
+		for neighbor in _neighbor_cells(current):
+			if visited.has(neighbor) or visited.size() >= 48:
+				continue
+			if get_surface(neighbor).get("state", "dry") != "wet":
+				continue
+			visited[neighbor] = true
+			force_set_surface(neighbor, "electrified", duration, source)
+			queue.append(neighbor)
+
 
 ## 获取 cell 上实体应受的 Buff 路径列表（供 InteractionSystem tick 使用）
 func get_entity_buffs(cell: Vector2i) -> Array[String]:
@@ -98,6 +115,12 @@ func get_entity_buffs(cell: Vector2i) -> Array[String]:
 			result.append("res://gameplay/abilities/data/frozen.tres")
 		"wet":
 			result.append("res://gameplay/abilities/data/wet.tres")
+		"electrified":
+			result.append("res://gameplay/abilities/data/shocked.tres")
+		"steam":
+			result.append("res://gameplay/abilities/data/steam_veil.tres")
+		"poisoned":
+			result.append("res://gameplay/abilities/data/poison.tres")
 	
 	return result
 
@@ -150,8 +173,12 @@ func _apply_surface_buffs(entity: Node, buff_paths: Array[String]) -> void:
 		# 火免实体跳过 burning
 		if buff.status_id == "burning" and entity.is_in_group("fire_immune"):
 			continue
+		if buff.status_id in ["wet", "frozen"]:
+			bm.remove_status("burning")
+		if buff.status_id == "wet":
+			bm.remove_status("poison")
 		if not bm.has_buff(buff.status_id):
-			bm.apply_buff(buff)
+			bm.apply_buff(buff.duplicate(true))
 
 
 func get_surface(cell: Vector2i) -> Dictionary:
@@ -169,6 +196,20 @@ func get_cells_in_radius(pos: Vector2, radius: float) -> Array[Vector2i]:
 func force_set_surface(cell: Vector2i, state: String, duration: float, source: String = "") -> void:
 	if _surface_scheduler:
 		_surface_scheduler.set_surface(cell, state, duration, source)
+
+func apply_area(position: Vector2, radius: float, tags: Array[String], source: String, created_state: String = "", duration: float = 8.0, affect_dry: bool = false) -> void:
+	var center := Vector2i(floori(position.x / 64), floori(position.y / 64))
+	var extent := ceili(radius / 64.0) + 1
+	for x in range(-extent, extent + 1):
+		for y in range(-extent, extent + 1):
+			var cell := center + Vector2i(x, y)
+			if position.distance_to(Vector2(cell.x * 64 + 32, cell.y * 64 + 32)) > radius:
+				continue
+			var current: String = get_surface(cell).get("state", "dry")
+			if not created_state.is_empty():
+				force_set_surface(cell, "burning" if created_state == "oiled" and current == "burning" else created_state, duration, source)
+			elif affect_dry or current != "dry":
+				apply_tags(cell, tags, source)
 
 
 func _to_string() -> String:

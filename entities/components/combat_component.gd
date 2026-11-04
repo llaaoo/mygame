@@ -12,6 +12,8 @@ var _entity: Player = null
 var _attack_hitbox: Area2D = null
 var _attack_hitbox_shape: CollisionShape2D = null
 var _animation_player: AnimationPlayer = null
+var _swing_active := false
+var _swing_targets: Dictionary = {}
 
 
 func setup(entity: Player, hitbox: Area2D, hitbox_shape: CollisionShape2D, anim: AnimationPlayer) -> void:
@@ -34,8 +36,10 @@ func setup(entity: Player, hitbox: Area2D, hitbox_shape: CollisionShape2D, anim:
 		_attack_hitbox.area_entered.connect(_on_attack_hit_area)
 
 
-func perform_melee_attack() -> void:
-	var attack_dir := _entity.get_mouse_direction()
+func perform_melee_attack(direction_override: Vector2 = Vector2.ZERO) -> void:
+	var attack_dir := direction_override.normalized() if direction_override != Vector2.ZERO else _entity.get_mouse_direction()
+	_swing_active = true
+	_swing_targets.clear()
 	_entity.facing_direction = attack_dir
 	_attack_hitbox.position = attack_dir * attack_range
 	_attack_hitbox.rotation = attack_dir.angle()
@@ -53,7 +57,8 @@ func perform_melee_attack() -> void:
 	if _animation_player.has_animation("attack"):
 		_animation_player.play("attack")
 
-	await _entity.get_tree().create_timer(0.15).timeout
+	await _entity.get_tree().create_timer(0.15, false).timeout
+	_swing_active = false
 	_attack_hitbox.monitoring = false
 	_attack_hitbox.position = Vector2.ZERO
 
@@ -80,6 +85,11 @@ func _on_attack_hit_area(area: Area2D) -> void:
 
 ## 近战命中统一入口 — 走 CombatExecutor 事件序列
 func _apply_melee_hit(target: Node2D) -> void:
+	if _swing_active:
+		var id := target.get_instance_id()
+		if _swing_targets.has(id):
+			return
+		_swing_targets[id] = true
 	var exec_inst := CombatExecutor.instance
 
 	# 进入异步事件序列
@@ -88,7 +98,28 @@ func _apply_melee_hit(target: Node2D) -> void:
 
 	# 发射 ON_HIT（带 melee/player 标签，供 TriggeredEffect 匹配）
 	# report_hit() 内部已调用 take_damage()
-	CombatExecutor.report_hit(_entity, target, attack_damage, target.global_position, null, ["melee", "player"])
+	var tags: Array[String] = ["melee", "player"]
+	var buffs := _entity.get_node_or_null("BuffManager") as BuffManager
+	var imbued_tags: Array[String] = buffs.get_attack_tags() if buffs else []
+	var skill: SkillData = null
+	if not imbued_tags.is_empty():
+		for tag in imbued_tags:
+			if tag not in tags:
+				tags.append(tag)
+		skill = SkillData.new()
+		skill.id = "imbued_melee"
+		skill.display_name = "元素近战"
+		skill.tags = tags
+		if "fire" in tags:
+			var fireball := _entity.skill_manager.pool.get_skill("fireball")
+			if fireball:
+				skill.synergies = fireball.synergies.duplicate()
+	var surface := SurfaceManager.instance
+	if surface and not imbued_tags.is_empty():
+		var cell := Vector2i(floori(target.global_position.x / 64), floori(target.global_position.y / 64))
+		if surface.get_surface(cell).get("state", "dry") != "dry":
+			surface.apply_tags(cell, tags, "元素近战")
+	CombatExecutor.report_hit(_entity, target, attack_damage, target.global_position, skill, tags)
 
 	# 更新 trace 最终伤害
 	var trace := CombatDebugger.active()

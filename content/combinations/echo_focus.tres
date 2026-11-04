@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CombinationRecipe" load_steps=3 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/combinations/combination_recipe.gd" id="1"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/resonant_guard_result.tres" id="2"]
+[resource]
+script = ExtResource("1")
+id = "echo_focus"
+trigger_action_id = "focus"
+required_caster_status = "echo_ready"
+consume_caster_status = true
+result_skill = ExtResource("2")
+mana_cost = 10
+cooldown = 2.0
+priority = 30

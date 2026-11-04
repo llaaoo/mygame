@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="1"]
+[ext_resource type="Script" path="res://gameplay/abilities/visuals/aoe_visual_data.gd" id="2"]
+
+[sub_resource type="Resource" id="Visual"]
+script = ExtResource("2")
+color = Color(1, 0.35, 0.08, 0.9)
+radius = 96.0
+scale = 1.0
+lifetime = 0.6
+
+[resource]
+script = ExtResource("1")
+id = "fire_sigil_burst"
+display_name = "火阵喷发"
+combination_only = true
+description = "在自己的火阵内使用震荡，触发以法阵为中心的范围喷发。"
+mechanics = "火阵 + 震荡；14 MP，消耗一次触发量。"
+role = "范围爆发"
+icon_atlas_index = 5
+skill_type = 2
+tags = ["fire", "aoe", "combination"]
+mp_cost = 14
+cooldown = 3.0
+damage = 32
+damage_scaling = 0.8
+archetype = "persistent_aoe"
+ignites_dry_surface = false
+aoe_visual = SubResource("Visual")

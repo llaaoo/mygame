@@ -7,6 +7,9 @@ static var instance: SaveManager
 
 var active_slot: int = 1
 var _sections: Dictionary = {}
+var progress_only := false
+signal progress_reload_requested
+signal before_save
 
 
 func _ready() -> void:
@@ -36,12 +39,16 @@ func _input(event: InputEvent) -> void:
 	if not (event is InputEventKey and event.pressed):
 		return
 	if event.keycode == KEY_F5:
-		save_game(1)
+		save_game(active_slot)
 	elif event.keycode == KEY_F9:
-		load_game(1)
+		if progress_only:
+			progress_reload_requested.emit()
+		else:
+			load_game(active_slot)
 
 
-func save_game(slot: int) -> void:
+func save_game(slot: int) -> bool:
+	before_save.emit()
 	active_slot = slot
 	var root := SaveData.Root.new()
 	root.meta = _collect_meta()
@@ -52,13 +59,39 @@ func save_game(slot: int) -> void:
 
 	var data: Dictionary = root.serialize()
 	var path := _path(slot)
-	var file := FileAccess.open(path, FileAccess.WRITE)
+	var file := FileAccess.open(path + ".tmp", FileAccess.WRITE)
 	if not file:
 		push_error("SaveManager: failed to write %s" % path)
-		return
+		return false
 	file.store_var(data, true)
+	var write_error := file.get_error()
 	file.close()
+	if write_error != OK:
+		return false
+	if FileAccess.file_exists(path):
+		var backup_error := DirAccess.copy_absolute(path, path + ".bak")
+		if backup_error != OK:
+			return false
+	if DirAccess.rename_absolute(path + ".tmp", path) != OK:
+		return false
 	print("SaveManager: saved %s" % path)
+	return true
+
+func read_extension(slot: int, section_id: String) -> Dictionary:
+	var path := _path(slot)
+	if not FileAccess.file_exists(path):
+		return {}
+	var file := FileAccess.open(path, FileAccess.READ)
+	if not file:
+		return {}
+	var data: Variant = file.get_var(false)
+	if not data is Dictionary:
+		push_warning("SaveManager: invalid progress file")
+		return {}
+	var migrated := _migrate(data)
+	var extensions: Dictionary = migrated.get("extensions", {})
+	var value: Variant = extensions.get(section_id, {})
+	return value.duplicate(true) if value is Dictionary else {}
 
 
 func load_game(slot: int) -> void:
