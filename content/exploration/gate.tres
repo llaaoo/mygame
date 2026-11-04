@@ -1,13 +1,77 @@
-[gd_resource type="Resource" script_class="ExplorationRegionData" load_steps=2 format=3]
-[ext_resource type="Script" path="res://gameplay/exploration/exploration_region_data.gd" id="1"]
+[gd_resource type="Resource" script_class="ExplorationRegionData" format=3]
+
+[ext_resource type="Script" path="res://gameplay/exploration/data/discovery_data.gd" id="1_0lemy"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/encounter_data.gd" id="2_gg3yk"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/world_event_data.gd" id="3_566r0"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/exit_data.gd" id="4_43cir"]
+[ext_resource type="Script" path="res://gameplay/exploration/exploration_region_data.gd" id="5_fkuy3"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/spell_puzzle_data.gd" id="6_pt2wh"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/spell_puzzle_route.gd" id="7_g8o8o"]
+
+[sub_resource type="Resource" id="Resource_7l0ct"]
+script = ExtResource("1_0lemy")
+id = "gate_supply"
+title = "熔炉前的补给"
+text = "恢复生命和法力。火焰领主有火焰抗性；可以利用霜阵，也可以近战、闪避和反复布阵应战。"
+pos = Vector2(-350, 180)
+heal = true
+
+[sub_resource type="Resource" id="Resource_6ulwb"]
+script = ExtResource("2_gg3yk")
+pos = Vector2(230, 0)
+hp = 80
+speed = 95.0
+
+[sub_resource type="Resource" id="Resource_wovp8"]
+script = ExtResource("2_gg3yk")
+pos = Vector2(350, -180)
+hp = 38
+role = 1
+
+[sub_resource type="Resource" id="Resource_dbm5m"]
+script = ExtResource("4_43cir")
+target = "powder"
+title = "返回火药库"
+pos = Vector2(-480, 0)
+
+[sub_resource type="Resource" id="Resource_o52wl"]
+script = ExtResource("4_43cir")
+target = "boss"
+title = "进入熔炉大厅"
+pos = Vector2(480, 0)
+requires_clear = true
+
+[sub_resource type="Resource" id="Resource_ftmy3"]
+script = ExtResource("4_43cir")
+target = "camp"
+title = "解锁营地捷径"
+pos = Vector2(0, 300)
+requires_clear = true
+
+[sub_resource type="Resource" id="Resource_wm6l1"]
+script = ExtResource("7_g8o8o")
+steps = PackedStringArray("ward_release")
+
+[sub_resource type="Resource" id="Resource_knhxw"]
+script = ExtResource("6_pt2wh")
+id = "magic.guard_oath"
+title = "守护誓碑"
+pos = Vector2(-100, -220)
+routes = Array[ExtResource("7_g8o8o")]([SubResource("Resource_wm6l1")])
+hint = "誓碑要求把防御转为攻击：回响铭印→凝神获得共鸣护盾，再按住Shift用震荡主动释放守护爆破。普通震荡无法激活。奖励守护粉2、晶砂4。"
+materials = {
+"crystal": 4,
+"ward_powder": 2
+}
+
 [resource]
-script = ExtResource("1")
+script = ExtResource("5_fkuy3")
 id = "gate"
 title = "重卫关隘"
 description = "远近混合守卫保护熔炉入口。清场后打开返回营地的捷径。"
 room_type = "elite"
 seed = 20261109
-encounters = Array[Dictionary]([{"role": 0, "hp": 80, "speed": 95, "pos": Vector2(230, 0)}, {"role": 1, "hp": 38, "pos": Vector2(350, -180)}])
-discoveries = Array[Dictionary]([{"id": "gate_supply", "title": "熔炉前的补给", "text": "恢复生命和法力。火焰领主有火焰抗性；可以利用霜阵，也可以近战、闪避和反复布阵应战。", "heal": true, "pos": Vector2(-350, 180)}])
-exits = Array[Dictionary]([{"target": "powder", "title": "返回火药库", "pos": Vector2(-480, 0), "requires_clear": false}, {"target": "boss", "title": "进入熔炉大厅", "pos": Vector2(480, 0), "requires_clear": true}, {"target": "camp", "title": "解锁营地捷径", "pos": Vector2(0, 300), "requires_clear": true}])
-spell_objects = Array[Dictionary]([{"id": "magic.guard_oath", "title": "守护誓碑", "pos": Vector2(-100, -220), "routes": [["ward_release"]], "hint": "誓碑要求把防御转为攻击：回响铭印→凝神获得共鸣护盾，再按住Shift用震荡主动释放守护爆破。普通震荡无法激活。奖励守护粉2、晶砂4。", "materials": {"ward_powder": 2, "crystal": 4}}])
+encounters = Array[ExtResource("2_gg3yk")]([SubResource("Resource_6ulwb"), SubResource("Resource_wovp8")])
+discoveries = Array[ExtResource("1_0lemy")]([SubResource("Resource_7l0ct")])
+spell_objects = Array[ExtResource("6_pt2wh")]([SubResource("Resource_knhxw")])
+exits = Array[ExtResource("4_43cir")]([SubResource("Resource_dbm5m"), SubResource("Resource_o52wl"), SubResource("Resource_ftmy3")])

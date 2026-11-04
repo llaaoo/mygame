@@ -16,7 +16,7 @@ signal skill_upgraded(source: String, skill: SkillData, upgrade_id: String, rank
 ## ── 核心依赖 ──
 var pool: SkillPool = null                 ## 技能池（ID索引）
 var executor: SkillExecutor = null         ## 执行器（计算+执行）
-var combinations: FireCombinationController
+var combinations: ConditionalCastController
 var restrict_actions := false
 var known_actions: Dictionary = {}
 
@@ -32,6 +32,7 @@ var _slots: Array[SkillInstance] = []
 
 ## ── 冷却（统一字典，source → remaining） ──
 var _cooldowns: Dictionary = {}
+var _executing := false
 
 
 func _ready() -> void:
@@ -43,8 +44,8 @@ func _ready() -> void:
 		executor = SkillExecutor.new()
 		executor.name = "SkillExecutor"
 		add_child(executor)
-	combinations = FireCombinationController.new()
-	combinations.name = "FireCombinations"
+	combinations = ConditionalCastController.new()
+	combinations.name = "ConditionalCasting"
 	add_child(combinations)
 	# 禁用独立 _process，改为 SimulationRuntime 统一驱动
 	process_mode = Node.PROCESS_MODE_DISABLED
@@ -53,15 +54,7 @@ func _ready() -> void:
 
 ## 注册到 SimulationRuntime（统一 tick）
 func _register_with_simulation() -> void:
-	var gr := GameRuntime.instance
-	if not gr:
-		call_deferred("_register_with_simulation")
-		return
-	var sim := gr.get_simulation_runtime()
-	if not sim:
-		call_deferred("_register_with_simulation")
-		return
-	sim.register_ticker(self)
+	RuntimeRegistration.register_ticker(self)
 
 
 ## 统一 tick 入口（由 SimulationRuntime 驱动，替代独立 _process）
@@ -215,17 +208,45 @@ func can_use(source: String) -> bool:
 	return _cooldowns.get(source, 0.0) <= 0.0
 
 
-func get_cooldown(source: String) -> float:
+func get_cooldown_state(source: String, plan: CastPlan = null) -> Dictionary:
 	var inst := _find_instance(source)
 	if combinations and inst and combinations.handles(inst.data):
-		var result := combinations.preview(inst.data, get_parent(), Input.is_key_pressed(KEY_SHIFT))
-		return combinations.remaining_cooldown(result, inst.data.get_id())
-	return _cooldowns.get(source, 0.0)
+		if not plan:
+			plan = combinations.preview(inst.data, get_parent())
+		return combinations.cooldown_state(plan, inst.data.get_id())
+	return {"remaining": float(_cooldowns.get(source, 0.0)), "duration": inst.total_cooldown if inst else 1.0}
 
+func get_cooldown(source: String) -> float:
+	return get_cooldown_state(source).remaining
 
 func get_cooldown_total(source: String) -> float:
-	return _get_cooldown_total(source)
+	return get_cooldown_state(source).duration
 
+## Validate the same explicit request that execution will accept.
+func can_start(source: String, caster: Node2D, context: CastContext) -> bool:
+	var inst := _find_instance(source)
+	if not context or _executing or not inst or not knows_action(inst.data) or inst.data.combination_only:
+		return false
+	if combinations and combinations.handles(inst.data):
+		return combinations.preview(inst.data, caster, context.empower).ready
+	if combinations and combinations.is_busy():
+		return false
+	var mana := caster.get_node_or_null("ManaComponent") as ManaComponent
+	var plan := combinations.build_plan(inst.data, caster, context.empower) if combinations else null
+	var cost := plan.cost if plan else _get_effective_mana_cost(inst.data, caster)
+	return inst.is_ready() and (not mana or mana.mp >= cost) and (not plan or combinations.supplies.can_pay(plan.material_costs))
+
+func use_source(source: String, caster: Node2D, context: CastContext) -> bool:
+	var inst := _find_instance(source)
+	return _execute_with_context(inst.data, source, caster, context) if inst else false
+
+
+## Channel pulses share ordinary material/status transactions; rate costs replace base MP.
+func use_channel_tick(source: String, caster: Node2D, context: CastContext, mana_cost: int) -> bool:
+	var inst := _find_instance(source)
+	if not inst or inst.data.cast_type != "channel" or inst.data.conditional_cast:
+		return false
+	return _execute_with_context(inst.data, source, caster, context, mana_cost)
 
 ## ── 释放（委托给 SkillExecutor） ──
 
@@ -265,102 +286,69 @@ func use_slot_with_context(idx: int, caster: Node2D, ctx: CastContext) -> bool:
 ## ── 内部执行（委托给 SkillExecutor） ──
 
 func _execute(skill: SkillData, source: String, caster: Node2D, direction: Vector2) -> bool:
-	if not knows_action(skill):
+	# Compatibility input adapter; explicit contexts never resample the keyboard.
+	var context := CastContext.simple(caster, direction, skill)
+	context.empower = Input.is_key_pressed(KEY_SHIFT)
+	return _execute_with_context(skill, source, caster, context)
+
+
+func _execute_with_context(skill: SkillData, source: String, caster: Node2D, ctx: CastContext, channel_cost: int = -1) -> bool:
+	if not ctx or _executing or not knows_action(skill):
 		return false
 	if skill.combination_only:
 		return false
 	if combinations and combinations.handles(skill):
-		var context := CastContext.simple(caster, direction, skill)
-		context.empower = Input.is_key_pressed(KEY_SHIFT)
-		return combinations.start(skill, caster, context, source)
-	if combinations and not combinations.pending.is_empty():
-		return false
-	# ── INPUT 阶段（阶段机门控） ──
-	var exec_inst := CombatExecutor.instance
-	if exec_inst:
-		exec_inst.begin_cast_sequence()
-
-	# 冷却检查
-	var inst := _find_instance(source)
-	if inst and not inst.is_ready():
-		if exec_inst:
-			exec_inst.enter_phase(CombatPhase.Phase.IDLE)
-		return false
-
-	# MP 检查
-	var mana_cost := _get_effective_mana_cost(skill, caster)
-	var mana := caster.get_node_or_null("ManaComponent") as ManaComponent
-	if mana and mana_cost > 0 and not mana.use_mp(mana_cost):
-		if exec_inst:
-			exec_inst.enter_phase(CombatPhase.Phase.IDLE)
-		return false
-
-	# 委托给 SkillExecutor（内部驱动 MODIFIER → EFFECT → EVENT → POST → IDLE）
-	var ctx := CastContext.simple(caster, direction, skill)
-	var ok := executor.execute(skill, ctx)
-
-	if not ok:
-		if mana and mana_cost > 0:
-			mana.restore_mp(mana_cost)
-		if exec_inst:
-			exec_inst.enter_phase(CombatPhase.Phase.IDLE)
-		return false
-
-	var cooldown := _get_effective_cooldown(skill, caster)
-	if inst:
-		inst.total_cooldown = cooldown
-		inst.current_cooldown = cooldown
-	_cooldowns[source] = cooldown
-	cooldown_changed.emit(source, cooldown, cooldown)
-	skill_used.emit(source, skill)
-	return true
-
-
-func _execute_with_context(skill: SkillData, source: String, caster: Node2D, ctx: CastContext) -> bool:
-	if not knows_action(skill):
-		return false
-	if skill.combination_only:
-		return false
-	if combinations and combinations.handles(skill):
-		ctx.empower = ctx.empower or Input.is_key_pressed(KEY_SHIFT)
 		return combinations.start(skill, caster, ctx, source)
-	if combinations and not combinations.pending.is_empty():
+	if combinations and combinations.is_busy():
 		return false
 	var exec_inst := CombatExecutor.instance
 	if exec_inst:
 		exec_inst.begin_cast_sequence()
 
 	var inst := _find_instance(source)
-	if inst and not inst.is_ready():
+	if inst and channel_cost < 0 and not inst.is_ready():
 		if exec_inst:
 			exec_inst.enter_phase(CombatPhase.Phase.IDLE)
 		return false
 
-	var mana_cost := _get_effective_mana_cost(skill, caster)
-	var mana := caster.get_node_or_null("ManaComponent") as ManaComponent
-	if mana and mana_cost > 0 and not mana.use_mp(mana_cost):
+	var plan := combinations.build_plan(skill, caster, ctx.empower) if combinations else CastPlan.new()
+	if not combinations:
+		plan.skill = skill
+		plan.cost = _get_effective_mana_cost(skill, caster)
+		plan.cooldown = _get_effective_cooldown(skill, caster)
+	if channel_cost >= 0:
+		plan.cost = maxi(0, plan.cost - _get_effective_mana_cost(skill, caster) + channel_cost)
+	plan.actor = caster
+	_executing = true
+	var transaction := CastTransaction.new(caster, combinations.supplies if combinations else null, 0)
+	if not transaction.reserve(plan):
+		transaction.rollback()
+		_executing = false
 		if exec_inst:
 			exec_inst.enter_phase(CombatPhase.Phase.IDLE)
 		return false
-
-	ctx.skill = skill
-	ctx.world = caster.get_tree().current_scene
-	var ok := executor.execute(skill, ctx)
-
-	if not ok:
-		if mana and mana_cost > 0:
-			mana.restore_mp(mana_cost)
+	ctx.caster = caster
+	ctx.skill = plan.skill
+	ctx.batch = transaction.batch
+	if not is_instance_valid(ctx.world):
+		ctx.world = CastContext.default_world(caster)
+	if not executor.execute(plan.skill, ctx):
+		transaction.rollback()
+		_executing = false
 		if exec_inst:
 			exec_inst.enter_phase(CombatPhase.Phase.IDLE)
 		return false
-
-	var cooldown := _get_effective_cooldown(skill, caster)
-	if inst:
-		inst.total_cooldown = cooldown
-		inst.current_cooldown = cooldown
-	_cooldowns[source] = cooldown
-	cooldown_changed.emit(source, cooldown, cooldown)
-	skill_used.emit(source, skill)
+	var cooldown := plan.cooldown
+	if channel_cost < 0:
+		if inst:
+			inst.total_cooldown = cooldown
+			inst.current_cooldown = cooldown
+		_cooldowns[source] = cooldown
+	executor.commit_batch(transaction.batch, transaction.commit)
+	_executing = false
+	if channel_cost < 0:
+		cooldown_changed.emit(source, cooldown, cooldown)
+	skill_used.emit(source, plan.skill)
 	return true
 
 
@@ -386,47 +374,19 @@ func _all_sources() -> Array[String]:
 ## ── 冷却内部 ──
 
 func _get_cooldown_total(source: String) -> float:
-	var inst := _find_instance(source)
-	if combinations and inst and combinations.handles(inst.data):
-		var plan := combinations.preview(inst.data, get_parent(), Input.is_key_pressed(KEY_SHIFT))
-		return maxf(inst.data.cooldown, float(plan.cooldown))
-	if inst and inst.data:
-		return inst.total_cooldown if inst.total_cooldown > 0.0 else inst.data.cooldown
-	return 1.0
-
+	return get_cooldown_total(source)
 
 func _get_effective_cooldown(skill: SkillData, caster: Node2D) -> float:
-	var cooldown := skill.cooldown
-	var player := caster as Player
-	if not player:
-		return cooldown
-	var modifier := 0.0
-	if player.mastery_manager:
-		modifier += player.mastery_manager.get_modifier_value("cooldown.%s" % skill.get_id())
-		for tag in skill.tags:
-			modifier += player.mastery_manager.get_modifier_value("cooldown.%s" % tag)
-	var equipment := player.get_node_or_null("EquipmentManager") as EquipmentManager
-	if equipment:
-		modifier += equipment.get_modifier_value("cooldown.all")
-		modifier += equipment.get_modifier_value("cooldown.%s" % skill.get_id())
-		for tag in skill.tags:
-			modifier += equipment.get_modifier_value("cooldown.%s" % tag)
-	return maxf(0.1, cooldown * (1.0 + modifier))
+	return effective_cooldown(skill, caster, skill.cooldown)
 
+func effective_cooldown(skill: SkillData, caster: Node2D, base_duration: float) -> float:
+	return CastCostPolicy.cooldown(skill, caster, base_duration)
 
 func _get_effective_mana_cost(skill: SkillData, caster: Node2D) -> int:
 	return effective_mana_cost(skill, caster, skill.mp_cost)
 
-
 func effective_mana_cost(skill: SkillData, caster: Node2D, base_cost: int) -> int:
-	var player := caster as Player
-	if not player:
-		return base_cost
-	var equipment := player.get_node_or_null("EquipmentManager") as EquipmentManager
-	var modifier := equipment.get_modifier_value("mana_cost.all") if equipment else 0.0
-	for tag in skill.tags:
-		modifier += equipment.get_modifier_value("mana_cost.%s" % tag) if equipment else 0.0
-	return maxi(0, int(round(base_cost * (1.0 + modifier))))
+	return CastCostPolicy.mana_cost(skill, caster, base_cost)
 
 
 ## ── 初始化（兼容旧 API） ──

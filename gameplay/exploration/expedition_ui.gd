@@ -156,7 +156,7 @@ func show_panel(title: String, text: String, buttons: Array[Dictionary], locked:
 	GameUIStyle.begin_modal(modal)
 
 func show_pause() -> void:
-	show_panel("远征暂停", "知识、委托奖励和已清理区域自动保存。返回营地可以恢复，未清理区域的敌人会重新出现。\n\n同一动作在火阵与霜阵中产生不同结果。J日志可查看已学配方、区域状态、水路选择和委托进度。", [
+	show_panel("远征暂停", "知识、委托奖励和已清理区域自动保存。返回营地可以恢复，未清理区域的敌人会重新出现。\n\n同一动作在火阵与霜阵中产生不同结果。J日志可查看已学法术组合、区域状态、水路选择和委托进度。", [
 		{"title": "继续", "callback": close_modal},
 		{"title": "返回营地", "callback": func(): close_modal(); travel_requested.emit("camp")},
 		{"title": "重置遭遇，保留已学知识", "callback": func(): close_modal(); replay_requested.emit()},

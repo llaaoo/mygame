@@ -41,7 +41,7 @@ func _run() -> void:
 		_check(reward.get("skill_id") != "fireball", "Fireball result offered as an equippable reward")
 	_check(sm.get_slot(4).data.get_id() == "fire_sigil" and sm.get_slot(5).data.get_id() == "ignite", "Starter slots missing")
 	_check(InputMap.has_action("skill_5") and InputMap.has_action("skill_6"), "Input actions missing")
-	_check(controller.preview(ignite, player).recipe_id == "", "Base ignition unexpectedly resolves a combo")
+	_check(controller.preview(ignite, player).rule_id == "", "Base ignition unexpectedly resolves a combo")
 	Input.action_press("skill_5")
 	for i in range(2):
 		await physics_frame
@@ -57,12 +57,12 @@ func _run() -> void:
 		return
 	_check(player.mana_component.mp == 192 and controller.field.charges == 2, "Placement cost or initial charges incorrect")
 	var preview := controller.preview(ignite, player)
-	_check(preview.recipe_id == "fire_sigil_fireball" and preview.cost == 12, "In-field preview incorrect")
+	_check(preview.rule_id == "fire_sigil_fireball" and preview.cost == 12, "In-field preview incorrect")
 	var outsider := Node2D.new()
 	game.add_child(outsider)
 	outsider.global_position = player.global_position
-	_check(CombinationResolver.resolve(ignite, controller.field, outsider, controller.RECIPE, true).recipe_id == "", "Foreign actor can use field")
-	_check(CombinationResolver.resolve(ignite, controller.field, player, controller.RECIPE, false).recipe_id == "", "Unlearned recipe resolves")
+	_check(SpellCombinationResolver.resolve(ignite, controller.field, outsider, controller.STARTER_RULE, true).rule_id == "", "Foreign actor can use field")
+	_check(SpellCombinationResolver.resolve(ignite, controller.field, player, controller.STARTER_RULE, false).rule_id == "", "Unlearned recipe resolves")
 	outsider.queue_free()
 
 	# Real physics target receives one directed fireball hit; no local spark is also released.

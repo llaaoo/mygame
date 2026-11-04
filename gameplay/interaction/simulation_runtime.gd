@@ -14,7 +14,7 @@ var _spatial_index: WorldSpatialIndex = null
 
 ## 实体 Tick 注册表 — 所有需要持续 tick 的实体组件在此注册
 ## 实体实现 tick(delta) 方法，SimulationRuntime 统一驱动
-var _entity_tickers: Array[Node] = []
+var _entity_tickers: Dictionary = {}
 
 ## 暂停标记
 var is_paused: bool = false
@@ -25,15 +25,15 @@ func _ready() -> void:
 	_surface_scheduler = SurfaceScheduler.new()
 	_surface_scheduler.name = "SurfaceScheduler"
 	add_child(_surface_scheduler)
-	
+
 	_propagation_scheduler = PropagationScheduler.new()
 	_propagation_scheduler.name = "PropagationScheduler"
 	add_child(_propagation_scheduler)
-	
+
 	_respawn_scheduler = RespawnScheduler.new()
 	_respawn_scheduler.name = "RespawnScheduler"
 	add_child(_respawn_scheduler)
-	
+
 	# 订阅 CommandBus 命令
 	call_deferred("_subscribe_to_bus")
 
@@ -41,20 +41,20 @@ func _ready() -> void:
 ## 注入外部依赖（由 GameRuntime 在初始化时调用）
 func setup_dependencies(spatial_index: WorldSpatialIndex, state_manager: WorldStateManager) -> void:
 	_spatial_index = spatial_index
-	
+
 	# SurfaceManager 作为外观层
 	_surface_manager = SurfaceManager.new()
 	_surface_manager.name = "SurfaceManager"
 	_surface_manager.setup(_surface_scheduler, spatial_index, _propagation_scheduler)
 	add_child(_surface_manager)
-	
+
 	# 注册默认 ReactionRule
 	_register_default_reactions()
-	
+
 	# 注入 SurfaceManager 到空间索引（使 query_surface() 可用）
 	if spatial_index and spatial_index.has_method("set_surface_manager"):
 		spatial_index.set_surface_manager(_surface_manager)
-	
+
 	# 传递依赖给子调度器
 	if _propagation_scheduler:
 		_propagation_scheduler.setup(_surface_scheduler, spatial_index, _surface_manager)
@@ -75,7 +75,7 @@ func _register_default_reactions() -> void:
 	oil_fire.spread_tags = ["fire"]
 	oil_fire.spread_damage = 1.0
 	_surface_manager.register_reaction(oil_fire)
-	
+
 	# wet + ice → frozen
 	var wet_ice := SurfaceReaction.new()
 	wet_ice.rule_id = "wet_ice"
@@ -85,7 +85,7 @@ func _register_default_reactions() -> void:
 	wet_ice.result_duration = 5.0
 	wet_ice.entity_status_path = "res://gameplay/abilities/data/frozen.tres"
 	_surface_manager.register_reaction(wet_ice)
-	
+
 	# wet + fire → dry（灭火）
 	var wet_fire := SurfaceReaction.new()
 	wet_fire.rule_id = "wet_fire"
@@ -94,7 +94,7 @@ func _register_default_reactions() -> void:
 	wet_fire.result_state = "steam"
 	wet_fire.result_duration = 3.0
 	_surface_manager.register_reaction(wet_fire)
-	
+
 	# burning + ice → dry（灭火）
 	var burn_ice := SurfaceReaction.new()
 	burn_ice.rule_id = "burn_ice"
@@ -103,7 +103,7 @@ func _register_default_reactions() -> void:
 	burn_ice.result_state = "dry"
 	burn_ice.result_duration = 0.0
 	_surface_manager.register_reaction(burn_ice)
-	
+
 	# burning + water/wet → dry
 	var burn_wet := SurfaceReaction.new()
 	burn_wet.rule_id = "burn_wet"
@@ -112,7 +112,7 @@ func _register_default_reactions() -> void:
 	burn_wet.result_state = "dry"
 	burn_wet.result_duration = 0.0
 	_surface_manager.register_reaction(burn_wet)
-	
+
 	# dry + fire → burning（火焰技能命中干燥地面）
 	var dry_fire := SurfaceReaction.new()
 	dry_fire.rule_id = "dry_fire"
@@ -122,7 +122,7 @@ func _register_default_reactions() -> void:
 	dry_fire.result_duration = 5.0
 	dry_fire.entity_status_path = "res://gameplay/abilities/data/burning.tres"
 	_surface_manager.register_reaction(dry_fire)
-	
+
 	# dry + ice → frozen（冰技能命中干燥地面）
 	var dry_ice := SurfaceReaction.new()
 	dry_ice.rule_id = "dry_ice"
@@ -146,29 +146,39 @@ func _register_default_reactions() -> void:
 
 ## 注册需要每帧 tick 的实体/组件（替代独立 _process）
 func register_ticker(node: Node) -> void:
-	if node in _entity_tickers:
+	var id := node.get_instance_id()
+	if _entity_tickers.has(id):
 		return
-	_entity_tickers.append(node)
+	_entity_tickers[id] = weakref(node)
+	node.tree_exiting.connect(_unregister_id.bind(id), CONNECT_ONE_SHOT)
 
-
-## 注销（实体销毁时调用）
 func unregister_ticker(node: Node) -> void:
-	_entity_tickers.erase(node)
+	if is_instance_valid(node):
+		_unregister_id(node.get_instance_id())
+
+func _unregister_id(id: int) -> void:
+	_entity_tickers.erase(id)
+
+func clear_region() -> void:
+	_surface_scheduler.clear()
+	_propagation_scheduler.clear()
+	_respawn_scheduler.clear()
+	_tick_accumulator = 0.0
 
 
 ## 统一 tick（由 GameRuntime._process 驱动）
 func tick(delta: float) -> void:
 	if is_paused:
 		return
-	
+
 	# 调度顺序: Surface → Propagation → Respawn → Entity Tickers
 	_surface_scheduler.tick(delta)
 	_propagation_scheduler.tick(delta)
 	_respawn_scheduler.tick(delta)
-	
+
 	# 实体 Tick（统一驱动，替代各系统独立 _process）
 	_tick_entities(delta)
-	
+
 	# 实体-表面交互（低频, 0.5s）
 	_tick_accumulator += delta
 	if _tick_accumulator >= 0.5 and _surface_manager:
@@ -178,11 +188,10 @@ func tick(delta: float) -> void:
 
 ## 驱动所有注册的实体 ticker
 func _tick_entities(delta: float) -> void:
-	# 倒序遍历以支持 tick 中安全删除
-	for i in range(_entity_tickers.size() - 1, -1, -1):
-		var ticker := _entity_tickers[i]
+	for id in _entity_tickers.keys():
+		var ticker := (_entity_tickers.get(id) as WeakRef).get_ref() as Node if _entity_tickers.has(id) else null
 		if not is_instance_valid(ticker) or not ticker.is_inside_tree():
-			_entity_tickers.remove_at(i)
+			_entity_tickers.erase(id)
 			continue
 		if ticker.has_method("tick"):
 			ticker.tick(delta)
@@ -220,7 +229,7 @@ func _on_respawn_request_command(cmd: RuntimeCommand) -> void:
 func _on_surface_change_command(cmd: RuntimeCommand) -> void:
 	if not _surface_manager:
 		return
-	
+
 	var pos: Vector2 = cmd.payload.get("position", Vector2.ZERO)
 	var aoe_radius: float = cmd.payload.get("destruction_radius", 0.0)
 	var aoe_damage: int = cmd.payload.get("destruction_aoe_damage", 0)
@@ -228,7 +237,7 @@ func _on_surface_change_command(cmd: RuntimeCommand) -> void:
 	var surface_state: String = cmd.payload.get("surface_state", "")
 	var surface_radius: float = cmd.payload.get("surface_radius", 0.0)
 	var display_name: String = cmd.payload.get("display_name", "?")
-	
+
 	# 表面生成
 	if not surface_state.is_empty() and surface_radius > 0.0:
 		var cell_radius := ceili(surface_radius / 64.0) + 1
@@ -239,16 +248,16 @@ func _on_surface_change_command(cmd: RuntimeCommand) -> void:
 				var dist := pos.distance_to(Vector2(cell.x * 64 + 32, cell.y * 64 + 32))
 				if dist <= surface_radius:
 					_surface_manager.force_set_surface(cell, surface_state, 10.0, "destroyed_%s" % display_name)
-		
+
 		print("💥 SimulationRuntime: 生成 %s 表面 (r=%.0f, pos=%s)" % [surface_state, surface_radius, pos])
-	
+
 	# AOE 标签触发 ReactionRule（如 oiled + fire → burning）
 	if not aoe_tags.is_empty() and surface_radius > 0.0:
 		# 转换为 Array[String]（JSON 反序列化产生无类型 Array）
 		var typed_tags: Array[String] = []
 		for t in aoe_tags:
 			typed_tags.append(str(t))
-		
+
 		var cell_radius := ceili(surface_radius / 64.0) + 1
 		var center := Vector2i(floori(pos.x / 64), floori(pos.y / 64))
 		for dx in range(-cell_radius, cell_radius + 1):
@@ -257,7 +266,7 @@ func _on_surface_change_command(cmd: RuntimeCommand) -> void:
 				var dist := pos.distance_to(Vector2(cell.x * 64 + 32, cell.y * 64 + 32))
 				if dist <= surface_radius:
 					_surface_manager.apply_tags(cell, typed_tags, "aoe_%s" % display_name)
-	
+
 	# AOE 伤害
 	if aoe_radius > 0.0 and aoe_damage > 0:
 		var targets: Array = _collect_aoe_damage_targets(pos, aoe_radius)
@@ -301,7 +310,16 @@ func _add_aoe_target(result: Array[Node2D], seen: Dictionary, node: Node, pos: V
 
 func _to_string() -> String:
 	return "SimulationRuntime(surf=%d, prop=%d, resp=%d)" % [
-		_surface_scheduler._active_surfaces.size() if _surface_scheduler else 0,
-		_propagation_scheduler._jobs.size() if _propagation_scheduler else 0,
-		_respawn_scheduler._respawn_queue.size() if _respawn_scheduler else 0
+		_surface_scheduler.active_count() if _surface_scheduler else 0,
+		_propagation_scheduler.pending_count() if _propagation_scheduler else 0,
+		_respawn_scheduler.pending_count() if _respawn_scheduler else 0
 	]
+
+func surface_cells() -> Array:
+	return _surface_scheduler.active_cells()
+
+func surface_at(cell: Vector2i) -> Dictionary:
+	return _surface_scheduler.get_surface(cell)
+
+func entity_ticker_count() -> int:
+	return _entity_tickers.size()

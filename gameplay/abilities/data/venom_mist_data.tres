@@ -9,6 +9,7 @@ scale = 1.1
 lifetime = 0.4
 [resource]
 script = ExtResource("1")
+conditional_cast = true
 id = "venom_mist"
 display_name = "毒雾"
 combination_only = false

@@ -18,6 +18,9 @@ func _ready() -> void:
 
 
 func get_current_region() -> Node:
+	var runtime := GameRuntime.instance
+	if runtime and runtime.get_region_session() and is_instance_valid(runtime.get_region_session().active_root):
+		return runtime.get_region_session().active_root
 	var root := get_tree().current_scene
 	if not root:
 		return null
@@ -28,6 +31,9 @@ func get_current_region() -> Node:
 
 
 func get_current_region_path() -> String:
+	var runtime := GameRuntime.instance
+	if runtime and runtime.get_region_session() and is_instance_valid(runtime.get_region_session().active_root):
+		return runtime.get_region_session().active_root.scene_file_path
 	if not _current_region_path.is_empty():
 		return _current_region_path
 	var region := get_current_region()
@@ -54,18 +60,14 @@ func ensure_region(region_path: String, spawn_marker_id: String = "") -> bool:
 	if not root:
 		return false
 
-	var world_runtime := GameRuntime.instance.get_world_runtime() if GameRuntime.instance else null
-	if world_runtime:
-		world_runtime.prepare_region_swap()
-
-	MarkerRegistry.clear()
-
-	if current:
-		root.remove_child(current)
-		current.queue_free()
-
-	var new_region := packed.instantiate()
-	root.add_child(new_region)
+	var runtime := GameRuntime.instance
+	if not runtime:
+		return false
+	runtime.get_region_session().leave(current, get_tree().get_first_node_in_group("player"))
+	var new_region := packed.instantiate() as Node2D
+	if not new_region:
+		return false
+	runtime.get_region_session().mount(new_region, root)
 	await get_tree().process_frame
 
 	_current_region_path = new_region.scene_file_path if not new_region.scene_file_path.is_empty() else region_path

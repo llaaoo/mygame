@@ -1,13 +1,77 @@
-[gd_resource type="Resource" script_class="ExplorationRegionData" load_steps=2 format=3]
-[ext_resource type="Script" path="res://gameplay/exploration/exploration_region_data.gd" id="1"]
+[gd_resource type="Resource" script_class="ExplorationRegionData" format=3]
+
+[ext_resource type="Script" path="res://gameplay/exploration/data/discovery_data.gd" id="1_0us06"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/encounter_data.gd" id="2_45yf3"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/world_event_data.gd" id="3_ke8ew"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/exit_data.gd" id="4_66iw7"]
+[ext_resource type="Script" path="res://gameplay/exploration/exploration_region_data.gd" id="5_jf6l1"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/spell_puzzle_data.gd" id="6_kxefh"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/spell_puzzle_route.gd" id="7_gc3xg"]
+
+[sub_resource type="Resource" id="Resource_r355u"]
+script = ExtResource("1_0us06")
+id = "fire_knowledge"
+title = "火阵铭刻记录"
+text = "已掌握火阵。按5铭刻，阵内使用右键或6火花发出火球；阵外仍是近距离火花。火阵仅有两次触发量，注意留出准备窗口。"
+pos = Vector2(-350, 180)
+actions = Array[String](["fire_sigil"])
+spell_rules = Array[String](["fire_sigil_fireball"])
+
+[sub_resource type="Resource" id="Resource_t34io"]
+script = ExtResource("2_45yf3")
+pos = Vector2(220, -110)
+hp = 35
+
+[sub_resource type="Resource" id="Resource_mjffx"]
+script = ExtResource("2_45yf3")
+pos = Vector2(340, 140)
+hp = 35
+
+[sub_resource type="Resource" id="Resource_4nj6m"]
+script = ExtResource("4_66iw7")
+target = "camp"
+title = "返回营地"
+pos = Vector2(-480, 0)
+
+[sub_resource type="Resource" id="Resource_yn5tb"]
+script = ExtResource("4_66iw7")
+target = "powder"
+title = "前往火药库"
+pos = Vector2(480, 0)
+requires_clear = true
+required_action = "fire_sigil"
+locked_message = "请先阅读入口旁的火阵铭刻记录。"
+
+[sub_resource type="Resource" id="Resource_bohnw"]
+script = ExtResource("4_66iw7")
+target = "archive"
+title = "支路：军械档案"
+pos = Vector2(0, -300)
+requires_clear = true
+
+[sub_resource type="Resource" id="Resource_108iu"]
+script = ExtResource("7_gc3xg")
+steps = PackedStringArray("fire")
+
+[sub_resource type="Resource" id="Resource_4l5ti"]
+script = ExtResource("6_kxefh")
+id = "magic.bramble_cache"
+title = "荆棘药箱"
+pos = Vector2(0, 240)
+routes = Array[ExtResource("7_gc3xg")]([SubResource("Resource_108iu")])
+hint = "荆棘缠住药箱。火焰能烧开外壳，阵外火花也可以。解开可取得树液3、炭屑2。"
+materials = {
+"charcoal": 2,
+"sap": 3
+}
+
 [resource]
-script = ExtResource("1")
+script = ExtResource("5_jf6l1")
 id = "yard"
 title = "监狱外院"
 description = "找到入口旁的火阵记录，清除守卫后探索前路。火阵内火花会变为火球。"
-room_type = "barracks"
 seed = 20261105
-encounters = Array[Dictionary]([{"role": 0, "hp": 35, "pos": Vector2(220, -110)}, {"role": 0, "hp": 35, "pos": Vector2(340, 140)}])
-discoveries = Array[Dictionary]([{"id": "fire_knowledge", "title": "火阵铭刻记录", "text": "已掌握火阵。按5铭刻，阵内使用右键或6火花发出火球；阵外仍是近距离火花。火阵仅有两次触发量，注意留出准备窗口。", "actions": ["fire_sigil"], "recipes": ["fire_sigil_fireball"], "pos": Vector2(-350, 180)}])
-exits = Array[Dictionary]([{"target": "camp", "title": "返回营地", "pos": Vector2(-480, 0), "requires_clear": false}, {"target": "powder", "title": "前往火药库", "pos": Vector2(480, 0), "requires_clear": true}, {"target": "archive", "title": "支路：军械档案", "pos": Vector2(0, -300), "requires_clear": true}])
-spell_objects = Array[Dictionary]([{"id": "magic.bramble_cache", "title": "荆棘药箱", "pos": Vector2(0, 240), "routes": [["fire"]], "hint": "荆棘缠住药箱。火焰能烧开外壳，阵外火花也可以。解开可取得树液3、炭屑2。", "materials": {"sap": 3, "charcoal": 2}}])
+encounters = Array[ExtResource("2_45yf3")]([SubResource("Resource_t34io"), SubResource("Resource_mjffx")])
+discoveries = Array[ExtResource("1_0us06")]([SubResource("Resource_r355u")])
+spell_objects = Array[ExtResource("6_kxefh")]([SubResource("Resource_4l5ti")])
+exits = Array[ExtResource("4_66iw7")]([SubResource("Resource_4nj6m"), SubResource("Resource_yn5tb"), SubResource("Resource_bohnw")])

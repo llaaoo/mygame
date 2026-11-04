@@ -12,6 +12,7 @@ lifetime = 0.2
 
 [resource]
 script = ExtResource("1")
+conditional_cast = true
 id = "ignite"
 display_name = "火花"
 description = "在身前迸出近距离火花。站在自己的火阵内时，触发定向火球。"

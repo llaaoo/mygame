@@ -1,12 +1,68 @@
-[gd_resource type="Resource" script_class="ExplorationRegionData" load_steps=2 format=3]
-[ext_resource type="Script" path="res://gameplay/exploration/exploration_region_data.gd" id="1"]
+[gd_resource type="Resource" script_class="ExplorationRegionData" format=3]
+
+[ext_resource type="Script" path="res://gameplay/exploration/data/discovery_data.gd" id="1_58wt0"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/encounter_data.gd" id="2_e061v"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/world_event_data.gd" id="3_w6ylc"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/exit_data.gd" id="4_ifosk"]
+[ext_resource type="Script" path="res://gameplay/exploration/exploration_region_data.gd" id="5_uphkk"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/spell_puzzle_data.gd" id="6_xolvr"]
+
+[sub_resource type="Resource" id="Resource_gnxpo"]
+script = ExtResource("1_58wt0")
+id = "powder_supply"
+title = "守卫补给"
+text = "恢复生命和法力。油桶的火焰也会伤害你；先观察站位再引燃。每个补给只能领取一次。"
+pos = Vector2(-350, 180)
+heal = true
+
+[sub_resource type="Resource" id="Resource_2wv6q"]
+script = ExtResource("1_58wt0")
+id = "powder_charcoal"
+title = "火药研磨残料"
+text = "取得施法原料。返回营地工作台可加工，M查看库存。此处只搜刮一次，休息与重置遭遇都不会重新发放。"
+pos = Vector2(-300, -200)
+materials = {
+"charcoal": 5
+}
+
+[sub_resource type="Resource" id="Resource_vxsy5"]
+script = ExtResource("2_e061v")
+pos = Vector2(200, -110)
+hp = 42
+
+[sub_resource type="Resource" id="Resource_g078r"]
+script = ExtResource("2_e061v")
+pos = Vector2(350, 130)
+hp = 32
+role = 1
+
+[sub_resource type="Resource" id="Resource_qsxu2"]
+script = ExtResource("4_ifosk")
+target = "yard"
+title = "返回外院"
+pos = Vector2(-480, 0)
+
+[sub_resource type="Resource" id="Resource_be5pc"]
+script = ExtResource("4_ifosk")
+target = "gate"
+title = "前往重卫关隘"
+pos = Vector2(480, 0)
+requires_clear = true
+
+[sub_resource type="Resource" id="Resource_64gmy"]
+script = ExtResource("4_ifosk")
+target = "drain"
+title = "支路：排水回廊"
+pos = Vector2(0, -300)
+requires_clear = true
+
 [resource]
-script = ExtResource("1")
+script = ExtResource("5_uphkk")
 id = "powder"
 title = "黑火药库"
 description = "利用油桶制造环境反应，也可绕开危险逐个击破。北侧排水支路有寒霜记录。"
 room_type = "explosive"
 seed = 20261107
-encounters = Array[Dictionary]([{"role": 0, "hp": 42, "pos": Vector2(200, -110)}, {"role": 1, "hp": 32, "pos": Vector2(350, 130)}])
-discoveries = Array[Dictionary]([{"id": "powder_supply", "title": "守卫补给", "text": "恢复生命和法力。油桶的火焰也会伤害你；先观察站位再引燃。每个补给只能领取一次。", "heal": true, "pos": Vector2(-350, 180)}, {"id": "powder_charcoal", "title": "火药研磨残料", "pos": Vector2(-300, -200), "materials": {"charcoal": 5}, "text": "取得施法原料。返回营地工作台可加工，M查看库存。此处只搜刮一次，休息与重置遭遇都不会重新发放。"}])
-exits = Array[Dictionary]([{"target": "yard", "title": "返回外院", "pos": Vector2(-480, 0), "requires_clear": false}, {"target": "gate", "title": "前往重卫关隘", "pos": Vector2(480, 0), "requires_clear": true}, {"target": "drain", "title": "支路：排水回廊", "pos": Vector2(0, -300), "requires_clear": true}])
+encounters = Array[ExtResource("2_e061v")]([SubResource("Resource_vxsy5"), SubResource("Resource_g078r")])
+discoveries = Array[ExtResource("1_58wt0")]([SubResource("Resource_gnxpo"), SubResource("Resource_2wv6q")])
+exits = Array[ExtResource("4_ifosk")]([SubResource("Resource_qsxu2"), SubResource("Resource_be5pc"), SubResource("Resource_64gmy")])

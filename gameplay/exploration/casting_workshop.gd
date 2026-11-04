@@ -26,7 +26,7 @@ func show_materials() -> void:
 	game.ui.show_panel("施法材料与配置", text, buttons)
 
 func show_action(skill: SkillData) -> void:
-	var controller: FireCombinationController = game.player.skill_manager.combinations
+	var controller: ConditionalCastController = game.player.skill_manager.combinations
 	var supplies := controller.supplies
 	var plan := controller.preview(skill, game.player, Input.is_key_pressed(KEY_SHIFT))
 	var text := "%s\n%s\n\n当前条件：%s · %d MP\n材料：%s\n" % [skill.display_name, skill.description, plan.effect_label, plan.cost, supplies.describe_cost(plan.material_costs) if not plan.material_costs.is_empty() else "无"]
@@ -35,9 +35,9 @@ func show_action(skill: SkillData) -> void:
 	for id in CastingSupplies.MATERIAL_IDS:
 		var material: CastingMaterialData = supplies.catalog[id]
 		var compatible := material.supports(skill.get_id(), skill.get_id())
-		for recipe in controller.recipes:
-			if recipe.trigger_action_id == skill.get_id() and controller.learned_recipes.has(recipe.id):
-				compatible = compatible or material.supports(skill.get_id(), recipe.result_skill.get_id())
+		for rule in controller.rules:
+			if rule.trigger_action_id == skill.get_id() and controller.learned_rules.has(rule.id):
+				compatible = compatible or material.supports(skill.get_id(), rule.result_skill.get_id())
 		if compatible:
 			text += "\n%s（持有%d）\n%s\n" % [material.title, supplies.count(id), material.description]
 			buttons.append({"title": "配置：" + material.title, "callback": _configure.bind(skill, id)})
@@ -55,8 +55,8 @@ func show_crafts() -> void:
 	var supplies: CastingSupplies = game.player.skill_manager.combinations.supplies
 	var text := "使用探索获得的原料加工成品。休息不补满材料，已搜刮的固定来源不会重复发放。基础火、霜法术始终可不带材料使用。\n\n"
 	var buttons: Array[Dictionary] = []
-	for id in CastingSupplies.CRAFTS:
-		var costs: Dictionary = CastingSupplies.CRAFTS[id]
+	for id in supplies.crafting_recipes:
+		var costs: Dictionary = supplies.crafting_recipes[id].inputs
 		text += "%s ×1 ← %s\n" % [supplies.title(id), supplies.describe_cost(costs)]
 		buttons.append({"title": "加工：" + supplies.title(id), "disabled": not supplies.can_pay(costs), "callback": _craft.bind(id)})
 	buttons.append({"title": "材料与配置", "callback": show_materials})

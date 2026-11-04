@@ -1,529 +1,60 @@
-# 🧠 Runtime Topology — 运行时拓扑与边界契约
+# 运行时拓扑与时序
 
-> **状态**: 已固化  
-> **版本**: 1.5  
-> **最后更新**: 2026-05-23  
-> **适用范围**: 整个项目运行时架构
+2026-11-04。本文从属于[项目架构](./ARCHITECTURE.md)，说明当前实现；早期“所有调用必须异步”和“战斗执行器纯计算”的描述已由公开请求/查询/事实边界替代。
 
----
+## 运行时结构
 
-## 定位
-
-本文档是 **COMBAT_CONTRACTS.md** 和 **WORLD_CONTRACTS.md** 的上层宪法。
-
-如果 Combat Contracts 是「战斗系统怎么做」，World Contracts 是「世界系统怎么做」，那么 Runtime Topology 回答的是：
-
-> **「这些系统如何共存而不互相吞噬」**
-
----
-
-## 一、五大 Runtime 边界
-
-```
-                         GameRuntime
-                              │
-        ┌──────────┬──────────┼──────────┬──────────┐
-        ▼          ▼          ▼          ▼          ▼
-    Combat      World     Simulation     UI        Save
-    Runtime     Runtime    Runtime     Runtime    Runtime
+```text
+GameRuntime
+├── CommandBus           延迟命令与区域scope
+├── CombatExecutor       命中、伤害、阶段与事件边界
+├── CombatEventBus       领域事实订阅
+├── WorldRuntime         物体状态、空间索引与场景同步
+├── SimulationRuntime    表面/传播/重生与实体持续计时
+├── RegionSession        活动区域、generation与共享退出协议
+├── RegionRuntime        场景资源切换适配器
+├── SaveManager          玩法收集与恢复
+│   └── SaveRepository   文件校验、迁移、备份与替换
+└── WorldTime            NPC日程使用的世界时钟
 ```
 
-### 1. CombatRuntime — 纯计算
-
-| 属性 | 值 |
-|------|-----|
-| 职责 | 伤害计算、技能执行、Modifier 管线、事件发射、条件判定 |
-| 输入 | `CastRequest` / `HitRequest` / `DamageRequest` |
-| 输出 | `CombatResult` / `CombatEvent` |
-| 状态 | `_phase`（阶段机）、`_cooldowns`、`_chain_count` |
-| 禁止 | 地图逻辑、AI 行为、世界状态修改 |
-
-**CombatRuntime 只做计算，不做世界控制。**
-
-```
-✅ CombatExecutor.report_hit(args) → DamageResult
-❌ CombatExecutor 中调用 WorldStateManager
-❌ CombatExecutor 中调用 SurfaceManager
-```
-
-### 2. WorldRuntime — 状态一致性
-
-| 属性 | 值 |
-|------|-----|
-| 职责 | 维护 WorldState 一致性、MapObject 生命周期、SceneTree 同步 |
-| 输入 | `DestroyedEvent` / `RespawnRequest` / `ChunkLoadRequest` |
-| 输出 | `WorldStateDelta` |
-| 状态 | `_object_states: Dictionary`（真实状态） |
-| 禁止 | 伤害计算、AI 调度、技能逻辑 |
-
-**WorldRuntime 的真实状态在 WorldStateManager 中。SceneTree 只是当前加载窗口的表现。**
-
-```
-✅ WorldStateManager.set_destroyed(id) → 更新字典 → 通知 SceneTree 更新 sprite
-❌ SceneTree 上直接改 MapObject 的 HP
-❌ 从 SceneTree 遍历获取世界状态
-```
-
-### 3. SimulationRuntime — 统一调度
-
-| 属性 | 值 |
-|------|-----|
-| 职责 | 统一驱动所有持续世界行为 |
-| 输入 | 时钟 tick |
-| 输出 | 分派到各 Scheduler |
-| 状态 | 调度队列 |
-
-**内部 Scheduler：**
-
-```
-SimulationRuntime
-├── SurfaceScheduler       # 表面状态倒计时 → 过期/传播
-├── PropagationScheduler   # 传播队列处理（每帧 N 个 job）
-├── RespawnScheduler       # 可破坏物重生倒计时
-├── WeatherScheduler       # 天气变化（预留）
-└── TimeScheduler          # 昼夜循环（预留）
-```
-
-**❌ 禁止每个系统自己 `_process()`：**
-
-```gdscript
-# 禁止
-SurfaceManager._process(delta)     # 独立 tick
-PropagationQueue._process(delta)   # 独立 tick
-RespawnTimer._process(delta)       # 独立 tick
-```
-
-**✅ 统一调度：**
-
-```gdscript
-# SimulationRuntime._process(delta)
-func _process(delta):
-    _surface_scheduler.tick(delta)
-    _propagation_scheduler.tick(delta)
-    _respawn_scheduler.tick(delta)
-    # 调度顺序显式、可审计、可暂停
-```
-
-### 4. UIRuntime — 表现
-
-| 属性 | 值 |
-|------|-----|
-| 职责 | HUD、菜单、技能栏、背包、对话框 |
-| 输入 | 用户输入 + Runtime 事件（只读） |
-| 输出 | 无（不修改任何 Runtime 状态） |
-| 禁止 | 直接修改 Combat/World/Simulation 状态 |
-
-**UI 只观察，不控制。**
-
-### 5. SaveRuntime — 持久化
-
-| 属性 | 值 |
-|------|-----|
-| 职责 | 序列化/反序列化 WorldState + PlayerState + 进度 |
-| 输入 | `SaveRequest` / `LoadRequest` |
-| 输出 | 文件 I/O |
-| 禁止 | 游戏逻辑 |
-
----
-
-## 二、Runtime Message Contract（最关键）
-
-### ❌ 禁止：Runtime 直接互相调用
-
-```gdscript
-# 禁止
-SurfaceManager.spawn_fire()         # World 直接调 Simulation
-PropagationQueue.trigger()          # World 直接调 Simulation
-WorldStateManager.save()            # 任意系统直接调 Save
-CombatExecutor.report_hit()         # World 直接调 Combat
-CombatEventBus.emit()              # 任意系统直接调事件总线
-```
-
-### ✅ 正确：统一 CommandBus
-
-```
-System A
-    │
-    ▼
-CommandBus.emit(RuntimeCommand)
-    │
-    ▼
-System B._on_command(cmd)
-```
-
-**RuntimeCommand 类型：**
-
-```gdscript
-# RuntimeCommand (Resource)
-type: String              # "HIT" / "DESTROYED" / "SURFACE_CHANGE" / "RESPAWN" / "CHUNK_LOAD"
-source: String            # 发起 Runtime 名称
-target: String            # 目标 Runtime 名称（或 "*" 广播）
-payload: Dictionary       # 数据
-```
-
-### 具体流程示例：火球命中油桶
-
-```
-❌ 错误链（直接调用）:
-Projectile → OilBarrel.explode() → Surface.spawn_fire() → Propagation.spread()
-
-✅ 正确链（CommandBus）:
-Projectile
-  → CommandBus.emit(HIT_REQUEST {source: "combat", target: oil_barrel, damage: 25})
-      │
-      ├─► CombatRuntime.on_hit_request()
-      │     → compute damage → report_hit → emit(DAMAGE_RESULT)
-      │
-      ├─► WorldRuntime.on_damage_result()
-      │     → oil_barrel.take_damage() → HP=0 → emit(DESTROYED {id: "oil_barrel_03"})
-      │
-      └─► SimulationRuntime.on_destroyed()
-            → enqueue surface change (oil → burning, radius=120)
-            → enqueue propagation job (spread fire, depth=0)
-```
-
-### CommandBus 规则
-
-| 规则 | 说明 |
-|------|------|
-| 谁产生事件，谁 emit | Projectile 产 HIT_REQUEST，WorldRuntime 产 DESTROYED |
-| 谁处理，谁 subscribe | CombatRuntime 订阅 HIT_REQUEST，SimulationRuntime 订阅 DESTROYED |
-| 不跨级调用 | WorldRuntime 不能直接调 CombatExecutor.report_hit() |
-| 异步 | CommandBus 不保证同帧处理（队列化，类似 Propagation BFS） |
-
----
-
-## 三、世界激活三级模型
-
-```
-┌────────────────────────────────────────────┐
-│              Activation Levels               │
-├────────────────────────────────────────────┤
-│                                              │
-│  ┌──────────┐    ┌──────────┐    ┌────────┐│
-│  │ Loaded   │    │ Dormant  │    │Abstract││
-│  │          │    │          │    │        ││
-│  │ SceneTree│    │ 只有     │    │ 只有   ││
-│  │ 完整存在  │    │ WorldState│   │ 统计   ││
-│  │ 全模拟   │    │ 不渲染   │    │ 结果   ││
-│  │          │    │          │    │        ││
-│  │ 玩家 2   │    │ 玩家离开 │    │ 极远   ││
-│  │ Chunk    │    │ 3分钟    │    │ 区域   ││
-│  └──────────┘    └──────────┘    └────────┘│
-│       │               │               │     │
-│       ▼               ▼               ▼     │
-│   实时 tick        定时 tick        事件驱动  │
-│   (每帧)          (每 5 秒)       (仅在查询时)│
-│                                              │
-└────────────────────────────────────────────┘
-```
-
-### Loaded（玩家附近 2 Chunk 半径）
-
-- SceneTree 完整存在
-- 所有系统全 tick
-- Surface 活跃、Propagation 活跃
-- ~200 个 MapObject 上限
-
-### Dormant（已访问但远离）
-
-- SceneTree **已卸载**
-- WorldStateManager 保留状态
-- 只 tick：Respawn 倒计时（低频，每 5 秒）
-- 不 tick：Surface、Propagation
-- 玩家返回时：从 WorldState 重建 SceneTree
-
-### Abstracted（未访问 / 极远）
-
-- 完全不加载
-- 不 tick
-- 仅在查询时返回统计结果
-- 例如：「北山贼营地」→ 3 天后被狼群摧毁 → 玩家到达时直接呈现最终结果
-
----
-
-## 四、内容能力验证标准
-
-系统架构的好坏不取决于它有多高级，而取决于：
-
-> **「能否低成本地产出内容」**
-
-### 三个验证场景
-
-#### 场景 A：完整地牢
-
-必须能在一个 SubMap 中完成：
-
-- [ ] 入口 Portal（显式过渡）
-- [ ] 3-5 场战斗（Enemy + 技能）
-- [ ] 2 个机关（可破坏冰墙 + 导电水面）
-- [ ] 1 个宝箱（Interactable + Loot）
-- [ ] Boss（高 HP + 特殊技能）
-- [ ] 可破坏场景物（木箱阵列 + 油桶链式反应）
-- [ ] 表面交互（燃烧地面 + 冰面）
-- [ ] 地图状态持久化（出地牢再进，破坏物保持）
-
-**验证标准**：一个设计师能在 2 小时内配置完成，无需改代码。
-
-#### 场景 B：完整城镇
-
-必须能在一个 Overworld Chunk 中完成：
-
-- [ ] 室内过渡（OverlayMap 或 SubMap）
-- [ ] NPC（Dialog 暂不要求，但 Interactable 要支持）
-- [ ] 门（状态切换：开/关）
-- [ ] 商店（Interactable → 调用 UIRuntime）
-- [ ] 世界状态（村民白天在集市，晚上在屋内 — 预留 SimulationRuntime 驱动）
-
-**验证标准**：放置一个 NPC + 门 + 室内场景，只改 .tres 和 .tscn，不改 .gd。
-
-#### 场景 C：完整野外区域
-
-必须能在 Overworld 中完成：
-
-- [ ] 2×2 Chunk 流式加载
-- [ ] 交互热点区域（Tier A + B + C 全覆盖）
-- [ ] 低密度过渡区（只有 Tier A）
-- [ ] 环境传播（火蔓延到油桶链，玩家引爆一个炸一片）
-- [ ] Chunk 卸载后返回 → Dormant 恢复正确
-
-**验证标准**：在野外放 20 个可破坏物 + 3 个热点区域，运行稳定（无崩溃、无泄露、无状态不一致）。
-
----
-
-## 五、当前进度与停止线
-
-### 已完成 ✅
-
-- CombatRuntime：核心计算链路完整（12 条契约）
-- WorldRuntime：WorldSpatialIndex + WorldStateManager + MapObject 注册/注销
-- SimulationRuntime：统一调度（Surface → Propagation → Respawn）
-- Status/Buff Runtime：status_id + 叠加规则 + DOT + 减速 + 状态查询
-- Surface Runtime：SurfaceReaction 数据驱动 + SurfaceManager + 7 条默认反应
-- MapObject 基类：四接口 + 破坏 AOE 链 + 表面生成 + 空间索引
-- Skill Architecture：Entity Archetype 收敛（2 Scene + N Data）
-- Visual Layer：ProjectileVisualData / AOEVisualData Resource
-- 三层激活模型设计
-- CommandBus 设计
-
-### 停止线 ⛔
-
-**不要再做：**
-
-- 新技能类型
-- 新 Modifier
-- 新 Condition
-- 新 GraphNode
-- 新事件类型
-- 新表面状态（当前 5 个已足够）
-
-**应该做：**
-
-- 实现 WorldSpatialIndex（地基）
-- 实现 MapObject 基类 + 生命周期
-- 实现 CommandBus（Runtime 通信）
-- 实现 SimulationRuntime 调度器
-- 完成「场景 A：完整地牢」验证
-
-### 工程判断标准
-
-| 不是 | 而是 |
-|------|------|
-| 系统有多高级 | 能否低成本产出内容 |
-| 功能多少 | 三个验证场景是否通过 |
-| Modifier 数量 | 设计师能否 2 小时配一个地牢 |
-| 元素种类 | 5 种状态是否已覆盖所有交互需求 |
-
----
-
-## 六、文件结构（v2.5 实际结构）
-
-> **迁移说明**: 原"最终收敛版"以 `res://runtime/` 为单根，实际演进为多根结构。  
-> `core/`（Runtime 基础设施）、`gameplay/`（战斗+技能+状态）、`world/`（WorldRuntime+地图）并行。
-
-```
-res://core/                        ← Runtime 基础设施
-├── game_runtime.gd                # 顶层 GameRuntime
-├── command/
-│   ├── command_bus.gd             # RuntimeCommand 总线
-│   └── runtime_command.gd         # RuntimeCommand Resource
-├── event/
-│   ├── combat_event.gd
-│   ├── combat_event_bus.gd
-│   └── combat_scope.gd
-├── state/
-│   ├── state.gd
-│   └── state_machine.gd
-└── debug/
-    ├── combat_debugger.gd
-    ├── combat_debug_ui.gd
-    └── combat_trace.gd
-
-res://gameplay/                    ← 游戏逻辑
-├── abilities/                     ← 技能系统
-│   ├── archetypes/
-│   ├── data/                      # SkillData .tres
-│   ├── runtime/                   # SkillExecutor, Projectile, CastContext
-│   ├── manager/                   # SkillManager
-│   ├── registry/                  # SkillPool
-│   ├── loadout/                   # SkillLoadout
-│   └── effect_graph/
-├── combat/                        ← 战斗核心
-│   ├── combat_executor.gd
-│   ├── combat_phase.gd
-│   ├── triggered_effect.gd
-│   ├── modifiers/
-│   └── conditions/
-├── status/
-│   ├── buff.gd
-│   └── buff_manager.gd
-├── inventory/
-│   ├── inventory.gd
-│   └── equipment_manager.gd
-├── quest/
-│   ├── data/
-│   ├── runtime/
-│   └── objectives/
-├── interaction/
-│   ├── simulation_runtime.gd
-│   ├── surface_manager.gd
-│   ├── surface_scheduler.gd
-│   ├── propagation_scheduler.gd
-│   └── respawn_scheduler.gd
-└── action/
-    ├── action.gd
-    ├── action_resolver.gd
-    └── player_action.gd          ← @deprecated
-
-res://world/                       ← 世界层
-├── world_runtime.gd
-├── state/world_state_manager.gd
-├── spatial/world_spatial_index.gd
-├── object/
-│   ├── map_object.gd
-│   ├── map_object_data.gd
-│   ├── interactable.gd
-│   └── signal_receiver.gd
-├── time/world_time.gd
-├── npcs/
-│   ├── npc_brain.gd
-│   └── move_to_task.gd
-└── markers/
-
-## 六-B、依赖方向（铁律）
-
-```
-simulation/  ──→  world/ (通过 CommandBus)
-world/       ──→  combat/ (通过 CommandBus)
-combat/      ──→  (无依赖，纯计算)
-ui/          ──→  (只读所有 Runtime)
-save/        ──→  world/ + combat/ (只读状态)
-```
-
-**禁止反向**：`combat/` 不能依赖 `world/`，`world/` 不能依赖 `simulation/`。
-├── game_runtime.gd              # 顶层 GameRuntime
-├── command_bus.gd               # RuntimeCommand 总线 (预留)
-├── runtime_command.gd           # RuntimeCommand Resource
-│
-├── combat/
-│   ├── combat_executor.gd       # 唯一世界写入口
-│   ├── combat_event.gd
-│   ├── combat_event_bus.gd
-│   ├── combat_phase.gd
-│   ├── combat_scope.gd
-│   ├── triggered_effect.gd
-│   ├── on_hit_apply_status.gd   # 命中挂状态通用模块
-│   ├── conditions/              # 条件判定
-│   ├── effect_graph/            # 效果图节点
-│   ├── debug/                   # CombatDebugger
-│   └── skills/
-│       ├── data/                # SkillData + status .tres
-│       ├── runtime/             # SkillExecutor, Projectile, CastContext
-│       ├── manager/             # SkillManager
-│       ├── modifiers/           # DamageModifier 管线
-│       ├── registry/            # SkillPool
-│       └── loadout/             # SkillLoadout
-│
-├── world/
-│   ├── world_runtime.gd         # WorldRuntime 入口
-│   ├── world_state_manager.gd   # 真实世界状态
-│   ├── world_spatial_index.gd   # 统一空间查询
-│   └── interaction/
-│       ├── surface_reaction.gd  # ReactionRule Resource
-│       └── surface_manager.gd   # SurfaceManager 外观
-│
-├── simulation/
-│   ├── simulation_runtime.gd    # 统一调度器
-│   ├── surface_scheduler.gd     # 表面倒计时
-│   ├── propagation_scheduler.gd # BFS 传播队列
-│   └── respawn_scheduler.gd     # 重生倒计时
-│
-├── ui/
-└── save/
-
-res://skills/
-├── archetypes/                  # Runtime 行为模板
-│   ├── linear_projectile.tscn
-│   └── persistent_aoe.tscn     # + persistent_aoe.gd
-└── visuals/                     # 表现层 Resource
-    ├── projectile_visual_data.gd
-    ├── aoe_visual_data.gd
-    ├── fire_visual.tres
-    ├── shadow_visual.tres
-    ├── fire_aoe_visual.tres
-    └── ice_aoe_visual.tres
-
-res://world/object/
-├── map_object.gd               # MapObject 基类 (4 接口)
-├── map_object_data.gd          # MapObjectData Resource
-├── oil_barrel.tscn             # 油桶 Scene
-└── oil_barrel_data.tres        # 油桶配置
-```
-
-### 依赖方向（铁律）
-
-```
-simulation/  ──→  world/ (命令式)
-world/       ──→  combat/ (通过 CommandBus)
-combat/      ──→  (无依赖，纯计算)
-ui/          ──→  (只读所有 Runtime)
-save/        ──→  world/ + combat/ (只读状态)
-```
-
-**禁止反向**：`combat/` 不能依赖 `world/`，`world/` 不能依赖 `simulation/`。
-
----
-
-## 🔴 反模式速查（运行时级别）
-
-| 反模式 | 正确做法 |
-|--------|---------|
-| CombatExecutor 中调 WorldStateManager | Combat 只输出 DamageResult，World 订阅 |
-| SurfaceManager 自己 `_process()` | SimulationRuntime 统一 tick |
-| WorldRuntime 直接 `CombatExecutor.report_hit()` | 通过 CommandBus 发 HIT_REQUEST |
-| SceneTree 遍历获取世界状态 | WorldStateManager 是真实状态源 |
-| 所有 Chunk 全时模拟 | Loaded / Dormant / Abstracted 三级 |
-| 每个系统独立 `_process()` | SimulationRuntime 统一调度 |
-| 全地图均匀可交互 | 三层密度 + 交互热点 |
-| 追求「全世界可交互」 | 追求「20 个高质量交互区域」 |
-| Runtime 之间直接互相调用 | CommandBus 异步命令 |
-| 新增表面状态或元素类型 | 用现有 5 状态覆盖，不够再讨论 |
-
----
-
-## 🤝 与下级契约的关系
-
-```
-RUNTIME_TOPOLOGY.md (本文档)
-    │
-    ├──► COMBAT_CONTRACTS.md (CombatRuntime 内部契约)
-    │
-    ├──► WORLD_CONTRACTS.md (WorldRuntime 内部契约)
-    │
-    └──► skill_architecture.md (技能内容架构 — 数据驱动, Archetype 收敛)
-```
-
-- Runtime Topology 定义 **Runtime 之间** 的边界
-- Combat/World Contracts 定义 **Runtime 内部** 的规则
-- skill_architecture.md 定义 **技能内容生产** 的方式（Scene ≠ 技能身份）
-- 任何跨 Runtime 调用 = 违反本文档 = 必须通过 CommandBus
+UI是角色/场景装配的表现组件集合，不要求一个名为UIRuntime的全局节点。旧房间的RunManager与探索的MVPGame保留各自流程，共用区域生命周期。
+
+## 一次施法
+
+1. 输入适配器创建Action与CastContext，记录强化意图。验证和执行读取同一请求。
+2. SkillManager检查知识与装备；条件动作由ConditionalCastController生成类型化计划、准备并校验真实条件版本。普通动作使用同一规划中的材料/恩赐和费用策略。
+3. CastTransaction保留资源，执行器暂存效果；任一结果拒绝则回滚。成功后提交所有状态，再通知资源/状态观察者并发布ON_CAST。
+4. 投射物/AoE/近战通过CombatExecutor.report_hit同步申请命中；接受后进行命中反应和实际扣血，返回HitResult。
+5. 物体破坏等延迟世界工作进入CommandBus。该队列不拆分施法原子事务。
+
+调用公开领域方法可以同步获得接受结果；读取状态通过查询API。禁止外部清空其他服务的内部容器。UI可请求服务执行操作，服务保留校验与写入权。
+
+## 时钟与就绪
+
+GameRuntime非暂停帧依次分发命令、推进触发冷却、调用SimulationRuntime。模拟服务推进表面、传播、重生、实体tick，再处理低频实体/表面接触。角色的生命、法力、状态、技能、条件准备、法阵、蓄力引导注册为ticker；位置/碰撞依赖物理帧，视觉更新保留在表现组件。
+
+RuntimeRegistration保存弱引用的早期注册请求，在GameRuntime就绪时一次性清空等待表；已有模拟服务时立即注册。同一节点ID只注册一次，tree_exiting自动注销；没有递归deferred轮询。角色事件装配延迟到场景组合根就绪后，必要时等待runtimes_ready。
+
+模拟暂停停止技能、恩赐、触发冷却等玩法时间。状态和持续AoE按实际存活时间处理周期，包含到期端点；大步长保留周期余量，表面自然迁移继续消耗超出的时间。
+
+## 区域边界
+
+`RegionSession.leave(root, actor)`依次：
+
+1. 取消角色准备、蓄力、引导、瞄准、位移Tween、召唤与临时状态；保留装备贡献。
+2. 有界派发已排队的WORLD目标事实；取消旧区域战斗/模拟工作，然后清空队列并推进scope。
+3. 各调度器清理自己的瞬态状态，世界空间索引清空。
+4. 推进generation，禁用、移出并删除旧根，清除活动根和地图锚点。
+
+`mount`标记新根并挂入场景。延迟命令携带scope，旧scope在入队和派发时拒绝；遭遇回调校验generation。需要跨区域长期保留的状态放在持久进度中，不能依赖旧节点或旧计时队列存活。
+
+CastContext默认world选择活动区域，便于统一卸载普通投射物、AoE和召唤。显式world仍按调用方提供的生命周期管理。
+
+## 持久化
+
+SaveRepository返回缺失、有效、备份恢复、无效、未来版本或I/O错误，不直接改玩法。SaveManager收集和恢复注册数据，MVP的进度服务负责探索恢复与自动保存重试。损坏文件无有效备份时保留原文件；未来版本不降级覆盖。失败读档保留当前旅程。
+
+## 验证
+
+`test_region_lifecycle.gd`检查早期/重复注册、旧命令与回调、世界事实保留、普通法术归属、反复切区和装备贡献。`test_status_transactions.gd`检查事务通知、命中资格、周期边界与属性重算。测试入口和完整范围见[重构进展](./REFACTOR_PROGRESS.md)。

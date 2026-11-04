@@ -3,7 +3,7 @@ extends RefCounted
 ## Pure cast-plan transformation. Spending is owned by the combination transaction.
 
 static func plan(skill: SkillData, actor: Node2D, empower: bool) -> Dictionary:
-	var result := {"skill": skill, "conditions": [], "retained": [], "spent": []}
+	var result := {"skill": skill, "conditions": [] as Array[CastStatusRequirement], "retained": [], "spent": []}
 	if skill.skill_type not in [SkillData.SkillType.PROJECTILE, SkillData.SkillType.AOE]:
 		return result
 	var manager := actor.get_node_or_null("BuffManager") as BuffManager
@@ -17,7 +17,7 @@ static func plan(skill: SkillData, actor: Node2D, empower: bool) -> Dictionary:
 		if not matches:
 			continue
 		var spend := empower and boon.can_empower
-		result.conditions.append({"id": boon.status_id, "version": manager.status_version(boon.status_id), "consume": spend, "cost": boon.empower_mana_cost if spend else 0, "factor": boon.empower_damage_multiplier if spend else boon.spell_damage_multiplier})
+		result.conditions.append(CastStatusRequirement.new(boon.status_id, manager.status_version(boon.status_id), spend, boon.empower_mana_cost if spend else 0, boon.empower_damage_multiplier if spend else boon.spell_damage_multiplier))
 		if spend:
 			result.spent.append(boon.display_name)
 		else:

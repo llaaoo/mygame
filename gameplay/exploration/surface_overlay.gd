@@ -15,9 +15,9 @@ func _process(delta: float) -> void:
 func _draw() -> void:
 	if not GameRuntime.instance:
 		return
-	var scheduler := GameRuntime.instance.get_simulation_runtime()._surface_scheduler
-	for cell: Vector2i in scheduler._active_surfaces:
-		var state: String = scheduler._active_surfaces[cell].state
+	var simulation := GameRuntime.instance.get_simulation_runtime()
+	for cell: Vector2i in simulation.surface_cells():
+		var state: String = simulation.surface_at(cell).state
 		if not COLORS.has(state):
 			continue
 		var point := to_local(Vector2(cell.x * 64, cell.y * 64))

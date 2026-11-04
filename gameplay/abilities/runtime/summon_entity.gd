@@ -207,3 +207,7 @@ func _on_expired() -> void:
 
 func is_dead() -> bool:
 	return not is_inside_tree()
+
+func _exit_tree() -> void:
+	if is_instance_valid(_manager):
+		_manager.unregister(self)

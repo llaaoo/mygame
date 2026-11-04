@@ -1,12 +1,47 @@
-[gd_resource type="Resource" script_class="ExplorationRegionData" load_steps=2 format=3]
-[ext_resource type="Script" path="res://gameplay/exploration/exploration_region_data.gd" id="1"]
+[gd_resource type="Resource" script_class="ExplorationRegionData" format=3]
+
+[ext_resource type="Script" path="res://gameplay/exploration/data/discovery_data.gd" id="1_lptr4"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/encounter_data.gd" id="2_0svwp"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/world_event_data.gd" id="3_baqav"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/exit_data.gd" id="4_u8pbx"]
+[ext_resource type="Script" path="res://gameplay/exploration/exploration_region_data.gd" id="5_7q8r2"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/spell_puzzle_data.gd" id="6_pl5kx"]
+
+[sub_resource type="Resource" id="Resource_frse3"]
+script = ExtResource("1_lptr4")
+id = "camp_guide"
+title = "远征者手记"
+text = "火花本身只影响近处。真正的法术来自条件：寻找监狱外院的火阵铭刻记录。死亡返回营地，已学知识和清理进度保留。"
+pos = Vector2(-200, -160)
+
+[sub_resource type="Resource" id="Resource_yc7l5"]
+script = ExtResource("1_lptr4")
+id = "material_handbook"
+title = "施法材料手册"
+text = "已掌握水引：前方制造水域、灭火并令敌人潮湿（默认4）。已掌握泼洒树脂：消耗树脂制剂铺油，需在K中编组。领取初始原料和成品。按M给基础动作配置可选素材；营地工作台可加工。灰延长火/霜法阵，树脂强化火球，霜盐强化冰霜，雷晶粉维持雷阵或强化雷矢。基础火/霜不强制带料。"
+pos = Vector2(-220, 200)
+actions = Array[String](["water_call", "oil_flask"])
+materials = {
+"ash": 2,
+"charcoal": 4,
+"crystal": 6,
+"frost_salt": 2,
+"resin": 2,
+"sap": 6,
+"storm_dust": 3
+}
+
+[sub_resource type="Resource" id="Resource_hd2lk"]
+script = ExtResource("4_u8pbx")
+target = "yard"
+title = "进入监狱外院"
+pos = Vector2(480, 0)
+
 [resource]
-script = ExtResource("1")
+script = ExtResource("5_7q8r2")
 id = "camp"
 title = "余烬营地"
 description = "阅读路标后出发。鼠标左键近战，右键火花，空格闪避，E交互，J日志，Esc暂停。"
-room_type = "barracks"
 seed = 20261104
-encounters = Array[Dictionary]([])
-discoveries = Array[Dictionary]([{"id": "camp_guide", "title": "远征者手记", "text": "火花本身只影响近处。真正的法术来自条件：寻找监狱外院的火阵铭刻记录。死亡返回营地，已学知识和清理进度保留。", "pos": Vector2(-200, -160)}, {"id": "material_handbook", "title": "施法材料手册", "text": "已掌握水引：前方制造水域、灭火并令敌人潮湿（默认4）。已掌握泼洒树脂：消耗树脂制剂铺油，需在K中编组。领取初始原料和成品。按M给基础动作配置可选素材；营地工作台可加工。灰延长火/霜法阵，树脂强化火球，霜盐强化冰霜，雷晶粉维持雷阵或强化雷矢。基础火/霜不强制带料。", "pos": Vector2(-220, 200), "actions": ["water_call", "oil_flask"], "materials": {"charcoal": 4, "sap": 6, "crystal": 6, "ash": 2, "resin": 2, "frost_salt": 2, "storm_dust": 3}}])
-exits = Array[Dictionary]([{"target": "yard", "title": "进入监狱外院", "pos": Vector2(480, 0), "requires_clear": false}])
+discoveries = Array[ExtResource("1_lptr4")]([SubResource("Resource_frse3"), SubResource("Resource_yc7l5")])
+exits = Array[ExtResource("4_u8pbx")]([SubResource("Resource_hd2lk")])

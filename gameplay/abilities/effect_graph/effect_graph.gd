@@ -1,12 +1,12 @@
 class_name EffectGraph
 extends Resource
 ## 效果图 — 节点组合的容器和执行入口
-## 
+##
 ## 用法：
 ##   var graph := EffectGraph.new()
 ##   graph.root = my_sequence_node
 ##   graph.run(ctx)
-## 
+##
 ## 这是"规则列表" → "可组合图"的关键跃迁
 
 ## 根节点（执行入口）
@@ -14,11 +14,13 @@ extends Resource
 
 
 ## 执行图
-func run(ev: CombatEvent) -> void:
+func run(ev: CombatEvent, before_effect: Callable = Callable()) -> bool:
 	if not root:
-		return
+		return false
 	var ctx := EffectGraphContext.from_event(ev)
+	ctx.before_effect = before_effect
 	root.process(ctx)
+	return ctx.accepted
 
 
 ## 从 TriggeredEffect 的旧模式迁移：条件列表 → ConditionGate + 效果

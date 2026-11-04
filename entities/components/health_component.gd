@@ -6,6 +6,7 @@ extends Node
 ## 属性
 @export var max_hp: int = 100
 @export var invincible_duration: float = 0.5
+@export var invincibility_blocks_status := true
 @export var regen_delay: float = 5.0
 @export var regen_rate: float = 3.0
 
@@ -21,6 +22,8 @@ var _time_since_damage: float = 0.0
 var _regen_accumulator: float = 0.0
 var _invincibility_remaining := 0.0
 var _hit_group_depth := 0
+var _hit_policies: Array[bool] = []
+var _periodic_depth := 0
 var _group_damaged := false
 var _active_family := ""
 var _invincibility_family := ""
@@ -39,15 +42,7 @@ func setup(shape: CollisionShape2D) -> void:
 
 ## 注册到 SimulationRuntime（统一 tick）
 func _register_with_simulation() -> void:
-	var gr := GameRuntime.instance
-	if not gr:
-		call_deferred("_register_with_simulation")
-		return
-	var sim := gr.get_simulation_runtime()
-	if not sim:
-		call_deferred("_register_with_simulation")
-		return
-	sim.register_ticker(self)
+	RuntimeRegistration.register_ticker(self)
 
 
 ## 统一 tick 入口（由 SimulationRuntime 驱动，替代独立 _process）
@@ -70,15 +65,15 @@ func tick(delta: float) -> void:
 
 
 func take_damage(amount: int) -> void:
-	var same_action := _hit_group_depth > 0 and not _active_family.is_empty() and _active_family == _invincibility_family
-	if (invincible and not same_action) or is_dead or amount <= 0:
+	if not can_receive_damage(_active_family) or amount <= 0:
 		return
 	var buffs := get_parent().get_node_or_null("BuffManager") as BuffManager
 	if buffs:
 		amount = maxi(1, ceili(amount * buffs.get_damage_taken_multiplier()))
 
+	var previous_hp := hp
 	hp = maxi(0, hp - amount)
-	if _hit_group_depth > 0:
+	if _hit_group_depth > 0 and _periodic_depth == 0:
 		_group_damaged = true
 	_time_since_damage = 0.0
 	health_changed.emit(hp, max_hp)
@@ -89,7 +84,7 @@ func take_damage(amount: int) -> void:
 	if hp <= 0:
 		is_dead = true
 		# 发射 ON_KILL 事件（在 died 信号之前）
-		_emit_kill_event(amount)
+		_emit_kill_event(maxi(0, amount - previous_hp))
 		died.emit()
 		if _collision_shape:
 			_collision_shape.set_deferred("disabled", true)
@@ -98,13 +93,24 @@ func take_damage(amount: int) -> void:
 	if _hit_group_depth == 0:
 		_start_invincibility()
 
-func begin_hit_group(family_id: String = "") -> void:
+func can_receive_damage(family: String = "", periodic: bool = false) -> bool:
+	return not is_dead and (periodic or _periodic_depth > 0 or not invincible or (not family.is_empty() and family == _invincibility_family))
+
+func can_receive_status(family: String = "") -> bool:
+	return not is_dead and (not invincibility_blocks_status or can_receive_damage(family))
+
+func begin_hit_group(family_id: String = "", periodic: bool = false) -> void:
 	if _hit_group_depth == 0:
 		_group_damaged = false
 		_active_family = family_id
 	_hit_group_depth += 1
+	_hit_policies.append(periodic)
+	if periodic:
+		_periodic_depth += 1
 
 func end_hit_group() -> void:
+	if not _hit_policies.is_empty() and _hit_policies.pop_back():
+		_periodic_depth -= 1
 	_hit_group_depth = maxi(0, _hit_group_depth - 1)
 	if _hit_group_depth == 0 and _group_damaged and not is_dead:
 		_start_invincibility()

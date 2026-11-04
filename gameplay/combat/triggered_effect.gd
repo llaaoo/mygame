@@ -1,11 +1,11 @@
 class_name TriggeredEffect
 extends Resource
 ## 触发式效果 — Event + Condition + Effect 的完整闭环
-## 
+##
 ## 支持两种模式：
 ##   1. 简单模式：conditions[] + _execute()（向后兼容）
 ##   2. 图模式：graph: EffectGraph（组合节点树）
-## 
+##
 ## 当 graph 不为 null 时，优先使用图模式
 
 ## ── 配置 ──
@@ -49,7 +49,7 @@ func unregister() -> void:
 		CombatEventBus.instance.unsubscribe(trigger_type, _on_event)
 
 
-## 内部回调：冷却 → 递归守卫 → 条件/图 → 执行
+## 内部回调：递归守卫 → 可用性查询 → 条件/图 → 冷却提交 → 执行
 func _on_event(ev: CombatEvent) -> void:
 	if not enabled:
 		return
@@ -59,23 +59,21 @@ func _on_event(ev: CombatEvent) -> void:
 	if CombatEventBus._emit_depth > max_recursion + 1:
 		return
 
-	# 冷却检查委托给 CombatExecutor（唯一冷却权威）
-	if cooldown > 0 and CombatExecutor.instance:
-		if not CombatExecutor.instance.check_trigger_cooldown(self, cooldown):
-			return
-
-	# 🆕 图模式：优先
-	if graph and graph.root:
-		graph.run(ev)
+	if cooldown > 0 and CombatExecutor.instance and not CombatExecutor.instance.can_trigger(self):
 		return
-
-	# 简单模式：条件 → 执行
+	if graph and graph.root:
+		graph.run(ev, _claim_cooldown)
+		return
 	var ctx := _build_context(ev)
 	for cond in conditions:
 		if cond and not cond.check(ctx):
 			return
+	# Claim before dispatch so a nested matching event cannot reenter the effect.
+	if _claim_cooldown():
+		_execute(ev)
 
-	_execute(ev)
+func _claim_cooldown() -> bool:
+	return not CombatExecutor.instance or CombatExecutor.instance.claim_trigger_cooldown(self, cooldown)
 
 
 ## 构建条件评估上下文

@@ -7,6 +7,8 @@ extends EffectNode
 
 
 func process(ctx: EffectGraphContext) -> void:
+	if not ctx.accept_effect():
+		return
 	var src_name: String = ctx.source.name if ctx.source else "?"
 	var tgt_name: String = ctx.target.name if ctx.target else "?"
 	print("📊 [Graph:%s] %s | src=%s → tgt=%s | data=%s" % [

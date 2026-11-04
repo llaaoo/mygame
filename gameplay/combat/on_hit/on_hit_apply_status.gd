@@ -16,33 +16,36 @@ static func create(tag: String, buff_path: String) -> OnHitApplyStatus:
 	effect.trigger_type = CombatEvent.Type.ON_HIT
 	effect.scope_source = "skill"
 	effect.max_recursion = 0
-	
+
 	var cond := SkillTagCondition.new()
 	cond.required_skill_tag = tag
 	effect.conditions = [cond]
-	
+
 	effect.required_skill_tag = tag
 	effect.status_buff_path = buff_path
 	return effect
 
 
 func _execute(ev: CombatEvent) -> void:
+	var result := ev.data.get("hit_result") as HitResult
+	if result and not result.status_accepted:
+		return
 	var target := ev.target
 	if not target:
 		return
-	
+
 	var buff_manager := target.get_node_or_null("BuffManager")
 	if not buff_manager:
 		return
-	
+
 	var buff := load(status_buff_path) as Buff
 	if not buff:
 		push_warning("[OnHitApplyStatus] 无法加载: %s" % status_buff_path)
 		return
-	
+
 	if required_skill_tag in ["water", "ice"]:
 		buff_manager.remove_status("burning")
 	if required_skill_tag == "water":
 		buff_manager.remove_status("poison")
-	buff_manager.apply_buff(buff.duplicate(true))
+	buff_manager.apply_buff(buff, ev.source, ev.skill)
 	print("🔥 [OnHitApplyStatus] %s → %s 挂 %s" % [ev.source.name if ev.source else "?", target.name, buff.display_name])

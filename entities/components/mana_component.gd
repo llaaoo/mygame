@@ -12,6 +12,7 @@ signal mp_changed(current_mp: int, max_mp: int)
 var mp: int = 50
 var _time_since_use: float = 0.0
 var _regen_accumulator: float = 0.0
+var _transaction: Dictionary = {}
 
 
 func _ready() -> void:
@@ -23,15 +24,7 @@ func _ready() -> void:
 
 ## 注册到 SimulationRuntime（统一 tick）
 func _register_with_simulation() -> void:
-	var gr := GameRuntime.instance
-	if not gr:
-		call_deferred("_register_with_simulation")
-		return
-	var sim := gr.get_simulation_runtime()
-	if not sim:
-		call_deferred("_register_with_simulation")
-		return
-	sim.register_ticker(self)
+	RuntimeRegistration.register_ticker(self)
 
 
 ## 统一 tick 入口（由 SimulationRuntime 驱动，替代独立 _process）
@@ -45,7 +38,7 @@ func tick(delta: float) -> void:
 		if amt > 0:
 			_regen_accumulator -= amt
 			mp = mini(max_mp, mp + amt)
-			mp_changed.emit(mp, max_mp)
+			notify_changed()
 
 
 ## 消耗 MP，返回是否成功
@@ -57,11 +50,31 @@ func use_mp(amount: int) -> bool:
 	mp -= amount
 	_time_since_use = 0.0
 	_regen_accumulator = 0.0
-	mp_changed.emit(mp, max_mp)
+	notify_changed()
 	return true
 
 
 ## 回复 MP（药水/Buff 等调用）
 func restore_mp(amount: int) -> void:
 	mp = mini(max_mp, mp + amount)
-	mp_changed.emit(mp, max_mp)
+	notify_changed()
+
+func notify_changed() -> void:
+	if _transaction.is_empty():
+		mp_changed.emit(mp, max_mp)
+
+func begin_transaction() -> void:
+	assert(_transaction.is_empty())
+	_transaction = {"mp": mp, "max_mp": max_mp, "time": _time_since_use, "accumulator": _regen_accumulator}
+
+func finish_transaction(commit: bool) -> Callable:
+	if _transaction.is_empty():
+		return Callable()
+	var changed: bool = mp != _transaction.mp or max_mp != _transaction.max_mp
+	if not commit:
+		mp = _transaction.mp
+		max_mp = _transaction.max_mp
+		_time_since_use = _transaction.time
+		_regen_accumulator = _transaction.accumulator
+	_transaction.clear()
+	return notify_changed if commit and changed else Callable()

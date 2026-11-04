@@ -239,12 +239,11 @@ func _layout_for_room(index: int, room_type: String) -> RefCounted:
 
 func _rebuild_room(layout: RefCounted) -> void:
 	if _room_root and is_instance_valid(_room_root):
-		_unregister_room_map_objects(_room_root)
-		_room_root.queue_free()
+		GameRuntime.instance.get_region_session().leave(_room_root, _player)
 
 	_room_root = Node2D.new()
 	_room_root.name = "RunArena_%s_%d" % [layout.template_id, state.room_index + 1]
-	_scene_root.add_child(_room_root)
+	GameRuntime.instance.get_region_session().mount(_room_root, _scene_root)
 
 	_build_floor(layout)
 	_build_walls(layout.arena_size)
@@ -252,14 +251,6 @@ func _rebuild_room(layout: RefCounted) -> void:
 		_add_room_obstacle(layout.obstacles[i], i)
 
 
-func _unregister_room_map_objects(root: Node) -> void:
-	var gr := GameRuntime.instance
-	if not gr or not gr.get_world_runtime():
-		return
-	for child in root.get_children():
-		if child is MapObject:
-			gr.get_world_runtime().unregister_object(child)
-		_unregister_room_map_objects(child)
 
 
 func _build_floor(layout: RefCounted) -> void:

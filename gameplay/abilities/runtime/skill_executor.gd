@@ -1,7 +1,7 @@
 class_name SkillExecutor
 extends Node
 ## 核心执行器 — 调度器 + 分阶段 Modifier Pipeline
-## 
+##
 ## 职责：
 ##   1. 持有分阶段 modifier 管线（FLAT → MULTIPLY → OVERRIDE → FINAL）
 ##   2. execute() 统一施法入口
@@ -14,6 +14,8 @@ extends Node
 
 ## ── 分阶段 Modifier 管线 ──
 ## key = DamageModifier.Stage (int), value = Array[DamageModifier] (已按 priority 排序)
+var _movement_tweens: Array[Tween] = []
+
 var modifiers_by_stage: Dictionary = {
 	DamageModifier.Stage.FLAT: [],
 	DamageModifier.Stage.MULTIPLY: [],
@@ -162,15 +164,19 @@ func execute(skill: SkillData, context: CastContext) -> bool:
 
 	return ok
 
-func commit_batch(batch: SkillExecutionBatch) -> void:
+func commit_batch(batch: SkillExecutionBatch, commit_resources: Callable = Callable()) -> void:
 	var runtime := CombatExecutor.instance
 	if runtime:
 		runtime.enter_phase(CombatPhase.Phase.MODIFIER)
 		runtime.enter_phase(CombatPhase.Phase.EFFECT)
 	for entry in batch.nodes:
 		entry.world.add_child.call_deferred(entry.node)
+	for effect in batch.effects:
+		effect.call()
 	for entry in batch.buffs:
-		entry.manager.apply_buff(entry.buff)
+		entry.manager.apply_buff(entry.buff, entry.get("source"), entry.get("skill"))
+	if commit_resources.is_valid():
+		commit_resources.call()
 	if runtime:
 		runtime.enter_phase(CombatPhase.Phase.EVENT)
 	for entry in batch.casts:
@@ -181,6 +187,25 @@ func commit_batch(batch: SkillExecutionBatch) -> void:
 	batch.nodes.clear()
 	batch.buffs.clear()
 	batch.casts.clear()
+	batch.effects.clear()
+
+func can_execute(skill: SkillData, actor: Node2D) -> bool:
+	match skill.skill_type:
+		SkillData.SkillType.BUFF:
+			return skill.buff_resource != null and actor.has_node("BuffManager")
+		SkillData.SkillType.DASH:
+			return actor is CharacterBody2D and skill.dash_speed > 0
+		SkillData.SkillType.SUMMON:
+			var manager := actor.get_node_or_null("SummonManager") as SummonManager
+			return skill.summon_data != null and manager != null and manager.can_summon()
+		SkillData.SkillType.PROJECTILE, SkillData.SkillType.AOE:
+			var scene := skill.projectile_scene if skill.skill_type == SkillData.SkillType.PROJECTILE else skill.aoe_scene
+			if not scene and skill.skill_type == SkillData.SkillType.PROJECTILE:
+				scene = skill.scene
+			if not scene and _ARCHETYPE_SCENES.has(skill.archetype):
+				scene = load(_ARCHETYPE_SCENES[skill.archetype]) as PackedScene
+			return scene != null
+	return false
 
 
 ## 发射战斗事件 → CombatExecutor（唯一权威入口）
@@ -200,7 +225,7 @@ const _ARCHETYPE_SCENES := {
 
 func _execute_projectile(skill: SkillData, ctx: CastContext) -> bool:
 	var scene: PackedScene
-	
+
 	# 优先用 SkillData 显式指定的场景（兼容旧数据）
 	if skill.projectile_scene:
 		scene = skill.projectile_scene
@@ -208,7 +233,7 @@ func _execute_projectile(skill: SkillData, ctx: CastContext) -> bool:
 		scene = skill.scene
 	elif not skill.archetype.is_empty() and _ARCHETYPE_SCENES.has(skill.archetype):
 		scene = load(_ARCHETYPE_SCENES[skill.archetype]) as PackedScene
-	
+
 	if not scene:
 		push_warning("[SkillExecutor] 无可用 archetype 场景: %s" % skill.archetype)
 		return false
@@ -256,13 +281,14 @@ func _execute_buff(skill: SkillData, ctx: CastContext) -> bool:
 	if not buff_manager:
 		return false
 	var buff := skill.buff_resource.duplicate() as Buff
+	buff.set_meta("definition_path", skill.buff_resource.resource_path)
 	if skill.buff_duration > 0:
 		buff.duration = skill.buff_duration
 	buff.duration = _get_buff_duration_with_mastery(buff, ctx.caster)
 	if ctx.batch:
-		ctx.batch.buffs.append({"manager": buff_manager, "buff": buff})
+		ctx.batch.buffs.append({"manager": buff_manager, "buff": buff, "source": ctx.caster, "skill": skill})
 	else:
-		buff_manager.apply_buff(buff)
+		buff_manager.apply_buff(buff, ctx.caster, skill)
 	# trace 由 BuffManager.apply_buff 统一记录
 	return true
 
@@ -271,17 +297,17 @@ func _execute_buff(skill: SkillData, ctx: CastContext) -> bool:
 
 func _execute_aoe(skill: SkillData, ctx: CastContext) -> bool:
 	var scene: PackedScene
-	
+
 	# 优先用 SkillData 显式指定的场景（兼容旧数据）
 	if skill.aoe_scene:
 		scene = skill.aoe_scene
 	elif not skill.archetype.is_empty() and _ARCHETYPE_SCENES.has(skill.archetype):
 		scene = load(_ARCHETYPE_SCENES[skill.archetype]) as PackedScene
-	
+
 	if not scene:
 		push_warning("[SkillExecutor] 无可用 AoE archetype 场景: %s" % skill.archetype)
 		return false
-	
+
 	var instance := scene.instantiate() as Node2D
 	# call_deferred 防止在物理查询链中触发 "flushing queries" 错误
 	if ctx.batch:
@@ -294,7 +320,7 @@ func _execute_aoe(skill: SkillData, ctx: CastContext) -> bool:
 	else:
 		var spawn_position := ctx.caster.global_position + ctx.direction * skill.cast_distance
 		instance.position = ctx.world.to_local(spawn_position) if ctx.world is Node2D else spawn_position
-	
+
 	if instance.has_method("setup"):
 		instance.setup(skill, ctx.caster)
 		if "damage" in instance:
@@ -310,7 +336,7 @@ func _execute_aoe(skill: SkillData, ctx: CastContext) -> bool:
 			instance.damage = dmg
 		if instance.has_method("set_caster"):
 			instance.set_caster(ctx.caster)
-	
+
 	instance.set_meta("skill_data", skill)
 	instance.set_meta("execution_family", ctx.family_id)
 	instance.set_meta("_combat_trace", CombatDebugger.active())
@@ -325,6 +351,13 @@ func _execute_aoe(skill: SkillData, ctx: CastContext) -> bool:
 func _execute_dash(skill: SkillData, ctx: CastContext) -> bool:
 	if not ctx.caster is CharacterBody2D:
 		return false
+	if ctx.batch:
+		ctx.batch.effects.append(_perform_dash.bind(skill, ctx))
+		return true
+	_perform_dash(skill, ctx)
+	return true
+
+func _perform_dash(skill: SkillData, ctx: CastContext) -> void:
 	var body := ctx.caster as CharacterBody2D
 	var target_pos := body.global_position + ctx.direction * skill.dash_distance
 
@@ -332,6 +365,8 @@ func _execute_dash(skill: SkillData, ctx: CastContext) -> bool:
 		target_pos = _find_shadow_step_target(body, ctx.direction, skill.dash_distance)
 
 	var tween := body.create_tween()
+	_movement_tweens = _movement_tweens.filter(func(active: Tween): return active.is_valid() and active.is_running())
+	_movement_tweens.append(tween)
 	tween.tween_property(body, "global_position", target_pos,
 		body.global_position.distance_to(target_pos) / skill.dash_speed
 	).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
@@ -344,7 +379,6 @@ func _execute_dash(skill: SkillData, ctx: CastContext) -> bool:
 		_record_buff_trace(buff_preview, ctx.caster.name)
 
 		tween.tween_callback(_apply_dash_buff.bind(skill, ctx.caster))
-	return true
 
 
 func _find_shadow_step_target(body: CharacterBody2D, direction: Vector2, max_dist: float) -> Vector2:
@@ -395,15 +429,22 @@ func _execute_summon(skill: SkillData, ctx: CastContext) -> bool:
 		return false
 
 	var instance := scene.instantiate() as SummonEntity
-	ctx.world.add_child.call_deferred(instance)
+	if ctx.batch:
+		ctx.batch.nodes.append({"node": instance, "world": ctx.world})
+	else:
+		ctx.world.add_child.call_deferred(instance)
 
 	# 在玩家身后生成
 	var spawn_pos := ctx.caster.global_position - ctx.direction * 50.0
 	# 加一点随机偏移，多个召唤物不重叠
 	spawn_pos += Vector2(randf_range(-30, 30), randf_range(-30, 30))
-	instance.global_position = spawn_pos
+	instance.position = ctx.world.to_local(spawn_pos) if ctx.world is Node2D else spawn_pos
 
-	instance.setup(_build_scaled_summon_data(skill.summon_data, player), player, manager)
+	var configure := instance.setup.bind(_build_scaled_summon_data(skill.summon_data, player), player, manager)
+	if ctx.batch:
+		ctx.batch.effects.append(configure)
+	else:
+		configure.call()
 	instance.set_meta("skill_data", skill)
 
 	return true
@@ -527,3 +568,9 @@ func clear_modifiers() -> void:
 ## 桶内排序：priority 小的先执行
 func _sort_bucket(stage: DamageModifier.Stage) -> void:
 	modifiers_by_stage[stage].sort_custom(func(a: DamageModifier, b: DamageModifier): return a.priority < b.priority)
+
+func cancel_pending_effects() -> void:
+	for tween in _movement_tweens:
+		if tween.is_valid():
+			tween.kill()
+	_movement_tweens.clear()

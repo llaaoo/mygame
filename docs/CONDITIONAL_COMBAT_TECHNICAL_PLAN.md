@@ -1,15 +1,12 @@
 # 条件组合与探索：技术架构评估和迭代方案
 
-> 2026-11-04 联动修订：当前探索MVP已支持不同类法阵并存、相容结果共同触发及完整费用提交。下文早期“最多一个阵/全局只选一个主动配方”约束保留作历史基线；本轮产品依据见 [Outward联动复盘](./OUTWARD_INTERACTION_REVIEW.md)，实际范围见 [MVP实现说明](./MVP_RELEASE.md)。
-
-> 日期：2026-11-04（Asia/Shanghai）；版本：v0.1。
-> 需求基线：[探索与条件组合战斗设计](./EXPLORATION_COMBINATION_DESIGN.md)。
-> 当前实施优先级：火花与火阵触发火球，区分基础动作和组合结果；暂停新增装备，重点完善技能与组合。
-> 后续进展：多配方、霜阵、固定发现、日志、探索入口及独立进度恢复已接入 MVP。本文下方的“当前代码”保留评估时基线，最新模块与验证见 [MVP 实现说明](./MVP_RELEASE.md)。
-> 后续素材/制造需求见 [施法素材扩展记录](./CASTING_MATERIALS_DESIGN.md)。当前只在技能公共流程设计中保持条件、结果修正与消耗提交的清楚边界，不提前实现素材、库存预留或制造组件。
-> 本文依据当前代码进行静态核对，引用之前独立行为检查已复现的问题；本文新增的组件、接口与测试均为计划，不代表已经实现。
-
-> 后续实现进展：火阵与火花的首条链已落地，见 [火阵原型](./FIRE_SIGIL_PROTOTYPE.md)。复用本评估中的个人会话和配方边界，但尚未完成全部 T0/T1、通用组合框架或探索持久化。下文“当前实现”保留评估时的基线，具体原型行为以实现说明和测试为准。
+> 更新：2026-11-04。本文保留方案评估时的覆盖矩阵和长期设计；下文“当前代码”“缺失”和计划接口名描述早期基线，不能作为现状清单。
+>
+> 当前探索MVP已实现多法阵相容结果、15条法术组合规则、材料/恩赐、机关、知识发现与持久化。A—D重构已落地CastContext、类型化CastPlan/组件、CastTransaction、StatusInstance/属性重算、HitResult、共享RegionSession和内容验证；详见[重构进展](./REFACTOR_PROGRESS.md)与[当前架构](./ARCHITECTURE.md)。原计划的CastRequest/ActionPlan分别沿用现有CastContext/CastPlan。
+>
+> “法术组合规则”表示技能、法阵和状态的条件关系；施法材料在规划中修正结果。“制造配方”表示原料转为库存物品，独立使用CraftingRecipe。材料、生存与制造的已实现/后续边界见[施法材料说明](./CASTING_MATERIALS_DESIGN.md)，产品范围见[MVP实现说明](./MVP_RELEASE.md)。
+>
+> 完整T0/T1、武器准备、防御等仍按产品需求迭代；本轮没有增加装备、生存指标或通用规则语言。Outward参考与组合取舍见[联动复盘](./OUTWARD_INTERACTION_REVIEW.md)。
 
 ## 1. 架构判断
 
@@ -35,17 +32,17 @@
 | 需求 | 当前实现与证据 | 判断 | 处理 |
 |---|---|---|---|
 | 基础伤害、命中、事件 | `CombatExecutor.report_hit()`、投射物/AoE/近战调用 | 可复用，需扩展上下文和结果 | 保持唯一伤害入口 |
-| 法术效果模板 | `SkillData`、`SkillExecutor`、projectile/AoE/Buff/Dash/Summon | 可复用 | 让组合选择结果，不为每个配方复制场景 |
+| 法术效果模板 | `SkillData`、`SkillExecutor`、projectile/AoE/Buff/Dash/Summon | 可复用 | 让组合选择结果，不为每个法术组合规则复制场景 |
 | 持续状态、刷新、互斥 | `BuffManager` 有时限、叠层、exclusive_group、remove_status | 部分满足 | 增加实例来源、消耗校验、移除原因 |
 | 条件纯判定 | `Condition`、`StatusCondition` 可检查 source/target | 部分满足 | 复用纯条件思想，适配主动上下文和原因，不滥用事件 ctx |
-| 主动条件组合 | 无法阵/配方解析路径 | 缺失 | 新增配方数据与解析器 |
+| 主动条件组合 | 无法阵/法术组合规则解析路径 | 缺失 | 新增法术组合规则数据与解析器 |
 | 准备、中断、条件消耗 | Player 内有蓄力和引导，SkillManager 只检查 MP 并立即执行 | 不满足 | 收敛角色动作生命周期 |
 | 法阵 | 持续 AoE 有位置和命中，但没有所有者限额/触发次数/准备查询契约 | 缺失 | 新增法阵实例与小型区域注册表 |
 | 武器附魔 | 装备有标签和数值修正；近战直接使用 attack_damage | 不满足 | 武器准备状态与近战上下文适配 |
 | 护盾与格挡 | HealthComponent 有无敌；未找到完整格挡/吸收结算组件 | 缺失 | 增加受击防御组件和已结算结果 |
 | 状态联动 | SkillSynergyResolver 在 ON_HIT 后触发额外伤害/施法 | 可保留，不等同主动组合 | 规范事件阶段、来源与递归 |
 | 材质/表面反应 | SurfaceReaction、SurfaceManager、传播/重生调度存在 | 部分满足 | 修查询契约，增加有限物件反应与来源传递 |
-| 已学能力、配方和日志 | SkillPool 是目录；Player 初始化加入全部 30 法术，精通负责门槛 | 缺失 | 新增角色能力/知识记录，目录与拥有状态分离 |
+| 已学能力、法术组合规则和日志 | SkillPool 是目录；Player 初始化加入全部 30 法术，精通负责门槛 | 缺失 | 新增角色能力/知识记录，目录与拥有状态分离 |
 | 装备改变组合行为 | EquipmentManager 汇总数值；标签未形成统一能力查询 | 部分满足 | 增加有限、类型明确的组合修正 |
 | 区域切换 | RegionRuntime.ensure_region()、MarkerRegistry、WorldStateManager | 部分满足 | 显式区域根、稳定对象 ID、切换清理顺序 |
 | 唯一奖励和世界里程碑 | 有物件状态和宝箱 opened，但不是统一奖励事务 | 不满足 | 固定奖励入口、领取记录与状态写回 |
@@ -99,7 +96,7 @@ flowchart TD
     Input[输入或 AI 意图] --> Action[Action / Player 输入适配]
     Action --> Manager[SkillManager：个人动作会话]
     Manager --> Query[采集当前条件上下文]
-    Query --> Resolver[CombinationResolver：纯解析]
+    Query --> Resolver[SpellCombinationResolver：纯解析]
     Resolver --> Plan[ActionPlan：结果、费用、消耗与失败原因]
     Plan --> Preview[HUD / 瞄准 / 条件提示]
     Plan --> Prepare[角色准备与中断]
@@ -111,12 +108,12 @@ flowchart TD
     Execute --> World[现有世界命令与表面反应]
 ```
 
-这是一次个人主动动作的路径。被动命中联动和世界后续反应仍走现有事件/命令，不倒流回主动输入配方解析。
+这是一次个人主动动作的路径。被动命中联动和世界后续反应仍走现有事件/命令，不倒流回主动输入法术组合规则解析。
 
 | 状态 | 唯一所有者 | 存档策略 |
 |---|---|---|
-| 内容目录与配方模板 | 只读 Resource 目录 | 保存 ID/版本，不保存 Node |
-| 已学技能、配方、永久强化、日志 | CharacterAbilityState | 长期保存 |
+| 内容目录与法术组合规则模板 | 只读 Resource 目录 | 保存 ID/版本，不保存 Node |
+| 已学技能、法术组合规则、永久强化、日志 | CharacterAbilityState | 长期保存 |
 | 槽位配置 | 现有 Loadout/SkillManager | 保存能力 ID 映射 |
 | 准备会话、冷却和取消恢复 | SkillManager 的个人运行态 | 返回营地重置，不冒充永久进度 |
 | 法力 | ManaComponent | 按角色恢复/营地策略处理 |
@@ -132,14 +129,14 @@ WeaponPreparationState 只维护武器准备，不能再维护一份与 BuffMana
 
 名称为建议，实际落地可合并小型纯数据类；不以文件数量衡量完成度。
 
-### A. 配方与纯解析模块
+### A. 法术组合规则与纯解析模块
 
 建议位置：`gameplay/abilities/combinations/`。
 
-- `CombinationRecipe` Resource：id、trigger_action_id、conditions、priority、result_action_id、费用与条件消耗声明、冷却组、展示信息。
+- `SpellCombinationRule` Resource：id、trigger_action_id、conditions、priority、result_action_id、费用与条件消耗声明、冷却组、展示信息。
 - `CombinationContext` RefCounted：角色身份、动作 ID、已学能力、装备版本、自有法阵句柄、相关状态句柄；只读快照，不修改世界。
 - `CombinationResolution`：匹配结果、可执行性、失败原因、总费用、预览数据。无匹配返回基础动作；防御降级按设计中明确例外执行。
-- `CombinationResolver`：纯函数式解析，稳定优先级；同优先级用配置 ID 稳定排序并在内容校验中报告意外冲突。
+- `SpellCombinationResolver`：纯函数式解析，稳定优先级；同优先级用配置 ID 稳定排序并在内容校验中报告意外冲突。
 
 复用现有 Condition 的无副作用接口思想，增加主动上下文适配及失败原因输出；已有 StatusCondition 不能不经适配就读取法阵、武器与知识。首版仅支持有限条件，不做表达式解释器。
 
@@ -149,7 +146,7 @@ WeaponPreparationState 只维护武器准备，不能再维护一份与 BuffMana
 
 会话状态：IDLE → PREPARING → READY_TO_COMMIT → COMMITTED → RECOVERY；准备期可进入 CANCELLED/INVALID。成功提交后不得再以“准备取消”退款。
 
-`ActionPlan` 包含 execution_id、输入动作与结果动作 ID、recipe_id、总成本、基础和组合冷却键、需要消耗的状态/法阵版本、准备时间及释放位置策略。
+`ActionPlan` 包含 execution_id、输入动作与结果动作 ID、rule_id、总成本、基础和组合冷却键、需要消耗的状态/法阵版本、准备时间及释放位置策略。
 
 预览与执行调用同一个解析器。释放时核对条件、装备、法阵位置/次数、角色状态和资源；计划过期时取消并返回原因，不悄悄改成另一个有副作用的结果。
 
@@ -187,16 +184,16 @@ WeaponPreparationState 只维护武器准备，不能再维护一份与 BuffMana
 
 保留 ON_HIT 的旧语义用于兼容，不能假定已有订阅者都可改变顺序。新增一个有明确用途的 `ON_HIT_RESOLVED` 到现有 CombatEventBus，霜卫和真实损血反馈观察这个事件；回溯迁移旧联动，避免同一效果订阅两处。新增事件不等于新增总线。
 
-Player.take_damage、Enemy.take_damage、HealthComponent 要有适配方案，确保不重复减伤、不重复扣血、不对 0 伤害强制取 1。不是重写 CombatExecutor，而是在唯一入口下补齐受击结果契约。
+Player.take_damage、Enemy.take_damage、HealthComponent 要有适法术组合规则案，确保不重复减伤、不重复扣血、不对 0 伤害强制取 1。不是重写 CombatExecutor，而是在唯一入口下补齐受击结果契约。
 
 ### F. 能力、知识与固定奖励入口
 
 建议 `gameplay/progression/`，先两个轻量模块：
 
-- `CharacterAbilityState`：已学动作、配方、强化，日志条目，稳定 ID 查询与序列化；可以组合内部字典，无需每个字典一个 Node。
+- `CharacterAbilityState`：已学动作、法术组合规则、强化，日志条目，稳定 ID 查询与序列化；可以组合内部字典，无需每个字典一个 Node。
 - `DiscoveryGrantService`：通过 grant_id 检查是否领取，应用能力/物品/日志奖励，写入领取标记并请求自动保存。被重复调用返回 already_granted，不重复发奖。
 
-世界基础反应不查 recipe_learned；主动术式查。SkillPool 仍负责资源索引，精通只提供新的成长策略允许的修正，不再作为另一套拥有清单。
+世界基础反应不查 spell_rule_learned；主动术式查。SkillPool 仍负责资源索引，精通只提供新的成长策略允许的修正，不再作为另一套拥有清单。
 
 固定奖励首次尽量直接授予，避免“宝箱已保存打开、掉出的唯一物品未捡起就消失”。奖励包与领取标记采用一致存档快照；失败时不记录已领取。以后若支持地面唯一物品，需同时持久化领取前的地面实体。
 
@@ -210,7 +207,7 @@ Player.take_damage、Enemy.take_damage、HealthComponent 要有适配方案，�
 
 HUD/瞄准读取 CombinationResolution，显示实际结果、总成本和不可用原因。法阵/附魔变化及装备变化使预览失效重算；不让 UI 自己维护另一套条件判断。
 
-知识日志显示持久记录，配方视图读取只读模板；不从 UI 扣 MP、消费附魔、直接设置 learned 字典。优先扩展现有 HUD/技能编组 UI，不建立另一套技能栏。
+知识日志显示持久记录，法术组合规则视图读取只读模板；不从 UI 扣 MP、消费附魔、直接设置 learned 字典。优先扩展现有 HUD/技能编组 UI，不建立另一套技能栏。
 
 ## 6. 必须迭代的现有组件
 
@@ -219,7 +216,7 @@ HUD/瞄准读取 CombinationResolution，显示实际结果、总成本和不可
 | SkillManager | 合并两套执行流程；承接个人会话、统一成本与稳定冷却键 | 普通/蓄力/引导/组合一致检查且不重入消费 |
 | ActionResolver | 不再用原始技能费用提前否决已减耗或组合动作；只做基础意图约束并委托实际计划校验 | 预览、可用提示与执行费用一致 |
 | Player | 保留输入/瞄准/移动；将准备和引导资源流程逐步交给 SkillManager；保留被动执行的明确入口 | 不同输入路径不绕过主动规则 |
-| SkillExecutor / CastContext | 只执行已接受结果；增加执行来源和配方元数据、显式位置有效标志、接受/失败语义 | 世界坐标 (0,0) 可作为合法施法位置；延迟对象可清理 |
+| SkillExecutor / CastContext | 只执行已接受结果；增加执行来源和法术组合规则元数据、显式位置有效标志、接受/失败语义 | 世界坐标 (0,0) 可作为合法施法位置；延迟对象可清理 |
 | CombatExecutor / CombatEvent | 受击结果、来源传播、执行 ID/父链 ID、被动触发限制 | 屏障零损血有效，连锁不重复启动主动组合 |
 | CombatComponent | 近战携带武器/附魔/动作上下文；一个攻击对同一目标只命中一次，普通和释放斩结果分开 | body/area 双回调不双算，释放斩不重复加附魔 |
 | Buff / BuffManager | 定义与运行实例分离；实例来源、版本、消费、移除原因；一致撤销全部叠层 | 消耗不会伪装成到期；清空后属性恢复 |
@@ -232,15 +229,15 @@ HUD/瞄准读取 CombinationResolution，显示实际结果、总成本和不可
 | SaveManager / SaveData | 明确角色/区域/临时策略、启动恢复顺序、自动保存、版本迁移和安全写入 | 关游戏重开正确，唯一奖励不重复且不丢失 |
 | RunManager / main | 模式入口分开；探索入口不执行自动开 run；run 场景用作回归试验场 | 两种模式互不删除对方区域和敌人 |
 
-装备修正先支持有限字段：prepare_time、field_radius、field_duration、recipe_cost、release_shape 等，明确作用对象/合并规则/上下限；复杂行为用显式效果资源。不要把任意字符串键拼成未经检查的第二种脚本语言。
+装备修正先支持有限字段：prepare_time、field_radius、field_duration、spell_rule_cost、release_shape 等，明确作用对象/合并规则/上下限；复杂行为用显式效果资源。不要把任意字符串键拼成未经检查的第二种脚本语言。
 
 ## 7. 事件、时间和身份的公共契约
 
 ### 7.1 被动与主动分开
 
-主动输入才走 CombinationResolver。被动触发明确标为 triggered，执行结果可复用 SkillExecutor，但不能重新消费主动配方的媒介和次数。
+主动输入才走 SpellCombinationResolver。被动触发明确标为 triggered，执行结果可复用 SkillExecutor，但不能重新消费主动法术组合规则的媒介和次数。
 
-事件至少传递 execution_id、parent_execution_id、chain_id、recipe_id、source_actor_id、effect_index、target_id 和命中序号。一次 AoE 的合法多 tick/多目标要有不同 effect/hit 标识，不能仅按 execution_id 去重而丢掉后续伤害。
+事件至少传递 execution_id、parent_execution_id、chain_id、rule_id、source_actor_id、effect_index、target_id 和命中序号。一次 AoE 的合法多 tick/多目标要有不同 effect/hit 标识，不能仅按 execution_id 去重而丢掉后续伤害。
 
 已有 MAX_EVENT_DEPTH 和 MAX_CHAIN_LENGTH 可以保留，但异步投射物/延迟执行也要携带链深及链预算。仅使用当前同步回调深度，无法约束跨帧触发。链上下文应有有界生命周期，不能永久保存所有历史命中 ID。
 
@@ -252,7 +249,7 @@ UI 可以在暂停时处理输入；法阵、状态、陷阱、冷却、准备�
 
 ### 7.3 ID 必须区分用途
 
-- 内容 ID：技能/配方/装备模板，长期稳定。
+- 内容 ID：技能/法术组合规则/装备模板，长期稳定。
 - 角色与区域对象 ID：进度和世界归属，长期稳定。
 - runtime instance ID/revision：法阵、状态、当前装备版本，只在本次运行有效。
 - execution ID：一次施法和事件链，不作为永久学习 ID。
@@ -265,7 +262,7 @@ UI 可以在暂停时处理输入；法阵、状态、陷阱、冷却、准备�
 
 启动顺序：读取/迁移存档 → 建立 GameRuntime 与 providers → 恢复角色能力和基础进度 → 实例化合法营地区域 → 绑定角色、装备和 loadout → 应用装备/成长修正一次 → 清空不应跨营地恢复的状态 → UI 绑定并开放输入。
 
-现有 load_game 主要恢复世界、区域、玩家后再恢复 extensions，新流程不能原封不动沿用，否则组合规则可能在已学配方还没载入时执行。探索恢复与旧 RPG 全快照恢复应有显式策略；旧槽位不静默改写成新语义。
+现有 load_game 主要恢复世界、区域、玩家后再恢复 extensions，新流程不能原封不动沿用，否则组合规则可能在已学法术组合规则还没载入时执行。探索恢复与旧 RPG 全快照恢复应有显式策略；旧槽位不静默改写成新语义。
 
 静态核对还发现 SaveManager.VERSION 为 3，而 SaveData.Root.serialize() 写出 version=2，迁移版本来源需要统一；新 schema 只在迁移实现并验证后确定，不能只改常量。
 
@@ -278,16 +275,16 @@ UI 可以在暂停时处理输入；法阵、状态、陷阱、冷却、准备�
 | 批次 | 必须实现 | 暂不包含 | 验收 |
 |---|---|---|---|
 | T0：稳定与契约 | 暂停、强化/冷却归属、存档启动与版本、测试模式隔离 | 新组合内容 | 现有相关测试通过；此前三项行为缺陷回归通过 |
-| T1：火阵闭环 | 配方/纯解析、个人准备计划、法阵、MP+次数提交、预览、执行 ID | 附魔、日志界面、区域扩张 | 一次火花预览正确；阵内火球且只扣一次；离阵取消不改结果 |
+| T1：火阵闭环 | 法术组合规则/纯解析、个人准备计划、法阵、MP+次数提交、预览、执行 ID | 附魔、日志界面、区域扩张 | 一次火花预览正确；阵内火球且只扣一次；离阵取消不改结果 |
 | T2：附魔与防御 | 武器准备、Buff 实例扩展、近战适配、DefenseComponent、已结算事件 | 通用武器实例系统 | 火附魔普通命中与消耗释放均正确；霜卫吸收一次且不递归 |
 | T3：探索持久化 | 能力记录、固定授予、日志、稳定区域根/对象 ID、世界机关适配 | 无缝开放世界、经济大全 | 领取→切区→重启→回访不丢能力、不重复奖励 |
-| T4：完整样板 | 其余配方、装备修正、敌人窗口/Boss、区域串联 | 新元素和符文序列 | 三种构筑完成样板，同一规则有战斗和探索用途 |
+| T4：完整样板 | 其余法术组合规则、装备修正、敌人窗口/Boss、区域串联 | 新元素和符文序列 | 三种构筑完成样板，同一规则有战斗和探索用途 |
 
-T1 先用临时测试角色授予火阵配方；T3 再接正式学习来源。T1 的计划协议同时预留条件消耗类型，因此 T2 不需要重写它。T0/T1 不要求一次性重构 Player、全部 Buff 和所有存档内容；按涉及路径逐步迁移，旧 API 作为有测试的适配层。
+T1 先用临时测试角色授予火阵法术组合规则；T3 再接正式学习来源。T1 的计划协议同时预留条件消耗类型，因此 T2 不需要重写它。T0/T1 不要求一次性重构 Player、全部 Buff 和所有存档内容；按涉及路径逐步迁移，旧 API 作为有测试的适配层。
 
 ## 10. 验证与内容工具
 
-现有 tests 中没有完整条件配方/法阵/附魔生命周期测试。旧 run 测试通过只能证明旧流程仍可用。
+现有 tests 中没有完整条件法术组合规则/法阵/附魔生命周期测试。旧 run 测试通过只能证明旧流程仍可用。
 
 新增测试应覆盖真实边界：
 
@@ -300,12 +297,12 @@ T1 先用临时测试角色授予火阵配方；T3 再接正式学习来源。T1
 7. 组合结果和基础动作不双伤害，派生投射物跨帧不无限触发。
 8. 存读、唯一奖励、门/宝箱状态、旧版本迁移、保存失败不记录半次领取。
 
-新增小型离线内容校验：ID 重复、悬空 result_action 引用、条件作用域错误、同优先级冲突、非法费用、未指定持久 ID、缺少提示文本。简单报错即可，暂不建设可视化配方编辑器。
+新增小型离线内容校验：ID 重复、悬空 result_action 引用、条件作用域错误、同优先级冲突、非法费用、未指定持久 ID、缺少提示文本。简单报错即可，暂不建设可视化法术组合规则编辑器。
 
-扩展现有 CombatDebugger：记录 base_action → recipe → result、条件快照、失败原因、费用、消耗句柄、HitResult、chain_id。否则“按键没有反应”与“条件不成立”难以区分。
+扩展现有 CombatDebugger：记录 base_action → spell_rule → result、条件快照、失败原因、费用、消耗句柄、HitResult、chain_id。否则“按键没有反应”与“条件不成立”难以区分。
 
 ## 11. 不需要现在建设的架构
 
-不需要：ECS 替换、通用能力图编辑器、第二套事件总线、每个配方一个脚本/场景、全局万能条件数据库、任意脚本表达式、完整 ItemInstance 经济重做、无缝地图流式加载、多人预测/回滚、可恢复任意战斗帧的存档。
+不需要：ECS 替换、通用能力图编辑器、第二套事件总线、每个法术组合规则一个脚本/场景、全局万能条件数据库、任意脚本表达式、完整 ItemInstance 经济重做、无缝地图流式加载、多人预测/回滚、可恢复任意战斗帧的存档。
 
 第一项编码工作建议是 T0 的三个已复现缺陷及动作/冷却归属回归，然后实施 T1。真正需要优先补齐的是可执行与可验证的公共契约，而非增加更多技能、Modifier 或全局 Runtime。

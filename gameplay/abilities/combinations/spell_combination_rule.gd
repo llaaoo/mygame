@@ -1,6 +1,6 @@
-class_name CombinationRecipe
+class_name SpellCombinationRule
 extends Resource
-## Read-only active recipe. Hit synergies remain in SkillSynergyResolver.
+## Read-only active rule. Hit synergies remain in SkillSynergyResolver.
 
 @export var id: String
 @export var trigger_action_id: String

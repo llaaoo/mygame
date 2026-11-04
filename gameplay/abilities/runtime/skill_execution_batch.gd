@@ -3,6 +3,7 @@ extends RefCounted
 ## Detached effects are activated only after every component accepts the action.
 var nodes: Array[Dictionary] = []
 var buffs: Array[Dictionary] = []
+var effects: Array[Callable] = []
 var casts: Array[Dictionary] = []
 
 func abort() -> void:
@@ -12,3 +13,4 @@ func abort() -> void:
 	nodes.clear()
 	buffs.clear()
 	casts.clear()
+	effects.clear()

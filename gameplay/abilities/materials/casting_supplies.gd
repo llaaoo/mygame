@@ -5,18 +5,17 @@ signal changed
 
 const MATERIAL_IDS := ["ash", "resin", "frost_salt", "storm_dust", "echo_ink", "venom_extract", "ward_powder"]
 const RAW_TITLES := {"charcoal": "炭屑", "sap": "树液", "crystal": "晶砂"}
-const CRAFTS := {
-	"ash": {"charcoal": 1}, "resin": {"sap": 2},
-	"frost_salt": {"crystal": 2}, "storm_dust": {"crystal": 1, "charcoal": 1},
-	"echo_ink": {"crystal": 1, "sap": 1}, "venom_extract": {"sap": 2, "charcoal": 1}, "ward_powder": {"ash": 1, "crystal": 1},
-}
 var amounts: Dictionary = {}
 var selected: Dictionary = {}
 var catalog: Dictionary = {}
+var crafting_recipes: Dictionary = {}
+var _transaction: Dictionary = {}
+var _notification_pending := false
 
 func _init() -> void:
 	for id in MATERIAL_IDS:
 		catalog[id] = load("res://content/casting_materials/%s.tres" % id)
+		crafting_recipes[id] = load("res://content/crafting/%s.tres" % id)
 
 func count(id: String) -> int:
 	return int(amounts.get(id, 0))
@@ -28,7 +27,7 @@ func grant(items: Dictionary) -> void:
 	for id in items:
 		if catalog.has(id) or RAW_TITLES.has(id):
 			amounts[id] = count(id) + maxi(0, int(items[id]))
-	changed.emit()
+	_notify_changed()
 
 func can_pay(costs: Dictionary) -> bool:
 	for id in costs:
@@ -42,7 +41,7 @@ func pay(costs: Dictionary) -> bool:
 	for id in costs:
 		amounts[id] = count(id) - int(costs[id])
 	if not costs.is_empty():
-		changed.emit()
+		_notify_changed()
 	return true
 
 func configure(action_id: String, material_id: String) -> void:
@@ -50,12 +49,18 @@ func configure(action_id: String, material_id: String) -> void:
 		selected.erase(action_id)
 	elif catalog.has(material_id):
 		selected[action_id] = material_id
-	changed.emit()
+	_notify_changed()
 
 func craft(id: String) -> bool:
-	if not CRAFTS.has(id) or not pay(CRAFTS[id]):
+	var recipe := crafting_recipes.get(id) as CraftingRecipe
+	if not recipe or not can_pay(recipe.inputs):
 		return false
-	grant({id: 1})
+	begin_transaction()
+	pay(recipe.inputs)
+	grant({recipe.output_id: recipe.output_count})
+	var notify := finish_transaction(true)
+	if notify.is_valid():
+		notify.call()
 	return true
 
 func plan(action: SkillData, base: SkillData, include_required: bool = true) -> Dictionary:
@@ -89,4 +94,26 @@ func restore(data: Dictionary) -> void:
 	for id in data.get("selected", {}):
 		if catalog.has(data.selected[id]):
 			selected[id] = data.selected[id]
-	changed.emit()
+	_notify_changed()
+
+func _notify_changed() -> void:
+	if not _transaction.is_empty():
+		_notification_pending = true
+	else:
+		changed.emit()
+
+func begin_transaction() -> void:
+	assert(_transaction.is_empty())
+	_transaction = serialize()
+	_notification_pending = false
+
+func finish_transaction(commit: bool) -> Callable:
+	if _transaction.is_empty():
+		return Callable()
+	if not commit:
+		amounts = _transaction.amounts
+		selected = _transaction.selected
+	_transaction.clear()
+	var notify := commit and _notification_pending
+	_notification_pending = false
+	return changed.emit if notify else Callable()

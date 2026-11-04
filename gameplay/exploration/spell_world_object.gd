@@ -1,8 +1,9 @@
 class_name SpellWorldObject
 extends Area2D
 ## Spell puzzles consume hit events, including zero-damage utility hits.
-signal solved(spec: Dictionary)
-var spec: Dictionary
+signal solved(spec: SpellPuzzleData)
+signal inspected(spec: SpellPuzzleData, completed: bool)
+var spec: SpellPuzzleData
 var completed := false
 var _steps: Array[int] = []
 var _label: Label
@@ -29,10 +30,7 @@ func _ready() -> void:
 	add_to_group("interactable")
 	var interaction := Interactable.new()
 	interaction.name = "Interactable"
-	interaction.set_callback(func(_actor: Node2D):
-		var scene := get_tree().current_scene
-		if scene is MVPGame:
-			scene.ui.show_panel(spec.title, "机关已解开，奖励已保存。" if completed else spec.hint, [{"title": "继续探索", "callback": scene.ui.close_modal}]))
+	interaction.set_callback(func(_actor: Node2D): inspected.emit(spec, completed))
 	add_child(interaction)
 
 func _exit_tree() -> void:
@@ -47,7 +45,7 @@ func _on_hit(event: CombatEvent) -> void:
 		return
 	var tags: Array = event.skill.tags if event.skill else event.data.get("tags", [])
 	for i in range(_steps.size()):
-		var route: Array = spec.routes[i]
+		var route: PackedStringArray = spec.routes[i].steps
 		if str(route[_steps[i]]) in tags:
 			_steps[i] += 1
 			if _steps[i] >= route.size():

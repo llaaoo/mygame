@@ -1,13 +1,17 @@
 class_name SkillTagCondition
 extends Condition
 ## 技能标签条件 — 检查触发事件关联的技能是否有指定标签
-## 
+##
 ## 示例：if skill has "fire" tag → 触发火焰精通效果
 
 @export var required_skill_tag: String = "fire"
+@export var allow_periodic := false
 
 
 func evaluate(ctx: Dictionary) -> bool:
+	var event := ctx.get("event") as CombatEvent
+	if event and not allow_periodic and "dot" in event.data.get("tags", []):
+		return false
 	var skill: SkillData = ctx.get("skill", null)
 	if not skill:
 		var ev: CombatEvent = ctx.get("event", null)

@@ -1,17 +1,17 @@
 class_name CombatExecutor
 extends Node
 ## 战斗执行器 — 唯一控制流入口
-## 
+##
 ## 原则（Single Authority Rule）：
 ##   - 只有 CombatExecutor 能发射事件
 ##   - 只有 CombatExecutor 能跨阶段调度
 ##   - Modifier/Graph/Projectile/HealthComponent 都必须通过它
-## 
+##
 ## 反模式（禁止）：
 ##   ❌ Projectile._emit_hit_event() 直接调 CombatEventBus
 ##   ❌ HealthComponent._emit_damage_event() 直接调 CombatEventBus
 ##   ❌ Modifier.modify() 内部触发副作用
-## 
+##
 ## 正确模式：
 ##   ✅ Projectile → CombatExecutor.report_hit()
 ##   ✅ HealthComponent → CombatExecutor.report_damage()
@@ -34,9 +34,10 @@ const MAX_CHAIN_LENGTH: int = 10
 ## ── 链式计数 ──
 var _chain_count: int = 0
 var _current_family := ""
+var _current_hit: HitContext
 
 ## ── TriggeredEffect 冷却表（所有权上交） ──
-## key = TriggeredEffect Resource, value = last_trigger_time (float)
+## key = TriggeredEffect Resource, value = remaining simulated seconds (float)
 ## TriggeredEffect 自身不再持有任何运行时状态
 var _trigger_cooldowns: Dictionary = {}
 
@@ -54,23 +55,45 @@ func _exit_tree() -> void:
 
 ## 报告命中 — 唯一伤害入口（事件 + 扣血）
 ## 所有命中源（Projectile/AoE/近战/陷阱/DOT）只能通过此方法造成伤害
-static func report_hit(caster: Node2D, target: Node2D, damage: int, position: Vector2, skill: SkillData = null, tags: Array = [], family_id: String = "") -> void:
-	var health := target.get_node_or_null("HealthComponent") as HealthComponent if is_instance_valid(target) else null
+static func report_hit(caster: Node2D, target: Node2D, damage: int, position: Vector2, skill: SkillData = null, tags: Array = [], family_id: String = "") -> HitResult:
+	var context := HitContext.new(caster, target, damage, position, skill, tags, family_id)
+	var result := HitResult.new()
+	result.attempted_damage = context.damage
+	if not is_instance_valid(target) or not target.has_method("take_damage"):
+		result.rejection = "invalid_target"
+		return result
+	var health := target.get_node_or_null("HealthComponent") as HealthComponent
+	if health and health.is_dead:
+		result.rejection = "dead"
+		return result
+	result.damage_accepted = not health or health.can_receive_damage(family_id, context.periodic)
+	result.status_accepted = not health or (context.periodic and not health.is_dead) or health.can_receive_status(family_id)
+	result.accepted = result.damage_accepted or result.status_accepted
+	if not result.accepted:
+		result.rejection = "invincible"
+		return result
+	var before := health.hp if health else 0
 	if health:
-		health.begin_hit_group(family_id)
-	if not instance:
-		_emit_direct(CombatEvent.Type.ON_HIT, caster, target, {"damage": damage, "position": position, "tags": tags}, skill)
-		_apply_damage(target, damage, tags)
-		if is_instance_valid(health):
-			health.end_hit_group()
-		return
-	var previous_family := instance._current_family
-	instance._current_family = family_id
-	instance._enforce_emit(CombatEvent.Type.ON_HIT, caster, target, {"damage": damage, "position": position, "tags": tags}, skill)
-	_apply_damage(target, damage, tags)
+		health.begin_hit_group(family_id, context.periodic)
+	var previous_family := instance._current_family if instance else ""
+	var previous_hit: HitContext = instance._current_hit if instance else null
+	if instance:
+		instance._current_family = family_id
+		instance._current_hit = context
+	var data := {"damage": context.damage if result.damage_accepted else 0, "position": position, "tags": context.tags, "hit_result": result}
+	if instance:
+		instance._enforce_emit(CombatEvent.Type.ON_HIT, caster, target, data, skill)
+	else:
+		_emit_direct(CombatEvent.Type.ON_HIT, caster, target, data, skill)
+	if result.damage_accepted and is_instance_valid(target):
+		_apply_damage(target, context.damage, context.tags)
 	if is_instance_valid(health):
+		result.damage_dealt = maxi(0, before - health.hp)
 		health.end_hit_group()
-	instance._current_family = previous_family
+	if instance:
+		instance._current_family = previous_family
+		instance._current_hit = previous_hit
+	return result
 
 
 ## 内部：安全调用 Damageable.take_damage()
@@ -78,9 +101,9 @@ static func _apply_damage(target: Node2D, amount: int, tags: Array = []) -> void
 	if amount <= 0:
 		return
 	# 存储命中标签（供 MapObject 判断破坏类型）
-	if not tags.is_empty() and "set_meta" in target:
+	if is_instance_valid(target):
 		target.set_meta("_last_hit_tags", tags)
-	if target and target.has_method("take_damage"):
+	if is_instance_valid(target) and target.has_method("take_damage"):
 		target.take_damage(amount)
 
 
@@ -103,7 +126,7 @@ static func report_kill(target: Node2D, overkill: int, position: Vector2) -> voi
 	if not instance:
 		_emit_direct(CombatEvent.Type.ON_KILL, null, target, {"overkill_damage": overkill, "position": position, "tags": tags}, null)
 		return
-	instance._enforce_emit(CombatEvent.Type.ON_KILL, null, target, {"overkill_damage": overkill, "position": position, "tags": tags}, null)
+	instance._enforce_emit(CombatEvent.Type.ON_KILL, instance._current_hit.source if instance._current_hit else null, target, {"overkill_damage": overkill, "position": position, "tags": tags}, instance._current_hit.skill if instance._current_hit else null)
 
 
 ## 报告施法（替代 SkillExecutor._emit_event）
@@ -117,6 +140,9 @@ static func report_cast(caster: Node2D, target: Node2D, skill: SkillData, extra_
 ## ── 强制执行 ──
 
 func _enforce_emit(type: CombatEvent.Type, source: Node2D, target: Node2D, data: Dictionary, skill: SkillData) -> void:
+	# Independent facts do not share a chain budget across frames/actions.
+	if CombatEventBus._emit_depth == 0:
+		_chain_count = 0
 	# 1. 深度防火墙
 	if CombatEventBus._emit_depth >= MAX_EVENT_DEPTH:
 		_record_firewall("MAX_EVENT_DEPTH=%d" % MAX_EVENT_DEPTH)
@@ -252,13 +278,26 @@ func end_hit_sequence() -> void:
 
 ## 检查并更新 TriggeredEffect 冷却
 ## 返回 true = 允许触发，false = 冷却中
-func check_trigger_cooldown(effect: Resource, cd: float) -> bool:
-	var now := Time.get_ticks_msec() / 1000.0
-	var last: float = _trigger_cooldowns.get(effect, -INF)
-	if now - last < cd:
+func tick(delta: float) -> void:
+	for effect in _trigger_cooldowns.keys():
+		var remaining := maxf(0.0, float(_trigger_cooldowns[effect]) - delta)
+		if remaining <= 0.0:
+			_trigger_cooldowns.erase(effect)
+		else:
+			_trigger_cooldowns[effect] = remaining
+
+func can_trigger(effect: Resource) -> bool:
+	return float(_trigger_cooldowns.get(effect, 0.0)) <= 0.0
+
+func claim_trigger_cooldown(effect: Resource, duration: float) -> bool:
+	if not can_trigger(effect):
 		return false
-	_trigger_cooldowns[effect] = now
+	if duration > 0:
+		_trigger_cooldowns[effect] = duration
 	return true
+
+func check_trigger_cooldown(effect: Resource, duration: float) -> bool:
+	return claim_trigger_cooldown(effect, duration)
 
 
 ## ── 额外伤害（TriggeredEffect 专用入口，不走事件系统避免递归） ──
@@ -269,7 +308,7 @@ static func report_bonus_damage(source: Node2D, target: Node2D, amount: int, ski
 		return
 	if not instance:
 		# 降级路径：无 Executor 时直接调用
-		if target and target.has_method("take_damage"):
+		if is_instance_valid(target) and target.has_method("take_damage"):
 			target.take_damage(amount)
 		return
 	instance._apply_bonus_damage(source, target, amount, skill, tags)
@@ -358,10 +397,11 @@ static func report_status_applied(target: Node2D, buff: Buff) -> void:
 
 
 ## Buff/Debuff 移除
-static func report_status_removed(target: Node2D, buff: Buff) -> void:
+static func report_status_removed(target: Node2D, buff: Buff, reason: String = "dispelled") -> void:
 	var data := {
 		"buff_name": buff.display_name,
 		"status_id": buff.status_id,
+		"reason": reason,
 		"effect": buff.describe(),
 	}
 	if not instance:

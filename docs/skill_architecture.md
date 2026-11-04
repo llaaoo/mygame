@@ -1,8 +1,28 @@
 # 技能系统架构设计文档
 
-> 版本: v2.0 | 日期: 2026-07-14
+> 版本: v3.0 | 日期: 2026-11-04
 >
 > **文档层级**: 本文档定义**技能内容生产**方式。Runtime 间边界见 [RUNTIME_TOPOLOGY](./RUNTIME_TOPOLOGY.md)，战斗内部契约见 [COMBAT_CONTRACTS](./COMBAT_CONTRACTS.md)，世界模拟契约见 [WORLD_CONTRACTS](./WORLD_CONTRACTS.md)。
+
+---
+
+## 当前规划、组合与制造边界
+
+| 类型 | 用途 |
+|---|---|
+| CastContext | 输入意图、施法者、目标、方向、world、蓄力与强化选择 |
+| CastPlan / CastComponent / CastStatusRequirement | 预览与准备使用的结果、成本、条件版本 |
+| ConditionalCastController / SpellCombinationResolver / SpellRuleIndex | 条件准备、纯规则匹配及按动作/作用域预索引 |
+| CastCostPolicy / CastTransaction | 公共费用冷却与原子资源/效果提交 |
+| Buff / StatusInstance / ActorAttributes | 定义、带来源的状态实例、基础值与临时贡献重算 |
+
+**法术组合规则**：`SpellCombinationRule`表示动作与法阵/状态的条件关系；施法材料和恩赐在规划中改变结果。**制造配方**：`CraftingRecipe`表示库存原料→库存成品，制造成功只发布一次完整库存变化。学习法术不制造物品，制造物品不解锁法术知识。
+
+`content/exploration/chapter.tres`集中注册本章动作、法术组合规则、区域和委托；制造配方位于`content/crafting/`，材料修正位于`content/casting_materials/`。旧存档`recipes`键兼容读入`spell_rules`。
+
+SkillData的`conditional_cast`声明条件施法能力，`field_type`声明布阵类别，`preparation`声明准备时长；控制器不从技能ID白名单或名字后缀推断行为。普通技能也使用材料/恩赐规划和事务执行；引导脉冲按累计费率支付法力，材料按每个成功脉冲结算，失败停止。
+
+新增已有行为的法术组合或机关通常只需资源与登记。新条件或行为原型仍需实现和验证；下文“200+技能”是扩展能力示例，不代表当前内容数量。当前MVP为10个动作、15条法术组合规则、7项制造配方。
 
 ---
 
@@ -38,7 +58,7 @@ Skill = Runtime Archetype + Payload + Visual Profile
 | BUFF | ❌ | 纯状态修改 |
 | DASH | ❌ | 纯位移 |
 | HEAL | ❌ | 数值修改 |
-| SUMMON | ✅ | summon_entity (未来) |
+| SUMMON | ✅ | summon_entity |
 
 ### 3. Scene 数量与技能数量解耦
 
@@ -55,7 +75,7 @@ Scene 数: < 10
 
 ### 文件结构（v2.5 更新）
 
-> 旧路径: `res://skills/` → 新: `res://gameplay/abilities/`  
+> 旧路径: `res://skills/` → 新: `res://gameplay/abilities/`
 > 旧路径: `res://runtime/combat/skills/` → 新: `res://gameplay/abilities/` + `res://gameplay/combat/`
 
 ```

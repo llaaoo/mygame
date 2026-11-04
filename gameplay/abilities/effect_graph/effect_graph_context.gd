@@ -1,7 +1,7 @@
 class_name EffectGraphContext
 extends RefCounted
 ## 图执行上下文 — 在 Node 之间流转的可读写数据载体
-## 
+##
 ## 每个节点可以读写 ctx，实现节点间通信
 ## halt() 可以中断整个图的执行
 
@@ -14,6 +14,19 @@ var data: Dictionary = {}
 
 ## ── 控制字段 ──
 var halted: bool = false
+var accepted := false
+var before_effect: Callable
+
+## Leaf nodes claim once, after their gates pass and before producing side effects.
+func accept_effect() -> bool:
+	if halted:
+		return false
+	if not accepted:
+		if before_effect.is_valid() and not before_effect.call():
+			halt()
+			return false
+		accepted = true
+	return true
 
 ## 终止执行（后续节点跳过）
 func halt() -> void:

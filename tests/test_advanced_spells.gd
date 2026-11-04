@@ -1,67 +1,4 @@
-extends "res://tests/test_spell_materials.gd"
-
-class HealthTarget extends CharacterBody2D:
-	var health: HealthComponent
-	var calls := 0
-	var move_speed := 100.0
-	func take_damage(amount: int) -> void:
-		calls += 1
-		health.take_damage(amount)
-
-class RejectingExecutor extends SkillExecutor:
-	func execute(_skill: SkillData, _context: CastContext) -> bool:
-		return false
-
-func _empowered_cast(slot: int, direction := Vector2.RIGHT) -> void:
-	var skill := sm.get_slot(slot).data
-	var context := CastContext.simple(game.player, direction, skill)
-	context.empower = true
-	_check(sm.use_slot_with_context(slot, game.player, context), "Empowered cast rejected: " + skill.get_id() + " / " + controller.last_message)
-	await create_timer(0.95 if skill.get_id().ends_with("_sigil") else 0.7).timeout
-
-func _health_target(offset: Vector2) -> HealthTarget:
-	var target := HealthTarget.new()
-	target.collision_layer = 2
-	target.collision_mask = 0
-	var shape := CircleShape2D.new()
-	shape.radius = 12
-	var body_shape := CollisionShape2D.new()
-	body_shape.shape = shape
-	target.add_child(body_shape)
-	var hurt := Area2D.new()
-	hurt.collision_layer = 8
-	hurt.collision_mask = 0
-	var hurt_shape := CollisionShape2D.new()
-	hurt_shape.shape = shape.duplicate()
-	hurt.add_child(hurt_shape)
-	target.add_child(hurt)
-	hurt.owner = target
-	target.health = HealthComponent.new()
-	target.health.name = "HealthComponent"
-	target.health.max_hp = 1000
-	target.health.regen_rate = 0
-	target.add_child(target.health)
-	var buffs := BuffManager.new()
-	buffs.name = "BuffManager"
-	target.add_child(buffs)
-	target.position = game.player.position + offset
-	game.region_root.add_child(target)
-	target.health.setup(body_shape)
-	return target
-
-func _arena() -> void:
-	await _sandbox()
-	for pair in [[0, "pulse"], [1, "focus"], [2, "frost_sigil"], [3, "echo_mark"], [4, "fire_sigil"], [5, "ignite"]]:
-		sm.equip_slot(pair[0], sm.pool.get_skill(pair[1]))
-	for id in supplies.selected.keys():
-		supplies.configure(id, "")
-
-func _hit_puzzle(skill_id: String, puzzle: SpellWorldObject) -> void:
-	var skill := sm.pool.get_skill(skill_id)
-	var context := CastContext.at_position(game.player, puzzle.global_position, skill)
-	context.world = game.region_root
-	_check(sm.executor.execute(skill, context), "Puzzle spell failed: " + skill_id)
-	await create_timer(0.2).timeout
+extends "res://tests/support/exploration_case.gd"
 
 func _run() -> void:
 	game = load("res://mvp.tscn").instantiate()
@@ -103,7 +40,7 @@ func _run() -> void:
 	game.ui.close_modal()
 	await _interact("雷阵与导电实验记录")
 	game.ui.close_modal()
-	_check(game.progress.recipes.size() == 15, "All fifteen authored recipes were not learned")
+	_check(game.progress.spell_rules.size() == 15, "All fifteen authored recipes were not learned")
 	await _travel("camp")
 	for i in range(4):
 		_check(supplies.craft("echo_ink"), "Echo ink crafting failed")
@@ -118,7 +55,7 @@ func _run() -> void:
 	var buffs: BuffManager = game.player.get_node("BuffManager")
 	supplies.configure("ignite", "echo_ink")
 	var preview := controller.preview(sm.get_slot(5).data, game.player)
-	_check(preview.recipe_id == "echo_spark" and preview.field == null and preview.cost == 15, "Status recipe priority/cost incorrect")
+	_check(preview.rule_id == "echo_spark" and preview.field == null and preview.cost == 15, "Status recipe priority/cost incorrect")
 	var ink := supplies.count("echo_ink")
 	var mana := game.player.mana_component.mp
 	var original := sm.executor
@@ -183,7 +120,7 @@ func _run() -> void:
 	paused = false
 	await create_timer(0.55).timeout
 	await _cast(3)
-	_check(controller.preview(sm.get_slot(0).data, game.player, true).recipe_id == "guard_pulse", "Guard release did not outrank the concurrent echo mark")
+	_check(controller.preview(sm.get_slot(0).data, game.player, true).rule_id == "guard_pulse", "Guard release did not outrank the concurrent echo mark")
 	var left := _dummy(Vector2(-75, 0))
 	var right := _dummy(Vector2(75, 0))
 	await _empowered_cast(0)
@@ -280,7 +217,7 @@ func _run() -> void:
 	current_scene = game
 	await _frames(10)
 	game.ui.close_modal()
-	_check(game.progress.recipes.size() == 15 and game.player.skill_manager.combinations.supplies.serialize() == saved and game.progress.claims.has("magic.guard_oath") and game.progress.claims.has("magic.triad_lock") and game.progress.claims.has("magic.toxic_still"), "Advanced knowledge, materials or lock rewards failed disk restore")
+	_check(game.progress.spell_rules.size() == 15 and game.player.skill_manager.combinations.supplies.serialize() == saved and game.progress.claims.has("magic.guard_oath") and game.progress.claims.has("magic.triad_lock") and game.progress.claims.has("magic.toxic_still"), "Advanced knowledge, materials or lock rewards failed disk restore")
 	_check(not game.player.get_node("BuffManager").has_buff("echo_ready"), "Temporary preparation was restored as permanent progress")
 	game.queue_free()
 	current_scene = null

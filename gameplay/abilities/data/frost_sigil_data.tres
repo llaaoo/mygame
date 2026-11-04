@@ -4,6 +4,9 @@
 
 [resource]
 script = ExtResource("1")
+conditional_cast = true
+field_type = "frost"
+preparation = 0.8
 id = "frost_sigil"
 display_name = "铭刻霜阵"
 description = "在脚下铭刻霜阵，站在阵内使用火花触发寒霜弹。"

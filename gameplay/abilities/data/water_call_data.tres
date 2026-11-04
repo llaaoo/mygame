@@ -9,6 +9,7 @@ scale = 1.1
 lifetime = 0.4
 [resource]
 script = ExtResource("1")
+conditional_cast = true
 id = "water_call"
 display_name = "水引"
 description = "在瞄准方向前方120距离创造半径105的水域，可灭火，配合冰霜冻结、配合雷电导电。"

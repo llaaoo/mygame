@@ -1,13 +1,110 @@
-[gd_resource type="Resource" script_class="ExplorationRegionData" load_steps=2 format=3]
-[ext_resource type="Script" path="res://gameplay/exploration/exploration_region_data.gd" id="1"]
+[gd_resource type="Resource" script_class="ExplorationRegionData" format=3]
+
+[ext_resource type="Script" path="res://gameplay/exploration/data/discovery_data.gd" id="1_2tmke"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/encounter_data.gd" id="2_egisc"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/world_event_data.gd" id="3_rof4x"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/exit_data.gd" id="4_w0xbv"]
+[ext_resource type="Script" path="res://gameplay/exploration/exploration_region_data.gd" id="5_e254v"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/spell_puzzle_data.gd" id="6_5155v"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/spell_puzzle_route.gd" id="7_b3fkq"]
+
+[sub_resource type="Resource" id="Resource_ivo0c"]
+script = ExtResource("1_2tmke")
+id = "focus_knowledge"
+title = "凝神碑：余烬与霜行"
+text = "已掌握凝神（2）。阵外凝神：5秒内移动速度提高8%。火阵＋凝神：余烬战意，10秒内近战攻击力+8并附带火焰命中，保留时火焰法术伤害+20%；Shift施法消耗余烬强化本次效果，随后失去持续收益；霜阵＋凝神：霜行，8秒内移动速度+30%并使普通冰霜施法伤害+20%；Shift施法消耗霜行，换取穿透/范围与更高伤害。两个组合均需10 MP和一次触发。凝神增益互相替换，重复释放刷新，不叠加。离开区域后清理。"
+pos = Vector2(-350, 180)
+actions = Array[String](["focus"])
+spell_rules = Array[String](["fire_sigil_focus", "frost_sigil_focus"])
+requires_clear = true
+
+[sub_resource type="Resource" id="Resource_fr7ah"]
+script = ExtResource("1_2tmke")
+id = "sanctum_supply"
+title = "祈堂储备"
+text = "取得一次性储备，恢复60点生命与法力。凝神增益让你在近战切入和远程拉扯之间选择。"
+pos = Vector2(-350, -180)
+heal = true
+requires_clear = true
+
+[sub_resource type="Resource" id="Resource_4radt"]
+script = ExtResource("1_2tmke")
+id = "sanctum_sap"
+title = "封存树液"
+text = "取得施法原料。返回营地工作台可加工，M查看库存。此处只搜刮一次，休息与重置遭遇都不会重新发放。"
+pos = Vector2(350, 230)
+materials = {
+"sap": 6
+}
+
+[sub_resource type="Resource" id="Resource_2wqfn"]
+script = ExtResource("1_2tmke")
+id = "echo_knowledge"
+title = "回响刻板：印记与转化"
+text = "学会回响铭印（用K编组），6 MP和回响墨1换取12秒印记。印记内火花→三重矢，震荡→三次脉冲，凝神→40%减伤护盾，水引→持续恢复。普通震荡保留护盾；按住Shift再接震荡才主动爆破。相容的回响与法阵可共同触发；互斥增益按优先级取一个，护盾爆破优先于回响脉冲。成功转化才消耗状态，跨区清理；M可配置新增材料。"
+pos = Vector2(0, -220)
+actions = Array[String](["echo_mark"])
+spell_rules = Array[String](["echo_spark", "echo_pulse", "echo_focus", "echo_water", "guard_pulse"])
+materials = {
+"crystal": 4,
+"echo_ink": 5,
+"sap": 4,
+"ward_powder": 2
+}
+requires_clear = true
+
+[sub_resource type="Resource" id="Resource_sb5p5"]
+script = ExtResource("2_egisc")
+pos = Vector2(160, -120)
+hp = 36
+role = 1
+
+[sub_resource type="Resource" id="Resource_hiagl"]
+script = ExtResource("2_egisc")
+pos = Vector2(320, 120)
+hp = 36
+role = 1
+
+[sub_resource type="Resource" id="Resource_1rjmm"]
+script = ExtResource("2_egisc")
+pos = Vector2(230, 0)
+hp = 55
+speed = 145.0
+
+[sub_resource type="Resource" id="Resource_vp53j"]
+script = ExtResource("4_w0xbv")
+target = "archive"
+title = "返回军械档案"
+pos = Vector2(-480, 0)
+
+[sub_resource type="Resource" id="Resource_yxeq3"]
+script = ExtResource("7_b3fkq")
+steps = PackedStringArray("ice", "fire", "echo")
+
+[sub_resource type="Resource" id="Resource_vv6gw"]
+script = ExtResource("7_b3fkq")
+steps = PackedStringArray("water", "lightning", "echo")
+
+[sub_resource type="Resource" id="Resource_u2sc2"]
+script = ExtResource("6_5155v")
+id = "magic.triad_lock"
+title = "三相共鸣锁"
+pos = Vector2(250, -60)
+routes = Array[ExtResource("7_b3fkq")]([SubResource("Resource_yxeq3"), SubResource("Resource_vv6gw")])
+hint = "先冰霜→火焰，或水引→雷电，再以回响三重矢、脉冲或孢子完成共鸣。三步需要顺序完成；解开获得回响墨2、守护粉2。"
+materials = {
+"echo_ink": 2,
+"ward_powder": 2
+}
+
 [resource]
-script = ExtResource("1")
+script = ExtResource("5_e254v")
 id = "sanctum"
 title = "静默祈堂"
 description = "远程守卫与快速近卫守着凝神碑。清场后取得两种互斥增益组合。"
 room_type = "boss"
 seed = 20261112
-encounters = Array[Dictionary]([{"role": 1, "hp": 36, "pos": Vector2(160, -120)}, {"role": 1, "hp": 36, "pos": Vector2(320, 120)}, {"role": 0, "hp": 55, "speed": 145, "pos": Vector2(230, 0)}])
-discoveries = Array[Dictionary]([{"id": "focus_knowledge", "title": "凝神碑：余烬与霜行", "requires_clear": true, "text": "已掌握凝神（2）。阵外凝神：5秒内移动速度提高8%。火阵＋凝神：余烬战意，10秒内近战攻击力+8并附带火焰命中，保留时火焰法术伤害+20%；Shift施法消耗余烬强化本次效果，随后失去持续收益；霜阵＋凝神：霜行，8秒内移动速度+30%并使普通冰霜施法伤害+20%；Shift施法消耗霜行，换取穿透/范围与更高伤害。两个组合均需10 MP和一次触发。凝神增益互相替换，重复释放刷新，不叠加。离开区域后清理。", "actions": ["focus"], "recipes": ["fire_sigil_focus", "frost_sigil_focus"], "pos": Vector2(-350, 180)}, {"id": "sanctum_supply", "title": "祈堂储备", "heal": true, "requires_clear": true, "text": "取得一次性储备，恢复60点生命与法力。凝神增益让你在近战切入和远程拉扯之间选择。", "pos": Vector2(-350, -180)}, {"id": "sanctum_sap", "title": "封存树液", "pos": Vector2(350, 230), "materials": {"sap": 6}, "text": "取得施法原料。返回营地工作台可加工，M查看库存。此处只搜刮一次，休息与重置遭遇都不会重新发放。"}, {"id": "echo_knowledge", "title": "回响刻板：印记与转化", "requires_clear": true, "pos": Vector2(0, -220), "text": "学会回响铭印（用K编组），6 MP和回响墨1换取12秒印记。印记内火花→三重矢，震荡→三次脉冲，凝神→40%减伤护盾，水引→持续恢复。普通震荡保留护盾；按住Shift再接震荡才主动爆破。相容的回响与法阵可共同触发；互斥增益按优先级取一个，护盾爆破优先于回响脉冲。成功转化才消耗状态，跨区清理；M可配置新增材料。", "actions": ["echo_mark"], "recipes": ["echo_spark", "echo_pulse", "echo_focus", "echo_water", "guard_pulse"], "materials": {"echo_ink": 5, "ward_powder": 2, "crystal": 4, "sap": 4}}])
-exits = Array[Dictionary]([{"target": "archive", "title": "返回军械档案", "pos": Vector2(-480, 0), "requires_clear": false}])
-spell_objects = Array[Dictionary]([{"id": "magic.triad_lock", "title": "三相共鸣锁", "pos": Vector2(250, -60), "routes": [["ice", "fire", "echo"], ["water", "lightning", "echo"]], "hint": "先冰霜→火焰，或水引→雷电，再以回响三重矢、脉冲或孢子完成共鸣。三步需要顺序完成；解开获得回响墨2、守护粉2。", "materials": {"echo_ink": 2, "ward_powder": 2}}])
+encounters = Array[ExtResource("2_egisc")]([SubResource("Resource_sb5p5"), SubResource("Resource_hiagl"), SubResource("Resource_1rjmm")])
+discoveries = Array[ExtResource("1_2tmke")]([SubResource("Resource_ivo0c"), SubResource("Resource_fr7ah"), SubResource("Resource_4radt"), SubResource("Resource_2wqfn")])
+spell_objects = Array[ExtResource("6_5155v")]([SubResource("Resource_u2sc2")])
+exits = Array[ExtResource("4_w0xbv")]([SubResource("Resource_vp53j")])

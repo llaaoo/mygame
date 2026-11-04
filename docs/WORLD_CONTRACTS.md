@@ -1,9 +1,21 @@
 # 🌍 World Contracts — 世界模拟运行时契约
 
-> **状态**: 已固化  
-> **版本**: 1.6  
-> **最后更新**: 2026-05-24  
+> **状态**: 已固化
+> **版本**: 1.6
+> **最后更新**: 2026-11-04
 > **适用范围**: `res://world/` `res://entities/components/`
+
+---
+
+## 当前生命周期约定（2026-11-04）
+
+本文从属于[ARCHITECTURE](./ARCHITECTURE.md)。公开查询/同步请求允许跨模块调用；伤害统一请求CombatExecutor，延迟破坏、表面与重生工作进入CommandBus。无需将即时命中拆成异步消息。
+
+探索、房间和场景地图统一通过RegionSession切换：取消角色临时动作，保留并派发旧世界事实，清理各调度器的瞬态工作，推进命令scope与回调generation后卸载旧根。稳定ID的WorldState保留，空间引用清空。默认法术world为活动区域；长期装备贡献独立保留。
+
+外部通过surface_cells/surface_at/reactions_for等API查询，不直接读写调度器容器。表面到期按剩余时间迁移，超出时间继续推进后继状态；frozen/electrified/steam到wet再到dry，不凭大帧延长存活。
+
+SpellWorldObject只消费已接受的命中并发出solved/inspected信号，不直接访问MVP界面。机关、发现、遭遇、出口和选择使用类型化Resource，并由内容验证器检查引用、步骤、奖励与路线。
 
 ---
 
@@ -347,7 +359,7 @@ world/
 
 gameplay/
   action/
-    player_action.gd              # Action Layer (6 Type)
+    action.gd                     # 通用Action意图
   interaction/
     simulation_runtime.gd
     surface_manager.gd

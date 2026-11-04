@@ -41,6 +41,7 @@ var skill_source: String = ""
 
 ## 扩展参数
 var params: Dictionary = {}
+var cast_context: CastContext # Explicit input snapshot shared by validation and execution.
 
 
 ## ── 快捷构造 ──

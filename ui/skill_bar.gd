@@ -55,7 +55,11 @@ func _process(_delta: float) -> void:
 	if not ignite:
 		_combination_hint.hide()
 		return
-	var plan := controller.preview(ignite, _skill_manager.get_parent(), Input.is_key_pressed(KEY_SHIFT))
+	var empower := Input.is_key_pressed(KEY_SHIFT)
+	var previews: Dictionary = {}
+	var hint_key := hash([ignite, {}])
+	previews[hint_key] = controller.preview(ignite, _skill_manager.get_parent(), empower)
+	var plan: CastPlan = previews[hint_key]
 	var action_name := "火花"
 	if not controller.pending.is_empty():
 		plan = controller.pending
@@ -75,11 +79,15 @@ func _process(_delta: float) -> void:
 	_combination_hint.text = text
 	_combination_hint.global_position = global_position + Vector2(0, -68)
 	for i in range(_sources.size()):
-		_update_cooldown(i)
 		var instance := _skill_manager.get_instance(_sources[i])
+		var preview: CastPlan
 		if instance and controller.handles(instance.data):
-			var preview := controller.preview(instance.data, _skill_manager.get_parent(), Input.is_key_pressed(KEY_SHIFT))
+			var key := hash([instance.base_data, instance.upgrade_ranks])
+			if not previews.has(key):
+				previews[key] = controller.preview(instance.data, _skill_manager.get_parent(), empower)
+			preview = previews[key]
 			_panels[i].tooltip_text = "%s → %s · %d MP\n%s\n%s\n%s" % [instance.data.display_name, preview.effect_label, preview.cost, controller.supplies.describe_cost(preview.material_costs) if not preview.material_costs.is_empty() else "无材料消耗", controller.boon_hint(preview), preview.reason if not preview.ready else preview.skill.description]
+		_update_cooldown(i, preview)
 
 
 func _add_item(source: String, label: String, size: Vector2) -> void:
@@ -156,15 +164,16 @@ func _refresh_idx(idx: int) -> void:
 	else:
 		icon.texture = null
 		icon.modulate = Color(1, 1, 1, 0.12)
-	
+
 	_bind_labels[idx].visible = true
 	_panels[idx].tooltip_text = "%s\n%s" % [skill.display_name, skill.description] if skill else "空槽"
 	_update_cooldown(idx)
 
 
-func _update_cooldown(idx: int) -> void:
-	var remaining := _skill_manager.get_cooldown(_sources[idx])
-	var total := _skill_manager.get_cooldown_total(_sources[idx])
+func _update_cooldown(idx: int, plan: CastPlan = null) -> void:
+	var state := _skill_manager.get_cooldown_state(_sources[idx], plan)
+	var remaining: float = state.remaining
+	var total: float = state.duration
 	var size := HAND_SIZE if idx < 2 else SLOT_SIZE
 	var mask := _masks[idx]
 	var cd_label := _cd_labels[idx]

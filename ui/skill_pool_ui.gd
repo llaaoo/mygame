@@ -342,8 +342,8 @@ func _refresh_grid() -> void:
 		if not skill: continue
 		if _skill_manager.restrict_actions and not _skill_manager.knows_action(skill):
 			var visible_result := false
-			for recipe in _skill_manager.combinations.recipes:
-				if recipe.result_skill.get_id() == skill.get_id() and _skill_manager.combinations.learned_recipes.has(recipe.id):
+			for rule in _skill_manager.combinations.rules:
+				if rule.result_skill.get_id() == skill.get_id() and _skill_manager.combinations.learned_rules.has(rule.id):
 					visible_result = true
 			if not visible_result:
 				continue
@@ -474,10 +474,10 @@ func _type_name(t: int) -> String:
 
 func _combination_description(skill: SkillData) -> String:
 	if _skill_manager and _skill_manager.combinations:
-		for recipe in _skill_manager.combinations.recipes:
-			if recipe.result_skill.get_id() == skill.get_id():
-				var trigger: SkillData = _skill_pool.get_skill(recipe.trigger_action_id)
-				return "组合结果：%s + %s → %s" % [recipe.condition_label(), trigger.display_name if trigger else recipe.trigger_action_id, skill.display_name]
+		for rule in _skill_manager.combinations.rules:
+			if rule.result_skill.get_id() == skill.get_id():
+				var trigger: SkillData = _skill_pool.get_skill(rule.trigger_action_id)
+				return "组合结果：%s + %s → %s" % [rule.condition_label(), trigger.display_name if trigger else rule.trigger_action_id, skill.display_name]
 	return "组合结果，不能直接装备"
 
 func _is_skill_unlocked(skill: SkillData) -> bool:

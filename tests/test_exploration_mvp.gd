@@ -1,61 +1,4 @@
-extends SceneTree
-
-class Target extends CharacterBody2D:
-	var hits := 0
-	var move_speed := 100.0
-	func take_damage(_amount: int) -> void:
-		hits += 1
-
-var errors: Array[String] = []
-var game: MVPGame
-
-func _initialize() -> void:
-	call_deferred("_run")
-
-func _frames(count: int = 5) -> void:
-	for i in range(count):
-		await process_frame
-
-func _travel(id: String) -> void:
-	game.request_travel(id)
-	await _frames()
-	_check(game.region_id == id, "Travel failed: " + id)
-
-func _interact(title: String) -> void:
-	var found: ExplorationInteractable
-	for node in get_nodes_in_group("interactable"):
-		if node is ExplorationInteractable and node.title.begins_with(title):
-			found = node
-			break
-	_check(found != null, "Interaction missing: " + title)
-	if found:
-		game.player.global_position = found.global_position
-		game.player._try_interact()
-		await _frames()
-
-func _clear_encounter() -> void:
-	for enemy in game.active_enemies.duplicate():
-		enemy.health_component.invincible = false
-		CombatExecutor.instance.reset_chain()
-		CombatExecutor.report_hit(game.player, enemy, 2000, enemy.global_position, null, ["test"])
-	await _frames()
-	_check(game.active_enemies.is_empty() and game.progress.cleared.has(game.region_id), "Actual deaths did not clear encounter")
-
-func _target(offset: Vector2) -> Target:
-	var target := Target.new()
-	target.collision_layer = 2
-	target.collision_mask = 0
-	var collider := CollisionShape2D.new()
-	var shape := CircleShape2D.new()
-	shape.radius = 10
-	collider.shape = shape
-	target.add_child(collider)
-	var buffs := BuffManager.new()
-	buffs.name = "BuffManager"
-	target.add_child(buffs)
-	target.position = game.player.position + offset
-	game.region_root.add_child(target)
-	return target
+extends "res://tests/support/exploration_case.gd"
 
 func _run() -> void:
 	game = load("res://mvp.tscn").instantiate()
@@ -81,7 +24,7 @@ func _run() -> void:
 	await _interact("前往火药库")
 	_check(game.region_id == "yard", "Locked forward exit was usable")
 	await _interact("火阵铭刻记录")
-	_check(paused and game.progress.recipes.has("fire_sigil_fireball") and sm.get_slot(4) != null, "Discovery did not teach and equip fire sigil")
+	_check(paused and game.progress.spell_rules.has("fire_sigil_fireball") and sm.get_slot(4) != null, "Discovery did not teach and equip fire sigil")
 	game.ui.close_modal()
 	var count := game.progress.journal.size()
 	await _interact("火阵铭刻记录")
@@ -96,7 +39,7 @@ func _run() -> void:
 	_check(game.region_id == "archive", "Optional branch exit missing")
 	await _interact("震荡与焰环")
 	game.ui.close_modal()
-	_check(sm.known_actions.has("pulse") and sm.combinations.learned_recipes.has("fire_sigil_pulse"), "Second recipe not learned")
+	_check(sm.known_actions.has("pulse") and sm.combinations.learned_rules.has("fire_sigil_pulse"), "Second recipe not learned")
 	await _clear_encounter()
 	await _travel("powder")
 	await _clear_encounter()
@@ -162,7 +105,7 @@ func _run() -> void:
 	_check(SaveManager.instance.save_game(2), "Save failed")
 	var restored := ExplorationProgress.new()
 	restored.deserialize_save_data(SaveManager.instance.read_extension(2, MVPGame.SECTION))
-	_check(restored.completed and restored.recipes.size() == 3 and restored.cleared.has("gate"), "Progress did not round-trip through disk")
+	_check(restored.completed and restored.spell_rules.size() == 3 and restored.cleared.has("gate"), "Progress did not round-trip through disk")
 	# Death must use expedition recovery, not the legacy HUD retry scene.
 	game.player.health_component.invincible = false
 	CombatExecutor.instance.reset_chain()
@@ -172,7 +115,7 @@ func _run() -> void:
 	game.ui.close_modal()
 	await _travel("camp")
 	_check(not game.player.health_component.is_dead and game.player.health_component.hp > 0, "Camp did not revive player")
-	_check(game.progress.completed and game.progress.recipes.size() == 3, "Death discarded knowledge or milestones")
+	_check(game.progress.completed and game.progress.spell_rules.size() == 3, "Death discarded knowledge or milestones")
 	# Recreate the entire scene and providers, restoring only persistent progress.
 	game.queue_free()
 	current_scene = null
@@ -189,8 +132,3 @@ func _run() -> void:
 	if errors.is_empty():
 		print("Exploration MVP passed: input, discovery, three combinations, branches, boss, disk restore, death and fresh-scene restart")
 	call_deferred("quit", 0 if errors.is_empty() else 1)
-
-func _check(condition: bool, message: String) -> void:
-	if not condition:
-		errors.append(message)
-		push_error(message)

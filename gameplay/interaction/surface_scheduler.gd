@@ -10,24 +10,31 @@ const MAX_SURFACE_CELLS := 256
 ##   {"state": "burning", "remaining": 5.0, "source": "oil_barrel_03"}
 var _active_surfaces: Dictionary = {}
 
+func clear() -> void:
+	_active_surfaces.clear()
+
+func active_count() -> int:
+	return _active_surfaces.size()
+
 
 func tick(delta: float) -> void:
-	var expired: Array[Vector2i] = []
-	
-	for cell: Vector2i in _active_surfaces:
-		var surf: Dictionary = _active_surfaces[cell]
-		surf["remaining"] = surf.get("remaining", 0.0) - delta
-		if surf["remaining"] <= 0.0:
-			expired.append(cell)
-	
-	for cell: Vector2i in expired:
-		_expire_cell(cell)
+	for cell: Vector2i in _active_surfaces.keys():
+		var remaining_delta := delta
+		while _active_surfaces.has(cell):
+			var life := maxf(0.0, float(_active_surfaces[cell].remaining))
+			if life > remaining_delta + 0.000001:
+				_active_surfaces[cell].remaining = life - remaining_delta
+				break
+			remaining_delta = maxf(0, remaining_delta - life)
+			_expire_cell(cell)
+			if remaining_delta <= 0.000001:
+				break
 
 
 func set_surface(cell: Vector2i, state: String, duration: float, source: String = "") -> void:
 	if not _active_surfaces.has(cell) and _active_surfaces.size() >= MAX_SURFACE_CELLS:
 		return
-	
+
 	_active_surfaces[cell] = {
 		"state": state,
 		"remaining": duration,
@@ -36,27 +43,27 @@ func set_surface(cell: Vector2i, state: String, duration: float, source: String 
 
 
 func get_surface(cell: Vector2i) -> Dictionary:
-	return _active_surfaces.get(cell, {"state": "dry", "remaining": 0.0})
+	return _active_surfaces.get(cell, {"state": "dry", "remaining": 0.0}).duplicate()
 
 
 func get_cells_in_radius(pos: Vector2, radius: float) -> Array[Vector2i]:
 	var result: Array[Vector2i] = []
 	var cell_radius := ceili(radius / 64.0) + 1
 	var center := Vector2i(floori(pos.x / 64), floori(pos.y / 64))
-	
+
 	for dx in range(-cell_radius, cell_radius + 1):
 		for dy in range(-cell_radius, cell_radius + 1):
 			var cell := Vector2i(center.x + dx, center.y + dy)
 			if _active_surfaces.has(cell):
 				result.append(cell)
-	
+
 	return result
 
 
 func _expire_cell(cell: Vector2i) -> void:
 	var surf: Dictionary = _active_surfaces[cell]
 	var state: String = surf.get("state", "")
-	
+
 	# 自然迁移规则
 	match state:
 		"burning":
@@ -71,3 +78,6 @@ func _expire_cell(cell: Vector2i) -> void:
 
 func _to_string() -> String:
 	return "SurfaceScheduler(active=%d)" % _active_surfaces.size()
+
+func active_cells() -> Array:
+	return _active_surfaces.keys()

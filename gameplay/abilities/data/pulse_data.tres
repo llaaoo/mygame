@@ -9,9 +9,10 @@ scale = 0.4
 lifetime = 0.25
 [resource]
 script = ExtResource("1")
+conditional_cast = true
 id = "pulse"
 display_name = "震荡"
-description = "近身能量震荡。火阵内转为火焰喷发；学会配方后，霜阵内转为寒霜新星。"
+description = "近身能量震荡。火阵内转为火焰喷发；学会组合规则后，霜阵内转为寒霜新星。"
 mechanics = "基础 3 MP；火阵组合14 MP，霜阵组合12 MP。"
 role = "近身触发"
 icon_atlas_index = 17

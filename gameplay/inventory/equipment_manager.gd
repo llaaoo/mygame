@@ -120,37 +120,16 @@ func _rebuild_loadout_effects() -> void:
 			_merge_numbers(_combat_modifiers, bonus.combat_modifiers)
 			_active_set_bonuses.append({"set": set_data, "count": count, "bonus": bonus})
 
-	var resolved := flat.duplicate(true)
-	for stat in percent:
-		var current := _read_stat_value(str(stat)) + float(flat.get(stat, 0.0))
-		resolved[stat] = float(resolved.get(stat, 0.0)) + round(current * float(percent[stat]))
-
-	if not resolved.is_empty() and _buff_manager:
-		_applied_stat_modifiers = resolved.duplicate(true)
+	if (not flat.is_empty() or not percent.is_empty()) and _buff_manager:
+		_applied_stat_modifiers = flat.duplicate(true)
 		_applied_buff = Buff.new()
 		_applied_buff.buff_id = "equipment_loadout"
 		_applied_buff.display_name = "装备负载"
-		_applied_buff.duration = 0.0
-		_applied_buff.stat_modifiers = resolved
+		_applied_buff.persistent = true
+		_applied_buff.stat_modifiers = flat
+		_applied_buff.stat_multipliers = percent
 		_buff_manager.apply_buff(_applied_buff)
 	set_bonuses_changed.emit()
-
-
-func _read_stat_value(stat: String) -> float:
-	var owner := get_parent()
-	match stat:
-		"max_hp":
-			var health := owner.get_node_or_null("HealthComponent") as HealthComponent
-			return health.max_hp if health else 0.0
-		"max_mana":
-			var mana := owner.get_node_or_null("ManaComponent") as ManaComponent
-			return mana.max_mp if mana else 0.0
-		"attack_damage":
-			var combat := owner.get_node_or_null("CombatComponent") as CombatComponent
-			return combat.attack_damage if combat else 0.0
-		"move_speed":
-			return float(owner.get("move_speed")) if "move_speed" in owner else 0.0
-	return float(owner.get(stat)) if stat in owner else 0.0
 
 
 func _merge_numbers(target: Dictionary, source: Dictionary) -> void:

@@ -39,35 +39,15 @@ static func _validate_melee(_entity: Node2D) -> bool:
 
 
 static func _validate_cast(entity: Node2D, action: Action) -> bool:
-	var mana := entity.get_node_or_null("ManaComponent") as ManaComponent
-	if not mana:
-		return true
-
 	var sm := entity.get_node_or_null("SkillManager") as SkillManager
 	if not sm:
-		return true
-
-	var skill: SkillData = null
-	match action.skill_source:
-		"left":
-			skill = sm.left_hand.data if sm.left_hand else null
-		"right":
-			skill = sm.right_hand.data if sm.right_hand else null
-		_:
-			var idx := action.skill_source.trim_prefix("slot_").to_int()
-			var inst: SkillInstance = sm.get_slot(idx)
-			skill = inst.data if inst else null
-
-	if skill and skill.mp_cost > 0:
-		if sm.combinations and sm.combinations.handles(skill):
-			return sm.combinations.preview(skill, entity).ready
-		if mana.mp < sm.effective_mana_cost(skill, entity, skill.mp_cost):
-			return false
-
-	if not sm.can_use(action.skill_source):
 		return false
-
-	return true
+	var inst := sm.get_instance(action.skill_source)
+	if not inst:
+		return false
+	if not action.cast_context:
+		action.cast_context = CastContext.simple(entity, action.direction, inst.data)
+	return sm.can_start(action.skill_source, entity, action.cast_context)
 
 
 static func _validate_dodge() -> bool:

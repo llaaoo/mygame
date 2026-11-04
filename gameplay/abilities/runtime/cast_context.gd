@@ -22,7 +22,7 @@ static func simple(caster: Node2D, direction: Vector2, skill: SkillData) -> Cast
 	ctx.caster = caster
 	ctx.direction = direction
 	ctx.skill = skill
-	ctx.world = caster.get_tree().current_scene
+	ctx.world = default_world(caster)
 	return ctx
 
 
@@ -35,7 +35,7 @@ static func targeted(caster: Node2D, target: Node2D, skill: SkillData) -> CastCo
 	ctx.target_position = target.global_position
 	ctx.has_target_position = true
 	ctx.skill = skill
-	ctx.world = caster.get_tree().current_scene
+	ctx.world = default_world(caster)
 	return ctx
 
 
@@ -47,5 +47,13 @@ static func at_position(caster: Node2D, position: Vector2, skill: SkillData) -> 
 	ctx.target_position = position
 	ctx.has_target_position = true
 	ctx.skill = skill
-	ctx.world = caster.get_tree().current_scene
+	ctx.world = default_world(caster)
 	return ctx
+
+## Region-owned effects expire with their region. Explicit callers can override world.
+static func default_world(actor: Node) -> Node:
+	if GameRuntime.instance:
+		var session := GameRuntime.instance.get_region_session()
+		if session and is_instance_valid(session.active_root):
+			return session.active_root
+	return actor.get_tree().current_scene if actor and actor.is_inside_tree() else null

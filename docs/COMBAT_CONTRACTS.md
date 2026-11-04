@@ -1,27 +1,27 @@
 # ⚔️ Combat Contracts — 确定性战斗运行时契约
 
-> **状态**: 已固化  
-> **版本**: 1.5  
-> **最后更新**: 2026-05-23  
+> **状态**: 已固化
+> **版本**: 1.5
+> **最后更新**: 2026-11-04
 > **适用范围**: `res://gameplay/abilities/` `res://gameplay/combat/` `res://entities/components/` `res://gameplay/inventory/` `res://gameplay/status/`
-> 
+>
 > **历史路径对照**: `skills/`→`gameplay/abilities/`, `systems/`→`gameplay/combat/`, `components/`→`entities/components/`, `items/`→`content/items/` + `gameplay/inventory/`
 
 ---
 
-## 🏛️ 架构稳定性声明
+## 当前执行边界（2026-11-04）
 
-技能系统已完成完整的「架构硬化」路径（Review → P0副作用收敛 → P1阶段机收敛 → 近战收敛 → 契约法典化）。**12条契约覆盖了战斗系统的全部关键路径，不再需要架构级别的大改。**
+本文从属于[ARCHITECTURE](./ARCHITECTURE.md)。以下契约约束领域职责，已实现的公开同步请求/查询允许跨服务调用；延迟世界工作才使用带区域scope的CommandBus。
 
-后续开发属于以下三类之一：
+- CastContext保留输入意图，CastPlan/组件/状态条件表达确定计划；预览不消费资源，准备提交重读真实版本。
+- CastTransaction覆盖法力、材料、状态与效果。成功后才发布通知，失败不产生消费或施法事实；普通技能、条件技能和引导脉冲共用执行边界。
+- Buff为定义，StatusInstance为实例；ActorAttributes从基础值和贡献重算。移除原因明确区分expired、consumed、dispelled、replaced、region_cleanup、restored。触发器可筛选原因。
+- report_hit返回HitResult，分别表示damage_accepted/status_accepted。默认接触无敌阻止两者，也可配置仅伤害无敌；零伤害工具仍可被接受。同次动作的family允许多个合法效果。
+- ON_HIT是资格接受后的前置反应入口，实际伤害尚未全部写回；最终伤害读返回的HitResult或扣血后的ON_DAMAGE。拒绝的命中不广播ON_HIT。
+- 已施加状态的DOT保留来源/技能与施加时魔法强度，绕过接触无敌，不新授予接触无敌；默认不触发直接命中的元素状态和命中熟练度奖励。HOT/DOT与持续AoE包含到期端点；大delta只累计实际存活时间。
+- 触发器先匹配，再占一次模拟冷却；一次性事件在调用回调前注销，覆盖嵌套发射。
 
-| 类别 | 定义 | 改动范围 | 示例 |
-|------|------|----------|------|
-| **纯增量** | 在现有框架内新增实例 | 新建文件 + 注册，核心零改动 | 新投射物技能、新Modifier、新Condition、新Buff |
-| **新分支** | 现有框架预留了扩展点 | 加 `match` 分支 + 一个 `_execute_*()` 方法 | 引导/蓄力技能、新 SkillType 枚举值 |
-| **新层级** | 需要系统级别的能力 | 新增独立模块，不改现有契约 | 联网 RPC 层、技能进化树、元素反应系统 |
-
-**关键原则**: 永远不会出现"推翻重来"。最坏情况是"加一层"或"开新分支"。
+法术组合规则（SpellCombinationRule）与制造配方（CraftingRecipe）是不同领域类型，见[技能架构](./skill_architecture.md)。功能扩展仍须通过实际回归验证；本文不预先保证任意新机制无需架构调整。
 
 ---
 
@@ -48,7 +48,7 @@
 
 ---
 
-## CONTRACT 1: CombatExecutor 是唯一世界写入口
+## CONTRACT 1: CombatExecutor 是伤害与战斗事实入口
 
 ### ✅ 合法
 
@@ -244,7 +244,7 @@ res://gameplay/abilities/          ← 旧: res://skills/
   manager/    → SkillManager (装备/冷却/委托)
   runtime/    → SkillExecutor / SkillInstance / CastContext / DamageContext / Projectile
   archetypes/ → 技能场景 (.tscn + 脚本)  ← 旧: scenes/
-  
+
 res://gameplay/combat/             ← 旧: res://systems/
   CombatEvent / CombatEventBus / CombatExecutor / CombatPhase / CombatScope
   TriggeredEffect / conditions/ / effect_graph/ / modifiers/ / debug/

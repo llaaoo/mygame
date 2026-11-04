@@ -17,6 +17,9 @@ enum SkillType {
 @export var id: String = ""                       ## 唯一标识符（推荐使用）
 @export var skill_id: String = ""                 ## @deprecated 用 id 代替，保留兼容
 @export var display_name: String = "未命名技能"
+@export var conditional_cast := false
+@export var field_type: String = ""
+@export var preparation := 0.25
 @export var combination_only: bool = false  ## Result effect; not an equippable player action.
 @export var icon: Texture2D
 @export_range(-1, 29, 1) var icon_atlas_index: int = -1

@@ -1,12 +1,37 @@
-[gd_resource type="Resource" script_class="ExplorationRegionData" load_steps=2 format=3]
-[ext_resource type="Script" path="res://gameplay/exploration/exploration_region_data.gd" id="1"]
+[gd_resource type="Resource" script_class="ExplorationRegionData" format=3]
+
+[ext_resource type="Script" path="res://gameplay/exploration/data/discovery_data.gd" id="1_0540c"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/encounter_data.gd" id="2_k0yjy"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/world_event_data.gd" id="3_e3mka"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/exit_data.gd" id="4_trrlp"]
+[ext_resource type="Script" path="res://gameplay/exploration/exploration_region_data.gd" id="5_daxmv"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/spell_puzzle_data.gd" id="6_jua6y"]
+
+[sub_resource type="Resource" id="Resource_xpjgj"]
+script = ExtResource("2_k0yjy")
+pos = Vector2(200, 0)
+hp = 280
+boss = true
+
+[sub_resource type="Resource" id="Resource_hatfk"]
+script = ExtResource("4_trrlp")
+target = "gate"
+title = "退回关隘"
+pos = Vector2(-480, 0)
+
+[sub_resource type="Resource" id="Resource_klq7n"]
+script = ExtResource("4_trrlp")
+target = "camp"
+title = "完成探索，返回营地"
+pos = Vector2(480, 0)
+requires_clear = true
+
 [resource]
-script = ExtResource("1")
+script = ExtResource("5_daxmv")
 id = "boss"
 title = "熔炉大厅"
 description = "击败火焰领主，解除监狱封锁。准备动作有风险，先闪避再布阵。"
 room_type = "boss"
 seed = 20261110
-encounters = Array[Dictionary]([{"boss": true, "hp": 280, "pos": Vector2(200, 0)}])
-discoveries = Array[Dictionary]([])
-exits = Array[Dictionary]([{"target": "gate", "title": "退回关隘", "pos": Vector2(-480, 0), "requires_clear": false}, {"target": "camp", "title": "完成探索，返回营地", "pos": Vector2(480, 0), "requires_clear": true}])
+encounters = Array[ExtResource("2_k0yjy")]([SubResource("Resource_xpjgj")])
+exits = Array[ExtResource("4_trrlp")]([SubResource("Resource_hatfk"), SubResource("Resource_klq7n")])

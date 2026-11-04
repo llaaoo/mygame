@@ -10,6 +10,7 @@ status_id = "echo_ready"
 exclusive_group = "echo_preparation"
 [resource]
 script = ExtResource("1")
+conditional_cast = true
 id = "echo_mark"
 display_name = "回响铭印"
 combination_only = false

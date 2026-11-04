@@ -13,6 +13,8 @@ var _consumed: Dictionary = {}
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_PAUSABLE
+	set_process(false)
+	RuntimeRegistration.register_ticker(self)
 	add_to_group("conditional_field")
 	_label = Label.new()
 	var offset: float = {"fire": 0.0, "frost": 18.0, "storm": 36.0}.get(field_type, 0.0)
@@ -24,7 +26,7 @@ func _ready() -> void:
 	_update_label()
 	queue_redraw()
 
-func _process(delta: float) -> void:
+func tick(delta: float) -> void:
 	remaining = maxf(0.0, remaining - delta)
 	if remaining <= 0.0 or charges <= 0 or not is_instance_valid(caster):
 		expire()

@@ -22,6 +22,8 @@ func _process(delta: float) -> void:
 
 
 func _on_hit(event: CombatEvent) -> void:
+	if "dot" in event.data.get("tags", []):
+		return
 	if event.source != _owner_entity or not event.skill or not is_instance_valid(event.target):
 		return
 	for synergy_resource in event.skill.synergies:

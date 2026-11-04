@@ -8,6 +8,9 @@ extends Node
 ## respawn_time > 0 → N 秒后重生
 
 var _respawn_queue: Array[Dictionary] = []
+
+func clear() -> void:
+	_respawn_queue.clear()
 var _world_state_manager: WorldStateManager = null
 
 
@@ -26,13 +29,13 @@ func enqueue(object_id: String, respawn_at: float, object_path: String = "") -> 
 func tick(delta: float) -> void:
 	if _respawn_queue.is_empty():
 		return
-	
+
 	var to_remove: Array[int] = []
-	
+
 	for i: int in range(_respawn_queue.size()):
 		var entry: Dictionary = _respawn_queue[i]
 		entry["remaining"] = entry["remaining"] - delta
-		
+
 		if entry["remaining"] <= 0.0:
 			var object_id: String = entry["object_id"]
 			# 通知 WorldStateManager 重生（数据层）
@@ -45,7 +48,7 @@ func tick(delta: float) -> void:
 			# 通知 MapObject 节点重生（表现层）
 			_restore_map_object(object_id, entry.get("object_path", ""))
 			to_remove.append(i)
-	
+
 	# 倒序移除
 	for i: int in range(to_remove.size() - 1, -1, -1):
 		_respawn_queue.remove_at(to_remove[i])
@@ -70,3 +73,6 @@ func _restore_map_object(object_id: String, object_path: String = "") -> void:
 
 func _to_string() -> String:
 	return "RespawnScheduler(pending=%d)" % _respawn_queue.size()
+
+func pending_count() -> int:
+	return _respawn_queue.size()

@@ -44,10 +44,10 @@ func register_reaction(rule: SurfaceReaction) -> void:
 func apply_tags(cell: Vector2i, tags: Array[String], source: String = "") -> bool:
 	if not _surface_scheduler:
 		return false
-	
+
 	var surf := _surface_scheduler.get_surface(cell)
 	var current_state: String = surf.get("state", "dry")
-	
+
 	var rules: Array = _reactions.get(current_state, [])
 	for rule in rules:
 		if not rule is SurfaceReaction:
@@ -55,7 +55,7 @@ func apply_tags(cell: Vector2i, tags: Array[String], source: String = "") -> boo
 		if rule.matches(current_state, tags):
 			_apply_reaction(cell, rule, tags, source)
 			return true
-	
+
 	return false
 
 
@@ -68,9 +68,9 @@ func _apply_reaction(cell: Vector2i, rule: SurfaceReaction, tags: Array[String],
 	if rule.spread_to_neighbors and _propagation_scheduler:
 		for neighbor in _neighbor_cells(cell):
 			_propagation_scheduler.enqueue(cell, neighbor, rule.spread_damage, 1, rule.spread_tags)
-	
+
 	print("🧪 Surface: %s + %s → %s (%.1fs) [%s]" % [rule.required_state, tags, rule.result_state, rule.result_duration, source])
-	
+
 	# 对站在该格上的实体施加 Buff
 	if not rule.entity_status_path.is_empty() and _spatial_index:
 		var entities := _spatial_index.query_cell(cell)
@@ -106,7 +106,7 @@ func get_entity_buffs(cell: Vector2i) -> Array[String]:
 	var result: Array[String] = []
 	var surf := _surface_scheduler.get_surface(cell)
 	var state: String = surf.get("state", "dry")
-	
+
 	# 表面状态 → 实体效果映射
 	match state:
 		"burning":
@@ -121,7 +121,7 @@ func get_entity_buffs(cell: Vector2i) -> Array[String]:
 			result.append("res://gameplay/abilities/data/steam_veil.tres")
 		"poisoned":
 			result.append("res://gameplay/abilities/data/poison.tres")
-	
+
 	return result
 
 
@@ -130,16 +130,16 @@ func get_entity_buffs(cell: Vector2i) -> Array[String]:
 func tick_entity_surface() -> void:
 	if not _surface_scheduler:
 		return
-	
+
 	var tree := get_tree()
 	if not tree:
 		return
-	
-	for cell: Vector2i in _surface_scheduler._active_surfaces:
+
+	for cell: Vector2i in _surface_scheduler.active_cells():
 		var buff_paths := get_entity_buffs(cell)
 		if buff_paths.is_empty():
 			continue
-		
+
 		# 1. MapObject（空间索引）— 燃烧表面造成伤害
 		if _spatial_index:
 			for entity in _spatial_index.query_cell(cell):
@@ -148,7 +148,7 @@ func tick_entity_surface() -> void:
 				var surf := _surface_scheduler.get_surface(cell)
 				if surf.get("state", "") == "burning" and entity.has_method("take_damage") and not entity.is_in_group("fire_immune"):
 					CombatExecutor.report_hit(null, entity, 3, entity.global_position, null, ["fire"])
-		
+
 		# 2. Player + Enemy（距离检测）
 		var cell_center := Vector2(cell.x * 64 + 32, cell.y * 64 + 32)
 		for group_name in ["player", "enemy"]:
@@ -217,3 +217,6 @@ func _to_string() -> String:
 		_reactions.size(),
 		_surface_scheduler._active_surfaces.size() if _surface_scheduler else 0
 	]
+
+func reactions_for(state: String) -> Array:
+	return _reactions.get(state, []).duplicate()

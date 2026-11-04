@@ -1,7 +1,7 @@
 class_name CallableNode
 extends EffectNode
 ## 可调用节点 — 包装一个 Callable 作为叶子动作
-## 
+##
 ## 用于快速原型和简单效果，不需要写新类
 
 @export var callback_name: String = ""            ## 调试标识
@@ -19,5 +19,5 @@ static func from_callable(cb: Callable, name_str: String = "") -> CallableNode:
 
 
 func process(ctx: EffectGraphContext) -> void:
-	if _callback.is_valid():
+	if _callback.is_valid() and ctx.accept_effect():
 		_callback.call(ctx)

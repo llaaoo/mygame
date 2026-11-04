@@ -1,5 +1,5 @@
-[gd_resource type="Resource" script_class="CombinationRecipe" load_steps=3 format=3]
-[ext_resource type="Script" path="res://gameplay/abilities/combinations/combination_recipe.gd" id="1"]
+[gd_resource type="Resource" script_class="SpellCombinationRule" load_steps=3 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/combinations/spell_combination_rule.gd" id="1"]
 [ext_resource type="Resource" path="res://gameplay/abilities/data/static_focus_result.tres" id="2"]
 [resource]
 script = ExtResource("1")

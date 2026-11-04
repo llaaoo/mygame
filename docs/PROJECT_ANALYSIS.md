@@ -1,9 +1,12 @@
 # 📘 项目完整分析文档 — "Study" 项目
 
+> 历史分析资料：本文记录重构前的状态与建议。2026-11-04后的实际模块、已完成项目和测试以[项目架构](./ARCHITECTURE.md)及[重构进展](./REFACTOR_PROGRESS.md)为准。
+
+
 > **生成日期**: 2026-05-30
 > **最后更新**: 2026-05-30
-> **引擎版本**: Godot 4.6.2 (stable) / GDScript 2.0  
-> **项目名称**: Study  
+> **引擎版本**: Godot 4.6.2 (stable) / GDScript 2.0
+> **项目名称**: Study
 > **排除分析**: `addons/`, `godot_state_charts_examples/`
 
 ---
@@ -366,8 +369,8 @@ res://
 
 ### 3.1 game_runtime.gd
 
-**类名**: `GameRuntime`  
-**继承**: `Node`  
+**类名**: `GameRuntime`
+**继承**: `Node`
 **角色**: 顶层运行时协调器（计划 Autoload）
 
 **功能**:
@@ -382,7 +385,7 @@ res://
 
 ### 3.2 input_setup.gd
 
-**继承**: `Node`  
+**继承**: `Node`
 **角色**: 运行时 InputMap 自动注册
 
 **功能**:
@@ -397,7 +400,7 @@ res://
 
 ### 3.3 state/state.gd — FSM 状态基类
 
-**类名**: `State`  
+**类名**: `State`
 **继承**: `Node`
 
 **功能**:
@@ -409,7 +412,7 @@ res://
 
 ### 3.4 state/state_machine.gd — FSM 状态机
 
-**类名**: `StateMachine`  
+**类名**: `StateMachine`
 **继承**: `Node`
 
 **功能**:
@@ -424,8 +427,8 @@ res://
 
 ### 3.5 event/combat_event.gd — 战斗事件
 
-**类名**: `CombatEvent`  
-**继承**: `RefCounted`  
+**类名**: `CombatEvent`
+**继承**: `RefCounted`
 **角色**: 事件总线中流转的纯数据载体
 
 **功能**:
@@ -437,8 +440,8 @@ res://
 
 ### 3.6 event/combat_event_bus.gd — 事件总线
 
-**类名**: `CombatEventBus`  
-**继承**: `Node`  
+**类名**: `CombatEventBus`
+**继承**: `Node`
 **角色**: 全局发布/订阅，每个场景一个实例
 
 **功能**:
@@ -453,8 +456,8 @@ res://
 
 ### 3.7 event/combat_scope.gd — 战斗作用域
 
-**类名**: `CombatScope`  
-**继承**: `RefCounted`  
+**类名**: `CombatScope`
+**继承**: `RefCounted`
 **角色**: 控制事件/效果的传播范围
 
 **功能**:
@@ -464,8 +467,8 @@ res://
 
 ### 3.8 command/command_bus.gd — 异步命令总线
 
-**类名**: `CommandBus`  
-**继承**: `Node`  
+**类名**: `CommandBus`
+**继承**: `Node`
 **角色**: 跨 Runtime 边界异步通信的唯一通道
 
 **功能**:
@@ -478,8 +481,8 @@ res://
 
 ### 3.9 command/runtime_command.gd — 运行时命令
 
-**类名**: `RuntimeCommand`  
-**继承**: `RefCounted`  
+**类名**: `RuntimeCommand`
+**继承**: `RefCounted`
 **角色**: 跨 Runtime 异步命令的数据载体
 
 **功能**:
@@ -492,7 +495,7 @@ res://
 
 ### 3.10 debug/combat_debugger.gd — 战斗调试器
 
-**功能**: 
+**功能**:
 - 全局 trace 开关 (`enabled: bool`)
 - `begin(label)` → 创建 CombatTrace → `store(trace)` → 关闭
 - `active()` → 获取当前活跃 trace
@@ -504,7 +507,7 @@ res://
 
 ### 3.12 debug/combat_trace.gd / combat_trace_event.gd
 
-**功能**: 
+**功能**:
 - `CombatTrace` — 单次技能/命中的完整追踪记录（阶段转移、Modifier 变化、事件发射、DOT tick）
 - `CombatTraceEvent` — 单个追踪条目（category + phase + message + before/after 值）
 
@@ -514,7 +517,7 @@ res://
 
 ### 4.1 action/player_action.gd — Action Layer
 
-**类名**: `PlayerAction`  
+**类名**: `PlayerAction`
 **功能**: 将原始 Input 转换为意图（Action）：
 - 6 种类型：`MOVE / MELEE / DODGE / CAST_PRESS / CAST_RELEASE / INTERACT`
 - 纯数据类，不包含决策逻辑
@@ -526,7 +529,7 @@ res://
 
 #### 4.2.1 data/skill_data.gd — 技能数据 Resource
 
-**类名**: `SkillData`  
+**类名**: `SkillData`
 **继承**: `Resource`
 
 **功能**: 定义技能的所有配置字段（纯数据，零逻辑）：
@@ -543,7 +546,7 @@ res://
 
 #### 4.2.2 runtime/skill_executor.gd — 核心执行器
 
-**类名**: `SkillExecutor`  
+**类名**: `SkillExecutor`
 **继承**: `Node`
 
 **功能**: 战斗技能的核心执行引擎：
@@ -560,7 +563,7 @@ res://
 
 #### 4.2.3 runtime/skill_instance.gd — 技能运行时包装
 
-**类名**: `SkillInstance`  
+**类名**: `SkillInstance`
 **继承**: `RefCounted`
 
 **功能**: 包装 SkillData + 运行时冷却状态：
@@ -570,7 +573,7 @@ res://
 
 #### 4.2.4 runtime/cast_context.gd — 施法上下文
 
-**类名**: `CastContext`  
+**类名**: `CastContext`
 **继承**: `RefCounted`
 
 **功能**: 纯数据类，SkillExecutor 的输入参数：
@@ -579,7 +582,7 @@ res://
 
 #### 4.2.5 runtime/damage_context.gd — 伤害上下文
 
-**类名**: `DamageContext`  
+**类名**: `DamageContext`
 **继承**: `RefCounted`
 
 **功能**: Modifier 管线中流转的伤害数据:
@@ -588,7 +591,7 @@ res://
 
 #### 4.2.6 runtime/projectile.gd — 投射物运行时
 
-**类名**: `Projectile`  
+**类名**: `Projectile`
 **继承**: `Area2D`
 
 **功能**:
@@ -599,7 +602,7 @@ res://
 
 #### 4.2.7 manager/skill_manager.gd — 技能管理器
 
-**类名**: `SkillManager`  
+**类名**: `SkillManager`
 **继承**: `Node`
 
 **功能**:
@@ -611,7 +614,7 @@ res://
 
 #### 4.2.8 registry/skill_pool.gd — 技能池
 
-**类名**: `SkillPool`  
+**类名**: `SkillPool`
 **继承**: `Resource`
 
 **功能**:
@@ -620,7 +623,7 @@ res://
 
 #### 4.2.9 loadout/skill_loadout.gd — 装备表
 
-**类名**: `SkillLoadout`  
+**类名**: `SkillLoadout`
 **继承**: `Resource`
 
 **功能**:
@@ -656,8 +659,8 @@ res://
 
 #### 4.3.1 combat_executor.gd — 唯一控制流入口 ⭐
 
-**类名**: `CombatExecutor`  
-**继承**: `Node`  
+**类名**: `CombatExecutor`
+**继承**: `Node`
 **角色**: 战斗系统的核心——所有 HP 修改、事件发射、阶段切换的唯一入口
 
 **功能**:
@@ -676,7 +679,7 @@ res://
 
 #### 4.3.2 combat_phase.gd — 战斗阶段锁
 
-**类名**: `CombatPhase`  
+**类名**: `CombatPhase`
 **继承**: `RefCounted`
 
 **功能**:
@@ -686,7 +689,7 @@ res://
 
 #### 4.3.3 triggered_effect.gd — 触发式效果
 
-**类名**: `TriggeredEffect`  
+**类名**: `TriggeredEffect`
 **继承**: `Resource`
 
 **功能**:
@@ -738,7 +741,7 @@ res://
 
 #### 4.4.1 buff.gd — Buff Resource
 
-**类名**: `Buff`  
+**类名**: `Buff`
 **继承**: `Resource`
 
 **功能**:
@@ -753,7 +756,7 @@ res://
 
 #### 4.4.2 buff_manager.gd — Buff 管理器
 
-**类名**: `BuffManager`  
+**类名**: `BuffManager`
 **继承**: `Node`
 
 **功能**:
@@ -770,7 +773,7 @@ res://
 
 #### 4.5.1 inventory.gd — 背包 Resource
 
-**类名**: `Inventory`  
+**类名**: `Inventory`
 **继承**: `Resource`
 
 **功能**:
@@ -781,7 +784,7 @@ res://
 
 #### 4.5.2 equipment_manager.gd — 装备管理器
 
-**类名**: `EquipmentManager`  
+**类名**: `EquipmentManager`
 **继承**: `Node`
 
 **功能**:
@@ -811,7 +814,7 @@ res://
 
 #### 4.6.3 runtime/ — 任务运行时
 
-- **QuestManager**: 
+- **QuestManager**:
   - `start_quest(data)` → 创建 QuestRuntime
   - 订阅 `ON_KILL / ON_INTERACT` → 转发给所有活跃 quest
   - 检测完成 → 移入 `_completed_quests`
@@ -831,7 +834,7 @@ res://
 
 #### 4.7.1 simulation_runtime.gd — 统一调度器
 
-**类名**: `SimulationRuntime`  
+**类名**: `SimulationRuntime`
 **继承**: `Node`
 
 **功能**:
@@ -848,7 +851,7 @@ res://
 
 #### 4.7.2 surface_manager.gd — 表面系统入口
 
-**类名**: `SurfaceManager`  
+**类名**: `SurfaceManager`
 **继承**: `Node`
 
 **功能**:
@@ -877,7 +880,7 @@ res://
 
 #### 5.1.1 health_component.gd
 
-**类名**: `HealthComponent`  
+**类名**: `HealthComponent`
 **继承**: `Node`
 
 **功能**: HP 系统核心——挂载到 Player/Enemy：
@@ -889,7 +892,7 @@ res://
 
 #### 5.1.2 combat_component.gd
 
-**类名**: `CombatComponent`  
+**类名**: `CombatComponent`
 **继承**: `Node`
 
 **功能**: 近战攻击组件：
@@ -899,7 +902,7 @@ res://
 
 #### 5.1.3 mana_component.gd
 
-**类名**: `ManaComponent`  
+**类名**: `ManaComponent`
 **继承**: `Node`
 
 **功能**: MP 系统：
@@ -909,7 +912,7 @@ res://
 
 #### 5.1.4 stats_component.gd
 
-**类名**: `StatsComponent`  
+**类名**: `StatsComponent`
 **继承**: `Node`
 
 **功能**: 主属性系统：
@@ -925,7 +928,7 @@ res://
 
 #### 5.2.1 player.gd
 
-**类名**: `Player`  
+**类名**: `Player`
 **继承**: `CharacterBody2D`
 
 **功能**: 玩家主协调器（最复杂的文件之一，~550 行）：
@@ -979,7 +982,7 @@ res://
 
 #### 5.3.1 enemy.gd
 
-**类名**: `Enemy`  
+**类名**: `Enemy`
 **继承**: `CharacterBody2D`
 
 **功能**:
@@ -1001,7 +1004,7 @@ res://
 
 #### 5.4.1 npc.gd
 
-**类名**: `NPC`  
+**类名**: `NPC`
 **继承**: `CharacterBody2D`
 
 **功能**: NPC 基类，挂载 `StatsComponent`，设置视觉颜色/缩放。
@@ -1012,7 +1015,7 @@ res://
 
 #### 5.5.1 pickup.gd — 拾取物基类
 
-**类名**: `Pickup`  
+**类名**: `Pickup`
 **继承**: `Area2D`
 
 **功能**:
@@ -1030,7 +1033,7 @@ res://
 
 ### 6.1 world_runtime.gd — 世界运行时入口
 
-**类名**: `WorldRuntime`  
+**类名**: `WorldRuntime`
 **继承**: `Node`
 
 **功能**:
@@ -1043,7 +1046,7 @@ res://
 
 ### 6.2 spatial/world_spatial_index.gd — 空间索引
 
-**类名**: `WorldSpatialIndex`  
+**类名**: `WorldSpatialIndex`
 **继承**: `RefCounted`
 
 **功能**: 统一空间查询的唯一入口：
@@ -1058,7 +1061,7 @@ res://
 
 ### 6.3 state/world_state_manager.gd — 世界状态管理器
 
-**类名**: `WorldStateManager`  
+**类名**: `WorldStateManager`
 **继承**: `Node`
 
 **功能**:
@@ -1072,7 +1075,7 @@ res://
 
 #### 6.4.1 map_object.gd — 基类
 
-**类名**: `MapObject`  
+**类名**: `MapObject`
 **继承**: `Node2D`
 
 **功能**:
@@ -1120,7 +1123,7 @@ res://
 
 #### 6.5.1 npc_brain.gd — 决策层
 
-**类名**: `NPCBrain`  
+**类名**: `NPCBrain`
 **继承**: `Node`
 
 **功能**:
@@ -1135,7 +1138,7 @@ res://
 
 #### 6.5.3 move_to_task.gd — 移动任务
 
-**类名**: `MoveToTask`  
+**类名**: `MoveToTask`
 **继承**: `Node`
 
 **功能**: `tick(delta)` — 优先 NavigationAgent2D 寻路，无 navmesh 时直线移动到目标 Marker。
@@ -1144,7 +1147,7 @@ res://
 
 ### 6.6 time/world_time.gd — 世界时间
 
-**类名**: `WorldTime`  
+**类名**: `WorldTime`
 **继承**: `Node`
 
 **功能**:
@@ -1177,7 +1180,7 @@ res://
 
 ### 8.1 hud.gd / hud.tscn — HUD 主界面
 
-**类名**: `HUD`  
+**类名**: `HUD`
 **继承**: `CanvasLayer`
 
 **功能**:
@@ -1189,7 +1192,7 @@ res://
 
 ### 8.2 inventory_panel.gd / inventory_panel.tscn — 背包面板
 
-**类名**: `InventoryPanel`  
+**类名**: `InventoryPanel`
 **继承**: `CanvasLayer`
 
 **功能**:
@@ -1201,7 +1204,7 @@ res://
 
 ### 8.3 level_up_ui.gd / level_up_ui.tscn — 升级 UI
 
-**类名**: `LevelUpUI`  
+**类名**: `LevelUpUI`
 **继承**: `CanvasLayer`
 
 **功能**:
@@ -1212,7 +1215,7 @@ res://
 
 ### 8.4 skill_bar.gd — 技能栏组件
 
-**类名**: `SkillBar`  
+**类名**: `SkillBar`
 **继承**: `HBoxContainer`
 
 **功能**:
@@ -1283,7 +1286,7 @@ res://
 ### 13.0 Runtime Sovereignty（运行时主权）声明
 
 > 经架构评审确认：本项目已进入 **Runtime Sovereignty** 阶段。
-> 
+>
 > 这意味着：
 > - **CombatRuntime** 只负责计算，不控制世界
 > - **WorldRuntime** 只维护状态一致性，不计算伤害

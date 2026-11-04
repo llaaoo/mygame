@@ -1,4 +1,4 @@
-extends "res://tests/test_joint_interactions.gd"
+extends "res://tests/support/exploration_case.gd"
 
 func _context(slot: int, empower: bool) -> CastContext:
 	var context := CastContext.simple(game.player, Vector2.RIGHT, sm.get_slot(slot).data)
@@ -32,7 +32,7 @@ func _run() -> void:
 			await _interact(title)
 			game.ui.close_modal()
 	var buffs: BuffManager = game.player.get_node("BuffManager")
-	_check(controller.recipes.size() == 15 and supplies.catalog.size() == 7, "Boon integration added unrelated spells/materials")
+	_check(controller.rules.size() == 15 and supplies.catalog.size() == 7, "Boon integration added unrelated spells/materials")
 
 	# Keeping the boon increases compatible spell damage without spending the boon.
 	await _arena()
@@ -55,7 +55,7 @@ func _run() -> void:
 	# Actual Shift input is sampled once; releasing it during preparation keeps intent.
 	_shift(true)
 	_check(Input.is_key_pressed(KEY_SHIFT) and sm.use_slot(5, game.player, Vector2.RIGHT), "Shift input did not request boon expenditure")
-	_check(controller.pending.get("empower", false), "Release intent was not captured")
+	_check(controller.pending.empower, "Release intent was not captured")
 	_shift(false)
 	await create_timer(0.7).timeout
 	var surfaces := GameRuntime.instance.get_simulation_runtime().get_surface_manager()

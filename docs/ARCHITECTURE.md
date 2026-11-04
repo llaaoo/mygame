@@ -1,281 +1,61 @@
-# 🏛️ 项目架构 — 六层边界与工程契约
+# 项目架构与维护边界
 
-> **状态**: v2.3  
-> **最后更新**: 2026-05-24  
-> **替换**: RUNTIME_TOPOLOGY.md (v1.0–v1.5)
+2026-11-04。本文件定义当前边界；[运行时拓扑](./RUNTIME_TOPOLOGY.md)说明时序，[战斗契约](./COMBAT_CONTRACTS.md)与[世界契约](./WORLD_CONTRACTS.md)说明领域规则。[重构进展](./REFACTOR_PROGRESS.md)记录验收范围。早期项目分析文档保留为历史资料。
 
----
+## 请求、查询与事实
 
-## 定位
+公开方法接受同步请求并返回是否接受，查询只读状态，已提交事件广播事实。需要原子性的施法保留在同一事务中。延迟世界工作由带区域作用域的 `CommandBus` 排队；它不承担全部跨模块调用。
 
-本文档是项目的**最高级架构文件**。定义六层边界的职责、依赖方向、禁止事项、以及当前状态和下一阶段优先级。
+UI可以调用领域服务请求训练、制造、交付或施法，由服务验证并修改状态；UI不直接写生命、库存或探索记录。保存恢复通过领域接口写入状态，文件处理独立于玩法。
 
-所有下层文档（COMBAT_CONTRACTS / WORLD_CONTRACTS / PHYSICS_LAYERS / skill_architecture）都受本文档约束。
+## 组合根与所有权
 
----
+| 所有者 | 职责与公共边界 |
+|---|---|
+| `GameRuntime` | 创建战斗、世界、模拟、命令、存档及区域服务；发出运行时就绪事件 |
+| `Player` | 装配角色组件，保留移动、受击、属性、状态机与场景接口 |
+| `PlayerInputController` | 将输入转换为 `Action`；只在输入边界采样强化意图 |
+| `PlayerCastingController` | 瞄准、蓄力、引导及取消；持续计时注册到模拟服务 |
+| `PlayerCombatBindings` | 角色事件、熟练度、触发器与辅助UI装配；退出时取消订阅 |
+| `SkillManager` | 动作知识、编组、冷却及公开施法请求 |
+| `ConditionalCastController` | 条件规划、准备、重校验与提交；按能力字段管理任意元素动作 |
+| `BuffManager` | 状态实例、版本、事务通知和属性重算 |
+| `MVPGame` | 探索启动、区域切换、遭遇完成、死亡与恢复的场景编排 |
+| `ExplorationProgressService` | 知识、发现、成长、委托、世界选择、奖励与保存同步 |
+| `ExplorationPresenter` | 展示进度和规则，向进度服务提交操作请求 |
+| `ExplorationRegionBuilder` | 将区域资源装配为遭遇、发现与交互节点 |
+| `RegionSession` | 探索、旧房间与场景地图共享的离开/进入边界 |
 
-## 一、六层边界 + 事件总线 + NPC 五层
+## 技能与状态
 
-### 全局事件总线
+`CastContext`保留施法者、来源、方向、目标、世界、蓄力和强化意图；`ActionResolver`与执行使用同一上下文。`CastPlan / CastComponent / CastStatusRequirement`表达确定结果和条件版本。预览不扣资源，准备提交时重新验证；`SpellRuleIndex`按动作与作用域预索引规则，同帧UI复用预览。
 
-```
-                      CombatEventBus (唯一事件流)
-                     ┌──────────┼──────────┐
-                     ▼          ▼          ▼
-                  Quest     NPCBrain   TriggeredEffect
-                (Condition  (AI决策)    (Buff/反应)
-                 +Counter)
-                     │          │          │
-                     └──────────┼──────────┘
-                                │
-                        PlayerInput
-                             ↓
-                     gameplay/action/
-                     PlayerAction (纯数据)
-                     poll_actions() → try_action()
-                     ↙    ↓    ↘
-               MELEE  CAST  INTERACT/DODGE
-                     ↘    ↓    ↙
-                     entities/
-                     StateMachine (行为执行)
-                           ↓
-                     world/
-                     (MapObject → 交互 → Loot/信号)
-                           ↓
-                     content/
-                     (纯 .tres，零运行时)
-```
+普通施法和条件施法共用费用策略、材料/恩赐规划、执行器与 `CastTransaction`。事务暂存法力、材料、状态消费和效果，全部接受后统一通知；失败恢复状态与计时，不广播消费或施法事实。引导脉冲复用普通事务，按累计引导费用结算整数法力，失败停止。
 
-### NPC 五层架构（关键分层）
+`Buff`是效果定义，`StatusInstance`持有来源、剩余时间、层数、周期进度和版本。`ActorAttributes`从永久基础值、固定/百分比贡献和速度倍率重算属性，避免移除时反向算术带来的漂移；装备贡献标记为持久，不随区域临时状态清除。
 
-```
-WorldTime (全局事实: 几点/白天黑夜)
-    ↓
-NPCBrain (决策: "现在该干什么" — 只读Schedule，不移动不播动画)
-    ↓
-Task (意图: "去铁匠铺工作" — MoveToTask/WanderTask/IdleTask)
-    ↓
-Action (行为: "怎么去" — MoveAction/UseAction/InteractAction)
-    ↓
-StateMachine (执行: 动画/移动/Tween — 禁止读WorldTime/选行为)
-```
+伤害入口为 `CombatExecutor.report_hit → HitResult`，分别表达伤害/状态资格。`ON_HIT`是接受后的命中反应入口，`ON_DAMAGE`是扣血后的事实；同次动作共享family。周期状态保留原施法者，使用已施加DOT策略，不因接触伤害无敌丢失后续跳数，默认不重触发普通元素附加状态。
 
-| 层 | 职责 | 禁止 |
-|----|------|------|
-| **WorldTime** | 全局时钟 0-24h | 不控制 NPC |
-| **NPCBrain** | 读 Schedule → 选 Task | 不移动、不播动画、不攻击 |
-| **Task** | 目标意图（MoveTo/Sleep/Work） | 不直接控制动画 |
-| **Action** | 行为执行（Move/Use/Interact） | — |
-| **StateMachine** | 动画/移动/Tween/死亡 | 禁止读 WorldTime/Quest/Schedule |
+## 内容与术语
 
-### Enemy vs NPC 根本区别
+| 内容 | 含义 | 数据位置 |
+|---|---|---|
+| 法术组合规则 | 动作＋法阵/状态产生结果，可叠加材料与恩赐修正 | `SpellCombinationRule`、`content/combinations/` |
+| 施法材料修正 | 施放时消费媒介，改变伤害、标签、范围或结果形态 | `CastingMaterialData`、`content/casting_materials/` |
+| 制造配方 | 消耗库存原料，产出库存物品 | `CraftingRecipe`、`content/crafting/` |
 
-| | Enemy | NPC |
-|------|------|------|
-| 模式 | 反应式 AI | 生活式 AI |
-| 驱动 | 玩家距离 | Schedule（时间） |
-| 无玩家时 | 原地待机 | 持续执行日程 |
-| 架构 | StateChart 直接驱动 | Schedule→Task→Action→FSM |
+区域、遭遇、发现、出口、世界事件、机关路线与委托使用类型化Resource；`content/exploration/chapter.tres`集中登记区域、动作、法术组合规则与委托。旧存档的 `recipes`键仅作为法术知识的迁移输入，新保存写入 `spell_rules`，制造配方不进入知识列表。
 
-```
-Enemy: Idle → Chase → Attack  (只对玩家反应)
-NPC:   06:00 Wake → 08:00 Work → 18:00 Eat → 22:00 Sleep  (独立生活)
-```
+已有行为的新内容主要修改资源；新条件、新原型或新世界反馈仍需要明确的代码扩展。禁止用未校验的字符串拼接成第二套隐式脚本语言。
 
-### 依赖方向（铁律）+ FSM 铁律
+## 世界、敌人与NPC
 
-```
-content  ← 被所有层引用（只读数据）
-world    → entities（通过 WorldSpatialIndex 查询）
-gameplay → entities（通过 CombatExecutor 修改）
-core     ← 被所有层使用
-ui       → 只读所有层
-```
+`WorldStateManager`持有稳定ID的物体事实，`WorldSpatialIndex`持有当前区域的空间引用；各调度器拥有自己的清理接口。法术默认挂在活动区域根下，显式上下文可指定其他世界节点。区域退出保留已排队的世界事实，清除瞬态工作，推进scope/generation后卸载旧根。异步回调必须验证来源作用域。
 
-**禁止反向**。**禁止系统互相引用**。
+敌人的反应式StateChart和NPC的 `WorldTime → NPCBrain → Task → Action → StateMachine`保留；状态机执行移动/动画，不选择日程、任务或宏观目标。本轮没有扩展NPC生活、生存数值、装备内容或开放世界流式加载。
 
-**FSM 铁律**: FSM 永远不允许直接选行为、读 WorldTime、读 Quest、改 Schedule。FSM 只能执行动画/移动/Tween/受击/死亡。
+## 验证与后续
 
-### 最终收敛结构
+统一入口：`python3 tools/run_tests.py`。每项检查隔离数据/配置/缓存，保留日志并设置超时；脚本错误、警告及非零退出均失败。CI使用相同入口。新增内容先运行内容验证，再运行受影响的玩法检查。
 
-```
-World (Time + Quest + EventBus + Relationship + Crime)
-    │
-NPC (Brain + Schedule + Task + Action + FSM)
-    │
-Combat (Executor + Modifier + Event + EffectGraph)
-    │
-Action Layer (Move/Attack/Use/Interact/Cast — Player/NPC/Boss 统一)
-```
-
----
-
-## 二、核心层 (core/)
-
-```
-core/
-├── state/
-│   ├── state.gd
-│   └── state_machine.gd
-├── event/
-│   └── combat_event.gd
-├── game_runtime.gd
-├── command_bus.gd
-└── runtime_command.gd
-```
-
----
-
-## 三、玩法层 (gameplay/)
-
-```
-gameplay/
-├── action/                          ← ✅ Action Layer (Player)
-│   └── player_action.gd
-│
-├── abilities/                       ← 技能系统
-│   ├── archetypes/
-│   ├── data/
-│   ├── manager/
-│   ├── registry/
-│   ├── runtime/
-│   ├── modifiers/
-│   ├── conditions/
-│   └── triggered_effect.gd
-│
-├── quest/                           ← ✅ Quest P1-P3
-│   ├── data/
-│   │   ├── quest_data.gd
-│   │   ├── quest_stage.gd
-│   │   └── objective.gd
-│   ├── runtime/
-│   │   ├── quest_runtime.gd
-│   │   └── quest_manager.gd
-│   ├── objectives/
-│   │   ├── kill_objective.gd
-│   │   └── interact_objective.gd
-│   └── ui/
-│       └── quest_tracker.gd
-│
-├── status/
-│   ├── buff.gd
-│   └── buff_manager.gd
-│
-├── inventory/
-│   ├── inventory.gd
-│   └── equipment_manager.gd
-│
-└── interaction/
-    ├── simulation_runtime.gd
-    ├── surface_manager.gd
-    ├── surface_reaction.gd
-    └── propagation_scheduler.gd
-```
-
----
-
-## 四、实体层 (entities/)
-
-```
-entities/
-├── components/
-│   ├── health_component.gd
-│   ├── combat_component.gd
-│   ├── mana_component.gd
-│   └── stats_component.gd
-├── player/
-│   ├── player.tscn
-│   ├── player.gd
-│   └── states/
-├── enemy/
-│   ├── enemy.tscn
-│   ├── enemy.gd               # StateChart (反应式AI)
-└── pickups/
-```
-
-**Enemy**: godot_state_charts 驱动（Idle→Chase→Attack），反应式 AI。
-**NPC**: Schedule → NPCBrain → Task → FSM 五层架构（生活式 AI）。
-
----
-
-## 五、世界层 (world/)
-
-```
-world/
-├── time/                       ← ✅ NPC Schedule P1
-│   └── world_time.gd           # 全局 24h 时钟
-├── markers/                    ← ✅ NPC Schedule P1
-│   ├── world_marker.gd         # 地图锚点
-│   └── marker_registry.gd      # marker_id → 位置
-├── npcs/                       ← ✅ NPC Schedule P1
-│   ├── npc_brain.gd            # 决策层
-│   ├── npc_schedule.gd         # 日程 Resource
-│   ├── schedule_entry.gd       # 日程条目 Resource
-│   ├── move_to_task.gd         # 移动到 Marker
-│   └── npc_villager.tscn       # 村民场景
-├── object/                     ← WorldObject 体系
-│   ├── map_object.gd / map_object_data.gd
-│   ├── interactable.gd / signal_receiver.gd
-│   ├── switch.gd / door.gd / chest.gd
-│   ├── spike_trap.gd / pressure_plate.gd
-│   ├── npc.gd (DialogueNPC) / dialogue_balloon.gd
-│   ├── portal.gd
-│   └── oil_barrel.tscn / breakable_wall.tscn / ...
-├── maps/overworld.tscn
-├── doors/ / switches/ / traps/ / loot/
-└── world_runtime.gd / world_spatial_index.gd / world_state_manager.gd
-```
-
----
-
-## 六、内容层 (content/)
-
-```
-content/
-├── items/   (player_inventory.tres, examples/)
-├── visuals/ (fire_visual.tres, shadow_visual.tres...)
-└── quests/  (kill_enemies_quest.tres)
-```
-
----
-
-## 七、当前状态 & 下一阶段优先级
-
-| 状态 | 任务 | 说明 |
-|:--:|------|------|
-| ✅ | WorldObject 体系 | 7 种物体 + 交互框架 |
-| ✅ | Action Layer (Player) | 5 state 统一走 poll_actions/try_action |
-| ✅ | Enemy StateChart | godot_state_charts |
-| ✅ | **Quest P1-P3** | Kill/Interact Objective + 多阶段 + QuestTracker |
-| ✅ | **NPC Schedule P1** | WorldTime + Marker + Schedule + MoveToTask |
-| 🔜 | Action Layer 统一 | Move/Use/Attack Action — Player/NPC/Boss 共享 |
-| 🔜 | NPC Schedule P2 | WanderTask / SleepTask / WorkTask |
-| 🔜 | Region System | 区域驱动世界 |
-| ⚪ 不做 | 技能系统继续抽象 | 已经够了 |
-| ⚪ 不做 | 行为树 / GOAP / Planner | 用 Schedule + Task 模式 |
-
----
-
-## 八、停止线
-
-**不要再扩展的方向**：
-- 新技能类型 / Modifier / Condition / GraphNode
-- AbilityNode / BehaviorTree / DSL / Quest Script / GOAP / Planner
-- FSM 读 WorldTime / Quest / Schedule
-
-**应该投入的方向**：
-- Action Layer 统一（Player/NPC/Boss 共享 Action）
-- NPC Schedule P2（Wander/Sleep/Work）
-- Content Pipeline（设计师 2 小时配一个地牢 + 任务链 + NPC 日程）
-
----
-
-## 九、工程判断标准
-
-| 不是 | 而是 |
-|------|------|
-| 系统有多高级 | 能否低成本产出内容 |
-| 功能多少 | NPC 是否持续生活而非玩家靠近才激活 |
-| AI 复杂度 | WorldTime + Schedule 是否让世界"活起来" |
-
-> **Runtime 是「怎么运行」，Content 是「有什么内容」。FSM 只执行，不决策。**
+当前架构重构以已复现缺陷和可维护性目标为范围；手感、画面、数值平衡和目标设备性能仍需试玩或profile。后续新增功能由产品需求决定，不以增加抽象层作为目标。

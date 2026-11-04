@@ -1,0 +1,188 @@
+class_name PlayerInputController
+extends Node
+
+var player: Player
+var casting: PlayerCastingController
+const INTERACT_RANGE := 80.0
+
+func _init(actor: Player) -> void:
+	player = actor
+	casting = player.casting
+
+func poll_universal_actions() -> Array[Action]:
+	if player.ui_blocked or player.health_component.is_dead:
+		return []
+
+	var actions: Array[Action] = []
+
+	# 移动
+	var input_dir := Input.get_vector("move_left", "move_right", "move_up", "move_down")
+	if input_dir.length() > 0.05:
+		actions.append(Action.move(input_dir, player))
+
+	# 闪避
+	if Input.is_action_just_pressed("dodge"):
+		actions.append(Action.dodge(input_dir if input_dir.length() > 0.1 else player.facing_direction, player))
+
+	# 近战（左键 = 无左手技能时直接近战）
+	if Input.is_action_just_pressed("attack") and not player.skill_manager.has_left_spell():
+		actions.append(Action.melee(player))
+
+	# 技能（左手/右手/快捷键1-6）
+	for pair in [["left", "attack"], ["right", "skill"]]:
+		_poll_universal_cast(actions, pair[0], pair[1])
+	for i in range(SkillManager.MAX_SLOTS):
+		_poll_universal_cast(actions, "slot_%d" % i, "skill_%d" % (i + 1))
+
+	# 交互
+	if Input.is_action_just_pressed("interact"):
+		actions.append(Action.interact(player))
+
+	return actions
+
+func _poll_universal_cast(actions: Array[Action], source: String, input_action: String) -> void:
+	if not _can_cast_source(source):
+		return
+	var pressed := Input.is_action_just_pressed(input_action)
+	var released := Input.is_action_just_released(input_action)
+	if not pressed and not released:
+		return
+	var action := Action.cast(source, player.get_mouse_direction(), player)
+	action.params["release"] = released
+	action.cast_context = CastContext.simple(player, action.direction, _get_skill_for_source(source))
+	action.cast_context.empower = Input.is_key_pressed(KEY_SHIFT)
+	actions.append(action)
+
+func resolve_action(action: Action) -> void:
+	# 统一验证（CAST 的验证在 CAST_RELEASE 分支内单独处理，CAST_PRESS 不验证）
+	if action.action_type != Action.ActionType.CAST:
+		if not ActionResolver.validate(player, action):
+			return
+
+	match action.action_type:
+		Action.ActionType.MELEE:
+			if player.skill_manager.combinations:
+				player.skill_manager.combinations.cancel("近战：准备取消")
+			casting.aiming_sources.clear()
+			casting.hide_aim()
+			player.state_machine.transition_to("attack")
+
+		Action.ActionType.DODGE:
+			if player.skill_manager.combinations:
+				player.skill_manager.combinations.cancel("闪避：准备取消")
+			casting._cancel_charge()
+			casting._cancel_channel()
+			casting.aiming_sources.clear()
+			casting.hide_aim()
+			player.state_machine.transition_to("dodge")
+
+		Action.ActionType.INTERACT:
+			_try_interact()
+
+		Action.ActionType.CAST:
+			if action.params.get("release", false):
+				# CAST_RELEASE — 验证后才执行
+				if casting._charge_source_matches(action.skill_source):
+					# 蓄力释放：取消蓄力，正常施放
+					casting.aiming_sources.erase(action.skill_source)
+					_cast_source(action.skill_source, action.cast_context)
+					player.state_machine.transition_to("skill")
+					if casting.aiming_sources.is_empty():
+						casting.hide_aim()
+					return
+				if casting._channeling_source == action.skill_source:
+					# 引导松开：停止引导
+					casting._cancel_channel()
+					casting.aiming_sources.erase(action.skill_source)
+					if casting.aiming_sources.is_empty():
+						casting.hide_aim()
+					return
+				if not ActionResolver.validate(player, action):
+					# MP/冷却不足，清除瞄准但不执行
+					casting.aiming_sources.erase(action.skill_source)
+					if casting.aiming_sources.is_empty():
+						casting.hide_aim()
+					return
+				if casting.aiming_sources.has(action.skill_source):
+					casting.aiming_sources.erase(action.skill_source)
+					_cast_source(action.skill_source, action.cast_context)
+					player.state_machine.transition_to("skill")
+				if casting.aiming_sources.is_empty():
+					casting.hide_aim()
+			else:
+				# CAST_PRESS — 总是显示瞄准
+				casting.aiming_sources[action.skill_source] = true
+				var skill := _get_skill_for_source(action.skill_source)
+				if skill:
+					# 蓄力技能：进入蓄力状态
+					if skill.cast_type == "charge":
+						casting._begin_charge(action.skill_source, skill)
+					# 引导技能：进入引导状态
+					elif skill.cast_type == "channel":
+						casting._begin_channel(action.skill_source, skill)
+					else:
+						casting.show_aim(action.skill_source, skill)
+
+func _can_cast_source(source: String) -> bool:
+	match source:
+		"left":  return player.skill_manager.has_left_spell()
+		"right": return player.skill_manager.has_right_spell()
+		_:
+			var idx := source.trim_prefix("slot_").to_int()
+			var inst: SkillInstance = player.skill_manager.get_slot(idx)
+			return inst != null and inst.data != null
+
+func _get_skill_for_source(source: String) -> SkillData:
+	var sm = player.skill_manager
+	match source:
+		"left":  return sm.left_hand.data if sm.left_hand else null
+		"right": return sm.right_hand.data if sm.right_hand else null
+		_:
+			var inst: SkillInstance = sm.get_slot(source.trim_prefix("slot_").to_int())
+			return inst.data if inst else null
+
+func _cast_source(source: String, context: CastContext = null) -> void:
+	if not context:
+		context = CastContext.simple(player, player.get_mouse_direction(), _get_skill_for_source(source))
+		context.empower = Input.is_key_pressed(KEY_SHIFT)
+	if casting._charge_skill and casting._charge_source_matches(source):
+		context.charge_power = casting._charge_power
+		casting._cancel_charge()
+	player.skill_manager.use_source(source, player, context)
+
+func _try_interact() -> void:
+	var balloon := DialogueBalloon.active
+	if balloon != null and is_instance_valid(balloon) and balloon.has_method("advance"):
+		balloon.advance()
+		get_viewport().set_input_as_handled()
+		return
+	if DialogueBalloon.just_closed_frame == Engine.get_process_frames():
+		get_viewport().set_input_as_handled()
+		return
+
+	var nearest: Node2D = null
+	var nearest_dist: float = INTERACT_RANGE
+
+	for node in get_tree().get_nodes_in_group("interactable"):
+		var target := node as Node2D
+		if not target:
+			continue
+		var dist := player.global_position.distance_to(target.global_position)
+		if dist < nearest_dist:
+			nearest = target
+			nearest_dist = dist
+
+	if nearest:
+		var interactable := nearest.get_node_or_null("Interactable") as Interactable
+		if interactable:
+			interactable.interact(player)
+			# 发射交互事件（供 Quest 等系统监听）
+			if CombatEventBus.instance:
+				var ev := CombatEvent.create(CombatEvent.Type.ON_INTERACT, player, nearest)
+				CombatEventBus.instance.emit(ev)
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventMouseButton:
+		if (event.button_index == MOUSE_BUTTON_WHEEL_UP or event.button_index == MOUSE_BUTTON_WHEEL_DOWN) and event.pressed:
+			if casting.aiming_sources.size() > 0:
+				casting.cancel_aim = true

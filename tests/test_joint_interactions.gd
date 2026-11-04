@@ -1,18 +1,4 @@
-extends "res://tests/test_advanced_spells.gd"
-
-class RejectSecond extends SkillExecutor:
-	var accepted := 0
-	func execute(skill: SkillData, context: CastContext) -> bool:
-		accepted += 1
-		return false if accepted == 2 else super.execute(skill, context)
-
-func _place(id: String) -> FireSigil:
-	sm.equip_slot(4, sm.pool.get_skill(id + "_sigil"))
-	var cooldown := sm.get_cooldown("slot_4")
-	if cooldown > 0:
-		await create_timer(cooldown + 0.1).timeout
-	await _cast(4)
-	return controller.field
+extends "res://tests/support/exploration_case.gd"
 
 func _run() -> void:
 	game = load("res://mvp.tscn").instantiate()
@@ -51,7 +37,7 @@ func _run() -> void:
 	game.ui.close_modal()
 	await _interact("雷阵与导电实验记录")
 	game.ui.close_modal()
-	_check(controller.recipes.size() == 15 and supplies.catalog.size() == 7, "Interaction pass changed authored spell/material counts")
+	_check(controller.rules.size() == 15 and supplies.catalog.size() == 7, "Interaction pass changed authored spell/material counts")
 
 	# Existing fields cooperate; one input pays the complete, visible result.
 	await _arena()

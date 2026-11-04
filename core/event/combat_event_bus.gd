@@ -1,11 +1,11 @@
 class_name CombatEventBus
 extends Node
 ## 战斗事件总线 — 全局发布/订阅
-## 
+##
 ## 用法：
 ##   发射方: CombatEventBus.emit(CombatEvent.create(ON_HIT, caster, target))
 ##   订阅方: CombatEventBus.subscribe(CombatEvent.Type.ON_KILL, func(ev): ...)
-## 
+##
 ## 原则：
 ##   - 单例：每个场景一个实例，通过 static instance 访问
 ##   - 订阅者不修改事件（事件是已发生的事实）
@@ -24,6 +24,8 @@ const MAX_DEPTH_HARD: int = 5
 ## ── 订阅表 ──
 ## key = CombatEvent.Type (int), value = Array[Callable]
 var _listeners: Dictionary = {}
+var _once_callbacks: Dictionary = {}
+var _subscription_serial := 0
 
 
 func _ready() -> void:
@@ -54,11 +56,19 @@ func unsubscribe(event_type: CombatEvent.Type, callback: Callable) -> void:
 
 ## 一次性订阅（触发后自动移除）
 func once(event_type: CombatEvent.Type, callback: Callable) -> void:
-	var wrapper: Callable
-	wrapper = func(ev: CombatEvent):
-		unsubscribe(event_type, wrapper)
-		callback.call(ev)
+	_subscription_serial += 1
+	var wrapper := _dispatch_once.bind(_subscription_serial)
+	_once_callbacks[_subscription_serial] = {"type": event_type, "callback": callback, "wrapper": wrapper}
 	subscribe(event_type, wrapper)
+
+func _dispatch_once(event: CombatEvent, id: int) -> void:
+	var entry: Dictionary = _once_callbacks.get(id, {})
+	if entry.is_empty():
+		return
+	_once_callbacks.erase(id)
+	unsubscribe(entry.type, entry.wrapper)
+	if entry.callback.is_valid():
+		entry.callback.call(event)
 
 
 ## ── 发射 ──
@@ -118,6 +128,7 @@ static func once_static(event_type: CombatEvent.Type, callback: Callable) -> voi
 
 func clear_all() -> void:
 	_listeners.clear()
+	_once_callbacks.clear()
 
 
 func get_listener_count(event_type: CombatEvent.Type = -1) -> int:

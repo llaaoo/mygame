@@ -33,11 +33,16 @@ func _ready() -> void:
 
 ## 重新计算所有派生属性
 func _recalculate_all() -> void:
-	max_hp_bonus = endurance * 5
-	max_mana = 30 + intelligence * 3
-	physical_damage = strength * 2
-	magic_damage = intelligence * 2
-	move_speed_bonus = agility * 3.0
+	max_hp_bonus = effective_stat("endurance") * 5
+	max_mana = 30 + effective_stat("intelligence") * 3
+	physical_damage = effective_stat("strength") * 2
+	magic_damage = effective_stat("intelligence") * 2
+	move_speed_bonus = effective_stat("agility") * 3.0
+
+func effective_stat(key: String) -> int:
+	var buffs := get_parent().get_node_or_null("BuffManager") as BuffManager if get_parent() else null
+	return buffs.effective_primary(key, int(get(key))) if buffs else int(get(key))
+
 
 
 ## 修改指定属性（用于 Buff/装备加成/升级）

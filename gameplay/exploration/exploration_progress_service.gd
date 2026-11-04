@@ -1,0 +1,154 @@
+class_name ExplorationProgressService
+extends RefCounted
+var game: MVPGame
+signal save_failed(message: String)
+signal changed
+var _save_dirty := false
+var _save_delay := 0.0
+
+func _init(owner_game: MVPGame) -> void:
+	game = owner_game
+
+func _queue_save() -> void:
+	_save_dirty = true
+	_save_delay = 1.0
+
+func tick(delta: float) -> void:
+	if _save_dirty and game.ready_for_play and not game.get_tree().paused:
+		_save_delay -= delta
+		if _save_delay <= 0:
+			_save_progress()
+
+func _apply_knowledge() -> void:
+	var sm := game.player.skill_manager
+	var previous := sm.known_actions.duplicate()
+	sm.known_actions = game.progress.actions.duplicate()
+	sm.combinations.learned_rules = game.progress.spell_rules.duplicate()
+	for pair in [["pulse", 0], ["focus", 1], ["frost_sigil", 2], ["water_call", 3], ["fire_sigil", 4], ["ignite", 5]]:
+		if game.progress.actions.has(pair[0]) and (previous.is_empty() or not previous.has(pair[0])):
+			var slot: int = pair[1]
+			if sm.get_slot(slot) != null:
+				slot = -1
+				for i in range(SkillManager.MAX_SLOTS):
+					if sm.get_slot(i) == null:
+						slot = i
+						break
+			if slot >= 0:
+				sm.equip_slot(slot, sm.pool.get_skill(pair[0]))
+	if previous.is_empty():
+		sm.equip_hand("right", sm.pool.get_skill("ignite"))
+
+func _restore_character() -> void:
+	var stats := game.player.stats_component
+	for key in game.progress.character_state.get("stats", {}):
+		if key in ["level", "experience", "exp_to_next", "attribute_points", "strength", "intelligence", "agility", "endurance"]:
+			stats.set(key, int(game.progress.character_state.stats[key]))
+	stats._recalculate_all()
+	game.player._apply_stats()
+	if game.player.mastery_manager and game.progress.character_state.has("mastery"):
+		game.player.mastery_manager.restore_state(game.progress.character_state.mastery)
+	stats.stat_changed.emit("level", stats.level)
+
+func _restore_player() -> void:
+	game.player.health_component.is_dead = false
+	game.player.health_component.invincible = false
+	game.player.health_component.hp = game.player.health_component.max_hp
+	game.player.mana_component.mp = game.player.mana_component.max_mp
+	game.player.health_changed.emit(game.player.health_component.hp, game.player.health_component.max_hp)
+	game.player.mp_changed.emit(game.player.mana_component.mp, game.player.mana_component.max_mp)
+	game.player.collision_shape.set_deferred("disabled", false)
+	game.player.set_process(true)
+	game.player.set_physics_process(true)
+	game.player.state_machine.transition_to("idle")
+	game.player.mana_component.mp_regen_rate = 3.0
+	game.player.health_component.regen_rate = 0.6
+	game.player.skill_manager.combinations.reset_session()
+
+func _save_progress() -> void:
+	if not game.persistence_enabled:
+		return
+	if SaveManager.instance.save_game(MVPGame.SAVE_SLOT):
+		_save_dirty = false
+	else:
+		_save_dirty = true
+		_save_delay = 5.0
+		save_failed.emit("保存未完成，当前进度仍保留在内存。原存档已保留，可按F5重试。")
+
+func _sync_progress() -> void:
+	game.progress.casting_supplies = game.player.skill_manager.combinations.supplies.serialize()
+	game.progress.world_states = GameRuntime.instance.get_world_runtime().state_manager.get_all_states().duplicate(true)
+	game.progress.loadout = game.player.skill_manager.serialize_skill_state()
+	game.progress.loadout["__configured"] = {}
+	var stats: Dictionary = {}
+	for key in ["level", "experience", "exp_to_next", "attribute_points", "strength", "intelligence", "agility", "endurance"]:
+		stats[key] = game.player.stats_component.get(key)
+	game.progress.character_state = {"stats": stats, "mastery": game.player.mastery_manager.serialize_state() if game.player.mastery_manager else {}}
+
+func _restore_loadout() -> void:
+	if game.progress.loadout.is_empty():
+		return
+	var sm := game.player.skill_manager
+	sm.unequip_hand("left")
+	sm.unequip_hand("right")
+	for i in range(SkillManager.MAX_SLOTS):
+		sm.unequip_slot(i)
+	sm.restore_skill_state(game.progress.loadout)
+
+func replay_encounters() -> void:
+	game.progress.cleared.clear()
+	game.progress.completed = false
+	game.progress.world_states.clear()
+	GameRuntime.instance.get_world_runtime().state_manager.set_all_states({})
+	game.request_travel("camp")
+
+
+func train(stat: String) -> bool:
+	if not game.player.stats_component.spend_attribute_point(stat):
+		return false
+	_save_progress()
+	return true
+
+func claim_quest(quest: ExplorationQuestData) -> bool:
+	if game.region_id != "camp" or quest not in game.quests or not quest.is_complete(game.progress):
+		return false
+	if not game.progress.claim("quest." + quest.id, "委托完成：" + quest.title, "营地收到你的报告，获得 %d 属性点。" % quest.attribute_points, [], []):
+		return false
+	game.player.stats_component.attribute_points += quest.attribute_points
+	_save_progress()
+	changed.emit()
+	return true
+
+func choose_world_event(entry: ExplorationWorldEventData, choice: ExplorationWorldChoiceData) -> bool:
+	if entry not in game.current_data.events or choice not in entry.choices or not game.active_enemies.is_empty():
+		return false
+	game.progress.choices[entry.id] = choice.id
+	var record := choice.title + "：" + choice.text
+	if not game.progress.claim(entry.id, entry.title, record, [], []):
+		for note in game.progress.journal:
+			if note.id == entry.id:
+				note.text = record
+	_save_progress()
+	changed.emit()
+	return true
+
+func discover(entry: ExplorationDiscoveryData) -> bool:
+	if entry not in game.current_data.discoveries or (entry.requires_clear and not game.active_enemies.is_empty()):
+		return false
+	if not game.progress.claim(entry.id, entry.title, entry.text, entry.actions, entry.spell_rules):
+		return false
+	game.player.skill_manager.combinations.supplies.grant(entry.materials)
+	_apply_knowledge()
+	if entry.heal:
+		game.player.heal(60)
+		game.player.restore_mp(60)
+	_save_progress()
+	changed.emit()
+	return true
+
+func solve_puzzle(spec: SpellPuzzleData) -> bool:
+	if spec not in game.current_data.spell_objects or not game.progress.claim(spec.id, spec.title, spec.hint + "\n机关已解开，材料收入行囊。", [], []):
+		return false
+	game.player.skill_manager.combinations.supplies.grant(spec.materials)
+	_queue_save()
+	changed.emit()
+	return true

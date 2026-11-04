@@ -1,54 +1,4 @@
-extends "res://tests/test_exploration_mvp.gd"
-
-class SpellTarget extends CharacterBody2D:
-	var damage_taken := 0
-	var move_speed := 100.0
-	func take_damage(amount: int) -> void:
-		damage_taken += amount
-
-var sm: SkillManager
-var controller: FireCombinationController
-var supplies: CastingSupplies
-
-func _dummy(offset: Vector2, enemy_group: bool = false) -> SpellTarget:
-	var target := SpellTarget.new()
-	target.collision_layer = 2
-	target.collision_mask = 0
-	var collider := CollisionShape2D.new()
-	var shape := CircleShape2D.new()
-	shape.radius = 12
-	collider.shape = shape
-	target.add_child(collider)
-	var buffs := BuffManager.new()
-	buffs.name = "BuffManager"
-	target.add_child(buffs)
-	target.position = game.player.position + offset
-	game.region_root.add_child(target)
-	if enemy_group:
-		target.add_to_group("enemy")
-	return target
-
-func _cast(slot: int, direction := Vector2.RIGHT) -> void:
-	var action := sm.get_slot(slot).data
-	_check(sm.use_slot(slot, game.player, direction), "Cast rejected: " + action.get_id() + " / " + controller.last_message)
-	await create_timer(0.95 if action.get_id().ends_with("_sigil") else 0.7).timeout
-
-func _sandbox() -> void:
-	await _travel("camp")
-	game.player.global_position = Vector2(12000, 12000)
-	game.player.mana_component.max_mp = 300
-	game.player.mana_component.mp = 300
-	game.player.mana_component.mp_regen_rate = 0
-	game.player.health_component.regen_rate = 0
-
-func _cell(point: Vector2) -> Vector2i:
-	return Vector2i(floori(point.x / 64), floori(point.y / 64))
-
-func _puzzle(id: String) -> SpellWorldObject:
-	for node in game.region_root.get_children():
-		if node is SpellWorldObject and node.spec.id == id:
-			return node
-	return null
+extends "res://tests/support/exploration_case.gd"
 
 func _run() -> void:
 	game = load("res://mvp.tscn").instantiate()
@@ -99,7 +49,7 @@ func _run() -> void:
 	game.ui.close_modal()
 	await _interact("雷阵与导电实验记录")
 	game.ui.close_modal()
-	_check(game.progress.recipes.size() == 9 and sm.known_actions.has("storm_sigil"), "Storm exploration grants missing")
+	_check(game.progress.spell_rules.size() == 9 and sm.known_actions.has("storm_sigil"), "Storm exploration grants missing")
 
 	# Optional placement reagent: pure preview, cancellation, final deduction.
 	await _sandbox()
@@ -252,7 +202,7 @@ func _run() -> void:
 	current_scene = game
 	await _frames(10)
 	game.ui.close_modal()
-	_check(game.player.skill_manager.combinations.supplies.serialize() == saved and game.progress.recipes.size() == 9 and game.progress.claims.has("magic.thermal_cache"), "Spell supplies/configuration/puzzles did not restore from disk")
+	_check(game.player.skill_manager.combinations.supplies.serialize() == saved and game.progress.spell_rules.size() == 9 and game.progress.claims.has("magic.thermal_cache"), "Spell supplies/configuration/puzzles did not restore from disk")
 	game.queue_free()
 	current_scene = null
 	await _frames(5)

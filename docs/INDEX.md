@@ -10,6 +10,8 @@
 PROJECT_ANALYSIS.md (完整项目分析 — 架构评估 + 文件功能清单 + 迭代建议)
     │
     ├── PROJECT_IMPROVEMENTS.md (当前改进点 — 已完成链路 + 剩余工作)
+    ├── CODE_REVIEW_2026_11_04.md (当前代码审查 — 已复现边界问题、重构顺序与验收)
+    ├── REFACTOR_PROGRESS.md (A—D重构验收 — 事务、状态、区域、内容、组件、测试与CI)
     │
     ├── EXPLORATION_COMBINATION_DESIGN.md (当前方向 — 探索与条件组合战斗方案)
     ├── CONDITIONAL_COMBAT_TECHNICAL_PLAN.md (技术落地 — 架构能力核对、组件边界与迭代批次)
@@ -17,11 +19,11 @@ PROJECT_ANALYSIS.md (完整项目分析 — 架构评估 + 文件功能清单 + 
     ├── BUFF_CASTING_DESIGN.md (恩赐取舍 — 持续收益、资格、保留增益、主动消费与材料联动)
     ├── OUTWARD_INTERACTION_REVIEW.md (当前迭代准则 — 复用工具、空间条件、用途转换与世界反馈)
     ├── CASTING_MATERIALS_DESIGN.md (当前实装 — 法术联动、施法材料、营地加工与世界机关)
-    ├── MVP_RELEASE.md (当前可运行版本 — 九区域、15配方、回响与毒性、七种材料、营地委托、世界交互与验证)
+    ├── MVP_RELEASE.md (当前可运行版本 — 九区域、15法术组合规则、回响与毒性、七种材料、营地委托、世界交互与验证)
     ├── ROGUELITE_PIVOT_PLAN.md (历史方向 — roguelite 转型与试验场参考)
     ├── MAP_GENERATION.md (地图生成 — seed、模板、布局约束与扩展方式)
     │
-    ├── ARCHITECTURE.md (宪法 — 六层边界)
+    ├── ARCHITECTURE.md (当前职责、所有权与请求/查询/事实边界)
     │       │
     │       ├── COMBAT_CONTRACTS.md (战斗内部 12 条契约)
     │       ├── WORLD_CONTRACTS.md (世界内部 9 条契约)
@@ -29,12 +31,12 @@ PROJECT_ANALYSIS.md (完整项目分析 — 架构评估 + 文件功能清单 + 
     │       ├── skill_architecture.md (技能内容生产方式)
     │       └── equipment_system.md (装备、词缀、套装与存档)
     │
-    └── RUNTIME_TOPOLOGY.md (运行时拓扑 — 五大 Runtime 边界)
+    └── RUNTIME_TOPOLOGY.md (运行时拓扑 — 时钟、事务、区域作用域与持久化)
 ```
 
 每份文档回答不同层级的问题。从上往下读，逐层深入。
 
-> 当前设计重点：探索获得知识、配方、技能与装备；自由搭配；世界反馈；优先完善条件组合。后续玩法规划先阅读 `EXPLORATION_COMBINATION_DESIGN.md`。该文档是尚未实现的新设计基线；现有房间制 roguelite 保留作战斗试验场，旧规划及架构文档中的产品范围和状态需结合当前代码核对。
+> 当前设计重点：探索获得知识、法术组合规则、技能与装备；自由搭配；世界反馈；优先完善条件组合。后续玩法规划先阅读 `EXPLORATION_COMBINATION_DESIGN.md`。该文档包含已落地的MVP方向与后续产品规划；实现范围见MVP_RELEASE，当前架构以ARCHITECTURE和REFACTOR_PROGRESS为准。旧房间制roguelite保留作战斗试验场。
 
 > 当前开发优先级：先跑通技能与条件组合的公共流程，再扩展素材、生存制造和装备。素材首版现已实装，范围与后续扩展见 `CASTING_MATERIALS_DESIGN.md`。
 
@@ -43,6 +45,18 @@ PROJECT_ANALYSIS.md (完整项目分析 — 架构评估 + 文件功能清单 + 
 ---
 
 ## 文档概要
+
+### [CODE_REVIEW_2026_11_04.md](./CODE_REVIEW_2026_11_04.md)
+
+基于当前main的代码审查，记录存档恢复、施法意图/冷却、Buff事务、命中语义和预览重复计算的复现结果，以及分批重构建议；实施状态见文首和 [重构进展](./REFACTOR_PROGRESS.md)。
+
+---
+
+### [REFACTOR_PROGRESS.md](./REFACTOR_PROGRESS.md)
+
+A—D批次实现与验收，包含施法/状态事务、命中结果、周期边界、共享区域生命周期、组件和内容拆分、独立fixture与统一runner/CI。
+
+---
 
 ### [BUFF_CASTING_DESIGN.md](./BUFF_CASTING_DESIGN.md)
 
@@ -74,9 +88,9 @@ PROJECT_ANALYSIS.md (完整项目分析 — 架构评估 + 文件功能清单 + 
 
 **核心内容**：
 - 基于当前代码的覆盖矩阵，区分可复用、部分满足和缺失。
-- 配方解析、个人动作会话、法阵、武器准备、防御、能力知识与固定奖励的归属。
+- 法术组合规则解析、个人动作会话、法阵、武器准备、防御、能力知识与固定奖励的归属。
 - 现有施法、Buff、事件、装备、世界状态、区域与存档组件的改造清单。
-- 分批交付顺序、行为回归与内容校验；新增接口均为规划，尚未实现。
+- 早期覆盖矩阵、分批交付顺序与后续设计边界；公共技能/状态/区域重构已落地，实际接口与验收见REFACTOR_PROGRESS。
 
 **何时阅读**：实施当前方案、修改公共接口或评估开发依赖之前。
 
@@ -88,7 +102,7 @@ PROJECT_ANALYSIS.md (完整项目分析 — 架构评估 + 文件功能清单 + 
 
 **核心内容**：
 - 探索奖励、已学能力、装备配置和临时条件的边界。
-- 法阵与武器附魔两套体系，六个主动配方及判定、消耗、中断、冲突规则。
+- 法阵与武器附魔两套体系，六个主动法术组合规则及判定、消耗、中断、冲突规则。
 - Buff、世界反应、敌人窗口、装备取舍、知识日志和存档设计。
 - 首个监狱区域样板、对现有代码的复用方式、实施顺序与验收门槛。
 

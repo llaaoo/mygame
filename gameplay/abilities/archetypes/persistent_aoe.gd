@@ -26,7 +26,7 @@ func setup(skill: SkillData, caster_node: Node2D) -> void:
 	damage = skill.damage  ## 会被 SkillExecutor 覆写为 resolve_damage()
 	_tick_interval = skill.aoe_tick_interval
 	_max_hits_per_target = skill.aoe_max_hits_per_target
-	
+
 	# skill.aoe_visual 优先，fallback 到旧字段
 	if skill.aoe_visual:
 		var vis := skill.aoe_visual
@@ -58,11 +58,11 @@ func setup(skill: SkillData, caster_node: Node2D) -> void:
 				shape = CircleShape2D.new()
 				shape_node.shape = shape
 			shape.radius = skill.aoe_radius
-	
-	
+
+
 	# 表面交互：AoE 生成 → 设置所在格表面状态
 	# Surface reactions run in _ready at the final world position.
-	
+
 	_needs_setup = false
 
 
@@ -89,7 +89,7 @@ func _ready() -> void:
 	# 碰撞层：AoE 是 HITBOX，检测 ACTOR + HURTBOX
 	collision_layer = 4   # HITBOX
 	collision_mask = 10   # ACTOR(2) | HURTBOX(8)
-	
+
 	# 确保碰撞形状
 	var shape_node = $CollisionShape2D
 	if shape_node and shape_node.shape == null:
@@ -115,22 +115,20 @@ func set_caster(c: Node2D) -> void:
 
 
 func _physics_process(delta: float) -> void:
-	_remaining_life -= delta
-	if _remaining_life <= 0:
+	var alive_time := minf(delta, maxf(0.0, _remaining_life))
+	if _tick_interval > 0.0:
+		_tick_elapsed += alive_time
+		while _tick_elapsed + 0.000001 >= _tick_interval:
+			_tick_elapsed = maxf(0, _tick_elapsed - _tick_interval)
+			_hit_window += 1
+			for body in get_overlapping_bodies():
+				_try_hit(body, true)
+			for area in get_overlapping_areas():
+				var target := area if area.has_method("take_damage") else area.owner
+				_try_hit(target, true)
+	_remaining_life = maxf(0, _remaining_life - delta)
+	if _remaining_life <= 0.000001:
 		_expire()
-		return
-	if _tick_interval <= 0.0:
-		return
-	_tick_elapsed += delta
-	if _tick_elapsed < _tick_interval:
-		return
-	_tick_elapsed -= _tick_interval
-	_hit_window += 1
-	for body in get_overlapping_bodies():
-		_try_hit(body, true)
-	for area in get_overlapping_areas():
-		var target := area if area.has_method("take_damage") else area.owner
-		_try_hit(target, true)
 
 
 func _on_body_entered(body: Node2D) -> void:

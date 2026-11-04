@@ -10,6 +10,7 @@ enum StackBehavior { REFRESH, INTENSITY, INDEPENDENT }
 @export var status_id: String = ""
 @export var category: Category = Category.BUFF
 @export var exclusive_group: String = ""
+@export var persistent := false
 @export var duration: float = 0.0
 @export var tick_interval: float = 0.0
 @export var stack_behavior: StackBehavior = StackBehavior.REFRESH
@@ -87,64 +88,3 @@ func describe() -> String:
 	var effect_str := ", ".join(parts) if not parts.is_empty() else "no modifiers"
 	var duration_str := " %.1fs" % duration if duration > 0.0 else " permanent"
 	return "%s: %s%s" % [name, effect_str, duration_str]
-
-
-func apply_to(entity: Node) -> void:
-	if not entity:
-		return
-	for stat_name in stat_modifiers:
-		_apply_stat(entity, stat_name, stat_modifiers[stat_name])
-	if speed_multiplier != 1.0 and "move_speed" in entity:
-		entity.move_speed *= speed_multiplier
-
-
-func remove_from(entity: Node) -> void:
-	if not entity:
-		return
-	for stat_name in stat_modifiers:
-		_apply_stat(entity, stat_name, -float(stat_modifiers[stat_name]))
-	if speed_multiplier != 1.0 and "move_speed" in entity and speed_multiplier != 0.0:
-		entity.move_speed /= speed_multiplier
-
-
-func _apply_stat(entity: Node, stat_name: String, amount: float) -> void:
-	var amt := int(amount)
-	if amt == 0:
-		return
-
-	if stat_name in PRIMARY_STATS:
-		var stats := _get_stats_component(entity)
-		if stats:
-			stats.modify_stat(stat_name, amt)
-		return
-
-	if stat_name == "max_hp":
-		var hp := entity.get_node_or_null("HealthComponent") as HealthComponent
-		if hp:
-			hp.max_hp += amt
-			hp.hp = clampi(hp.hp + amt, 1, hp.max_hp)
-			hp.health_changed.emit(hp.hp, hp.max_hp)
-		return
-
-	if stat_name == "attack_damage":
-		var combat := entity.get_node_or_null("CombatComponent") as CombatComponent
-		if combat:
-			combat.attack_damage += amt
-		return
-
-	if stat_name == "max_mana":
-		var mana := entity.get_node_or_null("ManaComponent") as ManaComponent
-		if mana:
-			mana.max_mp += amt
-			mana.mp = clampi(mana.mp + amt, 0, mana.max_mp)
-			mana.mp_changed.emit(mana.mp, mana.max_mp)
-		return
-
-	if stat_name in entity:
-		entity.set(stat_name, entity.get(stat_name) + amt)
-
-
-func _get_stats_component(entity: Node) -> StatsComponent:
-	if entity is Player:
-		return entity.stats_component
-	return entity.get_node_or_null("StatsComponent") as StatsComponent

@@ -1,4 +1,4 @@
-extends "res://tests/test_exploration_mvp.gd"
+extends "res://tests/support/exploration_case.gd"
 ## Real interactions, combat physics, buff lifecycle, quest rewards and disk restore.
 
 func _run() -> void:
@@ -65,7 +65,7 @@ func _run() -> void:
 	await _clear_encounter()
 	await _interact("寒霜新星试验记录")
 	game.ui.close_modal()
-	_check(game.progress.recipes.size() == 6, "Exploration did not grant all six recipes")
+	_check(game.progress.spell_rules.size() == 6, "Exploration did not grant all six recipes")
 	sm.equip_slot(0, sm.pool.get_skill("pulse"))
 
 	# Range control must hit both sides and apply the existing frozen status.
@@ -128,7 +128,7 @@ func _run() -> void:
 
 	# Both reversible choices affect a newly generated real Boss/region.
 	await _travel("cistern")
-	var event: Dictionary = game.current_data.events[0]
+	var event: ExplorationWorldEventData = game.current_data.events[0]
 	await _interact("旧水路控制阀")
 	_check(paused, "Cleared valve did not open choice panel")
 	game._choose_world_event(event, event.choices[0])
@@ -161,7 +161,7 @@ func _run() -> void:
 	_check(SaveManager.instance.save_game(2), "Expanded progress save failed")
 	var restored := ExplorationProgress.new()
 	restored.deserialize_save_data(SaveManager.instance.read_extension(2, MVPGame.SECTION))
-	_check(restored.choices.get("waterworks_choice") == "conduit" and restored.visited.has("sanctum") and restored.claims.has("quest.research") and restored.recipes.size() == 6, "Expanded progress not saved")
+	_check(restored.choices.get("waterworks_choice") == "conduit" and restored.visited.has("sanctum") and restored.claims.has("quest.research") and restored.spell_rules.size() == 6, "Expanded progress not saved")
 	sm.unequip_hand("left")
 	game.reload_progress()
 	await _frames()
@@ -176,7 +176,7 @@ func _run() -> void:
 	root.add_child(game)
 	current_scene = game
 	await _frames(10)
-	_check(game.progress.choices.get("waterworks_choice") == "conduit" and game.player.mana_component.mp_regen_rate == 5 and game.progress.recipes.size() == 6, "Fresh scene did not restore new content")
+	_check(game.progress.choices.get("waterworks_choice") == "conduit" and game.player.mana_component.mp_regen_rate == 5 and game.progress.spell_rules.size() == 6, "Fresh scene did not restore new content")
 	game.ui.close_modal()
 	points = game.player.stats_component.attribute_points
 	game._claim_quest(game.quests[2])
@@ -184,7 +184,7 @@ func _run() -> void:
 	game.ui.close_modal()
 	game.replay_encounters()
 	await _frames()
-	_check(game.progress.claims.has("quest.research") and game.progress.choices.get("waterworks_choice") == "conduit" and game.progress.recipes.size() == 6, "Replay discarded persistent rewards/choices")
+	_check(game.progress.claims.has("quest.research") and game.progress.choices.get("waterworks_choice") == "conduit" and game.progress.spell_rules.size() == 6, "Replay discarded persistent rewards/choices")
 	await _travel("cistern")
 	_check(game.active_enemies.size() == 3, "Replay did not rebuild expanded encounter")
 	game.queue_free()

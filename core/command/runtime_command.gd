@@ -1,7 +1,7 @@
 class_name RuntimeCommand
 extends RefCounted
 ## RuntimeCommand — 跨 Runtime 边界的异步命令
-## 所有 Runtime 之间的通信必须走 CommandBus，禁止直接调用
+## 延迟世界工作使用带区域scope的队列；同步请求和查询使用领域公开接口
 
 enum Target {
 	COMBAT,        ## CombatRuntime
@@ -22,6 +22,7 @@ var source: String = ""         ## 发起 Runtime 名称
 var target: Target = Target.ALL ## 目标 Runtime
 var payload: Dictionary = {}    ## 数据
 var timestamp: int = 0          ## Time.get_ticks_msec()
+var scope_id := 0
 
 
 static func create(cmd_type: String, src: String, tgt: Target, data: Dictionary = {}) -> RuntimeCommand:

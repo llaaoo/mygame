@@ -1,7 +1,10 @@
 class_name SaveManager
 extends Node
 
-const VERSION: int = 3
+const REPOSITORY := preload("res://core/save/save_repository.gd")
+const VERSION: int = REPOSITORY.VERSION
+var repository := REPOSITORY.new()
+var last_read: REPOSITORY.ReadResult
 
 static var instance: SaveManager
 
@@ -29,10 +32,13 @@ func register_section(section_id: String, provider: Variant) -> void:
 		push_warning("SaveManager: section '%s' is missing persistence methods." % section_id)
 		return
 	_sections[section_id] = provider
+	if provider.has_method("validate_save_data"):
+		repository.section_validators[section_id] = Callable(provider, "validate_save_data")
 
 
 func unregister_section(section_id: String) -> void:
 	_sections.erase(section_id)
+	repository.section_validators.erase(section_id)
 
 
 func _input(event: InputEvent) -> void:
@@ -57,71 +63,35 @@ func save_game(slot: int) -> bool:
 	root.quest = _collect_quests()
 	root.extensions = _collect_extensions()
 
-	var data: Dictionary = root.serialize()
-	var path := _path(slot)
-	var file := FileAccess.open(path + ".tmp", FileAccess.WRITE)
-	if not file:
-		push_error("SaveManager: failed to write %s" % path)
-		return false
-	file.store_var(data, true)
-	var write_error := file.get_error()
-	file.close()
-	if write_error != OK:
-		return false
-	if FileAccess.file_exists(path):
-		var backup_error := DirAccess.copy_absolute(path, path + ".bak")
-		if backup_error != OK:
-			return false
-	if DirAccess.rename_absolute(path + ".tmp", path) != OK:
-		return false
-	print("SaveManager: saved %s" % path)
-	return true
+	var saved := repository.write(_path(slot), root.serialize())
+	if saved:
+		print("SaveManager: saved %s" % _path(slot))
+	return saved
+
+func read_slot(slot: int) -> REPOSITORY.ReadResult:
+	last_read = repository.read(_path(slot))
+	return last_read
 
 func read_extension(slot: int, section_id: String) -> Dictionary:
-	var path := _path(slot)
-	if not FileAccess.file_exists(path):
+	var result := read_slot(slot)
+	if not result.usable():
 		return {}
-	var file := FileAccess.open(path, FileAccess.READ)
-	if not file:
-		return {}
-	var data: Variant = file.get_var(false)
-	if not data is Dictionary:
-		push_warning("SaveManager: invalid progress file")
-		return {}
-	var migrated := _migrate(data)
-	var extensions: Dictionary = migrated.get("extensions", {})
-	var value: Variant = extensions.get(section_id, {})
+	var value: Variant = result.data.get("extensions", {}).get(section_id, {})
 	return value.duplicate(true) if value is Dictionary else {}
 
-
 func load_game(slot: int) -> void:
-	var path := _path(slot)
-	if not FileAccess.file_exists(path):
-		print("SaveManager: missing save %s" % path)
+	var result := read_slot(slot)
+	if not result.usable():
 		return
-
-	var file := FileAccess.open(path, FileAccess.READ)
-	if not file:
-		return
-	var data: Variant = file.get_var(true)
-	file.close()
-	if not (data is Dictionary):
-		push_error("SaveManager: corrupted save data")
-		return
-
-	var raw := _migrate(data as Dictionary)
-	if raw.is_empty():
-		return
-
 	_cleanup_transient()
-
-	var root := SaveData.Root.deserialize(raw)
+	var root := SaveData.Root.deserialize(result.data)
 	_restore_world(root.world)
 	await _restore_region(root.meta)
 	_restore_player(root.player)
 	_restore_quests(root.quest)
 	_restore_extensions(root.extensions)
-	print("SaveManager: loaded %s" % path)
+	active_slot = slot
+	print("SaveManager: loaded %s" % _path(slot))
 
 
 func _cleanup_transient() -> void:
@@ -169,9 +139,10 @@ func _collect_player() -> SaveData.PlayerData:
 		p.mp = player.mana_component.mp
 		p.max_mp = player.mana_component.max_mp
 	var equipment := player.get_node_or_null("EquipmentManager") as EquipmentManager
-	if equipment:
-		p.max_hp -= int(equipment.get_applied_stat_modifier("max_hp"))
-		p.max_mp -= int(equipment.get_applied_stat_modifier("max_mana"))
+	var attributes := player.get_node("BuffManager").attributes as ActorAttributes
+	if attributes:
+		p.max_hp = roundi(attributes.base_value("max_hp"))
+		p.max_mp = roundi(attributes.base_value("max_mana"))
 
 	var sc := player.stats_component
 	if sc:
@@ -268,27 +239,7 @@ func _restore_extensions(data: Dictionary) -> void:
 
 
 func _migrate(raw: Dictionary) -> Dictionary:
-	var data := raw.duplicate(true)
-	var version: int = int(data.get("version", 1))
-	if version > VERSION:
-		push_error("SaveManager: save version %d is newer than supported version %d." % [version, VERSION])
-		return {}
-	while version < VERSION:
-		match version:
-			1:
-				data["extensions"] = data.get("extensions", {})
-				version = 2
-				data["version"] = version
-			2:
-				var player_data: Dictionary = data.get("player", {})
-				player_data["equipment_items"] = player_data.get("equipment_items", [])
-				data["player"] = player_data
-				version = 3
-				data["version"] = version
-			_:
-				push_error("SaveManager: no migration from version %d." % version)
-				return {}
-	return data
+	return repository.migrate(raw)
 
 
 func _restore_player(p: SaveData.PlayerData) -> void:
@@ -298,6 +249,11 @@ func _restore_player(p: SaveData.PlayerData) -> void:
 	var equipment := player.get_node_or_null("EquipmentManager") as EquipmentManager
 	if equipment:
 		equipment.clear_all()
+
+	var old_buffs := player.get_node_or_null("BuffManager") as BuffManager
+	if old_buffs:
+		old_buffs.clear_all(BuffManager.RemovalReason.RESTORED)
+		old_buffs.attributes.restore_bases({"max_hp": p.max_hp, "max_mana": p.max_mp})
 
 	player.global_position = p.position
 

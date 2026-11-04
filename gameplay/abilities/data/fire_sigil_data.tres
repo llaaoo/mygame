@@ -4,6 +4,9 @@
 
 [resource]
 script = ExtResource("1")
+conditional_cast = true
+field_type = "fire"
+preparation = 0.8
 id = "fire_sigil"
 display_name = "铭刻火阵"
 description = "在脚下铭刻火阵，站在阵内使用火花触发火球。"

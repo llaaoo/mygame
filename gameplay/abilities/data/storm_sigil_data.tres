@@ -2,6 +2,9 @@
 [ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="1"]
 [resource]
 script = ExtResource("1")
+conditional_cast = true
+field_type = "storm"
+preparation = 0.8
 id = "storm_sigil"
 display_name = "铭刻雷阵"
 description = "雷晶粉维持的法阵。雷阵＋火花释放雷矢，＋震荡产生雷环，＋凝神获得雷息。用K调整技能编组。"

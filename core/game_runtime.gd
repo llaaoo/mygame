@@ -1,17 +1,17 @@
 class_name GameRuntime
 extends Node
+signal runtimes_ready
 ## GameRuntime — 顶层运行时协调器 (Runtime Root)
 ##
 ## 五大 Runtime 边界:
-##   CombatRuntime (纯计算) — 伤害/技能/Modifier/事件（CombatExecutor + CombatEventBus）
+##   CombatRuntime (结算) — 伤害/技能/Modifier/事件（CombatExecutor + CombatEventBus）
 ##   WorldRuntime (状态一致性) — WorldState/MapObject/SceneTree同步
 ##   SimulationRuntime (统一调度) — Surface/Propagation/Respawn tick
-##   UIRuntime (只观察) — HUD/菜单/背包
+##   UIRuntime (展示与请求) — HUD/菜单/背包
 ##   SaveRuntime (持久化) — 序列化/反序列化
 ##
-## 依赖方向铁律: simulation → world → combat (通过 CommandBus)
-##                  combat 纯计算，无依赖
-##                  ui/save 只读所有 Runtime
+## 公共接口接受同步请求/查询；已提交事实广播事件，延迟世界工作使用带scope的CommandBus。
+## UI可请求领域服务操作，SaveManager通过恢复接口写入；文件I/O由SaveRepository负责。
 ##
 ## Runtime 唯一访问入口（禁止硬编码路径查找）:
 ##   GameRuntime.instance.get_world_runtime()
@@ -25,6 +25,7 @@ var world_runtime: WorldRuntime = null
 var simulation_runtime: SimulationRuntime = null
 var command_bus: CommandBus = null
 var region_runtime: RegionRuntime = null
+var region_session: RegionSession
 
 ## CombatExecutor / CombatEventBus 由 GameRuntime 统一创建（Player 不再越权创建）
 var combat_executor: CombatExecutor = null
@@ -42,6 +43,8 @@ func _ready() -> void:
 	if instance == null:
 		instance = self
 	_setup_runtimes()
+	RuntimeRegistration.runtime_ready(self)
+	runtimes_ready.emit()
 
 func _exit_tree() -> void:
 	if instance == self:
@@ -55,6 +58,9 @@ func _process(delta: float) -> void:
 	if command_bus:
 		command_bus.dispatch()
 
+	if combat_executor:
+		combat_executor.tick(delta)
+
 	# 2. SimulationRuntime 统一 tick
 	if simulation_runtime and simulation_runtime.has_method("tick"):
 		simulation_runtime.tick(delta)
@@ -63,6 +69,7 @@ func _process(delta: float) -> void:
 ## ── Runtime 初始化 ──
 
 func _setup_runtimes() -> void:
+	region_session = RegionSession.new(self)
 	# === CommandBus（最先创建，其他 Runtime 依赖它） ===
 	if not command_bus:
 		command_bus = CommandBus.new()
@@ -179,6 +186,9 @@ func get_command_bus() -> CommandBus:
 
 func get_region_runtime() -> RegionRuntime:
 	return region_runtime
+
+func get_region_session() -> RegionSession:
+	return region_session
 
 
 func get_combat_executor() -> CombatExecutor:

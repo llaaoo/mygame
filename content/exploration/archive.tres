@@ -1,13 +1,84 @@
-[gd_resource type="Resource" script_class="ExplorationRegionData" load_steps=2 format=3]
-[ext_resource type="Script" path="res://gameplay/exploration/exploration_region_data.gd" id="1"]
+[gd_resource type="Resource" script_class="ExplorationRegionData" format=3]
+
+[ext_resource type="Script" path="res://gameplay/exploration/data/discovery_data.gd" id="1_pn3v5"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/encounter_data.gd" id="2_enbnr"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/world_event_data.gd" id="3_rqq1e"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/exit_data.gd" id="4_1ii2c"]
+[ext_resource type="Script" path="res://gameplay/exploration/exploration_region_data.gd" id="5_efxqw"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/spell_puzzle_data.gd" id="6_8xdsm"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/spell_puzzle_route.gd" id="7_po377"]
+
+[sub_resource type="Resource" id="Resource_x0mar"]
+script = ExtResource("1_pn3v5")
+id = "pulse_knowledge"
+title = "震荡与焰环"
+text = "已掌握震荡（1）。阵外是近身能量冲击；火阵内变成以法阵为中心的范围喷发。与火球共用两次法阵资源，群敌近身时再选择使用。"
+pos = Vector2(-350, 180)
+actions = Array[String](["pulse"])
+spell_rules = Array[String](["fire_sigil_pulse"])
+
+[sub_resource type="Resource" id="Resource_6u4p8"]
+script = ExtResource("1_pn3v5")
+id = "cartographer_rescued"
+title = "被困的测绘员艾妲"
+text = "艾妲：谢谢！我沿着你清理的道路返回营地。在档案室北侧的祈堂里，凝神可以借法阵化为增益；水路尽头的机房还能改变熔炉的力量。回来找我交付营地委托吧。"
+pos = Vector2(-350, -180)
+hide_when_claimed = true
+requires_clear = true
+kind = "person"
+
+[sub_resource type="Resource" id="Resource_f8few"]
+script = ExtResource("2_enbnr")
+pos = Vector2(220, -120)
+hp = 32
+
+[sub_resource type="Resource" id="Resource_kbq51"]
+script = ExtResource("2_enbnr")
+pos = Vector2(300, -80)
+hp = 32
+
+[sub_resource type="Resource" id="Resource_7sj0l"]
+script = ExtResource("2_enbnr")
+pos = Vector2(380, 160)
+hp = 28
+role = 1
+
+[sub_resource type="Resource" id="Resource_rtk0n"]
+script = ExtResource("4_1ii2c")
+target = "yard"
+title = "返回外院"
+pos = Vector2(-480, 0)
+
+[sub_resource type="Resource" id="Resource_uqb8c"]
+script = ExtResource("4_1ii2c")
+target = "sanctum"
+title = "深层支路：静默祈堂"
+pos = Vector2(0, -300)
+requires_clear = true
+
+[sub_resource type="Resource" id="Resource_baira"]
+script = ExtResource("7_po377")
+steps = PackedStringArray("lightning")
+
+[sub_resource type="Resource" id="Resource_g0kms"]
+script = ExtResource("6_8xdsm")
+id = "magic.charged_crystal"
+title = "沉眠导能晶簇"
+pos = Vector2(260, 240)
+routes = Array[ExtResource("7_po377")]([SubResource("Resource_baira")])
+hint = "晶簇只对雷电共鸣。解开取得雷晶粉2、晶砂2。先探索排水回廊尽头的机房，学习雷阵。"
+materials = {
+"crystal": 2,
+"storm_dust": 2
+}
+
 [resource]
-script = ExtResource("1")
+script = ExtResource("5_efxqw")
 id = "archive"
 title = "军械档案室"
 description = "清理守卫，解救测绘员；北侧静默祈堂藏有增益组合。"
-room_type = "barracks"
 seed = 20261106
-encounters = Array[Dictionary]([{"role": 0, "hp": 32, "pos": Vector2(220, -120)}, {"role": 0, "hp": 32, "pos": Vector2(300, -80)}, {"role": 1, "hp": 28, "pos": Vector2(380, 160)}])
-discoveries = Array[Dictionary]([{"id": "pulse_knowledge", "title": "震荡与焰环", "text": "已掌握震荡（1）。阵外是近身能量冲击；火阵内变成以法阵为中心的范围喷发。与火球共用两次法阵资源，群敌近身时再选择使用。", "actions": ["pulse"], "recipes": ["fire_sigil_pulse"], "pos": Vector2(-350, 180)}, {"id": "cartographer_rescued", "title": "被困的测绘员艾妲", "kind": "person", "hide_when_claimed": true, "requires_clear": true, "text": "艾妲：谢谢！我沿着你清理的道路返回营地。在档案室北侧的祈堂里，凝神可以借法阵化为增益；水路尽头的机房还能改变熔炉的力量。回来找我交付营地委托吧。", "pos": Vector2(-350, -180)}])
-exits = Array[Dictionary]([{"target": "yard", "title": "返回外院", "pos": Vector2(-480, 0), "requires_clear": false}, {"target": "sanctum", "title": "深层支路：静默祈堂", "pos": Vector2(0, -300), "requires_clear": true}])
-spell_objects = Array[Dictionary]([{"id": "magic.charged_crystal", "title": "沉眠导能晶簇", "pos": Vector2(260, 240), "routes": [["lightning"]], "hint": "晶簇只对雷电共鸣。解开取得雷晶粉2、晶砂2。先探索排水回廊尽头的机房，学习雷阵。", "materials": {"storm_dust": 2, "crystal": 2}}])
+encounters = Array[ExtResource("2_enbnr")]([SubResource("Resource_f8few"), SubResource("Resource_kbq51"), SubResource("Resource_7sj0l")])
+discoveries = Array[ExtResource("1_pn3v5")]([SubResource("Resource_x0mar"), SubResource("Resource_6u4p8")])
+spell_objects = Array[ExtResource("6_8xdsm")]([SubResource("Resource_g0kms")])
+exits = Array[ExtResource("4_1ii2c")]([SubResource("Resource_rtk0n"), SubResource("Resource_uqb8c")])

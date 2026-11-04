@@ -5,13 +5,14 @@ extends Node
 ## 规则:
 ## 1. 谁产生事件，谁 emit
 ## 2. 谁处理，谁 subscribe
-## 3. 不跨级调用
+## 3. 同步请求/查询走公开接口；需要延迟的世界工作走此队列
 ## 4. 异步（不保证同帧处理）
 
 ## 最大队列大小（超出丢弃旧命令）
 const MAX_QUEUE_SIZE := 128
 
 var _queue: Array[RuntimeCommand] = []
+var scope_id := 1
 ## {String cmd_type: Array[Dictionary{"target": Target, "callback": Callable}]}
 var _subscribers: Dictionary = {}
 
@@ -22,6 +23,10 @@ func _ready() -> void:
 
 ## 发送命令（入队）
 func emit(cmd: RuntimeCommand) -> void:
+	if cmd.scope_id == 0:
+		cmd.scope_id = scope_id
+	if cmd.scope_id != scope_id:
+		return
 	if _queue.size() >= MAX_QUEUE_SIZE:
 		_queue.pop_front()
 	_queue.append(cmd)
@@ -55,8 +60,21 @@ func dispatch(max_per_tick: int = 16) -> void:
 	var processed := 0
 	while _queue.size() > 0 and processed < max_per_tick:
 		var cmd: RuntimeCommand = _queue.pop_front()
-		_dispatch_one(cmd)
+		if cmd.scope_id == scope_id:
+			_dispatch_one(cmd)
 		processed += 1
+
+func finish_region() -> void:
+	# Keep persistent world facts; discard combat/simulation work owned by the old region.
+	# A destroyed object may enqueue follow-up transient work while recording its state.
+	var processed := 0
+	while not _queue.is_empty() and processed < MAX_QUEUE_SIZE * 4:
+		var command: RuntimeCommand = _queue.pop_front()
+		if command.scope_id == scope_id and command.target == RuntimeCommand.Target.WORLD:
+			_dispatch_one(command)
+		processed += 1
+	_queue.clear()
+	scope_id += 1
 
 
 func _dispatch_one(cmd: RuntimeCommand) -> void:
