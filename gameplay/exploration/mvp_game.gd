@@ -295,8 +295,8 @@ func _update_objective() -> void:
 func _show_quests() -> void:
 	presenter._show_quests()
 
-func _claim_quest(quest: ExplorationQuestData) -> void:
-	presenter._claim_quest(quest)
+func _claim_quest(quest: ExplorationQuestData, approach_id: String = "") -> void:
+	presenter._claim_quest(quest, approach_id)
 
 func _show_world_event(entry: ExplorationWorldEventData) -> void:
 	presenter._show_world_event(entry)

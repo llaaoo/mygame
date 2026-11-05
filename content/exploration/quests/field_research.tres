@@ -1,5 +1,24 @@
-[gd_resource type="Resource" script_class="ExplorationQuestData" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="ExplorationQuestData" load_steps=5 format=3]
 [ext_resource type="Script" path="res://gameplay/exploration/exploration_quest_data.gd" id="1"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/quest_approach_data.gd" id="2"]
+
+[sub_resource type="Resource" id="analysis"]
+script = ExtResource("2")
+id = "analysis"
+title = "记录推演（智力14）"
+description = "清理三处区域并读齐三份实地观察，以推演完成报告。尚未接通的检修通路仍需亲自处理。"
+required_claims = PackedStringArray("field.archive_observation", "field.drain_observation", "field.cistern_observation")
+required_clears = PackedStringArray("archive", "drain", "cistern")
+required_attributes = {"intelligence": 14}
+
+[sub_resource type="Resource" id="inspection"]
+script = ExtResource("2")
+id = "inspection"
+title = "重载检修（力量14）"
+description = "清理三处区域并完成三个机关，搬运拆下的检修件，以现场检修成果代替文字记录。遗漏的观察仍可回访阅读。"
+required_claims = PackedStringArray("magic.charged_crystal", "magic.thermal_cache", "magic.waterworks_conductor")
+required_clears = PackedStringArray("archive", "drain", "cistern")
+required_attributes = {"strength": 14}
 [resource]
 script = ExtResource("1")
 id = "field_research"
@@ -7,3 +26,4 @@ title = "狱中复核"
 description = "阅读档案室、回廊和机房的三份实地观察，解开导能晶簇、热冲击封匣与水路检修晶闸，再回营地报告。已有工具的规律可以复用，三条检修捷径将保留你的成果。"
 required_claims = PackedStringArray("field.archive_observation", "field.drain_observation", "field.cistern_observation", "magic.charged_crystal", "magic.thermal_cache", "magic.waterworks_conductor")
 attribute_points = 1
+approaches = Array[ExtResource("2")]([SubResource("analysis"), SubResource("inspection")])

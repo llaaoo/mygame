@@ -239,6 +239,16 @@ func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 		for id in quest.required_clears:
 			if not catalog.regions.has(id):
 				_fail(quest, "Missing quest region: " + id)
+		var approach_ids: Dictionary = {}
+		for approach in quest.approaches:
+			if approach.id.is_empty() or approach_ids.has(approach.id) or approach.title.is_empty(): _fail(quest, "Invalid/duplicate quest approach")
+			approach_ids[approach.id] = true
+			if approach.required_attributes.is_empty() or not StatsComponent.valid_requirements(approach.required_attributes): _fail(quest, "Invalid quest attribute requirements")
+			if approach.required_claims.is_empty() and approach.required_clears.is_empty(): _fail(quest, "Quest approach needs exploration evidence")
+			for id in approach.required_claims:
+				if not claims.has(id): _fail(quest, "Missing approach discovery: " + id)
+			for id in approach.required_clears:
+				if not catalog.regions.has(id): _fail(quest, "Missing approach region: " + id)
 	for id in catalog.regions:
 		var visited: Dictionary = {}
 		var queue: Array = [id]
@@ -333,6 +343,8 @@ func _validate_entries(chapter: ExplorationChapterData) -> bool:
 	resources.append_array(chapter.actions)
 	resources.append_array(chapter.spell_rules)
 	resources.append_array(chapter.quests)
+	for quest in chapter.quests:
+		if quest: resources.append_array(quest.approaches)
 	for region in chapter.regions:
 		resources.append(region)
 		if region:

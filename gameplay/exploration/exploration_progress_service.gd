@@ -135,11 +135,15 @@ func train(stat: String) -> bool:
 	_save_progress()
 	return true
 
-func claim_quest(quest: ExplorationQuestData) -> bool:
-	if game.region_id != "camp" or quest not in game.quests or not quest.is_complete(game.progress):
+func claim_quest(quest: ExplorationQuestData, approach_id: String = "") -> bool:
+	if game.region_id != "camp" or quest not in game.quests or not quest.can_claim(game.progress, game.player.stats_component, approach_id):
 		return false
-	if not game.progress.claim("quest." + quest.id, "委托完成：" + quest.title, "营地收到你的报告，获得 %d 属性点。" % quest.attribute_points, [], []):
+	var approach := quest.find_approach(approach_id)
+	var report := "营地收到你的报告，获得 %d 属性点。" % quest.attribute_points
+	if approach: report += "\n完成方式：" + approach.title + "。" + approach.description
+	if not game.progress.claim("quest." + quest.id, "委托完成：" + quest.title, report, [], []):
 		return false
+	game.progress.choices["quest." + quest.id] = approach_id if approach else "standard"
 	game.player.stats_component.attribute_points += quest.attribute_points
 	_save_progress()
 	changed.emit()

@@ -183,6 +183,9 @@ func _connect_player() -> void:
 			player.stats_component.stat_changed.connect(_on_stat_changed)
 		if not player.stats_component.leveled_up.is_connected(_on_level_up):
 			player.stats_component.leveled_up.connect(_on_level_up)
+	var buffs := player.get_node_or_null("BuffManager") as BuffManager
+	if buffs and not buffs.buffs_changed.is_connected(_update_stats_display):
+		buffs.buffs_changed.connect(_update_stats_display)
 
 	buff_ui.setup(player)
 	summon_ui.setup(player)
@@ -296,7 +299,7 @@ func _update_stats_display() -> void:
 		return
 	var s := player.stats_component
 	stats_label.text = "Lv.%d STR %d INT %d AGI %d END %d" % [
-		s.level, s.strength, s.intelligence, s.agility, s.endurance,
+		s.level, s.effective_stat("strength"), s.effective_stat("intelligence"), s.effective_stat("agility"), s.effective_stat("endurance"),
 	]
 	if xp_bar:
 		xp_bar.max_value = max(1, s.exp_to_next)

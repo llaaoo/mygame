@@ -230,7 +230,7 @@ func show_panel(title: String, text: String, buttons: Array[Dictionary], locked:
 		var button := Button.new()
 		button.text = entry.title
 		button.clip_text = true
-		button.tooltip_text = entry.title
+		button.tooltip_text = entry.get("tooltip", entry.title)
 		button.custom_minimum_size.y = 38
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		button.disabled = bool(entry.get("disabled", false))

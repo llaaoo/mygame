@@ -68,6 +68,8 @@ func build_plan(skill: SkillData, actor: Node2D, empower: bool = false) -> CastP
 	result.field_bonus = 0.0
 	result.action_cooldown = get_parent().effective_cooldown(skill, actor, skill.cooldown)
 	result.signature = [["action_cooldown", result.action_cooldown]]
+	var stats := actor.get_node_or_null("StatsComponent") as StatsComponent
+	if stats: result.signature.append(["attributes", stats.primary_values()])
 	var equipment := actor.get_node_or_null("EquipmentManager") as EquipmentManager
 	if equipment:
 		result.signature.append(["equipment", equipment.loadout_revision])
@@ -149,7 +151,7 @@ func build_plan(skill: SkillData, actor: Node2D, empower: bool = false) -> CastP
 		result.cooldown_keys[key] = component.cooldown
 		result.cost += component.cost
 		result.cooldown = maxf(result.cooldown, component.cooldown)
-		result.preparation = maxf(result.preparation, component.preparation * clampf(1.0 + (equipment.casting_value("preparation_bonus") if equipment else 0.0), 0.5, 1.5))
+		result.preparation = maxf(result.preparation, component.preparation * (stats.preparation_multiplier if stats else 1.0) * clampf(1.0 + (equipment.casting_value("preparation_bonus") if equipment else 0.0), 0.5, 1.5))
 		result.field_bonus = maxf(result.field_bonus, component.field_bonus)
 		for id in material.costs:
 			result.material_costs[id] = int(result.material_costs.get(id, 0)) + int(material.costs[id])
@@ -170,6 +172,8 @@ func build_plan(skill: SkillData, actor: Node2D, empower: bool = false) -> CastP
 		elif component.skill.skill_type == SkillData.SkillType.PROJECTILE:
 			shape = "，%d发、额外穿透%d" % [component.skill.projectile_count, component.skill.projectile_pierce]
 		result.explanation.append(CastExplanationStep.new("effect", component.skill.get_id(), component.skill.display_name + ("〔" + affinity + "〕" if not affinity.is_empty() else "") + shape + ("；" + component.medium_label if not component.medium_label.is_empty() else "")))
+	if stats and stats.preparation_multiplier < 1.0:
+		result.explanation.append(CastExplanationStep.new("attributes", "agility", "敏捷%d：准备时间×%.2f，另与装备准备修正相乘" % [stats.effective_stat("agility"), stats.preparation_multiplier]))
 	result.explanation.append(CastExplanationStep.new("cost", "total", "总计%d MP；准备%.2f秒；%s" % [result.cost, result.preparation, supplies.describe_cost(result.material_costs) if not result.material_costs.is_empty() else "无材料消耗"]))
 	return result
 
