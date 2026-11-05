@@ -5,6 +5,24 @@ var game: MVPGame
 func _init(owner_game: MVPGame) -> void:
 	game = owner_game
 
+func show_arrival() -> void:
+	var first_visit := game.progress.claims.is_empty() and game.progress.cleared.is_empty()
+	var title := "余烬监狱 · 初次远征" if first_visit else "余烬监狱 · 继续旅程"
+	var text := "先读营地材料手册，取得水引，再去外院寻找火阵记录。\n\n这次先试一条规律：火花在火阵内变为火球，阵外仍是近身火花。按住动作键观察范围，松开施放。\n\n左键近战，右键火花，空格闪避，E调查；J日志，M材料，K编组，O装备。"
+	if not first_visit:
+		text = "监狱封锁已解除，可以回访遗漏支路或比较不同配置。" if game.progress.completed else "已恢复你的知识、装备、材料与探索进度。"
+		var reports: Array[String] = []
+		for quest in game.quests:
+			if quest.is_complete(game.progress) and not game.progress.claims.has("quest." + quest.id): reports.append(quest.title)
+		if not reports.is_empty(): text += "\n\n可交付委托：" + "、".join(reports)
+		var passages: Array[String] = []
+		for region: ExplorationRegionData in game.catalog.regions.values():
+			for exit in region.exits:
+				if not exit.camp_return_title.is_empty() and exit.claims_satisfied(game.progress): passages.append(region.title)
+		if not passages.is_empty(): text += "\n\n营地检修通路可直达：" + "、".join(passages)
+		text += "\n\nJ查看记录与待办，O查看当前装备。已清区域可在Esc选择本区试战：耗材照常消耗，击杀没有奖励，探索进度保留。"
+	game.ui.show_panel(title, text, [{"title": "开始探索" if first_visit else "继续旅程", "callback": game.ui.close_modal}, {"title": "查看探索日志", "callback": game.ui.show_journal}])
+
 func _show_training() -> void:
 	var stats := game.player.stats_component
 	var text := "可用属性点：%d\n力量 %d · 智力 %d · 敏捷 %d · 耐力 %d\n\n战斗获得经验，升级获得属性点。力量影响近战，智力影响魔法，敏捷影响移动，耐力影响生命。训练结果自动保存。" % [stats.attribute_points, stats.strength, stats.intelligence, stats.agility, stats.endurance]
@@ -20,6 +38,7 @@ func _train(stat: String) -> void:
 
 func _update_objective() -> void:
 	game.ui.heading.text = game.current_data.title + (" · 已清理" if game.progress.cleared.has(game.region_id) else "")
+	if game.practice_active: game.ui.heading.text = game.current_data.title + " · 本区试战"
 	game.ui.objective.text = game.current_data.description + ("\n剩余敌人：%d" % game.active_enemies.size() if not game.active_enemies.is_empty() else "")
 	if game.region_id == "boss" and game.progress.choices.get("waterworks_choice", "") == "cooling":
 		game.ui.objective.text += "\n冷却水路生效：领主生命 -25%，火抗降至10%。"
@@ -73,7 +92,8 @@ func journal_text() -> String:
 	for region: ExplorationRegionData in game.catalog.regions.values():
 		for exit in region.exits:
 			if exit.target == "camp" and not exit.required_claims.is_empty():
-				text += region.title + " · " + exit.title + ("：已开启\n" if exit.claims_satisfied(game.progress) else "：待解开对应机关\n" + exit.locked_message + "\n")
+				text += region.title + " · " + exit.title + ("：已开启，营地可直达返场\n" if exit.claims_satisfied(game.progress) else "：待解开对应机关\n" + exit.locked_message + "\n")
+	text += "\n本区试战\n在已清理区域按Esc，可单独重试当地敌人。耗材照常消耗，击杀无经验、掉落或残魂；知识、机关、委托和其他区域进度保持。\n"
 	text += "\n保留与兑现\n普通施法保留恩赐；Shift请求消费适配恩赐，形态与总成本见技能槽预览。节律护手可改为部分消费：保留当前剩余时长50%，较弱伤害倍率，每份另加3 MP。蕴魂、回响和护盾不受部分消费影响。\n"
 	text += "\n营地委托（回营地交付）\n"
 	for quest in game.quests:
@@ -96,19 +116,22 @@ func journal_text() -> String:
 	return text
 
 
-func inspect_discovery(entry: ExplorationDiscoveryData, node: ExplorationInteractable) -> void:
+func inspect_discovery(entry: ExplorationDiscoveryData, node: ExplorationInteractable, full: bool = false) -> void:
 	if entry.requires_clear and not game.active_enemies.is_empty():
 		game.ui.notify("先清除守卫，再靠近这里调查。")
 		return
+	var first_read := not game.progress.claims.has(entry.id)
 	var previous_ownership := game.progress.equipment_owned.duplicate()
 	if game.progress_service.discover(entry):
-		node.set_title(entry.title + "（已记录）")
+		if is_instance_valid(node): node.set_title(entry.title + "（已记录）")
 		if entry.id == "cartographer_rescued":
 			game.ui.notify("测绘员已沿清理过的道路返回营地。回去交付委托可领取成长奖励。")
-		if entry.hide_when_claimed:
+		if entry.hide_when_claimed and is_instance_valid(node):
 			node.queue_free()
-	var text := entry.text
+	var brief := first_read and not full and not entry.intro_text.is_empty()
+	var text := entry.intro_text + "\n\n完整用法已记入J日志，可随时回看。" if brief else entry.text
 	var buttons: Array[Dictionary] = [{"title": "记入日志，继续探索", "callback": game.ui.close_modal}]
+	if brief: buttons.append({"title": "查看完整记录", "callback": inspect_discovery.bind(entry, null, true)})
 	for id in entry.equipment:
 		var item := game.catalog.equipment.get(id) as EquipmentData
 		if item:

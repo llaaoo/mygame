@@ -110,5 +110,5 @@ func build_summary(candidate: EquipmentData = null) -> String:
 	var infusion_cost := _manager().medium_infusion_cost(candidate)
 	text += "介质灌注：Shift造地借用最新可反应法阵，1次充能 + %d MP（费用修正前）\n" % infusion_cost if infusion_cost >= 0 else "介质灌注：未启用\n"
 	var partial_cost := _manager().partial_boon_cost(candidate)
-	text += "恩赐消费：Shift保留剩余时长50%，改用保留伤害倍率；形态强化保留，每份再加%d MP（费用修正前）\n" % partial_cost if partial_cost >= 0 else "恩赐消费：Shift完整消费，获得完整释放倍率\n"
+	text += "恩赐消费：Shift保留剩余时长50%%，改用保留伤害倍率；形态强化保留，每份再加%d MP（费用修正前）\n" % partial_cost if partial_cost >= 0 else "恩赐消费：Shift完整消费，获得完整释放倍率\n"
 	return text

@@ -17,6 +17,10 @@ func _build_camp() -> void:
 	dummy.persistent_id = "camp.training_crate"
 	dummy.position = Vector2(250, 180)
 	game.region_root.add_child(dummy)
+	for region: ExplorationRegionData in game.catalog.regions.values():
+		for exit in region.exits:
+			if not exit.camp_return_title.is_empty() and exit.claims_satisfied(game.progress) and (not exit.requires_clear or game.progress.cleared.has(region.id)) and (exit.required_action.is_empty() or game.progress.actions.has(exit.required_action)):
+				_add_interaction(exit.camp_return_title, exit.camp_return_pos, game.request_travel.bind(region.id, exit.pos), "passage")
 
 func _build_props(layout: RefCounted) -> void:
 	for i in range(layout.props.size()):
@@ -41,10 +45,13 @@ func _build_props(layout: RefCounted) -> void:
 		node.position = position
 		game.region_root.add_child(node)
 
-func _spawn_enemy(spec: ExplorationEncounterData, layout: RefCounted, index: int) -> void:
+func _spawn_enemy(spec: ExplorationEncounterData, layout: RefCounted, index: int, rewards: bool = true) -> void:
 	var boss := bool(spec.boss)
 	var enemy := load("res://entities/boss/fire_lord.tscn" if boss else "res://entities/enemy/enemy.tscn").instantiate() as Enemy
 	enemy.name = "Encounter_%d" % index
+	enemy.rewards_enabled = rewards
+	enemy.health_drop_amount = 8
+	enemy.mana_drop_amount = 12
 	var point: Vector2 = spec.pos
 	if not layout.is_point_clear(point, 28):
 		for candidate in layout.enemy_offsets:

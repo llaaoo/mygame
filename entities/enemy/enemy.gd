@@ -14,6 +14,9 @@ class_name Enemy
 @export var return_tolerance: float = 12.0
 @export var ranged_preferred_range: float = 180.0
 @export var drop_scene: PackedScene
+@export var health_drop_amount := 20
+@export var mana_drop_amount := 30
+var rewards_enabled := true
 
 enum AIRole { MELEE, RANGED, HYBRID }
 @export var ai_role: AIRole = AIRole.MELEE
@@ -511,9 +514,9 @@ func take_damage(amount: int) -> void:
 
 
 func _on_died() -> void:
-	if player:
+	if player and rewards_enabled:
 		CombatExecutor.report_exp_bonus(player, 30 + stats_component.level * 10)
-	_spawn_drop()
+	if rewards_enabled: _spawn_drop()
 	died.emit()
 	queue_free()
 
@@ -528,5 +531,7 @@ func _spawn_drop() -> void:
 	if not drop_scene:
 		return
 	var drop := drop_scene.instantiate()
+	if drop is HealthPickup: drop.heal_amount = health_drop_amount
+	if drop is ManaPickup: drop.mana_amount = mana_drop_amount
 	get_parent().add_child.call_deferred(drop)
 	drop.global_position = global_position

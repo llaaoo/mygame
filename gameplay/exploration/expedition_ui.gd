@@ -3,6 +3,7 @@ extends CanvasLayer
 
 signal travel_requested(destination: String)
 signal replay_requested
+signal practice_requested
 signal materials_requested
 signal elements_requested
 signal trials_requested
@@ -16,6 +17,7 @@ var _message_time := 0.0
 var progress: ExplorationProgress
 var modal_locked := false
 var journal_provider: Callable
+var practice_available: Callable
 var _heading_panel: PanelContainer
 var _notice: PanelContainer
 var _modal_panel: PanelContainer
@@ -264,10 +266,11 @@ func _update_terrain() -> void:
 	_terrain_label.add_theme_color_override("font_color", GameUIStyle.TEXT_MUTED if state == "dry" else Color(SurfaceCatalog.color_for(state), 1))
 
 func show_pause() -> void:
-	show_panel("远征暂停", "知识、委托奖励和已清理区域自动保存。返回营地可以恢复，未清理区域的敌人会重新出现。\n\n同一动作在火阵与霜阵中产生不同结果。J日志可查看已学法术组合、区域状态、水路选择和委托进度。", [
+	show_panel("远征暂停", "知识、委托奖励和已清理区域自动保存。返营可以恢复；解开检修机关后，营地会开放直达该区域的通路。\n\n已清区域可单独重试：耗材照常消耗，击杀无经验、掉落或残魂，探索进度保留。重置整轮遭遇则重新开启全部战斗。", [
 		{"title": "继续", "callback": close_modal},
 		{"title": "装备与构筑", "callback": func(): equipment_requested.emit()},
 		{"title": "返回营地", "callback": func(): close_modal(); travel_requested.emit("camp")},
+		{"title": "重试本区（无击杀奖励）", "disabled": not practice_available.is_valid() or not practice_available.call(), "callback": func(): practice_requested.emit()},
 		{"title": "重置遭遇，保留已学知识", "callback": func(): close_modal(); replay_requested.emit()},
 	])
 

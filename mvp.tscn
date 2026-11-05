@@ -56,6 +56,7 @@ script = ExtResource("12_mvp")
 position = Vector2(-720, -430)
 debug_items = false
 exploration_mode = true
+melee_damage_multiplier = 0.6
 
 [node name="SkillManager" type="Node" parent="Player" unique_id=1978715642]
 script = ExtResource("5_4c57u")

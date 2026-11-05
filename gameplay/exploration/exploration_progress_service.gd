@@ -116,6 +116,18 @@ func replay_encounters() -> void:
 	GameRuntime.instance.get_world_runtime().state_manager.set_all_states({})
 	game.request_travel("camp")
 
+func practice_encounters() -> bool:
+	if not game.can_practice(): return false
+	game.ui.close_modal()
+	game.practice_active = true
+	var layout := game._generator.generate_room(game.current_data.seed, 0, game.current_data.room_type)
+	game.current_data.reserve_interaction_space(layout)
+	for i in range(game.current_data.encounters.size()):
+		game._spawn_enemy(game.current_data.encounters[i], layout, i, false)
+	game._update_objective()
+	game.ui.notify("本区试战：耗材照常消耗；击杀无经验、掉落或残魂。离区结束，已解机关与探索进度保留。")
+	return true
+
 
 func train(stat: String) -> bool:
 	if not game.player.stats_component.spend_attribute_point(stat):

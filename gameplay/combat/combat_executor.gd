@@ -132,10 +132,12 @@ static func report_kill(target: Node2D, overkill: int, position: Vector2) -> voi
 		var raw = target.get_meta("_last_hit_tags", [])
 		if raw is Array:
 			tags = raw
+	var reward_eligible := not target or not "rewards_enabled" in target or bool(target.rewards_enabled)
+	var data := {"overkill_damage": overkill, "position": position, "tags": tags, "reward_eligible": reward_eligible}
 	if not instance:
-		_emit_direct(CombatEvent.Type.ON_KILL, null, target, {"overkill_damage": overkill, "position": position, "tags": tags}, null)
+		_emit_direct(CombatEvent.Type.ON_KILL, null, target, data, null)
 		return
-	instance._enforce_emit(CombatEvent.Type.ON_KILL, instance._current_hit.source if instance._current_hit else null, target, {"overkill_damage": overkill, "position": position, "tags": tags}, instance._current_hit.skill if instance._current_hit else null)
+	instance._enforce_emit(CombatEvent.Type.ON_KILL, instance._current_hit.source if instance._current_hit else null, target, data, instance._current_hit.skill if instance._current_hit else null)
 
 
 ## 报告施法（替代 SkillExecutor._emit_event）

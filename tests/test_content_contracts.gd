@@ -19,6 +19,16 @@ func _invalid(chapter: ExplorationChapterData, fragment: String) -> void:
 func _run() -> void:
 	_check(ExplorationContentValidator.new().validate(ExplorationContentCatalog.new()).is_empty(), "Current content is invalid")
 	var chapter := _chapter()
+	for region in chapter.regions:
+		if region.id == "archive":
+			region.exits.back().camp_return_pos = Vector2(9999, 9999)
+	_invalid(chapter, "camp_return_pos: outside camp interaction bounds")
+	chapter = _chapter()
+	for region in chapter.regions:
+		if region.id == "archive":
+			region.exits.back().required_claims = []
+	_invalid(chapter, "camp_return_title: reverse passage needs a claim-gated camp exit")
+	chapter = _chapter()
 	chapter.regions[0].exits[0].target = "missing_region"
 	_invalid(chapter, "Dangling exit")
 	chapter = _chapter()
