@@ -189,9 +189,22 @@ func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 		for puzzle in region.spell_objects:
 			_claim(claims, puzzle.id, puzzle)
 			completion_claims[puzzle.id] = true
+			if not puzzle.pickup_claim.is_empty():
+				_claim(claims, puzzle.pickup_claim, puzzle)
+				completion_claims[puzzle.pickup_claim] = true
+				if puzzle.pickup_title.is_empty(): _fail(puzzle, "pickup_title: missing part name")
+			var method_ids: Dictionary = {}
+			for method in puzzle.work_methods:
+				if method.id.is_empty() or method_ids.has(method.id) or method.duration <= 0 or not is_finite(method.duration) or method.title.is_empty(): _fail(puzzle, "Invalid/duplicate work method")
+				method_ids[method.id] = true
+				if not StatsComponent.valid_requirements(method.required_attributes): _fail(method, "Invalid work attribute requirements")
+				_validate_materials(method, method.material_costs, supplies)
 			if puzzle.routes.is_empty():
 				_fail(puzzle, "Missing spell puzzle route")
 			for route in puzzle.routes:
+				if not route.id.is_empty():
+					if method_ids.has(route.id): _fail(puzzle, "Duplicate work/spell method ID")
+					method_ids[route.id] = true
 				if route.steps.is_empty() and route.required_surface.is_empty():
 					_fail(puzzle, "Empty spell puzzle route")
 				if not route.required_surface.is_empty() and (route.required_surface not in SurfaceCatalog.STATE_IDS or route.hold_seconds <= 0):
@@ -215,6 +228,9 @@ func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 	# All claims must be collected before checking cross-region exit references.
 	var return_points: Array[Vector2] = []
 	for region in catalog.chapter.regions:
+		for puzzle in region.spell_objects:
+			for id in puzzle.required_claims:
+				if not completion_claims.has(id): _fail(puzzle, "required_claims: unknown work prerequisite '%s'" % id)
 		for exit in region.exits:
 			for id in exit.required_claims:
 				if not completion_claims.has(id): _fail(exit, "required_claims: unknown completion marker '%s'" % id)
@@ -361,6 +377,7 @@ func _validate_entries(chapter: ExplorationChapterData) -> bool:
 			for puzzle in region.spell_objects:
 				if puzzle:
 					resources.append_array(puzzle.routes)
+					resources.append_array(puzzle.work_methods)
 	if null in resources:
 		_fail(chapter, "Missing content resource reference")
 		return false

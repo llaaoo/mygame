@@ -55,6 +55,11 @@ func _poll_universal_cast(actions: Array[Action], source: String, input_action: 
 	actions.append(action)
 
 func resolve_action(action: Action) -> void:
+	if player.field_work:
+		if action.action_type == Action.ActionType.INTERACT and player.field_work.interact(): return
+		if action.action_type in [Action.ActionType.MOVE, Action.ActionType.DODGE, Action.ActionType.MELEE, Action.ActionType.CAST]:
+			player.field_work.cancel("开始其他动作：作业取消")
+			player.field_work.close_panel()
 	# 统一验证（CAST 的验证在 CAST_RELEASE 分支内单独处理，CAST_PRESS 不验证）
 	if action.action_type != Action.ActionType.CAST:
 		if not ActionResolver.validate(player, action):

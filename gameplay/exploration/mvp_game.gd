@@ -28,6 +28,7 @@ var equipment_service: ExpeditionEquipment
 var knowledge: ElementKnowledge
 var trial_recorder: ElementTrialRecorder
 var workshop: CastingWorkshop
+var field_sites: FieldWorkSites
 var _generator := RunRoomGenerator.new()
 var _renderer := PrisonArena.new()
 
@@ -71,9 +72,11 @@ func _bootstrap() -> void:
 	ui.practice_requested.connect(progress_service.practice_encounters)
 	ui.practice_available = can_practice
 	player.skill_manager.combinations.feedback_requested.connect(ui.notify)
+	player.field_work.feedback_requested.connect(ui.notify)
 	equipment_service = ExpeditionEquipment.new(self)
 	ui.equipment_requested.connect(equipment_service.show_equipment)
 	workshop = CastingWorkshop.new(self)
+	field_sites = FieldWorkSites.new(self)
 	ui.materials_requested.connect(workshop.show_materials)
 	knowledge = ElementKnowledge.new()
 	knowledge.game = self
@@ -162,8 +165,14 @@ func _change_region(destination: String, arrival: Vector2 = Vector2.INF) -> void
 		object.spec = spec
 		object.position = spec.pos
 		object.completed = progress.claims.has(spec.id)
+		object.part_taken = not spec.pickup_claim.is_empty() and progress.claims.has(spec.pickup_claim)
+		object.eligibility = field_sites.reason.bind(object)
+		object.completion_handler = field_sites.complete_route.bind(object)
 		object.solved.connect(_on_spell_object_solved)
-		object.inspected.connect(presenter.inspect_puzzle)
+		if not spec.work_methods.is_empty():
+			object.inspected.connect(field_sites.on_inspected.bind(object))
+		else:
+			object.inspected.connect(presenter.inspect_puzzle)
 		region_root.add_child(object)
 	for entry in current_data.exits:
 		_add_interaction(entry.title, entry.pos, _use_exit.bind(entry), "passage")
@@ -249,12 +258,15 @@ func reload_progress() -> void:
 	request_travel("camp")
 
 func _on_spell_object_solved(spec: SpellPuzzleData) -> void:
-	if progress_service.solve_puzzle(spec):
+	if progress.claims.has(spec.id):
+		if not spec.work_methods.is_empty():
+			player.field_work.cancel("设备已解封")
+			player.field_work.close_panel()
 		var unlocked: Array[String] = []
 		for exit in current_data.exits:
 			if spec.id in exit.required_claims and exit.claims_satisfied(progress):
 				unlocked.append(exit.title)
-		ui.notify("解开：" + spec.title + " · 材料已收入行囊，按M查看。" + ("\n捷径已开启：" + "、".join(unlocked) + "；营地可直达此处。" if not unlocked.is_empty() else ""))
+		ui.notify((spec.completion_text if not spec.completion_text.is_empty() else "解开：" + spec.title + " · 材料已收入行囊，按M查看。") + ("\n捷径已开启：" + "、".join(unlocked) + "；营地可直达此处。" if not unlocked.is_empty() else ""))
 
 func can_practice() -> bool:
 	return ready_for_play and not _switching and not _defeated and not player.health_component.is_dead and not practice_active and progress.cleared.has(region_id) and not current_data.encounters.is_empty() and active_enemies.is_empty()

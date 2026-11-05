@@ -71,7 +71,12 @@ var facing_direction: Vector2 = Vector2.DOWN
 var mana_component: ManaComponent = null
 
 ## ── UI 面板打开时阻止游戏输入 ──
-var ui_blocked: bool = false
+var ui_blocked: bool = false:
+	set(value):
+		ui_blocked = value
+		if value and field_work:
+			field_work.cancel("打开菜单：作业取消")
+			field_work.close_panel()
 
 ## ── 运行时移动速度（基础 + 敏捷加成） ──
 var move_speed: float = 300.0
@@ -80,6 +85,7 @@ var move_speed: float = 300.0
 var casting: PlayerCastingController
 var input_controller: PlayerInputController
 var bindings: PlayerCombatBindings
+var field_work: PlayerFieldWork
 var aiming_sources: Dictionary:
 	get: return casting.aiming_sources if casting else {}
 var cancel_aim: bool:
@@ -144,6 +150,14 @@ func _ready() -> void:
 
 	# 状态机
 	_setup_state_machine()
+	if exploration_mode:
+		field_work = PlayerFieldWork.new(self)
+		add_child(field_work)
+		var work_state := preload("res://entities/player/states/work.gd").new()
+		work_state.name = "work"
+		work_state.entity = self
+		state_machine.add_child(work_state)
+		state_machine.states["work"] = work_state
 
 	# 视觉
 	if sprite and sprite.texture:
@@ -397,6 +411,9 @@ func heal(amount: int) -> void:
 	health_component.heal(maxi(0, int(round(amount * multiplier))))
 
 func cancel_region_actions() -> void:
+	if field_work:
+		field_work.cancel("区域切换：作业取消")
+		field_work.close_panel()
 	skill_manager.combinations.cancel("区域切换")
 	skill_manager.combinations.clear_field()
 	skill_manager.executor.cancel_pending_effects()

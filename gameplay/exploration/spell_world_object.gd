@@ -5,6 +5,9 @@ signal solved(spec: SpellPuzzleData)
 signal inspected(spec: SpellPuzzleData, completed: bool)
 var spec: SpellPuzzleData
 var completed := false
+var part_taken := false
+var eligibility: Callable
+var completion_handler: Callable
 var _steps: Array[int] = []
 var _held: Array[float] = []
 var _label: Label
@@ -45,7 +48,7 @@ func take_damage(_amount: int) -> void:
 	pass # This object responds to elements rather than health depletion.
 
 func _on_hit(event: CombatEvent) -> void:
-	if completed or event.target != self:
+	if completed or event.target != self or not eligible():
 		return
 	var tags: Array = event.skill.tags if event.skill else event.data.get("tags", [])
 	for i in range(_steps.size()):
@@ -61,6 +64,11 @@ func tick(delta: float) -> void:
 	_refresh()
 
 func _evaluate_routes(delta: float) -> void:
+	if not eligible():
+		for i in range(_steps.size()):
+			_steps[i] = 0
+			_held[i] = 0
+		return
 	var surfaces := GameRuntime.instance.get_simulation_runtime().get_surface_manager() if GameRuntime.instance else null
 	for i in range(spec.routes.size()):
 		var route := spec.routes[i]
@@ -71,16 +79,27 @@ func _evaluate_routes(delta: float) -> void:
 				continue
 			_held[i] += delta
 			if _held[i] + 0.000001 < route.hold_seconds: continue
-		completed = true
-		set_deferred("collision_layer", 0)
-		solved.emit(spec)
+		finish(route.id if not route.id.is_empty() else "spell_%d" % i)
 		break
+
+func eligible() -> bool:
+	return not completed and (not eligibility.is_valid() or str(eligibility.call()).is_empty())
+
+func finish(method_id: String) -> bool:
+	if completed: return false
+	if completion_handler.is_valid() and not completion_handler.call(method_id): return false
+	completed = true
+	set_deferred("collision_layer", 0)
+	_refresh()
+	solved.emit(spec)
+	return true
 
 func _refresh() -> void:
 	var count := 0
 	for step in _steps:
 		count = maxi(count, step)
-	_label.text = "[E] " + str(spec.title) + (" · 已解开" if completed else (" · 共鸣%d" % count if count > 0 else ""))
+	var result := " · 已解开" if spec.pickup_claim.is_empty() else " · 已取件" if part_taken else " · 可取件"
+	_label.text = "[E] " + str(spec.title) + (result if completed else (" · 共鸣%d" % count if count > 0 else ""))
 	if not completed:
 		for i in range(spec.routes.size()):
 			var route := spec.routes[i]

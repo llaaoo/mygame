@@ -1,5 +1,6 @@
 class_name SpellPuzzleRoute
 extends Resource
+@export var id: String = ""
 
 @export var steps: PackedStringArray
 
