@@ -13,7 +13,7 @@ func show_arrival() -> void:
 		text = "监狱封锁已解除，可以回访遗漏支路或比较不同配置。" if game.progress.completed else "已恢复你的知识、装备、材料与探索进度。"
 		var reports: Array[String] = []
 		for quest in game.quests:
-			if quest.is_complete(game.progress) and not game.progress.claims.has("quest." + quest.id): reports.append(quest.title)
+			if (quest.is_complete(game.progress) or quest.has_available_approach(game.progress, game.player.stats_component)) and not game.progress.claims.has("quest." + quest.id): reports.append(quest.title)
 		if not reports.is_empty(): text += "\n\n可交付委托：" + "、".join(reports)
 		var passages: Array[String] = []
 		for region: ExplorationRegionData in game.catalog.regions.values():
@@ -25,10 +25,31 @@ func show_arrival() -> void:
 
 func _show_training() -> void:
 	var stats := game.player.stats_component
-	var text := "可用属性点：%d\n力量 %d · 智力 %d · 敏捷 %d · 耐力 %d\n\n战斗获得经验，升级获得属性点。力量影响近战，智力影响魔法，敏捷影响移动，耐力影响生命。训练结果自动保存。" % [stats.attribute_points, stats.strength, stats.intelligence, stats.agility, stats.endurance]
+	var values := stats.derived_values()
+	var primary: Dictionary = values.primary
+	var text := "可用属性点：%d\n基础：力量%d · 智力%d · 敏捷%d · 耐力%d\n当前有效：力量%d · 智力%d · 敏捷%d · 耐力%d\n\n当前战斗与生存\n近战%d · 魔法加成%d · 生命上限%d · 法力上限%d\n移速%.0f · 属性准备时间×%.2f · 持续／陷阱伤害降低%.0f%%\n\n" % [stats.attribute_points, stats.strength, stats.intelligence, stats.agility, stats.endurance, primary.strength, primary.intelligence, primary.agility, primary.endurance, game.player.combat_component.attack_damage, stats.magic_damage, game.player.health_component.max_hp, game.player.mana_component.max_mp, game.player.move_speed, stats.preparation_multiplier, (1 - stats.hazard_damage_multiplier) * 100]
+	text += "力量：增强近战，可承担需要力量的任务处理方式。\n智力：增强魔法与法力，可通过记录推演解决任务。\n敏捷：增强移动，超过10后每点缩短1.5%准备，最多30%。\n耐力：增加生命，超过10后每点减免2%持续、环境与陷阱伤害，最多40%；不会免疫状态。\n\n下一点基础派生变化（已计入主属性增益，其他修正另计）\n"
 	var buttons: Array[Dictionary] = []
 	for pair in [["strength", "力量"], ["intelligence", "智力"], ["agility", "敏捷"], ["endurance", "耐力"]]:
-		buttons.append({"title": pair[1] + " +1", "disabled": stats.attribute_points <= 0, "callback": _train.bind(pair[0])})
+		var next := stats.derived_values({pair[0]: int(stats.get(pair[0])) + 1})
+		var change := ""
+		var benefit := ""
+		match pair[0]:
+			"strength":
+				change = "基础近战%d→%d" % [roundi((10 + values.physical_damage) * game.player.melee_damage_multiplier), roundi((10 + next.physical_damage) * game.player.melee_damage_multiplier)]
+				benefit = change
+			"intelligence":
+				change = "魔法加成%d→%d，基础法力%d→%d" % [values.magic_damage, next.magic_damage, values.max_mana, next.max_mana]
+				benefit = "法力%d→%d" % [values.max_mana, next.max_mana]
+			"agility":
+				change = "基础移速%.0f→%.0f，属性准备×%.3f→×%.3f" % [game.player.base_move_speed + values.move_speed_bonus, game.player.base_move_speed + next.move_speed_bonus, values.preparation_multiplier, next.preparation_multiplier]
+				benefit = "准备缩短%.1f%%→%.1f%%" % [(1 - values.preparation_multiplier) * 100, (1 - next.preparation_multiplier) * 100]
+			"endurance":
+				change = "基础生命%d→%d，危险伤害减免%.0f%%→%.0f%%" % [50 + values.max_hp_bonus, 50 + next.max_hp_bonus, (1 - values.hazard_damage_multiplier) * 100, (1 - next.hazard_damage_multiplier) * 100]
+				benefit = "生命%d→%d" % [50 + values.max_hp_bonus, 50 + next.max_hp_bonus]
+		text += pair[1] + " +1：" + change + "\n"
+		buttons.append({"title": pair[1] + " +1 · " + benefit, "tooltip": change, "disabled": stats.attribute_points <= 0, "callback": _train.bind(pair[0])})
+	text += "\n升级获得属性点。任务按提交时的有效属性检查，可借助临时增益；原有常规交付方式保留。训练结果自动保存。"
 	buttons.append({"title": "完成训练", "callback": game.ui.close_modal})
 	game.ui.show_panel("营地训练", text, buttons)
 
@@ -49,15 +70,32 @@ func _show_quests() -> void:
 	for quest in game.quests:
 		var claimed := game.progress.claims.has("quest." + quest.id)
 		var complete := quest.is_complete(game.progress)
-		var status := "已交付" if claimed else ("可交付" if complete else "进行中")
+		var alternate := quest.has_available_approach(game.progress, game.player.stats_component)
+		var status := "已交付" if claimed else ("可交付" if complete else "可选交付" if alternate else "进行中")
 		text += "%s [%s] %d/%d\n%s\n奖励：%d 属性点\n\n" % [quest.title, status, quest.objective_count(game.progress), quest.required_claims.size() + quest.required_clears.size(), quest.description, quest.attribute_points]
 		buttons.append({"title": ("已交付：" if claimed else "交付：") + quest.title, "disabled": claimed or not complete, "callback": _claim_quest.bind(quest)})
+		for approach in quest.approaches:
+			var available := approach.available(game.progress, game.player.stats_component)
+			var hint := game.player.stats_component.describe_requirements(approach.required_attributes) + "；" + _approach_evidence(approach)
+			text += "可选方式：%s\n%s\n%s\n" % [approach.title, approach.description, hint]
+			buttons.append({"title": approach.title + ("（已交付）" if claimed else ""), "tooltip": approach.description + "\n" + hint, "disabled": claimed or not available, "callback": _claim_quest.bind(quest, approach.id)})
 	buttons.append({"title": "继续探索", "callback": game.ui.close_modal})
 	game.ui.show_panel("营地委托", text, buttons)
 
-func _claim_quest(quest: ExplorationQuestData) -> void:
-	game.progress_service.claim_quest(quest)
+func _claim_quest(quest: ExplorationQuestData, approach_id: String = "") -> void:
+	game.progress_service.claim_quest(quest, approach_id)
 	_show_quests()
+
+func _approach_evidence(approach: ExplorationQuestApproachData) -> String:
+	var missing: Array[String] = []
+	for id in approach.required_clears:
+		if not game.progress.cleared.has(id): missing.append("清理" + game.catalog.regions[id].title)
+	for id in approach.required_claims:
+		if game.progress.claims.has(id): continue
+		for region: ExplorationRegionData in game.catalog.regions.values():
+			for entry in region.discoveries + region.spell_objects + region.events:
+				if entry.id == id: missing.append(entry.title)
+	return "现场凭据齐备" if missing.is_empty() else "还需：" + "、".join(missing)
 
 func _show_world_event(entry: ExplorationWorldEventData) -> void:
 	if not game.active_enemies.is_empty():

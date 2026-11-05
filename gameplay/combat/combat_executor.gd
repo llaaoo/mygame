@@ -320,8 +320,7 @@ static func report_bonus_damage(source: Node2D, target: Node2D, amount: int, ski
 	if not instance:
 		# 降级路径：无 Executor 时直接调用
 		if is_instance_valid(target) and target.has_method("take_damage"):
-			var buffs := target.get_node_or_null("BuffManager") as BuffManager
-			target.take_damage(int(round(amount * (buffs.get_incoming_hit_multiplier(skill, tags) if buffs else 1.0))))
+			target.take_damage(int(round(amount * HitContext.incoming_factor(target, skill, tags))))
 		return
 	instance._apply_bonus_damage(source, target, amount, skill, tags)
 
@@ -333,8 +332,7 @@ func _apply_bonus_damage(source: Node2D, target: Node2D, amount: int, skill: Ski
 	if "hp" in target and target.hp <= 0:
 		return
 	# Use the parent's pre-hit snapshot; bonuses still begin from unmitigated base damage.
-	var buffs := target.get_node_or_null("BuffManager") as BuffManager
-	var factor := _current_hit.incoming_multiplier if _current_hit and _current_hit.target == target else (buffs.get_incoming_hit_multiplier(skill, tags) if buffs else 1.0)
+	var factor := _current_hit.incoming_multiplier if _current_hit and _current_hit.target == target else HitContext.incoming_factor(target, skill, tags)
 	amount = int(round(amount * factor))
 	if not tags.is_empty():
 		target.set_meta("_last_hit_tags", tags)

@@ -19,6 +19,18 @@ func _invalid(chapter: ExplorationChapterData, fragment: String) -> void:
 func _run() -> void:
 	_check(ExplorationContentValidator.new().validate(ExplorationContentCatalog.new()).is_empty(), "Current content is invalid")
 	var chapter := _chapter()
+	chapter.quests.back().approaches[0].required_attributes = {"missing_attribute": 14}
+	_invalid(chapter, "Invalid quest attribute requirements")
+	chapter = _chapter()
+	chapter.quests.back().approaches[0].required_clears.append("missing_approach_region")
+	_invalid(chapter, "Missing approach region")
+	chapter = _chapter()
+	chapter.quests.back().approaches[0].required_claims.append("missing_approach_claim")
+	_invalid(chapter, "Missing approach discovery")
+	chapter = _chapter()
+	chapter.quests.back().approaches.append(null)
+	_invalid(chapter, "Missing content resource reference")
+	chapter = _chapter()
 	for region in chapter.regions:
 		if region.id == "archive":
 			region.exits.back().camp_return_pos = Vector2(9999, 9999)
