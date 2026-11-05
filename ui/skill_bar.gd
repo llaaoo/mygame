@@ -32,6 +32,7 @@ var _hint_panel: PanelContainer
 var _preparation_bar: ProgressBar
 var _cost_labels: Array[Label] = []
 var _affinity_strips: Array[ColorRect] = []
+var _icon_keys: Array = []
 
 
 func setup(sm: SkillManager) -> void:
@@ -54,7 +55,7 @@ func setup(sm: SkillManager) -> void:
 func _build() -> void:
 	for child in get_children():
 		child.queue_free()
-	_cost_labels.clear(); _affinity_strips.clear()
+	_cost_labels.clear(); _affinity_strips.clear(); _icon_keys.clear()
 	_panels.clear(); _icons.clear(); _masks.clear(); _bind_labels.clear(); _cd_labels.clear(); _sources.clear()
 
 	# 左手
@@ -102,19 +103,28 @@ func _process(_delta: float) -> void:
 	if _preview_elapsed < 0.1: return
 	_preview_elapsed = 0.0
 	var controller := _skill_manager.combinations
-	var ignite := _skill_manager.pool.get_skill("ignite") if _skill_manager.pool else null
-	if not ignite:
+	var actor := _skill_manager.get_parent() as Player
+	var source := actor.casting.aimed_source() if actor else ""
+	var hint_instance := _skill_manager.get_instance(source if not source.is_empty() else "right")
+	if not hint_instance:
+		for candidate in _sources:
+			hint_instance = _skill_manager.get_instance(candidate)
+			if hint_instance: break
+	var action := hint_instance.data if hint_instance else null
+	if not action:
 		_combination_hint.hide()
 		return
+	_combination_hint.show()
 	var previews: Dictionary = {}
-	var hint_key := hash([ignite, {}])
-	previews[hint_key] = controller.preview(ignite, _skill_manager.get_parent(), empower)
+	var hint_key := hash([hint_instance.base_data, hint_instance.upgrade_ranks])
+	previews[hint_key] = controller.preview(action, _skill_manager.get_parent(), empower)
 	var plan: CastPlan = previews[hint_key]
-	var action_name := "火花"
+	var action_name: String = action.display_name
 	if not controller.pending.is_empty():
 		plan = controller.pending
 		action_name = plan.action.display_name
 	var text := ("Shift · " if empower else "") + "%s → %s · %d MP" % [action_name, plan.effect_label, plan.cost]
+	text += " · " + controller.effect_scope(plan.skill)
 	if not plan.material_costs.is_empty():
 		text += " · " + controller.supplies.describe_cost(plan.material_costs)
 	var boon_hint := controller.boon_hint(plan)
@@ -122,10 +132,10 @@ func _process(_delta: float) -> void:
 		text += "\n" + boon_hint
 	if not controller.pending.is_empty():
 		text += "\n准备：%s · %.1fs" % [controller.pending.effect_label, maxf(0, controller.pending.remaining)]
-	elif not controller.last_message.is_empty():
-		text += "\n" + controller.last_message
 	elif not plan.ready:
 		text += "\n" + plan.reason
+	elif source.is_empty() and not controller.last_message.is_empty():
+		text += "\n" + controller.last_message
 	_combination_hint.text = text
 	_preparation_bar.visible = not controller.pending.is_empty()
 	if _preparation_bar.visible:
@@ -146,6 +156,10 @@ func _process(_delta: float) -> void:
 				previews[comparison_key] = instance.data.display_name + "\n\n普通 · " + _brief_plan(alternate if empower else preview) + "\n\nShift · " + _brief_plan(preview if empower else alternate) + "\n\n数字为本次MP费用 · M查看完整材料与条件"
 			_panels[i].tooltip_text = previews[comparison_key]
 		if preview:
+			var icon_key: Variant = preview.skill.icon if preview.skill.icon else preview.skill.icon_atlas_index
+			if _icon_keys[i] != icon_key:
+				_icons[i].texture = SkillIconCatalog.get_icon(preview.skill)
+				_icon_keys[i] = icon_key
 			_cost_labels[i].text = "%d" % preview.cost
 			_cost_labels[i].modulate = GameUIStyle.TEXT_MAIN if preview.ready else GameUIStyle.GOLD
 			var accent := ElementVisuals.color_for(preview.skill.tags)
@@ -178,6 +192,7 @@ func _add_item(source: String, label: String, size: Vector2) -> void:
 	icon.modulate = Color(1, 1, 1, 0.3)
 	inner.add_child(icon)
 	_icons.append(icon)
+	_icon_keys.append(null)
 	var strip := ColorRect.new()
 	strip.size = Vector2(size.x, 2)
 	strip.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -238,6 +253,7 @@ func _refresh_idx(idx: int) -> void:
 			skill = inst.data if inst else null
 
 	var icon := _icons[idx]
+	_icon_keys[idx] = (skill.icon if skill.icon else skill.icon_atlas_index) if skill else null
 	if skill:
 		icon.texture = SkillIconCatalog.get_icon(skill)
 		icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST

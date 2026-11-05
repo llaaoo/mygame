@@ -213,10 +213,19 @@ func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 			if not catalog.regions.has(exit.target) or (not exit.required_action.is_empty() and not catalog.actions.has(exit.required_action)):
 				_fail(region, "Dangling exit/knowledge requirement")
 	# All claims must be collected before checking cross-region exit references.
+	var return_points: Array[Vector2] = []
 	for region in catalog.chapter.regions:
 		for exit in region.exits:
 			for id in exit.required_claims:
 				if not completion_claims.has(id): _fail(exit, "required_claims: unknown completion marker '%s'" % id)
+			if not exit.camp_return_title.is_empty():
+				if region.id == "camp" or exit.target != "camp" or exit.required_claims.is_empty():
+					_fail(exit, "camp_return_title: reverse passage needs a claim-gated camp exit")
+				if not exit.camp_return_pos.is_finite() or absf(exit.camp_return_pos.x) > 480 or absf(exit.camp_return_pos.y) > 280:
+					_fail(exit, "camp_return_pos: outside camp interaction bounds")
+				for point in return_points:
+					if point.distance_to(exit.camp_return_pos) < 110: _fail(exit, "camp_return_pos: overlapping reverse passages")
+				return_points.append(exit.camp_return_pos)
 	var quest_ids: Dictionary = {}
 	for quest in catalog.chapter.quests:
 		if quest_ids.has(quest.id):

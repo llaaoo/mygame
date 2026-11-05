@@ -26,6 +26,7 @@ static func create_for_player(exp: int = 15) -> OnKillBonusExp:
 
 
 func _execute(ev: CombatEvent) -> void:
+	if not ev.data.get("reward_eligible", true): return
 	# 击杀奖励发放给玩家（副作用收敛到 CombatExecutor）
 	var player := ev.target.get_tree().get_first_node_in_group("player") as Player
 	if not player:

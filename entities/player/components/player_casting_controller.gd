@@ -17,6 +17,12 @@ var _aim_distance: float = 60.0
 var _aim_ground_targeted := false
 var _aim_ring: Line2D
 var _ring_radius := -1.0
+var _aim_refresh := 0.0
+
+func aimed_source() -> String:
+	# Dictionary insertion order follows the latest pressed source. Releasing one
+	# source falls back to any other source that is still being held.
+	return str(aiming_sources.keys().back()) if not aiming_sources.is_empty() else ""
 
 func _init(actor: Player) -> void:
 	player = actor
@@ -104,6 +110,12 @@ func tick(delta: float) -> void:
 	if player.health_component.is_dead:
 		cancel_all()
 		return
+	_aim_refresh -= delta
+	if _aim_refresh <= 0 and not aiming_sources.is_empty():
+		_aim_refresh = .1
+		var source := aimed_source()
+		var instance := player.skill_manager.get_instance(source)
+		if instance: show_aim(source, instance.data)
 	# 蓄力累加
 	if _charging_source != "" and _charge_skill:
 		_charge_power = minf(1.0, _charge_power + delta / maxf(0.001, _charge_skill.charge_duration))
@@ -161,6 +173,14 @@ func show_aim(_source: String, skill: SkillData) -> void:
 		color = Color(ElementVisuals.status_color(skill.buff_resource.status_id), .6)
 
 	match skill.skill_type:
+		SkillData.SkillType.PROJECTILE:
+			_aim_distance = minf(360, skill.projectile_speed * skill.projectile_lifetime)
+			_aim_line.default_color = color
+			_aim_line.visible = true
+			_aim_dot.modulate = color
+			_aim_dot.scale = Vector2(0.08, 0.08)
+			_aim_dot.visible = true
+
 		SkillData.SkillType.BUFF:
 			_aim_line.visible = false
 			_aim_dot.modulate = color

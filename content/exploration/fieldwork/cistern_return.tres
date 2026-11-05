@@ -6,4 +6,6 @@ target = "camp"
 title = "返营检修升降机"
 pos = Vector2(430, -240)
 required_claims = PackedStringArray("magic.waterworks_conductor")
+camp_return_title = "检修通路：蓄水机房"
+camp_return_pos = Vector2(420, 280)
 locked_message = "独立升降机尚未接通：让水路检修晶闸所在格实际导电持续0.5秒。"

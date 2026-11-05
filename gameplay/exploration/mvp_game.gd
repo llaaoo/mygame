@@ -15,6 +15,7 @@ var active_enemies: Array[Enemy] = []
 var ui: ExpeditionUI
 var _switching := false
 var _defeated := false
+var practice_active := false # Regional rehearsal only; never serialized as progress.
 var progress_service: ExplorationProgressService
 var presenter: ExplorationPresenter
 var builder: ExplorationRegionBuilder
@@ -67,6 +68,9 @@ func _bootstrap() -> void:
 	progress_service.changed.connect(presenter._update_objective)
 	ui.travel_requested.connect(request_travel)
 	ui.replay_requested.connect(replay_encounters)
+	ui.practice_requested.connect(progress_service.practice_encounters)
+	ui.practice_available = can_practice
+	player.skill_manager.combinations.feedback_requested.connect(ui.notify)
 	equipment_service = ExpeditionEquipment.new(self)
 	ui.equipment_requested.connect(equipment_service.show_equipment)
 	workshop = CastingWorkshop.new(self)
@@ -91,7 +95,7 @@ func _bootstrap() -> void:
 	player.skill_manager.slot_changed.connect(func(_slot: int): _queue_save())
 	player.skill_manager.combinations.supplies.changed.connect(_queue_save)
 	(player.get_node("EquipmentManager") as EquipmentManager).loadout_changed.connect(_queue_save)
-	ui.show_panel("余烬监狱 · 探索与组合", "你回到一座被封锁的监狱。火花、震荡和凝神在火、霜、雷阵中产生不同法术；水引和树脂创造新的环境条件。\n\n普通施法保留适配恩赐并获得增益；按住Shift施法可消耗恩赐，换取更强形态，随后失去持续收益。共鸣护盾也需要Shift＋震荡才主动引爆。\n\n左键近战，右键火花，空格闪避，E交互，J日志，M材料，K编组，O装备。先读营地手册，再去外院学习火阵。试着把水引放在脚下灭火、用火花点燃油面，再在支路学习冻结与碎冰。发现装备后返回营地整备。", [{"title": "开始探索 / 继续旅程", "callback": ui.close_modal}])
+	presenter.show_arrival()
 
 	if load_status == SaveRepository.Status.RECOVERED:
 		ui.notify("主存档不可用，已从有效备份恢复进度。")
@@ -101,19 +105,20 @@ func _bootstrap() -> void:
 func get_active_region() -> Node2D:
 	return region_root
 
-func request_travel(destination: String) -> void:
+func request_travel(destination: String, arrival: Vector2 = Vector2.INF) -> void:
 	if _switching or not catalog.regions.has(destination):
 		return
 	_switching = true
-	call_deferred("_change_region", destination)
+	call_deferred("_change_region", destination, arrival)
 
 func _clear_temporary() -> void:
 	GameRuntime.instance.get_region_session().leave(region_root, player)
 	region_root = null
 	active_enemies.clear()
 
-func _change_region(destination: String) -> void:
+func _change_region(destination: String, arrival: Vector2 = Vector2.INF) -> void:
 	_clear_temporary()
+	practice_active = false
 	region_id = destination
 	progress.visited[destination] = true
 	current_data = catalog.regions[destination]
@@ -127,6 +132,8 @@ func _change_region(destination: String) -> void:
 	_renderer.build(region_root, layout)
 	region_root.add_child(preload("res://gameplay/exploration/surface_overlay.gd").new())
 	player.global_position = layout.entry_offset
+	if arrival.is_finite() and layout.is_point_clear(arrival, 20):
+		player.global_position = arrival
 	var camera := player.get_node_or_null("Camera2D") as Camera2D
 	if camera:
 		var view_size := get_viewport().get_visible_rect().size / camera.zoom
@@ -193,11 +200,17 @@ func _use_exit(entry: ExplorationExitData) -> void:
 func _on_enemy_died(enemy: Enemy, generation: int) -> void:
 	if not GameRuntime.instance.get_region_session().is_current(generation):
 		return
-	if is_instance_valid(enemy):
+	if is_instance_valid(enemy) and enemy.rewards_enabled:
 		var soul := SoulRemnant.new()
 		region_root.add_child(soul)
 		soul.global_position = enemy.global_position
 	active_enemies.erase(enemy)
+	if practice_active:
+		if active_enemies.is_empty():
+			practice_active = false
+			ui.notify("本区试战完成。没有击杀奖励，探索与机关进度保持；Esc可再次试战。")
+		_update_objective()
+		return
 	if active_enemies.is_empty():
 		progress.cleared[region_id] = true
 		if region_id == "boss":
@@ -241,7 +254,10 @@ func _on_spell_object_solved(spec: SpellPuzzleData) -> void:
 		for exit in current_data.exits:
 			if spec.id in exit.required_claims and exit.claims_satisfied(progress):
 				unlocked.append(exit.title)
-		ui.notify("解开：" + spec.title + " · 材料已收入行囊，按M查看。" + ("\n捷径已开启：" + "、".join(unlocked) if not unlocked.is_empty() else ""))
+		ui.notify("解开：" + spec.title + " · 材料已收入行囊，按M查看。" + ("\n捷径已开启：" + "、".join(unlocked) + "；营地可直达此处。" if not unlocked.is_empty() else ""))
+
+func can_practice() -> bool:
+	return ready_for_play and not _switching and not _defeated and not player.health_component.is_dead and not practice_active and progress.cleared.has(region_id) and not current_data.encounters.is_empty() and active_enemies.is_empty()
 
 func _queue_save() -> void:
 	progress_service._queue_save()
@@ -297,8 +313,8 @@ func _build_camp() -> void:
 func _build_props(layout: RefCounted) -> void:
 	builder._build_props(layout)
 
-func _spawn_enemy(spec: ExplorationEncounterData, layout: RefCounted, index: int) -> void:
-	builder._spawn_enemy(spec, layout, index)
+func _spawn_enemy(spec: ExplorationEncounterData, layout: RefCounted, index: int, rewards: bool = true) -> void:
+	builder._spawn_enemy(spec, layout, index, rewards)
 
 func _add_interaction(title: String, point: Vector2, callback: Callable, kind: String = "note") -> ExplorationInteractable:
 	return builder._add_interaction(title, point, callback, kind)

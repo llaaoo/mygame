@@ -46,6 +46,7 @@ var _skill_pool: SkillPool = null
 ## ── 调试 ──
 @export var debug_items: bool = false
 @export var exploration_mode: bool = false
+@export_range(0.1, 2.0, 0.05) var melee_damage_multiplier := 1.0
 
 
 ## ── 信号（HUD 订阅） ──
@@ -168,7 +169,7 @@ func _ready() -> void:
 func _apply_stats() -> void:
 	stats_component._recalculate_all()
 	var buffs := get_node("BuffManager") as BuffManager
-	buffs.set_base_attributes({"max_hp": 50 + stats_component.max_hp_bonus, "max_mana": stats_component.max_mana, "attack_damage": 10 + stats_component.physical_damage, "move_speed": base_move_speed + stats_component.move_speed_bonus})
+	buffs.set_base_attributes({"max_hp": 50 + stats_component.max_hp_bonus, "max_mana": stats_component.max_mana, "attack_damage": roundi((10 + stats_component.physical_damage) * melee_damage_multiplier), "move_speed": base_move_speed + stats_component.move_speed_bonus})
 	health_component.hp = clampi(health_component.hp, 0 if health_component.is_dead else 1, health_component.max_hp)
 	mana_component.mp = clampi(mana_component.mp, 0, mana_component.max_mp)
 

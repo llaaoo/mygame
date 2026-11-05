@@ -17,6 +17,7 @@ PROJECT_ANALYSIS.md (完整项目分析 — 架构评估 + 文件功能清单 + 
     ├── FIVE_ELEMENT_IMPLEMENTATION.md (当前交付 — 七批实现、实际场景、部分消费、敌人反馈与实验记录)
     ├── REGION_CONTENT_EXPANSION.md (最新玩法内容 — 三处多解遭遇、永久返营捷径、实地记录与狱中复核委托)
     ├── PLAYTEST_REVIEW_2026_11_05.md (章节试玩 — 通关与冷启动复核、近战/组合收益、捷径回报及操作提示问题)
+    ├── PLAYTEST_FIXES.md (试玩迭代 — 当前动作反馈、双向检修通路、本区无奖励试战、教学与战斗对照)
     ├── SYSTEM_CONTENT_READINESS.md (当前系统检查 — 可扩内容、校验缺口、世界条件、敌人配置与扩充顺序)
     ├── VISUAL_UI_POLISH.md (画面与反馈 — 元素特效、法阵/恩赐寿命、镜头、技能栏及响应式配置页)
     ├── FOUR_ELEMENT_ATTUNEMENT.md (最新扩充 — 地面/材料准备、流息与毒契、持续防护与主动消费)

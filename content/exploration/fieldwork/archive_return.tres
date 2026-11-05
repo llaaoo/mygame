@@ -6,4 +6,6 @@ target = "camp"
 title = "返营检修升降机"
 pos = Vector2(430, -240)
 required_claims = PackedStringArray("magic.charged_crystal")
+camp_return_title = "检修通路：军械档案室"
+camp_return_pos = Vector2(-430, 280)
 locked_message = "检修升降机尚未通电：先解开南侧沉眠导能晶簇。"

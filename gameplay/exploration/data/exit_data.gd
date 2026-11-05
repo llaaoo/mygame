@@ -8,6 +8,9 @@ extends Resource
 @export var required_action: String = ""
 @export var required_claims: PackedStringArray = []
 @export var locked_message: String = "请先探索并掌握所需知识。"
+## Optional reverse entrance, unlocked by the very same existing conditions.
+@export var camp_return_title: String = ""
+@export var camp_return_pos: Vector2 = Vector2.ZERO
 
 func claims_satisfied(progress: ExplorationProgress) -> bool:
 	for id in required_claims:

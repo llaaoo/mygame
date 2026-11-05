@@ -4,6 +4,7 @@ extends Node
 
 signal action_committed(result_id: String)
 signal action_cancelled(reason: String)
+signal feedback_requested(message: String)
 
 const SIGIL := preload("res://gameplay/abilities/fields/fire_sigil.gd")
 const STARTER_RULE := preload("res://content/combinations/fire_sigil_fireball.tres")
@@ -394,6 +395,16 @@ func _commit() -> void:
 			cooldowns[key] = plan.cooldown_keys[key]
 			cooldown_durations[key] = plan.cooldown_keys[key]
 		_message("%s · %d MP%s" % [plan.effect_label, plan.cost, " · " + supplies.describe_cost(plan.material_costs) if not plan.material_costs.is_empty() else ""])
+		var exhausted: Array[String] = []
+		for component in plan.components:
+			if is_instance_valid(component.field) and component.field.charges == 0:
+				var title := FireSigil.title_for(component.field.field_type)
+				if title not in exhausted: exhausted.append(title)
+		if not exhausted.is_empty():
+			var next := build_plan(plan.action, actor, plan.empower)
+			var notice := "、".join(exhausted) + "充能耗尽：" + plan.action.display_name + "下次为" + next.effect_label + " · " + effect_scope(next.skill)
+			_message(last_message + "\n" + notice)
+			feedback_requested.emit(notice)
 		for component in plan.components:
 			get_parent().skill_used.emit(plan.source, component.skill)
 	else:
@@ -433,6 +444,16 @@ func _dead(actor: Node2D) -> bool:
 func _message(message: String) -> void:
 	last_message = message
 	_message_remaining = 2.5
+
+func effect_scope(skill: SkillData) -> String:
+	if not skill.field_type.is_empty(): return "脚下布阵"
+	match skill.skill_type:
+		SkillData.SkillType.PROJECTILE: return "远程投射物"
+		SkillData.SkillType.AOE:
+			return ("落点半径" if skill.ground_targeted else "近身半径") + "%.0f" % (skill.aoe_visual.radius if skill.aoe_visual else skill.aoe_radius)
+		SkillData.SkillType.BUFF: return "自身增益"
+		SkillData.SkillType.DASH: return "位移"
+	return "召唤"
 
 func describe_plan(plan: CastPlan) -> String:
 	var lines: Array[String] = [plan.effect_label]
