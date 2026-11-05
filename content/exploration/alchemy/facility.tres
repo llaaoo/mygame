@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="RepairFacilityData" format=3]
+[ext_resource type="Script" path="res://gameplay/exploration/data/repair_facility_data.gd" id="1"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/field_work_method.gd" id="2"]
+[sub_resource type="Resource" id="assembly"]
+script = ExtResource("2")
+id = "assemble"
+title = "安装泵芯与调压器"
+duration = 3.0
+[resource]
+script = ExtResource("1")
+id = "alchemy.repaired"
+start_claim = "alchemy.started"
+title = "重启调和台"
+pos = Vector2(360, -180)
+description = "档案室读图纸，回廊与机房解封并E取件；可提前探索。集齐后站定组装3秒，无额外材料。永久开启材料回收；委托板另奖1属性点。"
+required_claims = PackedStringArray("alchemy.started", "alchemy.schematic", "alchemy.pump_taken", "alchemy.regulator_taken")
+assembly = SubResource("assembly")

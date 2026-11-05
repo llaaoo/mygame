@@ -22,6 +22,7 @@ func show_materials() -> void:
 		var material_id := str(supplies.selected.get(id, ""))
 		buttons.append({"title": skill.display_name + " · " + (supplies.title(material_id) if not material_id.is_empty() else "基础"), "callback": show_action.bind(skill)})
 	buttons.append({"title": "营地加工", "disabled": game.region_id != "camp", "callback": show_crafts})
+	buttons.append({"title": "调和台回收" + ("" if recycling_available() else "（需营地修复）"), "disabled": not recycling_available(), "callback": show_recycling})
 	buttons.append({"title": "继续探索", "callback": game.ui.close_modal})
 	game.ui.show_panel("施法材料与配置", text, buttons)
 
@@ -69,3 +70,30 @@ func _craft(id: String) -> void:
 	if game.region_id == "camp" and game.player.skill_manager.combinations.supplies.craft(id):
 		game._save_progress()
 	show_crafts()
+
+func recycling_available() -> bool:
+	return game.region_id == "camp" and not game._switching and not game.player.health_component.is_dead and game.progress.claims.has(AlchemyRepairService.REPAIRED)
+
+func recycle(id: String) -> bool:
+	if not recycling_available(): return false
+	if not game.player.skill_manager.combinations.supplies.recycle(id): return false
+	game._save_progress()
+	return true
+
+func show_recycling() -> void:
+	if not recycling_available(): return
+	var supplies: CastingSupplies = game.player.skill_manager.combinations.supplies
+	var text := "消耗两批成品，返还一批原制造配方投入。每次只处理一份，不递归拆解、不补满材料；精炼灰等中间成品原样返还。\n\n"
+	var buttons: Array[Dictionary] = []
+	for id in CastingSupplies.MATERIAL_IDS:
+		var preview := supplies.recycle_preview(id)
+		if preview.is_empty(): continue
+		text += "消耗：%s\n返还：%s\n\n" % [supplies.describe_cost(preview.costs), supplies.describe_cost(preview.returns)]
+		buttons.append({"title": "回收一份：" + supplies.title(id), "disabled": not supplies.can_pay(preview.costs), "callback": _recycle.bind(id)})
+	buttons.append({"title": "材料与配置", "callback": show_materials})
+	buttons.append({"title": "继续探索", "callback": game.ui.close_modal})
+	game.ui.show_panel("调和台 · 材料回收", text, buttons)
+
+func _recycle(id: String) -> void:
+	if not recycle(id): game.ui.notify("回收条件已变化，未扣除材料。")
+	show_recycling()

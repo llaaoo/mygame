@@ -172,6 +172,13 @@ func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 				if not catalog.equipment.has(id):
 					_fail(note, "Unknown equipment reward: " + id)
 			_validate_materials(note, note.materials, supplies)
+		for facility in region.facilities:
+			_claim(claims, facility.id, facility)
+			_claim(claims, facility.start_claim, facility)
+			completion_claims[facility.id] = true
+			completion_claims[facility.start_claim] = true
+			if region.id != "camp" or facility.title.is_empty() or facility.description.is_empty() or facility.required_claims.is_empty(): _fail(facility, "Invalid camp repair facility")
+			if not facility.assembly.validation_error().is_empty() or not facility.assembly.material_costs.is_empty(): _fail(facility, "assembly: invalid free work method")
 		for encounter in region.encounters:
 			_validate_enemy_profile(encounter, profiles)
 			if encounter.hp <= 0 or encounter.speed <= 0 or encounter.role not in [0, 1, 2]:
@@ -228,6 +235,11 @@ func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 	# All claims must be collected before checking cross-region exit references.
 	var return_points: Array[Vector2] = []
 	for region in catalog.chapter.regions:
+		for patch in region.surface_patches:
+			if not patch.disabled_by_claim.is_empty() and not completion_claims.has(patch.disabled_by_claim): _fail(patch, "disabled_by_claim: unknown completion marker '%s'" % patch.disabled_by_claim)
+		for facility in region.facilities:
+			for id in facility.required_claims:
+				if not completion_claims.has(id): _fail(facility, "required_claims: unknown facility prerequisite '%s'" % id)
 		for puzzle in region.spell_objects:
 			for id in puzzle.required_claims:
 				if not completion_claims.has(id): _fail(puzzle, "required_claims: unknown work prerequisite '%s'" % id)
@@ -368,6 +380,9 @@ func _validate_entries(chapter: ExplorationChapterData) -> bool:
 			resources.append_array(region.valves)
 			resources.append_array(region.surface_patches)
 			resources.append_array(region.fixed_props)
+			resources.append_array(region.facilities)
+			for facility in region.facilities:
+				if facility: resources.append(facility.assembly)
 			for valve in region.valves:
 				if valve: resources.append_array(valve.paths)
 			resources.append_array(region.interaction_points())

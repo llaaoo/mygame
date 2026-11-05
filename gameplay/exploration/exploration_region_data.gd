@@ -13,6 +13,7 @@ extends Resource
 @export var valves: Array[SurfaceValveData] = []
 @export var surface_patches: Array[SurfacePatchData] = []
 @export var fixed_props: Array[ExplorationPropData] = []
+@export var facilities: Array[RepairFacilityData] = []
 @export var exits: Array[ExplorationExitData] = []
 
 func reserve_interaction_space(layout: RefCounted) -> void:
@@ -32,6 +33,7 @@ func interaction_points() -> Array[Resource]:
 	points.append_array(spell_objects)
 	points.append_array(valves)
 	points.append_array(fixed_props)
+	points.append_array(facilities)
 	for patch in surface_patches:
 		if patch: points.append_array(_patch_points(patch))
 	for valve in valves:

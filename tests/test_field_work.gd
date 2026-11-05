@@ -68,6 +68,7 @@ func run() -> void:
 	player.health_component.health_changed.emit(60, player.health_component.max_hp)
 	var before := supplies.serialize()
 	check(work.start_selected() and player.state_machine.current_state.name == "work", "Work failed to enter state")
+	check(not work.start_selected(), "Duplicate work request restarted timer")
 	work.tick(.7)
 	check(supplies.serialize() == before and not site.completed, "Work charged before completion")
 	# A heal cannot mask later damage within the same frame.
@@ -82,7 +83,7 @@ func run() -> void:
 	check(not game.progress.claims.has(spec.pickup_claim), "Opening teleported the part into inventory")
 	check(game.field_sites.take_part(site) and not game.field_sites.take_part(site), "Part pickup was missing or duplicated")
 	# Each interrupt leaves inventory and world state untouched.
-	for interruption in ["move", "dodge", "attack", "cast", "E", "Esc", "menu", "attributes", "condition", "range", "region", "death"]:
+	for interruption in ["move", "dodge", "attack", "cast", "E", "Esc", "menu", "attributes", "method", "equipment", "stock", "reject", "condition", "range", "region", "death"]:
 		game.progress.claims.erase(spec.id)
 		site = await open_site()
 		game.field_sites.inspect(site)
@@ -107,6 +108,20 @@ func run() -> void:
 			"attributes":
 				player.stats_component.modify_stat("agility", 1)
 				work.tick(.1)
+			"method":
+				patch.duration = 2
+				work.tick(.1)
+				patch.duration = 1.5
+			"equipment":
+				(player.get_node("EquipmentManager") as EquipmentManager).loadout_revision += 1
+				work.tick(.1)
+			"stock":
+				supplies.pay({"resin": supplies.count("resin")})
+				before = supplies.serialize()
+				work.tick(.1)
+			"reject":
+				work._commit_provider = func(_method: FieldWorkMethod) -> bool: return false
+				work.tick(1.5)
 			"condition":
 				game.progress.claims.erase("test.blueprint")
 				work.tick(.1)
@@ -119,6 +134,7 @@ func run() -> void:
 				player.health_component.invincible = false
 				CombatExecutor.report_hit(null, player, 999, player.position, null, ["test"])
 		check(not work.is_busy() and supplies.serialize() == before and not game.progress.claims.has(spec.id), "Interrupt leaked resources/progress: " + interruption)
+		if interruption == "stock": supplies.grant({"resin": 3})
 	# A spell can win while an operation is pending, without charging its materials.
 	site = await open_site()
 	game.field_sites.inspect(site)

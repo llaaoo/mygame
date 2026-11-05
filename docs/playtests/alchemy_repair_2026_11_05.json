@@ -1,0 +1,362 @@
+{
+  "date": "2026-11-05",
+  "scope": "Desktop OS keyboard/mouse play with read-only telemetry. Existing cleared character, drain combat restored by local no-reward replay. Not a fresh full-chapter pacing benchmark.",
+  "source": "Previously completed chapter: level5,13 earned unspent points. Identical copied inventory/equipment at branch point; spend8 points per branch,5 left before quest.",
+  "attribute_field_probe": {
+    "stats": {
+      "agility": 10,
+      "attribute_points": 6,
+      "endurance": 10,
+      "exp_to_next": 505,
+      "experience": 178,
+      "intelligence": 14,
+      "level": 5,
+      "strength": 14
+    },
+    "equipment": {
+      "4": "cadence_gloves",
+      "8": "keeper_ring"
+    },
+    "completion_methods": {
+      "alchemy.pump_open": "force",
+      "alchemy.regulator_open": "calibrate",
+      "alchemy.repaired": "assemble"
+    },
+    "facts": {
+      "alchemy.pump_open": true,
+      "alchemy.pump_taken": true,
+      "alchemy.regulator_open": true,
+      "alchemy.regulator_taken": true,
+      "alchemy.repaired": true,
+      "alchemy.schematic": true,
+      "alchemy.started": true,
+      "quest.alchemy_repair": true
+    },
+    "observations": [
+      "Actual enemy damage canceled work without payment or opening.",
+      "Last successful pump attempt left20HP hunter active; frozen movement150->45 verified; dodge away,stand still2sec,then E pickup.",
+      "100HP/72MP via earned strength14/intelligence14. Learning attempts used4frost_salt total; successful pump attempt used1frost_salt/9MP. This multi-attempt probe is not directly comparable with clean route records.",
+      "Intelligence calibration2.5sec,camp assembly3sec,once-only point reward and frost_salt2->crystal2 recycling completed."
+    ]
+  },
+  "route_records": [
+    {
+      "route": "spell",
+      "completion_methods": {
+        "alchemy.pump_open": "thermal_impact",
+        "alchemy.regulator_open": "steam",
+        "alchemy.repaired": "assemble"
+      },
+      "facts": {
+        "alchemy.pump_open": true,
+        "alchemy.pump_taken": true,
+        "alchemy.regulator_open": true,
+        "alchemy.regulator_taken": true,
+        "alchemy.repaired": true,
+        "alchemy.schematic": true,
+        "alchemy.started": true,
+        "quest.alchemy_repair": true
+      },
+      "trial": {
+        "casts": 5,
+        "damage_dealt": 60,
+        "damage_taken": 37,
+        "final": {
+          "equipment": [
+            "cadence_gloves",
+            "keeper_ring"
+          ],
+          "loadout": {
+            "right": {
+              "skill_id": "ignite",
+              "upgrades": {}
+            },
+            "slot_0": {
+              "skill_id": "pulse",
+              "upgrades": {}
+            },
+            "slot_1": {
+              "skill_id": "focus",
+              "upgrades": {}
+            },
+            "slot_2": {
+              "skill_id": "echo_mark",
+              "upgrades": {}
+            },
+            "slot_3": {
+              "skill_id": "water_call",
+              "upgrades": {}
+            },
+            "slot_4": {
+              "skill_id": "fire_sigil",
+              "upgrades": {}
+            },
+            "slot_5": {
+              "skill_id": "ignite",
+              "upgrades": {}
+            }
+          },
+          "max_hp": 120,
+          "max_mp": 60,
+          "stats": {
+            "agility": 14,
+            "endurance": 14,
+            "intelligence": 10,
+            "strength": 10
+          },
+          "supplies": {
+            "amounts": {
+              "ash": 2,
+              "charcoal": 13,
+              "crystal": 24,
+              "echo_ink": 4,
+              "frost_salt": 8,
+              "resin": 4,
+              "sap": 23,
+              "storm_dust": 11,
+              "venom_extract": 9,
+              "ward_powder": 2
+            },
+            "selected": {}
+          }
+        },
+        "initial": {
+          "equipment": [
+            "cadence_gloves",
+            "keeper_ring"
+          ],
+          "loadout": {
+            "right": {
+              "skill_id": "ignite",
+              "upgrades": {}
+            },
+            "slot_0": {
+              "skill_id": "pulse",
+              "upgrades": {}
+            },
+            "slot_1": {
+              "skill_id": "focus",
+              "upgrades": {}
+            },
+            "slot_2": {
+              "skill_id": "echo_mark",
+              "upgrades": {}
+            },
+            "slot_3": {
+              "skill_id": "water_call",
+              "upgrades": {}
+            },
+            "slot_4": {
+              "skill_id": "fire_sigil",
+              "upgrades": {}
+            },
+            "slot_5": {
+              "skill_id": "ignite",
+              "upgrades": {}
+            }
+          },
+          "max_hp": 120,
+          "max_mp": 60,
+          "stats": {
+            "agility": 14,
+            "endurance": 14,
+            "intelligence": 10,
+            "strength": 10
+          },
+          "supplies": {
+            "amounts": {
+              "ash": 2,
+              "charcoal": 13,
+              "crystal": 24,
+              "echo_ink": 4,
+              "frost_salt": 8,
+              "resin": 4,
+              "sap": 23,
+              "storm_dust": 11,
+              "venom_extract": 9,
+              "ward_powder": 2
+            },
+            "selected": {}
+          }
+        },
+        "label": "冻结控制",
+        "mana_spent": 28,
+        "materials": {},
+        "melee": 6,
+        "regions": [
+          "camp",
+          "drain",
+          "camp",
+          "cistern",
+          "camp"
+        ],
+        "result": "手动结束",
+        "seconds": 41.7929111851849,
+        "work_actions": 1
+      }
+    },
+    {
+      "route": "material",
+      "completion_methods": {
+        "alchemy.pump_open": "frost_impact",
+        "alchemy.regulator_open": "patch",
+        "alchemy.repaired": "assemble"
+      },
+      "facts": {
+        "alchemy.pump_open": true,
+        "alchemy.pump_taken": true,
+        "alchemy.regulator_open": true,
+        "alchemy.regulator_taken": true,
+        "alchemy.repaired": true,
+        "alchemy.schematic": true,
+        "alchemy.started": true,
+        "quest.alchemy_repair": true
+      },
+      "trial": {
+        "casts": 2,
+        "damage_dealt": 60,
+        "damage_taken": 51,
+        "final": {
+          "equipment": [
+            "cadence_gloves",
+            "keeper_ring"
+          ],
+          "loadout": {
+            "right": {
+              "skill_id": "ignite",
+              "upgrades": {}
+            },
+            "slot_0": {
+              "skill_id": "pulse",
+              "upgrades": {}
+            },
+            "slot_1": {
+              "skill_id": "focus",
+              "upgrades": {}
+            },
+            "slot_2": {
+              "skill_id": "echo_mark",
+              "upgrades": {}
+            },
+            "slot_3": {
+              "skill_id": "water_call",
+              "upgrades": {}
+            },
+            "slot_4": {
+              "skill_id": "fire_sigil",
+              "upgrades": {}
+            },
+            "slot_5": {
+              "skill_id": "ignite",
+              "upgrades": {}
+            }
+          },
+          "max_hp": 120,
+          "max_mp": 60,
+          "stats": {
+            "agility": 14,
+            "endurance": 14,
+            "intelligence": 10,
+            "strength": 10
+          },
+          "supplies": {
+            "amounts": {
+              "ash": 2,
+              "charcoal": 13,
+              "crystal": 22,
+              "echo_ink": 4,
+              "frost_salt": 7,
+              "resin": 3,
+              "sap": 23,
+              "storm_dust": 11,
+              "venom_extract": 9,
+              "ward_powder": 2
+            },
+            "selected": {
+              "water_call": "frost_salt"
+            }
+          }
+        },
+        "initial": {
+          "equipment": [
+            "cadence_gloves",
+            "keeper_ring"
+          ],
+          "loadout": {
+            "right": {
+              "skill_id": "ignite",
+              "upgrades": {}
+            },
+            "slot_0": {
+              "skill_id": "pulse",
+              "upgrades": {}
+            },
+            "slot_1": {
+              "skill_id": "focus",
+              "upgrades": {}
+            },
+            "slot_2": {
+              "skill_id": "echo_mark",
+              "upgrades": {}
+            },
+            "slot_3": {
+              "skill_id": "water_call",
+              "upgrades": {}
+            },
+            "slot_4": {
+              "skill_id": "fire_sigil",
+              "upgrades": {}
+            },
+            "slot_5": {
+              "skill_id": "ignite",
+              "upgrades": {}
+            }
+          },
+          "max_hp": 120,
+          "max_mp": 60,
+          "stats": {
+            "agility": 14,
+            "endurance": 14,
+            "intelligence": 10,
+            "strength": 10
+          },
+          "supplies": {
+            "amounts": {
+              "ash": 2,
+              "charcoal": 13,
+              "crystal": 24,
+              "echo_ink": 4,
+              "frost_salt": 8,
+              "resin": 4,
+              "sap": 23,
+              "storm_dust": 11,
+              "venom_extract": 9,
+              "ward_powder": 2
+            },
+            "selected": {
+              "water_call": "frost_salt"
+            }
+          }
+        },
+        "label": "冻结控制",
+        "mana_spent": 13,
+        "materials": {
+          "crystal": 2,
+          "frost_salt": 1,
+          "resin": 1
+        },
+        "melee": 6,
+        "regions": [
+          "camp",
+          "drain",
+          "camp",
+          "cistern",
+          "camp"
+        ],
+        "result": "手动结束",
+        "seconds": 45.1472954444443,
+        "work_actions": 2
+      }
+    }
+  ]
+}

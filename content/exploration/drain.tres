@@ -26,6 +26,8 @@
 
 [ext_resource type="Resource" path="res://content/exploration/enemies/sentry.tres" id="profile_sentry"]
 
+[ext_resource type="Resource" path="res://content/exploration/alchemy/pump.tres" id="alchemy_pump"]
+
 [sub_resource type="Resource" id="field_steam_hold"]
 script = ExtResource("7_kfmxl")
 required_surface = "steam"
@@ -143,7 +145,7 @@ room_type = "traps"
 seed = 20261108
 encounters = Array[ExtResource("2_omdmg")]([SubResource("Resource_mqj3w"), SubResource("Resource_2lu4k")])
 discoveries = Array[ExtResource("1_rfnbd")]([SubResource("Resource_cq0b6"), SubResource("Resource_mex14"), SubResource("Resource_6c60e"), ExtResource("exp_drain_trial_supply"), ExtResource("field_observation")])
-spell_objects = Array[ExtResource("6_fpipr")]([SubResource("Resource_6dacc"), SubResource("Resource_g3yad")])
+spell_objects = Array[ExtResource("6_fpipr")]([SubResource("Resource_6dacc"), SubResource("Resource_g3yad"), ExtResource("alchemy_pump")])
 exits = Array[ExtResource("4_ovc10")]([SubResource("Resource_pxhbf"), SubResource("Resource_scj00"), ExtResource("field_return")])
 surface_patches = Array[ExtResource("exp_type_surface_patches")]([ExtResource("exp_drain_pool"), ExtResource("exp_drain_poison")])
 fixed_props = Array[ExtResource("exp_type_fixed_props")]([ExtResource("exp_drain_fence")])

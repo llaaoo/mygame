@@ -7,7 +7,7 @@ func _run() -> void:
 	current_scene = game
 	await _frames(10)
 	game.ui.close_modal()
-	_check(game.quests.size() == 4, "Camp quests missing")
+	_check(game.quests.size() == 5, "Camp quests missing")
 	var points := game.player.stats_component.attribute_points
 	game._claim_quest(game.quests[0])
 	_check(game.player.stats_component.attribute_points == points and not game.progress.claims.has("quest.rescue"), "Incomplete quest awarded points")

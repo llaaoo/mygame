@@ -63,6 +63,26 @@ func craft(id: String) -> bool:
 		notify.call()
 	return true
 
+func recycle_preview(id: String) -> Dictionary:
+	var recipe := crafting_recipes.get(id) as CraftingRecipe
+	if not recipe or not catalog.has(id) or recipe.output_id != id or recipe.output_count <= 0 or recipe.inputs.is_empty(): return {}
+	for input in recipe.inputs:
+		if (not catalog.has(input) and not RAW_TITLES.has(input)) or not recipe.inputs[input] is int or int(recipe.inputs[input]) <= 0: return {}
+	return {"costs": {recipe.output_id: 2 * recipe.output_count}, "returns": recipe.inputs.duplicate()}
+
+func recycle(id: String) -> bool:
+	if not _transaction.is_empty(): return false
+	var preview := recycle_preview(id)
+	if preview.is_empty() or not can_pay(preview.costs): return false
+	begin_transaction()
+	if not pay(preview.costs):
+		finish_transaction(false)
+		return false
+	grant(preview.returns)
+	var notify := finish_transaction(true)
+	if notify.is_valid(): notify.call()
+	return true
+
 func plan(action: SkillData, base: SkillData, include_required: bool = true, preparation_material: String = "") -> Dictionary:
 	var costs: Dictionary = {}
 	var material_id := str(selected.get(action.get_id(), ""))

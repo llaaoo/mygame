@@ -18,6 +18,20 @@ func _run() -> void:
 	enemy.get_node("StateChart").process_mode = Node.PROCESS_MODE_DISABLED
 	await physics_frame
 	var awareness := enemy.surface_awareness
+	# Test the action and patrol/return movement paths, not just the status flag.
+	var buffs := enemy.get_node("BuffManager") as BuffManager
+	enemy.surface_awareness = null
+	enemy.resolve_action(Action.move(Vector2.RIGHT, enemy))
+	var ordinary_speed := enemy.velocity.length()
+	buffs.apply_buff(load("res://gameplay/abilities/data/frozen.tres"), enemy)
+	enemy.resolve_action(Action.move(Vector2.RIGHT, enemy))
+	check(is_equal_approx(enemy.velocity.length(), ordinary_speed * .3), "Frozen did not slow actual enemy action movement")
+	enemy._move_towards_point(enemy.position + Vector2.RIGHT * 200)
+	check(is_equal_approx(enemy.velocity.length(), ordinary_speed * .3), "Frozen did not slow patrol/return movement")
+	buffs.remove_status("frozen")
+	enemy.resolve_action(Action.move(Vector2.RIGHT, enemy))
+	check(is_equal_approx(enemy.velocity.length(), ordinary_speed), "Enemy speed did not recover after freeze")
+	enemy.surface_awareness = awareness
 	var surfaces := GameRuntime.instance.get_simulation_runtime().get_surface_manager()
 	var cell := SurfaceManager.cell_at(enemy.global_position)
 	surfaces.force_set_surface(cell + Vector2i.RIGHT, "burning", 12)
