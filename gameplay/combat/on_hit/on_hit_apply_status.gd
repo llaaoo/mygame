@@ -45,7 +45,7 @@ func _execute(ev: CombatEvent) -> void:
 
 	if required_skill_tag in ["water", "ice"]:
 		buff_manager.remove_status("burning")
-	if required_skill_tag == "water":
+	if required_skill_tag == "water" and (not ev.skill or "poison" not in ev.skill.tags):
 		buff_manager.remove_status("poison")
 	buff_manager.apply_buff(buff, ev.source, ev.skill)
 	print("🔥 [OnHitApplyStatus] %s → %s 挂 %s" % [ev.source.name if ev.source else "?", target.name, buff.display_name])

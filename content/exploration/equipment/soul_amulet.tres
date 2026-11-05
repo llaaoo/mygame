@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="EquipmentData" format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/equipment_data.gd" id="equipment"]
+[ext_resource type="Script" path="res://gameplay/inventory/data/casting_equipment_profile.gd" id="profile"]
+[sub_resource type="Resource" id="Profile"]
+script = ExtResource("profile")
+soul_capacity_bonus = 2
+soul_range_bonus = 60.0
+[resource]
+script = ExtResource("equipment")
+id = "soul_amulet"
+display_name = "游魂吊坠"
+description = "蕴魂容量+2、汲魂范围+60；最大生命-15。以生存余量换取更多可选择的魂术兑现。"
+special_effect_text = "蕴魂容量+2、汲魂范围+60；最大生命-15。以生存余量换取更多可选择的魂术兑现。"
+item_type = 1
+rarity = 2
+slot_type = 7
+icon_atlas_index = 15
+stat_modifiers = {"max_hp": -15}
+combat_modifiers = {}
+casting_profile = SubResource("Profile")

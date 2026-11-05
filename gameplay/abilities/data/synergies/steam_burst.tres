@@ -11,3 +11,5 @@ required_target_status = "burning"
 bonus_damage_ratio = 0.5
 consume_target_status = true
 bonus_tags = ["water", "reaction"]
+
+required_hit_tags = ["ice", "water"]

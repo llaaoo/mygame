@@ -11,14 +11,14 @@
 script = ExtResource("1_lptr4")
 id = "camp_guide"
 title = "远征者手记"
-text = "火花本身只影响近处。真正的法术来自条件：寻找监狱外院的火阵铭刻记录。死亡返回营地，已学知识和清理进度保留。"
+text = "火花虽近，也能点油、融冰、引爆中毒。法阵改变同一个动作的形态，水引创造可复用的环境条件。寻找外院的火阵记录，再用已有工具实验。死亡返回营地，已学知识和清理进度保留。"
 pos = Vector2(-200, -160)
 
 [sub_resource type="Resource" id="Resource_yc7l5"]
 script = ExtResource("1_lptr4")
 id = "material_handbook"
 title = "施法材料手册"
-text = "已掌握水引：前方制造水域、灭火并令敌人潮湿（默认4）。已掌握泼洒树脂：消耗树脂制剂铺油，需在K中编组。领取初始原料和成品。按M给基础动作配置可选素材；营地工作台可加工。灰延长火/霜法阵，树脂强化火球，霜盐强化冰霜，雷晶粉维持雷阵或强化雷矢。基础火/霜不强制带料。"
+text = "已掌握水引：选择落点制造水域、灭火并令敌人潮湿（默认4）。已掌握泼洒树脂：消耗树脂制剂铺油，需在K中编组。领取初始原料和成品。按M给基础动作配置可选素材；营地工作台可加工。灰延长火/霜法阵，树脂强化火球，霜盐强化冰霜，雷晶粉维持雷阵或强化雷矢。基础火/霜不强制带料。\n\n水引、树脂和毒雾可以用鼠标选择120范围内落点。水引放在自己脚下，能洗去燃烧和中毒；铺水、结冰、破冰与导电可以接成同一条水路。\n\n同一个水引，在M配置霜盐会凝成冰面，雷晶粉会形成导电水域，毒性萃取会留下毒地。材料会消耗且增加法力；毒水不能冲毒，雷水也可能伤到自己。档案室的守阵者指环可以让Shift造地借用脚下法阵：先改变材料性质，再接受法阵反应，落点保持不变。\n\n学会凝神后，站在普通水面Shift凝神，8 MP并消耗所在1格准备流息：8秒减伤10%，强化水系（含凝霜形态）；Shift水系施法可消费它铺水。普通凝神仍为4 MP。"
 pos = Vector2(-220, 200)
 actions = Array[String](["water_call", "oil_flask"])
 materials = {
@@ -30,7 +30,9 @@ materials = {
 "sap": 6,
 "storm_dust": 3
 }
+element_clues = Array[String](["fire", "water", "lightning", "poison"])
 
+spell_rules = Array[String](["terrain_water_focus"])
 [sub_resource type="Resource" id="Resource_hd2lk"]
 script = ExtResource("4_u8pbx")
 target = "yard"

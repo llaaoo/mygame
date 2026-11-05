@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="ExplorationDiscoveryData" format=3]
+[ext_resource type="Script" path="res://gameplay/exploration/data/discovery_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "experiment.drain_trial_supply"
+title = "元素实验补给：污染与庇护"
+text = "水池与毒区就在前方。清洁水可以洗毒；毒水不能。先水后火可形成蒸汽：减速15%，但受到投射物直接伤害降低25%，接触刷新2秒；近战、范围和持续伤害不减。也可用毒地迫使远程守卫换位，再用火花点燃。\n\n补给仅领取一次；回营地可以继续加工，休息和重置遭遇不会重复发放。"
+pos = Vector2(-300, 96)
+materials = { "venom_extract": 3, "frost_salt": 3, "sap": 3, "charcoal": 3 }

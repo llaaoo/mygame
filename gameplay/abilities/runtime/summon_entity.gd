@@ -211,3 +211,7 @@ func is_dead() -> bool:
 func _exit_tree() -> void:
 	if is_instance_valid(_manager):
 		_manager.unregister(self)
+
+func cancel_prepared() -> void:
+	if is_instance_valid(_manager):
+		_manager.unregister(self)

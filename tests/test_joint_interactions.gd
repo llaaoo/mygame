@@ -37,7 +37,7 @@ func _run() -> void:
 	game.ui.close_modal()
 	await _interact("雷阵与导电实验记录")
 	game.ui.close_modal()
-	_check(controller.rules.size() == 15 and supplies.catalog.size() == 7, "Interaction pass changed authored spell/material counts")
+	_check(controller.rules.size() == game.catalog.chapter.spell_rules.size() and supplies.catalog.size() == 7, "Registered spell rules or retained material catalog diverged")
 
 	# Existing fields cooperate; one input pays the complete, visible result.
 	await _arena()
@@ -104,12 +104,16 @@ func _run() -> void:
 	await _place("fire")
 	await _place("frost")
 	var target := _health_target(Vector2(60, 0))
+	target.health.invincible_duration = 2.0 # Keep the asynchronous assertion inside an explicit window.
 	var expected := 0
 	for id in ["fire_sigil_burst", "frost_ring"]:
 		var skill := sm.pool.get_skill(id)
 		expected += sm.executor.resolve_damage(skill, CastContext.simple(game.player, Vector2.RIGHT, skill))
 	await _cast(0)
-	_check(target.health.hp == 1000 - expected and target.calls == 2, "Same-action field effects swallowed damage or duplicated Body/Hurtbox")
+	var fire_damage := sm.executor.resolve_damage(sm.pool.get_skill("fire_sigil_burst"), CastContext.simple(game.player, Vector2.RIGHT, sm.pool.get_skill("fire_sigil_burst")))
+	var frost_damage := sm.executor.resolve_damage(sm.pool.get_skill("frost_ring"), CastContext.simple(game.player, Vector2.RIGHT, sm.pool.get_skill("frost_ring")))
+	var valid_totals := [expected + int(round(frost_damage * 0.5)), expected + int(round(fire_damage * 0.6))]
+	_check(1000 - target.health.hp in valid_totals and target.calls == 3, "Same-action field effects lost a primary hit, doubled a contact or failed the shared steam/melt reaction")
 	var hp := target.health.hp
 	CombatExecutor.report_hit(null, target, 20, target.position, null, ["separate_action"])
 	_check(target.health.hp == hp, "Unrelated action bypassed shared-action invincibility")
@@ -200,5 +204,5 @@ func _run() -> void:
 	current_scene = null
 	await _frames(5)
 	if errors.is_empty():
-		print("Joint interactions passed: existing field composition, atomic staged casts, real-health families, elemental melee/world reuse and connected-water conduction; content counts unchanged")
+		print("Joint interactions passed: existing field composition, atomic staged casts, real-health families, elemental melee/world reuse and connected-water conduction; registered content stays consistent")
 	call_deferred("quit", 0 if errors.is_empty() else 1)

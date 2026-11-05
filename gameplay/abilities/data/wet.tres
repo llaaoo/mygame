@@ -7,3 +7,5 @@ script = ExtResource("1_v1oy5")
 display_name = "潮湿"
 status_id = "wet"
 duration = 6.0
+
+category = 1

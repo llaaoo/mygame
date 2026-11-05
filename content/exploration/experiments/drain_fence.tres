@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="ExplorationPropData" format=3]
+[ext_resource type="Script" path="res://gameplay/exploration/data/exploration_prop_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://world/object/wooden_fence.tscn" id="fence"]
+[resource]
+script = ExtResource("1")
+id = "experiment.drain_fence"
+pos = Vector2(160, -160)
+scene = ExtResource("fence")

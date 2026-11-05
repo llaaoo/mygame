@@ -47,7 +47,7 @@ static func allowed_phases_for_event(event_type: CombatEvent.Type) -> Array[Phas
 			return [Phase.IDLE, Phase.EVENT, Phase.POST]
 		CombatEvent.Type.ON_HEAL:
 			return [Phase.IDLE, Phase.EVENT, Phase.POST]
-		CombatEvent.Type.ON_STATUS_APPLIED, CombatEvent.Type.ON_STATUS_REMOVED:
+		CombatEvent.Type.ON_STATUS_APPLIED, CombatEvent.Type.ON_STATUS_REMOVED, CombatEvent.Type.ON_STATUS_CHANGED:
 			return [Phase.IDLE, Phase.EFFECT, Phase.EVENT, Phase.POST]
 		CombatEvent.Type.ON_DODGE, CombatEvent.Type.ON_CRIT:
 			return [Phase.IDLE, Phase.EVENT]

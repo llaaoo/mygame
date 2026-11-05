@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="EquipmentData" format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/equipment_data.gd" id="equipment"]
+[ext_resource type="Script" path="res://gameplay/inventory/data/casting_equipment_profile.gd" id="profile"]
+[sub_resource type="Resource" id="Profile"]
+script = ExtResource("profile")
+field_radius_bonus = 24.0
+field_duration_bonus = 6.0
+medium_infusion = true
+medium_infusion_cost = 2
+[resource]
+script = ExtResource("equipment")
+id = "keeper_ring"
+display_name = "守阵者指环"
+description = "布阵半径+24、法阵寿命+6秒；全法术费用+15%。更大覆盖也需要更宽的安全空地。Shift造地时借用脚下最新一个可反应法阵，消耗1次充能和额外2 MP（费用修正前）；改变地面，不改变落点。"
+special_effect_text = "布阵半径+24、法阵寿命+6秒；全法术费用+15%。更大覆盖也需要更宽的安全空地。Shift造地时借用脚下最新一个可反应法阵，消耗1次充能和额外2 MP（费用修正前）；改变地面，不改变落点。"
+item_type = 1
+rarity = 2
+slot_type = 8
+icon_atlas_index = 9
+stat_modifiers = {}
+combat_modifiers = {"mana_cost.all": 0.15}
+casting_profile = SubResource("Profile")

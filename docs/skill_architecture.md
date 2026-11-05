@@ -14,7 +14,10 @@
 | CastPlan / CastComponent / CastStatusRequirement | 预览与准备使用的结果、成本、条件版本 |
 | ConditionalCastController / SpellCombinationResolver / SpellRuleIndex | 条件准备、纯规则匹配及按动作/作用域预索引 |
 | CastCostPolicy / CastTransaction | 公共费用冷却与原子资源/效果提交 |
+| CastingMaterialData / BoonSpellModifier / MediumInfusion | 先按性质应用材料与恩赐，再按装备能力借阵改变介质，保留已有动作身份 |
 | Buff / StatusInstance / ActorAttributes | 定义、带来源的状态实例、基础值与临时贡献重算 |
+
+`SkillData.surface_payload_tags`是有序地面载荷，与命中标签分开。造地范围和投射物命中先放置基础介质，再由SurfaceManager的同一反应表解释载荷；预览也查询此表。新增属性适配的水系效果可以直接复用材料，无需复制具名组合。已选法术组合优先占用法阵，装备借阵只使用未占用且能反应的法阵。连续普通施法与准备施法共用唯一事务编号。见[涌现施法设计](./EMERGENT_CASTING_DESIGN.md)。
 
 **法术组合规则**：`SpellCombinationRule`表示动作与法阵/状态的条件关系；施法材料和恩赐在规划中改变结果。**制造配方**：`CraftingRecipe`表示库存原料→库存成品，制造成功只发布一次完整库存变化。学习法术不制造物品，制造物品不解锁法术知识。
 
@@ -22,9 +25,17 @@
 
 SkillData的`conditional_cast`声明条件施法能力，`field_type`声明布阵类别，`preparation`声明准备时长；控制器不从技能ID白名单或名字后缀推断行为。普通技能也使用材料/恩赐规划和事务执行；引导脉冲按累计费率支付法力，材料按每个成功脉冲结算，失败停止。
 
-新增已有行为的法术组合或机关通常只需资源与登记。新条件或行为原型仍需实现和验证；下文“200+技能”是扩展能力示例，不代表当前内容数量。当前MVP为10个动作、15条法术组合规则、7项制造配方。
+新增已有行为的法术组合或机关通常只需资源与登记。新条件或行为原型仍需实现和验证；下文“200+技能”是扩展能力示例，不代表当前内容数量。当前MVP为11个动作、19条法术组合规则、7项制造配方；新增魂术与装备关系见[SPELL_BUFF_EQUIPMENT_ITERATION](./SPELL_BUFF_EQUIPMENT_ITERATION.md)。
 
 ---
+
+## 现有工具的用途扩展
+
+共享命中反应使用`ElementReactionCatalog`和`SkillSynergyData.required_hit_tags`，不要求为火花、火球、附魔攻击和每个材料变体重复登记同一元素性质。专属反应仍可配置，同ID只结算一次；地面反应保持独立的SurfaceReaction。碎冰属于命中/地面关系，未新增主动技能条目。
+
+`SkillData.ground_targeted`用于现有水引、树脂、毒雾；输入与瞄准共用`CastContext.ground_point`限制范围，CastPlan记录释放时的点。条件结果若以法阵为中心仍使用法阵位置，转为自身Buff时不改变接收者。方向型便捷调用保留旧行为。
+
+当前产品取舍与验收见[现有技能组合与扩展](./EXISTING_SPELL_INTERACTION_PLAN.md)。
 
 ## 核心原则
 
@@ -337,3 +348,7 @@ RUNTIME_TOPOLOGY.md
 - ✅ SkillData 只是纯数据
 - ✅ setup() 注入一切参数
 - ✅ 30 分钟完成一个新技能
+
+## 元素归属与形态
+
+基础元素为fire/water/lightning/poison。ice保留为parent_id=water的凝霜形态；family_ids用于去重归类，definition用于精确形态与命中效果。不能将全部ice标签替换为water：材料、Buff和命中仍可限定具体形态，元素归属不自动改变施法资格或附加状态。详见[元素与形态修订](./ELEMENT_FAMILY_DESIGN.md)。

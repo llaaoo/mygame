@@ -40,7 +40,7 @@ func _run() -> void:
 	game.ui.close_modal()
 	await _interact("雷阵与导电实验记录")
 	game.ui.close_modal()
-	_check(game.progress.spell_rules.size() == 15, "All fifteen authored recipes were not learned")
+	_check(game.progress.spell_rules.size() == 20, "All twenty authored spell combinations were not learned")
 	await _travel("camp")
 	for i in range(4):
 		_check(supplies.craft("echo_ink"), "Echo ink crafting failed")
@@ -217,7 +217,7 @@ func _run() -> void:
 	current_scene = game
 	await _frames(10)
 	game.ui.close_modal()
-	_check(game.progress.spell_rules.size() == 15 and game.player.skill_manager.combinations.supplies.serialize() == saved and game.progress.claims.has("magic.guard_oath") and game.progress.claims.has("magic.triad_lock") and game.progress.claims.has("magic.toxic_still"), "Advanced knowledge, materials or lock rewards failed disk restore")
+	_check(game.progress.spell_rules.size() == 20 and game.player.skill_manager.combinations.supplies.serialize() == saved and game.progress.claims.has("magic.guard_oath") and game.progress.claims.has("magic.triad_lock") and game.progress.claims.has("magic.toxic_still"), "Advanced knowledge, materials or lock rewards failed disk restore")
 	_check(not game.player.get_node("BuffManager").has_buff("echo_ready"), "Temporary preparation was restored as permanent progress")
 	game.queue_free()
 	current_scene = null

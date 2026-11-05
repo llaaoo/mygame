@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="ExplorationDiscoveryData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/exploration/data/discovery_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "field.cistern_observation"
+title = "机房观察：连接与断路"
+text = "两条预设水路都能把雷电送往检修晶闸，干地和冰面会切断连接。先用震荡把冰面接回水路，再从远处导电；留出自己的干燥落脚点，敌人也会尝试避开危险。\n\n晶闸只看它所在格是否实际导电并保持半秒，向干燥晶闸发射雷矢无法代替水路。完成后，东北侧独立检修升降机永久开放，水干也不会锁回。\n\n这条捷径不要求选择冷却熔炉或魔力导流；原有阀门选择与检修梯照常工作。把已经学会的铺水、冻结和破冰再用一次，就能改变返程。"
+pos = Vector2(-224, -224)
+element_clues = Array[String](["water", "lightning"])

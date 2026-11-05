@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="ExplorationDiscoveryData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/exploration/data/discovery_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "field.drain_observation"
+title = "回廊观察：庇护与污染"
+text = "守点术士依靠投射物压制通道，追猎者则会寻找接近方向。给自己留一块干地：清洁水能洗毒；水与火形成的蒸汽可减免投射物直接伤害，近战和毒的持续伤害仍要躲。\n\n让热冲击封匣脚下真正形成蒸汽并保持半秒，也能打开它。东北侧检修梯随之通往营地。原有冰火、水雷顺序仍然有效。\n\n读过毒理记录并学会凝神后，可以准备毒契。普通毒性施法保留抗毒；完整消费扩大压力，也会失去保护。节律护手可用更多MP保留一半当前剩余时长。"
+pos = Vector2(-224, -160)
+element_clues = Array[String](["fire", "water", "poison"])

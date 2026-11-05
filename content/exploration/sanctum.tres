@@ -21,6 +21,7 @@ requires_clear = true
 [sub_resource type="Resource" id="Resource_fr7ah"]
 script = ExtResource("1_2tmke")
 id = "sanctum_supply"
+equipment = Array[String](["soul_amulet"])
 title = "祈堂储备"
 text = "取得一次性储备，恢复60点生命与法力。凝神增益让你在近战切入和远程拉扯之间选择。"
 pos = Vector2(-350, -180)

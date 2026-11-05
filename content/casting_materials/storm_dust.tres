@@ -4,9 +4,12 @@
 script = ExtResource("1")
 id = "storm_dust"
 title = "雷晶粉"
-description = "铭刻雷阵的必需媒介；也可将雷矢改为三发散射，每发伤害70%，额外4 MP。"
+description = "铭刻雷阵的必需媒介；雷矢或水系投射物变三发散射，每发伤害70%；造水同时导电，可能波及自己与相连水域，额外4 MP。"
 result_ids = PackedStringArray("storm_bolt")
 extra_mana = 4
 projectile_count = 3
 spread = 28.0
 damage_multiplier = 0.7
+supported_tags = PackedStringArray("water")
+supported_types = [0, 2]
+added_tags = ["lightning"]

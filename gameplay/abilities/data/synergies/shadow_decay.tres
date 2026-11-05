@@ -11,3 +11,5 @@ required_target_status = "poison"
 bonus_damage_ratio = 0.4
 cooldown = 0.15
 bonus_tags = ["shadow", "poison", "reaction"]
+
+required_hit_tags = ["shadow"]

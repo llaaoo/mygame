@@ -13,7 +13,12 @@ import time
 ROOT = Path(__file__).resolve().parents[1]
 QUICK = ["save_system", "save_recovery", "skill_catalog", "skill_upgrades", "room_generation"]
 INTEGRATION = [
-    "cast_refactor", "status_transactions", "content_contracts", "region_lifecycle", "player_components", "boon_choices", "joint_interactions", "advanced_spells",
+    "normal_budget_tactics", "content_expansion", "environment_attunement", "five_element_rules",
+    "partial_boons",
+    "element_knowledge",
+    "element_world", "enemy_surfaces",
+    "element_trials",
+    "cast_refactor", "status_transactions", "content_contracts", "region_lifecycle", "player_components", "soul_spell_system", "expedition_builds", "existing_spell_interactions", "emergent_mediums", "boon_choices", "joint_interactions", "advanced_spells",
     "spell_materials", "exploration_content", "exploration_mvp", "fire_combinations",
     "ui_system", "run_loop", "equipment_system", "gameplay",
 ]

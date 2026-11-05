@@ -10,3 +10,5 @@ description = "闪电命中潮湿目标时造成 45% 额外伤害。"
 required_target_status = "wet"
 bonus_damage_ratio = 0.45
 bonus_tags = ["lightning", "reaction"]
+
+required_hit_tags = ["lightning"]

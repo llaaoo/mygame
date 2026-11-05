@@ -14,6 +14,9 @@ var _channel_timer: float = 0.0         ## tick 累加器
 var _aim_line: Line2D = null
 var _aim_dot: Sprite2D = null
 var _aim_distance: float = 60.0
+var _aim_ground_targeted := false
+var _aim_ring: Line2D
+var _ring_radius := -1.0
 
 func _init(actor: Player) -> void:
 	player = actor
@@ -39,6 +42,12 @@ func _setup_aim_indicator() -> void:
 	_aim_dot.z_index = 20
 	_aim_dot.visible = false
 	player.add_child(_aim_dot)
+	_aim_ring = Line2D.new()
+	_aim_ring.name = "GroundTargetArea"
+	_aim_ring.width = 1.5
+	_aim_ring.z_index = 19
+	_aim_ring.visible = false
+	player.add_child(_aim_ring)
 
 func _charge_source_matches(source: String) -> bool:
 	return source == _charging_source or (
@@ -117,12 +126,22 @@ func tick(delta: float) -> void:
 				break
 			_channel_mana_total = total
 
+	var plan := player.skill_manager.combinations.pending
+	if not plan.is_empty() and plan.has_target_position and plan.skill.skill_type == SkillData.SkillType.AOE:
+		var radius := plan.skill.aoe_visual.radius if plan.skill.aoe_visual else plan.skill.aoe_radius
+		var color := plan.skill.aoe_visual.color if plan.skill.aoe_visual else _aim_color(plan.skill.skill_type)
+		show_ground_area(plan.target_position, radius, color)
+	elif not _aim_dot or not _aim_dot.visible or not _aim_ground_targeted:
+		if _aim_ring: _aim_ring.hide()
 	if not _aim_dot or not _aim_dot.visible:
 		return
 	if _aim_line.visible:
 		var dir := player.get_mouse_direction()
-		_aim_line.points = PackedVector2Array([Vector2.ZERO, dir * _aim_distance])
-		_aim_dot.global_position = player.global_position + dir * _aim_distance
+		var point := CastContext.ground_point(player, player.get_global_mouse_position(), _aim_distance) if _aim_ground_targeted else player.global_position + dir * _aim_distance
+		_aim_line.points = PackedVector2Array([Vector2.ZERO, player.to_local(point)])
+		_aim_dot.global_position = point
+		if _aim_ground_targeted:
+			show_ground_area(point, _ring_radius, _aim_dot.modulate)
 	else:
 		_aim_dot.global_position = player.global_position
 
@@ -132,7 +151,14 @@ func show_aim(_source: String, skill: SkillData) -> void:
 	if player.skill_manager.combinations and player.skill_manager.combinations.handles(skill):
 		skill = player.skill_manager.combinations.preview(skill, player, Input.is_key_pressed(KEY_SHIFT)).skill
 
-	var color := _aim_color(skill.skill_type)
+	_aim_ground_targeted = skill.ground_targeted
+	if not _aim_ground_targeted and _aim_ring:
+		_aim_ring.hide()
+	var color := skill.aoe_visual.color if skill.skill_type == SkillData.SkillType.AOE and skill.aoe_visual else _aim_color(skill.skill_type)
+	if skill.skill_type == SkillData.SkillType.PROJECTILE:
+		color = Color(ElementVisuals.color_for(skill.tags), .7)
+	elif skill.skill_type == SkillData.SkillType.BUFF and skill.buff_resource:
+		color = Color(ElementVisuals.status_color(skill.buff_resource.status_id), .6)
 
 	match skill.skill_type:
 		SkillData.SkillType.BUFF:
@@ -146,8 +172,11 @@ func show_aim(_source: String, skill: SkillData) -> void:
 			_aim_line.default_color = color
 			_aim_line.visible = true
 			_aim_dot.modulate = color
-			_aim_dot.scale = Vector2(skill.aoe_radius / 80.0, skill.aoe_radius / 80.0)
+			var radius := skill.aoe_visual.radius if skill.aoe_visual else skill.aoe_radius
+			_aim_dot.scale = Vector2(radius / 80.0, radius / 80.0)
 			_aim_dot.visible = true
+			if _aim_ground_targeted:
+				show_ground_area(CastContext.ground_point(player, player.get_global_mouse_position(), _aim_distance), radius, color)
 
 		SkillData.SkillType.DASH:
 			_aim_distance = skill.dash_distance
@@ -175,6 +204,7 @@ func _aim_color(skill_type: int) -> Color:
 	return Color.WHITE
 
 func hide_aim() -> void:
+	if _aim_ring: _aim_ring.hide()
 	if _aim_line: _aim_line.visible = false
 	if _aim_dot: _aim_dot.visible = false
 
@@ -183,3 +213,16 @@ func cancel_all() -> void:
 	_cancel_channel()
 	aiming_sources.clear()
 	hide_aim()
+
+func show_ground_area(point: Vector2, radius: float, color: Color) -> void:
+	if not _aim_ring:
+		return
+	if not is_equal_approx(_ring_radius, radius):
+		_ring_radius = radius
+		var points := PackedVector2Array()
+		for i in range(49):
+			points.append(Vector2.from_angle(float(i) * TAU / 48.0) * radius)
+		_aim_ring.points = points
+	_aim_ring.default_color = Color(color, 0.7)
+	_aim_ring.global_position = point
+	_aim_ring.show()

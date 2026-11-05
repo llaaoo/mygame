@@ -19,6 +19,9 @@ var empower := false
 var status_conditions: Array[CastStatusRequirement] = []
 var retained_boons: Array[String] = []
 var consumed_boons: Array[String] = []
+var partial_boons: Array[String] = []
+var infusions: Array[String] = []
+var explanation: Array[CastExplanationStep] = []
 var effect_label := ""
 var reason := ""
 var ready := false
@@ -28,9 +31,15 @@ var actor: Node2D
 var scope: Node
 var position := Vector2.ZERO
 var direction := Vector2.ZERO
+var target_position := Vector2.ZERO
+var has_target_position := false
 var health := 0
 var execution_id := 0
 var remaining := 0.0
+var soul_remnant: SoulRemnant
+var soul_revision := -1
+var placement_radius := 96.0
+var placement_duration := 15.0
 
 func is_empty() -> bool:
 	return action == null

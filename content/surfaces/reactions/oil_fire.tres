@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="SurfaceReaction" format=3]
+[ext_resource type="Script" path="res://gameplay/interaction/surface_reaction.gd" id="1"]
+[resource]
+script = ExtResource("1")
+rule_id = "oil_fire"
+required_state = "oiled"
+required_tags = ["fire"]
+result_state = "burning"
+result_duration = 8.0
+spread_to_neighbors = true
+spread_tags = ["fire"]
+spread_damage = 1.0

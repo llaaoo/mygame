@@ -8,14 +8,38 @@
 [ext_resource type="Script" path="res://gameplay/exploration/data/spell_puzzle_data.gd" id="6_fpipr"]
 [ext_resource type="Script" path="res://gameplay/exploration/data/spell_puzzle_route.gd" id="7_kfmxl"]
 
+[ext_resource type="Resource" path="res://content/exploration/experiments/drain_pool.tres" id="exp_drain_pool"]
+[ext_resource type="Resource" path="res://content/exploration/experiments/drain_poison.tres" id="exp_drain_poison"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/surface_patch_data.gd" id="exp_type_surface_patches"]
+
+[ext_resource type="Resource" path="res://content/exploration/experiments/drain_fence.tres" id="exp_drain_fence"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/exploration_prop_data.gd" id="exp_type_fixed_props"]
+
+[ext_resource type="Resource" path="res://content/exploration/experiments/drain_trial_supply.tres" id="exp_drain_trial_supply"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/discovery_data.gd" id="exp_type_discoveries"]
+
+[ext_resource type="Resource" path="res://content/exploration/fieldwork/drain_observation.tres" id="field_observation"]
+
+[ext_resource type="Resource" path="res://content/exploration/fieldwork/drain_return.tres" id="field_return"]
+
+[ext_resource type="Resource" path="res://content/exploration/enemies/hunter.tres" id="profile_hunter"]
+
+[ext_resource type="Resource" path="res://content/exploration/enemies/sentry.tres" id="profile_sentry"]
+
+[sub_resource type="Resource" id="field_steam_hold"]
+script = ExtResource("7_kfmxl")
+required_surface = "steam"
+hold_seconds = 0.5
+
 [sub_resource type="Resource" id="Resource_cq0b6"]
 script = ExtResource("1_rfnbd")
 id = "frost_knowledge"
 title = "寒霜铭刻记录"
-text = "已掌握霜阵（3）。霜阵内使用同一个火花会产生寒霜弹，命中减速并冻结潮湿表面。不同类型法阵可以叠放，同类重建只更新自己；重叠处同一个动作可触发多个结果，费用相加。"
+text = "已掌握霜阵（3）。霜阵内使用同一个火花会产生寒霜弹，命中减速并冻结潮湿表面。不同类型法阵可以叠放，同类重建只更新自己；重叠处同一个动作可触发多个结果，费用相加。\n\n阵外震荡或回响脉冲能打碎已冻结目标，额外50%伤害，代价是失去剩余冻结控制。震荡也能打碎冻结地面、恢复水路，再接雷电沿连通水面传播。\n\n水系的凝霜形态也能作为准备：学会凝神后，Shift凝神借脚下冰面准备霜行，10 MP并消耗所在1格；或在M配置霜盐，1份和额外2 MP替代地面。普通水不会触发霜行。"
 pos = Vector2(-350, 180)
 actions = Array[String](["frost_sigil"])
-spell_rules = Array[String](["frost_sigil_spark"])
+spell_rules = Array[String](["terrain_frost_focus", "frost_sigil_spark"])
+element_clues = Array[String](["water"])
 
 [sub_resource type="Resource" id="Resource_mex14"]
 script = ExtResource("1_rfnbd")
@@ -31,28 +55,32 @@ materials = {
 script = ExtResource("1_rfnbd")
 id = "venom_knowledge"
 title = "毒理记录：雾与孢子"
-text = "学会毒雾（K编组），6 MP和毒性萃取1制造10秒毒区。水引冲洗毒区并解除中毒；火球可引爆中毒目标，冰霜可用于减速留人。回响印记＋毒雾变为穿透孢子，仍消耗毒性萃取。M给冰霜触发配置毒性萃取，还可同时施加冻结与中毒。"
+text = "学会毒雾（K编组），6 MP和毒性萃取1制造10秒毒区。水引冲洗毒区并解除中毒；火球可引爆中毒目标，冰霜可用于减速留人。回响印记＋毒雾变为穿透孢子，仍消耗毒性萃取。M给冰霜触发配置毒性萃取，还可同时施加冻结与中毒。\n\n用近距离火花或火焰近战也能引爆中毒，不必总用火球。一次命中新挂上的状态不会在同次命中被当成预先准备；可以先毒性冰霜，再用火花同时融冰、引爆。\n\n毒性萃取同样能改变水引：水域先变毒地，不再用于洗毒。若戴守阵者指环，在火阵内Shift施放这份水引，毒地会继续被引燃；消耗一份材料、一次火阵充能和额外法力，落点仍由你选择。\n\n学会凝神后，Shift凝神借脚下毒地准备毒契，8 MP并消耗所在1格；或给凝神配置毒性萃取，1份和额外3 MP替代地面。毒契解除并免疫中毒，完整消费后会失去抗毒；节律护手能以额外法力保留一半剩余时长。"
 pos = Vector2(100, -220)
 actions = Array[String](["venom_mist"])
-spell_rules = Array[String](["echo_venom"])
+spell_rules = Array[String](["terrain_poison_focus", "echo_venom"])
 materials = {
 "charcoal": 3,
 "sap": 4,
 "venom_extract": 5
 }
 requires_clear = true
+element_clues = Array[String](["poison"])
 
 [sub_resource type="Resource" id="Resource_mqj3w"]
 script = ExtResource("2_omdmg")
-pos = Vector2(200, -100)
+pos = Vector2(192, -96)
 hp = 30
 speed = 150.0
+profile = ExtResource("profile_hunter")
 
 [sub_resource type="Resource" id="Resource_2lu4k"]
 script = ExtResource("2_omdmg")
-pos = Vector2(330, 160)
+pos = Vector2(352, 128)
 hp = 30
-speed = 150.0
+role = 1
+speed = 95.0
+profile = ExtResource("profile_sentry")
 
 [sub_resource type="Resource" id="Resource_pxhbf"]
 script = ExtResource("4_ovc10")
@@ -80,8 +108,8 @@ script = ExtResource("6_fpipr")
 id = "magic.thermal_cache"
 title = "热冲击封匣"
 pos = Vector2(260, 240)
-routes = Array[ExtResource("7_kfmxl")]([SubResource("Resource_yj58a"), SubResource("Resource_cov44")])
-hint = "封印有两条破解路线：先冰霜冷却，再用火焰冲击；或者先用水引浸湿，再用雷击激活导槽。纯近战无法打开。跨区后未完成的步骤重置；解开后取得晶砂4、霜盐1。"
+routes = Array[ExtResource("7_kfmxl")]([SubResource("Resource_yj58a"), SubResource("Resource_cov44"), SubResource("field_steam_hold")])
+hint = "封印可先冰霜后火焰，或先水引后雷电。也可以用水引与火花，让封匣所在格实际蒸汽保持0.5秒；这个方法无需消耗品。纯近战无法打开。跨区后未完成步骤重置；解开后取得晶砂4、霜盐1，并开启东北侧返营检修梯。"
 materials = {
 "crystal": 4,
 "frost_salt": 1
@@ -103,14 +131,17 @@ materials = {
 "venom_extract": 2
 }
 
+
 [resource]
 script = ExtResource("5_ovwmc")
 id = "drain"
 title = "排水回廊"
-description = "学会霜阵应对高速守卫；北侧机房有范围寒霜记录与旧水路阀门。"
+description = "利用清洁水、蒸汽和毒区对付追猎者与远程守卫；封匣连着返营检修梯。"
 room_type = "traps"
 seed = 20261108
 encounters = Array[ExtResource("2_omdmg")]([SubResource("Resource_mqj3w"), SubResource("Resource_2lu4k")])
-discoveries = Array[ExtResource("1_rfnbd")]([SubResource("Resource_cq0b6"), SubResource("Resource_mex14"), SubResource("Resource_6c60e")])
+discoveries = Array[ExtResource("1_rfnbd")]([SubResource("Resource_cq0b6"), SubResource("Resource_mex14"), SubResource("Resource_6c60e"), ExtResource("exp_drain_trial_supply"), ExtResource("field_observation")])
 spell_objects = Array[ExtResource("6_fpipr")]([SubResource("Resource_6dacc"), SubResource("Resource_g3yad")])
-exits = Array[ExtResource("4_ovc10")]([SubResource("Resource_pxhbf"), SubResource("Resource_scj00")])
+exits = Array[ExtResource("4_ovc10")]([SubResource("Resource_pxhbf"), SubResource("Resource_scj00"), ExtResource("field_return")])
+surface_patches = Array[ExtResource("exp_type_surface_patches")]([ExtResource("exp_drain_pool"), ExtResource("exp_drain_poison")])
+fixed_props = Array[ExtResource("exp_type_fixed_props")]([ExtResource("exp_drain_fence")])

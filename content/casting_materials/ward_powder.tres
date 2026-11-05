@@ -4,7 +4,7 @@
 script = ExtResource("1")
 id = "ward_powder"
 title = "守护粉"
-description = "延长凝神增益与共鸣护盾4秒，额外2 MP；不强化回响印记。"
-result_ids = PackedStringArray("focus", "resonant_guard", "ember_focus", "frost_stride", "static_focus")
+description = "延长凝神恩赐、共鸣护盾、先祖护佑或净魂保护4秒，额外2 MP；不延长蕴魂或回响印记。"
+result_ids = PackedStringArray("focus", "resonant_guard", "ember_focus", "frost_stride", "static_focus", "ancestral_ward", "soul_cleanse", "flow_attunement", "venom_accord")
 extra_mana = 2
 buff_duration_bonus = 4.0

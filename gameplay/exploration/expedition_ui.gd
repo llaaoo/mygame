@@ -4,6 +4,9 @@ extends CanvasLayer
 signal travel_requested(destination: String)
 signal replay_requested
 signal materials_requested
+signal elements_requested
+signal trials_requested
+signal equipment_requested
 
 var heading: Label
 var objective: Label
@@ -13,16 +16,23 @@ var _message_time := 0.0
 var progress: ExplorationProgress
 var modal_locked := false
 var journal_provider: Callable
+var _heading_panel: PanelContainer
+var _notice: PanelContainer
+var _modal_panel: PanelContainer
+var _terrain_label: Label
+var _terrain_time := 0.0
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	layer = GameUIStyle.LAYER_RUN
 	var panel := PanelContainer.new()
+	_heading_panel = panel
 	panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
-	panel.offset_left = -260
-	panel.offset_right = 260
+	panel.offset_left = -210
+	panel.offset_right = 210
 	panel.offset_top = 8
-	panel.add_theme_stylebox_override("panel", GameUIStyle.panel_style())
+	panel.add_theme_stylebox_override("panel", GameUIStyle.panel_style(.94, 5, GameUIStyle.BORDER_STRONG))
+	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(panel)
 	var box := VBoxContainer.new()
 	panel.add_child(box)
@@ -31,14 +41,43 @@ func _ready() -> void:
 	objective.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(heading)
 	box.add_child(objective)
-	var controls := _label("左键近战 · 右键/6火花 · 空格闪避 · E交互 · Shift消耗恩赐 · J日志 · Esc暂停", 11)
-	box.add_child(controls)
-	message = _label("", 15)
-	message.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
-	message.position = Vector2(-270, -190)
-	message.size = Vector2(540, 70)
+	var footer := PanelContainer.new()
+	footer.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
+	footer.offset_left = -214
+	footer.offset_right = -18
+	footer.offset_top = -68
+	footer.offset_bottom = -18
+	footer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	footer.add_theme_stylebox_override("panel", GameUIStyle.panel_style(.85, 4))
+	add_child(footer)
+	var controls := _label("J 日志   M 材料   O 装备\nK 技能编组   Esc 暂停", 11)
+	GameUIStyle.apply_label(controls, 11, GameUIStyle.TEXT_MUTED)
+	footer.add_child(controls)
+	var terrain := PanelContainer.new()
+	terrain.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT)
+	terrain.offset_left = 18
+	terrain.offset_right = 216
+	terrain.offset_top = -68
+	terrain.offset_bottom = -18
+	terrain.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	terrain.add_theme_stylebox_override("panel", GameUIStyle.panel_style(.85, 4))
+	add_child(terrain)
+	_terrain_label = _label("脚下 · 干地", 12)
+	terrain.add_child(_terrain_label)
+	_notice = PanelContainer.new()
+	_notice.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
+	_notice.offset_left = -250
+	_notice.offset_right = 250
+	_notice.offset_top = 112
+	_notice.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_notice.add_theme_stylebox_override("panel", GameUIStyle.panel_style(.94, 5, GameUIStyle.BORDER_STRONG))
+	add_child(_notice)
+	message = _label("", 14)
 	message.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	add_child(message)
+	_notice.add_child(message)
+	_notice.hide()
+	get_viewport().size_changed.connect(_layout_modal)
+	_layout_modal()
 
 func _label(text: String, size: int) -> Label:
 	var label := Label.new()
@@ -49,12 +88,18 @@ func _label(text: String, size: int) -> Label:
 	return label
 
 func _process(delta: float) -> void:
+	_terrain_time += delta
+	if _terrain_time >= .2:
+		_terrain_time = 0
+		_update_terrain()
 	if not get_tree().paused:
 		_message_time -= delta
 		if _message_time <= 0:
 			message.text = ""
+			_notice.hide()
 
 func notify(text: String) -> void:
+	_notice.show()
 	message.text = text
 	_message_time = 5.0
 
@@ -85,12 +130,22 @@ func _unhandled_input(event: InputEvent) -> void:
 			materials_requested.emit()
 		get_viewport().set_input_as_handled()
 
+	elif event.keycode == KEY_O:
+		if modal_locked:
+			return
+		if is_instance_valid(modal):
+			close_modal()
+		else:
+			equipment_requested.emit()
+		get_viewport().set_input_as_handled()
+
 func close_modal() -> void:
 	if is_instance_valid(modal):
 		modal.hide()
 		GameUIStyle.end_modal(modal)
 		modal.queue_free()
 	modal = null
+	_modal_panel = null
 	modal_locked = false
 
 func show_panel(title: String, text: String, buttons: Array[Dictionary], locked: bool = false) -> void:
@@ -107,9 +162,9 @@ func show_panel(title: String, text: String, buttons: Array[Dictionary], locked:
 	modal.add_child(backdrop)
 	var panel := PanelContainer.new()
 	panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
-	panel.position = Vector2(-310, -230)
-	panel.custom_minimum_size = Vector2(620, 460)
-	panel.add_theme_stylebox_override("panel", GameUIStyle.panel_style(0.99, 8))
+	_modal_panel = panel
+	panel.name = "ContentPanel"
+	panel.add_theme_stylebox_override("panel", GameUIStyle.panel_style(0.99, 6, GameUIStyle.BORDER_STRONG))
 	backdrop.add_child(panel)
 	var margin := MarginContainer.new()
 	for side in ["left", "right", "top", "bottom"]:
@@ -118,17 +173,41 @@ func show_panel(title: String, text: String, buttons: Array[Dictionary], locked:
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 12)
 	margin.add_child(box)
-	box.add_child(_label(title, 24))
+	var title_row := HBoxContainer.new()
+	box.add_child(title_row)
+	var title_label := _label(title, 23)
+	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	title_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	title_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	title_label.tooltip_text = title
+	title_row.add_child(title_label)
+	if not locked:
+		var close := Button.new()
+		close.text = "关闭"
+		close.tooltip_text = "Esc · 关闭窗口"
+		GameUIStyle.apply_button(close, GameUIStyle.GOLD)
+		close.pressed.connect(close_modal)
+		title_row.add_child(close)
+	box.add_child(HSeparator.new())
 	var scroll := ScrollContainer.new()
-	scroll.custom_minimum_size = Vector2(570, 270)
+	scroll.name = "BodyScroll"
+	scroll.custom_minimum_size = Vector2(0, 100)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.follow_focus = true
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	box.add_child(scroll)
 	var body := RichTextLabel.new()
 	body.fit_content = true
-	body.custom_minimum_size.x = 550
+	body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	body.scroll_active = false
+	body.selection_enabled = true
 	body.text = text
 	body.add_theme_font_size_override("normal_font_size", 15)
+	body.add_theme_color_override("default_color", GameUIStyle.TEXT_MAIN)
+	body.add_theme_constant_override("line_separation", 5)
 	scroll.add_child(body)
+	scroll.resized.connect(func(): body.custom_minimum_size.x = maxf(1, scroll.size.x - 20))
 	var button_host: Container = box
 	if buttons.size() > 3:
 		var grid := GridContainer.new()
@@ -137,34 +216,64 @@ func show_panel(title: String, text: String, buttons: Array[Dictionary], locked:
 		grid.add_theme_constant_override("v_separation", 8)
 		if buttons.size() > 6:
 			var button_scroll := ScrollContainer.new()
-			button_scroll.custom_minimum_size.y = 145
+			button_scroll.custom_minimum_size.y = 176
 			box.add_child(button_scroll)
 			grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			button_scroll.add_child(grid)
 		else:
 			box.add_child(grid)
 		button_host = grid
+	var first_button: Button
 	for entry in buttons:
 		var button := Button.new()
 		button.text = entry.title
+		button.clip_text = true
+		button.tooltip_text = entry.title
 		button.custom_minimum_size.y = 38
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		button.disabled = bool(entry.get("disabled", false))
 		GameUIStyle.apply_button(button)
 		button.pressed.connect(entry.callback)
 		button_host.add_child(button)
+		if not button.disabled and first_button == null: first_button = button
+	_layout_modal()
+	if first_button: first_button.call_deferred("grab_focus")
 	GameUIStyle.begin_modal(modal)
+
+func _layout_modal() -> void:
+	var viewport := get_viewport().get_visible_rect().size
+	if is_instance_valid(_heading_panel):
+		var width := minf(420, viewport.x - 580)
+		_heading_panel.offset_left = -width * .5
+		_heading_panel.offset_right = width * .5
+	if not is_instance_valid(_modal_panel): return
+	var extent := Vector2(minf(760, viewport.x - 48), minf(548, viewport.y - 48))
+	_modal_panel.offset_left = -extent.x * .5
+	_modal_panel.offset_right = extent.x * .5
+	_modal_panel.offset_top = -extent.y * .5
+	_modal_panel.offset_bottom = extent.y * .5
+
+func _update_terrain() -> void:
+	var player := get_tree().get_first_node_in_group("player") as Node2D
+	if not player or not GameRuntime.instance: return
+	var surfaces := GameRuntime.instance.get_simulation_runtime().get_surface_manager()
+	var state: String = surfaces.surface_at(player.global_position).state
+	var title := SurfaceManager.surface_title(state)
+	var detail: String = {"dry": "Shift 施法 · 恩赐兑现", "wet": "清洗 / 凝霜 / 导电", "frozen": "凝霜控制 · 冲击可破冰", "burning": "燃烧危险 · 水可灭火", "electrified": "感电危险 · 注意站位", "poisoned": "中毒危险 · 清水可清洗", "steam": "蒸汽掩护 · 投射物减伤", "oiled": "可燃介质 · 小心引火"}.get(state, "")
+	_terrain_label.text = "脚下 · " + title + "\n" + detail
+	_terrain_label.add_theme_color_override("font_color", GameUIStyle.TEXT_MUTED if state == "dry" else Color(SurfaceCatalog.color_for(state), 1))
 
 func show_pause() -> void:
 	show_panel("远征暂停", "知识、委托奖励和已清理区域自动保存。返回营地可以恢复，未清理区域的敌人会重新出现。\n\n同一动作在火阵与霜阵中产生不同结果。J日志可查看已学法术组合、区域状态、水路选择和委托进度。", [
 		{"title": "继续", "callback": close_modal},
+		{"title": "装备与构筑", "callback": func(): equipment_requested.emit()},
 		{"title": "返回营地", "callback": func(): close_modal(); travel_requested.emit("camp")},
 		{"title": "重置遭遇，保留已学知识", "callback": func(): close_modal(); replay_requested.emit()},
 	])
 
 func show_journal() -> void:
 	if journal_provider.is_valid():
-		show_panel("探索日志", journal_provider.call(), [{"title": "继续探索", "callback": close_modal}])
+		show_panel("探索日志", journal_provider.call(), [{"title": "元素关系：线索与验证", "callback": elements_requested.emit}, {"title": "实验路线与配置记录", "callback": trials_requested.emit}, {"title": "继续探索", "callback": close_modal}])
 		return
 	var text := "行动提示\n鼠标左键近战；右键或6使用火花；1震荡、3霜阵、5火阵需要探索学习。\n法阵内火花产生远程法术；新阵替换旧阵。J关闭日志。\n\n监狱路线\n营地 → 外院 → 火药库 → 重卫关隘 → 熔炉大厅\n可选支路：外院的军械档案、火药库的排水回廊。\n\n发现记录\n"
 	for entry in progress.journal:

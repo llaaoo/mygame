@@ -10,10 +10,11 @@ lifetime = 0.4
 [resource]
 script = ExtResource("1")
 conditional_cast = true
+ground_targeted = true
 id = "venom_mist"
 display_name = "毒雾"
 combination_only = false
-description = "消耗毒性萃取1，在前方制造10秒毒雾。无直接伤害，命中和进入毒雾会中毒；水引冲洗，火焰引燃。"
+description = "鼠标选择120范围内释放10秒毒雾，消耗毒性萃取1。火花或火焰近战可引爆中毒，水引可冲洗毒区；把水留在脚下也能自救。"
 mechanics = "6 MP。"
 role = "环境控制"
 icon_atlas_index = 17

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="SurfaceDefinition" format=3]
+[ext_resource type="Script" path="res://gameplay/interaction/surface_definition.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "wet"
+title = "水域"
+color = Color(0.2, 0.5, 0.9, 0.32)
+status_paths = ["res://gameplay/abilities/data/wet.tres"]
+cleanse_statuses = ["burning", "poison"]
+refresh_statuses = []
+danger = 0
+expiry_state = ""
+expiry_duration = 0.0

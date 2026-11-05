@@ -103,6 +103,17 @@ func _run() -> void:
 	entity.queue_free()
 	for i in range(3): await process_frame
 	_check(manager.active_summons.is_empty(), "Direct summon removal left manager registration")
+	# Accepted, detached effects still belong to the executor until they enter a live region.
+	var pending_context := CastContext.simple(player, Vector2.RIGHT, summon)
+	pending_context.batch = SkillExecutionBatch.new()
+	_check(sm.executor.execute(summon, pending_context), "Pending summon preparation failed")
+	sm.executor.commit_batch(pending_context.batch)
+	var pending_summon := manager.active_summons[0]
+	var storm := sm.pool.get_skill("flame_storm")
+	var storm_context := CastContext.simple(player, Vector2.RIGHT, storm)
+	_check(sm.executor.execute(storm, storm_context), "Pending area effect failed")
+	game._change_region("yard")
+	_check(not is_instance_valid(pending_summon) and manager.active_summons.is_empty() and sm.executor._pending_nodes.is_empty(), "Immediate travel leaked an accepted detached effect/registration")
 	await fixture.close()
 	if failures.is_empty():
 		print("Player components passed: channel time/cost/material/rollback, charge source and staged summon lifecycle")

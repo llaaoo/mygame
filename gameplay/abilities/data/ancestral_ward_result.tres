@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="SkillData" format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="skill"]
+[ext_resource type="Script" path="res://gameplay/status/buff.gd" id="buff"]
+[sub_resource type="Resource" id="Buff"]
+script = ExtResource("buff")
+status_id = "ancestral_ward"
+buff_id = "ancestral_ward"
+display_name = "先祖护佑"
+duration = 8.0
+exclusive_group = "ancestral_boon"
+damage_taken_multiplier = 0.75
+spell_tags = ["fire", "ice", "lightning", "arcane"]
+spell_damage_multiplier = 1.15
+can_empower = true
+empower_name = "先祖回声"
+empower_damage_multiplier = 1.45
+empower_mana_cost = 2
+empower_pierce_bonus = 1
+tactical_hint = "保留减伤与15%法术增益；Shift伤害施法消费护佑，增加伤害和穿透，额外2 MP。"
+[resource]
+script = ExtResource("skill")
+id = "ancestral_ward"
+display_name = "先祖护佑"
+combination_only = true
+description = "Shift＋凝神兑现1层蕴魂，获得8秒护佑：受到伤害减少25%，适配法术伤害提高15%。普通施法保留；Shift伤害施法可再消费护佑强化。"
+mechanics = "8 MP＋蕴魂1层；护佑与凝神恩赐可并存，不同减伤相乘，最低承受10%伤害。"
+icon_atlas_index = 15
+skill_type = 1
+tags = ["soul", "buff"]
+mp_cost = 8
+cooldown = 2.0
+buff_resource = SubResource("Buff")
+buff_duration = 8.0
+
+school = 3

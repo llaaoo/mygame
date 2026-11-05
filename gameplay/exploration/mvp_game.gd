@@ -1,5 +1,6 @@
 class_name MVPGame
 extends Node
+signal region_changed(id: String)
 
 var catalog := ExplorationContentCatalog.new()
 const SAVE_SLOT := 2
@@ -22,6 +23,9 @@ var _save_dirty: bool:
 var persistence_enabled := true
 var ready_for_play := false
 var quests: Array[ExplorationQuestData] = []
+var equipment_service: ExpeditionEquipment
+var knowledge: ElementKnowledge
+var trial_recorder: ElementTrialRecorder
 var workshop: CastingWorkshop
 var _generator := RunRoomGenerator.new()
 var _renderer := PrisonArena.new()
@@ -63,19 +67,31 @@ func _bootstrap() -> void:
 	progress_service.changed.connect(presenter._update_objective)
 	ui.travel_requested.connect(request_travel)
 	ui.replay_requested.connect(replay_encounters)
+	equipment_service = ExpeditionEquipment.new(self)
+	ui.equipment_requested.connect(equipment_service.show_equipment)
 	workshop = CastingWorkshop.new(self)
 	ui.materials_requested.connect(workshop.show_materials)
+	knowledge = ElementKnowledge.new()
+	knowledge.game = self
+	add_child(knowledge)
+	ui.elements_requested.connect(knowledge.show_page)
+	trial_recorder = ElementTrialRecorder.new()
+	trial_recorder.game = self
+	add_child(trial_recorder)
+	ui.trials_requested.connect(trial_recorder.show_page)
 	quests.assign(catalog.chapter.quests)
 	player.died.connect(_on_player_died)
 	_apply_knowledge()
 	_restore_loadout()
 	_restore_character()
+	equipment_service.restore()
 	_change_region("camp")
 	ready_for_play = true
 	player.skill_manager.hand_changed.connect(func(_source: String): _queue_save())
 	player.skill_manager.slot_changed.connect(func(_slot: int): _queue_save())
 	player.skill_manager.combinations.supplies.changed.connect(_queue_save)
-	ui.show_panel("余烬监狱 · 探索与组合", "你回到一座被封锁的监狱。火花、震荡和凝神在火、霜、雷阵中产生不同法术；水引和树脂创造新的环境条件。\n\n普通施法保留适配恩赐并获得增益；按住Shift施法可消耗恩赐，换取更强形态，随后失去持续收益。共鸣护盾也需要Shift＋震荡才主动引爆。\n\n左键近战，右键火花，空格闪避，E交互，J日志，M材料，K编组。先读营地的施法材料手册，再去外院学习火阵。", [{"title": "开始探索 / 继续旅程", "callback": ui.close_modal}])
+	(player.get_node("EquipmentManager") as EquipmentManager).loadout_changed.connect(_queue_save)
+	ui.show_panel("余烬监狱 · 探索与组合", "你回到一座被封锁的监狱。火花、震荡和凝神在火、霜、雷阵中产生不同法术；水引和树脂创造新的环境条件。\n\n普通施法保留适配恩赐并获得增益；按住Shift施法可消耗恩赐，换取更强形态，随后失去持续收益。共鸣护盾也需要Shift＋震荡才主动引爆。\n\n左键近战，右键火花，空格闪避，E交互，J日志，M材料，K编组，O装备。先读营地手册，再去外院学习火阵。试着把水引放在脚下灭火、用火花点燃油面，再在支路学习冻结与碎冰。发现装备后返回营地整备。", [{"title": "开始探索 / 继续旅程", "callback": ui.close_modal}])
 
 	if load_status == SaveRepository.Status.RECOVERED:
 		ui.notify("主存档不可用，已从有效备份恢复进度。")
@@ -111,6 +127,16 @@ func _change_region(destination: String) -> void:
 	_renderer.build(region_root, layout)
 	region_root.add_child(preload("res://gameplay/exploration/surface_overlay.gd").new())
 	player.global_position = layout.entry_offset
+	var camera := player.get_node_or_null("Camera2D") as Camera2D
+	if camera:
+		var view_size := get_viewport().get_visible_rect().size / camera.zoom
+		var frame := Vector2(maxf(layout.arena_size.x + 72, view_size.x), maxf(layout.arena_size.y + 72, view_size.y)) * .5
+		camera.limit_left = floori(-frame.x)
+		camera.limit_right = ceili(frame.x)
+		camera.limit_top = floori(-frame.y)
+		camera.limit_bottom = ceili(frame.y)
+		camera.reset_smoothing()
+		camera.force_update_scroll()
 	if destination == "camp":
 		_restore_player()
 		_build_camp()
@@ -119,6 +145,7 @@ func _change_region(destination: String) -> void:
 		if not progress.cleared.has(destination):
 			for i in range(current_data.encounters.size()):
 				_spawn_enemy(current_data.encounters[i], layout, i)
+	builder.build_element_objects()
 	for entry in current_data.discoveries:
 		_add_discovery(entry)
 	for entry in current_data.events:
@@ -132,11 +159,7 @@ func _change_region(destination: String) -> void:
 		object.inspected.connect(presenter.inspect_puzzle)
 		region_root.add_child(object)
 	for entry in current_data.exits:
-		var target := str(entry.target)
-		if destination == "camp" and target == "yard":
-			_add_interaction(entry.title, entry.pos, func(): request_travel("yard"), "passage")
-		else:
-			_add_interaction(entry.title, entry.pos, _use_exit.bind(entry), "passage")
+		_add_interaction(entry.title, entry.pos, _use_exit.bind(entry), "passage")
 	if destination == "camp" and progress.cleared.has("gate"):
 		_add_interaction("捷径：重卫关隘", Vector2(0, 280), func(): request_travel("gate"), "passage")
 	if destination == "camp" and progress.choices.has("waterworks_choice"):
@@ -149,9 +172,13 @@ func _change_region(destination: String) -> void:
 	player.ui_blocked = false
 	_switching = false
 	_update_objective()
+	region_changed.emit(destination)
 	_save_progress()
 
 func _use_exit(entry: ExplorationExitData) -> void:
+	if not entry.claims_satisfied(progress):
+		ui.notify(entry.locked_message)
+		return
 	if entry.requires_clear and not active_enemies.is_empty():
 		ui.notify("通道封锁：先清除本区域守卫。")
 		return
@@ -166,6 +193,10 @@ func _use_exit(entry: ExplorationExitData) -> void:
 func _on_enemy_died(enemy: Enemy, generation: int) -> void:
 	if not GameRuntime.instance.get_region_session().is_current(generation):
 		return
+	if is_instance_valid(enemy):
+		var soul := SoulRemnant.new()
+		region_root.add_child(soul)
+		soul.global_position = enemy.global_position
 	active_enemies.erase(enemy)
 	if active_enemies.is_empty():
 		progress.cleared[region_id] = true
@@ -179,6 +210,7 @@ func _on_player_died() -> void:
 	if _defeated:
 		return
 	_defeated = true
+	if trial_recorder and trial_recorder.active: trial_recorder.call_deferred("finish", "死亡中断")
 	progress.deaths += 1
 	player.skill_manager.combinations.cancel("死亡")
 	player.skill_manager.combinations.clear_field()
@@ -191,6 +223,7 @@ func reload_progress() -> void:
 		ui.notify("没有可读取的有效存档，当前旅程与原存档已保留。")
 		return
 	ui.close_modal()
+	if trial_recorder: trial_recorder.active = false
 	_clear_temporary()
 	progress.deserialize_save_data(data)
 	player.skill_manager.combinations.supplies.restore(progress.casting_supplies)
@@ -198,11 +231,17 @@ func reload_progress() -> void:
 	_apply_knowledge()
 	_restore_loadout()
 	_restore_character()
+	equipment_service.restore()
+	knowledge.restore_clues()
 	request_travel("camp")
 
 func _on_spell_object_solved(spec: SpellPuzzleData) -> void:
 	if progress_service.solve_puzzle(spec):
-		ui.notify("解开：" + spec.title + " · 材料已收入行囊，按M查看。")
+		var unlocked: Array[String] = []
+		for exit in current_data.exits:
+			if spec.id in exit.required_claims and exit.claims_satisfied(progress):
+				unlocked.append(exit.title)
+		ui.notify("解开：" + spec.title + " · 材料已收入行囊，按M查看。" + ("\n捷径已开启：" + "、".join(unlocked) if not unlocked.is_empty() else ""))
 
 func _queue_save() -> void:
 	progress_service._queue_save()

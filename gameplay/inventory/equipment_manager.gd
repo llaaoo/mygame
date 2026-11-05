@@ -6,6 +6,7 @@ signal loadout_changed
 signal set_bonuses_changed
 
 var _equipped: Dictionary = {}
+var loadout_revision := 0
 var _applied_buff: Buff
 var _combat_modifiers: Dictionary = {}
 var _applied_stat_modifiers: Dictionary = {}
@@ -90,6 +91,7 @@ func get_active_set_bonuses() -> Array[Dictionary]:
 
 
 func _rebuild_loadout_effects() -> void:
+	loadout_revision += 1
 	if _applied_buff and _buff_manager:
 		_buff_manager.remove_buff(_applied_buff)
 	_applied_buff = null
@@ -129,6 +131,8 @@ func _rebuild_loadout_effects() -> void:
 		_applied_buff.stat_modifiers = flat
 		_applied_buff.stat_multipliers = percent
 		_buff_manager.apply_buff(_applied_buff)
+	if _buff_manager:
+		_buff_manager.reconcile_stack_limits()
 	set_bonuses_changed.emit()
 
 
@@ -149,3 +153,37 @@ static func slot_name(slot: int) -> String:
 		EquipmentData.SlotType.AMULET: return "护符"
 		EquipmentData.SlotType.RING: return "戒指"
 	return "未知"
+
+func casting_value(key: String) -> float:
+	if key not in CastingEquipmentProfile.KEYS:
+		return 0.0
+	var value := 0.0
+	for item in get_all_equipped():
+		if item.casting_profile:
+			value += float(item.casting_profile.get(key))
+	return value
+
+## Capability query also supports a candidate loadout for the equipment comparison UI.
+func medium_infusion_cost(candidate: EquipmentData = null) -> int:
+	var items := get_all_equipped()
+	if candidate:
+		items = items.filter(func(item: EquipmentData): return item.slot_type != candidate.slot_type)
+		items.append(candidate)
+	var cost := -1
+	for item in items:
+		if item.casting_profile and item.casting_profile.medium_infusion:
+			var value: int = item.casting_profile.medium_infusion_cost
+			cost = value if cost < 0 else mini(cost, value)
+	return cost
+
+func partial_boon_cost(candidate: EquipmentData = null) -> int:
+	var items := get_all_equipped()
+	if candidate:
+		items = items.filter(func(item: EquipmentData): return item.slot_type != candidate.slot_type)
+		items.append(candidate)
+	var cost := -1
+	for item in items:
+		if item.casting_profile and item.casting_profile.partial_boon_consumption:
+			var value: int = item.casting_profile.partial_boon_mana_cost
+			cost = value if cost < 0 else mini(cost, value)
+	return cost

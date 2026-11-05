@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="SurfaceReaction" format=3]
+[ext_resource type="Script" path="res://gameplay/interaction/surface_reaction.gd" id="1"]
+[resource]
+script = ExtResource("1")
+rule_id = "wet_fire"
+required_state = "wet"
+required_tags = ["fire"]
+result_state = "steam"
+result_duration = 3.0

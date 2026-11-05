@@ -12,3 +12,5 @@ stack_behavior = 1
 max_stacks = 3
 tick_damage = 5
 tick_damage_scaling = 0.3
+
+category = 2

@@ -4,7 +4,9 @@
 script = ExtResource("1")
 id = "venom_extract"
 title = "毒性萃取"
-description = "毒雾的必需媒介；可给寒霜弹/寒霜新星附加中毒，额外3 MP。"
+description = "毒雾的必需媒介；冰/水投射物或范围法术附毒，造水形成毒地、失去洗毒用途，额外3 MP。"
 result_ids = PackedStringArray("frost_bolt", "frost_ring")
 extra_mana = 3
 added_tags = ["poison"]
+supported_tags = PackedStringArray("ice", "water")
+supported_types = [0, 2]

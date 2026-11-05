@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="ElementDefinition" format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/data/element_definition.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "lightning"
+title = "雷"
+color = Color(0.8, 0.55, 1, 1)
+description = "利用潮湿与连通水路传导，干地截断；也可能波及自己。"
+hit_status_paths = []

@@ -18,6 +18,9 @@ enum SkillType {
 @export var skill_id: String = ""                 ## @deprecated 用 id 代替，保留兼容
 @export var display_name: String = "未命名技能"
 @export var conditional_cast := false
+@export var ground_targeted := false
+@export var requires_soul_remnant := false
+@export var soul_harvest_range := 150.0
 @export var field_type: String = ""
 @export var preparation := 0.25
 @export var combination_only: bool = false  ## Result effect; not an equippable player action.
@@ -84,6 +87,9 @@ enum SkillType {
 @export var ignites_dry_surface: bool = true  ## Some bursts only react with existing material surfaces.
 @export var creates_surface: String = ""
 @export var impact_surface: String = ""
+## Ordered medium transformations, applied after creating the base surface.
+## Separate from hit tags: borrowing a field changes terrain, not hit status effects.
+@export var surface_payload_tags: Array[String] = []
 @export var surface_radius: float = 80.0
 @export var surface_duration: float = 8.0
 @export_range(1, 30, 1) var aoe_max_hits_per_target: int = 1

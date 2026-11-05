@@ -6,3 +6,4 @@ extends Resource
 @export var role: int = 0
 @export var speed: float = 105.0
 @export var boss: bool = false
+@export var profile: ExplorationEnemyProfile

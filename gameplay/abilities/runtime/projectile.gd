@@ -49,6 +49,9 @@ func setup(skill: SkillData, caster_node: Node2D, dir: Vector2) -> void:
 			spr.modulate = skill.projectile_color
 			spr.scale = Vector2(skill.projectile_scale, skill.projectile_scale)
 	
+	if spr and spr.texture and "placeholders/" in spr.texture.resource_path:
+		spr.hide()
+		SpellVisual.attach(self, skill, "projectile", clampf(collision_radius, 6, 16))
 	_needs_setup = false
 
 
@@ -230,11 +233,12 @@ func _apply_impact_surface() -> void:
 	_impact_applied = true
 	var sim := GameRuntime.instance.get_simulation_runtime() if GameRuntime.instance else null
 	if sim:
-		sim.get_surface_manager().apply_area(global_position, skill.surface_radius, skill.tags, skill.display_name, skill.impact_surface, skill.surface_duration)
+		sim.get_surface_manager().apply_area(global_position, skill.surface_radius, skill.tags, skill.display_name, skill.impact_surface, skill.surface_duration, false, skill.surface_payload_tags)
 
 
 ## 发射 ON_HIT → CombatExecutor（唯一权威入口）
 func _emit_hit_event(target: Node2D) -> void:
+	SpellVisual.impact(self, get_meta("skill_data", null) as SkillData)
 	# A nearby impact may happen before the first travel sampling interval.
 	_apply_to_surface()
 	var skill := get_meta("skill_data", null) as SkillData

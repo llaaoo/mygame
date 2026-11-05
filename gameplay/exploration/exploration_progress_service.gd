@@ -20,6 +20,16 @@ func tick(delta: float) -> void:
 			_save_progress()
 
 func _apply_knowledge() -> void:
+	var backfilled := false
+	# New techniques on already-read notes are backfilled without replaying rewards.
+	for region: ExplorationRegionData in game.catalog.regions.values():
+		for note in region.discoveries:
+			if game.progress.claims.has(note.id):
+				for id in note.spell_rules:
+					if game.catalog.spell_rules.has(id) and not game.progress.spell_rules.has(id):
+						game.progress.spell_rules[id] = true
+						backfilled = true
+	if backfilled: _queue_save()
 	var sm := game.player.skill_manager
 	var previous := sm.known_actions.duplicate()
 	sm.known_actions = game.progress.actions.duplicate()
@@ -75,6 +85,10 @@ func _save_progress() -> void:
 		save_failed.emit("保存未完成，当前进度仍保留在内存。原存档已保留，可按F5重试。")
 
 func _sync_progress() -> void:
+	# Include already emitted world facts even when saving before the next runtime frame.
+	GameRuntime.instance.get_command_bus().flush_world_facts()
+	if game.equipment_service:
+		game.equipment_service.sync()
 	game.progress.casting_supplies = game.player.skill_manager.combinations.supplies.serialize()
 	game.progress.world_states = GameRuntime.instance.get_world_runtime().state_manager.get_all_states().duplicate(true)
 	game.progress.loadout = game.player.skill_manager.serialize_skill_state()
@@ -95,6 +109,7 @@ func _restore_loadout() -> void:
 	sm.restore_skill_state(game.progress.loadout)
 
 func replay_encounters() -> void:
+	if game.trial_recorder and game.trial_recorder.active: game.trial_recorder.finish("重置遭遇")
 	game.progress.cleared.clear()
 	game.progress.completed = false
 	game.progress.world_states.clear()
@@ -134,8 +149,12 @@ func choose_world_event(entry: ExplorationWorldEventData, choice: ExplorationWor
 func discover(entry: ExplorationDiscoveryData) -> bool:
 	if entry not in game.current_data.discoveries or (entry.requires_clear and not game.active_enemies.is_empty()):
 		return false
+	var reward := game.equipment_service.grant(entry)
 	if not game.progress.claim(entry.id, entry.title, entry.text, entry.actions, entry.spell_rules):
-		return false
+		if reward:
+			_save_progress()
+		return reward
+	if game.knowledge: game.knowledge.read_clues(entry)
 	game.player.skill_manager.combinations.supplies.grant(entry.materials)
 	_apply_knowledge()
 	if entry.heal:

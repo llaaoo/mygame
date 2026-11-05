@@ -21,7 +21,6 @@ var cooldown_durations: Dictionary = {}
 var last_message := ""
 var _message_remaining := 0.0
 var _recovery := 0.0
-var _serial := 0
 var _committing := false
 
 func _ready() -> void:
@@ -53,9 +52,9 @@ func build_plan(skill: SkillData, actor: Node2D, empower: bool = false) -> CastP
 	if not skill.conditional_cast:
 		components.append(SpellCombinationResolver.base_plan(skill))
 	elif allow_layered_fields:
-		components = SpellCombinationResolver.resolve_components(skill, live_fields(), actor, rules, learned_rules, empower, rule_index)
+		components = SpellCombinationResolver.resolve_components(skill, live_fields(), actor, rules, learned_rules, empower, rule_index, supplies)
 	else:
-		components.append(SpellCombinationResolver.resolve_rules(skill, field if is_instance_valid(field) else null, actor, rule_index.for_action(skill.get_id()), learned_rules, empower, true))
+		components.append(SpellCombinationResolver.resolve_rules(skill, field if is_instance_valid(field) else null, actor, rule_index.for_action(skill.get_id()), learned_rules, empower, true, supplies))
 	var result := CastPlan.new()
 	result.rule_id = components[0].rule_id
 	result.field = components[0].field
@@ -68,21 +67,58 @@ func build_plan(skill: SkillData, actor: Node2D, empower: bool = false) -> CastP
 	result.field_bonus = 0.0
 	result.action_cooldown = get_parent().effective_cooldown(skill, actor, skill.cooldown)
 	result.signature = [["action_cooldown", result.action_cooldown]]
+	var equipment := actor.get_node_or_null("EquipmentManager") as EquipmentManager
+	if equipment:
+		result.signature.append(["equipment", equipment.loadout_revision])
+		result.placement_radius = clampf(96 + equipment.casting_value("field_radius_bonus"), 48, 180)
+		result.placement_duration = clampf(15 + equipment.casting_value("field_duration_bonus"), 5, 40)
+	if skill.requires_soul_remnant:
+		result.soul_remnant = SoulRemnant.nearest(actor, skill.soul_harvest_range + (equipment.casting_value("soul_range_bonus") if equipment else 0.0))
+		result.soul_revision = result.soul_remnant.revision if result.soul_remnant else -1
+		result.signature.append([result.soul_remnant.get_instance_id() if result.soul_remnant else 0, result.soul_revision, (actor.get_node("BuffManager") as BuffManager).status_version("soul_charge")])
 	result.empower = empower
+	result.explanation.append(CastExplanationStep.new("action", skill.get_id(), "基础动作：" + skill.display_name))
 	result.status_conditions = []
 	result.retained_boons = []
 	result.consumed_boons = []
 	var charged_boons: Dictionary = {}
 	var names: Array[String] = []
+	var infusion_fields := live_fields()
+	# Active combinations have first claim; a field charge cannot fund two components.
+	for component in components:
+		if component.field != null:
+			infusion_fields.erase(component.field)
 	for i in range(components.size()):
 		var component := components[i]
-		var material := supplies.plan(skill, component.skill, i == 0)
+		if not component.rule_id.is_empty():
+			var condition := FireSigil.title_for(component.field.field_type) + "，1次充能" if component.field else Buff.status_title(component.status_id)
+			if not component.surface_state.is_empty():
+				condition = "脚下" + SurfaceManager.surface_title(component.surface_state) + "：完成后消耗所在1格，保留周围介质"
+			elif not component.substitute_material.is_empty():
+				condition = supplies.title(component.substitute_material) + "×1替代地面（不附加投射物改造）"
+			result.explanation.append(CastExplanationStep.new("combination", component.rule_id, condition + " → " + component.skill.display_name))
+		var material := supplies.plan(skill, component.skill, i == 0, component.substitute_material)
+		if not material.material_id.is_empty():
+			var entry: CastingMaterialData = supplies.catalog[material.material_id]
+			var purpose := "替代地面准备恩赐，不附加投射物改造；额外%d MP（修正前）" % entry.extra_mana if not component.substitute_material.is_empty() else entry.description
+			result.explanation.append(CastExplanationStep.new("material", entry.id, entry.title + "：" + purpose))
 		var boon := BoonSpellModifier.plan(material.skill, actor, empower)
 		component.skill = boon.skill
 		component.boon_conditions = boon.conditions
+		var infusion_cost := MediumInfusion.plan(component, actor, infusion_fields, empower)
+		if not component.infusion_label.is_empty():
+			result.infusions.append(component.infusion_label)
+			result.explanation.append(CastExplanationStep.new("equipment", "medium_infusion", component.infusion_label + "，额外%d MP（修正前），落点不变" % infusion_cost))
+			infusion_fields.erase(component.field)
 		var boon_cost := 0
 		for condition in boon.conditions:
 			result.status_conditions.append(condition)
+			if not charged_boons.has("explain:" + condition.id):
+				charged_boons["explain:" + condition.id] = true
+				var snapshot := (actor.get_node("BuffManager") as BuffManager).capture_status(condition.id)
+				var title: String = snapshot.buff.display_name if not snapshot.is_empty() else condition.id
+				var mode := "保留" if not condition.consume else "部分消费，保留当前剩余时长50%" if condition.mode == CastStatusRequirement.ConsumptionMode.HALF_LIFETIME else "完整消费，失去持续收益"
+				result.explanation.append(CastExplanationStep.new("boon", condition.id, "%s：%s；伤害倍率×%.2f，额外%d MP（修正前）；无伤害工具只获得形态变化" % [title, mode, condition.factor, condition.cost]))
 			if condition.consume and not charged_boons.has(condition.id):
 				boon_cost += int(condition.cost)
 				charged_boons[condition.id] = true
@@ -92,13 +128,18 @@ func build_plan(skill: SkillData, actor: Node2D, empower: bool = false) -> CastP
 		for title in boon.spent:
 			if title not in result.consumed_boons:
 				result.consumed_boons.append(title)
+		for title in boon.partial:
+			if title not in result.partial_boons:
+				result.partial_boons.append(title)
 		if not component.status_id.is_empty():
-			result.status_conditions.append(CastStatusRequirement.new(component.status_id, component.status_version, component.consume_status))
+			var requirement := CastStatusRequirement.new(component.status_id, component.status_version, component.consume_status)
+			requirement.stacks = component.consume_stacks
+			result.status_conditions.append(requirement)
 			if component.consume_status:
-				var title: String = {"echo_ready": "回响印记", "resonant_guard": "共鸣护盾"}.get(component.status_id, component.status_id)
+				var title: String = {"echo_ready": "回响印记", "resonant_guard": "共鸣护盾", "soul_charge": "蕴魂1层"}.get(component.status_id, component.status_id)
 				if title not in result.consumed_boons:
 					result.consumed_boons.append(title)
-		component.cost = get_parent().effective_mana_cost(component.skill, actor, int(component.cost) + int(material.extra_mana) + boon_cost)
+		component.cost = get_parent().effective_mana_cost(component.skill, actor, int(component.cost) + int(material.extra_mana) + boon_cost + infusion_cost)
 		component.cooldown = get_parent().effective_cooldown(component.skill, actor, component.cooldown)
 		component.material_costs = material.costs
 		component.material_id = material.material_id
@@ -107,15 +148,28 @@ func build_plan(skill: SkillData, actor: Node2D, empower: bool = false) -> CastP
 		result.cooldown_keys[key] = component.cooldown
 		result.cost += component.cost
 		result.cooldown = maxf(result.cooldown, component.cooldown)
-		result.preparation = maxf(result.preparation, component.preparation)
+		result.preparation = maxf(result.preparation, component.preparation * clampf(1.0 + (equipment.casting_value("preparation_bonus") if equipment else 0.0), 0.5, 1.5))
 		result.field_bonus = maxf(result.field_bonus, component.field_bonus)
 		for id in material.costs:
 			result.material_costs[id] = int(result.material_costs.get(id, 0)) + int(material.costs[id])
 		result.signature.append(component.fingerprint())
-		names.append(component.skill.display_name)
+		names.append(component.skill.display_name + ("〔" + component.medium_label + "〕" if not component.medium_label.is_empty() else ""))
 	result.skill = components[0].skill
+	result.field = components[0].field
 	result.material_id = components[0].material_id
 	result.effect_label = " + ".join(names)
+	for component in components:
+		var shape := ""
+		if component.skill.skill_type == SkillData.SkillType.BUFF and component.skill.buff_resource:
+			shape = "；" + component.skill.buff_resource.describe()
+			if component.skill.buff_duration > 0: shape += "；本次持续%.1f秒" % component.skill.buff_duration
+		var affinity := ElementCatalog.affinity_label(component.skill.tags)
+		if component.skill.skill_type == SkillData.SkillType.AOE:
+			shape = "，半径%.0f" % (component.skill.aoe_visual.radius if component.skill.aoe_visual else component.skill.aoe_radius)
+		elif component.skill.skill_type == SkillData.SkillType.PROJECTILE:
+			shape = "，%d发、额外穿透%d" % [component.skill.projectile_count, component.skill.projectile_pierce]
+		result.explanation.append(CastExplanationStep.new("effect", component.skill.get_id(), component.skill.display_name + ("〔" + affinity + "〕" if not affinity.is_empty() else "") + shape + ("；" + component.medium_label if not component.medium_label.is_empty() else "")))
+	result.explanation.append(CastExplanationStep.new("cost", "total", "总计%d MP；准备%.2f秒；%s" % [result.cost, result.preparation, supplies.describe_cost(result.material_costs) if not result.material_costs.is_empty() else "无材料消耗"]))
 	return result
 
 func boon_hint(plan: CastPlan) -> String:
@@ -123,7 +177,11 @@ func boon_hint(plan: CastPlan) -> String:
 	if not plan.retained_boons.is_empty():
 		text = "保留：" + "、".join(plan.retained_boons)
 	if not plan.consumed_boons.is_empty():
-		text += ("；" if not text.is_empty() else "") + "消耗：" + "、".join(plan.consumed_boons)
+		text += ("；" if not text.is_empty() else "") + "完整消耗：" + "、".join(plan.consumed_boons)
+	if not plan.partial_boons.is_empty():
+		text += ("；" if not text.is_empty() else "") + "部分消耗：" + "、".join(plan.partial_boons) + "（保留剩余时长50%，较弱伤害强化）"
+	if not plan.infusions.is_empty():
+		text += ("；" if not text.is_empty() else "") + "借用：" + "、".join(plan.infusions) + "，额外法力已计入"
 	return text
 
 func cooldown_state(plan: CastPlan, action_id: String) -> Dictionary:
@@ -156,6 +214,12 @@ func preview(skill: SkillData, actor: Node2D, empower: bool = false) -> CastPlan
 	var mana := actor.get_node_or_null("ManaComponent") as ManaComponent
 	if mana and mana.mp < int(result.cost):
 		result.reason = "法力不足，需要 %d MP" % result.cost
+	if skill.requires_soul_remnant:
+		var buffs := actor.get_node("BuffManager") as BuffManager
+		if not result.soul_remnant:
+			result.reason = "附近没有残魂：击败守卫后靠近残魂，再使用汲魂"
+		elif buffs.get_stack_count("soul_charge") >= buffs.stack_limit(skill.buff_resource):
+			result.reason = "蕴魂已满：先以Shift组合兑现，再汲取残魂"
 	if not supplies.can_pay(result.material_costs):
 		result.reason = "施法材料不足：" + supplies.describe_cost(result.material_costs)
 	result.ready = result.reason.is_empty()
@@ -171,18 +235,20 @@ func start(skill: SkillData, actor: Node2D, context: CastContext, source: String
 	var scope := _scope(actor)
 	if not scope:
 		return false
-	if not skill.field_type.is_empty() and not _can_place(actor, actor.global_position):
+	if not skill.field_type.is_empty() and not _can_place(actor, actor.global_position, plan.placement_radius):
 		_message("铭刻位置被障碍物阻挡")
 		return false
-	_serial += 1
 	plan.action = skill
 	plan.source = source
 	plan.actor = actor
 	plan.scope = scope
 	plan.position = actor.global_position
 	plan.direction = context.direction
+	plan.has_target_position = skill.ground_targeted and context.has_target_position
+	if plan.has_target_position:
+		plan.target_position = CastContext.ground_point(actor, context.target_position, skill.cast_distance)
 	plan.health = _health(actor)
-	plan.execution_id = _serial
+	plan.execution_id = CastTransaction.allocate_id()
 	plan.remaining = plan.preparation
 	pending = plan
 	_message("准备：%s" % plan.skill.display_name)
@@ -276,7 +342,7 @@ func _commit() -> void:
 		cancel("组合材料已不足，未扣费")
 		return
 	var placement: bool = not plan.action.field_type.is_empty()
-	if placement and not _can_place(actor, plan.position):
+	if placement and not _can_place(actor, plan.position, plan.placement_radius):
 		cancel("铭刻位置被阻挡")
 		return
 	for component in plan.components:
@@ -292,7 +358,8 @@ func _commit() -> void:
 		var next := SIGIL.new()
 		next.caster = actor
 		next.field_type = plan.action.field_type
-		next.remaining += float(plan.field_bonus)
+		next.radius = plan.placement_radius
+		next.remaining = plan.placement_duration + float(plan.field_bonus)
 		if allow_layered_fields:
 			clear_field_type(next.field_type)
 		else:
@@ -308,7 +375,10 @@ func _commit() -> void:
 			context.world = plan.scope
 			context.batch = batch
 			context.family_id = "%s:%s" % [get_instance_id(), plan.execution_id]
-			if component.field != null:
+			if plan.has_target_position:
+				context.target_position = plan.target_position
+				context.has_target_position = true
+			if component.field != null and component.anchor_to_field:
 				context.target_position = component.field.global_position
 				context.has_target_position = true
 			if not get_parent().executor.execute(component.skill, context):
@@ -331,6 +401,7 @@ func _commit() -> void:
 		_message("组合未接受，资源与准备状态已恢复")
 	_committing = false
 	if ok:
+		get_parent().cast_committed.emit(plan)
 		for component in plan.components:
 			action_committed.emit(component.skill.get_id())
 	else:
@@ -342,10 +413,10 @@ func _can_execute(skill: SkillData) -> bool:
 func _scope(actor: Node2D) -> Node:
 	return CastContext.default_world(actor)
 
-func _can_place(actor: Node2D, position: Vector2) -> bool:
+func _can_place(actor: Node2D, position: Vector2, radius: float = 96.0) -> bool:
 	var query := PhysicsShapeQueryParameters2D.new()
 	var circle := CircleShape2D.new()
-	circle.radius = 96
+	circle.radius = radius
 	query.shape = circle
 	query.transform = Transform2D(0, position)
 	query.collision_mask = 1
@@ -362,3 +433,31 @@ func _dead(actor: Node2D) -> bool:
 func _message(message: String) -> void:
 	last_message = message
 	_message_remaining = 2.5
+
+func describe_plan(plan: CastPlan) -> String:
+	var lines: Array[String] = [plan.effect_label]
+	for step in plan.explanation: lines.append(step.text)
+	var hint := boon_hint(plan)
+	if not hint.is_empty(): lines.append(hint)
+	lines.append("可准备" if plan.ready else plan.reason)
+	return "\n".join(lines)
+
+func describe_comparison(action: SkillData, actor: Node2D, normal: CastPlan = null, shifted: CastPlan = null, target: Node2D = null) -> String:
+	if not normal: normal = preview(action, actor)
+	if not shifted: shifted = preview(action, actor, true)
+	var text := "普通施法\n" + describe_plan(normal) + "\n\nShift施法\n" + describe_plan(shifted)
+	for rule: SpellCombinationRule in rule_index.for_action(action.get_id()):
+		if not rule.required_surface.is_empty() and learned_rules.has(rule.id):
+			var candidate := SpellCombinationResolver.resolve(action, null, actor, rule, true, true, supplies)
+			text += "\n" + rule.result_skill.display_name + "准备条件：" + rule.condition_label() + ("（条件具备，优先处理法阵、回响与魂术）" if not candidate.rule_id.is_empty() else "（当前介质不满足）")
+	if not is_instance_valid(target):
+		return text + "\n\n目标反应在实际命中时判断；以上不保证命中或目标状态保持。"
+	var target_buffs := target.get_node_or_null("BuffManager") as BuffManager
+	var caster_buffs := actor.get_node_or_null("BuffManager") as BuffManager
+	var candidates: Array[String] = []
+	for component in shifted.components:
+		for reaction in ElementReactionCatalog.for_skill(component.skill):
+			if not reaction.required_target_status.is_empty() and (not target_buffs or not target_buffs.has_buff(reaction.required_target_status)): continue
+			if not reaction.required_caster_status.is_empty() and (not caster_buffs or not caster_buffs.has_buff(reaction.required_caster_status)): continue
+			if reaction.display_name not in candidates: candidates.append(reaction.display_name)
+	return text + "\n\n若命中当前目标，可满足：" + ("、".join(candidates) if not candidates.is_empty() else "尚无额外反应条件") + "。实际命中时重新判断。"

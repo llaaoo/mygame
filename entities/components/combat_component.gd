@@ -1,5 +1,6 @@
 class_name CombatComponent
 extends Node
+signal melee_started
 ## 近战战斗组件 — 攻击盒管理 + 命中检测
 ## 挂载到 Player 节点，通过 setup() 注入依赖
 
@@ -37,6 +38,7 @@ func setup(entity: Player, hitbox: Area2D, hitbox_shape: CollisionShape2D, anim:
 
 
 func perform_melee_attack(direction_override: Vector2 = Vector2.ZERO) -> void:
+	melee_started.emit()
 	var attack_dir := direction_override.normalized() if direction_override != Vector2.ZERO else _entity.get_mouse_direction()
 	_swing_active = true
 	_swing_targets.clear()
@@ -110,10 +112,6 @@ func _apply_melee_hit(target: Node2D) -> void:
 		skill.id = "imbued_melee"
 		skill.display_name = "元素近战"
 		skill.tags = tags
-		if "fire" in tags:
-			var fireball := _entity.skill_manager.pool.get_skill("fireball")
-			if fireball:
-				skill.synergies = fireball.synergies.duplicate()
 	var surface := SurfaceManager.instance
 	if surface and not imbued_tags.is_empty():
 		var cell := Vector2i(floori(target.global_position.x / 64), floori(target.global_position.y / 64))

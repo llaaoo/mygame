@@ -47,34 +47,12 @@ func _build_floor(layout: RefCounted) -> void:
 		patch.z_index = -118
 		_room_root.add_child(patch)
 
-	var half: Vector2 = layout.arena_size * 0.5
-	var columns: int = maxi(1, int(layout.arena_size.x / 112.0))
-	var column_half: int = floori(columns / 2.0)
-	for x in range(-column_half, column_half + 1):
-		var line := Line2D.new()
-		line.width = 2.0
-		line.default_color = Color(accent.r, accent.g, accent.b, 0.35)
-		line.z_index = -115
-		var px := _room_origin.x + float(x) * 112.0
-		line.points = PackedVector2Array([
-			Vector2(px, _room_origin.y - half.y),
-			Vector2(px, _room_origin.y + half.y),
-		])
-		_room_root.add_child(line)
-
-	var rows: int = maxi(1, int(layout.arena_size.y / 112.0))
-	var row_half: int = floori(rows / 2.0)
-	for y in range(-row_half, row_half + 1):
-		var line := Line2D.new()
-		line.width = 2.0
-		line.default_color = Color(accent.r, accent.g, accent.b, 0.35)
-		line.z_index = -115
-		var py := _room_origin.y + float(y) * 112.0
-		line.points = PackedVector2Array([
-			Vector2(_room_origin.x - half.x, py),
-			Vector2(_room_origin.x + half.x, py),
-		])
-		_room_root.add_child(line)
+	var detail := preload("res://gameplay/presentation/prison_floor_detail.gd").new()
+	detail.extent = layout.arena_size
+	detail.base = base_color
+	detail.accent = accent
+	detail.z_index = -116
+	_room_root.add_child(detail)
 
 
 func _build_walls(arena_size: Vector2) -> void:

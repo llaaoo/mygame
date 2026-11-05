@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="ExplorationDiscoveryData" format=3]
+[ext_resource type="Script" path="res://gameplay/exploration/data/discovery_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "experiment.archive_trial_supply"
+title = "元素实验补给：控制与兑现"
+text = "先在左侧读震荡记录，再观察中部冰面：保留减速、以震荡碎冰恢复水路，或用火花融化。近战也能打破木栅栏。水引配置霜盐可制造自己的冰面；安全试验后再用同样办法对付守卫。\n\n补给仅领取一次；回营地可以继续加工，休息和重置遭遇不会重复发放。"
+pos = Vector2(-300, 96)
+materials = { "frost_salt": 3, "resin": 2, "charcoal": 3, "sap": 3 }

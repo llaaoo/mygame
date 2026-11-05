@@ -40,9 +40,11 @@ func tick(delta: float) -> void:
 			if instance.remaining <= 0.000001:
 				_remove(instance, RemovalReason.EXPIRED)
 
-func apply_buff(buff: Buff, source: Node2D = null, skill: SkillData = null) -> void:
-	if not buff:
-		return
+func apply_buff(buff: Buff, source: Node2D = null, skill: SkillData = null) -> bool:
+	if not buff or is_immune(buff.status_id):
+		return false
+	for status in buff.cleanse_statuses:
+		remove_status(status, RemovalReason.DISPELLED)
 	_touch_status(buff.status_id)
 	if not buff.exclusive_group.is_empty():
 		for instance: StatusInstance in _instances.duplicate():
@@ -53,18 +55,19 @@ func apply_buff(buff: Buff, source: Node2D = null, skill: SkillData = null) -> v
 		existing = _find(buff.status_id)
 	if existing and buff.stack_behavior != Buff.StackBehavior.INDEPENDENT:
 		if buff.stack_behavior == Buff.StackBehavior.INTENSITY:
-			existing.stacks = mini(existing.definition.max_stacks, existing.stacks + 1)
+			existing.stacks = mini(stack_limit(existing.definition), existing.stacks + 1)
 		existing.remaining = buff.duration
 		# Keep periodic progress when a status is refreshed; frequent refresh cannot prevent its tick.
 		_refresh_source(existing, source, skill)
 		_rebuild_attributes()
 		_notify(true, existing.definition)
-		return
+		return true
 	_serial += 1
 	var instance := StatusInstance.new(_serial, buff, source, skill)
 	_instances.append(instance)
 	_rebuild_attributes()
 	_notify(true, buff)
+	return true
 
 func _refresh_source(instance: StatusInstance, source: Node2D, skill: SkillData) -> void:
 	if is_instance_valid(source):
@@ -166,7 +169,9 @@ func _notify(applied: bool, buff: Buff, reason: RemovalReason = RemovalReason.DI
 
 func _publish(events: Array, changed: bool, include_mana: bool = true) -> void:
 	for event in events:
-		if event.applied:
+		if event.has("stacks"):
+			CombatExecutor.report_status_changed(get_parent(), event.buff, event.amount, event.stacks, event.reason)
+		elif event.applied:
 			CombatExecutor.report_status_applied(get_parent(), event.buff)
 		else:
 			CombatExecutor.report_status_removed(get_parent(), event.buff, RemovalReason.keys()[event.reason].to_lower())
@@ -223,6 +228,14 @@ func get_damage_taken_multiplier() -> float:
 		result *= pow(instance.definition.damage_taken_multiplier, instance.stacks)
 	return clampf(result, 0.1, 4.0)
 
+func get_incoming_hit_multiplier(skill: SkillData, tags: Array) -> float:
+	if not skill or skill.skill_type != SkillData.SkillType.PROJECTILE or "dot" in tags or "melee" in tags or "melee" in skill.tags:
+		return 1.0
+	var factor := 1.0
+	for instance in _instances:
+		factor *= pow(instance.definition.incoming_projectile_multiplier, instance.stacks)
+	return clampf(factor, 0.1, 4.0)
+
 func get_speed_multiplier() -> float:
 	var result := 1.0
 	for instance in _instances:
@@ -241,7 +254,7 @@ func get_spell_boons() -> Array[Buff]:
 	var result: Array[Buff] = []
 	for instance in _instances:
 		var buff := instance.definition
-		if not buff.spell_tags.is_empty() and not buff.status_id.is_empty():
+		if (not buff.spell_tags.is_empty() or not buff.spell_elements.is_empty()) and not buff.status_id.is_empty():
 			result.append(buff)
 	return result
 
@@ -267,7 +280,7 @@ func get_active_buff_entries() -> Array:
 	var result: Array = []
 	for instance in _instances:
 		var buff := instance.definition
-		result.append({"id": buff.get_runtime_id(), "instance_id": instance.serial, "name": buff.display_name if not buff.display_name.is_empty() else buff.status_id, "status_id": buff.status_id, "icon": buff.icon, "remaining": instance.remaining, "duration": buff.duration, "progress": clampf(instance.remaining / buff.duration, 0, 1) if buff.duration > 0 else 1.0, "stacks": instance.stacks, "description": buff.describe(), "resource_path": buff.resource_path})
+		result.append({"id": buff.get_runtime_id(), "instance_id": instance.serial, "name": buff.display_name if not buff.display_name.is_empty() else buff.status_id, "status_id": buff.status_id, "icon": buff.icon, "remaining": instance.remaining, "duration": buff.duration, "progress": clampf(instance.remaining / buff.duration, 0, 1) if buff.duration > 0 else 1.0, "stacks": instance.stacks, "capacity": stack_limit(buff), "category": buff.category, "source": instance.source().name if is_instance_valid(instance.source()) else "环境/自身", "description": buff.describe(), "resource_path": buff.resource_path})
 	return result
 
 func serialize_state() -> Array[Dictionary]:
@@ -291,7 +304,7 @@ func restore_state(entries: Array[Dictionary]) -> void:
 		apply_buff(buff)
 		var instance := _find(buff.get_runtime_id())
 		instance.remaining = maxf(0, float(entry.get("remaining", buff.duration)))
-		instance.stacks = clampi(int(entry.get("stacks", 1)), 1, maxi(1, buff.max_stacks))
+		instance.stacks = clampi(int(entry.get("stacks", 1)), 1, stack_limit(buff))
 		instance.elapsed = maxf(0, float(entry.get("tick_elapsed", 0)))
 		instance.source_magic = float(entry.get("source_magic", 0))
 	_rebuild_attributes()
@@ -313,3 +326,63 @@ func _apply_tick(instance: StatusInstance) -> void:
 		CombatExecutor.report_hit(instance.source(), entity, damage, entity.global_position, instance.source_skill, ["dot", buff.status_id])
 	if buff.tick_heal > 0 and entity.has_method("heal"):
 		entity.heal(buff.tick_heal * instance.stacks)
+
+func stack_limit(buff: Buff) -> int:
+	var extra := 0
+	var equipment := get_parent().get_node_or_null("EquipmentManager") as EquipmentManager
+	if equipment and not buff.capacity_key.is_empty():
+		extra = int(equipment.casting_value(buff.capacity_key))
+	return maxi(1, buff.max_stacks + extra)
+
+func is_immune(status: String) -> bool:
+	if status.is_empty():
+		return false
+	if status == "burning" and get_parent().is_in_group("fire_immune"):
+		return true
+	for instance in _instances:
+		if status in instance.definition.status_immunities:
+			return true
+	return false
+
+## amount=0 preserves the legacy whole-status consumption contract.
+func consume_duration(id: String, retained_fraction: float = 0.5) -> bool:
+	var instance := _find(id)
+	if not instance or not instance.definition.can_empower or instance.definition.duration <= 0 or instance.remaining <= 0 or retained_fraction <= 0 or retained_fraction >= 1:
+		return false
+	instance.remaining *= retained_fraction
+	_touch_status(id)
+	_notify_stacks(instance.definition, 0, instance.stacks, "partially_consumed")
+	return true
+
+func consume_status(id: String, amount: int = 0) -> bool:
+	var instance := _find(id)
+	if not instance or amount < 0 or (amount > 0 and instance.stacks < amount):
+		return false
+	var spent := amount if amount > 0 else instance.stacks
+	var left := instance.stacks - spent
+	if left == 0:
+		_remove(instance, RemovalReason.CONSUMED)
+	else:
+		instance.stacks = left
+		_touch_status(id)
+		_rebuild_attributes()
+	_notify_stacks(instance.definition, spent, left, "consumed")
+	return true
+
+func _notify_stacks(buff: Buff, amount: int, stacks: int, reason: String) -> void:
+	var event := {"buff": buff, "amount": amount, "stacks": stacks, "reason": reason}
+	if _in_transaction:
+		_events.append(event)
+		_changed = true
+	else:
+		_publish([event], true)
+
+func reconcile_stack_limits() -> void:
+	for instance in _instances:
+		var limit := stack_limit(instance.definition)
+		if instance.stacks > limit:
+			var removed := instance.stacks - limit
+			instance.stacks = limit
+			_touch_status(instance.definition.status_id)
+			_rebuild_attributes()
+			_notify_stacks(instance.definition, removed, limit, "capacity_changed")

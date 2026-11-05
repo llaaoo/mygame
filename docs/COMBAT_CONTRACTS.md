@@ -21,6 +21,8 @@
 - 已施加状态的DOT保留来源/技能与施加时魔法强度，绕过接触无敌，不新授予接触无敌；默认不触发直接命中的元素状态和命中熟练度奖励。HOT/DOT与持续AoE包含到期端点；大delta只累计实际存活时间。
 - 触发器先匹配，再占一次模拟冷却；一次性事件在调用回调前注销，覆盖嵌套发射。
 
+共享元素反应由`ElementReactionCatalog`按命中标签选择，专属配置优先，按ID去重。`target_statuses_before / source_statuses_before`在ON_HIT前采样，附加状态的监听者不能令刚挂上的状态在同次命中自触发。后续命中仍读取届时的状态，保留同一动作多个结果的顺序联动。反应冷却按目标隔离并由模拟tick推进；无敌拒绝及DOT不触发直接命中反应。
+
 法术组合规则（SpellCombinationRule）与制造配方（CraftingRecipe）是不同领域类型，见[技能架构](./skill_architecture.md)。功能扩展仍须通过实际回归验证；本文不预先保证任意新机制无需架构调整。
 
 ---
@@ -538,3 +540,9 @@ AoE 的 trace 生命周期 = AoE 实例的生命周期。命中事件持续记�
 | 元素反应 | `res://systems/elemental/` | 监听 `ON_DAMAGE` + 元素标签 → 加 `ElementalReactionModifier` |
 | 组合技连招 | `res://skills/combo/` | 监听 `ON_CAST` 序列 → 触发连招 `TriggeredEffect` |
 | 弹射/穿透投射物 | `res://skills/runtime/` 扩展 | 继承 `Projectile` → 覆写 `_on_hit()` 不 `queue_free()` |
+
+## 五元素增补：投射物减伤与观测
+
+HitContext在命中前固定投射物条件减伤倍率；命中事件仍以未扣该倍率的主伤害计算反应，主伤害及附加伤害在统一写入口各乘一次。蒸汽不作用于近战、范围或DOT，既有通用伤害减免仍独立应用。CombatExecutor的damage_applied信号报告实际生命损失，用于只读实验记录；不额外发起命中或重复扣血。SkillManager在资源和效果全部接受后按整次动作发布cast_committed，多个结果不重复统计成本。
+
+投射物条件减伤还要排除实际melee命中标签；附魔近战沿用临时SkillData时，不能因旧默认SkillType而被误判为远程投射物。

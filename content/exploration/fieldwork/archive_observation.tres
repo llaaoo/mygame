@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="ExplorationDiscoveryData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/exploration/data/discovery_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "field.archive_observation"
+title = "档案室观察：控制与兑现"
+text = "水池和冰面改变了守备兵接近的路线。先用冰霜拖慢他们，可以留出绕行与近战的窗口；再接震荡，会把剩余控制兑现为碎冰伤害。火花也能融冰，栅栏可以点燃或普通破坏。\n\n南侧晶簇的外壳可先受冰霜或火焰处理，再以震荡冲开；雷电仍可直接共鸣。解开后，东北侧检修升降机通往营地，补给只领一次。\n\n祈堂学会凝神后再回访：水面能准备流息，冰面能准备霜行。同一处地面可以用于控制敌人，也可以用于准备自己。"
+pos = Vector2(-224, 160)
+element_clues = Array[String](["fire", "water"])

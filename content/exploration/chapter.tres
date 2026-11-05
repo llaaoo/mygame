@@ -42,9 +42,31 @@
 [ext_resource type="Resource" path="res://content/exploration/quests/waterworks.tres" id="quests_waterworks"]
 [ext_resource type="Resource" path="res://content/exploration/quests/research.tres" id="quests_research"]
 
+[ext_resource type="Resource" path="res://gameplay/abilities/data/soul_harvest_data.tres" id="actions_soul_harvest"]
+[ext_resource type="Resource" path="res://content/combinations/soul_spark.tres" id="spell_rules_soul_spark"]
+[ext_resource type="Resource" path="res://content/combinations/soul_pulse.tres" id="spell_rules_soul_pulse"]
+[ext_resource type="Resource" path="res://content/combinations/soul_focus.tres" id="spell_rules_soul_focus"]
+[ext_resource type="Resource" path="res://content/combinations/soul_water.tres" id="spell_rules_soul_water"]
+
+[ext_resource type="Script" path="res://gameplay/inventory/data/equipment_data.gd" id="equipment_type"]
+[ext_resource type="Resource" path="res://content/exploration/equipment/keeper_ring.tres" id="equipment_keeper_ring"]
+[ext_resource type="Resource" path="res://content/exploration/equipment/soul_amulet.tres" id="equipment_soul_amulet"]
+[ext_resource type="Resource" path="res://content/exploration/equipment/covenant_ring.tres" id="equipment_covenant_ring"]
+[ext_resource type="Resource" path="res://content/exploration/equipment/cadence_gloves.tres" id="equipment_cadence_gloves"]
+
+[ext_resource type="Resource" path="res://content/combinations/terrain_fire_focus.tres" id="terrain_fire"]
+[ext_resource type="Resource" path="res://content/combinations/terrain_water_focus.tres" id="terrain_water"]
+[ext_resource type="Resource" path="res://content/combinations/terrain_frost_focus.tres" id="terrain_frost"]
+[ext_resource type="Resource" path="res://content/combinations/terrain_lightning_focus.tres" id="terrain_lightning"]
+[ext_resource type="Resource" path="res://content/combinations/terrain_poison_focus.tres" id="terrain_poison"]
+
+[ext_resource type="Resource" path="res://content/exploration/quests/field_research.tres" id="quests_field_research"]
+
 [resource]
 script = ExtResource("chapter")
 regions = Array[ExtResource("regions_type")]([ExtResource("regions_camp"), ExtResource("regions_yard"), ExtResource("regions_archive"), ExtResource("regions_powder"), ExtResource("regions_drain"), ExtResource("regions_cistern"), ExtResource("regions_sanctum"), ExtResource("regions_gate"), ExtResource("regions_boss")])
-actions = Array[ExtResource("actions_type")]([ExtResource("actions_ignite"), ExtResource("actions_fire_sigil"), ExtResource("actions_pulse"), ExtResource("actions_frost_sigil"), ExtResource("actions_focus"), ExtResource("actions_water_call"), ExtResource("actions_oil_flask"), ExtResource("actions_storm_sigil"), ExtResource("actions_echo_mark"), ExtResource("actions_venom_mist")])
-spell_rules = Array[ExtResource("spell_rules_type")]([ExtResource("spell_rules_fire_sigil_fireball"), ExtResource("spell_rules_fire_sigil_pulse"), ExtResource("spell_rules_frost_sigil_spark"), ExtResource("spell_rules_frost_sigil_pulse"), ExtResource("spell_rules_fire_sigil_focus"), ExtResource("spell_rules_frost_sigil_focus"), ExtResource("spell_rules_storm_sigil_spark"), ExtResource("spell_rules_storm_sigil_pulse"), ExtResource("spell_rules_storm_sigil_focus"), ExtResource("spell_rules_echo_spark"), ExtResource("spell_rules_echo_pulse"), ExtResource("spell_rules_echo_focus"), ExtResource("spell_rules_echo_water"), ExtResource("spell_rules_echo_venom"), ExtResource("spell_rules_guard_pulse")])
-quests = Array[ExtResource("quests_type")]([ExtResource("quests_rescue"), ExtResource("quests_waterworks"), ExtResource("quests_research")])
+actions = Array[ExtResource("actions_type")]([ExtResource("actions_ignite"), ExtResource("actions_fire_sigil"), ExtResource("actions_pulse"), ExtResource("actions_frost_sigil"), ExtResource("actions_focus"), ExtResource("actions_water_call"), ExtResource("actions_oil_flask"), ExtResource("actions_storm_sigil"), ExtResource("actions_echo_mark"), ExtResource("actions_venom_mist"), ExtResource("actions_soul_harvest")])
+spell_rules = Array[ExtResource("spell_rules_type")]([ExtResource("spell_rules_fire_sigil_fireball"), ExtResource("spell_rules_fire_sigil_pulse"), ExtResource("spell_rules_frost_sigil_spark"), ExtResource("spell_rules_frost_sigil_pulse"), ExtResource("spell_rules_fire_sigil_focus"), ExtResource("spell_rules_frost_sigil_focus"), ExtResource("spell_rules_storm_sigil_spark"), ExtResource("spell_rules_storm_sigil_pulse"), ExtResource("spell_rules_storm_sigil_focus"), ExtResource("spell_rules_echo_spark"), ExtResource("spell_rules_echo_pulse"), ExtResource("spell_rules_echo_focus"), ExtResource("spell_rules_echo_water"), ExtResource("spell_rules_echo_venom"), ExtResource("spell_rules_guard_pulse"), ExtResource("spell_rules_soul_spark"), ExtResource("spell_rules_soul_pulse"), ExtResource("spell_rules_soul_focus"), ExtResource("spell_rules_soul_water"), ExtResource("terrain_fire"), ExtResource("terrain_water"), ExtResource("terrain_frost"), ExtResource("terrain_lightning"), ExtResource("terrain_poison")])
+quests = Array[ExtResource("quests_type")]([ExtResource("quests_rescue"), ExtResource("quests_waterworks"), ExtResource("quests_research"), ExtResource("quests_field_research")])
+
+equipment = Array[ExtResource("equipment_type")]([ExtResource("equipment_keeper_ring"), ExtResource("equipment_soul_amulet"), ExtResource("equipment_covenant_ring"), ExtResource("equipment_cadence_gloves")])

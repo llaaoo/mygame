@@ -66,7 +66,7 @@ func _build_status_panel(root: Control) -> void:
 	var title := Label.new()
 	title.text = "探索者"
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	GameUIStyle.apply_label(title, 14, GameUIStyle.GOLD)
+	GameUIStyle.apply_label(title, 15, GameUIStyle.GOLD)
 	title_row.add_child(title)
 
 	stats_label = Label.new()
@@ -110,8 +110,8 @@ func _build_skill_bar(root: Control) -> void:
 	var panel := PanelContainer.new()
 	panel.name = "SkillBarPanel"
 	panel.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-	panel.offset_left = -224
-	panel.offset_right = 224
+	panel.offset_left = -248
+	panel.offset_right = 248
 	panel.offset_top = -82
 	panel.offset_bottom = -12
 	panel.add_theme_stylebox_override("panel", GameUIStyle.panel_style(0.90, 6))
@@ -132,7 +132,7 @@ func _add_resource_row(parent: VBoxContainer, label_text: String, bar: ProgressB
 	var label := Label.new()
 	label.custom_minimum_size = Vector2(24, 0)
 	label.text = label_text
-	GameUIStyle.apply_label(label, 10, color)
+	GameUIStyle.apply_label(label, 11, color)
 	row.add_child(label)
 
 	bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -141,7 +141,7 @@ func _add_resource_row(parent: VBoxContainer, label_text: String, bar: ProgressB
 	var value := Label.new()
 	value.custom_minimum_size = Vector2(58, 0)
 	value.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	GameUIStyle.apply_label(value, 10, GameUIStyle.TEXT_MAIN)
+	GameUIStyle.apply_label(value, 12, GameUIStyle.TEXT_MAIN)
 	row.add_child(value)
 	return value
 

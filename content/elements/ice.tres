@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ElementDefinition" format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/data/element_definition.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "ice"
+parent_id = "water"
+title = "凝霜"
+color = Color(0.45, 0.9, 1, 1)
+description = "水系的凝霜形态：冻结控制与通路变化；保留减速，或以冲击破冰兑现。"
+hit_status_paths = ["res://gameplay/abilities/data/frozen.tres"]

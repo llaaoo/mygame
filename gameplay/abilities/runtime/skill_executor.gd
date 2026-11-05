@@ -15,6 +15,7 @@ extends Node
 ## ── 分阶段 Modifier 管线 ──
 ## key = DamageModifier.Stage (int), value = Array[DamageModifier] (已按 priority 排序)
 var _movement_tweens: Array[Tween] = []
+var _pending_nodes: Array[Dictionary] = []
 
 var modifiers_by_stage: Dictionary = {
 	DamageModifier.Stage.FLAT: [],
@@ -170,7 +171,7 @@ func commit_batch(batch: SkillExecutionBatch, commit_resources: Callable = Calla
 		runtime.enter_phase(CombatPhase.Phase.MODIFIER)
 		runtime.enter_phase(CombatPhase.Phase.EFFECT)
 	for entry in batch.nodes:
-		entry.world.add_child.call_deferred(entry.node)
+		_defer_node(entry.node, entry.world)
 	for effect in batch.effects:
 		effect.call()
 	for entry in batch.buffs:
@@ -313,7 +314,7 @@ func _execute_aoe(skill: SkillData, ctx: CastContext) -> bool:
 	if ctx.batch:
 		ctx.batch.nodes.append({"node": instance, "world": ctx.world})
 	else:
-		ctx.world.add_child.call_deferred(instance)
+		_defer_node(instance, ctx.world)
 	# 若指定了 target_position（如触发施法），直接放在目标位置
 	if ctx.has_target_position or ctx.target_position != Vector2.ZERO:
 		instance.position = ctx.world.to_local(ctx.target_position) if ctx.world is Node2D else ctx.target_position
@@ -432,7 +433,7 @@ func _execute_summon(skill: SkillData, ctx: CastContext) -> bool:
 	if ctx.batch:
 		ctx.batch.nodes.append({"node": instance, "world": ctx.world})
 	else:
-		ctx.world.add_child.call_deferred(instance)
+		_defer_node(instance, ctx.world)
 
 	# 在玩家身后生成
 	var spawn_pos := ctx.caster.global_position - ctx.direction * 50.0
@@ -538,9 +539,13 @@ func _apply_mastery_damage_bonuses(base_damage: int, skill: SkillData, caster: N
 
 func _get_buff_duration_with_mastery(buff: Buff, caster: Node2D) -> float:
 	var player := caster as Player
-	if not player or not player.mastery_manager:
+	if not player:
 		return buff.duration
-	var delta := player.mastery_manager.get_modifier_value("buff.duration.all")
+	var equipment := player.get_node_or_null("EquipmentManager") as EquipmentManager
+	var delta := equipment.casting_value("boon_duration_bonus") if equipment and buff.can_empower else 0.0
+	if not player.mastery_manager:
+		return maxf(0, buff.duration * maxf(0.25, 1 + delta))
+	delta += player.mastery_manager.get_modifier_value("buff.duration.all")
 	if not buff.status_id.is_empty():
 		delta += player.mastery_manager.get_modifier_value("buff.%s.duration" % buff.status_id)
 	return maxf(0.0, buff.duration * (1.0 + delta))
@@ -570,7 +575,36 @@ func _sort_bucket(stage: DamageModifier.Stage) -> void:
 	modifiers_by_stage[stage].sort_custom(func(a: DamageModifier, b: DamageModifier): return a.priority < b.priority)
 
 func cancel_pending_effects() -> void:
+	for entry in _pending_nodes:
+		_discard_node(entry.node)
+	_pending_nodes.clear()
 	for tween in _movement_tweens:
 		if tween.is_valid():
 			tween.kill()
 	_movement_tweens.clear()
+
+## The executor owns detached effects until activation, including region/scene cancellation.
+func _defer_node(node: Node, world: Node) -> void:
+	_pending_nodes.append({"node": node, "world": world})
+	if _pending_nodes.size() == 1:
+		call_deferred("_flush_pending_nodes")
+
+func _flush_pending_nodes() -> void:
+	var entries := _pending_nodes.duplicate()
+	_pending_nodes.clear()
+	for entry in entries:
+		if not is_instance_valid(entry.node):
+			continue
+		if is_instance_valid(entry.world) and entry.world.is_inside_tree() and not entry.world.is_queued_for_deletion():
+			entry.world.add_child(entry.node)
+		else:
+			_discard_node(entry.node)
+
+func _discard_node(node: Node) -> void:
+	if is_instance_valid(node):
+		if node.has_method("cancel_prepared"):
+			node.cancel_prepared()
+		node.free()
+
+func _exit_tree() -> void:
+	cancel_pending_effects()

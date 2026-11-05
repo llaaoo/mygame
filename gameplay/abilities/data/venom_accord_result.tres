@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=4 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="1"]
+[ext_resource type="Script" path="res://gameplay/status/buff.gd" id="2"]
+[sub_resource type="Resource" id="Buff"]
+script = ExtResource("2")
+buff_id = "venom_accord"
+status_id = "venom_accord"
+display_name = "毒契"
+exclusive_group = "sigil_attunement"
+duration = 8.0
+can_empower = true
+empower_mana_cost = 3
+empower_radius_bonus = 24.0
+empower_surface_radius = 96.0
+cleanse_statuses = ["poison"]
+status_immunities = ["poison"]
+spell_tags = ["poison"]
+spell_damage_multiplier = 1.15
+empower_name = "蚀散"
+empower_damage_multiplier = 1.5
+empower_pierce_bonus = 1
+empower_surface = "poisoned"
+empower_surface_duration = 10.0
+[resource]
+script = ExtResource("1")
+id = "venom_accord"
+display_name = "毒契"
+combination_only = true
+description = "8秒内解除并免疫中毒，保留时毒性法术伤害+15%。Shift消费：伤害+50%、范围+24、穿透+1，留下毒地，额外3 MP；随后失去抗毒，自己的毒地也有危险。节律护手可保留一半当前时长，代价是较弱伤害与更多法力。"
+mechanics = "8 MP；持续8秒；与其他凝神恩赐互斥。"
+role = "增益触发"
+icon_atlas_index = 17
+skill_type = 1
+tags = ["buff", "combination"]
+mp_cost = 8
+cooldown = 4.0
+buff_resource = SubResource("Buff")
+buff_duration = 8.0

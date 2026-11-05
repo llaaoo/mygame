@@ -8,6 +8,23 @@
 [ext_resource type="Script" path="res://gameplay/exploration/exploration_region_data.gd" id="6_n7qas"]
 [ext_resource type="Script" path="res://gameplay/exploration/data/spell_puzzle_data.gd" id="7_jcdlb"]
 
+[ext_resource type="Resource" path="res://content/exploration/experiments/cistern_trial_supply.tres" id="exp_cistern_trial_supply"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/discovery_data.gd" id="exp_type_discoveries"]
+
+[ext_resource type="Resource" path="res://content/exploration/experiments/cistern_valve.tres" id="exp_cistern_valve"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/surface_valve_data.gd" id="exp_type_valves"]
+
+[ext_resource type="Resource" path="res://content/exploration/experiments/cistern_conductor.tres" id="exp_cistern_conductor"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/spell_puzzle_data.gd" id="exp_type_spell_objects"]
+
+[ext_resource type="Resource" path="res://content/exploration/fieldwork/cistern_observation.tres" id="field_observation"]
+
+[ext_resource type="Resource" path="res://content/exploration/fieldwork/cistern_return.tres" id="field_return"]
+
+[ext_resource type="Resource" path="res://content/exploration/enemies/hunter.tres" id="profile_hunter"]
+
+[ext_resource type="Resource" path="res://content/exploration/enemies/sentry.tres" id="profile_sentry"]
+
 [sub_resource type="Resource" id="Resource_p7lin"]
 script = ExtResource("1_dhw8p")
 id = "nova_knowledge"
@@ -20,34 +37,40 @@ requires_clear = true
 [sub_resource type="Resource" id="Resource_olfsw"]
 script = ExtResource("1_dhw8p")
 id = "storm_knowledge"
+equipment = Array[String](["cadence_gloves"])
 title = "雷阵与导电实验记录"
-text = "已掌握雷阵。每次铭刻需要9 MP和雷晶粉1；雷阵＋火花＝雷矢（11 MP），＋震荡＝雷环（13 MP），＋凝神＝雷息（10 MP）。先用水引令目标潮湿，可强化雷击并使水面带电。用K把雷阵编入快捷槽；M可将火花配置雷晶粉，雷矢会变成三发散射。"
+text = "已掌握雷阵。每次铭刻需要9 MP和雷晶粉1；雷阵＋火花＝雷矢（11 MP），＋震荡＝雷环（13 MP），＋凝神＝雷息（10 MP）。先用水引令目标潮湿，可强化雷击并使水面带电。用K把雷阵编入快捷槽；M可将火花配置雷晶粉，雷矢会变成三发散射。\n\n雷晶粉也可以配置给水引，造水时直接使水带电，沿已有相连水面传播。无需新学一招雷水；消耗同一份粉，也承担自伤风险。\n\n学会凝神后，Shift凝神借脚下导电水域准备雷息，10 MP并消耗所在1格；或在M给凝神配置雷晶粉，1份和额外4 MP替代地面。其余水路仍然带电，准备不会免除感电。"
 pos = Vector2(-350, -180)
 actions = Array[String](["storm_sigil"])
-spell_rules = Array[String](["storm_sigil_spark", "storm_sigil_pulse", "storm_sigil_focus"])
+spell_rules = Array[String](["terrain_lightning_focus", "storm_sigil_spark", "storm_sigil_pulse", "storm_sigil_focus"])
 materials = {
 "crystal": 3,
 "storm_dust": 3
 }
-requires_clear = true
+requires_clear = false
+element_clues = Array[String](["lightning"])
 
 [sub_resource type="Resource" id="Resource_8f51j"]
 script = ExtResource("2_b0gjv")
-pos = Vector2(150, -90)
+pos = Vector2(160, -96)
 hp = 48
 speed = 135.0
+profile = ExtResource("profile_hunter")
 
 [sub_resource type="Resource" id="Resource_cmts4"]
 script = ExtResource("2_b0gjv")
-pos = Vector2(290, 100)
+pos = Vector2(224, -96)
 hp = 48
 speed = 135.0
+profile = ExtResource("profile_hunter")
 
 [sub_resource type="Resource" id="Resource_dyfh2"]
 script = ExtResource("2_b0gjv")
-pos = Vector2(370, -50)
+pos = Vector2(352, 224)
 hp = 32
 role = 1
+speed = 95.0
+profile = ExtResource("profile_sentry")
 
 [sub_resource type="Resource" id="Resource_7vcu5"]
 script = ExtResource("4_uoek5")
@@ -79,9 +102,11 @@ pos = Vector2(-480, 0)
 script = ExtResource("6_n7qas")
 id = "cistern"
 title = "蓄水机房"
-description = "清理混合守卫，取回寒霜新星记录，决定水路流向。"
+description = "铺水、冻结断路、破冰接回；真实导电启动晶闸并开放独立返营捷径。"
 seed = 20261111
 encounters = Array[ExtResource("2_b0gjv")]([SubResource("Resource_8f51j"), SubResource("Resource_cmts4"), SubResource("Resource_dyfh2")])
-discoveries = Array[ExtResource("1_dhw8p")]([SubResource("Resource_p7lin"), SubResource("Resource_olfsw")])
+discoveries = Array[ExtResource("1_dhw8p")]([SubResource("Resource_p7lin"), SubResource("Resource_olfsw"), ExtResource("exp_cistern_trial_supply"), ExtResource("field_observation")])
 events = Array[ExtResource("3_kpavw")]([SubResource("Resource_gvyst")])
-exits = Array[ExtResource("5_ujenr")]([SubResource("Resource_y5ea2")])
+exits = Array[ExtResource("5_ujenr")]([SubResource("Resource_y5ea2"), ExtResource("field_return")])
+valves = Array[ExtResource("exp_type_valves")]([ExtResource("exp_cistern_valve")])
+spell_objects = Array[ExtResource("exp_type_spell_objects")]([ExtResource("exp_cistern_conductor")])

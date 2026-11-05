@@ -15,6 +15,10 @@ enum StackBehavior { REFRESH, INTENSITY, INDEPENDENT }
 @export var tick_interval: float = 0.0
 @export var stack_behavior: StackBehavior = StackBehavior.REFRESH
 @export var max_stacks: int = 1
+@export var capacity_key: String = ""
+@export var cleanse_statuses: Array[String] = []
+@export var status_immunities: Array[String] = []
+@export_multiline var tactical_hint: String = ""
 @export var stat_modifiers: Dictionary = {}
 @export var stat_multipliers: Dictionary = {}
 @export var tick_heal: int = 0
@@ -22,8 +26,11 @@ enum StackBehavior { REFRESH, INTENSITY, INDEPENDENT }
 @export var tick_damage_scaling: float = 0.0
 @export var speed_multiplier: float = 1.0
 @export var damage_taken_multiplier: float = 1.0
+@export var incoming_projectile_multiplier := 1.0
 @export var attack_tags: Array[String] = []
 @export var spell_tags: Array[String] = []
+## Family affinity is explicit; old spell_tags remain exact form selectors.
+@export var spell_elements: Array[String] = []
 @export var spell_damage_multiplier := 1.0
 @export var can_empower := false
 @export var empower_name: String = ""
@@ -57,34 +64,50 @@ func describe() -> String:
 	for stat in stat_modifiers:
 		var value: float = stat_modifiers[stat]
 		var sign := "+" if value >= 0 else ""
-		parts.append("%s%s%d" % [stat, sign, int(value)])
+		parts.append("%s%s%d" % [_stat_title(stat), sign, int(value)])
 
 	for stat in stat_multipliers:
 		var mul: float = stat_multipliers[stat]
 		var sign := "+" if mul >= 0 else ""
-		parts.append("%s%s%d%%" % [stat, sign, int(mul * 100.0)])
+		parts.append("%s%s%d%%" % [_stat_title(stat), sign, int(mul * 100.0)])
 
 	if tick_damage > 0:
 		parts.append("DOT %d/%.1fs" % [tick_damage, tick_interval])
 	if tick_heal > 0:
 		parts.append("HOT %d/%.1fs" % [tick_heal, tick_interval])
 	if speed_multiplier != 1.0:
-		parts.append("speed x%.2f" % speed_multiplier)
+		parts.append("移速 ×%.2f" % speed_multiplier)
 	if damage_taken_multiplier != 1.0:
 		parts.append("受到伤害 x%.2f" % damage_taken_multiplier)
+	if incoming_projectile_multiplier != 1.0:
+		parts.append("投射物直接伤害 x%.2f" % incoming_projectile_multiplier)
 	if not attack_tags.is_empty():
 		var attack_elements: Array[String] = []
 		for tag in attack_tags:
-			attack_elements.append({"fire": "火焰", "ice": "冰霜", "lightning": "雷电"}.get(tag, tag))
+			attack_elements.append({"fire": "火焰", "water": "水", "ice": "凝霜", "lightning": "雷电", "poison": "毒"}.get(tag, tag))
 		parts.append("近战附加" + "/".join(attack_elements))
 	if spell_damage_multiplier != 1.0:
 		var elements: Array[String] = []
+		for family in spell_elements:
+			elements.append(ElementCatalog.definition(family).title + "系")
 		for tag in spell_tags:
-			elements.append({"fire": "火焰", "ice": "冰霜", "lightning": "雷电"}.get(tag, tag))
+			elements.append({"fire": "火焰", "water": "水", "ice": "凝霜", "lightning": "雷电", "poison": "毒"}.get(tag, tag))
 		parts.append("%s法术伤害 x%.2f（保留）" % ["/".join(elements), spell_damage_multiplier])
 	if can_empower:
 		parts.append("Shift消耗：%s（额外%d MP）" % [empower_name, empower_mana_cost])
 
+	if not cleanse_statuses.is_empty():
+		parts.append("净化：" + "、".join(cleanse_statuses.map(status_title)))
+	if not status_immunities.is_empty():
+		parts.append("保护：" + "、".join(status_immunities.map(status_title)))
+	if not tactical_hint.is_empty():
+		parts.append(tactical_hint)
 	var effect_str := ", ".join(parts) if not parts.is_empty() else "no modifiers"
 	var duration_str := " %.1fs" % duration if duration > 0.0 else " permanent"
 	return "%s: %s%s" % [name, effect_str, duration_str]
+
+static func status_title(id: String) -> String:
+	return {"burning": "燃烧", "poison": "中毒", "shocked": "感电", "frozen": "冻结", "wet": "潮湿", "soul_charge": "蕴魂", "clear_mind": "清明", "ancestral_ward": "先祖护佑"}.get(id, id)
+
+static func _stat_title(key: String) -> String:
+	return {"attack_damage": "近战攻击", "strength": "力量", "intelligence": "智力", "agility": "敏捷", "endurance": "耐力", "max_hp": "生命上限", "max_mp": "法力上限"}.get(key, key)

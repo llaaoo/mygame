@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="EquipmentData" format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/equipment_data.gd" id="equipment"]
+[ext_resource type="Script" path="res://gameplay/inventory/data/casting_equipment_profile.gd" id="profile"]
+[sub_resource type="Resource" id="Profile"]
+script = ExtResource("profile")
+preparation_bonus = -0.2
+partial_boon_consumption = true
+partial_boon_mana_cost = 3
+[resource]
+script = ExtResource("equipment")
+id = "cadence_gloves"
+display_name = "节律护手"
+description = "条件施法准备缩短20%；全法术费用+15%。Shift释放恩赐保留当前剩余时长50%，使用保留伤害倍率，形态强化保留；每份再加3 MP（修正前）。不作用于蕴魂、回响或护盾。"
+special_effect_text = "条件施法准备缩短20%；全法术费用+15%。Shift释放恩赐保留当前剩余时长50%，使用保留伤害倍率，形态强化保留；每份再加3 MP（修正前）。不作用于蕴魂、回响或护盾。"
+item_type = 1
+rarity = 2
+slot_type = 4
+icon_atlas_index = 11
+stat_modifiers = {}
+combat_modifiers = {"mana_cost.all": 0.15}
+casting_profile = SubResource("Profile")

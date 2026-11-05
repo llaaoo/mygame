@@ -82,6 +82,10 @@ static func _spawn(parent: Node, text: String, color: Color, world_pos: Vector2,
 	var dn := DamageNumber.new()
 	dn.name = "DamageNumber"
 	# 随机偏移避免重叠
-	dn.global_position = world_pos + Vector2(randf_range(-12, 12), randf_range(-8, 8))
+	var point := world_pos + Vector2(randf_range(-12, 12), randf_range(-8, 8))
+	dn.position = parent.to_local(point) if parent is Node2D else point
 	parent.add_child(dn)
 	dn.configure(text, color, scale)
+
+static func spawn_reaction(parent: Node, title: String, world_pos: Vector2) -> void:
+	_spawn(parent, title, Color(0.55, 0.88, 1.0), world_pos, 0.9)

@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="SurfaceReaction" format=3]
+[ext_resource type="Script" path="res://gameplay/interaction/surface_reaction.gd" id="1"]
+[resource]
+script = ExtResource("1")
+rule_id = "poisoned_fire"
+required_state = "poisoned"
+required_tags = ["fire"]
+result_state = "burning"
+result_duration = 6.0

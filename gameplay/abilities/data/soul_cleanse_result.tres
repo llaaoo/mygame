@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="SkillData" format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="skill"]
+[ext_resource type="Script" path="res://gameplay/status/buff.gd" id="buff"]
+[sub_resource type="Resource" id="Buff"]
+script = ExtResource("buff")
+status_id = "clear_mind"
+buff_id = "clear_mind"
+display_name = "清明"
+duration = 6.0
+cleanse_statuses = ["burning", "poison", "shocked"]
+status_immunities = ["burning", "poison", "shocked"]
+tactical_hint = "净化并阻止燃烧、中毒、感电；不能阻挡直接伤害或冻结。"
+[resource]
+script = ExtResource("skill")
+id = "soul_cleanse"
+display_name = "净魂"
+combination_only = true
+description = "Shift＋水引兑现1层蕴魂，净化自身燃烧、中毒、感电，获得6秒对应状态保护。不会清除冻结或直接伤害；守护粉延长保护。"
+mechanics = "7 MP＋蕴魂1层；净化后获得清明，材料费用正常结算。"
+icon_atlas_index = 6
+skill_type = 1
+tags = ["soul", "water", "buff"]
+mp_cost = 7
+cooldown = 3.0
+buff_resource = SubResource("Buff")
+buff_duration = 6.0
+
+school = 2

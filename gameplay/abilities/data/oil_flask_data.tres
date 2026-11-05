@@ -10,9 +10,10 @@ lifetime = 0.4
 [resource]
 script = ExtResource("1")
 conditional_cast = true
+ground_targeted = true
 id = "oil_flask"
 display_name = "泼洒树脂"
-description = "在瞄准方向前方120距离创造半径105的油面，可被火焰引燃；每次消耗一份树脂制剂。"
+description = "鼠标选择120范围内泼洒树脂，消耗树脂制剂1。用近身火花或火焰近战也能点燃，形成封路或引爆条件；注意自己的站位。"
 mechanics = "2 MP；持续12秒；无直接伤害。"
 role = "创造环境条件"
 icon_atlas_index = 6

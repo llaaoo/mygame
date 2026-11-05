@@ -10,6 +10,9 @@ extends Resource
 @export var discoveries: Array[ExplorationDiscoveryData] = []
 @export var events: Array[ExplorationWorldEventData] = []
 @export var spell_objects: Array[SpellPuzzleData] = []
+@export var valves: Array[SurfaceValveData] = []
+@export var surface_patches: Array[SurfacePatchData] = []
+@export var fixed_props: Array[ExplorationPropData] = []
 @export var exits: Array[ExplorationExitData] = []
 
 func reserve_interaction_space(layout: RefCounted) -> void:
@@ -27,4 +30,27 @@ func interaction_points() -> Array[Resource]:
 	points.append_array(events)
 	points.append_array(exits)
 	points.append_array(spell_objects)
+	points.append_array(valves)
+	points.append_array(fixed_props)
+	for patch in surface_patches:
+		if patch: points.append_array(_patch_points(patch))
+	for valve in valves:
+		if not valve: continue
+		for path in valve.paths:
+			if not path: continue
+			for point in path.points:
+				var patch := SurfacePatchData.new()
+				patch.pos = point
+				points.append(patch)
 	return points
+
+func _patch_points(patch: SurfacePatchData) -> Array[Resource]:
+	var result: Array[Resource] = [patch]
+	for x in range(-ceili(patch.radius / 64), ceili(patch.radius / 64) + 1):
+		for y in range(-ceili(patch.radius / 64), ceili(patch.radius / 64) + 1):
+			var offset := Vector2(x, y) * 64
+			if offset.length() > patch.radius: continue
+			var point := SurfacePatchData.new()
+			point.pos = patch.pos + offset
+			result.append(point)
+	return result

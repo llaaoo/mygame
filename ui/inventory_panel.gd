@@ -171,6 +171,8 @@ func _refresh_summary() -> void:
 	var equipped_count := equipment_manager.get_all_equipped().size()
 	_summary.text = "装备战力  %d    已装备  %d / %d" % [equipment_manager.get_total_power_score(), equipped_count, SLOT_BUTTON_MAP.size()]
 	var lines: Array[String] = []
+	if get_tree().current_scene is MVPGame:
+		_summary.text = "已装备 %d件 · 营地可换装 · O查看构筑取舍" % equipped_count
 	for entry in equipment_manager.get_set_summaries():
 		var data := entry.data as EquipmentSetData
 		lines.append("%s  %d 件" % [entry.name, entry.count])
@@ -189,6 +191,8 @@ func _on_inv_clicked(index: int) -> void:
 
 
 func _on_equip_clicked(slot_type: int) -> void:
+	if not _can_change_equipment():
+		return
 	if not inventory or not equipment_manager:
 		return
 	var item := equipment_manager.get_equipment(slot_type)
@@ -222,6 +226,8 @@ func _swap_inventory_slots(a: int, b: int) -> void:
 
 
 func _inventory_to_equip(inventory_index: int, equipment_slot: int) -> void:
+	if not _can_change_equipment():
+		return
 	var slot := inventory.get_slot(inventory_index)
 	if not slot.item is EquipmentData:
 		return
@@ -234,3 +240,7 @@ func _inventory_to_equip(inventory_index: int, equipment_slot: int) -> void:
 		inventory.add_item(old)
 	equipment_manager.equip(item)
 	_refresh_all()
+
+func _can_change_equipment() -> bool:
+	var scene := get_tree().current_scene
+	return not scene is MVPGame or scene.region_id == "camp"

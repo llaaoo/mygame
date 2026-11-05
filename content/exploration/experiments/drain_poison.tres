@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="SurfacePatchData" format=3]
+[ext_resource type="Script" path="res://gameplay/exploration/data/surface_patch_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+pos = Vector2(96, 32)
+state = "poisoned"
+radius = 64.0
+duration = 60.0

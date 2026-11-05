@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="SkillData" format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="skill"]
+[ext_resource type="Resource" path="res://content/visuals/shadow_visual.tres" id="visual"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/synergies/melt.tres" id="synergy_melt"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/synergies/vaporize.tres" id="synergy_vaporize"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/synergies/toxic_ignition.tres" id="synergy_toxic_ignition"]
+
+[resource]
+script = ExtResource("skill")
+id = "soul_lance"
+display_name = "魂焰矢"
+combination_only = true
+description = "Shift＋火花兑现1层蕴魂，释放穿透的魂焰。可燃烧、融冰与引爆油料；树脂令命中留下火区，回响墨进一步增加穿透。"
+mechanics = "9 MP＋蕴魂1层；伤害24＋0.8魔法；穿透1目标。与法阵结果可共同释放。"
+icon_atlas_index = 12
+skill_type = 0
+tags = ["soul", "fire", "projectile"]
+mp_cost = 9
+cooldown = 1.8
+damage = 24
+damage_scaling = 0.8
+archetype = "linear_projectile"
+visual = ExtResource("visual")
+projectile_speed = 620.0
+projectile_pierce = 1
+
+synergies = [ExtResource("synergy_melt"), ExtResource("synergy_vaporize"), ExtResource("synergy_toxic_ignition")]
