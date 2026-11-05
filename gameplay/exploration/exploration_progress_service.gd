@@ -180,10 +180,31 @@ func discover(entry: ExplorationDiscoveryData) -> bool:
 	changed.emit()
 	return true
 
-func solve_puzzle(spec: SpellPuzzleData) -> bool:
-	if spec not in game.current_data.spell_objects or not game.progress.claim(spec.id, spec.title, spec.hint + "\n机关已解开，材料收入行囊。", [], []):
+func solve_puzzle(spec: SpellPuzzleData, method_id: String = "") -> bool:
+	if spec not in game.current_data.spell_objects or game.progress.claims.has(spec.id):
 		return false
-	game.player.skill_manager.combinations.supplies.grant(spec.materials)
+	for claim in spec.required_claims:
+		if not game.progress.claims.has(claim): return false
+	var costs: Dictionary = {}
+	var accepted := method_id.is_empty() and spec.work_methods.is_empty()
+	for i in range(spec.routes.size()):
+		var route := spec.routes[i]
+		if method_id == (route.id if not route.id.is_empty() else "spell_%d" % i): accepted = true
+	for method in spec.work_methods:
+		if method.id != method_id: continue
+		if game.player.health_component.is_dead or not game.player.stats_component.meets_requirements(method.required_attributes): return false
+		costs = method.material_costs
+		accepted = true
+	var supplies := game.player.skill_manager.combinations.supplies
+	if not accepted or not supplies.can_pay(costs): return false
+	supplies.begin_transaction()
+	if not supplies.pay(costs) or not game.progress.claim(spec.id, spec.title, spec.completion_text if not spec.completion_text.is_empty() else spec.hint + "\n机关已解开，材料收入行囊。", [], []):
+		supplies.finish_transaction(false)
+		return false
+	if not spec.work_methods.is_empty(): game.progress.choices[spec.id] = method_id
+	supplies.grant(spec.materials)
+	var notify := supplies.finish_transaction(true)
 	_queue_save()
+	if notify.is_valid(): notify.call()
 	changed.emit()
 	return true

@@ -10,6 +10,7 @@ var _started := 0.0
 func _ready() -> void:
 	game.player.skill_manager.cast_committed.connect(_on_cast)
 	game.player.combat_component.melee_started.connect(_on_melee)
+	game.player.field_work.work_committed.connect(_on_work)
 	CombatExecutor.instance.damage_applied.connect(_on_damage)
 	game.region_changed.connect(_on_region)
 
@@ -52,6 +53,12 @@ func _on_cast(plan: CastPlan) -> void:
 func _on_melee() -> void:
 	if active: run.melee += 1
 
+func _on_work(method: FieldWorkMethod) -> void:
+	if not active: return
+	run["work_actions"] = int(run.get("work_actions", 0)) + 1
+	for id in method.material_costs:
+		run.materials[id] = int(run.materials.get(id, 0)) + int(method.material_costs[id])
+
 func _on_damage(source: Node2D, target: Node2D, amount: int) -> void:
 	if not active: return
 	if target == game.player: run.damage_taken += amount
@@ -79,7 +86,7 @@ func show_page() -> void:
 		var equipment_titles: Array[String] = []
 		for id in entry.initial.get("equipment", []):
 			equipment_titles.append(game.catalog.equipment[id].display_name if game.catalog.equipment.has(id) else "其他装备")
-		text += "\n%s · %.1f秒 · %s\n施法%d / 近战%d · 造成%d / 受伤%d · MP%d\n材料：%s\n路线：%s\n起始装备：%s\n" % [entry.label, entry.seconds, entry.result, entry.casts, entry.melee, entry.damage_dealt, entry.damage_taken, entry.mana_spent, _material_text(entry.materials), "→".join(region_titles), "、".join(equipment_titles) if not equipment_titles.is_empty() else "无"]
+		text += "\n%s · %.1f秒 · %s\n施法%d / 近战%d / 作业%d · 造成%d / 受伤%d · MP%d\n材料：%s\n路线：%s\n起始装备：%s\n" % [entry.label, entry.seconds, entry.result, entry.casts, entry.melee, entry.get("work_actions", 0), entry.damage_dealt, entry.damage_taken, entry.mana_spent, _material_text(entry.materials), "→".join(region_titles), "、".join(equipment_titles) if not equipment_titles.is_empty() else "无"]
 		var stats: Dictionary = entry.initial.get("stats", {})
 		text += "起始上限：生命%d / 法力%d；力%d 智%d 敏%d 耐%d\n起始材料：%s\n" % [entry.initial.get("max_hp", 0), entry.initial.get("max_mp", 0), stats.get("strength", 0), stats.get("intelligence", 0), stats.get("agility", 0), stats.get("endurance", 0), _material_text(entry.initial.get("supplies", {}).get("amounts", {}))]
 		if entry.initial != entry.final: text += "过程中配置或库存发生变化，起止状态均已记录。\n"

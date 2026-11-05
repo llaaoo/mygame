@@ -308,3 +308,5 @@ A—D批次实现与验收，包含施法/状态事务、命中结果、周期�
 | v2.6 | 2026-05 | P1.4 完成 — COMBAT_CONTRACTS.md / skill_architecture.md / RUNTIME_TOPOLOGY.md 路径同步至实际目录结构 |
 | v2.7 | 2026-05 | 文档校准至 2026-05-30 当前状态 — P0/P1 主链完成，三条冒烟链已确认，PROJECT_IMPROVEMENTS.md 纳入索引 |
 | v3.0 | 2026-11-04 | 新增探索与条件组合战斗设计基线；旧 roguelite 规划保留为历史与试验场参考，尚未改变玩法代码 |
+
+- [重启调和台：现场作业、任务与回收](ALCHEMY_REPAIR.md)
