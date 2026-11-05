@@ -28,18 +28,20 @@ func show_materials() -> void:
 func show_action(skill: SkillData) -> void:
 	var controller: ConditionalCastController = game.player.skill_manager.combinations
 	var supplies := controller.supplies
-	var plan := controller.preview(skill, game.player, Input.is_key_pressed(KEY_SHIFT))
-	var text := "%s\n%s\n\n当前条件：%s · %d MP\n材料：%s\n" % [skill.display_name, skill.description, plan.effect_label, plan.cost, supplies.describe_cost(plan.material_costs) if not plan.material_costs.is_empty() else "无"]
-	text += controller.boon_hint(plan) + "\n普通施法保留适配恩赐；按住Shift施法可消耗恩赐强化这次效果，之后失去其持续收益。\n"
+	var text := "%s\n%s\n\n%s\n\n" % [skill.display_name, skill.description, controller.describe_comparison(skill, game.player)]
+	text += "材料先改变性质，再处理恩赐和装备借阵。污染水不能洗毒，导电会波及自身。节律护手使Shift部分消费恩赐，保留剩余时长50%，使用较弱伤害倍率。\n"
 	var buttons: Array[Dictionary] = [{"title": "无可选强化", "callback": _configure.bind(skill, "")}]
 	for id in CastingSupplies.MATERIAL_IDS:
 		var material: CastingMaterialData = supplies.catalog[id]
-		var compatible := material.supports(skill.get_id(), skill.get_id())
+		var preparation_hint := ""
+		var compatible := material.supports(skill.get_id(), skill.get_id(), skill)
 		for rule in controller.rules:
 			if rule.trigger_action_id == skill.get_id() and controller.learned_rules.has(rule.id):
-				compatible = compatible or material.supports(skill.get_id(), rule.result_skill.get_id())
+				compatible = compatible or rule.substitute_material == id or material.supports(skill.get_id(), rule.result_skill.get_id(), rule.result_skill)
+				if rule.substitute_material == id:
+					preparation_hint = "Shift凝神：替代地面准备" + rule.result_skill.display_name + "，额外%d MP；只作为介质，不附加投射物改造。" % material.extra_mana
 		if compatible:
-			text += "\n%s（持有%d）\n%s\n" % [material.title, supplies.count(id), material.description]
+			text += "\n%s（持有%d）\n%s\n" % [material.title, supplies.count(id), material.description + ("\n" + preparation_hint if not preparation_hint.is_empty() else "")]
 			buttons.append({"title": "配置：" + material.title, "callback": _configure.bind(skill, id)})
 	buttons.append({"title": "返回材料总览", "callback": show_materials})
 	game.ui.show_panel("配置：" + skill.display_name, text, buttons)

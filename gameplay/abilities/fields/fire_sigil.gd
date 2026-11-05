@@ -63,13 +63,21 @@ static func title_for(type: String) -> String:
 	return {"fire": "火阵", "frost": "霜阵", "storm": "雷阵"}.get(type, type)
 
 func _draw() -> void:
-	var tint := Color(0.35, 0.75, 1.0) if field_type == "frost" else Color(1.0, 0.38, 0.08)
-	if field_type == "storm":
-		tint = Color(0.85, 0.65, 1.0)
-	var ring_radius := radius - (4.0 if field_type == "frost" else (8.0 if field_type == "storm" else 0.0))
-	draw_circle(Vector2.ZERO, radius, Color(tint, 0.09))
-	draw_arc(Vector2.ZERO, ring_radius, 0, TAU, 64, Color(tint, 0.9), 3, true)
-	draw_arc(Vector2.ZERO, radius * 0.78, 0, TAU, 64, Color(tint, 0.65), 1, true)
+	var tag: String = {"fire": "fire", "frost": "ice", "storm": "lightning"}.get(field_type, "arcane")
+	var tint := ElementVisuals.color_for([tag])
+	var ring_radius := radius - (4.0 if field_type == "frost" else 8.0 if field_type == "storm" else 0.0)
+	draw_circle(Vector2.ZERO, ring_radius, Color(tint, .045))
+	draw_arc(Vector2.ZERO, ring_radius, 0, TAU, 80, Color(tint, .7), 1.5, true)
+	draw_arc(Vector2.ZERO, ring_radius - 6, 0, TAU, 80, Color(tint, .3), 1, true)
+	for i in range(12):
+		var angle := i * TAU / 12
+		var outer := Vector2.from_angle(angle) * ring_radius
+		var inner := Vector2.from_angle(angle) * (ring_radius - (11 if i % 3 == 0 else 5))
+		draw_line(inner, outer, Color(tint, .7), 1.5, true)
 	for i in range(6):
-		var angle := i * TAU / 6.0
-		draw_line(Vector2.from_angle(angle) * radius * 0.55, Vector2.from_angle(angle + TAU / 3) * radius * 0.55, Color(tint, 0.6), 2, true)
+		var angle := i * TAU / 6 - PI / 2
+		draw_line(Vector2.from_angle(angle) * radius * .53, Vector2.from_angle(angle + TAU / 3) * radius * .53, Color(tint, .55), 1, true)
+	for i in range(charges):
+		var angle := -PI / 2 + (i - (charges - 1) * .5) * .22
+		draw_circle(Vector2.from_angle(angle) * (ring_radius - 15), 3, tint.lightened(.3))
+	draw_arc(Vector2.ZERO, ring_radius - 3, -PI / 2, -PI / 2 + TAU * clampf(remaining / 15, 0, 1), 64, Color(tint, .32), 2, true)

@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="SkillSynergyData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_synergy_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "shatter"
+display_name = "碎冰"
+description = "震荡或回响脉冲命中已冻结目标时额外造成50%伤害并打碎冻结；消耗控制时间换取爆发。"
+required_hit_tags = ["impact"]
+required_target_status = "frozen"
+bonus_damage_ratio = 0.5
+consume_target_status = true
+bonus_tags = ["reaction", "shatter"]

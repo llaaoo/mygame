@@ -10,17 +10,17 @@ const LAYER_MODAL := 180
 const LAYER_CRITICAL := 200
 const LAYER_DEBUG := 240
 
-const PANEL_BG := Color(0.027, 0.031, 0.039, 0.90)
+const PANEL_BG := Color(0.035, 0.054, 0.065, 0.94)
 const PANEL_BG_SOLID := Color(0.035, 0.041, 0.052, 0.98)
 const SURFACE := Color(0.055, 0.063, 0.078, 0.96)
 const SURFACE_RAISED := Color(0.075, 0.086, 0.105, 0.98)
-const PANEL_BORDER := Color(0.29, 0.32, 0.36, 0.92)
+const PANEL_BORDER := Color(0.28, 0.34, 0.36, 0.85)
 const BORDER_STRONG := Color(0.52, 0.43, 0.27, 0.95)
 const SLOT_BG := Color(0.047, 0.054, 0.067, 0.96)
-const TEXT_MAIN := Color(0.91, 0.92, 0.90, 1.0)
-const TEXT_MUTED := Color(0.58, 0.62, 0.66, 1.0)
+const TEXT_MAIN := Color(0.94, 0.93, 0.87, 1.0)
+const TEXT_MUTED := Color(0.65, 0.71, 0.72, 1.0)
 const TEXT_DISABLED := Color(0.36, 0.39, 0.43, 1.0)
-const GOLD := Color(0.94, 0.70, 0.27, 1.0)
+const GOLD := Color(0.87, 0.72, 0.43, 1.0)
 const ACCENT := Color(0.32, 0.65, 0.78, 1.0)
 const SUCCESS := Color(0.32, 0.74, 0.45, 1.0)
 const DANGER := Color(0.84, 0.27, 0.20, 1.0)
@@ -40,6 +40,9 @@ static func panel_style(
 	sb.set_border_width_all(border_width)
 	sb.border_color = border_color
 	sb.set_corner_radius_all(radius)
+	sb.shadow_color = Color(0, 0, 0, .32)
+	sb.shadow_size = 6
+	sb.shadow_offset = Vector2(0, 3)
 	sb.content_margin_left = 12
 	sb.content_margin_right = 12
 	sb.content_margin_top = 10
@@ -63,10 +66,10 @@ static func surface_style(highlight: bool = false, radius: int = 5) -> StyleBoxF
 static func slot_style(highlight: bool = false) -> StyleBoxFlat:
 	var sb := surface_style(highlight, 4)
 	sb.bg_color = Color(0.095, 0.078, 0.045, 0.98) if highlight else SLOT_BG
-	sb.content_margin_left = 5
-	sb.content_margin_right = 5
-	sb.content_margin_top = 5
-	sb.content_margin_bottom = 5
+	sb.content_margin_left = 3
+	sb.content_margin_right = 3
+	sb.content_margin_top = 3
+	sb.content_margin_bottom = 3
 	return sb
 
 

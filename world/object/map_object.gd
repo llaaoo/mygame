@@ -88,6 +88,8 @@ func restore_state(data: Dictionary) -> void:
 	_apply_visual()
 	if _state == "INTACT":
 		_restore_collision()
+	elif _state in ["DESTROYED", "RESPAWNING"]:
+		_remove_collision()
 
 
 ## --- 内部 ---

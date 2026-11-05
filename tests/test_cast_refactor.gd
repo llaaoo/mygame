@@ -178,10 +178,12 @@ func _run() -> void:
 	bar.setup(sm)
 	counted.previews = 0
 	bar._process(0.016)
-	_check(counted.previews == 1, "SkillBar repeated identical plans within one refresh")
+	_check(counted.previews == 2, "SkillBar did not reuse one plan per ordinary/Shift mode within a refresh")
 	buffs.apply_buff(load("res://gameplay/abilities/data/ember_focus_result.tres").buff_resource.duplicate(true))
 	bar._process(0.016)
-	_check(counted.previews == 2 and bar._panels[1].tooltip_text.contains("余烬战意"), "Next-frame boon changes reused a stale preview")
+	_check(counted.previews == 4 and bar._panels[1].tooltip_text.contains("余烬战意"), "Next-frame boon changes reused a stale preview")
+	bar._process(0.016)
+	_check(counted.previews == 4, "Unchanged previews ignored the bounded refresh interval")
 	bar.queue_free()
 	await fixture.close()
 	if failures.is_empty():

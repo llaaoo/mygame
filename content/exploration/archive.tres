@@ -8,9 +8,36 @@
 [ext_resource type="Script" path="res://gameplay/exploration/data/spell_puzzle_data.gd" id="6_8xdsm"]
 [ext_resource type="Script" path="res://gameplay/exploration/data/spell_puzzle_route.gd" id="7_po377"]
 
+[ext_resource type="Resource" path="res://content/exploration/experiments/archive_pool.tres" id="exp_archive_pool"]
+[ext_resource type="Resource" path="res://content/exploration/experiments/archive_ice.tres" id="exp_archive_ice"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/surface_patch_data.gd" id="exp_type_surface_patches"]
+
+[ext_resource type="Resource" path="res://content/exploration/experiments/archive_fence.tres" id="exp_archive_fence"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/exploration_prop_data.gd" id="exp_type_fixed_props"]
+
+[ext_resource type="Resource" path="res://content/exploration/experiments/archive_trial_supply.tres" id="exp_archive_trial_supply"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/discovery_data.gd" id="exp_type_discoveries"]
+
+[ext_resource type="Resource" path="res://content/exploration/fieldwork/archive_observation.tres" id="field_observation"]
+
+[ext_resource type="Resource" path="res://content/exploration/fieldwork/archive_return.tres" id="field_return"]
+
+[ext_resource type="Resource" path="res://content/exploration/enemies/guard.tres" id="profile_guard"]
+
+[ext_resource type="Resource" path="res://content/exploration/enemies/sentry.tres" id="profile_sentry"]
+
+[sub_resource type="Resource" id="field_ice_impact"]
+script = ExtResource("7_po377")
+steps = PackedStringArray("ice", "impact")
+
+[sub_resource type="Resource" id="field_fire_impact"]
+script = ExtResource("7_po377")
+steps = PackedStringArray("fire", "impact")
+
 [sub_resource type="Resource" id="Resource_x0mar"]
 script = ExtResource("1_pn3v5")
 id = "pulse_knowledge"
+equipment = Array[String](["keeper_ring"])
 title = "震荡与焰环"
 text = "已掌握震荡（1）。阵外是近身能量冲击；火阵内变成以法阵为中心的范围喷发。与火球共用两次法阵资源，群敌近身时再选择使用。"
 pos = Vector2(-350, 180)
@@ -29,19 +56,25 @@ kind = "person"
 
 [sub_resource type="Resource" id="Resource_f8few"]
 script = ExtResource("2_enbnr")
-pos = Vector2(220, -120)
+pos = Vector2(128, 32)
 hp = 32
+speed = 105.0
+profile = ExtResource("profile_guard")
 
 [sub_resource type="Resource" id="Resource_kbq51"]
 script = ExtResource("2_enbnr")
-pos = Vector2(300, -80)
+pos = Vector2(256, 80)
 hp = 32
+speed = 105.0
+profile = ExtResource("profile_guard")
 
 [sub_resource type="Resource" id="Resource_7sj0l"]
 script = ExtResource("2_enbnr")
-pos = Vector2(380, 160)
+pos = Vector2(352, 160)
 hp = 28
 role = 1
+speed = 95.0
+profile = ExtResource("profile_sentry")
 
 [sub_resource type="Resource" id="Resource_rtk0n"]
 script = ExtResource("4_1ii2c")
@@ -65,20 +98,24 @@ script = ExtResource("6_8xdsm")
 id = "magic.charged_crystal"
 title = "沉眠导能晶簇"
 pos = Vector2(260, 240)
-routes = Array[ExtResource("7_po377")]([SubResource("Resource_baira")])
-hint = "晶簇只对雷电共鸣。解开取得雷晶粉2、晶砂2。先探索排水回廊尽头的机房，学习雷阵。"
+routes = Array[ExtResource("7_po377")]([SubResource("Resource_baira"), SubResource("field_ice_impact"), SubResource("field_fire_impact")])
+hint = "晶簇可由雷电直接共鸣；也可先以冰霜或火焰处理外壳，再用震荡冲开。首次探索可用火花→震荡，无需消耗品。解开取得雷晶粉2、晶砂2，并开启东北侧返营检修升降机。未完成的顺序跨区重置，已完成永久保留。"
 materials = {
 "crystal": 2,
 "storm_dust": 2
 }
 
+
+
 [resource]
 script = ExtResource("5_efxqw")
 id = "archive"
 title = "军械档案室"
-description = "清理守卫，解救测绘员；北侧静默祈堂藏有增益组合。"
+description = "观察水域和冰面，选择控制或破冰；解开晶簇可开放独立返营捷径。"
 seed = 20261106
 encounters = Array[ExtResource("2_enbnr")]([SubResource("Resource_f8few"), SubResource("Resource_kbq51"), SubResource("Resource_7sj0l")])
-discoveries = Array[ExtResource("1_pn3v5")]([SubResource("Resource_x0mar"), SubResource("Resource_6u4p8")])
+discoveries = Array[ExtResource("1_pn3v5")]([SubResource("Resource_x0mar"), SubResource("Resource_6u4p8"), ExtResource("exp_archive_trial_supply"), ExtResource("field_observation")])
 spell_objects = Array[ExtResource("6_8xdsm")]([SubResource("Resource_g0kms")])
-exits = Array[ExtResource("4_1ii2c")]([SubResource("Resource_rtk0n"), SubResource("Resource_uqb8c")])
+exits = Array[ExtResource("4_1ii2c")]([SubResource("Resource_rtk0n"), SubResource("Resource_uqb8c"), ExtResource("field_return")])
+surface_patches = Array[ExtResource("exp_type_surface_patches")]([ExtResource("exp_archive_pool"), ExtResource("exp_archive_ice")])
+fixed_props = Array[ExtResource("exp_type_fixed_props")]([ExtResource("exp_archive_fence")])

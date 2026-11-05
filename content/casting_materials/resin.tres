@@ -4,8 +4,8 @@
 script = ExtResource("1")
 id = "resin"
 title = "树脂制剂"
-description = "强化火球：飞行减慢20%，命中留下半径80的6秒燃烧区，额外4 MP。"
-result_ids = PackedStringArray("fireball")
+description = "强化火球或魂焰矢：飞行减慢20%，命中留下半径80的6秒燃烧区，额外4 MP。"
+result_ids = PackedStringArray("fireball", "soul_lance")
 extra_mana = 4
 projectile_speed_multiplier = 0.8
 impact_surface = "burning"

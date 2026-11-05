@@ -6,6 +6,9 @@ var tint := Color(0.95, 0.7, 0.25)
 var callback: Callable
 var kind := "note"
 var _label: Label
+var _player: Node2D
+var _label_time := 0.0
+var _near := false
 
 func _ready() -> void:
 	match kind:
@@ -27,14 +30,34 @@ func _ready() -> void:
 	_label.add_theme_color_override("font_color", tint)
 	add_child(_label)
 	set_title(title)
+	_player = get_tree().get_first_node_in_group("player") as Node2D
+	_update_proximity()
 	queue_redraw()
 
 func set_title(value: String) -> void:
 	title = value
 	if _label:
-		_label.text = "[E] " + title
+		_label.text = ("[E] " if _near else "") + title
+
+func _process(delta: float) -> void:
+	_label_time += delta
+	if _label_time >= .15:
+		_label_time = 0
+		_update_proximity()
+
+func _update_proximity() -> void:
+	if not is_instance_valid(_player): return
+	var distance := global_position.distance_squared_to(_player.global_position)
+	var near := distance < PlayerInputController.INTERACT_RANGE * PlayerInputController.INTERACT_RANGE
+	if _near != near:
+		_near = near
+		set_title(title)
+		queue_redraw()
+	_label.visible = distance < 280 * 280 or kind in ["passage", "person"]
+	_label.modulate.a = 1.0 if near else .7
 
 func _draw() -> void:
+	if _near: draw_arc(Vector2.ZERO, 25, 0, TAU, 32, Color(tint, .35), 1, true)
 	draw_circle(Vector2.ZERO, 19, Color(tint, 0.18))
 	draw_arc(Vector2.ZERO, 20, 0, TAU, 32, tint, 2, true)
 	match kind:

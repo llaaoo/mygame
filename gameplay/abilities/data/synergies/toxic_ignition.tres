@@ -12,3 +12,5 @@ bonus_damage_ratio = 0.75
 consume_target_status = true
 cooldown = 0.2
 bonus_tags = ["fire", "poison", "reaction"]
+
+required_hit_tags = ["fire"]

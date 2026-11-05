@@ -6,6 +6,8 @@ extends Resource
 @export_multiline var description: String
 @export var action_ids: PackedStringArray
 @export var result_ids: PackedStringArray
+@export var supported_tags: PackedStringArray
+@export var supported_types: Array[int] = []
 @export var extra_mana := 0
 @export var field_lifetime_bonus := 0.0
 @export var damage_multiplier := 1.0
@@ -20,8 +22,15 @@ extends Resource
 @export var added_tags: Array[String] = []
 @export var buff_duration_bonus := 0.0
 
-func supports(action_id: String, result_id: String) -> bool:
-	return action_id in action_ids or result_id in result_ids
+func supports(action_id: String, result_id: String, skill: SkillData = null) -> bool:
+	if action_id in action_ids or result_id in result_ids:
+		return true
+	if not skill or skill.skill_type not in supported_types:
+		return false
+	for tag in supported_tags:
+		if tag in skill.tags:
+			return true
+	return false
 
 func modify(skill: SkillData) -> SkillData:
 	var result := skill.create_runtime_variant()
@@ -44,4 +53,7 @@ func modify(skill: SkillData) -> SkillData:
 		result.impact_surface = impact_surface
 		result.surface_radius = impact_radius
 		result.surface_duration = impact_duration
+	for tag in added_tags:
+		if tag not in result.surface_payload_tags:
+			result.surface_payload_tags.append(tag)
 	return result

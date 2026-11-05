@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ExplorationEnemyProfile" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/exploration/data/enemy_profile.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "hunter"
+title = "追猎者"
+appearance_preset = 0
+role = 0
+melee_damage = 8
+melee_cooldown = 0.9
+attack_range = 50.0
+ranged_preferred_range = 180.0

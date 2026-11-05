@@ -18,6 +18,7 @@ var _entity_tickers: Dictionary = {}
 
 ## 暂停标记
 var is_paused: bool = false
+var elapsed_time := 0.0
 var _tick_accumulator: float = 0.0  ## 实体-表面交互低频 tick
 
 
@@ -64,81 +65,7 @@ func setup_dependencies(spatial_index: WorldSpatialIndex, state_manager: WorldSt
 
 ## 注册默认表面反应规则
 func _register_default_reactions() -> void:
-	# oiled + fire → burning（传播）
-	var oil_fire := SurfaceReaction.new()
-	oil_fire.rule_id = "oil_fire"
-	oil_fire.required_state = "oiled"
-	oil_fire.required_tags = ["fire"]
-	oil_fire.result_state = "burning"
-	oil_fire.result_duration = 8.0
-	oil_fire.spread_to_neighbors = true
-	oil_fire.spread_tags = ["fire"]
-	oil_fire.spread_damage = 1.0
-	_surface_manager.register_reaction(oil_fire)
-
-	# wet + ice → frozen
-	var wet_ice := SurfaceReaction.new()
-	wet_ice.rule_id = "wet_ice"
-	wet_ice.required_state = "wet"
-	wet_ice.required_tags = ["ice"]
-	wet_ice.result_state = "frozen"
-	wet_ice.result_duration = 5.0
-	wet_ice.entity_status_path = "res://gameplay/abilities/data/frozen.tres"
-	_surface_manager.register_reaction(wet_ice)
-
-	# wet + fire → dry（灭火）
-	var wet_fire := SurfaceReaction.new()
-	wet_fire.rule_id = "wet_fire"
-	wet_fire.required_state = "wet"
-	wet_fire.required_tags = ["fire"]
-	wet_fire.result_state = "steam"
-	wet_fire.result_duration = 3.0
-	_surface_manager.register_reaction(wet_fire)
-
-	# burning + ice → dry（灭火）
-	var burn_ice := SurfaceReaction.new()
-	burn_ice.rule_id = "burn_ice"
-	burn_ice.required_state = "burning"
-	burn_ice.required_tags = ["ice"]
-	burn_ice.result_state = "dry"
-	burn_ice.result_duration = 0.0
-	_surface_manager.register_reaction(burn_ice)
-
-	# burning + water/wet → dry
-	var burn_wet := SurfaceReaction.new()
-	burn_wet.rule_id = "burn_wet"
-	burn_wet.required_state = "burning"
-	burn_wet.required_tags = ["water"]
-	burn_wet.result_state = "dry"
-	burn_wet.result_duration = 0.0
-	_surface_manager.register_reaction(burn_wet)
-
-	# dry + fire → burning（火焰技能命中干燥地面）
-	var dry_fire := SurfaceReaction.new()
-	dry_fire.rule_id = "dry_fire"
-	dry_fire.required_state = "dry"
-	dry_fire.required_tags = ["fire"]
-	dry_fire.result_state = "burning"
-	dry_fire.result_duration = 5.0
-	dry_fire.entity_status_path = "res://gameplay/abilities/data/burning.tres"
-	_surface_manager.register_reaction(dry_fire)
-
-	# dry + ice → frozen（冰技能命中干燥地面）
-	var dry_ice := SurfaceReaction.new()
-	dry_ice.rule_id = "dry_ice"
-	dry_ice.required_state = "dry"
-	dry_ice.required_tags = ["ice"]
-	dry_ice.result_state = "frozen"
-	dry_ice.result_duration = 4.0
-	dry_ice.entity_status_path = "res://gameplay/abilities/data/frozen.tres"
-	_surface_manager.register_reaction(dry_ice)
-	for spec in [["wet", "lightning", "electrified", 5.0], ["frozen", "fire", "wet", 5.0], ["dry", "water", "wet", 12.0], ["electrified", "ice", "frozen", 4.0], ["poisoned", "fire", "burning", 6.0], ["poisoned", "water", "wet", 8.0], ["poisoned", "ice", "frozen", 4.0], ["wet", "poison", "poisoned", 8.0]]:
-		var reaction := SurfaceReaction.new()
-		reaction.rule_id = str(spec[0]) + "_" + str(spec[1])
-		reaction.required_state = str(spec[0])
-		reaction.required_tags = [str(spec[1])]
-		reaction.result_state = str(spec[2])
-		reaction.result_duration = float(spec[3])
+	for reaction in SurfaceCatalog.all_reactions():
 		_surface_manager.register_reaction(reaction)
 
 
@@ -171,6 +98,7 @@ func tick(delta: float) -> void:
 	if is_paused:
 		return
 
+	elapsed_time += delta
 	# 调度顺序: Surface → Propagation → Respawn → Entity Tickers
 	_surface_scheduler.tick(delta)
 	_propagation_scheduler.tick(delta)

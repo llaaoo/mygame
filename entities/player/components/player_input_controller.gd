@@ -49,7 +49,8 @@ func _poll_universal_cast(actions: Array[Action], source: String, input_action: 
 		return
 	var action := Action.cast(source, player.get_mouse_direction(), player)
 	action.params["release"] = released
-	action.cast_context = CastContext.simple(player, action.direction, _get_skill_for_source(source))
+	var skill := _get_skill_for_source(source)
+	action.cast_context = CastContext.at_position(player, CastContext.ground_point(player, player.get_global_mouse_position(), skill.cast_distance), skill) if skill.ground_targeted else CastContext.simple(player, action.direction, skill)
 	action.cast_context.empower = Input.is_key_pressed(KEY_SHIFT)
 	actions.append(action)
 

@@ -11,3 +11,5 @@ required_target_status = "frozen"
 bonus_damage_ratio = 0.6
 consume_target_status = true
 bonus_tags = ["fire", "reaction"]
+
+required_hit_tags = ["fire"]

@@ -3,6 +3,7 @@ extends PanelContainer
 
 var _buff_manager: BuffManager = null
 var _list: VBoxContainer = null
+var _rows: Dictionary = {}
 var _refresh_accum: float = 0.0
 
 
@@ -48,20 +49,25 @@ func _process(delta: float) -> void:
 func _refresh() -> void:
 	if not _list or not _buff_manager:
 		return
-	for child in _list.get_children():
-		child.queue_free()
-
-	var entries := _buff_manager.get_active_buff_entries()
+	var entries := _buff_manager.get_active_buff_entries().filter(func(entry): return entry.id != "equipment_loadout")
 	visible = not entries.is_empty()
-	if entries.is_empty():
-		var empty_label := Label.new()
-		empty_label.text = "No active effects"
-		GameUIStyle.apply_label(empty_label, 11, GameUIStyle.TEXT_MUTED)
-		_list.add_child(empty_label)
-		return
-
+	var seen: Dictionary = {}
 	for entry in entries:
-		_list.add_child(_make_buff_row(entry))
+		var id: int = entry.instance_id
+		seen[id] = true
+		if not _rows.has(id):
+			_rows[id] = _make_buff_row(entry)
+			_list.add_child(_rows[id])
+		var row: Control = _rows[id]
+		(row.get_meta("name_label") as Label).text = _format_name(entry)
+		(row.get_meta("timer_bar") as ProgressBar).value = entry.progress
+		row.tooltip_text = "%s\n%s\n来源：%s" % [["增益", "异常", "持续伤害", "控制", "光环"][entry.category], entry.description, str(entry.source)]
+	for id in _rows.keys():
+		if not seen.has(id):
+			var row: Control = _rows[id]
+			_list.remove_child(row)
+			row.queue_free()
+			_rows.erase(id)
 
 
 func _make_buff_row(entry: Dictionary) -> Control:
@@ -79,8 +85,14 @@ func _make_buff_row(entry: Dictionary) -> Control:
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	icon.texture = entry.get("icon", null)
 	icon.modulate = Color.WHITE if icon.texture else Color(1, 1, 1, 0.12)
-	icon_box.visible = icon.texture != null
+	icon_box.visible = true
 	icon_box.add_child(icon)
+	if not icon.texture:
+		var glyph := Label.new()
+		glyph.text = "◇"
+		glyph.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		GameUIStyle.apply_label(glyph, 17, _color_for_status(entry.get("status_id", "")))
+		icon_box.add_child(glyph)
 
 	var text_box := VBoxContainer.new()
 	text_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -89,7 +101,7 @@ func _make_buff_row(entry: Dictionary) -> Control:
 
 	var name := Label.new()
 	name.text = _format_name(entry)
-	GameUIStyle.apply_label(name, 10, GameUIStyle.TEXT_MAIN)
+	GameUIStyle.apply_label(name, 12, GameUIStyle.TEXT_MAIN)
 	text_box.add_child(name)
 
 	var bar := ProgressBar.new()
@@ -101,6 +113,8 @@ func _make_buff_row(entry: Dictionary) -> Control:
 	bar.add_theme_stylebox_override("fill", GameUIStyle.bar_fill(_color_for_status(entry.get("status_id", ""))))
 	text_box.add_child(bar)
 
+	row.set_meta("name_label", name)
+	row.set_meta("timer_bar", bar)
 	return row
 
 
@@ -108,22 +122,12 @@ func _format_name(entry: Dictionary) -> String:
 	var label: String = entry.get("name", "Effect")
 	var stacks: int = entry.get("stacks", 1)
 	var remaining: float = entry.get("remaining", 0.0)
-	if stacks > 1:
-		label += " x%d" % stacks
+	if int(entry.get("capacity", 1)) > 1:
+		label += " %d/%d" % [stacks, int(entry.capacity)]
 	if remaining > 0.0:
 		label += "  %.1fs" % remaining
 	return label
 
 
 func _color_for_status(status_id: String) -> Color:
-	match status_id:
-		"burning":
-			return Color(0.92, 0.32, 0.14, 1.0)
-		"frozen":
-			return Color(0.35, 0.72, 0.95, 1.0)
-		"poison":
-			return Color(0.42, 0.78, 0.28, 1.0)
-		"wet":
-			return Color(0.28, 0.52, 0.86, 1.0)
-		_:
-			return GameUIStyle.GOLD
+	return ElementVisuals.status_color(status_id)

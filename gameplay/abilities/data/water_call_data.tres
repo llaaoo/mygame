@@ -10,9 +10,10 @@ lifetime = 0.4
 [resource]
 script = ExtResource("1")
 conditional_cast = true
+ground_targeted = true
 id = "water_call"
 display_name = "水引"
-description = "在瞄准方向前方120距离创造半径105的水域，可灭火，配合冰霜冻结、配合雷电导电。"
+description = "鼠标选择120范围内的水域落点，可放在脚下洗去燃烧/中毒，或铺设导电水路。水引本身无伤害；水与冰霜凝冻，水与雷电导电，火焰使水变蒸汽。"
 mechanics = "5 MP；持续12秒；无直接伤害。"
 role = "创造环境条件"
 icon_atlas_index = 6

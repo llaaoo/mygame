@@ -8,3 +8,5 @@ display_name = "冻结"
 status_id = "frozen"
 duration = 3.0
 speed_multiplier = 0.3
+
+category = 3

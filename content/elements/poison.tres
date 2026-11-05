@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="ElementDefinition" format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/data/element_definition.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "poison"
+title = "毒"
+color = Color(0.4, 0.8, 0.15, 1)
+description = "污染与持续压力；持续消耗、被清洗，或提前被火引爆。"
+hit_status_paths = ["res://gameplay/abilities/data/poison.tres"]

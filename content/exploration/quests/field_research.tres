@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="ExplorationQuestData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/exploration/exploration_quest_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "field_research"
+title = "狱中复核"
+description = "阅读档案室、回廊和机房的三份实地观察，解开导能晶簇、热冲击封匣与水路检修晶闸，再回营地报告。已有工具的规律可以复用，三条检修捷径将保留你的成果。"
+required_claims = PackedStringArray("field.archive_observation", "field.drain_observation", "field.cistern_observation", "magic.charged_crystal", "magic.thermal_cache", "magic.waterworks_conductor")
+attribute_points = 1

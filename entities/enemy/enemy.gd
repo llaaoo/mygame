@@ -44,6 +44,7 @@ const PRESET_STATS: Array[Dictionary] = [
 const MELEE_SPLASH_RADIUS: float = 40.0
 const MELEE_SPLASH_DAMAGE: float = 0.5
 
+var surface_awareness: EnemySurfaceAwareness
 var enemy_color: Color = Color.RED
 var enemy_scale: Vector2 = Vector2(0.4, 0.4)
 var enemy_name: String = "敌人"
@@ -73,6 +74,10 @@ func _ready() -> void:
 	_home_position = global_position
 	$CollisionShape2D.shape = load("res://entities/enemy/enemy_body_shape.tres")
 	_create_buff_manager()
+	surface_awareness = EnemySurfaceAwareness.new()
+	surface_awareness.actor = self
+	surface_awareness.cautious = ai_role == AIRole.RANGED
+	add_child(surface_awareness)
 	_apply_preset_stats(enemy_type)
 	health_component.setup($CollisionShape2D)
 	health_component.regen_rate = 0.0
@@ -195,6 +200,8 @@ func poll_actions() -> Array[Action]:
 			if _can_use_ranged(dist):
 				actions.append(Action.cast("right", get_target_direction(), self))
 		"Attack":
+			if surface_awareness and surface_awareness.should_evade:
+				actions.append(Action.move(surface_awareness.direction, self))
 			if ai_role == AIRole.RANGED:
 				if _can_use_ranged(dist):
 					actions.append(Action.cast("right", get_target_direction(), self))
@@ -210,7 +217,8 @@ func resolve_action(action: Action) -> void:
 
 	match action.action_type:
 		Action.ActionType.MOVE:
-			velocity = action.direction * move_speed
+			var direction := surface_awareness.steer(action.direction) * action.direction.length() if surface_awareness else action.direction
+			velocity = direction * move_speed
 			move_and_slide()
 		Action.ActionType.CAST:
 			skill_manager.use_hand(action.skill_source, self, action.direction)
@@ -289,8 +297,7 @@ func _on_attack_physics(delta: float) -> void:
 		return
 
 	if ai_role == AIRole.RANGED and dist < attack_range * 0.7:
-		velocity = (global_position - target.global_position).normalized() * move_speed * 0.7
-		move_and_slide()
+		resolve_action(Action.move((global_position - target.global_position).normalized() * 0.7, self))
 		return
 
 	var actions := poll_actions()
@@ -478,6 +485,8 @@ func _flash_damage() -> void:
 
 
 func _find_player() -> void:
+	if not is_inside_tree() or is_queued_for_deletion():
+		return
 	player = get_tree().get_first_node_in_group("player") as Player
 	if not player:
 		await get_tree().create_timer(0.5).timeout

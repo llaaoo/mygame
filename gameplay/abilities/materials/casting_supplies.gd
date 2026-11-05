@@ -63,18 +63,19 @@ func craft(id: String) -> bool:
 		notify.call()
 	return true
 
-func plan(action: SkillData, base: SkillData, include_required: bool = true) -> Dictionary:
+func plan(action: SkillData, base: SkillData, include_required: bool = true, preparation_material: String = "") -> Dictionary:
 	var costs: Dictionary = {}
 	var material_id := str(selected.get(action.get_id(), ""))
 	var optional: CastingMaterialData = catalog.get(material_id)
-	if optional and not optional.supports(action.get_id(), base.get_id()):
+	var is_preparation := optional != null and material_id == preparation_material
+	if optional and not is_preparation and not optional.supports(action.get_id(), base.get_id(), base):
 		optional = null
 		material_id = ""
 	if include_required and not action.required_material.is_empty():
 		costs[action.required_material] = action.material_amount
 	if optional:
 		costs[material_id] = int(costs.get(material_id, 0)) + 1
-	return {"skill": optional.modify(base) if optional else base, "costs": costs, "material_id": material_id, "extra_mana": optional.extra_mana if optional else 0, "field_bonus": optional.field_lifetime_bonus if optional else 0.0}
+	return {"skill": optional.modify(base) if optional and not is_preparation else base, "costs": costs, "material_id": material_id, "extra_mana": optional.extra_mana if optional else 0, "field_bonus": optional.field_lifetime_bonus if optional else 0.0}
 
 func describe_cost(costs: Dictionary) -> String:
 	var parts: Array[String] = []

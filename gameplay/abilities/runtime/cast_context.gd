@@ -57,3 +57,7 @@ static func default_world(actor: Node) -> Node:
 		if session and is_instance_valid(session.active_root):
 			return session.active_root
 	return actor.get_tree().current_scene if actor and actor.is_inside_tree() else null
+
+## One bounded point used by input, aiming and conditional preparation.
+static func ground_point(actor: Node2D, requested: Vector2, max_range: float) -> Vector2:
+	return actor.global_position + (requested - actor.global_position).limit_length(maxf(0, max_range))

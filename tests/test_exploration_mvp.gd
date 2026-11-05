@@ -105,7 +105,7 @@ func _run() -> void:
 	_check(SaveManager.instance.save_game(2), "Save failed")
 	var restored := ExplorationProgress.new()
 	restored.deserialize_save_data(SaveManager.instance.read_extension(2, MVPGame.SECTION))
-	_check(restored.completed and restored.spell_rules.size() == 3 and restored.cleared.has("gate"), "Progress did not round-trip through disk")
+	_check(restored.completed and restored.spell_rules.size() == 5 and restored.cleared.has("gate"), "Progress did not round-trip through disk")
 	# Death must use expedition recovery, not the legacy HUD retry scene.
 	game.player.health_component.invincible = false
 	CombatExecutor.instance.reset_chain()
@@ -115,7 +115,7 @@ func _run() -> void:
 	game.ui.close_modal()
 	await _travel("camp")
 	_check(not game.player.health_component.is_dead and game.player.health_component.hp > 0, "Camp did not revive player")
-	_check(game.progress.completed and game.progress.spell_rules.size() == 3, "Death discarded knowledge or milestones")
+	_check(game.progress.completed and game.progress.spell_rules.size() == 5, "Death discarded knowledge or milestones")
 	# Recreate the entire scene and providers, restoring only persistent progress.
 	game.queue_free()
 	current_scene = null

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="SpellCombinationRule" load_steps=3 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/combinations/spell_combination_rule.gd" id="1"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/frost_stride_result.tres" id="2"]
+[resource]
+script = ExtResource("1")
+id = "terrain_frost_focus"
+trigger_action_id = "focus"
+required_surface = "frozen"
+substitute_material = "frost_salt"
+requires_empower = true
+result_skill = ExtResource("2")
+mana_cost = 10
+cooldown = 4.0
+preparation = 0.4
+priority = -10

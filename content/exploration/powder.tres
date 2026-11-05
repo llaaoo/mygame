@@ -10,6 +10,7 @@
 [sub_resource type="Resource" id="Resource_gnxpo"]
 script = ExtResource("1_58wt0")
 id = "powder_supply"
+equipment = Array[String](["covenant_ring"])
 title = "守卫补给"
 text = "恢复生命和法力。油桶的火焰也会伤害你；先观察站位再引燃。每个补给只能领取一次。"
 pos = Vector2(-350, 180)

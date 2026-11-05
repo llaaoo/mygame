@@ -24,6 +24,7 @@ enum SlotType {
 @export var affixes: Array[EquipmentAffixData] = []
 @export var set_data: EquipmentSetData
 @export_multiline var special_effect_text: String = ""
+@export var casting_profile: CastingEquipmentProfile
 @export var on_equip_buff: PackedScene
 
 

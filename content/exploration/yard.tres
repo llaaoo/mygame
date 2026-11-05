@@ -12,10 +12,11 @@
 script = ExtResource("1_0us06")
 id = "fire_knowledge"
 title = "火阵铭刻记录"
-text = "已掌握火阵。按5铭刻，阵内使用右键或6火花发出火球；阵外仍是近距离火花。火阵仅有两次触发量，注意留出准备窗口。"
+text = "已掌握火阵。按5铭刻，阵内使用右键或6火花发出火球；阵外仍是近距离火花。火阵仅有两次触发量，注意留出准备窗口。\n\n阵外火花也能点燃油面、融化冻结和引爆中毒；火阵提供远程形态，元素的用途并不依赖站在法阵里。\n\n学会凝神后，Shift凝神可借脚下燃烧准备余烬战意，10 MP并消耗所在1格；也可在M给凝神配置树脂，消耗1份和额外4 MP替代地面。火地仍会伤你，准备不是免火。"
 pos = Vector2(-350, 180)
 actions = Array[String](["fire_sigil"])
-spell_rules = Array[String](["fire_sigil_fireball"])
+spell_rules = Array[String](["terrain_fire_focus", "fire_sigil_fireball"])
+element_clues = Array[String](["fire"])
 
 [sub_resource type="Resource" id="Resource_t34io"]
 script = ExtResource("2_45yf3")
@@ -65,6 +66,27 @@ materials = {
 "sap": 3
 }
 
+[sub_resource type="Resource" id="SoulKnowledge"]
+script = ExtResource("1_0us06")
+id = "soul_knowledge"
+title = "魂术拾遗：残魂与蕴魂"
+text = "守卫战死留下60秒残魂。靠近后使用汲魂（K编组）消耗4 MP，获得1层蕴魂，最多3层、持续45秒。普通施法保留；Shift＋火花→穿透魂焰，震荡→魂霜，凝神→先祖护佑，水引→净魂，每次消费1层。触发动作仍须沿支路学习。回响印记与护盾爆破优先；魂术可与适配法阵结果共同发生，总费用相加。材料沿用：树脂铺火、墨加穿透、霜盐扩范围、守护粉延时。残魂和临时Buff跨区清理，不可带回营地囤积。"
+pos = Vector2(-360, -210)
+actions = Array[String](["soul_harvest"])
+spell_rules = Array[String](["soul_spark", "soul_pulse", "soul_focus", "soul_water"])
+
+[sub_resource type="Resource" id="SoulRoute"]
+script = ExtResource("7_gc3xg")
+steps = PackedStringArray("soul")
+[sub_resource type="Resource" id="SoulCache"]
+script = ExtResource("6_kxefh")
+id = "magic.soul_cache"
+title = "缄默骨匣"
+pos = Vector2(-230, 250)
+routes = Array[ExtResource("7_gc3xg")]([SubResource("SoulRoute")])
+hint = "封印回应魂术，而非寻常火焰。阅读外院魂术拾遗，借残魂兑现魂焰矢或魂霜震荡。解开获得回响墨2、守护粉1；离开区域不会重置已领材料。"
+materials = {"echo_ink": 2, "ward_powder": 1}
+
 [resource]
 script = ExtResource("5_jf6l1")
 id = "yard"
@@ -72,6 +94,6 @@ title = "监狱外院"
 description = "找到入口旁的火阵记录，清除守卫后探索前路。火阵内火花会变为火球。"
 seed = 20261105
 encounters = Array[ExtResource("2_45yf3")]([SubResource("Resource_t34io"), SubResource("Resource_mjffx")])
-discoveries = Array[ExtResource("1_0us06")]([SubResource("Resource_r355u")])
-spell_objects = Array[ExtResource("6_kxefh")]([SubResource("Resource_4l5ti")])
+discoveries = Array[ExtResource("1_0us06")]([SubResource("Resource_r355u"), SubResource("SoulKnowledge")])
+spell_objects = Array[ExtResource("6_kxefh")]([SubResource("Resource_4l5ti"), SubResource("SoulCache")])
 exits = Array[ExtResource("4_66iw7")]([SubResource("Resource_4nj6m"), SubResource("Resource_yn5tb"), SubResource("Resource_bohnw")])

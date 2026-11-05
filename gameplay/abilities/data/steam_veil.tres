@@ -6,5 +6,7 @@ display_name = "蒸汽迟滞"
 status_id = "steam_veil"
 duration = 2.0
 speed_multiplier = 0.85
+incoming_projectile_multiplier = 0.75
+tactical_hint = "投射物直接伤害降低25%；近战、范围与持续伤害不变。接触蒸汽刷新2秒，离开后自然消退。"
 tick_interval = 1.0
 tick_damage = 0

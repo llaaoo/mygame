@@ -8,3 +8,5 @@ duration = 2.0
 speed_multiplier = 0.85
 tick_interval = 1.0
 tick_damage = 4
+
+category = 1

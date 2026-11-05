@@ -6,6 +6,7 @@ signal inspected(spec: SpellPuzzleData, completed: bool)
 var spec: SpellPuzzleData
 var completed := false
 var _steps: Array[int] = []
+var _held: Array[float] = []
 var _label: Label
 
 func _ready() -> void:
@@ -17,8 +18,11 @@ func _ready() -> void:
 	circle.radius = 22
 	shape.shape = circle
 	add_child(shape)
+	set_process(false)
+	RuntimeRegistration.register_ticker(self)
 	for route in spec.routes:
 		_steps.append(0)
+		_held.append(0.0)
 	_label = Label.new()
 	_label.position = Vector2(-120, -55)
 	_label.size.x = 240
@@ -46,20 +50,42 @@ func _on_hit(event: CombatEvent) -> void:
 	var tags: Array = event.skill.tags if event.skill else event.data.get("tags", [])
 	for i in range(_steps.size()):
 		var route: PackedStringArray = spec.routes[i].steps
-		if str(route[_steps[i]]) in tags:
+		if _steps[i] < route.size() and str(route[_steps[i]]) in tags:
 			_steps[i] += 1
-			if _steps[i] >= route.size():
-				completed = true
-				set_deferred("collision_layer", 0)
-				solved.emit(spec)
-				break
+	_evaluate_routes(0.0)
 	_refresh()
+
+func tick(delta: float) -> void:
+	if completed: return
+	_evaluate_routes(delta)
+	_refresh()
+
+func _evaluate_routes(delta: float) -> void:
+	var surfaces := GameRuntime.instance.get_simulation_runtime().get_surface_manager() if GameRuntime.instance else null
+	for i in range(spec.routes.size()):
+		var route := spec.routes[i]
+		if _steps[i] < route.steps.size(): continue
+		if not route.required_surface.is_empty():
+			if not surfaces or surfaces.surface_at(global_position + route.surface_offset).get("state", "dry") != route.required_surface:
+				_held[i] = 0.0
+				continue
+			_held[i] += delta
+			if _held[i] + 0.000001 < route.hold_seconds: continue
+		completed = true
+		set_deferred("collision_layer", 0)
+		solved.emit(spec)
+		break
 
 func _refresh() -> void:
 	var count := 0
 	for step in _steps:
 		count = maxi(count, step)
 	_label.text = "[E] " + str(spec.title) + (" · 已解开" if completed else (" · 共鸣%d" % count if count > 0 else ""))
+	if not completed:
+		for i in range(spec.routes.size()):
+			var route := spec.routes[i]
+			if not route.required_surface.is_empty():
+				_label.text += "\n检测：%s %.1f/%.1fs" % [SurfaceManager.surface_title(route.required_surface), _held[i], route.hold_seconds]
 	queue_redraw()
 
 func _draw() -> void:

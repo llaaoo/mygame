@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="EquipmentData" format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/equipment_data.gd" id="equipment"]
+[ext_resource type="Script" path="res://gameplay/inventory/data/casting_equipment_profile.gd" id="profile"]
+[sub_resource type="Resource" id="Profile"]
+script = ExtResource("profile")
+empower_damage_bonus = 0.25
+empower_mana_bonus = 2
+boon_duration_bonus = -0.25
+[resource]
+script = ExtResource("equipment")
+id = "covenant_ring"
+display_name = "灰烬契印"
+description = "消费恩赐时，伤害倍率额外+0.25、每份恩赐额外2 MP；获得的可释放恩赐持续时间-25%。不延长魂量，也不提供被动法术增伤。"
+special_effect_text = "消费恩赐时，伤害倍率额外+0.25、每份恩赐额外2 MP；获得的可释放恩赐持续时间-25%。不延长魂量，也不提供被动法术增伤。"
+item_type = 1
+rarity = 2
+slot_type = 8
+icon_atlas_index = 12
+stat_modifiers = {}
+combat_modifiers = {}
+casting_profile = SubResource("Profile")

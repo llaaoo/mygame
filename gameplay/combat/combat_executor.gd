@@ -1,5 +1,6 @@
 class_name CombatExecutor
 extends Node
+signal damage_applied(source: Node2D, target: Node2D, amount: int)
 ## 战斗执行器 — 唯一控制流入口
 ##
 ## 原则（Single Authority Rule）：
@@ -81,12 +82,16 @@ static func report_hit(caster: Node2D, target: Node2D, damage: int, position: Ve
 		instance._current_family = family_id
 		instance._current_hit = context
 	var data := {"damage": context.damage if result.damage_accepted else 0, "position": position, "tags": context.tags, "hit_result": result}
+	var target_buffs := target.get_node_or_null("BuffManager") as BuffManager
+	var source_buffs := caster.get_node_or_null("BuffManager") as BuffManager if is_instance_valid(caster) else null
+	data["target_statuses_before"] = target_buffs.get_active_statuses() if target_buffs else []
+	data["source_statuses_before"] = source_buffs.get_active_statuses() if source_buffs else []
 	if instance:
 		instance._enforce_emit(CombatEvent.Type.ON_HIT, caster, target, data, skill)
 	else:
 		_emit_direct(CombatEvent.Type.ON_HIT, caster, target, data, skill)
 	if result.damage_accepted and is_instance_valid(target):
-		_apply_damage(target, context.damage, context.tags)
+		_apply_damage(target, int(round(context.damage * context.incoming_multiplier)), context.tags, caster)
 	if is_instance_valid(health):
 		result.damage_dealt = maxi(0, before - health.hp)
 		health.end_hit_group()
@@ -97,14 +102,18 @@ static func report_hit(caster: Node2D, target: Node2D, damage: int, position: Ve
 
 
 ## 内部：安全调用 Damageable.take_damage()
-static func _apply_damage(target: Node2D, amount: int, tags: Array = []) -> void:
+static func _apply_damage(target: Node2D, amount: int, tags: Array = [], source: Node2D = null) -> void:
 	if amount <= 0:
 		return
 	# 存储命中标签（供 MapObject 判断破坏类型）
 	if is_instance_valid(target):
 		target.set_meta("_last_hit_tags", tags)
 	if is_instance_valid(target) and target.has_method("take_damage"):
+		var health := target.get_node_or_null("HealthComponent") as HealthComponent
+		var before := health.hp if health else 0
 		target.take_damage(amount)
+		if instance and is_instance_valid(health):
+			instance.damage_applied.emit(source, target, maxi(0, before - health.hp))
 
 
 ## 报告伤害（替代 HealthComponent._emit_damage_event）
@@ -309,7 +318,8 @@ static func report_bonus_damage(source: Node2D, target: Node2D, amount: int, ski
 	if not instance:
 		# 降级路径：无 Executor 时直接调用
 		if is_instance_valid(target) and target.has_method("take_damage"):
-			target.take_damage(amount)
+			var buffs := target.get_node_or_null("BuffManager") as BuffManager
+			target.take_damage(int(round(amount * (buffs.get_incoming_hit_multiplier(skill, tags) if buffs else 1.0))))
 		return
 	instance._apply_bonus_damage(source, target, amount, skill, tags)
 
@@ -320,12 +330,16 @@ func _apply_bonus_damage(source: Node2D, target: Node2D, amount: int, skill: Ski
 	# 安全检查：目标已死则跳过
 	if "hp" in target and target.hp <= 0:
 		return
+	# Use the parent's pre-hit snapshot; bonuses still begin from unmitigated base damage.
+	var buffs := target.get_node_or_null("BuffManager") as BuffManager
+	var factor := _current_hit.incoming_multiplier if _current_hit and _current_hit.target == target else (buffs.get_incoming_hit_multiplier(skill, tags) if buffs else 1.0)
+	amount = int(round(amount * factor))
 	if not tags.is_empty():
 		target.set_meta("_last_hit_tags", tags)
 	var health := target.get_node_or_null("HealthComponent") as HealthComponent
 	if health:
 		health.begin_hit_group(_current_family)
-	target.take_damage(amount)
+	_apply_damage(target, amount, tags if not tags.is_empty() else target.get_meta("_last_hit_tags", []), source)
 	if is_instance_valid(health):
 		health.end_hit_group()
 
@@ -408,3 +422,10 @@ static func report_status_removed(target: Node2D, buff: Buff, reason: String = "
 		_emit_direct(CombatEvent.Type.ON_STATUS_REMOVED, null, target, data, null)
 		return
 	instance._enforce_emit(CombatEvent.Type.ON_STATUS_REMOVED, null, target, data, null)
+
+static func report_status_changed(target: Node2D, buff: Buff, amount: int, stacks: int, reason: String) -> void:
+	var data := {"status_id": buff.status_id, "buff_name": buff.display_name, "amount": amount, "stacks": stacks, "reason": reason}
+	if instance:
+		instance._enforce_emit(CombatEvent.Type.ON_STATUS_CHANGED, null, target, data, null)
+	else:
+		_emit_direct(CombatEvent.Type.ON_STATUS_CHANGED, null, target, data, null)

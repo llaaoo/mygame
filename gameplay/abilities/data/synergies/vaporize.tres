@@ -10,3 +10,5 @@ required_caster_status = ""
 bonus_damage_ratio = 0.3
 consume_target_status = true
 bonus_tags = ["reaction", "vaporize"]
+
+required_hit_tags = ["fire"]

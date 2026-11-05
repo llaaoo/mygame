@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="ExplorationExitData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/exploration/data/exit_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+target = "camp"
+title = "返营检修升降机"
+pos = Vector2(430, -240)
+required_claims = PackedStringArray("magic.charged_crystal")
+locked_message = "检修升降机尚未通电：先解开南侧沉眠导能晶簇。"

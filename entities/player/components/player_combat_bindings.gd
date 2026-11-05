@@ -42,19 +42,19 @@ func _setup_event_bus() -> void:
 	_setup_mastery()
 
 	# ON_HIT 火焰技能 → 挂 burning 状态
-	_on_hit_fire_status = OnHitApplyStatus.create("fire", "res://gameplay/abilities/data/burning.tres")
+	_on_hit_fire_status = OnHitApplyStatus.create("fire", ElementCatalog.definition("fire").hit_status_paths[0])
 	_register_triggered_effects(_on_hit_fire_status)
 
 	# ON_HIT 冰霜技能 → 挂 frozen 减速
-	_on_hit_ice_status = OnHitApplyStatus.create("ice", "res://gameplay/abilities/data/frozen.tres")
+	_on_hit_ice_status = OnHitApplyStatus.create("ice", ElementCatalog.definition("ice").hit_status_paths[0])
 	_register_triggered_effects(_on_hit_ice_status)
 
 	# ON_HIT 毒素技能 → 挂 poison DOT
-	_on_hit_poison_status = OnHitApplyStatus.create("poison", "res://gameplay/abilities/data/poison.tres")
+	_on_hit_poison_status = OnHitApplyStatus.create("poison", ElementCatalog.definition("poison").hit_status_paths[0])
 	_register_triggered_effects(_on_hit_poison_status)
 
 	# ON_HIT 水系技能 → 挂 wet，供闪电和冰系联动
-	_on_hit_water_status = OnHitApplyStatus.create("water", "res://gameplay/abilities/data/wet.tres")
+	_on_hit_water_status = OnHitApplyStatus.create("water", ElementCatalog.definition("water").hit_status_paths[0])
 	_register_triggered_effects(_on_hit_water_status)
 
 	# ON_HIT 闪电技能 → 连锁弹射
@@ -65,6 +65,7 @@ func _setup_event_bus() -> void:
 	_synergy_resolver.name = "SkillSynergyResolver"
 	player.add_child(_synergy_resolver)
 	_synergy_resolver.setup(player)
+	_synergy_resolver.reaction_triggered.connect(_show_reaction)
 
 	# EffectGraph：ON_HIT 火焰技能
 	_register_graph_demo()
@@ -352,3 +353,8 @@ func _exit_tree() -> void:
 	if CombatEventBus.instance:
 		CombatEventBus.instance.unsubscribe(CombatEvent.Type.ON_HIT, _on_player_hit_for_mastery)
 		CombatEventBus.instance.unsubscribe(CombatEvent.Type.ON_KILL, _on_player_kill_for_mastery)
+
+func _show_reaction(title: String, position: Vector2) -> void:
+	var world := CastContext.default_world(player)
+	if is_instance_valid(world) and world.is_inside_tree() and not world.is_queued_for_deletion():
+		DamageNumber.spawn_reaction(world, title, position - Vector2(0, 25))

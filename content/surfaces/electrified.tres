@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="SurfaceDefinition" format=3]
+[ext_resource type="Script" path="res://gameplay/interaction/surface_definition.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "electrified"
+title = "导电水域"
+color = Color(0.8, 0.55, 1, 0.5)
+status_paths = ["res://gameplay/abilities/data/wet.tres", "res://gameplay/abilities/data/shocked.tres"]
+cleanse_statuses = []
+refresh_statuses = []
+danger = 1
+expiry_state = "wet"
+expiry_duration = 4.0
+danger_status = "shocked"

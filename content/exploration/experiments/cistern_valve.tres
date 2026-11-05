@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="SurfaceValveData" format=3]
+[ext_resource type="Script" path="res://gameplay/exploration/data/surface_valve_data.gd" id="1"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/water_path_data.gd" id="path"]
+[sub_resource type="Resource" id="a"]
+script = ExtResource("path")
+title = "路线A：直通水槽"
+points = PackedVector2Array(-160, 96, -96, 96, -32, 96, 32, 96, 96, 96, 160, 96, 224, 96, 288, 96)
+[sub_resource type="Resource" id="b"]
+script = ExtResource("path")
+title = "路线B：南侧迂回"
+points = PackedVector2Array(-160, 96, -160, 160, -160, 224, -96, 224, -32, 224, 32, 224, 96, 224, 160, 224, 224, 224, 288, 224, 288, 160, 288, 96)
+[resource]
+script = ExtResource("1")
+id = "valve.cistern_experiment"
+title = "实验水路分流阀"
+pos = Vector2(-224, 32)
+paths = Array[ExtResource("path")]([SubResource("a"), SubResource("b")])

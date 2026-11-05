@@ -49,7 +49,7 @@ func _run() -> void:
 	game.ui.close_modal()
 	await _interact("雷阵与导电实验记录")
 	game.ui.close_modal()
-	_check(game.progress.spell_rules.size() == 9 and sm.known_actions.has("storm_sigil"), "Storm exploration grants missing")
+	_check(game.progress.spell_rules.size() == 13 and sm.known_actions.has("storm_sigil"), "Storm exploration grants missing")
 
 	# Optional placement reagent: pure preview, cancellation, final deduction.
 	await _sandbox()
@@ -202,7 +202,7 @@ func _run() -> void:
 	current_scene = game
 	await _frames(10)
 	game.ui.close_modal()
-	_check(game.player.skill_manager.combinations.supplies.serialize() == saved and game.progress.spell_rules.size() == 9 and game.progress.claims.has("magic.thermal_cache"), "Spell supplies/configuration/puzzles did not restore from disk")
+	_check(game.player.skill_manager.combinations.supplies.serialize() == saved and game.progress.spell_rules.size() == 13 and game.progress.claims.has("magic.thermal_cache"), "Spell supplies/configuration/puzzles did not restore from disk")
 	game.queue_free()
 	current_scene = null
 	await _frames(5)

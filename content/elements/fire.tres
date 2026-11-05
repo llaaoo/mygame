@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="ElementDefinition" format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/data/element_definition.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "fire"
+title = "火"
+color = Color(1, 0.28, 0.05, 1)
+description = "点燃与兑现准备；火能引燃油和毒地，也会融冰、蒸发水。"
+hit_status_paths = ["res://gameplay/abilities/data/burning.tres"]

@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="ExplorationDiscoveryData" format=3]
+[ext_resource type="Script" path="res://gameplay/exploration/data/discovery_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "experiment.cistern_trial_supply"
+title = "元素实验补给：连接与断路"
+text = "先在左侧读导电记录。南侧分流阀以E轮换关闭、路线A和B；观察实际水格。冻结一段水路可以截断传导，震荡破冰后再从远端雷击。东侧检修晶闸检测实际导电持续0.5秒，干地上直接雷击无效；机关是可选补给，不封锁返程。领取护手后回营地试部分消费。\n\n补给仅领取一次；回营地可以继续加工，休息和重置遭遇不会重复发放。"
+pos = Vector2(-300, 96)
+materials = { "storm_dust": 3, "frost_salt": 2, "crystal": 4 }

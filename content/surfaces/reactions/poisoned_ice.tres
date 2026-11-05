@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="SurfaceReaction" format=3]
+[ext_resource type="Script" path="res://gameplay/interaction/surface_reaction.gd" id="1"]
+[resource]
+script = ExtResource("1")
+rule_id = "poisoned_ice"
+required_state = "poisoned"
+required_tags = ["ice"]
+result_state = "frozen"
+result_duration = 4.0

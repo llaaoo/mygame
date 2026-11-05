@@ -5,6 +5,7 @@ extends Resource
 @export var id: String = ""
 @export var display_name: String = "联动"
 @export_multiline var description: String = ""
+@export var required_hit_tags: Array[String] = [] ## Any listed tag; empty preserves explicit per-skill rules.
 @export var required_target_status: String = ""
 @export var required_caster_status: String = ""
 @export var bonus_damage_ratio: float = 0.0

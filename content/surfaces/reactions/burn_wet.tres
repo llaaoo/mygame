@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="SurfaceReaction" format=3]
+[ext_resource type="Script" path="res://gameplay/interaction/surface_reaction.gd" id="1"]
+[resource]
+script = ExtResource("1")
+rule_id = "burn_wet"
+required_state = "burning"
+required_tags = ["water"]
+result_state = "dry"
+result_duration = 0.0

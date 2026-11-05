@@ -10,3 +10,5 @@ required_caster_status = "static_focus"
 bonus_damage_ratio = 0.35
 consume_target_status = false
 bonus_tags = ["reaction", "static_overload"]
+
+required_hit_tags = ["lightning"]

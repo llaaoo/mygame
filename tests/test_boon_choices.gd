@@ -32,7 +32,7 @@ func _run() -> void:
 			await _interact(title)
 			game.ui.close_modal()
 	var buffs: BuffManager = game.player.get_node("BuffManager")
-	_check(controller.rules.size() == 15 and supplies.catalog.size() == 7, "Boon integration added unrelated spells/materials")
+	_check(controller.rules.size() == game.catalog.chapter.spell_rules.size() and supplies.catalog.size() == 7, "Registered spell rules or retained material catalog diverged")
 
 	# Keeping the boon increases compatible spell damage without spending the boon.
 	await _arena()

@@ -9,9 +9,12 @@ const MAX_SURFACE_CELLS := 256
 ## _active_surfaces: Dictionary[Vector2i, Dictionary]
 ##   {"state": "burning", "remaining": 5.0, "source": "oil_barrel_03"}
 var _active_surfaces: Dictionary = {}
+var _versions: Dictionary = {}
+var _serial := 0
 
 func clear() -> void:
 	_active_surfaces.clear()
+	_versions.clear()
 
 func active_count() -> int:
 	return _active_surfaces.size()
@@ -35,6 +38,12 @@ func set_surface(cell: Vector2i, state: String, duration: float, source: String 
 	if not _active_surfaces.has(cell) and _active_surfaces.size() >= MAX_SURFACE_CELLS:
 		return
 
+	if state == "dry" or duration <= 0:
+		take_surface(cell)
+		return
+	if not _active_surfaces.has(cell) or _active_surfaces[cell].state != state:
+		_serial += 1
+		_versions[cell] = _serial
 	_active_surfaces[cell] = {
 		"state": state,
 		"remaining": duration,
@@ -64,16 +73,11 @@ func _expire_cell(cell: Vector2i) -> void:
 	var surf: Dictionary = _active_surfaces[cell]
 	var state: String = surf.get("state", "")
 
-	# 自然迁移规则
-	match state:
-		"burning":
-			_active_surfaces.erase(cell)
-		"frozen", "electrified", "steam":
-			_active_surfaces[cell] = {"state": "wet", "remaining": 4.0, "source": "expiry"}
-		"wet", "oiled":
-			_active_surfaces.erase(cell)  # 回到 dry（默认）
-		_:
-			_active_surfaces.erase(cell)
+	var definition := SurfaceCatalog.definition(state)
+	if definition and not definition.expiry_state.is_empty():
+		set_surface(cell, definition.expiry_state, definition.expiry_duration, "expiry")
+	else:
+		take_surface(cell)
 
 
 func _to_string() -> String:
@@ -81,3 +85,12 @@ func _to_string() -> String:
 
 func active_cells() -> Array:
 	return _active_surfaces.keys()
+
+func revision(cell: Vector2i) -> int:
+	return int(_versions.get(cell, -1))
+
+func take_surface(cell: Vector2i) -> Dictionary:
+	var previous: Dictionary = _active_surfaces.get(cell, {}).duplicate()
+	_active_surfaces.erase(cell)
+	_versions.erase(cell)
+	return previous

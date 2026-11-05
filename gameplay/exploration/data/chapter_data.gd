@@ -3,4 +3,5 @@ extends Resource
 @export var regions: Array[ExplorationRegionData] = []
 @export var actions: Array[SkillData] = []
 @export var spell_rules: Array[SpellCombinationRule] = []
+@export var equipment: Array[EquipmentData] = []
 @export var quests: Array[ExplorationQuestData] = []

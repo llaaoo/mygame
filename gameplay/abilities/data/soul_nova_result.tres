@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="SkillData" format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="skill"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/synergies/deep_freeze.tres" id="synergy_deep_freeze"]
+
+[resource]
+script = ExtResource("skill")
+id = "soul_nova"
+display_name = "魂霜震荡"
+combination_only = true
+description = "Shift＋震荡兑现1层蕴魂，在自身周围释放冰霜冲击。冻结水面并减速敌人，用霜盐扩大覆盖。"
+mechanics = "10 MP＋蕴魂1层；半径110；伤害20＋0.6魔法；冰霜命中与世界反应。"
+icon_atlas_index = 4
+skill_type = 2
+tags = ["soul", "ice", "aoe"]
+mp_cost = 10
+cooldown = 2.2
+damage = 20
+damage_scaling = 0.6
+archetype = "persistent_aoe"
+aoe_radius = 110.0
+aoe_lifetime = 0.4
+aoe_scale = 1.4
+aoe_color = Color(0.6, 0.85, 1, 0.7)
+cast_distance = 0.0
+ignites_dry_surface = false
+
+synergies = [ExtResource("synergy_deep_freeze")]

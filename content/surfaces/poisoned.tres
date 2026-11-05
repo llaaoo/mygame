@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="SurfaceDefinition" format=3]
+[ext_resource type="Script" path="res://gameplay/interaction/surface_definition.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "poisoned"
+title = "毒地"
+color = Color(0.4, 0.8, 0.15, 0.45)
+status_paths = ["res://gameplay/abilities/data/poison.tres"]
+cleanse_statuses = []
+refresh_statuses = []
+danger = 0.8
+expiry_state = ""
+expiry_duration = 0.0
+danger_status = "poison"

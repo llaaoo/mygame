@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=4 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="1"]
+[ext_resource type="Script" path="res://gameplay/status/buff.gd" id="2"]
+[sub_resource type="Resource" id="Buff"]
+script = ExtResource("2")
+buff_id = "flow_attunement"
+status_id = "flow_attunement"
+display_name = "流息"
+exclusive_group = "sigil_attunement"
+duration = 8.0
+can_empower = true
+empower_mana_cost = 3
+empower_radius_bonus = 24.0
+empower_surface_radius = 96.0
+damage_taken_multiplier = 0.9
+cleanse_statuses = ["burning"]
+spell_elements = ["water"]
+spell_damage_multiplier = 1.1
+empower_name = "涌流"
+empower_damage_multiplier = 1.4
+empower_surface = "wet"
+empower_surface_duration = 8.0
+[resource]
+script = ExtResource("1")
+id = "flow_attunement"
+display_name = "流息"
+combination_only = true
+description = "8秒内受到伤害减少10%，准备时解除燃烧；水系（含凝霜形态）法术保留伤害+10%。Shift消费：伤害+40%、范围+24，落点铺水，额外3 MP；随后失去减伤。不会让普通水自动冻结。"
+mechanics = "8 MP；持续8秒；与其他凝神恩赐互斥。"
+role = "增益触发"
+icon_atlas_index = 17
+skill_type = 1
+tags = ["buff", "combination"]
+mp_cost = 8
+cooldown = 4.0
+buff_resource = SubResource("Buff")
+buff_duration = 8.0

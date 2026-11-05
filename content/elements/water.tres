@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="ElementDefinition" format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/data/element_definition.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "water"
+title = "水"
+color = Color(0.2, 0.5, 0.9, 1)
+description = "同一个水系具有液态、凝霜与蒸汽变化：液态铺设和清洗介质，凝霜减速与控制，蒸汽提供短暂庇护。水也能导电、受污染；只有清洁水用于洗毒。材料、Buff与装备改变形态和取舍。"
+hit_status_paths = ["res://gameplay/abilities/data/wet.tres"]

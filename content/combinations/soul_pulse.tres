@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="SpellCombinationRule" format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/combinations/spell_combination_rule.gd" id="rule"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/soul_nova_result.tres" id="result"]
+[resource]
+script = ExtResource("rule")
+id = "soul_pulse"
+trigger_action_id = "pulse"
+required_caster_status = "soul_charge"
+consume_caster_status = true
+consume_stacks = 1
+requires_empower = true
+result_skill = ExtResource("result")
+mana_cost = 10
+cooldown = 2.2
+priority = 20

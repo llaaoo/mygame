@@ -6,7 +6,9 @@ func _init(owner_game: MVPGame) -> void:
 	game = owner_game
 
 func _build_camp() -> void:
+	_add_interaction("元素实验：路线与配置记录", Vector2(-260, -240), game.trial_recorder.show_page, "note")
 	_add_interaction("篝火：恢复并保存", Vector2(-150, 50), func(): game._restore_player(); game._save_progress(); game.ui.notify("休整完成，生命和法力已恢复。"))
+	_add_interaction("营地整备台：装备与构筑", Vector2(-260, -140), game.equipment_service.show_equipment, "mechanism")
 	_add_interaction("查阅探索日志", Vector2(150, -180), game.ui.show_journal)
 	_add_interaction("营地训练：分配属性", Vector2(0, -180), game._show_training)
 	_add_interaction("施法工作台：加工材料", Vector2(0, 130), game.workshop.show_crafts, "mechanism")
@@ -55,8 +57,11 @@ func _spawn_enemy(spec: ExplorationEncounterData, layout: RefCounted, index: int
 				break
 	enemy.position = point
 	if not boss:
-		enemy.enemy_type = 2 if game.region_id == "gate" and index == 0 else 0
-		enemy.ai_role = int(spec.role) as Enemy.AIRole
+		enemy.enemy_type = spec.profile.appearance_preset if spec.profile else (2 if game.region_id == "gate" and index == 0 else 0)
+		enemy.ai_role = int(spec.profile.role if spec.profile else spec.role) as Enemy.AIRole
+		if spec.profile:
+			enemy.set_meta("encounter_profile", spec.profile.id)
+			enemy.set_meta("encounter_title", spec.profile.title)
 	if boss:
 		var data := load("res://content/bosses/fire_lord.tres").duplicate(true) as BossData
 		data.resists = {"fire": 0.1 if game.progress.choices.get("waterworks_choice", "") == "cooling" else 0.3}
@@ -71,6 +76,11 @@ func _spawn_enemy(spec: ExplorationEncounterData, layout: RefCounted, index: int
 	enemy.detect_range = 440
 	enemy.move_speed = float(spec.speed)
 	enemy.attack_damage = 9 if not boss else 15
+	if not boss and spec.profile:
+		enemy.attack_damage = spec.profile.melee_damage
+		enemy.attack_cooldown = spec.profile.melee_cooldown
+		enemy.attack_range = spec.profile.attack_range
+		enemy.ranged_preferred_range = spec.profile.ranged_preferred_range
 	enemy.died.connect(game._on_enemy_died.bind(enemy, GameRuntime.instance.get_region_session().generation), CONNECT_ONE_SHOT)
 	game.active_enemies.append(enemy)
 
@@ -91,3 +101,24 @@ func _add_discovery(entry: ExplorationDiscoveryData) -> void:
 		label += "（已记录）"
 	var node := _add_interaction(label, entry.pos, Callable(), entry.kind)
 	node.callback = game.presenter.inspect_discovery.bind(entry, node)
+
+func build_element_objects() -> void:
+	var surfaces := GameRuntime.instance.get_simulation_runtime().get_surface_manager()
+	for patch in game.current_data.surface_patches:
+		surfaces.apply_area(game.region_root.to_global(patch.pos), patch.radius, [], "authored:" + game.region_id, patch.state, patch.duration)
+	for prop in game.current_data.fixed_props:
+		var node := prop.scene.instantiate() as MapObject
+		node.persistent_id = prop.id
+		node.position = prop.pos
+		game.region_root.add_child(node)
+	for spec in game.current_data.valves:
+		var valve := SurfaceValve.new()
+		valve.spec = spec
+		valve.position = spec.pos
+		valve.mode = str(game.progress.choices.get(spec.id, "off"))
+		if valve.mode not in ["off", "a", "b"]: valve.mode = "off"
+		valve.state_changed.connect(func(mode: String):
+			game.progress.choices[spec.id] = mode
+			game._queue_save()
+			game.ui.notify("水路已切换。只补充清洁水，冰、毒、电与火的变化保留；旧水自然消退。"))
+		game.region_root.add_child(valve)

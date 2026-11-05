@@ -63,6 +63,10 @@ func setup(skill: SkillData, caster_node: Node2D) -> void:
 	# 表面交互：AoE 生成 → 设置所在格表面状态
 	# Surface reactions run in _ready at the final world position.
 
+	var marker := get_node_or_null("Sprite2D") as Sprite2D
+	if marker and marker.texture and "placeholders/" in marker.texture.resource_path:
+		marker.hide()
+		SpellVisual.attach(self, skill, "burst", skill.aoe_visual.radius if skill.aoe_visual else skill.aoe_radius, lifetime)
 	_needs_setup = false
 
 
@@ -81,7 +85,7 @@ func _apply_surface(skill: SkillData) -> void:
 	if not sm:
 		return
 	var radius := skill.aoe_visual.radius if skill.aoe_visual else skill.aoe_radius
-	sm.apply_area(global_position, radius, skill.tags, skill.display_name, skill.creates_surface, skill.surface_duration, skill.ignites_dry_surface)
+	sm.apply_area(global_position, radius, skill.tags, skill.display_name, skill.creates_surface, skill.surface_duration, skill.ignites_dry_surface, skill.surface_payload_tags)
 
 
 func _ready() -> void:

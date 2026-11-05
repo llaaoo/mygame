@@ -64,6 +64,21 @@ func dispatch(max_per_tick: int = 16) -> void:
 			_dispatch_one(cmd)
 		processed += 1
 
+func flush_world_facts() -> void:
+	# Saving must include persistent facts without running queued combat/simulation work.
+	var retained: Array[RuntimeCommand] = []
+	var processed := 0
+	while not _queue.is_empty() and processed < MAX_QUEUE_SIZE * 4:
+		var command: RuntimeCommand = _queue.pop_front()
+		if command.scope_id == scope_id:
+			if command.target == RuntimeCommand.Target.WORLD:
+				_dispatch_one(command)
+			else:
+				retained.append(command)
+		processed += 1
+	retained.append_array(_queue)
+	_queue.assign(retained)
+
 func finish_region() -> void:
 	# Keep persistent world facts; discard combat/simulation work owned by the old region.
 	# A destroyed object may enqueue follow-up transient work while recording its state.

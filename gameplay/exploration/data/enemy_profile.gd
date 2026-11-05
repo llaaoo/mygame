@@ -1,0 +1,11 @@
+class_name ExplorationEnemyProfile
+extends Resource
+## Optional ordinary-enemy behavior. HP, speed and position belong to the encounter.
+@export var id: String
+@export var title: String
+@export_enum("哨兵", "士兵", "重兵") var appearance_preset := 0
+@export_enum("近战", "远程", "混合") var role := 0
+@export var melee_damage := 9
+@export var melee_cooldown := 1.0
+@export var attack_range := 55.0
+@export var ranged_preferred_range := 180.0

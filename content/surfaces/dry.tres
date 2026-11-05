@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="SurfaceDefinition" format=3]
+[ext_resource type="Script" path="res://gameplay/interaction/surface_definition.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "dry"
+title = "干地"
+color = Color(0, 0, 0, 0)
+status_paths = []
+cleanse_statuses = []
+refresh_statuses = []
+danger = 0
+expiry_state = ""
+expiry_duration = 0.0

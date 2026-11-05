@@ -11,6 +11,7 @@ signal hand_changed(hand: String)          ## "left" / "right"
 signal slot_changed(slot_index: int)
 signal cooldown_changed(source: String, remaining: float, total: float)
 signal skill_used(source: String, skill: SkillData)
+signal cast_committed(plan: CastPlan)
 signal skill_upgraded(source: String, skill: SkillData, upgrade_id: String, rank: int)
 
 ## ── 核心依赖 ──
@@ -319,8 +320,10 @@ func _execute_with_context(skill: SkillData, source: String, caster: Node2D, ctx
 	if channel_cost >= 0:
 		plan.cost = maxi(0, plan.cost - _get_effective_mana_cost(skill, caster) + channel_cost)
 	plan.actor = caster
+	plan.action = skill
+	plan.source = source
 	_executing = true
-	var transaction := CastTransaction.new(caster, combinations.supplies if combinations else null, 0)
+	var transaction := CastTransaction.new(caster, combinations.supplies if combinations else null, CastTransaction.allocate_id())
 	if not transaction.reserve(plan):
 		transaction.rollback()
 		_executing = false
@@ -349,6 +352,7 @@ func _execute_with_context(skill: SkillData, source: String, caster: Node2D, ctx
 	if channel_cost < 0:
 		cooldown_changed.emit(source, cooldown, cooldown)
 	skill_used.emit(source, plan.skill)
+	cast_committed.emit(plan)
 	return true
 
 

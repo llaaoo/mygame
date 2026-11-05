@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="SpellPuzzleData" format=3]
+[ext_resource type="Script" path="res://gameplay/exploration/data/spell_puzzle_data.gd" id="1"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/spell_puzzle_route.gd" id="route"]
+[sub_resource type="Resource" id="route"]
+script = ExtResource("route")
+required_surface = "electrified"
+hold_seconds = 0.5
+[resource]
+script = ExtResource("1")
+id = "magic.waterworks_conductor"
+title = "水路检修晶闸"
+pos = Vector2(288, 96)
+routes = Array[ExtResource("route")]([SubResource("route")])
+hint = "这里需要实际导电水域保持0.5秒。E操作西侧分流阀接通水路；冰面截断传导，震荡能破冰接回。已启动后永久解锁补给和东北侧独立返营升降机，无需持续供电。也可用自己的水引铺设介质。原有返程不受此机关限制。"
+materials = { "crystal": 3, "storm_dust": 1 }

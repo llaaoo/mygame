@@ -1,6 +1,6 @@
 # 📚 项目文档索引
 
-> 版本: v3.0 | 最后更新: 2026-11-04
+> 版本: v3.0 | 最后更新: 2026-11-05
 
 ---
 
@@ -14,12 +14,20 @@ PROJECT_ANALYSIS.md (完整项目分析 — 架构评估 + 文件功能清单 + 
     ├── REFACTOR_PROGRESS.md (A—D重构验收 — 事务、状态、区域、内容、组件、测试与CI)
     │
     ├── EXPLORATION_COMBINATION_DESIGN.md (当前方向 — 探索与条件组合战斗方案)
+    ├── FIVE_ELEMENT_IMPLEMENTATION.md (当前交付 — 七批实现、实际场景、部分消费、敌人反馈与实验记录)
+    ├── REGION_CONTENT_EXPANSION.md (最新玩法内容 — 三处多解遭遇、永久返营捷径、实地记录与狱中复核委托)
+    ├── SYSTEM_CONTENT_READINESS.md (当前系统检查 — 可扩内容、校验缺口、世界条件、敌人配置与扩充顺序)
+    ├── VISUAL_UI_POLISH.md (画面与反馈 — 元素特效、法阵/恩赐寿命、镜头、技能栏及响应式配置页)
+    ├── FOUR_ELEMENT_ATTUNEMENT.md (最新扩充 — 地面/材料准备、流息与毒契、持续防护与主动消费)
+    ├── ELEMENT_FAMILY_DESIGN.md (最新分类 — 四类基础元素，凝霜并入水系，形态与归属分开)
+    ├── EMERGENT_CASTING_DESIGN.md (元素基线 — 火水雷毒与水系凝霜、法术/Buff/装备交叉、现有介质链与后续顺序)
     ├── CONDITIONAL_COMBAT_TECHNICAL_PLAN.md (技术落地 — 架构能力核对、组件边界与迭代批次)
     ├── FIRE_SIGIL_PROTOTYPE.md (已实现原型 — 火阵＋火花触发火球、试玩和测试)
     ├── BUFF_CASTING_DESIGN.md (恩赐取舍 — 持续收益、资格、保留增益、主动消费与材料联动)
     ├── OUTWARD_INTERACTION_REVIEW.md (当前迭代准则 — 复用工具、空间条件、用途转换与世界反馈)
     ├── CASTING_MATERIALS_DESIGN.md (当前实装 — 法术联动、施法材料、营地加工与世界机关)
-    ├── MVP_RELEASE.md (当前可运行版本 — 九区域、15法术组合规则、回响与毒性、七种材料、营地委托、世界交互与验证)
+    ├── SPELL_BUFF_EQUIPMENT_ITERATION.md (当前联动扩充 — 残魂、层数Buff、净化、固定构筑装备)
+    ├── MVP_RELEASE.md (当前可运行版本 — 九区域、24法术组合规则、回响与毒性、七种材料、营地委托、世界交互与验证)
     ├── ROGUELITE_PIVOT_PLAN.md (历史方向 — roguelite 转型与试验场参考)
     ├── MAP_GENERATION.md (地图生成 — seed、模板、布局约束与扩展方式)
     │
@@ -38,13 +46,43 @@ PROJECT_ANALYSIS.md (完整项目分析 — 架构评估 + 文件功能清单 + 
 
 > 当前设计重点：探索获得知识、法术组合规则、技能与装备；自由搭配；世界反馈；优先完善条件组合。后续玩法规划先阅读 `EXPLORATION_COMBINATION_DESIGN.md`。该文档包含已落地的MVP方向与后续产品规划；实现范围见MVP_RELEASE，当前架构以ARCHITECTURE和REFACTOR_PROGRESS为准。旧房间制roguelite保留作战斗试验场。
 
-> 当前开发优先级：先跑通技能与条件组合的公共流程，再扩展素材、生存制造和装备。素材首版现已实装，范围与后续扩展见 `CASTING_MATERIALS_DESIGN.md`。
+> 当前开发顺序：技能用途与世界条件 → Buff层数、防护与兑现 → 装备构筑。魂术、层数消费、净化/保护、4件固定装备已接通，详见`SPELL_BUFF_EQUIPMENT_ITERATION.md`；生存指标与完整装备经济仍属后续产品范围。
 
 > 默认入口已更新为 `mvp.tscn`，当前交付范围与验证边界见 `MVP_RELEASE.md`；旧 `main.tscn` 保留为回归场景。启动与操作见根目录 README。
 
 ---
 
 ## 文档概要
+
+### [ELEMENT_FAMILY_DESIGN.md](./ELEMENT_FAMILY_DESIGN.md)
+
+最新元素分类：水、凝霜归入同一水系，四类基础元素；解释形态差异、兼容迁移及后续内容原则。
+
+---
+
+### [FIVE_ELEMENT_IMPLEMENTATION.md](./FIVE_ELEMENT_IMPLEMENTATION.md)
+
+元素构筑试玩当前交付，包含七批实现、能力审计、操作路线、恩赐取舍、阀门与实际地面条件、敌人局部移动、配置记录和验证边界。
+
+---
+
+### [EMERGENT_CASTING_DESIGN.md](./EMERGENT_CASTING_DESIGN.md)
+
+先锚定火、水、雷、毒四类基础元素，凝霜并入水系；以法术形式、Buff保留/消费、材料、装备条件与环境组成可推导的玩法。列清现有水引介质链、后续候选、实施顺序和验收标准。
+
+---
+
+### [EXISTING_SPELL_INTERACTION_PLAN.md](./EXISTING_SPELL_INTERACTION_PLAN.md)
+
+当前优先：深化现有工具的多用途、条件连锁与操作空间；基础火花性质复用、震荡碎冰、定点水引/树脂/毒雾、可复用环境规则与验证。
+
+---
+
+### [SPELL_BUFF_EQUIPMENT_ITERATION.md](./SPELL_BUFF_EQUIPMENT_ITERATION.md)
+
+2026-11-05技能→Buff→装备联动：残魂条件、蕴魂分层兑现、净化与防护、固定构筑装备、实际玩法和验证边界。
+
+---
 
 ### [CODE_REVIEW_2026_11_04.md](./CODE_REVIEW_2026_11_04.md)
 
@@ -215,6 +253,7 @@ A—D批次实现与验收，包含施法/状态事务、命中结果、周期�
 |---------|--------|
 | 了解项目全貌 | PROJECT_ANALYSIS.md |
 | 了解当前产品方向与条件组合方案 | EXPLORATION_COMBINATION_DESIGN.md |
+| 用现有法术、材料、环境和装备形成可推导的变化 | [EMERGENT_CASTING_DESIGN.md](./EMERGENT_CASTING_DESIGN.md) |
 | 运行当前 MVP、了解已实现内容与验证边界 | MVP_RELEASE.md |
 | 判断架构是否满足新方案、安排技术迭代 | CONDITIONAL_COMBAT_TECHNICAL_PLAN.md |
 | 试玩/验证已经实现的火阵组合 | FIRE_SIGIL_PROTOTYPE.md |

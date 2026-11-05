@@ -4,7 +4,7 @@
 script = ExtResource("1")
 id = "echo_ink"
 title = "回响墨"
-description = "回响铭印的必需媒介；也可让回响三重矢每发穿透1个目标，额外3 MP。"
-result_ids = PackedStringArray("echo_barrage")
+description = "回响铭印的必需媒介；也可让回响三重矢每发或魂焰矢额外穿透1个目标，额外3 MP。"
+result_ids = PackedStringArray("echo_barrage", "soul_lance")
 extra_mana = 3
 pierce_bonus = 1
