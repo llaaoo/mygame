@@ -19,16 +19,25 @@ func _invalid(chapter: ExplorationChapterData, fragment: String) -> void:
 func _run() -> void:
 	_check(ExplorationContentValidator.new().validate(ExplorationContentCatalog.new()).is_empty(), "Current content is invalid")
 	var chapter := _chapter()
-	chapter.quests.back().approaches[0].required_attributes = {"missing_attribute": 14}
+	chapter.regions[0].facilities[0].required_claims.append("missing_repair_claim")
+	_invalid(chapter, "unknown facility prerequisite")
+	chapter = _chapter()
+	chapter.regions[0].facilities[0].assembly = null
+	_invalid(chapter, "Missing content resource reference")
+	chapter = _chapter()
+	chapter.regions[4].surface_patches[0].disabled_by_claim = "missing_pump_claim"
+	_invalid(chapter, "disabled_by_claim: unknown")
+	chapter = _chapter()
+	chapter.quests[3].approaches[0].required_attributes = {"missing_attribute": 14}
 	_invalid(chapter, "Invalid quest attribute requirements")
 	chapter = _chapter()
-	chapter.quests.back().approaches[0].required_clears.append("missing_approach_region")
+	chapter.quests[3].approaches[0].required_clears.append("missing_approach_region")
 	_invalid(chapter, "Missing approach region")
 	chapter = _chapter()
-	chapter.quests.back().approaches[0].required_claims.append("missing_approach_claim")
+	chapter.quests[3].approaches[0].required_claims.append("missing_approach_claim")
 	_invalid(chapter, "Missing approach discovery")
 	chapter = _chapter()
-	chapter.quests.back().approaches.append(null)
+	chapter.quests[3].approaches.append(null)
 	_invalid(chapter, "Missing content resource reference")
 	chapter = _chapter()
 	for region in chapter.regions:

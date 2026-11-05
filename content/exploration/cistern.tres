@@ -25,6 +25,8 @@
 
 [ext_resource type="Resource" path="res://content/exploration/enemies/sentry.tres" id="profile_sentry"]
 
+[ext_resource type="Resource" path="res://content/exploration/alchemy/regulator.tres" id="alchemy_regulator"]
+
 [sub_resource type="Resource" id="Resource_p7lin"]
 script = ExtResource("1_dhw8p")
 id = "nova_knowledge"
@@ -110,4 +112,4 @@ discoveries = Array[ExtResource("1_dhw8p")]([SubResource("Resource_p7lin"), SubR
 events = Array[ExtResource("3_kpavw")]([SubResource("Resource_gvyst")])
 exits = Array[ExtResource("5_ujenr")]([SubResource("Resource_y5ea2"), ExtResource("field_return")])
 valves = Array[ExtResource("exp_type_valves")]([ExtResource("exp_cistern_valve")])
-spell_objects = Array[ExtResource("exp_type_spell_objects")]([ExtResource("exp_cistern_conductor")])
+spell_objects = Array[ExtResource("exp_type_spell_objects")]([ExtResource("exp_cistern_conductor"), ExtResource("alchemy_regulator")])

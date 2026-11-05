@@ -29,6 +29,7 @@ var knowledge: ElementKnowledge
 var trial_recorder: ElementTrialRecorder
 var workshop: CastingWorkshop
 var field_sites: FieldWorkSites
+var alchemy: AlchemyRepairService
 var _generator := RunRoomGenerator.new()
 var _renderer := PrisonArena.new()
 
@@ -77,6 +78,7 @@ func _bootstrap() -> void:
 	ui.equipment_requested.connect(equipment_service.show_equipment)
 	workshop = CastingWorkshop.new(self)
 	field_sites = FieldWorkSites.new(self)
+	alchemy = AlchemyRepairService.new(self)
 	ui.materials_requested.connect(workshop.show_materials)
 	knowledge = ElementKnowledge.new()
 	knowledge.game = self
@@ -259,6 +261,7 @@ func reload_progress() -> void:
 
 func _on_spell_object_solved(spec: SpellPuzzleData) -> void:
 	if progress.claims.has(spec.id):
+		alchemy.on_opened(spec)
 		if not spec.work_methods.is_empty():
 			player.field_work.cancel("设备已解封")
 			player.field_work.close_panel()

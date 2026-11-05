@@ -1,11 +1,14 @@
 [gd_resource type="Resource" script_class="ExplorationRegionData" format=3]
 
+
 [ext_resource type="Script" path="res://gameplay/exploration/data/discovery_data.gd" id="1_lptr4"]
 [ext_resource type="Script" path="res://gameplay/exploration/data/encounter_data.gd" id="2_0svwp"]
 [ext_resource type="Script" path="res://gameplay/exploration/data/world_event_data.gd" id="3_baqav"]
 [ext_resource type="Script" path="res://gameplay/exploration/data/exit_data.gd" id="4_u8pbx"]
 [ext_resource type="Script" path="res://gameplay/exploration/exploration_region_data.gd" id="5_7q8r2"]
 [ext_resource type="Script" path="res://gameplay/exploration/data/spell_puzzle_data.gd" id="6_pl5kx"]
+[ext_resource type="Resource" path="res://content/exploration/alchemy/facility.tres" id="alchemy_facility"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/repair_facility_data.gd" id="facility_type"]
 
 [sub_resource type="Resource" id="Resource_frse3"]
 script = ExtResource("1_lptr4")
@@ -40,6 +43,7 @@ target = "yard"
 title = "进入监狱外院"
 pos = Vector2(480, 0)
 
+
 [resource]
 script = ExtResource("5_7q8r2")
 id = "camp"
@@ -48,3 +52,4 @@ description = "阅读路标后出发。鼠标左键近战，右键火花，空�
 seed = 20261104
 discoveries = Array[ExtResource("1_lptr4")]([SubResource("Resource_frse3"), SubResource("Resource_yc7l5")])
 exits = Array[ExtResource("4_u8pbx")]([SubResource("Resource_hd2lk")])
+facilities = Array[ExtResource("facility_type")]([ExtResource("alchemy_facility")])

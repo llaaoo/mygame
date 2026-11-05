@@ -6,3 +6,4 @@ pos = Vector2(96, 32)
 state = "poisoned"
 radius = 64.0
 duration = 60.0
+disabled_by_claim = "alchemy.pump_open"

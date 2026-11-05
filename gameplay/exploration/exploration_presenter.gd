@@ -131,6 +131,7 @@ func journal_text() -> String:
 		for exit in region.exits:
 			if exit.target == "camp" and not exit.required_claims.is_empty():
 				text += region.title + " · " + exit.title + ("：已开启，营地可直达返场\n" if exit.claims_satisfied(game.progress) else "：待解开对应机关\n" + exit.locked_message + "\n")
+	text += "\n" + game.alchemy.status_text() + "\n"
 	text += "\n本区试战\n在已清理区域按Esc，可单独重试当地敌人。耗材照常消耗，击杀无经验、掉落或残魂；知识、机关、委托和其他区域进度保持。\n"
 	text += "\n保留与兑现\n普通施法保留恩赐；Shift请求消费适配恩赐，形态与总成本见技能槽预览。节律护手可改为部分消费：保留当前剩余时长50%，较弱伤害倍率，每份另加3 MP。蕴魂、回响和护盾不受部分消费影响。\n"
 	text += "\n营地委托（回营地交付）\n"

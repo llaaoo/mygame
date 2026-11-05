@@ -6,6 +6,8 @@ func _init(owner_game: MVPGame) -> void:
 	game = owner_game
 
 func _build_camp() -> void:
+	for facility in game.current_data.facilities:
+		game.alchemy.mount(facility)
 	_add_interaction("元素实验：路线与配置记录", Vector2(-260, -240), game.trial_recorder.show_page, "note")
 	_add_interaction("篝火：恢复并保存", Vector2(-150, 50), func(): game._restore_player(); game._save_progress(); game.ui.notify("休整完成，生命和法力已恢复。"))
 	_add_interaction("营地整备台：装备与构筑", Vector2(-260, -140), game.equipment_service.show_equipment, "mechanism")
@@ -112,6 +114,7 @@ func _add_discovery(entry: ExplorationDiscoveryData) -> void:
 func build_element_objects() -> void:
 	var surfaces := GameRuntime.instance.get_simulation_runtime().get_surface_manager()
 	for patch in game.current_data.surface_patches:
+		if not patch.disabled_by_claim.is_empty() and game.progress.claims.has(patch.disabled_by_claim): continue
 		surfaces.apply_area(game.region_root.to_global(patch.pos), patch.radius, [], "authored:" + game.region_id, patch.state, patch.duration)
 	for prop in game.current_data.fixed_props:
 		var node := prop.scene.instantiate() as MapObject

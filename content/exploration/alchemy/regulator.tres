@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="SpellPuzzleData" format=3]
+[ext_resource type="Script" path="res://gameplay/exploration/data/spell_puzzle_data.gd" id="1"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/spell_puzzle_route.gd" id="2"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/field_work_method.gd" id="3"]
+[sub_resource type="Resource" id="calibrate"]
+script = ExtResource("3")
+id = "calibrate"
+title = "校准调压芯（智力14）"
+required_attributes = {"intelligence": 14}
+duration = 2.5
+[sub_resource type="Resource" id="patch"]
+script = ExtResource("3")
+id = "patch"
+title = "材料密封修补"
+material_costs = {"resin": 1, "crystal": 2}
+duration = 1.5
+[sub_resource type="Resource" id="steam"]
+script = ExtResource("2")
+id = "steam"
+required_surface = "steam"
+hold_seconds = 0.5
+[resource]
+script = ExtResource("1")
+id = "alchemy.regulator_open"
+title = "失稳的旧调压器"
+pos = Vector2(160, -224)
+required_claims = PackedStringArray("alchemy.schematic")
+pickup_claim = "alchemy.regulator_taken"
+pickup_title = "调压器"
+work_methods = Array[ExtResource("3")]([SubResource("calibrate"), SubResource("patch")])
+routes = Array[ExtResource("2")]([SubResource("steam")])
+hint = "需图纸。智力14站定2.5秒，或树脂制剂1＋晶砂2站定1.5秒；也可用水引与火花使本格实际蒸汽保持0.5秒。仅命中标签无效。首次开封泄出6秒蒸汽，能减轻投射物直击；随后E取件。"
+completion_text = "调压器已解封：泄压形成6秒蒸汽。靠近E取调压器；回访与取件不重复泄压。"

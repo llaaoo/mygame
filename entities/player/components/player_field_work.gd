@@ -116,7 +116,7 @@ func tick(delta: float) -> void:
 			cancel("操作条件已失效，未扣材料")
 		else:
 			pending.remaining -= delta
-			if pending.remaining <= 0: _commit()
+			if pending.remaining <= 0.000001: _commit()
 	_refresh -= delta
 	if _refresh <= 0:
 		_refresh = .1
