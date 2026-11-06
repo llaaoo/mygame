@@ -113,7 +113,7 @@ func _bootstrap() -> void:
 	ui.pause_provider = show_valley_pause
 	ui.map_provider = show_map
 func show_valley_pause() -> void:
-	ui.show_panel("灰河谷 · 暂停","野外连续行走，遗迹沿实际入口往返。G只记录亲自到过的地点。\n\n撤回镇中需现场站定3秒，移动、攻击、施法或受伤打断；不治疗、不补货。F5保存当前地点与进度，F9读取。已击败敌人和永久成果保留。",[{"title":"继续旅程","callback":ui.close_modal},{"title":"查看行路图","callback":show_map},{"title":"现场撤回河谷镇","disabled":is_at_base(),"callback":retreat.begin},{"title":"重试遗迹（无击杀奖励）","disabled":not can_practice(),"callback":progress_service.practice_encounters},{"title":"重置河谷遭遇（无击杀奖励）","callback":replay_encounters}])
+	ui.show_panel("灰河谷 · 暂停","野外连续行走，遗迹沿实际入口往返。G只记录亲自到过的地点。\n\n撤回镇中需现场站定3秒，移动、攻击、施法或受伤打断；不治疗、不补货。F5保存当前地点与进度，F9读取。已击败敌人和永久成果保留。",[{"title":"继续旅程","callback":ui.close_modal},{"title":"查看行路图","callback":show_map},{"title":"现场撤回河谷镇","disabled":is_at_base(),"callback":retreat.begin},{"title":"重试遗迹（无击杀奖励）","disabled":not can_practice(),"callback":progress_service.practice_encounters},{"title":"重置河谷遭遇（无击杀奖励）","callback":replay_encounters},{"title":"旧监狱验证场（独立存档）","callback":open_prototype}])
 func replay_encounters() -> void:
 	if trial_recorder.active: trial_recorder.finish("重置河谷遭遇")
 	ui.close_modal()
@@ -132,3 +132,8 @@ func knowledge_changed() -> void:
 		for note in region.discoveries:
 			if progress.claims.has(note.id):
 				for id in note.get_meta("crafting_recipes",[]):supplies.known_recipes[id]=true
+
+func open_prototype() -> void:
+	_save_progress()
+	ui.close_modal()
+	get_tree().change_scene_to_file("res://mvp.tscn")

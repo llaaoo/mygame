@@ -1,6 +1,6 @@
 # 📚 项目文档索引
 
-> 版本: v3.0 | 最后更新: 2026-11-05
+> 版本: v3.1 | 最后更新: 2026-11-06
 
 ---
 
@@ -53,7 +53,7 @@ PROJECT_ANALYSIS.md (完整项目分析 — 架构评估 + 文件功能清单 + 
 
 > 当前开发顺序：技能用途与世界条件 → Buff层数、防护与兑现 → 装备构筑。魂术、层数消费、净化/保护、4件固定装备已接通，详见`SPELL_BUFF_EQUIPMENT_ITERATION.md`；生存指标与完整装备经济仍属后续产品范围。
 
-> 默认入口已更新为 `mvp.tscn`，当前交付范围与验证边界见 `MVP_RELEASE.md`；旧 `main.tscn` 保留为回归场景。启动与操作见根目录 README。
+> 默认入口已更新为 `grayriver.tscn`（灰河谷），原 `mvp.tscn` 保留为监狱验证场；灰河谷交付与验证边界见 `GRAYRIVER_FRONTIER.md`、`GRAYRIVER_PLAYTEST.md`，原验证场见 `MVP_RELEASE.md`；旧 `main.tscn` 保留为回归场景。启动与操作见根目录 README。
 
 ---
 
@@ -314,3 +314,6 @@ A—D批次实现与验收，包含施法/状态事务、命中结果、周期�
 - [现场组合五轮迭代](FIELD_COMBINATION_ITERATION.md)
 - [本地试玩与操作](LOCAL_PLAYTEST.md)
 - [首章实际试玩记录](FIELD_CHAPTER_PLAYTEST.md)
+
+- [灰河谷：地区设计与建设](GRAYRIVER_FRONTIER.md)
+- [灰河谷：正常角色试玩与交付边界](GRAYRIVER_PLAYTEST.md)
