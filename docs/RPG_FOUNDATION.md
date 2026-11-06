@@ -87,3 +87,10 @@ V 格挡要求实际持有武器或盾、检查正面方向、消耗体力；盾
 
 ![体力、稳定与负重](playtests/rpg_foundation_hud.png)
 ![口袋与背包](playtests/rpg_foundation_inventory.png)
+
+## 本轮验证结果
+
+- 基座提交 `488864e6af2202d580c2c788fd6d19cf8c67910b`：从 `git archive` 导出的源码创建空缓存目录，Godot 4.6.3 首次导入通过，完整回归 **62/62** 通过。对应云日志目录 `/tmp/mygame-tests-a3p69ebt`；工作区完整回归也为62/62。
+- 方向锁定修正提交 `8c449b53aabbad094d5df28fdddcd590aaaeb388`：再次从提交归档、空缓存导入，inventory/combat/systems/startup **4/4** 通过，覆盖未按格挡轮询不改变攻击/翻滚方向；日志 `/tmp/mygame-tests-jega5t2p`。
+- 同一修正提交的归档源码在正常模拟与 AI 开启的图形环境运行 `capture_rpg_foundation.gd` 通过：实际移动/重击输入、体力扣除和敌人响应均通过断言。界面检查包括小窗口装备与设置、真实鼠标启动作业；已修复体力标签挤压。
+- `git diff --check` 通过。云端验证完成；仓库未加入或启用 GitHub Actions 工作流。未生成新的桌面发布包。
