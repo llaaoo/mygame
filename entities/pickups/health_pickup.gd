@@ -8,4 +8,4 @@ extends Pickup
 
 func _on_collected(player: Player) -> void:
 	if player.has_method("heal"):
-		player.heal(heal_amount)
+		player.heal(heal_amount, "drop")

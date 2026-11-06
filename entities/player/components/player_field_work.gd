@@ -2,6 +2,8 @@ class_name PlayerFieldWork
 extends Node
 signal feedback_requested(message: String)
 signal work_committed(method: FieldWorkMethod)
+signal work_started(method: FieldWorkMethod)
+signal work_cancelled(method: FieldWorkMethod, reason: String)
 const RANGE := 80.0
 var player: Player
 var panel: FieldWorkPanel
@@ -93,6 +95,7 @@ func start_selected() -> bool:
 	var equipment := player.get_node("EquipmentManager") as EquipmentManager
 	pending = {"method": method, "fingerprint": method.fingerprint(), "remaining": method.duration, "duration": method.duration, "position": player.global_position, "attributes": player.stats_component.primary_values(), "equipment": equipment.loadout_revision}
 	player.state_machine.transition_to("work")
+	work_started.emit(method)
 	_refresh_panel()
 	return true
 
@@ -131,11 +134,15 @@ func _commit() -> void:
 	_to_idle()
 	close_panel()
 	if accepted: work_committed.emit(method)
-	else: feedback_requested.emit("操作条件已失效，未扣材料")
+	else:
+		work_cancelled.emit(method, "操作条件失效")
+		feedback_requested.emit("操作条件已失效，未扣材料")
 
 func cancel(reason: String = "作业取消", change_state := true) -> void:
 	if pending.is_empty(): return
+	var method: FieldWorkMethod = pending.method
 	pending = {}
+	work_cancelled.emit(method, reason)
 	if change_state: _to_idle()
 	feedback_requested.emit(reason)
 

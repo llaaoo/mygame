@@ -8,7 +8,10 @@ extends Node
 @export var mp_regen_delay: float = 2.0       ## 施法后延迟（秒）才开始回复
 var regen_multiplier := 1.0
 var regen_bonus := 0.0
+var regen_bonus_sources: Dictionary = {}
+var _recovery_events: Array = []
 
+signal recovered(actual: float, source: String)
 signal mp_changed(current_mp: int, max_mp: int)
 
 var mp: int = 50
@@ -39,7 +42,9 @@ func tick(delta: float) -> void:
 		var amt := int(_regen_accumulator)
 		if amt > 0:
 			_regen_accumulator -= amt
-			mp = mini(max_mp, mp + amt)
+			var actual := mini(max_mp - mp, amt)
+			mp += actual
+			RecoveryAccounting.regeneration(recovered, actual, mp_regen_rate, regen_bonus_sources)
 			notify_changed()
 
 
@@ -57,8 +62,12 @@ func use_mp(amount: int) -> bool:
 
 
 ## 回复 MP（药水/Buff 等调用）
-func restore_mp(amount: int) -> void:
-	mp = mini(max_mp, mp + amount)
+func restore_mp(amount: int, source := "skill") -> void:
+	var actual := mini(max_mp - mp, maxi(0, amount))
+	mp += actual
+	if actual > 0:
+		if _transaction.is_empty(): recovered.emit(float(actual), source)
+		else: _recovery_events.append({"actual": actual, "source": source})
 	notify_changed()
 
 func notify_changed() -> void:
@@ -67,6 +76,7 @@ func notify_changed() -> void:
 
 func begin_transaction() -> void:
 	assert(_transaction.is_empty())
+	_recovery_events.clear()
 	_transaction = {"mp": mp, "max_mp": max_mp, "time": _time_since_use, "accumulator": _regen_accumulator}
 
 func finish_transaction(commit: bool) -> Callable:
@@ -79,4 +89,9 @@ func finish_transaction(commit: bool) -> Callable:
 		_time_since_use = _transaction.time
 		_regen_accumulator = _transaction.accumulator
 	_transaction.clear()
-	return notify_changed if commit and changed else Callable()
+	var events := _recovery_events.duplicate()
+	_recovery_events.clear()
+	if not commit: return Callable()
+	return func():
+		if changed: notify_changed()
+		for event in events: recovered.emit(float(event.actual), event.source)

@@ -11,6 +11,12 @@ func _ready() -> void:
 	game.player.skill_manager.cast_committed.connect(_on_cast)
 	game.player.combat_component.melee_started.connect(_on_melee)
 	game.player.field_work.work_committed.connect(_on_work)
+	game.player.field_work.work_started.connect(_on_work_started)
+	game.player.field_work.work_cancelled.connect(_on_work_cancelled)
+	game.player.health_component.recovered.connect(_on_recovery.bind("hp"))
+	game.player.mana_component.recovered.connect(_on_recovery.bind("mp"))
+	SurfaceManager.instance.reaction_occurred.connect(_on_surface)
+	(game.player.get_node("SkillSynergyResolver") as SkillSynergyResolver).reaction_observed.connect(_on_hit_reaction)
 	CombatExecutor.instance.damage_applied.connect(_on_damage)
 	game.region_changed.connect(_on_region)
 
@@ -21,12 +27,12 @@ func _snapshot() -> Dictionary:
 	ids.sort()
 	var stats: Dictionary = {}
 	for key in Buff.PRIMARY_STATS: stats[key] = game.player.stats_component.get(key)
-	return {"stats": stats, "max_hp": game.player.health_component.max_hp, "max_mp": game.player.mana_component.max_mp, "equipment": ids, "loadout": game.player.skill_manager.serialize_skill_state(), "supplies": game.player.skill_manager.combinations.supplies.serialize(), "survival": game.survival.serialize()}
+	return {"stats": stats, "max_hp": game.player.health_component.max_hp, "max_mp": game.player.mana_component.max_mp, "equipment": ids, "loadout": game.player.skill_manager.serialize_skill_state(), "supplies": game.player.skill_manager.combinations.supplies.serialize(), "survival": game.survival.serialize(), "world_choices": game.progress.choices.duplicate()}
 
 func start(label: String) -> bool:
 	if active or label not in LABELS: return false
 	_started = GameRuntime.instance.get_simulation_runtime().elapsed_time
-	run = {"label": label, "seconds": 0.0, "casts": 0, "melee": 0, "damage_dealt": 0, "damage_taken": 0, "mana_spent": 0, "materials": {}, "regions": [game.region_id], "initial": _snapshot(), "final": {}, "result": "进行中"}
+	run = {"recovery": {"hp": {}, "mp": {}}, "work_attempts": {}, "work_interruptions": {}, "cast_steps": [], "surface_steps": [], "label": label, "seconds": 0.0, "casts": 0, "melee": 0, "damage_dealt": 0, "damage_taken": 0, "mana_spent": 0, "materials": {}, "regions": [game.region_id], "initial": _snapshot(), "final": {}, "result": "进行中"}
 	active = true
 	game.ui.close_modal()
 	game.ui.notify("开始记录：" + label + "。按自己的配置探索；J可结束记录。按实际配置和补给计量。")
@@ -45,10 +51,30 @@ func finish(result: String = "手动结束") -> Dictionary:
 
 func _on_cast(plan: CastPlan) -> void:
 	if not active: return
+	if run.cast_steps.size() < 128:
+		var explanation: Array[String] = []
+		for step in plan.explanation: explanation.append(step.text)
+		run.cast_steps.append({"action": plan.action.get_id(), "result": plan.effect_label, "explanation": explanation})
 	run.casts += 1
 	run.mana_spent += plan.cost
 	for id in plan.material_costs:
 		run.materials[id] = int(run.materials.get(id, 0)) + int(plan.material_costs[id])
+
+func _on_recovery(amount: float, source: String, resource: String) -> void:
+	if active and amount > 0:
+		run.recovery[resource][source] = float(run.recovery[resource].get(source, 0)) + amount
+
+func _on_work_started(method: FieldWorkMethod) -> void:
+	if active: run.work_attempts[method.id] = int(run.work_attempts.get(method.id, 0)) + 1
+
+func _on_work_cancelled(method: FieldWorkMethod, _reason: String) -> void:
+	if active: run.work_interruptions[method.id] = int(run.work_interruptions.get(method.id, 0)) + 1
+
+func _on_surface(id: String, cell: Vector2i, source: String) -> void:
+	if active and run.surface_steps.size() < 128: run.surface_steps.append({"reaction": id, "cell": [cell.x, cell.y], "source": source})
+
+func _on_hit_reaction(id: String, point: Vector2) -> void:
+	if active and run.surface_steps.size() < 128: run.surface_steps.append({"reaction": "hit:" + id, "position": [point.x, point.y], "source": "实际命中反应"})
 
 func _on_melee() -> void:
 	if active: run.melee += 1
@@ -88,6 +114,7 @@ func show_page() -> void:
 		for id in entry.initial.get("equipment", []):
 			equipment_titles.append(game.catalog.equipment[id].display_name if game.catalog.equipment.has(id) else "其他装备")
 		text += "\n%s · %.1f秒 · %s\n施法%d / 近战%d / 作业%d · 造成%d / 受伤%d · MP%d\n材料：%s\n路线：%s\n起始装备：%s\n" % [entry.label, entry.seconds, entry.result, entry.casts, entry.melee, entry.get("work_actions", 0), entry.damage_dealt, entry.damage_taken, entry.mana_spent, _material_text(entry.materials), "→".join(region_titles), "、".join(equipment_titles) if not equipment_titles.is_empty() else "无"]
+		text += "实际恢复（按来源）：" + JSON.stringify(entry.get("recovery", {})) + "\n作业尝试/中断：" + JSON.stringify(entry.get("work_attempts", {})) + " / " + JSON.stringify(entry.get("work_interruptions", {})) + "\n"
 		var stats: Dictionary = entry.initial.get("stats", {})
 		text += "起始上限：生命%d / 法力%d；力%d 智%d 敏%d 耐%d\n起始材料：%s\n" % [entry.initial.get("max_hp", 0), entry.initial.get("max_mp", 0), stats.get("strength", 0), stats.get("intelligence", 0), stats.get("agility", 0), stats.get("endurance", 0), _material_text(entry.initial.get("supplies", {}).get("amounts", {}))]
 		if entry.initial != entry.final: text += "过程中配置或库存发生变化，起止状态均已记录。\n"

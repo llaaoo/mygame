@@ -207,8 +207,8 @@ func _on_mp_changed(current_mp: int, max_mp: int) -> void:
 func use_mp(amount: int) -> bool:
 	return mana_component.use_mp(amount)
 
-func restore_mp(amount: int) -> void:
-	mana_component.restore_mp(amount)
+func restore_mp(amount: int, source := "skill") -> void:
+	mana_component.restore_mp(amount, source)
 
 ## ── 技能初始化 ──
 
@@ -406,10 +406,10 @@ func take_damage(amount: int) -> void:
 	var reduction := clampf(equipment.get_modifier_value("damage_reduction"), 0.0, 0.75) if equipment else 0.0
 	health_component.take_damage(maxi(1, int(round(amount * (1.0 - reduction)))))
 
-func heal(amount: int) -> void:
+func heal(amount: int, source := "skill") -> void:
 	var equipment := get_node_or_null("EquipmentManager") as EquipmentManager
 	var multiplier := 1.0 + (equipment.get_modifier_value("healing_received") if equipment else 0.0)
-	health_component.heal(maxi(0, int(round(amount * multiplier))))
+	health_component.heal(maxi(0, int(round(amount * multiplier))), source)
 
 func cancel_region_actions() -> void:
 	skill_manager.combinations.supplies.clear_selection()

@@ -7,4 +7,4 @@ extends Pickup
 
 func _on_collected(player: Player) -> void:
 	if player.has_method("restore_mp"):
-		player.restore_mp(mana_amount)
+		player.restore_mp(mana_amount, "drop")
