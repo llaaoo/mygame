@@ -5,6 +5,10 @@ extends Resource
 @export var title: String
 @export_multiline var description: String
 @export var room_type: String = "barracks"
+@export var open_field := false
+@export var authored_size := Vector2.ZERO
+@export var authored_entry := Vector2.ZERO
+@export var authored_obstacles: Array[Dictionary] = []
 @export var seed: int = 1
 @export var encounters: Array[ExplorationEncounterData] = []
 @export var discoveries: Array[ExplorationDiscoveryData] = []
@@ -63,3 +67,16 @@ func _patch_points(patch: SurfacePatchData) -> Array[Resource]:
 			point.pos = patch.pos + offset
 			result.append(point)
 	return result
+
+func make_layout() -> RunRoomLayout:
+	if authored_size == Vector2.ZERO:
+		return RunRoomGenerator.new().generate_room(seed, 0, room_type)
+	var layout := RunRoomLayout.new()
+	layout.seed = seed
+	layout.room_type = room_type
+	layout.arena_size = authored_size
+	layout.entry_offset = authored_entry
+	layout.exit_offset = Vector2(authored_size.x * .5 - 60, 0)
+	layout.obstacles.assign(authored_obstacles.duplicate(true))
+	for encounter in encounters: layout.enemy_offsets.append(encounter.pos)
+	return layout

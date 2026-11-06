@@ -37,7 +37,7 @@ func sync() -> void:
 			game.progress.equipment_loadout[str(item.slot_type)] = item.id
 
 func equip(id: String) -> bool:
-	if game.region_id != "camp" or not game.progress.equipment_owned.get(id, false) or not game.catalog.equipment.has(id):
+	if not game.is_at_base() or not game.progress.equipment_owned.get(id, false) or not game.catalog.equipment.has(id):
 		return false
 	if not _manager().equip(game.catalog.equipment[id]):
 		return false
@@ -46,7 +46,7 @@ func equip(id: String) -> bool:
 	return true
 
 func unequip(slot: int) -> bool:
-	if game.region_id != "camp" or not _manager().unequip(slot):
+	if not game.is_at_base() or not _manager().unequip(slot):
 		return false
 	_reconcile_inventory()
 	game._save_progress()
@@ -89,7 +89,7 @@ func show_detail(id: String) -> void:
 	var text := "%s · %s\n%s\n\n当前同槽：%s\n%s" % [item.display_name, EquipmentManager.slot_name(item.slot_type), item.description, current.display_name if current else "空", build_summary()]
 	text += "\n装备后预计\n" + build_summary(item)
 	var active := current == item
-	var buttons: Array[Dictionary] = [{"title": "卸下" if active else "装备", "disabled": game.region_id != "camp" or not game.progress.equipment_owned.get(id, false), "callback": _change.bind(id, active)}, {"title": "返回装备总览", "callback": show_equipment}]
+	var buttons: Array[Dictionary] = [{"title": "卸下" if active else "装备", "disabled": not game.is_at_base() or not game.progress.equipment_owned.get(id, false), "callback": _change.bind(id, active)}, {"title": "返回装备总览", "callback": show_equipment}]
 	game.ui.show_panel(item.display_name, text, buttons)
 
 func _change(id: String, active: bool) -> void:

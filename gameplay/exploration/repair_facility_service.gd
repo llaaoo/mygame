@@ -35,9 +35,8 @@ func _reason(method: FieldWorkMethod, node: ExplorationInteractable, spec: Repai
 	if not _valid(node, spec) or method != spec.assembly: return "设施已不可用"
 	if game.progress.claims.has(spec.id): return "设施已修复"
 	if spec.requires_clear:
-		if not game.progress.cleared.has(game.region_id): return "先清理本区，再建设前哨"
-		for enemy in game.active_enemies:
-			if is_instance_valid(enemy) and not enemy.health_component.is_dead: return "现场仍有敌人，无法建设"
+		if not game.is_area_cleared(spec.pos): return "先清理本区，再建设前哨"
+		if game.has_hostiles_near(spec.pos): return "现场仍有敌人，无法建设"
 	for id in spec.required_claims:
 		if not game.progress.claims.has(id): return "还需：" + claim_title(id)
 	return ""

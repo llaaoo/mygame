@@ -31,7 +31,7 @@ func serialize() -> Dictionary:
 
 func tick(delta: float) -> void:
 	if not game.ready_for_play or game._switching or game.get_tree().paused or game.player.health_component.is_dead: return
-	needs.tick(delta, game.player.stats_component.effective_stat("endurance"), game.region_id == "camp")
+	needs.tick(delta, game.player.stats_component.effective_stat("endurance"), game.is_at_base())
 	apply_recovery()
 	_ui_time += delta
 	_save_time += delta
@@ -210,7 +210,7 @@ func _open(node: Node2D, options: Array[FieldWorkMethod], guide: String, spec: S
 func _available(node: Node2D, spec: SurvivalStationData) -> bool:
 	if game._switching or game.player.health_component.is_dead or not is_instance_valid(node) or not node.is_inside_tree(): return false
 	if node == game.player: return spec == null
-	return node.get_parent() == game.region_root and ((spec != null and node.has_meta("survival_station") and node.get_meta("survival_station") == spec and spec in game.current_data.survival_stations) or (spec == null and ((game.region_id == "camp" and node.get_meta("survival_rest", false)) or field_rest_available(node))))
+	return node.get_parent() == game.region_root and ((spec != null and node.has_meta("survival_station") and node.get_meta("survival_station") == spec and spec in game.current_data.survival_stations) or (spec == null and ((game.is_at_base() and node.get_meta("survival_rest", false)) or field_rest_available(node))))
 
 func has_heat(node: Node2D, spec: SurvivalStationData) -> bool:
 	return spec.lit or SurfaceManager.instance.surface_at(node.global_position + spec.heat_offset).get("state", "dry") == "burning"
@@ -250,7 +250,7 @@ func _reason(option: FieldWorkMethod, node: Node2D, spec: SurvivalStationData) -
 			if not spec or spec.kind != "forage": return "采集点已失效"
 			if needs.harvests.has(spec.id): return "尚在再生：%.0f秒" % needs.harvests[spec.id]
 		"rest", "basic":
-			if game.region_id != "camp" or not node.get_meta("survival_rest", false):
+			if not game.is_at_base() or not node.get_meta("survival_rest", false):
 				if not field_rest_available(node) or option.id != "rest:short": return "需要营地篝火；前哨仅可短休"
 			if parts[0] == "rest" and (parts.size() != 2 or parts[1] not in ["short", "full"]): return "未知休整方式"
 		_:

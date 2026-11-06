@@ -19,6 +19,7 @@ var _message_time := 0.0
 var progress: ExplorationProgress
 var modal_locked := false
 var journal_provider: Callable
+var pause_provider: Callable
 var practice_available: Callable
 var _heading_panel: PanelContainer
 var _notice: PanelContainer
@@ -288,6 +289,9 @@ func _update_terrain() -> void:
 	_terrain_label.add_theme_color_override("font_color", GameUIStyle.TEXT_MUTED if state == "dry" else Color(SurfaceCatalog.color_for(state), 1))
 
 func show_pause() -> void:
+	if pause_provider.is_valid():
+		pause_provider.call()
+		return
 	show_panel("远征暂停", "知识、委托奖励和已清理区域自动保存。菜单撤离需站定3秒，受伤会打断；返营后主动休整。解开检修机关后，营地会开放直达该区域的通路。\n\n已清区域可单独重试：耗材照常消耗，击杀无经验、掉落或残魂，探索进度保留。重置整轮遭遇则重新开启全部战斗。", [
 		{"title": "继续", "callback": close_modal},
 		{"title": "装备与构筑", "callback": func(): equipment_requested.emit()},

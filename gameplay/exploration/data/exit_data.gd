@@ -1,6 +1,7 @@
 class_name ExplorationExitData
 extends Resource
 
+@export var arrival := Vector2.INF
 @export var target: String
 @export var title: String
 @export var pos: Vector2 = Vector2.ZERO

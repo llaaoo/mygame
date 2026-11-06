@@ -30,6 +30,7 @@ func _apply_knowledge() -> void:
 						game.progress.spell_rules[id] = true
 						backfilled = true
 	if backfilled: _queue_save()
+	game.knowledge_changed()
 	var sm := game.player.skill_manager
 	var previous := sm.known_actions.duplicate()
 	sm.known_actions = game.progress.actions.duplicate()
@@ -77,7 +78,7 @@ func _restore_player() -> void:
 func _save_progress() -> void:
 	if not game.persistence_enabled:
 		return
-	if SaveManager.instance.save_game(MVPGame.SAVE_SLOT):
+	if SaveManager.instance.save_game(game.save_slot):
 		_save_dirty = false
 	else:
 		_save_dirty = true
@@ -89,6 +90,7 @@ func _sync_progress() -> void:
 	GameRuntime.instance.get_command_bus().flush_world_facts()
 	if game.equipment_service:
 		game.equipment_service.sync()
+	game.progress.journey = game.journey_location()
 	if game.survival: game.progress.survival_state = game.survival.serialize()
 	game.progress.casting_supplies = game.player.skill_manager.combinations.supplies.serialize(true)
 	game.progress.world_states = GameRuntime.instance.get_world_runtime().state_manager.get_all_states().duplicate(true)
@@ -121,7 +123,7 @@ func practice_encounters() -> bool:
 	if not game.can_practice(): return false
 	game.ui.close_modal()
 	game.practice_active = true
-	var layout := game._generator.generate_room(game.current_data.seed, 0, game.current_data.room_type)
+	var layout := game.current_data.make_layout()
 	game.current_data.reserve_interaction_space(layout)
 	for i in range(game.current_data.encounters.size()):
 		game._spawn_enemy(game.current_data.encounters[i], layout, i, false)
@@ -137,7 +139,7 @@ func train(stat: String) -> bool:
 	return true
 
 func claim_quest(quest: ExplorationQuestData, approach_id: String = "") -> bool:
-	if game.region_id != "camp" or quest not in game.quests or not quest.can_claim(game.progress, game.player.stats_component, approach_id):
+	if not game.is_at_base() or quest not in game.quests or not quest.can_claim(game.progress, game.player.stats_component, approach_id):
 		return false
 	var approach := quest.find_approach(approach_id)
 	var report := "营地收到你的报告，获得 %d 属性点。" % quest.attribute_points
@@ -151,7 +153,7 @@ func claim_quest(quest: ExplorationQuestData, approach_id: String = "") -> bool:
 	return true
 
 func choose_world_event(entry: ExplorationWorldEventData, choice: ExplorationWorldChoiceData) -> bool:
-	if entry not in game.current_data.events or choice not in entry.choices or not game.active_enemies.is_empty():
+	if entry not in game.current_data.events or choice not in entry.choices or game.has_hostiles_near(entry.pos):
 		return false
 	game.progress.choices[entry.id] = choice.id
 	var record := choice.title + "：" + choice.text
@@ -164,7 +166,7 @@ func choose_world_event(entry: ExplorationWorldEventData, choice: ExplorationWor
 	return true
 
 func discover(entry: ExplorationDiscoveryData) -> bool:
-	if entry not in game.current_data.discoveries or (entry.requires_clear and not game.active_enemies.is_empty()):
+	if entry not in game.current_data.discoveries or (entry.requires_clear and game.has_hostiles_near(entry.pos)):
 		return false
 	var reward := game.equipment_service.grant(entry)
 	if not game.progress.claim(entry.id, entry.title, entry.text, entry.actions, entry.spell_rules):

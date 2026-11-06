@@ -1,0 +1,23 @@
+class_name GrayriverPresenter
+extends ExplorationPresenter
+func show_arrival() -> void:
+	game.ui.show_panel("灰河谷 · 自由远征","你来到灰河谷西南的河谷镇。先读镇中施法手册、领取口粮，再自行选路。\n\n林地、矿道、湖岸、工区和湿地互相连通，旧监狱在东北。北桥和南侧浅滩始终开放，修复木桥可缩短往返。镇中艾妲记录你的发现与世界成果。\n\nG地图 · J日志 · N补给 · M本次材料 · K基础动作 · O装备\n地图只记录亲自到过的地点。动作、材料和恩赐需要亲手组合，系统不会自动准备。F5存档，F9读档；独立旅程不覆盖监狱验证场。",[{"title":"开始河谷旅程","callback":game.ui.close_modal},{"title":"查看日志","callback":game.ui.show_journal}])
+func _update_objective() -> void:
+	if not game.current_data: return
+	game.ui.heading.text = game.current_data.title
+	game.ui.objective.text = ("河谷镇 · 可以整备、烹饪、训练和交付" if game.is_at_base() else game.current_data.description)
+func journal_text() -> String:
+	var text := "灰河谷旅程\nWASD移动，左键近战，右键火花，E调查；G地图、N补给、M本次素材、K基础动作、O手动装备。知识通过现场阅读学习；组合由当前地面、法阵、恩赐和素材产生。\n\n已发现地点\n"
+	text += (game as GrayriverGame).discovered_places()
+	text += "\n镇中委托\n"
+	for quest in game.quests:
+		text += quest.title+" · "+("已交付" if game.progress.claims.has("quest."+quest.id) else "可交付" if quest.is_complete(game.progress) else "进行中")+"\n"+quest.description+"\n"
+	text += "\n永久成果\n"
+	for pair in [["river.bridge_fixed","中部木桥"],["alchemy.pump_open","工区排污泵与湿地清水"],["river.outpost","驿站前哨"],["alchemy.repaired","镇中调和台"]]:
+		text += ("✓ " if game.progress.claims.has(pair[0]) else "□ ")+pair[1]+"\n"
+	text += "\n未取部件\n"
+	for pair in [["alchemy.pump_open","alchemy.pump_taken","工区泵芯"],["alchemy.regulator_open","alchemy.regulator_taken","矿道调压器"]]:
+		if game.progress.claims.has(pair[0]) and not game.progress.claims.has(pair[1]): text += pair[2]+"：已解封，靠近E取件\n"
+	text += "\n发现记录\n"
+	for note in game.progress.journal: text += "\n"+note.title+"\n"+note.text+"\n"
+	return text
