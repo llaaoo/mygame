@@ -74,6 +74,7 @@ func resolve_action(action: Action) -> void:
 			player.state_machine.transition_to("attack")
 
 		Action.ActionType.DODGE:
+			if player.survival: player.survival.exert(.5)
 			if player.skill_manager.combinations:
 				player.skill_manager.combinations.cancel("闪避：准备取消")
 			casting._cancel_charge()

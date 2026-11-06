@@ -19,6 +19,7 @@ var character_state: Dictionary = {}
 var visited: Dictionary = {}
 var choices: Dictionary = {}
 var casting_supplies: Dictionary = {}
+var survival_state: Dictionary = {}
 
 func claim(id: String, title: String, text: String, new_actions: Array, new_spell_rules: Array) -> bool:
 	if claims.has(id):
@@ -32,11 +33,12 @@ func claim(id: String, title: String, text: String, new_actions: Array, new_spel
 	return true
 
 func serialize_save_data() -> Dictionary:
-	return {"trial_runs": trial_runs.duplicate(true), "element_clues": element_clues.duplicate(), "verified_reactions": verified_reactions.duplicate(), "equipment_owned": equipment_owned.duplicate(), "equipment_loadout": equipment_loadout.duplicate(), "actions": actions.duplicate(), "spell_rules": spell_rules.duplicate(), "claims": claims.duplicate(), "cleared": cleared.duplicate(), "journal": journal.duplicate(true), "completed": completed, "deaths": deaths, "world_states": world_states.duplicate(true), "loadout": loadout.duplicate(true), "character_state": character_state.duplicate(true), "visited": visited.duplicate(), "choices": choices.duplicate(), "casting_supplies": casting_supplies.duplicate(true)}
+	return {"survival_state": survival_state.duplicate(true), "trial_runs": trial_runs.duplicate(true), "element_clues": element_clues.duplicate(), "verified_reactions": verified_reactions.duplicate(), "equipment_owned": equipment_owned.duplicate(), "equipment_loadout": equipment_loadout.duplicate(), "actions": actions.duplicate(), "spell_rules": spell_rules.duplicate(), "claims": claims.duplicate(), "cleared": cleared.duplicate(), "journal": journal.duplicate(true), "completed": completed, "deaths": deaths, "world_states": world_states.duplicate(true), "loadout": loadout.duplicate(true), "character_state": character_state.duplicate(true), "visited": visited.duplicate(), "choices": choices.duplicate(), "casting_supplies": casting_supplies.duplicate(true)}
 
 func validate_save_data(value: Variant) -> bool:
 	if not value is Dictionary:
 		return false
+	if not SurvivalNeeds.valid(value.get("survival_state", {})): return false
 	if not value.get("completed", false) is bool or not value.get("deaths", 0) is int:
 		return false
 	for key in ["actions", "spell_rules", "recipes", "claims", "cleared", "world_states", "loadout", "character_state", "visited", "choices", "casting_supplies", "equipment_owned", "equipment_loadout", "element_clues", "verified_reactions"]:
@@ -51,6 +53,7 @@ func validate_save_data(value: Variant) -> bool:
 		if not run.get("work_actions", 0) is int or int(run.get("work_actions", 0)) < 0: return false
 		if not run.get("materials") is Dictionary or not run.get("regions") is Array or not run.get("initial") is Dictionary or not run.get("final") is Dictionary: return false
 		for snapshot in [run.initial, run.final]:
+			if not SurvivalNeeds.valid(snapshot.get("survival", {})): return false
 			if not snapshot.get("equipment", []) is Array: return false
 			for item in snapshot.get("equipment", []):
 				if not item is String: return false
@@ -106,6 +109,7 @@ func validate_save_data(value: Variant) -> bool:
 	return true
 
 func deserialize_save_data(data: Dictionary) -> void:
+	survival_state = data.get("survival_state", {}).duplicate(true)
 	trial_runs.assign(data.get("trial_runs", []))
 	while trial_runs.size() > 10: trial_runs.pop_front()
 	element_clues = data.get("element_clues", {}).duplicate()

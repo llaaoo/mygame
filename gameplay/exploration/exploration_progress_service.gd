@@ -70,7 +70,7 @@ func _restore_player() -> void:
 	game.player.set_process(true)
 	game.player.set_physics_process(true)
 	game.player.state_machine.transition_to("idle")
-	game.player.mana_component.mp_regen_rate = 3.0
+	game.player.mana_component.mp_regen_rate = 5.0 if game.progress.choices.get("waterworks_choice", "") == "conduit" else 3.0
 	game.player.health_component.regen_rate = 0.6
 	game.player.skill_manager.combinations.reset_session()
 
@@ -89,6 +89,7 @@ func _sync_progress() -> void:
 	GameRuntime.instance.get_command_bus().flush_world_facts()
 	if game.equipment_service:
 		game.equipment_service.sync()
+	if game.survival: game.progress.survival_state = game.survival.serialize()
 	game.progress.casting_supplies = game.player.skill_manager.combinations.supplies.serialize()
 	game.progress.world_states = GameRuntime.instance.get_world_runtime().state_manager.get_all_states().duplicate(true)
 	game.progress.loadout = game.player.skill_manager.serialize_skill_state()

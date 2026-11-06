@@ -21,12 +21,17 @@ func count(id: String) -> int:
 	return int(amounts.get(id, 0))
 
 func title(id: String) -> String:
-	return catalog[id].title if catalog.has(id) else str(RAW_TITLES.get(id, id))
+	return catalog[id].title if catalog.has(id) else str(RAW_TITLES.get(id, SurvivalCatalog.TITLES.get(id, id)))
+
+static func known_item(id: String) -> bool:
+	return id in MATERIAL_IDS or RAW_TITLES.has(id) or SurvivalCatalog.TITLES.has(id)
 
 func grant(items: Dictionary) -> void:
 	for id in items:
-		if catalog.has(id) or RAW_TITLES.has(id):
-			amounts[id] = count(id) + maxi(0, int(items[id]))
+		if known_item(id):
+			var added := maxi(0, int(items[id]))
+			if id in ["clean_water", "dirty_water"]: added = mini(added, maxi(0, SurvivalCatalog.WATER_CAPACITY - SurvivalCatalog.water_count(self)))
+			amounts[id] = count(id) + added
 	_notify_changed()
 
 func can_pay(costs: Dictionary) -> bool:
@@ -110,8 +115,10 @@ func restore(data: Dictionary) -> void:
 	amounts.clear()
 	selected.clear()
 	for id in data.get("amounts", {}):
-		if catalog.has(id) or RAW_TITLES.has(id):
-			amounts[id] = maxi(0, int(data.amounts[id]))
+		if known_item(id):
+			var amount := maxi(0, int(data.amounts[id]))
+			if id in ["clean_water", "dirty_water"]: amount = mini(amount, maxi(0, SurvivalCatalog.WATER_CAPACITY - SurvivalCatalog.water_count(self)))
+			amounts[id] = amount
 	for id in data.get("selected", {}):
 		if catalog.has(data.selected[id]):
 			selected[id] = data.selected[id]

@@ -14,6 +14,7 @@ extends Resource
 @export var surface_patches: Array[SurfacePatchData] = []
 @export var fixed_props: Array[ExplorationPropData] = []
 @export var facilities: Array[RepairFacilityData] = []
+@export var survival_stations: Array[SurvivalStationData] = []
 @export var exits: Array[ExplorationExitData] = []
 
 func reserve_interaction_space(layout: RefCounted) -> void:
@@ -34,6 +35,12 @@ func interaction_points() -> Array[Resource]:
 	points.append_array(valves)
 	points.append_array(fixed_props)
 	points.append_array(facilities)
+	points.append_array(survival_stations)
+	for station in survival_stations:
+		if station and station.kind == "cook":
+			var heat := SurfacePatchData.new()
+			heat.pos = station.pos + station.heat_offset
+			points.append(heat)
 	for patch in surface_patches:
 		if patch: points.append_array(_patch_points(patch))
 	for valve in valves:

@@ -27,6 +27,9 @@
 
 [ext_resource type="Resource" path="res://content/exploration/alchemy/regulator.tres" id="alchemy_regulator"]
 
+[ext_resource type="Script" path="res://gameplay/exploration/survival/survival_station_data.gd" id="survival_type"]
+[ext_resource type="Resource" path="res://content/survival/cistern_water.tres" id="survival_cistern_water"]
+
 [sub_resource type="Resource" id="Resource_p7lin"]
 script = ExtResource("1_dhw8p")
 id = "nova_knowledge"
@@ -113,3 +116,4 @@ events = Array[ExtResource("3_kpavw")]([SubResource("Resource_gvyst")])
 exits = Array[ExtResource("5_ujenr")]([SubResource("Resource_y5ea2"), ExtResource("field_return")])
 valves = Array[ExtResource("exp_type_valves")]([ExtResource("exp_cistern_valve")])
 spell_objects = Array[ExtResource("exp_type_spell_objects")]([ExtResource("exp_cistern_conductor"), ExtResource("alchemy_regulator")])
+survival_stations = Array[ExtResource("survival_type")]([ExtResource("survival_cistern_water")])

@@ -21,6 +21,7 @@ func show_arrival() -> void:
 				if not exit.camp_return_title.is_empty() and exit.claims_satisfied(game.progress): passages.append(region.title)
 		if not passages.is_empty(): text += "\n\n营地检修通路可直达：" + "、".join(passages)
 		text += "\n\nJ查看记录与待办，O查看当前装备。已清区域可在Esc选择本区试战：耗材照常消耗，击杀没有奖励，探索进度保留。"
+	text += "\n\n远征口粮袋在营地西侧，N查看饮食、饮水与疲劳。回营不自动补满，在篝火主动短休或充分休整；缺补给时可吃免费粗食。"
 	game.ui.show_panel(title, text, [{"title": "开始探索" if first_visit else "继续旅程", "callback": game.ui.close_modal}, {"title": "查看探索日志", "callback": game.ui.show_journal}])
 
 func _show_training() -> void:
@@ -132,6 +133,7 @@ func journal_text() -> String:
 			if exit.target == "camp" and not exit.required_claims.is_empty():
 				text += region.title + " · " + exit.title + ("：已开启，营地可直达返场\n" if exit.claims_satisfied(game.progress) else "：待解开对应机关\n" + exit.locked_message + "\n")
 	text += "\n" + game.alchemy.status_text() + "\n"
+	text += "\n远征生存（N补给）\n" + game.survival.description() + "\n"
 	text += "\n本区试战\n在已清理区域按Esc，可单独重试当地敌人。耗材照常消耗，击杀无经验、掉落或残魂；知识、机关、委托和其他区域进度保持。\n"
 	text += "\n保留与兑现\n普通施法保留恩赐；Shift请求消费适配恩赐，形态与总成本见技能槽预览。节律护手可改为部分消费：保留当前剩余时长50%，较弱伤害倍率，每份另加3 MP。蕴魂、回响和护盾不受部分消费影响。\n"
 	text += "\n营地委托（回营地交付）\n"

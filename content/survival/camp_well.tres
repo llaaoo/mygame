@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="SurvivalStationData" format=3]
+[ext_resource type="Script" path="res://gameplay/exploration/survival/survival_station_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "survival.station.camp_well"
+title = "营地井：装饮用水"
+pos = Vector2(-100, 210)
+kind = "water"
+clean = true

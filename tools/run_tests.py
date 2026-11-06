@@ -14,6 +14,9 @@ ROOT = Path(__file__).resolve().parents[1]
 QUICK = ["save_system", "save_recovery", "skill_catalog", "skill_upgrades", "room_generation"]
 INTEGRATION = [
     "field_work",
+    "survival_needs",
+    "survival_world",
+    "survival_rest",
     "alchemy_repair",
     "material_recycling",
     "rpg_attributes",

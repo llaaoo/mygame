@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="SurvivalStationData" format=3]
+[ext_resource type="Script" path="res://gameplay/exploration/survival/survival_station_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "survival.station.archive_grain"
+title = "谷粮储藏：可再生采集"
+pos = Vector2(-192, -240)
+kind = "forage"
+harvest = {"grain": 2}

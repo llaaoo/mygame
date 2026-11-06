@@ -128,7 +128,7 @@ func run() -> void:
 	CombatExecutor.report_hit(null, player, 999, player.global_position, null, ["environment"])
 	check(game.ui.modal_locked and game.progress.completed and game.progress.cleared.archive, "Practice death erased exploration completion")
 	await travel("camp")
-	check(not game.practice_active and not game.can_practice() and game.progress.cleared.archive and player.health_component.hp == 100 and before_death == sm.combinations.supplies.serialize(), "Leaving practice lost progress, refunded supplies or kept practice active")
+	check(not game.practice_active and not game.can_practice() and game.progress.cleared.archive and player.health_component.hp == 50 and before_death == sm.combinations.supplies.serialize(), "Leaving practice lost progress, refunded supplies or kept practice active")
 	game.presenter.show_arrival()
 	check("监狱封锁已解除" in modal_text() and "先读营地材料手册" not in modal_text(), "Completed save still displays the new-player introduction")
 	game.ui.close_modal()

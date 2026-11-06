@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="ExplorationDiscoveryData" format=3]
+[ext_resource type="Script" path="res://gameplay/exploration/data/discovery_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "survival.archive_recipe"
+title = "伙房笔记：醒神茶"
+pos = Vector2(-96, -224)
+text = "学会醒神茶：苦叶1、饮用水1，在炉灶烹煮；野外另需炭屑1燃料，或用真实火焰代替。饮用补水25、疲劳-15，解除当前中毒，150秒法力回复+1/秒；不提供持续免疫。和普通饮水收益可并存，同种茶仅刷新。"
+materials = {"herb": 2}
