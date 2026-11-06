@@ -1,0 +1,52 @@
+extends SceneTree
+var errors: Array[String] = []
+func check(ok: bool, message: String) -> void:
+	if not ok:
+		errors.append(message)
+		push_error(message)
+func _init() -> void:
+	var needs := SurvivalNeeds.new()
+	needs.tick(600, 10)
+	check(is_equal_approx(needs.nutrition, 60) and is_equal_approx(needs.hydration, 40) and is_equal_approx(needs.fatigue, 24), "Ten-minute baseline need rates inconsistent")
+	var hardy := SurvivalNeeds.new()
+	hardy.tick(600, 20)
+	check(hardy.nutrition > needs.nutrition and hardy.hydration > needs.hydration and hardy.fatigue < needs.fatigue, "Effective endurance did not protect expedition needs")
+	var camp := SurvivalNeeds.new()
+	camp.tick(600, 10, true)
+	check(is_equal_approx(camp.nutrition, 90) and is_equal_approx(camp.hydration, 85) and camp.fatigue == 0, "Camp did not shelter passive fatigue/consumption")
+	needs.nutrition = 0
+	needs.hydration = 0
+	needs.fatigue = 90
+	check(needs.preparation_multiplier() == 1.25 and is_equal_approx(needs.recovery().mana_multiplier, .175), "Fatigue/dehydration penalties inconsistent")
+	needs.consume("ration")
+	check(needs.nutrition == 45 and needs.meal == "ration" and needs.meal_remaining == 180, "Food did not replenish nutrition/slot")
+	needs.tick(10, 10)
+	needs.consume("ration")
+	check(needs.meal_remaining == 180 and is_equal_approx(needs.recovery().health_bonus, .6), "Repeated food stacked or extended beyond refresh")
+	needs.consume("broth")
+	check(needs.meal == "broth" and needs.meal_remaining == 240 and is_equal_approx(needs.recovery().health_bonus, .4), "Soup did not replace the original meal")
+	needs.consume("clean_water")
+	needs.consume("tea")
+	check(needs.water_remaining == 120 and needs.tea_remaining == 150 and needs.recovery().mana_bonus == 2, "Meal/drink/tea independent slots failed")
+	var before := needs.serialize()
+	var restored := SurvivalNeeds.new()
+	restored.restore(before)
+	check(restored.serialize() == before, "Needs restore changed remaining durations")
+	restored.tick(240, 10)
+	check(restored.meal == "" and restored.water_remaining == 0 and restored.tea_remaining == 0 and restored.recovery().health_bonus == 0, "Expired food left permanent regeneration")
+	for value in [{"fatigue": NAN}, {"hydration": INF}, {"nutrition": -1}, {"fatigue": 101}, {"meal": "unknown"}, {"harvests": {"x": INF}}, {"hp": -1}, {"mp": .5}, {"water_remaining": 121}]:
+		check(not SurvivalNeeds.valid(value), "Invalid needs state accepted: " + str(value))
+	check(SurvivalNeeds.valid({}), "Legacy save default rejected")
+	var supplies := CastingSupplies.new()
+	supplies.grant({"clean_water": 3, "dirty_water": 4, "grain": 3})
+	check(SurvivalCatalog.water_count(supplies) == 4 and supplies.count("grain") == 3, "Shared waterskin capacity failed")
+	supplies.configure("water_call", "ration")
+	check(not supplies.selected.has("water_call") and supplies.catalog.size() == 7 and supplies.crafting_recipes.size() == 7, "Provisions became casting materials or inflated manufacturing catalogs")
+	var original := supplies.serialize()
+	supplies.begin_transaction()
+	supplies.pay({"grain": 1})
+	supplies.grant({"ration": 1})
+	supplies.finish_transaction(false)
+	check(original == supplies.serialize(), "Shared inventory failed provision transaction rollback")
+	if errors.is_empty(): print("Survival needs passed: real-time rates, endurance, shelter, bounded recovery penalties, meal slots, persistence, finite state and shared waterskin inventory")
+	quit(0 if errors.is_empty() else 1)

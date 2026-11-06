@@ -8,6 +8,7 @@ signal materials_requested
 signal elements_requested
 signal trials_requested
 signal equipment_requested
+signal survival_requested
 
 var heading: Label
 var objective: Label
@@ -23,6 +24,7 @@ var _notice: PanelContainer
 var _modal_panel: PanelContainer
 var _terrain_label: Label
 var _terrain_time := 0.0
+var _survival_label: Label
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -52,9 +54,20 @@ func _ready() -> void:
 	footer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	footer.add_theme_stylebox_override("panel", GameUIStyle.panel_style(.85, 4))
 	add_child(footer)
-	var controls := _label("J 日志   M 材料   O 装备\nK 技能编组   Esc 暂停", 11)
+	var controls := _label("J 日志 M 材料 O 装备\nN 补给 K 编组 Esc 暂停", 11)
 	GameUIStyle.apply_label(controls, 11, GameUIStyle.TEXT_MUTED)
 	footer.add_child(controls)
+	var needs_panel := PanelContainer.new()
+	needs_panel.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
+	needs_panel.offset_left = 20
+	needs_panel.offset_right = 290
+	needs_panel.offset_top = 136
+	needs_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	needs_panel.add_theme_stylebox_override("panel", GameUIStyle.panel_style(.85, 4))
+	add_child(needs_panel)
+	_survival_label = _label("饱食100 · 饮水100 · 疲劳0", 12)
+	_survival_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	needs_panel.add_child(_survival_label)
 	var terrain := PanelContainer.new()
 	terrain.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT)
 	terrain.offset_left = 18
@@ -105,6 +118,9 @@ func notify(text: String) -> void:
 	message.text = text
 	_message_time = 5.0
 
+func set_survival_status(text: String) -> void:
+	if _survival_label: _survival_label.text = text
+
 func _unhandled_input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed or event.echo:
 		return
@@ -132,6 +148,11 @@ func _unhandled_input(event: InputEvent) -> void:
 			materials_requested.emit()
 		get_viewport().set_input_as_handled()
 
+	elif event.keycode == KEY_N:
+		if modal_locked: return
+		if is_instance_valid(modal): close_modal()
+		else: survival_requested.emit()
+		get_viewport().set_input_as_handled()
 	elif event.keycode == KEY_O:
 		if modal_locked:
 			return

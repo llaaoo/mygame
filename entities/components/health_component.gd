@@ -9,6 +9,8 @@ extends Node
 @export var invincibility_blocks_status := true
 @export var regen_delay: float = 5.0
 @export var regen_rate: float = 3.0
+var regen_multiplier := 1.0
+var regen_bonus := 0.0
 
 ## 信号
 signal health_changed(current_hp: int, max_hp: int)
@@ -56,7 +58,7 @@ func tick(delta: float) -> void:
 		return
 	_time_since_damage += delta
 	if _time_since_damage >= regen_delay:
-		_regen_accumulator += regen_rate * delta
+		_regen_accumulator += (regen_rate + regen_bonus) * regen_multiplier * delta
 		var heal_amt := int(_regen_accumulator)
 		if heal_amt > 0:
 			_regen_accumulator -= heal_amt

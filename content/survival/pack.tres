@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="ExplorationDiscoveryData" format=3]
+[ext_resource type="Script" path="res://gameplay/exploration/data/discovery_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "survival.pack"
+title = "远征口粮袋"
+pos = Vector2(-310, 80)
+text = "饮食、饮水与休整：N查看需求与补给。吃喝需要站定，战斗继续，受伤会打断。谷粮可在炉灶烤饼，未净化水需炭屑过滤并煮沸；野外锅可借火花点燃的火位节省燃料。水袋共4份，普通魔法水面不能装成饮用水。\n\n返营不自动补满，在篝火E短休、充分休整或吃免费粗食。休整消耗饱食饮水，不产生库存；已领物品不重复发放。死亡返营获半数生命法力与最低应急需求，仍需整备。"
+materials = {"ration": 2, "grain": 3, "herb": 2, "clean_water": 4}

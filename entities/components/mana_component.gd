@@ -6,6 +6,8 @@ extends Node
 @export var max_mp: int = 50
 @export var mp_regen_rate: float = 2.0       ## 每秒回复量
 @export var mp_regen_delay: float = 2.0       ## 施法后延迟（秒）才开始回复
+var regen_multiplier := 1.0
+var regen_bonus := 0.0
 
 signal mp_changed(current_mp: int, max_mp: int)
 
@@ -33,7 +35,7 @@ func tick(delta: float) -> void:
 		return
 	_time_since_use += delta
 	if _time_since_use >= mp_regen_delay:
-		_regen_accumulator += mp_regen_rate * delta
+		_regen_accumulator += (mp_regen_rate + regen_bonus) * regen_multiplier * delta
 		var amt := int(_regen_accumulator)
 		if amt > 0:
 			_regen_accumulator -= amt

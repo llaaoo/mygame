@@ -21,7 +21,7 @@ func _snapshot() -> Dictionary:
 	ids.sort()
 	var stats: Dictionary = {}
 	for key in Buff.PRIMARY_STATS: stats[key] = game.player.stats_component.get(key)
-	return {"stats": stats, "max_hp": game.player.health_component.max_hp, "max_mp": game.player.mana_component.max_mp, "equipment": ids, "loadout": game.player.skill_manager.serialize_skill_state(), "supplies": game.player.skill_manager.combinations.supplies.serialize()}
+	return {"stats": stats, "max_hp": game.player.health_component.max_hp, "max_mp": game.player.mana_component.max_mp, "equipment": ids, "loadout": game.player.skill_manager.serialize_skill_state(), "supplies": game.player.skill_manager.combinations.supplies.serialize(), "survival": game.survival.serialize()}
 
 func start(label: String) -> bool:
 	if active or label not in LABELS: return false
@@ -77,7 +77,7 @@ func show_page() -> void:
 	for id in ["water_call", "pulse", "frost_sigil", "storm_sigil", "venom_mist"]:
 		var skill := game.player.skill_manager.pool.get_skill(id)
 		text += "%s：%s\n" % [skill.display_name, "已学，K可编组" if game.progress.actions.has(id) else "尚未掌握，沿路线查阅记录"]
-	text += "\n三条检修捷径解锁后，营地可直接返场。已清理区域按Esc可重试本区，耗材照常消耗，击杀没有经验、掉落或残魂；探索进度保留。\n\n记录包含实际施法与近战次数、已提交MP与材料消耗、造成伤害、自身受伤、游戏内用时和起止配置。菜单暂停时间不计入；由环境造成且无法归因玩家的伤害不计入造成伤害。初始属性/装备/补给保存在记录中，比较时应使用相近预算。最多保留10次；按自己的配置与补给开始。\n"
+	text += "\n三条检修捷径解锁后，营地可直接返场。已清理区域按Esc可重试本区，耗材照常消耗，击杀没有经验、掉落或残魂；探索进度保留。\n\n记录包含实际施法、近战与作业次数、已提交MP与材料消耗、造成伤害、自身受伤、游戏内用时和起止配置。菜单暂停时间不计入；由环境造成且无法归因玩家的伤害不计入造成伤害。初始属性/装备/补给保存在记录中，比较时应使用相近预算。最多保留10次；按自己的配置与补给开始。\n"
 	if active:
 		text += "\n正在记录：%s · %.1f秒 · 施法/近战合计%d次\n" % [run.label, GameRuntime.instance.get_simulation_runtime().elapsed_time - _started, int(run.casts) + int(run.melee)]
 	for entry in game.progress.trial_runs:

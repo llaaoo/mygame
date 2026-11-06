@@ -143,6 +143,7 @@ func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 	var claims: Dictionary = {}
 	var completion_claims: Dictionary = {}
 	var profiles: Dictionary = {}
+	var station_ids: Dictionary = {}
 	for region in catalog.chapter.regions:
 		if not region or region.id.is_empty() or region.title.is_empty():
 			_fail(catalog.chapter, "Invalid region")
@@ -172,6 +173,11 @@ func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 				if not catalog.equipment.has(id):
 					_fail(note, "Unknown equipment reward: " + id)
 			_validate_materials(note, note.materials, supplies)
+		for station in region.survival_stations:
+			if station.id.is_empty() or station_ids.has(station.id) or station.title.is_empty() or station.kind not in ["water", "cook", "forage"]: _fail(station, "Invalid/duplicate survival station")
+			station_ids[station.id] = true
+			if station.kind == "forage" and station.harvest.is_empty(): _fail(station, "harvest: empty provisions")
+			_validate_materials(station, station.harvest, supplies)
 		for facility in region.facilities:
 			_claim(claims, facility.id, facility)
 			_claim(claims, facility.start_claim, facility)
@@ -235,6 +241,8 @@ func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 	# All claims must be collected before checking cross-region exit references.
 	var return_points: Array[Vector2] = []
 	for region in catalog.chapter.regions:
+		for station in region.survival_stations:
+			if not station.cleaned_by_claim.is_empty() and not completion_claims.has(station.cleaned_by_claim): _fail(station, "cleaned_by_claim: unknown completion marker")
 		for patch in region.surface_patches:
 			if not patch.disabled_by_claim.is_empty() and not completion_claims.has(patch.disabled_by_claim): _fail(patch, "disabled_by_claim: unknown completion marker '%s'" % patch.disabled_by_claim)
 		for facility in region.facilities:
@@ -254,6 +262,11 @@ func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 				for point in return_points:
 					if point.distance_to(exit.camp_return_pos) < 110: _fail(exit, "camp_return_pos: overlapping reverse passages")
 				return_points.append(exit.camp_return_pos)
+	for id in SurvivalCatalog.RECIPES:
+		var recipe: Dictionary = SurvivalCatalog.RECIPES[id]
+		if not SurvivalCatalog.TITLES.has(recipe.output): _fail(catalog.chapter, "Unknown cooking output")
+		_validate_materials(catalog.chapter, recipe.inputs, supplies)
+		if not str(recipe.unlock).is_empty() and not completion_claims.has(recipe.unlock): _fail(catalog.chapter, "Unknown cooking knowledge")
 	var quest_ids: Dictionary = {}
 	for quest in catalog.chapter.quests:
 		if quest_ids.has(quest.id):
@@ -360,7 +373,7 @@ func _claim(claims: Dictionary, id: String, resource: Resource) -> void:
 
 func _validate_materials(resource: Resource, values: Dictionary, supplies: CastingSupplies) -> void:
 	for id in values:
-		if not supplies.catalog.has(id) and not CastingSupplies.RAW_TITLES.has(id):
+		if not CastingSupplies.known_item(str(id)):
 			_fail(resource, "Unknown material: " + str(id))
 		if not values[id] is int or int(values[id]) <= 0:
 			_fail(resource, "Material quantities must be positive integers")
@@ -381,6 +394,7 @@ func _validate_entries(chapter: ExplorationChapterData) -> bool:
 			resources.append_array(region.surface_patches)
 			resources.append_array(region.fixed_props)
 			resources.append_array(region.facilities)
+			resources.append_array(region.survival_stations)
 			for facility in region.facilities:
 				if facility: resources.append(facility.assembly)
 			for valve in region.valves:

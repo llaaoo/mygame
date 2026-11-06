@@ -18,6 +18,7 @@ PROJECT_ANALYSIS.md (完整项目分析 — 架构评估 + 文件功能清单 + 
     ├── REGION_CONTENT_EXPANSION.md (最新玩法内容 — 三处多解遭遇、永久返营捷径、实地记录与狱中复核委托)
     ├── PLAYTEST_REVIEW_2026_11_05.md (章节试玩 — 通关与冷启动复核、近战/组合收益、捷径回报及操作提示问题)
     ├── PLAYTEST_FIXES.md (试玩迭代 — 当前动作反馈、双向检修通路、本区无奖励试战、教学与战斗对照)
+    ├── SURVIVAL_EXPEDITION.md (远征生存 — 饮食饮水、疲劳休整、借火烹饪、水质、采集再生与兼容)
     ├── ALCHEMY_REPAIR.md (多解支线 — 即时检修、图纸与部件、永久材料回收与桌面试玩)
     ├── RPG_ATTRIBUTES.md (属性成长 — 有效主属性、施法准备、环境耐受、任务处理方式与扩展边界)
     ├── SYSTEM_CONTENT_READINESS.md (当前系统检查 — 可扩内容、校验缺口、世界条件、敌人配置与扩充顺序)

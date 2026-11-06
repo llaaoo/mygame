@@ -86,6 +86,7 @@ var casting: PlayerCastingController
 var input_controller: PlayerInputController
 var bindings: PlayerCombatBindings
 var field_work: PlayerFieldWork
+var survival: SurvivalService
 var aiming_sources: Dictionary:
 	get: return casting.aiming_sources if casting else {}
 var cancel_aim: bool:

@@ -1,0 +1,88 @@
+{
+  "date": "2026-11-06",
+  "method": "OS keyboard/mouse on ordinary game window; telemetry read-only; previously completed legacy save with100HP/60MP and four attributes10. Local drain replay has no kill rewards.",
+  "combat_eating": {
+    "before_hp": 86,
+    "after_hp": 64,
+    "ration_before": 3,
+    "ration_after": 3,
+    "result": "受到伤害：作业取消，未扣材料",
+    "enemies": [
+      {
+        "frozen": false,
+        "hp": 20,
+        "id": "Encounter_0",
+        "pos": [
+          192.969390869141,
+          -47.4154739379883
+        ],
+        "profile": "hunter",
+        "role": 0,
+        "screen": [
+          768.969360351562,
+          275.183685302734
+        ],
+        "speed": 150.0,
+        "state": "Attack"
+      },
+      {
+        "frozen": false,
+        "hp": 30,
+        "id": "Encounter_1",
+        "pos": [
+          372.026794433594,
+          33.5158233642578
+        ],
+        "profile": "sentry",
+        "role": 1,
+        "screen": [
+          948.026794433594,
+          356.114990234375
+        ],
+        "speed": 95.0,
+        "state": "Attack"
+      }
+    ]
+  },
+  "final_survival": {
+    "fatigue": 0.0,
+    "harvests": {},
+    "hp": 100,
+    "hydration": 69.8777691086227,
+    "meal": "ration",
+    "meal_remaining": 79.157616113997,
+    "mp": 60,
+    "nutrition": 56.5472321631563,
+    "tea_remaining": 128.031527200577,
+    "water_remaining": 21.4344506695529
+  },
+  "final_inventory": {
+    "amounts": {
+      "ash": 2,
+      "charcoal": 13,
+      "clean_water": 3,
+      "crystal": 24,
+      "echo_ink": 4,
+      "frost_salt": 8,
+      "grain": 1,
+      "herb": 3,
+      "ration": 3,
+      "resin": 4,
+      "sap": 23,
+      "storm_dust": 11,
+      "tea": 0,
+      "venom_extract": 9,
+      "ward_powder": 2
+    },
+    "selected": {}
+  },
+  "observations": [
+    "Legacy save initialized unmet survival fields safely.",
+    "One camp ration consumed grain1; field fire ration also consumed grain1 with charcoal13 unchanged.",
+    "Standing in fire canceled cooking with no charge; safe ground completed cooking.",
+    "Saved75HP recovered75HP on cold restart; meal and drink timers persisted.",
+    "Tea discovery, cooking and drinking completed.",
+    "Returning after combat retained56HP; explicit full rest restored100HP and paid nutrition20/hydration25."
+  ],
+  "limitations": "Local functional playtest and automated ten-minute clock projection; not a full20-30minute survival balance benchmark."
+}

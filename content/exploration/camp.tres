@@ -10,6 +10,11 @@
 [ext_resource type="Resource" path="res://content/exploration/alchemy/facility.tres" id="alchemy_facility"]
 [ext_resource type="Script" path="res://gameplay/exploration/data/repair_facility_data.gd" id="facility_type"]
 
+[ext_resource type="Script" path="res://gameplay/exploration/survival/survival_station_data.gd" id="survival_type"]
+[ext_resource type="Resource" path="res://content/survival/camp_well.tres" id="survival_camp_well"]
+[ext_resource type="Resource" path="res://content/survival/camp_stove.tres" id="survival_camp_stove"]
+[ext_resource type="Resource" path="res://content/survival/pack.tres" id="survival_pack"]
+
 [sub_resource type="Resource" id="Resource_frse3"]
 script = ExtResource("1_lptr4")
 id = "camp_guide"
@@ -50,6 +55,7 @@ id = "camp"
 title = "余烬营地"
 description = "阅读路标后出发。鼠标左键近战，右键火花，空格闪避，E交互，J日志，Esc暂停。"
 seed = 20261104
-discoveries = Array[ExtResource("1_lptr4")]([SubResource("Resource_frse3"), SubResource("Resource_yc7l5")])
+discoveries = Array[ExtResource("1_lptr4")]([SubResource("Resource_frse3"), SubResource("Resource_yc7l5"), ExtResource("survival_pack")])
 exits = Array[ExtResource("4_u8pbx")]([SubResource("Resource_hd2lk")])
 facilities = Array[ExtResource("facility_type")]([ExtResource("alchemy_facility")])
+survival_stations = Array[ExtResource("survival_type")]([ExtResource("survival_camp_well"), ExtResource("survival_camp_stove")])

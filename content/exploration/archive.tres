@@ -28,6 +28,11 @@
 
 [ext_resource type="Resource" path="res://content/exploration/alchemy/schematic.tres" id="alchemy_schematic"]
 
+[ext_resource type="Script" path="res://gameplay/exploration/survival/survival_station_data.gd" id="survival_type"]
+[ext_resource type="Resource" path="res://content/survival/archive_pot.tres" id="survival_archive_pot"]
+[ext_resource type="Resource" path="res://content/survival/archive_grain.tres" id="survival_archive_grain"]
+[ext_resource type="Resource" path="res://content/survival/archive_recipe.tres" id="survival_archive_recipe"]
+
 [sub_resource type="Resource" id="field_ice_impact"]
 script = ExtResource("7_po377")
 steps = PackedStringArray("ice", "impact")
@@ -116,8 +121,9 @@ title = "军械档案室"
 description = "观察水域和冰面，选择控制或破冰；解开晶簇可开放独立返营捷径。"
 seed = 20261106
 encounters = Array[ExtResource("2_enbnr")]([SubResource("Resource_f8few"), SubResource("Resource_kbq51"), SubResource("Resource_7sj0l")])
-discoveries = Array[ExtResource("1_pn3v5")]([SubResource("Resource_x0mar"), SubResource("Resource_6u4p8"), ExtResource("exp_archive_trial_supply"), ExtResource("field_observation"), ExtResource("alchemy_schematic")])
+discoveries = Array[ExtResource("1_pn3v5")]([SubResource("Resource_x0mar"), SubResource("Resource_6u4p8"), ExtResource("exp_archive_trial_supply"), ExtResource("field_observation"), ExtResource("alchemy_schematic"), ExtResource("survival_archive_recipe")])
 spell_objects = Array[ExtResource("6_8xdsm")]([SubResource("Resource_g0kms")])
 exits = Array[ExtResource("4_1ii2c")]([SubResource("Resource_rtk0n"), SubResource("Resource_uqb8c"), ExtResource("field_return")])
 surface_patches = Array[ExtResource("exp_type_surface_patches")]([ExtResource("exp_archive_pool"), ExtResource("exp_archive_ice")])
 fixed_props = Array[ExtResource("exp_type_fixed_props")]([ExtResource("exp_archive_fence")])
+survival_stations = Array[ExtResource("survival_type")]([ExtResource("survival_archive_pot"), ExtResource("survival_archive_grain")])

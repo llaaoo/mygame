@@ -167,7 +167,8 @@ func _refresh_panel() -> void:
 		var method := methods[i]
 		text += ("▶ " if selected == i else "  ") + method.title + " · %.1fs" % method.duration
 		var reason := reason_for(method)
-		text += "\n" + (reason if not reason.is_empty() else "可操作")
-		if not method.material_costs.is_empty(): text += " · " + player.skill_manager.combinations.supplies.describe_cost(method.material_costs)
+		if selected == i:
+			text += "\n" + (reason if not reason.is_empty() else "可操作")
+			if not method.material_costs.is_empty(): text += " · " + player.skill_manager.combinations.supplies.describe_cost(method.material_costs)
 		text += "\n"
 	panel.display(text + _guide + "\nQ切换 · E开始 · Esc收起\n战斗继续进行")

@@ -30,6 +30,7 @@ var trial_recorder: ElementTrialRecorder
 var workshop: CastingWorkshop
 var field_sites: FieldWorkSites
 var alchemy: AlchemyRepairService
+var survival: SurvivalService
 var _generator := RunRoomGenerator.new()
 var _renderer := PrisonArena.new()
 
@@ -79,6 +80,12 @@ func _bootstrap() -> void:
 	workshop = CastingWorkshop.new(self)
 	field_sites = FieldWorkSites.new(self)
 	alchemy = AlchemyRepairService.new(self)
+	survival = SurvivalService.new()
+	survival.game = self
+	player.survival = survival
+	add_child(survival)
+	survival.restore(progress.survival_state)
+	ui.survival_requested.connect(survival.show_page)
 	ui.materials_requested.connect(workshop.show_materials)
 	knowledge = ElementKnowledge.new()
 	knowledge.game = self
@@ -122,6 +129,9 @@ func _clear_temporary() -> void:
 	active_enemies.clear()
 
 func _change_region(destination: String, arrival: Vector2 = Vector2.INF) -> void:
+	var previous_hp := player.health_component.hp
+	var previous_mp := player.mana_component.mp
+	var was_dead := player.health_component.is_dead
 	_clear_temporary()
 	practice_active = false
 	region_id = destination
@@ -151,6 +161,7 @@ func _change_region(destination: String, arrival: Vector2 = Vector2.INF) -> void
 		camera.force_update_scroll()
 	if destination == "camp":
 		_restore_player()
+		survival.camp_arrival(previous_hp, previous_mp, was_dead)
 		_build_camp()
 	else:
 		_build_props(layout)
@@ -239,7 +250,7 @@ func _on_player_died() -> void:
 	player.skill_manager.combinations.cancel("死亡")
 	player.skill_manager.combinations.clear_field()
 	_save_progress()
-	ui.show_panel("远征中断", "返回营地重新整备。已学知识、已清理区域和发现记录保留；未清理遭遇重新开始。", [{"title": "返回营地", "callback": func(): ui.close_modal(); request_travel("camp")}], true)
+	ui.show_panel("远征中断", "返回营地后恢复半数生命和法力，并保留最低饱食饮水。到篝火主动休整或吃粗食，库存不会免费补满。已学知识、已清理区域和发现记录保留；未清理遭遇重新开始。", [{"title": "返回营地", "callback": func(): ui.close_modal(); request_travel("camp")}], true)
 
 func reload_progress() -> void:
 	var data := SaveManager.instance.read_extension(SAVE_SLOT, SECTION)
@@ -257,6 +268,7 @@ func reload_progress() -> void:
 	_restore_character()
 	equipment_service.restore()
 	knowledge.restore_clues()
+	survival.restore(progress.survival_state)
 	request_travel("camp")
 
 func _on_spell_object_solved(spec: SpellPuzzleData) -> void:

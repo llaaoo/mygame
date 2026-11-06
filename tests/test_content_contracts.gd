@@ -19,6 +19,15 @@ func _invalid(chapter: ExplorationChapterData, fragment: String) -> void:
 func _run() -> void:
 	_check(ExplorationContentValidator.new().validate(ExplorationContentCatalog.new()).is_empty(), "Current content is invalid")
 	var chapter := _chapter()
+	chapter.regions[0].survival_stations[0].cleaned_by_claim = "missing_potable_claim"
+	_invalid(chapter, "cleaned_by_claim: unknown")
+	chapter = _chapter()
+	chapter.regions[0].survival_stations[0].kind = "missing_kind"
+	_invalid(chapter, "Invalid/duplicate survival station")
+	chapter = _chapter()
+	chapter.regions[0].survival_stations.append(null)
+	_invalid(chapter, "Missing content resource reference")
+	chapter = _chapter()
 	chapter.regions[0].facilities[0].required_claims.append("missing_repair_claim")
 	_invalid(chapter, "unknown facility prerequisite")
 	chapter = _chapter()

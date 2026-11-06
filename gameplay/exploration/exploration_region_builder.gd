@@ -9,7 +9,8 @@ func _build_camp() -> void:
 	for facility in game.current_data.facilities:
 		game.alchemy.mount(facility)
 	_add_interaction("元素实验：路线与配置记录", Vector2(-260, -240), game.trial_recorder.show_page, "note")
-	_add_interaction("篝火：恢复并保存", Vector2(-150, 50), func(): game._restore_player(); game._save_progress(); game.ui.notify("休整完成，生命和法力已恢复。"))
+	var rest := _add_interaction("篝火：休整与粗食", Vector2(-150, 50), Callable(), "mechanism")
+	game.survival.mount_rest(rest)
 	_add_interaction("营地整备台：装备与构筑", Vector2(-260, -140), game.equipment_service.show_equipment, "mechanism")
 	_add_interaction("查阅探索日志", Vector2(150, -180), game.ui.show_journal)
 	_add_interaction("营地训练：分配属性", Vector2(0, -180), game._show_training)
@@ -113,6 +114,8 @@ func _add_discovery(entry: ExplorationDiscoveryData) -> void:
 
 func build_element_objects() -> void:
 	var surfaces := GameRuntime.instance.get_simulation_runtime().get_surface_manager()
+	for station in game.current_data.survival_stations:
+		game.survival.mount(station)
 	for patch in game.current_data.surface_patches:
 		if not patch.disabled_by_claim.is_empty() and game.progress.claims.has(patch.disabled_by_claim): continue
 		surfaces.apply_area(game.region_root.to_global(patch.pos), patch.radius, [], "authored:" + game.region_id, patch.state, patch.duration)

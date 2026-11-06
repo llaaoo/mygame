@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="SurvivalStationData" format=3]
+[ext_resource type="Script" path="res://gameplay/exploration/survival/survival_station_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "survival.station.archive_pot"
+title = "旧伙房锅：可借火烹饪"
+pos = Vector2(320, -208)
+kind = "cook"
+heat_offset = Vector2(96, 48)
