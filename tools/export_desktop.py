@@ -14,6 +14,19 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "dist"
 
 
+def copy_documentation(folder):
+    # Keep source filenames so relative links also work in the standalone ZIP.
+    for name in ["LOCAL_PLAYTEST.md", "GRAYRIVER_FRONTIER.md", "GRAYRIVER_PLAYTEST.md"]:
+        shutil.copy2(ROOT / "docs" / name, folder / name)
+    shutil.copy2(folder / "LOCAL_PLAYTEST.md", folder / "README.md")
+    shutil.copy2(folder / "GRAYRIVER_PLAYTEST.md", folder / "PLAYTEST.md")
+    images = folder / "playtests"
+    images.mkdir()
+    for path in (ROOT / "docs/playtests").glob("grayriver_*.png"):
+        shutil.copy2(path, images / path.name)
+    shutil.copytree(ROOT / "docs/validation", folder / "validation")
+
+
 def main():
     revision = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
     dirty = bool(subprocess.check_output(["git", "status", "--porcelain"], cwd=ROOT, text=True).strip())
@@ -65,9 +78,7 @@ def main():
                     result = subprocess.run([str(binary), "--headless", "--quit-after", "60"], cwd=folder, env=env, stdout=stream, stderr=subprocess.STDOUT, timeout=60)
                 if result.returncode or "ERROR:" in (OUT / "linux-smoke.log").read_text():
                     raise SystemExit("Linux exported runtime smoke failed")
-            shutil.copy2(ROOT / "docs/LOCAL_PLAYTEST.md", folder / "README.md")
-            shutil.copy2(ROOT / "docs/GRAYRIVER_PLAYTEST.md", folder / "PLAYTEST.md")
-            shutil.copytree(ROOT / "docs/validation", folder / "validation")
+            copy_documentation(folder)
             (folder / "SOURCE.json").write_text(json.dumps({"source_revision": revision, "godot": version, "platform": platform, "build_overrides": {"editor_plugins.enabled": []}, "validation": "Linux headless startup passed" if platform == "linux" else "PE/PCK checked; Windows interactive run still required"}, indent=2) + "\n")
             archive = OUT / f"EmberPrison-{platform}-{revision[:8]}.zip"
             with zipfile.ZipFile(archive, "w", zipfile.ZIP_DEFLATED, compresslevel=6) as bundle:
