@@ -10,3 +10,5 @@ melee_damage = 8
 melee_cooldown = 0.9
 attack_range = 50.0
 ranged_preferred_range = 180.0
+
+melee_windup = 0.25

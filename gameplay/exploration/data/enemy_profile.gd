@@ -9,3 +9,7 @@ extends Resource
 @export var melee_cooldown := 1.0
 @export var attack_range := 55.0
 @export var ranged_preferred_range := 180.0
+
+@export var melee_windup := 0.4
+@export var melee_recovery := 0.25
+@export var ranged_windup := 0.45

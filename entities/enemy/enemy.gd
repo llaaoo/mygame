@@ -7,6 +7,9 @@ class_name Enemy
 @export var attack_range: float = 55.0
 @export var attack_damage: int = 8
 @export var attack_cooldown: float = 1.0
+@export var melee_windup := 0.4
+@export var melee_recovery := 0.25
+@export var ranged_windup := 0.45
 @export var patrol_enabled: bool = false
 @export var patrol_points: PackedVector2Array = PackedVector2Array()
 @export var patrol_pause: float = 0.8
@@ -47,6 +50,7 @@ const PRESET_STATS: Array[Dictionary] = [
 const MELEE_SPLASH_RADIUS: float = 40.0
 const MELEE_SPLASH_DAMAGE: float = 0.5
 
+var attack_preparation: EnemyAttackPreparation
 var surface_awareness: EnemySurfaceAwareness
 var enemy_color: Color = Color.RED
 var enemy_scale: Vector2 = Vector2(0.4, 0.4)
@@ -77,6 +81,9 @@ func _ready() -> void:
 	_home_position = global_position
 	$CollisionShape2D.shape = load("res://entities/enemy/enemy_body_shape.tres")
 	_create_buff_manager()
+	attack_preparation = EnemyAttackPreparation.new()
+	attack_preparation.actor = self
+	add_child(attack_preparation)
 	surface_awareness = EnemySurfaceAwareness.new()
 	surface_awareness.actor = self
 	surface_awareness.cautious = ai_role == AIRole.RANGED
@@ -215,6 +222,7 @@ func poll_actions() -> Array[Action]:
 
 
 func resolve_action(action: Action) -> void:
+	if attack_preparation and attack_preparation.busy(): return
 	if not ActionResolver.validate(self, action):
 		return
 
@@ -224,7 +232,9 @@ func resolve_action(action: Action) -> void:
 			velocity = direction * move_speed
 			move_and_slide()
 		Action.ActionType.CAST:
-			skill_manager.use_hand(action.skill_source, self, action.direction)
+			var target := _get_current_target()
+			var direction := action.direction
+			attack_preparation.begin(target, direction, ranged_windup, 0, func(): skill_manager.use_hand(action.skill_source, self, direction), "ranged")
 		Action.ActionType.MELEE:
 			_do_melee_attack()
 
@@ -387,6 +397,7 @@ func _get_patrol_world_point(index: int) -> Vector2:
 
 
 func _move_towards_point(target_point: Vector2) -> void:
+	if attack_preparation and attack_preparation.busy(): return
 	var dir := target_point - global_position
 	if dir.length_squared() <= 1.0:
 		velocity = Vector2.ZERO
@@ -399,8 +410,13 @@ func _do_melee_attack() -> void:
 	var target := _get_current_target()
 	if not attack_ready or not target:
 		return
+	if not attack_preparation.begin(target, (target.global_position - global_position).normalized(), melee_windup, melee_recovery, func():
+		if attack_preparation.melee_connects(): _resolve_melee_hit(target)
+	, "melee"): return
 	attack_ready = false
+	_attack_ready_remaining = maxf(attack_cooldown, melee_windup + melee_recovery)
 
+func _resolve_melee_hit(target: Node2D) -> void:
 	var trace := CombatDebugger.begin("melee_enemy", "敌人近战")
 	var exec_inst := CombatExecutor.instance
 	if exec_inst:
@@ -425,7 +441,6 @@ func _do_melee_attack() -> void:
 	if trace:
 		CombatDebugger.store(trace)
 
-	_attack_ready_remaining = attack_cooldown
 
 func _process(delta: float) -> void:
 	if not attack_ready:
@@ -514,6 +529,7 @@ func take_damage(amount: int) -> void:
 
 
 func _on_died() -> void:
+	if attack_preparation: attack_preparation.cancel()
 	if player and rewards_enabled:
 		CombatExecutor.report_exp_bonus(player, 30 + stats_component.level * 10)
 	if rewards_enabled: _spawn_drop()

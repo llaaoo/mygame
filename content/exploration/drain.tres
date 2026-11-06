@@ -85,7 +85,7 @@ profile = ExtResource("profile_hunter")
 
 [sub_resource type="Resource" id="Resource_2lu4k"]
 script = ExtResource("2_omdmg")
-pos = Vector2(352, 128)
+pos = Vector2(384, 128)
 hp = 30
 role = 1
 speed = 95.0
