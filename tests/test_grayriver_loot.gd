@@ -86,7 +86,7 @@ func run() -> void:
 	second.take_damage(1000)
 	await frames()
 	check(game.loot.take("river.enemy.camp.forest.3","equipment","river_coat") == 1 and game.equipment_service.count("river_coat") == 2,"Duplicate coats collapsed into one ownership flag")
-	check(not game.player.inventory_panel._can_change_equipment(),"Wilderness inventory allowed town-only equipment changes")
+	check(game.player.inventory_panel._can_change_equipment(),"Safe wilderness did not permit manual equipment changes")
 	game.player.position = Vector2(-3500,2100)
 	check(game.equipment_service.equip("river_coat") and game.player.inventory.get_item_count(game.catalog.equipment.river_coat) == 1,"Equipping erased a second copy")
 	check((game.player.get_node("EquipmentVisual") as ActorEquipmentVisual).items.any(func(item): return item.id == "river_coat"),"Player does not show the recovered coat")

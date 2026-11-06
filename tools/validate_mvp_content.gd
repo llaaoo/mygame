@@ -11,5 +11,5 @@ func _init() -> void:
 	if failures.is_empty():
 		print("MVP content passed: %d regions, %d spell combination rules, %d manufacturing recipes, %d quests, clear interactions and connected routes" % [catalog.regions.size(), catalog.spell_rules.size(), CastingSupplies.new().crafting_recipes.size(), catalog.chapter.quests.size()])
 		print("Exploration builds: %d actions, %d fixed equipment rewards" % [catalog.actions.size(), catalog.equipment.size()])
-		print("Grayriver content passed: continuous wilderness, 3 interiors, discovered formulas and 6 town commissions")
+		print("Grayriver content passed: continuous wilderness, 3 interiors, discovered formulas and %d town commissions" % GrayriverDefinition.build().quests.size())
 	quit(0 if failures.is_empty() else 1)

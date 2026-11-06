@@ -1,6 +1,9 @@
 class_name ExplorationProgress
 extends RefCounted
 
+var tracked_quest := ""
+var waypoint: Dictionary = {}
+var story_actors: Dictionary = {}
 var journey: Dictionary = {}
 var trial_runs: Array[Dictionary] = []
 var element_clues: Dictionary = {}
@@ -36,7 +39,7 @@ func claim(id: String, title: String, text: String, new_actions: Array, new_spel
 	return true
 
 func serialize_save_data() -> Dictionary:
-	return {"equipment_counts": equipment_counts.duplicate(), "loot_records": loot_records.duplicate(true), "journey": journey.duplicate(true), "survival_state": survival_state.duplicate(true), "trial_runs": trial_runs.duplicate(true), "element_clues": element_clues.duplicate(), "verified_reactions": verified_reactions.duplicate(), "equipment_owned": equipment_owned.duplicate(), "equipment_loadout": equipment_loadout.duplicate(), "actions": actions.duplicate(), "spell_rules": spell_rules.duplicate(), "claims": claims.duplicate(), "cleared": cleared.duplicate(), "journal": journal.duplicate(true), "completed": completed, "deaths": deaths, "world_states": world_states.duplicate(true), "loadout": loadout.duplicate(true), "character_state": character_state.duplicate(true), "visited": visited.duplicate(), "choices": choices.duplicate(), "casting_supplies": casting_supplies.duplicate(true)}
+	return {"tracked_quest": tracked_quest, "waypoint": waypoint.duplicate(true), "story_actors": story_actors.duplicate(true), "equipment_counts": equipment_counts.duplicate(), "loot_records": loot_records.duplicate(true), "journey": journey.duplicate(true), "survival_state": survival_state.duplicate(true), "trial_runs": trial_runs.duplicate(true), "element_clues": element_clues.duplicate(), "verified_reactions": verified_reactions.duplicate(), "equipment_owned": equipment_owned.duplicate(), "equipment_loadout": equipment_loadout.duplicate(), "actions": actions.duplicate(), "spell_rules": spell_rules.duplicate(), "claims": claims.duplicate(), "cleared": cleared.duplicate(), "journal": journal.duplicate(true), "completed": completed, "deaths": deaths, "world_states": world_states.duplicate(true), "loadout": loadout.duplicate(true), "character_state": character_state.duplicate(true), "visited": visited.duplicate(), "choices": choices.duplicate(), "casting_supplies": casting_supplies.duplicate(true)}
 
 func validate_save_data(value: Variant) -> bool:
 	if not value is Dictionary:
@@ -46,6 +49,14 @@ func validate_save_data(value: Variant) -> bool:
 	if not counts is Dictionary: return false
 	for id in counts:
 		if not id is String or not counts[id] is int or counts[id] < 0 or counts[id] > 999: return false
+	if not value.get("tracked_quest", "") is String: return false
+	var mark = value.get("waypoint", {})
+	if not mark is Dictionary: return false
+	if not mark.is_empty():
+		if not mark.get("position") is Array or mark.position.size()!=2: return false
+		for n in mark.position:
+			if typeof(n) not in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(n)) or absf(float(n))>100000: return false
+	if not GrayriverStories.valid_states(value.get("story_actors", {})): return false
 	var location = value.get("journey", {})
 	if not location is Dictionary: return false
 	if not location.is_empty():
@@ -136,6 +147,9 @@ func validate_save_data(value: Variant) -> bool:
 	return true
 
 func deserialize_save_data(data: Dictionary) -> void:
+	tracked_quest = data.get("tracked_quest", "")
+	waypoint = data.get("waypoint", {}).duplicate(true)
+	story_actors = data.get("story_actors", {}).duplicate(true)
 	journey = data.get("journey", {}).duplicate(true)
 	survival_state = data.get("survival_state", {}).duplicate(true)
 	trial_runs.assign(data.get("trial_runs", []))

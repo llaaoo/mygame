@@ -107,3 +107,9 @@ func has_space(item: ItemData, quantity: int = 1) -> bool:
 		if slot.item == null:
 			space += item.max_stack if item.stackable else 1
 	return space >= quantity
+
+func empty_slot_count() -> int:
+	var count := 0
+	for slot in _slots:
+		if not slot.item: count += 1
+	return count

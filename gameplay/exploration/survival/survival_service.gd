@@ -109,6 +109,9 @@ func description() -> String:
 	return text
 
 func show_page() -> void:
+	if game is GrayriverGame and game.hub:
+		game.hub.open("supplies")
+		return
 	var recovery := needs.recovery()
 	var text := status_line() + "\n" + timers_line() + "\n\n"
 	var demands: Array[String] = []

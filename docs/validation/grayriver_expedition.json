@@ -1,0 +1,277 @@
+{
+  "date": "2026-11-06",
+  "engine": "Godot 4.6.3",
+  "base_revision": "138c4542aea5078b992fc1aa00dd370c190188bb",
+  "branch": "feat/grayriver-expedition-upgrade",
+  "full_suite": {
+    "command": "python tools/run_tests.py --suite all --jobs 2 --timeout 90",
+    "passed": 59,
+    "total": 59,
+    "checks": [
+      {
+        "name": "advanced_spells",
+        "passed": true
+      },
+      {
+        "name": "alchemy_repair",
+        "passed": true
+      },
+      {
+        "name": "boon_choices",
+        "passed": true
+      },
+      {
+        "name": "cast_refactor",
+        "passed": true
+      },
+      {
+        "name": "content",
+        "passed": true
+      },
+      {
+        "name": "content_contracts",
+        "passed": true
+      },
+      {
+        "name": "content_expansion",
+        "passed": true
+      },
+      {
+        "name": "element_knowledge",
+        "passed": true
+      },
+      {
+        "name": "element_trials",
+        "passed": true
+      },
+      {
+        "name": "element_world",
+        "passed": true
+      },
+      {
+        "name": "emergent_mediums",
+        "passed": true
+      },
+      {
+        "name": "enemy_preparation",
+        "passed": true
+      },
+      {
+        "name": "enemy_surfaces",
+        "passed": true
+      },
+      {
+        "name": "environment_attunement",
+        "passed": true
+      },
+      {
+        "name": "equipment_system",
+        "passed": true
+      },
+      {
+        "name": "existing_spell_interactions",
+        "passed": true
+      },
+      {
+        "name": "expedition_builds",
+        "passed": true
+      },
+      {
+        "name": "expedition_feedback",
+        "passed": true
+      },
+      {
+        "name": "exploration_content",
+        "passed": true
+      },
+      {
+        "name": "exploration_mvp",
+        "passed": true
+      },
+      {
+        "name": "field_outpost",
+        "passed": true
+      },
+      {
+        "name": "field_work",
+        "passed": true
+      },
+      {
+        "name": "fire_combinations",
+        "passed": true
+      },
+      {
+        "name": "five_element_rules",
+        "passed": true
+      },
+      {
+        "name": "frontier_expedition",
+        "passed": true
+      },
+      {
+        "name": "frontier_projects",
+        "passed": true
+      },
+      {
+        "name": "gameplay",
+        "passed": true
+      },
+      {
+        "name": "grayriver_content",
+        "passed": true
+      },
+      {
+        "name": "grayriver_foundation",
+        "passed": true
+      },
+      {
+        "name": "grayriver_journey",
+        "passed": true
+      },
+      {
+        "name": "grayriver_loot",
+        "passed": true
+      },
+      {
+        "name": "grayriver_routes",
+        "passed": true
+      },
+      {
+        "name": "grayriver_salvage",
+        "passed": true
+      },
+      {
+        "name": "joint_interactions",
+        "passed": true
+      },
+      {
+        "name": "material_intent",
+        "passed": true
+      },
+      {
+        "name": "material_recycling",
+        "passed": true
+      },
+      {
+        "name": "normal_budget_tactics",
+        "passed": true
+      },
+      {
+        "name": "partial_boons",
+        "passed": true
+      },
+      {
+        "name": "player_components",
+        "passed": true
+      },
+      {
+        "name": "playtest_iteration",
+        "passed": true
+      },
+      {
+        "name": "region_lifecycle",
+        "passed": true
+      },
+      {
+        "name": "retreat_ledger",
+        "passed": true
+      },
+      {
+        "name": "room_generation",
+        "passed": true
+      },
+      {
+        "name": "rpg_attributes",
+        "passed": true
+      },
+      {
+        "name": "run_loop",
+        "passed": true
+      },
+      {
+        "name": "save_recovery",
+        "passed": true
+      },
+      {
+        "name": "save_system",
+        "passed": true
+      },
+      {
+        "name": "shared_characters",
+        "passed": true
+      },
+      {
+        "name": "skill_catalog",
+        "passed": true
+      },
+      {
+        "name": "skill_upgrades",
+        "passed": true
+      },
+      {
+        "name": "soul_spell_system",
+        "passed": true
+      },
+      {
+        "name": "spell_materials",
+        "passed": true
+      },
+      {
+        "name": "startup",
+        "passed": true
+      },
+      {
+        "name": "status_transactions",
+        "passed": true
+      },
+      {
+        "name": "survival_needs",
+        "passed": true
+      },
+      {
+        "name": "survival_rest",
+        "passed": true
+      },
+      {
+        "name": "survival_world",
+        "passed": true
+      },
+      {
+        "name": "tactical_balance",
+        "passed": true
+      },
+      {
+        "name": "ui_system",
+        "passed": true
+      }
+    ]
+  },
+  "followup": {
+    "commands": [
+      "python tools/run_tests.py --tests frontier_expedition frontier_projects --timeout 45",
+      "python tools/run_tests.py --tests frontier_expedition grayriver_loot grayriver_salvage --timeout 45"
+    ],
+    "purpose": "Final needs panel, compact supply belt and hostility/reward persistence checks",
+    "passed": 5,
+    "total": 5
+  },
+  "graphics": {
+    "renderer": "gl_compatibility, software Mesa / Xorg dummy",
+    "sizes": [
+      "1152x648",
+      "960x600"
+    ],
+    "fixture": "tools/capture_frontier_expedition.gd",
+    "script_errors": 0,
+    "driver_warning": "VSync changes unsupported by dummy graphics driver",
+    "scope": "Staged isolated saves, frozen simulation, explicit inventory/positions; actual pointer click starts timed work. Not a natural campaign or balance acceptance."
+  },
+  "cold_committed_source": {
+    "revision": "d6e02df",
+    "method": "git archive HEAD into a fresh directory without .godot or user saves",
+    "import": "passed, Godot recovery import",
+    "command": "python tools/run_tests.py --tests frontier_expedition frontier_projects grayriver_loot grayriver_salvage content startup --timeout 45 --jobs 2",
+    "passed": 6,
+    "total": 6
+  }
+}

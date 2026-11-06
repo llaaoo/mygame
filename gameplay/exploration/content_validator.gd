@@ -204,6 +204,11 @@ func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 				var corpse_claim := "loot.river.enemy."+str(encounter.get_meta("persistent_id"))
 				_claim(claims,corpse_claim,encounter)
 				completion_claims[corpse_claim] = true
+				var actor_id: String="river.enemy."+str(encounter.get_meta("persistent_id"))
+				if GrayriverStories.PEOPLE.has(actor_id):
+					var outcome: String=GrayriverStories.PEOPLE[actor_id].claim
+					_claim(claims,outcome,encounter)
+					completion_claims[outcome]=true
 			_validate_enemy_profile(encounter, profiles)
 			if encounter.character:
 				for item in encounter.character.equipment:

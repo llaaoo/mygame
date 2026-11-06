@@ -1,6 +1,10 @@
 class_name GrayriverGame
 extends MVPGame
 const TOWN := Rect2(-4600,1100,2400,2200)
+var hub: FrontierHub
+var guidance: FrontierGuidance
+var stories: GrayriverStories
+var frontier_hud: FrontierHUD
 var loot: GrayriverLoot
 var definition: Dictionary
 var terrain: GrayriverTerrain
@@ -8,6 +12,10 @@ var resuming_journey := false
 var _location_clock := 0.0
 var _discovery_clock := 0.0
 func _ready() -> void:
+	FrontierControls.load_preferences()
+	hub=FrontierHub.new(self)
+	guidance=FrontierGuidance.new(self)
+	stories=GrayriverStories.new(self)
 	loot = GrayriverLoot.new(self)
 	definition = GrayriverDefinition.data()
 	catalog = ExplorationContentCatalog.new(GrayriverDefinition.build())
@@ -40,8 +48,10 @@ func _spawn_enemy(spec: ExplorationEncounterData, layout: RefCounted, index: int
 	var enemy := active_enemies.back() as Enemy
 	enemy.set_meta("frontier_claim",id)
 	enemy.set_meta("frontier_group",spec.get_meta("group",region_id))
+	stories.mount(enemy)
 func _on_enemy_died(enemy: Enemy, generation: int) -> void:
 	if not GameRuntime.instance.get_region_session().is_current(generation): return
+	stories.died(enemy)
 	loot.record_enemy(enemy)
 	if not practice_active: progress.claims[enemy.get_meta("frontier_claim", "river.enemy.unknown")] = true
 	super._on_enemy_died(enemy,generation)
@@ -50,7 +60,7 @@ func is_at_base() -> bool:
 	return region_id == "camp" and is_instance_valid(player) and TOWN.has_point(player.global_position)
 func has_hostiles_near(point: Vector2) -> bool:
 	for enemy in active_enemies:
-		if is_instance_valid(enemy) and not enemy.health_component.is_dead and enemy.global_position.distance_to(point)<500: return true
+		if is_instance_valid(enemy) and not enemy.health_component.is_dead and not enemy.story_truce and enemy.global_position.distance_to(point)<500: return true
 	return false
 func is_area_cleared(point: Vector2) -> bool:
 	if region_id != "camp": return progress.cleared.has(region_id)
@@ -58,7 +68,8 @@ func is_area_cleared(point: Vector2) -> bool:
 	for i in range(current_data.encounters.size()):
 		if current_data.encounters[i].pos.distance_to(point)>650: continue
 		relevant = true
-		if not progress.claims.has("river.enemy." + str(current_data.encounters[i].get_meta("persistent_id"))): return false
+		var id := "river.enemy." + str(current_data.encounters[i].get_meta("persistent_id"))
+		if not progress.claims.has(id) and not (GrayriverStories.PEOPLE.has(id) and progress.claims.has(GrayriverStories.PEOPLE[id].claim)): return false
 	return relevant
 func journey_location() -> Dictionary:
 	if not is_instance_valid(player) or region_id.is_empty(): return {}
@@ -96,14 +107,16 @@ func _process(delta: float) -> void:
 		_save_progress()
 		ui.notify("灰河谷通路已恢复。你仍可探索遗漏地点、处理委托或回访设施。")
 func show_map() -> void:
-	ui.show_panel("灰河谷行路图","",[{"title":"继续探索","callback":ui.close_modal}])
-	var scroll:=ui._modal_panel.find_child("BodyScroll",true,false) as ScrollContainer
-	var body:=scroll.get_child(0)
-	scroll.remove_child(body)
-	body.queue_free()
+	var root:=VBoxContainer.new()
+	root.add_child(FrontierWidgets.label("滚轮缩放 · 中键/右键拖动 · 左键放置路标 · 暗处为未探索地区",13,true))
 	var map:=GrayriverMap.new()
 	map.game=self
-	scroll.add_child(map)
+	root.add_child(map)
+	var row:=HBoxContainer.new()
+	row.add_child(FrontierWidgets.button("定位当前位置",map.center_player))
+	row.add_child(FrontierWidgets.button("清除路标",func(): progress.waypoint.clear(); _queue_save(); map.queue_redraw()))
+	root.add_child(row)
+	ui.show_view("灰河谷 / 行路图",root)
 
 func discovered_places() -> String:
 	var text:=""
@@ -115,6 +128,11 @@ func _bootstrap() -> void:
 	await super._bootstrap()
 	ui.pause_provider = show_valley_pause
 	ui.map_provider = show_map
+	ui.journal_action=hub.open.bind("quests","")
+	ui.shortcut_action=hub.handle_shortcut
+	frontier_hud=FrontierHUD.new()
+	frontier_hud.game=self
+	add_child(frontier_hud)
 func show_valley_pause() -> void:
 	ui.show_panel("灰河谷 · 暂停","野外连续行走，遗迹沿实际入口往返。G只记录亲自到过的地点。\n\n撤回镇中需现场站定3秒，移动、攻击、施法或受伤打断；不治疗、不补货。F5保存当前地点与进度，F9读取。已击败敌人和永久成果保留。",[{"title":"继续旅程","callback":ui.close_modal},{"title":"查看行路图","callback":show_map},{"title":"现场撤回河谷镇","disabled":is_at_base(),"callback":retreat.begin},{"title":"重试遗迹（无击杀奖励）","disabled":not can_practice(),"callback":progress_service.practice_encounters},{"title":"重置河谷遭遇（无击杀奖励）","callback":replay_encounters},{"title":"旧监狱验证场（独立存档）","callback":open_prototype}])
 func replay_encounters() -> void:
@@ -142,6 +160,10 @@ func open_prototype() -> void:
 	get_tree().change_scene_to_file("res://mvp.tscn")
 
 func _change_region(destination: String, arrival: Vector2 = Vector2.INF) -> void:
+	for id in GrayriverStories.PEOPLE:
+		if progress.claims.has(id):
+			var person: Dictionary=GrayriverStories.PEOPLE[id]
+			progress.claim(person.claim,person.title,"先前旅程已以战斗结束这段纠纷。",[],[])
 	super._change_region(destination,arrival)
 	# New optional encounters remain available in regions cleared by older saves.
 	if destination != "camp" and progress.cleared.has(destination):
@@ -150,3 +172,20 @@ func _change_region(destination: String, arrival: Vector2 = Vector2.INF) -> void
 		for i in range(current_data.encounters.size()):
 			if current_data.encounters[i].optional_encounter: _spawn_enemy(current_data.encounters[i],layout,i)
 	loot.mount_region()
+	var scenery:=FrontierScenery.new()
+	scenery.game=self
+	region_root.add_child(scenery)
+
+func _show_quests() -> void:
+	hub.open("quests")
+
+func _on_spell_object_solved(spec: SpellPuzzleData) -> void:
+	super._on_spell_object_solved(spec)
+	builder.mount_available_stations()
+	for child in region_root.get_children():
+		if child is FrontierScenery: child.queue_redraw()
+
+func _clear_temporary() -> void:
+	stories.sync()
+	stories.actors.clear()
+	super._clear_temporary()
