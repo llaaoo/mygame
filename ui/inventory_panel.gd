@@ -196,6 +196,11 @@ func _on_equip_clicked(slot_type: int) -> void:
 	if not inventory or not equipment_manager:
 		return
 	var item := equipment_manager.get_equipment(slot_type)
+	var scene := get_tree().current_scene
+	if scene is MVPGame and scene.equipment_service:
+		scene.equipment_service.unequip(slot_type)
+		_refresh_all()
+		return
 	if item and inventory.has_space(item):
 		equipment_manager.unequip(slot_type)
 		inventory.add_item(item)
@@ -234,6 +239,11 @@ func _inventory_to_equip(inventory_index: int, equipment_slot: int) -> void:
 	var item := slot.item as EquipmentData
 	if item.slot_type != equipment_slot:
 		return
+	var scene := get_tree().current_scene
+	if scene is MVPGame and scene.equipment_service:
+		scene.equipment_service.equip(item.id)
+		_refresh_all()
+		return
 	var old := equipment_manager.get_equipment(equipment_slot)
 	inventory.remove_item(item)
 	if old:
@@ -243,4 +253,4 @@ func _inventory_to_equip(inventory_index: int, equipment_slot: int) -> void:
 
 func _can_change_equipment() -> bool:
 	var scene := get_tree().current_scene
-	return not scene is MVPGame or scene.region_id == "camp"
+	return not scene is MVPGame or scene.is_at_base()
