@@ -48,15 +48,18 @@ func _process(delta: float) -> void:
 func _update_proximity() -> void:
 	if not is_instance_valid(_player): return
 	var distance := global_position.distance_squared_to(_player.global_position)
-	var near := distance < PlayerInputController.INTERACT_RANGE * PlayerInputController.INTERACT_RANGE
+	var near := _player is Player and (_player as Player).input_controller.interaction_target() == self
 	if _near != near:
 		_near = near
 		set_title(title)
 		queue_redraw()
-	_label.visible = distance < 280 * 280 or kind in ["passage", "person"]
+	_label.visible = near or (kind in ["passage", "person"] and distance < 180*180)
 	_label.modulate.a = 1.0 if near else .7
 
 func _draw() -> void:
+	if get_tree().current_scene is GrayriverGame:
+		_draw_frontier()
+		return
 	if _near: draw_arc(Vector2.ZERO, 25, 0, TAU, 32, Color(tint, .35), 1, true)
 	draw_circle(Vector2.ZERO, 19, Color(tint, 0.18))
 	draw_arc(Vector2.ZERO, 20, 0, TAU, 32, tint, 2, true)
@@ -80,3 +83,33 @@ func _draw() -> void:
 			draw_rect(Rect2(-7, -10, 14, 20), tint, false, 2)
 			draw_line(Vector2(-4, -3), Vector2(4, -3), tint, 1)
 			draw_line(Vector2(-4, 3), Vector2(4, 3), tint, 1)
+
+func _draw_frontier() -> void:
+	draw_set_transform(Vector2(0,4),0,Vector2(1,.45))
+	draw_circle(Vector2.ZERO,22,Color(0,0,0,.22))
+	draw_set_transform(Vector2.ZERO)
+	if _near: draw_arc(Vector2.ZERO,26,0,TAU,32,Color(tint,.7),1,true)
+	match kind:
+		"person":
+			draw_rect(Rect2(-8,0,6,18),Color("353c3a"))
+			draw_rect(Rect2(2,0,6,18),Color("353c3a"))
+			draw_rect(Rect2(-12,-20,24,27),Color("72735c"))
+			draw_rect(Rect2(-8,-34,16,16),Color("bc9a78"))
+			draw_rect(Rect2(-9,-37,18,7),Color("464138"))
+			draw_line(Vector2(-8,-4),Vector2(8,-4),Color("b4a47e"),3)
+		"passage":
+			for x in [-19,19]: draw_rect(Rect2(x-5,-14,10,32),Color("6f7468"))
+			draw_rect(Rect2(-24,-20,48,10),Color("868a77"))
+			draw_polyline(PackedVector2Array([Vector2(-7,0),Vector2(4,-7),Vector2(4,7)]),Color("d1bf8b"),2)
+		"mechanism":
+			draw_rect(Rect2(-20,-10,40,20),Color("6f5b40"))
+			for x in [-14,14]: draw_line(Vector2(x,5),Vector2(x,18),Color("443b2c"),5)
+			draw_line(Vector2(-13,-10),Vector2(8,0),Color("afaa8a"),3)
+		_:
+			draw_rect(Rect2(-15,-8,30,22),Color("6e563a"))
+			draw_rect(Rect2(-16,-11,32,8),Color("9a8155"))
+			if kind!="cache":
+				draw_rect(Rect2(-9,-15,18,13),Color("c6b78d"))
+				draw_line(Vector2(-6,-11),Vector2(6,-11),Color("71674f"),1)
+	if _near:
+		draw_colored_polygon(PackedVector2Array([Vector2(-4,-46),Vector2(4,-46),Vector2(0,-40)]),GameUIStyle.GOLD)

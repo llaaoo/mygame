@@ -76,6 +76,8 @@ static func build() -> ExplorationChapterData:
 			exit.target = raw.target
 			exit.title = raw.title
 			exit.pos = vector(raw.pos)
+			exit.required_claims=PackedStringArray(raw.get("required_claims",[]))
+			exit.locked_message=raw.get("locked_message",exit.locked_message)
 			if raw.has("arrival"): exit.arrival = vector(raw.arrival)
 			region.exits.append(exit)
 		for raw in entry.get("stations", []):

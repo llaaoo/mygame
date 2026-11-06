@@ -245,6 +245,18 @@
             450
           ],
           "text": "洛恩曾经守桥，如今依然举着桥纹盾截留运料。他的盾让他更耐打，却拖慢脚步。可以利用近战锁向前摇从侧面绕开；不打算交战，也能沿西侧找回散落材料。穿戴的取舍对你也一样有效。"
+        },
+        {
+          "id": "river.beacon_log",
+          "title": "守炉人的最后一页",
+          "pos": [
+            1020,
+            -2150
+          ],
+          "text": "“北风再大，也要让矿工看见这盏火。侧廊的承梁松了，要先用炭烘干，再以晶砂加固；矿里那条坡道直通湖岸。芮克带走了最后的晶石，他还欠大家一个解释。”\n炉旁留着一份没来得及吃的烤饼。",
+          "materials": {
+            "ration": 1
+          }
         }
       ],
       "stations": [
@@ -354,6 +366,19 @@
           "required_claims": [
             "river.relief"
           ]
+        },
+        {
+          "id": "river.north_cook",
+          "title": "湖岸烽炉营锅",
+          "pos": [
+            1250,
+            -2180
+          ],
+          "kind": "cook",
+          "lit": true,
+          "required_claims": [
+            "river.north_beacon"
+          ]
         }
       ],
       "patches": [
@@ -453,6 +478,33 @@
             "storm_dust": 2,
             "crystal": 3
           }
+        },
+        {
+          "id": "river.north_beacon",
+          "title": "湖岸旧烽炉",
+          "pos": [
+            1120,
+            -2208
+          ],
+          "hint": "让真实火焰在炉中保持2秒，或花炭屑2、树液1站定3秒重砌炉膛。点燃后这里恢复锅位。",
+          "completion_text": "湖岸烽炉重新燃起，旁边的营锅可用了。每次烹饪仍消耗原料。",
+          "routes": [
+            {
+              "required_surface": "burning",
+              "hold_seconds": 2
+            }
+          ],
+          "work": [
+            {
+              "id": "beacon_fuel",
+              "title": "重砌烽炉：炭屑2、树液1",
+              "duration": 3,
+              "material_costs": {
+                "charcoal": 2,
+                "sap": 1
+              }
+            }
+          ]
         }
       ],
       "facilities": [
@@ -594,6 +646,22 @@
             -1600
           ],
           "target": "river_prison"
+        },
+        {
+          "title": "湖岸侧廊：进入矿道",
+          "pos": [
+            1100,
+            -2050
+          ],
+          "target": "river_mine",
+          "arrival": [
+            -650,
+            360
+          ],
+          "required_claims": [
+            "river.mine_shore"
+          ],
+          "locked_message": "出口从内部坍塌，先在矿道侧廊加固承梁。"
         }
       ],
       "encounters": [
@@ -1097,6 +1165,22 @@
             -1300,
             -2650
           ]
+        },
+        {
+          "title": "侧廊：前往北部湖岸",
+          "pos": [
+            -650,
+            440
+          ],
+          "target": "camp",
+          "arrival": [
+            1100,
+            -2050
+          ],
+          "required_claims": [
+            "river.mine_shore"
+          ],
+          "locked_message": "侧廊承梁尚未加固，先检查旁边的支架。"
         }
       ],
       "puzzles": [
@@ -1150,6 +1234,30 @@
             110
           ],
           "kind": "pillar"
+        }
+      ],
+      "deliveries": [
+        {
+          "id": "river.mine_shore",
+          "title": "矿道侧廊承梁",
+          "pos": [
+            -400,
+            440
+          ],
+          "description": "湖岸侧廊的承梁松脱。花晶砂1、炭屑2，站定4秒烘干并加固。开通后可以从这条真实出口到达湖岸，不需要绕回山路。",
+          "completion_text": "侧廊已经加固，湖岸出口可以通行，湖边也能从原路返回矿道。",
+          "already_text": "支架稳固，沿侧廊可往返湖岸。",
+          "methods": [
+            {
+              "id": "shore_braces",
+              "title": "烘干并加固：晶砂1、炭屑2",
+              "duration": 4,
+              "material_costs": {
+                "crystal": 1,
+                "charcoal": 2
+              }
+            }
+          ]
         }
       ]
     },
@@ -1544,10 +1652,43 @@
     {
       "id": "river_quartermaster",
       "title": "矿道运料官的去向",
-      "description": "找到矿工的欠货记录，并亲自从运料官遗骸取回至少一件剩余物品，回镇向艾妲报告。",
+      "description": "找到矿工的欠货记录，向运料官追讨真实晶石或以战斗结束欠货纠纷，回镇报告。",
       "required_claims": [
         "river.quartermaster_note",
-        "loot.river.enemy.river_mine.quartermaster"
+        "river.mine_settled"
+      ],
+      "points": 1
+    },
+    {
+      "id": "river_road_people",
+      "title": "驿路上的人",
+      "description": "翻车后的缺粮让巡路人拦住商旅。找到运料单，处理洛恩的拦路，再搭设驿站前哨。可以交涉，也可以战斗；和平解决不会夺取装备。",
+      "required_claims": [
+        "river.caravan_manifest",
+        "river.bridge_settled",
+        "river.outpost"
+      ],
+      "points": 2
+    },
+    {
+      "id": "river_north_link",
+      "title": "湖与矿之间",
+      "description": "读守炉人的遗页，处理芮克的欠货，修好矿道侧廊承梁并重燃湖岸烽炉。新出口与锅位会长期保留。",
+      "required_claims": [
+        "river.beacon_log",
+        "river.mine_settled",
+        "river.mine_shore",
+        "river.north_beacon"
+      ],
+      "points": 2
+    },
+    {
+      "id": "river_old_oath",
+      "title": "不再守候的命令",
+      "description": "带回档案窖名册，结束赫铎的守岗。可凭名册交涉，也可在他重伤时接受认输，或战斗到底。",
+      "required_claims": [
+        "river.dossier",
+        "river.veteran_settled"
       ],
       "points": 1
     }

@@ -3,6 +3,9 @@ extends Node
 
 var player: Player
 var casting: PlayerCastingController
+var _focus: Node2D
+var _focus_frame := -1
+var _focus_origin := Vector2.INF
 const INTERACT_RANGE := 80.0
 
 func _init(actor: Player) -> void:
@@ -25,7 +28,7 @@ func poll_universal_actions() -> Array[Action]:
 		actions.append(Action.dodge(input_dir if input_dir.length() > 0.1 else player.facing_direction, player))
 
 	# 近战（左键 = 无左手技能时直接近战）
-	if Input.is_action_just_pressed("attack") and not player.skill_manager.has_left_spell():
+	if Input.is_action_just_pressed("attack") and not player.skill_manager.has_left_spell() and not _pointer_over_interface():
 		actions.append(Action.melee(player))
 
 	# 技能（左手/右手/快捷键1-6）
@@ -41,6 +44,7 @@ func poll_universal_actions() -> Array[Action]:
 	return actions
 
 func _poll_universal_cast(actions: Array[Action], source: String, input_action: String) -> void:
+	if source in ["left","right"] and _pointer_over_interface() and not Input.is_action_just_released(input_action): return
 	if not _can_cast_source(source):
 		return
 	var pressed := Input.is_action_just_pressed(input_action)
@@ -50,6 +54,9 @@ func _poll_universal_cast(actions: Array[Action], source: String, input_action: 
 	var action := Action.cast(source, player.get_mouse_direction(), player)
 	action.params["release"] = released
 	var skill := _get_skill_for_source(source)
+	var quick := get_tree().current_scene is GrayriverGame and FrontierControls.quick_cast and skill.cast_type not in ["charge","channel"]
+	if quick and released: return
+	action.params["quick_cast"] = quick
 	action.cast_context = CastContext.at_position(player, CastContext.ground_point(player, player.get_global_mouse_position(), skill.cast_distance), skill) if skill.ground_targeted else CastContext.simple(player, action.direction, skill)
 	action.cast_context.empower = Input.is_key_pressed(KEY_SHIFT)
 	actions.append(action)
@@ -117,6 +124,11 @@ func resolve_action(action: Action) -> void:
 				if casting.aiming_sources.is_empty():
 					casting.hide_aim()
 			else:
+				if action.params.get("quick_cast",false):
+					if ActionResolver.validate(player,action):
+						_cast_source(action.skill_source,action.cast_context)
+						player.state_machine.transition_to("skill")
+					return
 				# CAST_PRESS — 总是显示瞄准
 				casting.aiming_sources[action.skill_source] = true
 				var skill := _get_skill_for_source(action.skill_source)
@@ -167,17 +179,7 @@ func _try_interact() -> void:
 		get_viewport().set_input_as_handled()
 		return
 
-	var nearest: Node2D = null
-	var nearest_dist: float = INTERACT_RANGE
-
-	for node in get_tree().get_nodes_in_group("interactable"):
-		var target := node as Node2D
-		if not target:
-			continue
-		var dist := player.global_position.distance_to(target.global_position)
-		if dist < nearest_dist:
-			nearest = target
-			nearest_dist = dist
+	var nearest := interaction_target(true)
 
 	if nearest:
 		var interactable := nearest.get_node_or_null("Interactable") as Interactable
@@ -193,3 +195,21 @@ func _input(event: InputEvent) -> void:
 		if (event.button_index == MOUSE_BUTTON_WHEEL_UP or event.button_index == MOUSE_BUTTON_WHEEL_DOWN) and event.pressed:
 			if casting.aiming_sources.size() > 0:
 				casting.cancel_aim = true
+
+func interaction_target(refresh := false) -> Node2D:
+	var frame := Engine.get_physics_frames()
+	if not refresh and frame == _focus_frame and _focus_origin == player.global_position and is_instance_valid(_focus): return _focus
+	_focus_frame=frame
+	_focus_origin=player.global_position
+	_focus=null
+	var nearest:=INTERACT_RANGE
+	for node in get_tree().get_nodes_in_group("interactable"):
+		if not node is Node2D or node.is_queued_for_deletion(): continue
+		var distance:=player.global_position.distance_to(node.global_position)
+		if distance<nearest:
+			nearest=distance
+			_focus=node
+	return _focus
+
+func _pointer_over_interface() -> bool:
+	return get_viewport().gui_get_hovered_control()!=null

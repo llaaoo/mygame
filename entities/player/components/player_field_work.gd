@@ -27,6 +27,10 @@ func _ready() -> void:
 	RuntimeRegistration.register_ticker(self)
 	panel = FieldWorkPanel.new()
 	add_child(panel)
+	panel.selector.item_selected.connect(func(index: int):
+		if not is_busy(): selected=index; _refresh_panel())
+	panel.start_button.pressed.connect(start_selected)
+	panel.cancel_button.pressed.connect(func(): cancel("已取消作业"); close_panel())
 	_last_hp = player.health_component.hp
 	player.health_component.health_changed.connect(_on_health)
 
@@ -166,6 +170,7 @@ func _on_health(hp: int, _maximum: int) -> void:
 
 func _refresh_panel() -> void:
 	if not _in_range(): return
+	panel.choices(methods,selected,is_busy(),reason_for(methods[selected]) if not methods.is_empty() else "")
 	var text := _title + "\n"
 	if not pending.is_empty():
 		panel.display(text + pending.method.title + " · %.1fs\n保持站定 · E或Esc取消\n移动、施法和受伤会打断" % maxf(0, pending.remaining), 1 - pending.remaining / pending.duration)

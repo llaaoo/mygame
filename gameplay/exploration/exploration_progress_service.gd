@@ -86,6 +86,7 @@ func _save_progress() -> void:
 		save_failed.emit("保存未完成，当前进度仍保留在内存。原存档已保留，可按F5重试。")
 
 func _sync_progress() -> void:
+	if game is GrayriverGame and game.stories: game.stories.sync()
 	# Include already emitted world facts even when saving before the next runtime frame.
 	GameRuntime.instance.get_command_bus().flush_world_facts()
 	if game.equipment_service:

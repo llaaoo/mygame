@@ -44,7 +44,7 @@ func sync() -> void:
 			game.progress.equipment_loadout[str(item.slot_type)] = item.id
 
 func equip(id: String) -> bool:
-	if not game.is_at_base() or count(id) <= 0 or not game.catalog.equipment.has(id):
+	if not change_reason().is_empty() or count(id) <= 0 or not game.catalog.equipment.has(id):
 		return false
 	if not _fits_loadout(game.catalog.equipment[id].slot_type,game.catalog.equipment[id]): return false
 	if not _manager().equip(game.catalog.equipment[id]):
@@ -54,7 +54,7 @@ func equip(id: String) -> bool:
 	return true
 
 func unequip(slot: int) -> bool:
-	if not game.is_at_base() or not _fits_loadout(slot) or not _manager().unequip(slot):
+	if not change_reason().is_empty() or not _fits_loadout(slot) or not _manager().unequip(slot):
 		return false
 	_reconcile_inventory()
 	game._save_progress()
@@ -108,6 +108,9 @@ func _manager() -> EquipmentManager:
 	return game.player.get_node("EquipmentManager") as EquipmentManager
 
 func show_equipment() -> void:
+	if game is GrayriverGame and game.hub:
+		game.hub.open("equipment")
+		return
 	var text := "在营地整备。装备有明确取舍，同槽只能选择一件；已拥有物品保留，重置遭遇不重复发奖。I背包也可查看装备。\n\n" + build_summary()
 	var buttons: Array[Dictionary] = []
 	for id in game.catalog.equipment:
@@ -160,3 +163,9 @@ func build_summary(candidate: EquipmentData = null) -> String:
 	var partial_cost := _manager().partial_boon_cost(candidate)
 	text += "恩赐消费：Shift保留剩余时长50%%，改用保留伤害倍率；形态强化保留，每份再加%d MP（费用修正前）\n" % partial_cost if partial_cost >= 0 else "恩赐消费：Shift完整消费，获得完整释放倍率\n"
 	return text
+
+func change_reason() -> String:
+	if game is GrayriverGame:
+		if game.player.health_component.is_dead or game.player.field_work.is_busy() or game.player.skill_manager.combinations.is_busy() or not game.player.casting.aiming_sources.is_empty(): return "先结束当前动作，再手动换装。"
+		return "附近有敌人，先脱离战斗再换装。" if game.has_hostiles_near(game.player.position) else ""
+	return "返回营地整备。" if not game.is_at_base() else ""

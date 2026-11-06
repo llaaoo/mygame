@@ -19,7 +19,7 @@ static func snapshot(enemy: Enemy) -> Dictionary:
 	return {"equipment": equipment, "materials": materials}
 
 func record_enemy(enemy: Enemy) -> void:
-	if game.practice_active or not enemy.rewards_enabled: return
+	if game.practice_active or not (enemy.rewards_enabled or enemy.get_meta("story_loot_eligible",false)): return
 	var id := str(enemy.get_meta("frontier_claim", ""))
 	if id.is_empty() or game.progress.loot_records.has(id): return
 	var record := snapshot(enemy)
@@ -50,6 +50,9 @@ func _available(id: String) -> bool:
 
 func inspect(id: String) -> void:
 	if not _available(id): return
+	if game.hub:
+		game.hub.open("loot",id)
+		return
 	var record: Dictionary = game.progress.loot_records[id]
 	var text := "物品来自死者实际穿戴与剩余行囊。已消耗的材料不会再出现；未取走的东西会留在这里。\n\n"
 	var buttons: Array[Dictionary] = []
@@ -104,6 +107,7 @@ func take(id: String, kind := "", item_id := "") -> int:
 
 func inspect_actor(enemy: Enemy) -> void:
 	if not is_instance_valid(enemy) or enemy.health_component.is_dead or enemy.global_position.distance_to(game.player.global_position) >= PlayerInputController.INTERACT_RANGE: return
+	if game.stories.inspect(enemy): return
 	var carried := snapshot(enemy)
 	var text := "穿戴与行囊读取当前实物，击败后回收这些装备及尚未用掉的物资。\n\n" if enemy.rewards_enabled else "这是无奖励试战：穿戴仍产生战斗效果，击败后不生成新的战利品。\n\n"
 	for id in carried.equipment:

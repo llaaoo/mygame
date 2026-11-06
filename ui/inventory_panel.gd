@@ -51,7 +51,10 @@ func _input(event: InputEvent) -> void:
 	elif event.keycode == KEY_I:
 		if get_tree().paused and not visible:
 			return
-		toggle()
+		var scene := get_tree().current_scene
+		if scene is GrayriverGame and scene.hub:
+			scene.hub.handle_shortcut(KEY_I)
+		else: toggle()
 		get_viewport().set_input_as_handled()
 
 
@@ -253,4 +256,4 @@ func _inventory_to_equip(inventory_index: int, equipment_slot: int) -> void:
 
 func _can_change_equipment() -> bool:
 	var scene := get_tree().current_scene
-	return not scene is MVPGame or scene.is_at_base()
+	return scene.equipment_service.change_reason().is_empty() if scene is MVPGame else true

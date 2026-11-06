@@ -29,6 +29,7 @@ var _player_search: Timer
 @export var mana_drop_amount := 30
 var rewards_enabled := true
 var physical_loot := false
+var story_truce := false
 
 enum AIRole { MELEE, RANGED, HYBRID }
 @export var ai_role: AIRole = AIRole.MELEE
@@ -173,11 +174,17 @@ func _subscribe_revenge_events() -> void:
 
 
 func _on_got_hit(ev: CombatEvent) -> void:
-	if ev.target != self:
+	if ev.target != self or health_component.is_dead:
 		return
 	if ev.source == self or not is_instance_valid(ev.source):
 		return
 	if ev.source is Player:
+		if story_truce:
+			story_truce=false
+			var scene:=get_tree().current_scene as GrayriverGame
+			if scene and not scene.active_enemies.has(self):
+				scene.active_enemies.append(self)
+				scene.progress.cleared.erase(scene.region_id)
 		_revenge_target = ev.source
 		_returning_home = false
 		return
@@ -203,6 +210,7 @@ func _on_target_killed(ev: CombatEvent) -> void:
 
 
 func _get_current_target() -> Node2D:
+	if story_truce: return null
 	if _is_valid_target(_revenge_target):
 		return _revenge_target
 	if _is_valid_target(player) and global_position.distance_to(player.global_position) <= detect_range * 1.35:

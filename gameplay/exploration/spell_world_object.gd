@@ -59,7 +59,9 @@ func _on_hit(event: CombatEvent) -> void:
 	_refresh()
 
 func tick(delta: float) -> void:
-	if completed: return
+	if completed:
+		_update_focus()
+		return
 	_evaluate_routes(delta)
 	_refresh()
 
@@ -104,16 +106,33 @@ func _refresh() -> void:
 		for i in range(spec.routes.size()):
 			var route := spec.routes[i]
 			if not route.required_surface.is_empty():
-				_label.text += "\n检测：%s %.1f/%.1fs" % [SurfaceManager.surface_title(route.required_surface), _held[i], route.hold_seconds]
+				_label.text += "\n%s保持 %.1f / %.1f秒" % [SurfaceManager.surface_title(route.required_surface), _held[i], route.hold_seconds]
+	_update_focus()
 	queue_redraw()
 
+func _update_focus() -> void:
+	if not get_tree().current_scene is GrayriverGame: return
+	var player:=get_tree().get_first_node_in_group("player") as Player
+	_label.visible=is_instance_valid(player) and player.input_controller.interaction_target()==self
+
 func _draw() -> void:
-	if not completed:
+	if not completed and (not get_tree().current_scene is GrayriverGame or _label.visible):
 		for route in spec.routes:
 			if route.required_surface.is_empty(): continue
 			var corner := Vector2(SurfaceManager.cell_at(global_position + route.surface_offset)) * 64 - global_position
 			draw_rect(Rect2(corner, Vector2(64,64)), Color(.5,.8,.9,.2))
 			draw_rect(Rect2(corner, Vector2(64,64)), Color(.5,.8,.9,.7), false, 2)
+	if get_tree().current_scene is GrayriverGame:
+		var tint:=GameUIStyle.SUCCESS if completed else GameUIStyle.GOLD
+		if spec.id=="river.north_beacon":
+			if _label.visible: draw_arc(Vector2.ZERO,38,0,TAU,32,tint,1,true)
+			return
+		draw_rect(Rect2(-23,-14,46,34),Color("262f2e"))
+		draw_rect(Rect2(-23,-14,46,11),Color("6d7060"))
+		draw_line(Vector2(-17,5),Vector2(17,5),Color("a69772"),2)
+		draw_arc(Vector2(0,-5),10,0,TAU,24,tint,2,true)
+		if _label.visible: draw_arc(Vector2.ZERO,29,0,TAU,32,tint,1,true)
+		return
 	var color := Color(0.4, 0.9, 0.65) if completed else Color(0.8, 0.6, 1.0)
 	draw_circle(Vector2.ZERO, 23, Color(color, 0.18))
 	draw_rect(Rect2(-18, -18, 36, 36), color, false, 2)

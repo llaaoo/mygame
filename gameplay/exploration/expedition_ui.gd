@@ -22,6 +22,9 @@ var journal_provider: Callable
 var map_provider: Callable
 var pause_provider: Callable
 var practice_available: Callable
+var journal_action: Callable
+var shortcut_action: Callable
+var _modal_extent := Vector2(760,548)
 var _heading_panel: PanelContainer
 var _notice: PanelContainer
 var _modal_panel: PanelContainer
@@ -127,6 +130,9 @@ func set_survival_status(text: String) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed or event.echo:
 		return
+	if not modal_locked and shortcut_action.is_valid() and shortcut_action.call(event.keycode):
+		get_viewport().set_input_as_handled()
+		return
 	if event.keycode == KEY_ESCAPE:
 		if is_instance_valid(modal):
 			if not modal_locked:
@@ -179,8 +185,9 @@ func close_modal() -> void:
 	_modal_panel = null
 	modal_locked = false
 
-func show_panel(title: String, text: String, buttons: Array[Dictionary], locked: bool = false) -> void:
+func show_panel(title: String, text: String, buttons: Array[Dictionary], locked: bool = false, extent := Vector2(760,548)) -> void:
 	close_modal()
+	_modal_extent = extent
 	modal_locked = locked
 	modal = CanvasLayer.new()
 	modal.layer = GameUIStyle.LAYER_MODAL + 1
@@ -238,7 +245,8 @@ func show_panel(title: String, text: String, buttons: Array[Dictionary], locked:
 	body.add_theme_color_override("default_color", GameUIStyle.TEXT_MAIN)
 	body.add_theme_constant_override("line_separation", 5)
 	scroll.add_child(body)
-	scroll.resized.connect(func(): body.custom_minimum_size.x = maxf(1, scroll.size.x - 20))
+	scroll.resized.connect(func():
+		if is_instance_valid(body): body.custom_minimum_size.x = maxf(1, scroll.size.x - 20))
 	var button_host: Container = box
 	if buttons.size() > 3:
 		var grid := GridContainer.new()
@@ -278,7 +286,7 @@ func _layout_modal() -> void:
 		_heading_panel.offset_left = -width * .5
 		_heading_panel.offset_right = width * .5
 	if not is_instance_valid(_modal_panel): return
-	var extent := Vector2(minf(760, viewport.x - 48), minf(548, viewport.y - 48))
+	var extent := Vector2(minf(_modal_extent.x, viewport.x - 48), minf(_modal_extent.y, viewport.y - 48))
 	_modal_panel.offset_left = -extent.x * .5
 	_modal_panel.offset_right = extent.x * .5
 	_modal_panel.offset_top = -extent.y * .5
@@ -307,6 +315,9 @@ func show_pause() -> void:
 	])
 
 func show_journal() -> void:
+	if journal_action.is_valid():
+		journal_action.call()
+		return
 	if journal_provider.is_valid():
 		show_panel("探索日志", journal_provider.call(), [{"title": "元素关系：线索与验证", "callback": elements_requested.emit}, {"title": "实验路线与配置记录", "callback": trials_requested.emit}, {"title": "继续探索", "callback": close_modal}])
 		return
@@ -316,3 +327,14 @@ func show_journal() -> void:
 	if progress.journal.is_empty():
 		text += "还没有发现记录。先阅读营地手记和外院入口的铭刻记录。"
 	show_panel("探索日志", text, [{"title": "继续探索", "callback": close_modal}])
+
+func show_view(title: String, content: Control) -> void:
+	show_panel(title,"",[],false,Vector2(1080,660))
+	var scroll := _modal_panel.find_child("BodyScroll",true,false) as ScrollContainer
+	var old := scroll.get_child(0)
+	scroll.remove_child(old)
+	old.queue_free()
+	scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	content.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.add_child(content)
