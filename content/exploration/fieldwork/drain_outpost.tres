@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="RepairFacilityData" format=3]
+[ext_resource type="Script" path="res://gameplay/exploration/data/repair_facility_data.gd" id="1"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/field_work_method.gd" id="2"]
+[sub_resource type="Resource" id="build"]
+script = ExtResource("2")
+id = "build_outpost"
+title = "搭设检修前哨"
+duration = 3.0
+material_costs = {"charcoal": 2, "grain": 2}
+[resource]
+script = ExtResource("1")
+id = "outpost.drain_built"
+title = "排水回廊检修前哨"
+pos = Vector2(-352, -32)
+service = "outpost"
+requires_clear = true
+description = "清理回廊且现场无敌人后，炭屑2＋谷粮2站定建设3秒。永久提供野外短休与锅位，烹饪仍需燃料或亲手点火；与排污泵修复独立。"
+completion_text = "检修前哨已建成：E短休，北侧锅位可烹饪。仍需携带补给或点火；修复排污泵可进一步改善水源。重试遭遇不撤销建设，敌人仍会打断作业。"
+assembly = SubResource("build")

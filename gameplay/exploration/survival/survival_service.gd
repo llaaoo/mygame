@@ -151,6 +151,15 @@ func mount_rest(node: ExplorationInteractable) -> void:
 	node.set_meta("survival_rest", true)
 	node.callback = inspect_rest.bind(node)
 
+func inspect_field_rest(node: ExplorationInteractable) -> void:
+	_open(node, [method("rest:short", "野外短休3秒：生命+40/法力+30/疲劳-25", 3)], "短休消耗饱食5、饮水10；敌人、移动和其他动作仍会打断。不提供粗食或充分休整。旁边锅位仍需燃料或实际火源。")
+
+func field_rest_available(node: Node2D) -> bool:
+	var id := str(node.get_meta("survival_field_rest", ""))
+	for facility in game.current_data.facilities:
+		if facility.id == id and facility.service == "outpost" and game.progress.claims.has(id): return true
+	return false
+
 func inspect_rest(node: ExplorationInteractable) -> void:
 	_open(node, [method("rest:short", "短休3秒：生命+40/法力+30/疲劳-25", 3), method("rest:full", "充分休整6秒：恢复生命法力/疲劳归零", 6), method("basic", "营地粗食2秒：饱食与饮水至少60", 2)], "短休消耗饱食5、饮水10；充分休整消耗饱食20、饮水25。粗食不产生物品或额外恢复Buff，补给耗尽时仍可整备。")
 
@@ -179,7 +188,7 @@ func _open(node: Node2D, options: Array[FieldWorkMethod], guide: String, spec: S
 func _available(node: Node2D, spec: SurvivalStationData) -> bool:
 	if game._switching or game.player.health_component.is_dead or not is_instance_valid(node) or not node.is_inside_tree(): return false
 	if node == game.player: return spec == null
-	return node.get_parent() == game.region_root and ((spec != null and node.has_meta("survival_station") and node.get_meta("survival_station") == spec and spec in game.current_data.survival_stations) or (spec == null and game.region_id == "camp" and node.get_meta("survival_rest", false)))
+	return node.get_parent() == game.region_root and ((spec != null and node.has_meta("survival_station") and node.get_meta("survival_station") == spec and spec in game.current_data.survival_stations) or (spec == null and ((game.region_id == "camp" and node.get_meta("survival_rest", false)) or field_rest_available(node))))
 
 func has_heat(node: Node2D, spec: SurvivalStationData) -> bool:
 	return spec.lit or SurfaceManager.instance.surface_at(node.global_position + spec.heat_offset).get("state", "dry") == "burning"
@@ -219,7 +228,8 @@ func _reason(option: FieldWorkMethod, node: Node2D, spec: SurvivalStationData) -
 			if not spec or spec.kind != "forage": return "采集点已失效"
 			if needs.harvests.has(spec.id): return "尚在再生：%.0f秒" % needs.harvests[spec.id]
 		"rest", "basic":
-			if game.region_id != "camp" or not node.get_meta("survival_rest", false): return "需要营地篝火"
+			if game.region_id != "camp" or not node.get_meta("survival_rest", false):
+				if not field_rest_available(node) or option.id != "rest:short": return "需要营地篝火；前哨仅可短休"
 			if parts[0] == "rest" and (parts.size() != 2 or parts[1] not in ["short", "full"]): return "未知休整方式"
 		_:
 			return "未知补给操作"
