@@ -116,8 +116,8 @@
           "id": "river.frost",
           "title": "湖岸凝霜记录",
           "pos": [
-            700,
-            -2400
+            900,
+            -2250
           ],
           "text": "学会霜阵。水系也能凝霜控制；冻结保持减速，冲击能打碎冰面恢复水路。北岸石桥保持开放。",
           "requires_clear": false,
@@ -135,7 +135,8 @@
           "template": "drain/venom_knowledge",
           "crafts": [
             "venom_extract"
-          ]
+          ],
+          "kind": "person"
         },
         {
           "id": "survival.drain_recipe",
@@ -274,6 +275,21 @@
           "harvest": {
             "herb": 2
           }
+        },
+        {
+          "id": "river.relief_garden",
+          "title": "米菈的苦叶药圃",
+          "pos": [
+            -4100,
+            2300
+          ],
+          "kind": "forage",
+          "harvest": {
+            "herb": 2
+          },
+          "required_claims": [
+            "river.relief"
+          ]
         }
       ],
       "patches": [
@@ -293,13 +309,13 @@
             2400
           ],
           "state": "wet",
-          "radius": 96,
+          "radius": 224,
           "duration": 600
         },
         {
           "pos": [
-            700,
-            -2400
+            896,
+            -2304
           ],
           "state": "frozen",
           "radius": 64,
@@ -637,6 +653,92 @@
           "speed": 135,
           "group": "prison_road",
           "id": "camp.prison_road.11"
+        }
+      ],
+      "deliveries": [
+        {
+          "id": "river.relief",
+          "title": "炊事员米菈：最后一顿热饭",
+          "pos": [
+            -3950,
+            2600
+          ],
+          "description": "为留下的行路者交付一份炖汤，或一份烤饼加一份清水。烹饪、携带与交付都需要亲手完成，站定1.5秒，成功才扣除。交付后开放镇边药圃。",
+          "methods": [
+            {
+              "id": "hot_meal",
+              "title": "交付苦叶炖汤",
+              "duration": 1.5,
+              "material_costs": {
+                "broth": 1
+              }
+            },
+            {
+              "id": "dry_meal",
+              "title": "交付烤饼与饮用水",
+              "duration": 1.5,
+              "material_costs": {
+                "ration": 1,
+                "clean_water": 1
+              }
+            }
+          ],
+          "rewards": {
+            "grain": 2,
+            "herb": 1
+          }
+        }
+      ],
+      "events": [
+        {
+          "id": "waterworks_choice",
+          "title": "工区调流水轮",
+          "pos": [
+            3200,
+            512
+          ],
+          "text": "水路闸真正导电启动后，可把旧水工设施用于冷却监狱熔炉，或为法术导流。只能维持一条，随时可回来调整。",
+          "required_claims": [
+            "river.conductor"
+          ],
+          "choices": [
+            {
+              "id": "cooling",
+              "title": "冷却熔炉",
+              "text": "后续领主遭遇生命减少25%，火抗降低到10%。"
+            },
+            {
+              "id": "conduit",
+              "title": "魔力导流",
+              "text": "进入区域后基础法力回复由3提高到5；领主保持原生命与火抗。"
+            }
+          ]
+        }
+      ],
+      "props": [
+        {
+          "id": "river.mill_oil",
+          "pos": [
+            2800,
+            1050
+          ],
+          "scene": "oil_barrel"
+        },
+        {
+          "id": "river.forest_fence",
+          "pos": [
+            -2700,
+            -1500
+          ],
+          "scene": "wooden_fence"
+        },
+        {
+          "id": "river.road_fence",
+          "pos": [
+            -1900,
+            600
+          ],
+          "scene": "wooden_fence"
         }
       ]
     },
@@ -1263,6 +1365,15 @@
         "river_prison"
       ],
       "points": 2
+    },
+    {
+      "id": "river_relief",
+      "title": "行路者的热饭",
+      "description": "把实际食品交到镇中米菈手里。可以带烤饼与清水，也可在学会炖汤后亲手制作再交付。",
+      "required_claims": [
+        "river.relief"
+      ],
+      "points": 1
     }
   ]
 }

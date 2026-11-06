@@ -1,0 +1,52 @@
+extends SceneTree
+const Legacy:=preload("res://tests/support/mvp_fixture.gd")
+const Fixture:=preload("res://tests/support/grayriver_fixture.gd")
+var errors:Array[String]=[]
+func _init() -> void:call_deferred("run")
+func check(ok:bool,message:String) -> void:
+	if not ok:errors.append(message);push_error(message)
+func run() -> void:
+	var legacy:=Legacy.new(self)
+	var old:=await legacy.boot(true)
+	old.player.health_component.hp=51
+	old.player.mana_component.mp=27
+	old._save_progress()
+	var prototype:=FileAccess.get_file_as_bytes("user://save_2.sav")
+	await legacy.close()
+	var fixture:=Fixture.new(self)
+	var game:=await fixture.boot(true)
+	var p:=game.player
+	p.position=Vector2(-1800,1000)
+	p.health_component.hp=67
+	p.mana_component.mp=29
+	game._save_progress()
+	var saved:=SaveManager.instance.read_extension(3,"grayriver_frontier")
+	check(saved.journey.position==[-1800.0,1000.0] and saved.survival_state.hp==67,"Saved journey lost exact position or vitals")
+	check(prototype==FileAccess.get_file_as_bytes("user://save_2.sav"),"Frontier overwrote prototype slot")
+	# One defeated outdoor actor survives leaving, loading and encountering the same area again.
+	var enemy:Enemy=game.active_enemies[0]
+	var id:String=enemy.get_meta("frontier_claim")
+	enemy.rewards_enabled=false
+	enemy.take_damage(1000)
+	game._save_progress()
+	await fixture.close()
+	game=await fixture.boot(true)
+	check(game.player.position.distance_to(Vector2(-1800,1000))<2 and game.player.health_component.hp==67 and game.player.mana_component.mp==29,"Bootstrap teleported or refilled saved traveler")
+	check(game.active_enemies.size()==10 and game.progress.claims.has(id),"Defeated outdoor actor respawned on load")
+	game.show_map()
+	check(paused,"Map failed pause lifecycle")
+	var key:=InputEventKey.new();key.keycode=KEY_G;key.pressed=true
+	game.ui._unhandled_input(key)
+	check(not paused and not is_instance_valid(game.ui.modal),"G cannot close paused map")
+	game.player.position=Vector2(-3300,2100)
+	check(game.is_at_base(),"Town service boundary broken")
+	game.progress.claims["river.bridge_fixed"]=true
+	game.replay_encounters()
+	for i in range(8):await process_frame
+	check(game.progress.claims.has("river.bridge_fixed") and game.active_enemies.size()==11 and game.active_enemies.all(func(e):return not e.rewards_enabled),"Rehearsal lost permanent world or restored rewards")
+	await fixture.close()
+	old=await legacy.boot(true)
+	check(old.player.health_component.hp==51 and old.player.mana_component.mp==27,"Prototype cannot continue original save")
+	await legacy.close()
+	if errors.is_empty():print("Grayriver journey passed: isolated slots, exact resume/vitals, stable enemy facts, map pause, reward-free replay and legacy continuation")
+	quit(0 if errors.is_empty() else 1)

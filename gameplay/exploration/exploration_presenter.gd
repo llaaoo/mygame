@@ -99,8 +99,12 @@ func _approach_evidence(approach: ExplorationQuestApproachData) -> String:
 	return "现场凭据齐备" if missing.is_empty() else "还需：" + "、".join(missing)
 
 func _show_world_event(entry: ExplorationWorldEventData) -> void:
-	if not game.active_enemies.is_empty():
-		game.ui.notify("机房守卫仍在巡逻，先清场再操作阀门。")
+	for id in entry.required_claims:
+		if not game.progress.claims.has(id):
+			game.ui.notify("设备尚未接通：先处理附近的实际水路机关。")
+			return
+	if game.has_hostiles_near(entry.pos):
+		game.ui.notify("附近守卫仍在巡逻，先确保设备周围安全。")
 		return
 	var selected: String = game.progress.choices.get(entry.id, "")
 	var text: String = entry.text + "\n\n"
