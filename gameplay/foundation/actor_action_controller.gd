@@ -53,7 +53,7 @@ func try_action(action: Action) -> OperationResult:
 			return OperationResult.success()
 		Action.ActionType.GUARD:
 			guarding=bool(action.params.get("held",false)) and not busy() and can_guard()
-			if action.direction.length_squared()>.01: facing=action.direction.normalized()
+			if guarding and action.direction.length_squared()>.01: facing=action.direction.normalized()
 			return OperationResult.success()
 		Action.ActionType.SPRINT:
 			sprinting=bool(action.params.get("held",false))

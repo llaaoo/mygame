@@ -20,6 +20,9 @@ func run() -> void:
 	var hp:=target.health_component.hp
 	check(controls.try_action(attack).accepted and controls.stamina.current==88,"Physical attack did not spend stamina at acceptance")
 	check(not controls.contact(target).accepted and target.health_component.hp==hp,"Weapon hit before windup")
+	var guard_poll:=Action.new(); guard_poll.action_type=Action.ActionType.GUARD; guard_poll.direction=Vector2.LEFT; guard_poll.params["held"]=false
+	controls.try_action(guard_poll)
+	check(controls.facing==Vector2.RIGHT,"Unheld guard poll changed committed attack direction")
 	controls.elapsed=.2
 	var hit:=controls.contact(target)
 	check(hit.accepted and hit.damage_dealt>0 and hit.impact_applied==20,"Shared physical hit did not resolve damage and impact")
@@ -32,6 +35,8 @@ func run() -> void:
 	controls.stamina.current=100
 	var dodge:=Action.dodge(Vector2.LEFT,player)
 	check(controls.try_action(dodge).accepted and controls.stamina.current==80,"Dodge did not consume shared resource")
+	controls.try_action(guard_poll)
+	check(controls.facing==Vector2.LEFT,"Guard input changed committed dodge direction")
 	controls.elapsed=.12
 	var avoided:=CombatExecutor.report_hit(target,player,10,player.position,null,["melee"],"dodge-test",20)
 	check(not avoided.accepted and avoided.rejection=="dodge","Dodge window did not reject direct contact")
