@@ -20,4 +20,4 @@ J只列已发现补给与建设、已到达区域捷径及解封未取部件。�
 
 存档在Godot的用户数据目录`Study`中，与编辑器运行共用相同应用名；如要独立新档，可先备份原存档或使用独立系统账户。不要删除自己的原档。Linux可通过XDG_DATA_HOME等变量隔离试玩目录。
 
-当前为首章原型。Windows包已检查PE/PCK结构，尚需Windows设备实机运行；Linux包已做导出后启动检查。20—30分钟为首次探索目标，熟悉路线的输入辅助试玩不能替代首次玩家耗时。详细实测、资源收支与已知问题见源码docs/FIELD_CHAPTER_PLAYTEST.md。
+当前为首章原型。Windows包已检查PE/PCK结构，尚需Windows设备实机运行；Linux包已做导出后启动检查。20—30分钟为首次探索目标，熟悉路线的输入辅助试玩不能替代首次玩家耗时。详细实测、资源收支与已知问题见随包PLAYTEST.md及validation数据；源码对应docs/FIELD_CHAPTER_PLAYTEST.md。

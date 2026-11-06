@@ -67,6 +67,7 @@ def main():
                     raise SystemExit("Linux exported runtime smoke failed")
             shutil.copy2(ROOT / "docs/LOCAL_PLAYTEST.md", folder / "README.md")
             shutil.copy2(ROOT / "docs/FIELD_CHAPTER_PLAYTEST.md", folder / "PLAYTEST.md")
+            shutil.copytree(ROOT / "docs/validation", folder / "validation")
             (folder / "SOURCE.json").write_text(json.dumps({"source_revision": revision, "godot": version, "platform": platform, "build_overrides": {"editor_plugins.enabled": []}, "validation": "Linux headless startup passed" if platform == "linux" else "PE/PCK checked; Windows interactive run still required"}, indent=2) + "\n")
             archive = OUT / f"EmberPrison-{platform}-{revision[:8]}.zip"
             with zipfile.ZipFile(archive, "w", zipfile.ZIP_DEFLATED, compresslevel=6) as bundle:
