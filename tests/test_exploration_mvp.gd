@@ -32,7 +32,7 @@ func _run() -> void:
 	game.ui.close_modal()
 	var before_attack := game.player.health_component.hp
 	game.player.global_position = game.active_enemies[0].global_position + Vector2(-40, 0)
-	await create_timer(game.active_enemies[0].attack_cooldown + 0.3).timeout
+	await create_timer(game.active_enemies[0].attack_cooldown + game.active_enemies[0].melee_windup + 0.3).timeout
 	_check(game.player.health_component.hp < before_attack, "Melee enemy AI did not attack the player")
 	await _clear_encounter()
 	await _interact("支路：军械档案")

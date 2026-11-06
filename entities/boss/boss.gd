@@ -12,6 +12,7 @@ var boss_name: String:
 	get:
 		return boss_data.boss_name if boss_data else "Boss"
 
+var _pending_skills: Array[String] = []
 var _skill_timer: float = 0.0
 var _rage_mode: bool = false
 var _triggered_thresholds: Array[float] = []
@@ -29,6 +30,7 @@ func _ready() -> void:
 		enemy_color = boss_data.color
 		enemy_scale = Vector2(boss_data.scale, boss_data.scale)
 
+	melee_windup = .5
 	super._ready()
 
 	# 覆盖 Enemy 预设的视觉（BossData 优先）
@@ -137,6 +139,9 @@ func _check_phase(_current_hp: int, max_hp: int) -> void:
 
 
 func _cast_skill(skill_id: String) -> void:
+	if attack_preparation.busy():
+		if not _pending_skills.has(skill_id) and _pending_skills.size() < 4: _pending_skills.append(skill_id)
+		return
 	var skill := skill_manager.pool.get_skill(skill_id)
 	if not skill:
 		var p := get_tree().get_first_node_in_group("player") as Player
@@ -146,8 +151,13 @@ func _cast_skill(skill_id: String) -> void:
 		return
 
 	var dir := get_player_direction() if player else Vector2.DOWN
-	skill_manager.executor.execute(skill, CastContext.simple(self, dir, skill))
-	print("👹 [%s] 释放 %s！" % [boss_data.boss_name, skill.display_name])
+	var ctx := CastContext.at_position(self, global_position + dir * skill.cast_distance, skill)
+	var size := skill.aoe_visual.radius if skill.aoe_visual else skill.aoe_radius
+	attack_preparation.begin(_get_current_target(), dir, .75, 0, func(): skill_manager.executor.execute(skill, ctx), "aoe", ctx.target_position, size)
+
+func _process(delta: float) -> void:
+	super._process(delta)
+	if not _pending_skills.is_empty() and not attack_preparation.busy(): _cast_skill(_pending_skills.pop_front())
 
 
 ## ── 火系减伤（从 BossData.resists 读取） ──

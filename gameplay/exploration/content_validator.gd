@@ -459,6 +459,8 @@ func _validate_enemy_profile(encounter: ExplorationEncounterData, profiles: Dict
 		_fail(encounter, "profile: Boss cannot use an ordinary enemy profile '%s'" % profile.id)
 	if profile.id.is_empty() or profile.title.is_empty() or profile.appearance_preset not in [0, 1, 2] or profile.role not in [0, 1, 2] or profile.melee_damage <= 0 or not is_finite(profile.melee_cooldown) or profile.melee_cooldown <= 0 or not is_finite(profile.attack_range) or profile.attack_range <= 0 or not is_finite(profile.ranged_preferred_range) or profile.ranged_preferred_range < profile.attack_range:
 		_fail(profile, "Invalid enemy profile id/preset/role/combat parameters: " + profile.id)
+	for timing in [profile.melee_windup, profile.melee_recovery, profile.ranged_windup]:
+		if not is_finite(timing) or timing <= 0 or timing > 2: _fail(profile, "Invalid attack preparation timing: " + str(timing))
 	if profiles.has(profile.id) and profiles[profile.id] != profile:
 		_fail(profile, "Duplicate enemy profile id: " + profile.id)
 	profiles[profile.id] = profile

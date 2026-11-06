@@ -88,6 +88,9 @@ func _spawn_enemy(spec: ExplorationEncounterData, layout: RefCounted, index: int
 	enemy.attack_damage = 9 if not boss else 15
 	if not boss and spec.profile:
 		enemy.attack_damage = spec.profile.melee_damage
+		enemy.melee_windup = spec.profile.melee_windup
+		enemy.melee_recovery = spec.profile.melee_recovery
+		enemy.ranged_windup = spec.profile.ranged_windup
 		enemy.attack_cooldown = spec.profile.melee_cooldown
 		enemy.attack_range = spec.profile.attack_range
 		enemy.ranged_preferred_range = spec.profile.ranged_preferred_range
