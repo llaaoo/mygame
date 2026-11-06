@@ -90,7 +90,7 @@ func _sync_progress() -> void:
 	if game.equipment_service:
 		game.equipment_service.sync()
 	if game.survival: game.progress.survival_state = game.survival.serialize()
-	game.progress.casting_supplies = game.player.skill_manager.combinations.supplies.serialize()
+	game.progress.casting_supplies = game.player.skill_manager.combinations.supplies.serialize(true)
 	game.progress.world_states = GameRuntime.instance.get_world_runtime().state_manager.get_all_states().duplicate(true)
 	game.progress.loadout = game.player.skill_manager.serialize_skill_state()
 	game.progress.loadout["__configured"] = {}

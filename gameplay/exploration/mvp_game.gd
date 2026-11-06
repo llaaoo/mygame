@@ -108,6 +108,8 @@ func _bootstrap() -> void:
 	player.skill_manager.combinations.supplies.changed.connect(_queue_save)
 	(player.get_node("EquipmentManager") as EquipmentManager).loadout_changed.connect(_queue_save)
 	presenter.show_arrival()
+	if player.skill_manager.combinations.supplies.discarded_legacy_selection:
+		ui.notify("材料已改为本次选择：旧自动绑定已清除，库存保留。M选择素材，实际使用成功后清除选择。")
 
 	if load_status == SaveRepository.Status.RECOVERED:
 		ui.notify("主存档不可用，已从有效备份恢复进度。")
@@ -247,6 +249,7 @@ func _on_player_died() -> void:
 	_defeated = true
 	if trial_recorder and trial_recorder.active: trial_recorder.call_deferred("finish", "死亡中断")
 	progress.deaths += 1
+	player.skill_manager.combinations.supplies.clear_selection()
 	player.skill_manager.combinations.cancel("死亡")
 	player.skill_manager.combinations.clear_field()
 	_save_progress()

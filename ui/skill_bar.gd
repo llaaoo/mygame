@@ -156,9 +156,9 @@ func _process(_delta: float) -> void:
 				previews[comparison_key] = instance.data.display_name + "\n\n普通 · " + _brief_plan(alternate if empower else preview) + "\n\nShift · " + _brief_plan(preview if empower else alternate) + "\n\n数字为本次MP费用 · M查看完整材料与条件"
 			_panels[i].tooltip_text = previews[comparison_key]
 		if preview:
-			var icon_key: Variant = preview.skill.icon if preview.skill.icon else preview.skill.icon_atlas_index
+			var icon_key: Variant = instance.data.icon if instance.data.icon else instance.data.icon_atlas_index
 			if _icon_keys[i] != icon_key:
-				_icons[i].texture = SkillIconCatalog.get_icon(preview.skill)
+				_icons[i].texture = SkillIconCatalog.get_icon(instance.data)
 				_icon_keys[i] = icon_key
 			_cost_labels[i].text = "%d" % preview.cost
 			_cost_labels[i].modulate = GameUIStyle.TEXT_MAIN if preview.ready else GameUIStyle.GOLD

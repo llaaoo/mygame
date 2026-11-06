@@ -13,7 +13,7 @@ func show_materials() -> void:
 	text += "\n原料\n"
 	for id in CastingSupplies.RAW_TITLES:
 		text += "%s ×%d\n" % [supplies.title(id), supplies.count(id)]
-	text += "\n为基础动作选择一种可选强化，只对适配的结果消费。相容的法阵和印记可共同响应，总费用相加；资源不足或准备条件改变，整次动作取消。特殊施法的必需材料不能关闭。\n\n按M开关；K可编组雷阵、回响铭印、毒雾等动作。互斥增益按优先级选择一个，同优先级取后布的阵；护盾爆破先于回响脉冲。悬停技能槽查看本次全部结果与总费用。"
+	text += "\n为本次基础动作选择一种素材：实际使用成功后清除；中断不扣料并保留选择，不适配则不消费。离区、死亡和读档清除选择。相容的法阵和印记可共同响应，总费用相加；资源不足或准备条件改变，整次动作取消。特殊施法的必需材料不能关闭。\n\n按M开关；K可编组雷阵、回响铭印、毒雾等动作。互斥增益按优先级选择一个，同优先级取后布的阵；护盾爆破先于回响脉冲。悬停技能槽查看本次全部结果与总费用。"
 	var buttons: Array[Dictionary] = []
 	for id in game.player.skill_manager.known_actions:
 		var skill: SkillData = game.player.skill_manager.pool.get_skill(id)
@@ -24,14 +24,14 @@ func show_materials() -> void:
 	buttons.append({"title": "营地加工", "disabled": game.region_id != "camp", "callback": show_crafts})
 	buttons.append({"title": "调和台回收" + ("" if recycling_available() else "（需营地修复）"), "disabled": not recycling_available(), "callback": show_recycling})
 	buttons.append({"title": "继续探索", "callback": game.ui.close_modal})
-	game.ui.show_panel("施法材料与配置", text, buttons)
+	game.ui.show_panel("施法材料与本次选择", text, buttons)
 
 func show_action(skill: SkillData) -> void:
 	var controller: ConditionalCastController = game.player.skill_manager.combinations
 	var supplies := controller.supplies
 	var text := "%s\n%s\n\n%s\n\n" % [skill.display_name, skill.description, controller.describe_comparison(skill, game.player)]
 	text += "材料先改变性质，再处理恩赐和装备借阵。污染水不能洗毒，导电会波及自身。节律护手使Shift部分消费恩赐，保留剩余时长50%，使用较弱伤害倍率。\n"
-	var buttons: Array[Dictionary] = [{"title": "无可选强化", "callback": _configure.bind(skill, "")}]
+	var buttons: Array[Dictionary] = [{"title": "本次不加素材", "callback": _configure.bind(skill, "")}]
 	for id in CastingSupplies.MATERIAL_IDS:
 		var material: CastingMaterialData = supplies.catalog[id]
 		var preparation_hint := ""
@@ -43,9 +43,9 @@ func show_action(skill: SkillData) -> void:
 					preparation_hint = "Shift凝神：替代地面准备" + rule.result_skill.display_name + "，额外%d MP；只作为介质，不附加投射物改造。" % material.extra_mana
 		if compatible:
 			text += "\n%s（持有%d）\n%s\n" % [material.title, supplies.count(id), material.description + ("\n" + preparation_hint if not preparation_hint.is_empty() else "")]
-			buttons.append({"title": "配置：" + material.title, "callback": _configure.bind(skill, id)})
+			buttons.append({"title": "本次选择：" + material.title, "callback": _configure.bind(skill, id)})
 	buttons.append({"title": "返回材料总览", "callback": show_materials})
-	game.ui.show_panel("配置：" + skill.display_name, text, buttons)
+	game.ui.show_panel("本次选择：" + skill.display_name, text, buttons)
 
 func _configure(skill: SkillData, id: String) -> void:
 	game.player.skill_manager.combinations.supplies.configure(skill.get_id(), id)

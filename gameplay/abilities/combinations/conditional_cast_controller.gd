@@ -232,10 +232,12 @@ func preview(skill: SkillData, actor: Node2D, empower: bool = false) -> CastPlan
 			result.reason = "蕴魂已满：先以Shift组合兑现，再汲取残魂"
 	if not supplies.can_pay(result.material_costs):
 		result.reason = "施法材料不足：" + supplies.describe_cost(result.material_costs)
+	if skill.combination_only: result.reason = "组合结果须通过基础动作与现场条件触发"
 	result.ready = result.reason.is_empty()
 	return result
 
 func start(skill: SkillData, actor: Node2D, context: CastContext, source: String) -> bool:
+	if not skill or skill.combination_only or not get_parent().knows_action(skill): return false
 	if get_tree().paused or _dead(actor) or ("ui_blocked" in actor and actor.ui_blocked):
 		return false
 	var plan := preview(skill, actor, context.empower)
@@ -465,8 +467,11 @@ func effect_scope(skill: SkillData) -> String:
 	return "召唤"
 
 func describe_plan(plan: CastPlan) -> String:
-	var lines: Array[String] = [plan.effect_label]
-	for step in plan.explanation: lines.append(step.text)
+	var lines: Array[String] = []
+	for step in plan.explanation:
+		if step.kind != "effect": lines.append(step.text)
+	for step in plan.explanation:
+		if step.kind == "effect": lines.append("产生结果：" + step.text)
 	var hint := boon_hint(plan)
 	if not hint.is_empty(): lines.append(hint)
 	lines.append("可准备" if plan.ready else plan.reason)
