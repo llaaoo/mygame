@@ -51,6 +51,7 @@ func _spawn_enemy(spec: ExplorationEncounterData, layout: RefCounted, index: int
 	var enemy := load("res://entities/boss/fire_lord.tscn" if boss else "res://entities/enemy/enemy.tscn").instantiate() as Enemy
 	enemy.name = "Encounter_%d" % index
 	enemy.rewards_enabled = rewards
+	enemy.physical_loot = game is GrayriverGame
 	enemy.health_drop_amount = 8
 	enemy.mana_drop_amount = 12
 	var point: Vector2 = spec.pos
@@ -108,7 +109,7 @@ func _add_interaction(title: String, point: Vector2, callback: Callable, kind: S
 	return node
 
 func _add_discovery(entry: ExplorationDiscoveryData) -> void:
-	if entry.hide_when_claimed and game.progress.claims.has(entry.id):
+	if entry.hide_when_claimed and game.progress.claims.has(entry.id) and not game.equipment_service.has_pending_rewards(entry):
 		return
 	var label := str(entry.title)
 	if game.progress.claims.has(entry.id):

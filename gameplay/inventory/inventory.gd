@@ -25,6 +25,7 @@ func _resize_slots() -> void:
 
 ## 添加物品（返回成功数量，0=背包满）
 func add_item(item: ItemData, quantity: int = 1) -> int:
+	if quantity <= 0: return 0
 	var added = 0
 	var remaining = quantity
 

@@ -71,3 +71,9 @@ static func melee_contact(actor: Node2D, target: Node2D, damage: int, base_tags:
 		var cell := SurfaceManager.cell_at(target.global_position)
 		if surface.get_surface(cell).get("state","dry")!="dry": surface.apply_tags(cell,tags,"元素近战")
 	CombatExecutor.report_hit(actor,target,damage,target.global_position,skill,tags)
+
+static func incoming_damage(actor: Node2D, amount: int) -> int:
+	if amount <= 0: return 0
+	var equipment := actor.get_node_or_null("EquipmentManager") as EquipmentManager
+	var reduction := clampf(equipment.get_modifier_value("damage_reduction"),0.0,0.75) if equipment else 0.0
+	return maxi(1,roundi(amount*(1.0-reduction)))

@@ -32,7 +32,7 @@ func run() -> void:
 	await fixture.close()
 	game=await fixture.boot(true)
 	check(game.player.position.distance_to(Vector2(-1800,1000))<2 and game.player.health_component.hp==67 and game.player.mana_component.mp==29,"Bootstrap teleported or refilled saved traveler")
-	check(game.active_enemies.size()==10 and game.progress.claims.has(id),"Defeated outdoor actor respawned on load")
+	check(game.active_enemies.size()==11 and game.progress.claims.has(id),"Defeated outdoor actor respawned on load")
 	game.show_map()
 	check(paused,"Map failed pause lifecycle")
 	var key:=InputEventKey.new();key.keycode=KEY_G;key.pressed=true
@@ -43,7 +43,7 @@ func run() -> void:
 	game.progress.claims["river.bridge_fixed"]=true
 	game.replay_encounters()
 	for i in range(8):await process_frame
-	check(game.progress.claims.has("river.bridge_fixed") and game.active_enemies.size()==11 and game.active_enemies.all(func(e):return not e.rewards_enabled),"Rehearsal lost permanent world or restored rewards")
+	check(game.progress.claims.has("river.bridge_fixed") and game.active_enemies.size()==12 and game.active_enemies.all(func(e):return not e.rewards_enabled),"Rehearsal lost permanent world or restored rewards")
 	var inventory:=game.player.skill_manager.combinations.supplies.serialize()
 	game.player.position=Vector2(2000,1000)
 	game.player.take_damage(1000)

@@ -13,6 +13,7 @@ static func build() -> ExplorationChapterData:
 	chapter.actions.assign(source.chapter.actions)
 	chapter.spell_rules.assign(source.chapter.spell_rules)
 	chapter.equipment.assign(source.chapter.equipment)
+	chapter.equipment.append_array(GrayriverItems.equipment())
 	var definition := data()
 	for entry in definition.regions:
 		var region := ExplorationRegionData.new()
@@ -52,6 +53,8 @@ static func build() -> ExplorationChapterData:
 			site.title=raw.title
 			site.pos=vector(raw.pos)
 			site.description=raw.description
+			site.completion_text=raw.get("completion_text",site.completion_text)
+			site.already_text=raw.get("already_text",site.already_text)
 			site.rewards=amounts(raw.get("rewards",{}))
 			site.required_claims=PackedStringArray(raw.get("required_claims",[]))
 			for work_data in raw.methods:site.methods.append(work_method(work_data))
@@ -63,6 +66,7 @@ static func build() -> ExplorationChapterData:
 			if raw.has("character"): encounter.character=load("res://content/characters/river_%s.tres"%raw.character)
 			encounter.speed = float(raw.get("speed", 105))
 			encounter.boss = raw.get("boss", false)
+			encounter.optional_encounter = raw.get("optional", false)
 			if raw.has("profile"): encounter.profile = load("res://content/exploration/enemies/%s.tres" % raw.profile)
 			encounter.set_meta("persistent_id", str(raw.id))
 			encounter.set_meta("group", str(raw.get("group", region.id)))

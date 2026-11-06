@@ -28,6 +28,7 @@ var _player_search: Timer
 @export var health_drop_amount := 20
 @export var mana_drop_amount := 30
 var rewards_enabled := true
+var physical_loot := false
 
 enum AIRole { MELEE, RANGED, HYBRID }
 @export var ai_role: AIRole = AIRole.MELEE
@@ -124,6 +125,15 @@ func _setup_character() -> void:
 	_apply_stats()
 	ActorCombatModel.configure_actions(self,character_definition)
 	ActorCombatModel.configure_equipment(self,character_definition)
+	ActorEquipmentVisual.install(self)
+	if physical_loot:
+		add_to_group("interactable")
+		var interaction := Interactable.new()
+		interaction.name = "Interactable"
+		interaction.set_callback(func(_actor: Node2D):
+			var scene := get_tree().current_scene as GrayriverGame
+			if scene: scene.loot.inspect_actor(self))
+		add_child(interaction)
 	health_component.hp=health_component.max_hp
 	mana_component.mp=mana_component.max_mp
 	stats_component.stat_changed.connect(func(_key,_value):_apply_stats())
@@ -586,7 +596,7 @@ func distance_to_player() -> float:
 
 func take_damage(amount: int) -> void:
 	_flash_damage()
-	health_component.take_damage(amount)
+	health_component.take_damage(ActorCombatModel.incoming_damage(self,amount))
 
 
 func _on_died() -> void:
@@ -596,7 +606,7 @@ func _on_died() -> void:
 	if attack_preparation: attack_preparation.cancel()
 	if player and rewards_enabled:
 		CombatExecutor.report_exp_bonus(player, 30 + stats_component.level * 10)
-	if rewards_enabled: _spawn_drop()
+	if rewards_enabled and not physical_loot: _spawn_drop()
 	died.emit()
 	queue_free()
 

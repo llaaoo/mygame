@@ -8,7 +8,7 @@ func mount(spec: DeliverySiteData) -> void:
 func inspect(node: ExplorationInteractable, spec: DeliverySiteData) -> void:
 	if not _valid(node,spec):return
 	if game.progress.claims.has(spec.id):
-		game.ui.show_panel(spec.title,"这批口粮已经送到。你亲手交付的补给帮了忙，镇边的苦叶药圃现在可以采集；重复交谈不会再发放奖励。",[{"title":"继续旅程","callback":game.ui.close_modal}])
+		game.ui.show_panel(spec.title,spec.already_text,[{"title":"继续旅程","callback":game.ui.close_modal}])
 		return
 	game.player.field_work.inspect(node,spec.title,spec.methods,_reason.bind(node,spec),_complete.bind(node,spec),spec.description)
 func _valid(node: Node2D, spec: DeliverySiteData) -> bool:
@@ -26,7 +26,7 @@ func _complete(method: FieldWorkMethod,node: Node2D,spec: DeliverySiteData) -> b
 	if not supplies.pay(method.material_costs):
 		supplies.finish_transaction(false)
 		return false
-	if not game.progress.claim(spec.id,spec.title,"实际交付："+method.title+"。药圃对你开放，可回委托板报告。",[],[]):
+	if not game.progress.claim(spec.id,spec.title,"实际交付："+method.title+"。"+spec.completion_text,[],[]):
 		supplies.finish_transaction(false)
 		return false
 	supplies.grant(spec.rewards)
@@ -35,5 +35,5 @@ func _complete(method: FieldWorkMethod,node: Node2D,spec: DeliverySiteData) -> b
 	var notify:=supplies.finish_transaction(true)
 	if notify.is_valid():notify.call()
 	game._save_progress()
-	game.ui.notify("口粮已经送到。镇边苦叶药圃开放，艾妲的委托板可记录这次成果。")
+	game.ui.notify(spec.completion_text)
 	return true

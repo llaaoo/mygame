@@ -6,6 +6,7 @@
 [ext_resource type="Resource" path="res://gameplay/abilities/data/focus_data.tres" id="focus"]
 [ext_resource type="Resource" path="res://gameplay/abilities/data/water_call_data.tres" id="water_call"]
 [ext_resource type="Resource" path="res://content/exploration/equipment/cadence_gloves.tres" id="gloves"]
+[ext_resource type="Resource" path="res://content/frontier/equipment/river_staff.tres" id="river_staff"]
 [sub_resource type="Resource" id="Loadout"]
 script = ExtResource("loadout")
 right_hand = "ignite"
@@ -23,5 +24,5 @@ melee_multiplier = 0.6
 skills = [ExtResource("fire_sigil"), ExtResource("ignite"), ExtResource("focus"), ExtResource("water_call")]
 loadout = SubResource("Loadout")
 combinations = PackedStringArray("fire_sigil_fireball", "fire_sigil_focus")
-equipment = [ExtResource("gloves")]
+equipment = [ExtResource("gloves"), ExtResource("river_staff")]
 materials = {"ward_powder": 1}

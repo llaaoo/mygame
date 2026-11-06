@@ -143,6 +143,7 @@ func _ready() -> void:
 	if character_definition:
 		if not character_definition.skills.is_empty(): ActorCombatModel.configure_actions(self, character_definition)
 		ActorCombatModel.configure_equipment(self, character_definition)
+	ActorEquipmentVisual.install(self)
 
 	# 战斗事件总线（如果有则复用，没有则创建）
 	_setup_event_bus()
@@ -383,9 +384,7 @@ func cast_slot(idx: int) -> bool:
 	return ok
 
 func take_damage(amount: int) -> void:
-	var equipment := get_node_or_null("EquipmentManager") as EquipmentManager
-	var reduction := clampf(equipment.get_modifier_value("damage_reduction"), 0.0, 0.75) if equipment else 0.0
-	health_component.take_damage(maxi(1, int(round(amount * (1.0 - reduction)))))
+	health_component.take_damage(ActorCombatModel.incoming_damage(self,amount))
 
 func heal(amount: int, source := "skill") -> void:
 	var equipment := get_node_or_null("EquipmentManager") as EquipmentManager

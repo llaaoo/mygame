@@ -5,10 +5,11 @@ var _clock := 0.0
 var _label: Label
 func _ready() -> void:
 	_label=Label.new()
-	_label.position=Vector2(-100,-86)
+	_label.position=Vector2(-100,-98)
 	_label.size.x=200
 	_label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
 	_label.add_theme_font_size_override("font_size",11)
+	_label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	add_child(_label)
 func _process(delta: float) -> void:
 	_clock-=delta
@@ -21,6 +22,9 @@ func _process(delta: float) -> void:
 			_label.text+=" · "+entry.name
 	if not plan.is_empty():
 		_label.text+="\n"+plan.action.display_name+(" → "+plan.effect_label if plan.action.display_name!=plan.effect_label else "")
+	if actor.physical_loot:
+		_label.text += "\n[E] 观察穿戴与行囊"
+	if is_instance_valid(actor.player): _label.visible = actor.position.distance_to(actor.player.position) < 360
 	queue_redraw()
 func _draw() -> void:
 	for entry in [[actor.health_component.hp,actor.health_component.max_hp,-42,Color(.8,.25,.18)],[actor.mana_component.mp,actor.mana_component.max_mp,-36,Color(.2,.5,.9)]]:

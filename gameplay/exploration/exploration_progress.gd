@@ -6,6 +6,8 @@ var trial_runs: Array[Dictionary] = []
 var element_clues: Dictionary = {}
 var verified_reactions: Dictionary = {}
 var equipment_owned: Dictionary = {}
+var equipment_counts: Dictionary = {}
+var loot_records: Dictionary = {}
 var equipment_loadout: Dictionary = {}
 var actions: Dictionary = {"ignite": true}
 var spell_rules: Dictionary = {}
@@ -34,11 +36,16 @@ func claim(id: String, title: String, text: String, new_actions: Array, new_spel
 	return true
 
 func serialize_save_data() -> Dictionary:
-	return {"journey": journey.duplicate(true), "survival_state": survival_state.duplicate(true), "trial_runs": trial_runs.duplicate(true), "element_clues": element_clues.duplicate(), "verified_reactions": verified_reactions.duplicate(), "equipment_owned": equipment_owned.duplicate(), "equipment_loadout": equipment_loadout.duplicate(), "actions": actions.duplicate(), "spell_rules": spell_rules.duplicate(), "claims": claims.duplicate(), "cleared": cleared.duplicate(), "journal": journal.duplicate(true), "completed": completed, "deaths": deaths, "world_states": world_states.duplicate(true), "loadout": loadout.duplicate(true), "character_state": character_state.duplicate(true), "visited": visited.duplicate(), "choices": choices.duplicate(), "casting_supplies": casting_supplies.duplicate(true)}
+	return {"equipment_counts": equipment_counts.duplicate(), "loot_records": loot_records.duplicate(true), "journey": journey.duplicate(true), "survival_state": survival_state.duplicate(true), "trial_runs": trial_runs.duplicate(true), "element_clues": element_clues.duplicate(), "verified_reactions": verified_reactions.duplicate(), "equipment_owned": equipment_owned.duplicate(), "equipment_loadout": equipment_loadout.duplicate(), "actions": actions.duplicate(), "spell_rules": spell_rules.duplicate(), "claims": claims.duplicate(), "cleared": cleared.duplicate(), "journal": journal.duplicate(true), "completed": completed, "deaths": deaths, "world_states": world_states.duplicate(true), "loadout": loadout.duplicate(true), "character_state": character_state.duplicate(true), "visited": visited.duplicate(), "choices": choices.duplicate(), "casting_supplies": casting_supplies.duplicate(true)}
 
 func validate_save_data(value: Variant) -> bool:
 	if not value is Dictionary:
 		return false
+	if not GrayriverLoot.valid_records(value.get("loot_records", {})): return false
+	var counts = value.get("equipment_counts", {})
+	if not counts is Dictionary: return false
+	for id in counts:
+		if not id is String or not counts[id] is int or counts[id] < 0 or counts[id] > 999: return false
 	var location = value.get("journey", {})
 	if not location is Dictionary: return false
 	if not location.is_empty():
@@ -138,7 +145,11 @@ func deserialize_save_data(data: Dictionary) -> void:
 	if element_clues.get("ice", false): element_clues["water"] = true
 	element_clues.erase("ice")
 	verified_reactions = data.get("verified_reactions", {}).duplicate()
+	loot_records = data.get("loot_records", {}).duplicate(true)
+	equipment_counts = data.get("equipment_counts", {}).duplicate()
 	equipment_owned = data.get("equipment_owned", {}).duplicate()
+	for id in equipment_owned:
+		if equipment_owned[id] and not equipment_counts.has(id): equipment_counts[id] = 1
 	equipment_loadout = data.get("equipment_loadout", {}).duplicate()
 	actions = data.get("actions", {"ignite": true}).duplicate()
 	actions["ignite"] = true

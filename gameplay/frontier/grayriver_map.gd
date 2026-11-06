@@ -36,7 +36,12 @@ func _draw() -> void:
 		var bridge:=project(Vector2(300,500))
 		draw_circle(bridge,4,GameUIStyle.GOLD)
 		draw_string(font,bridge+Vector2(6,-5),"木桥 · "+("已修复" if game.progress.claims.has("river.bridge_fixed") else "损坏"),HORIZONTAL_ALIGNMENT_LEFT,-1,13,GameUIStyle.TEXT_MAIN)
+	for record: Dictionary in game.progress.loot_records.values():
+		if record.region != "camp" or (record.equipment.is_empty() and record.materials.is_empty()): continue
+		var at := project(GrayriverDefinition.vector(record.position))
+		draw_line(at-Vector2(3,3),at+Vector2(3,3),Color("e2ab66"),2)
+		draw_line(at+Vector2(-3,3),at+Vector2(3,-3),Color("e2ab66"),2)
 	var position:=game.player.position
 	if game.region_id!="camp": position=game.catalog.regions[game.region_id].exits[0].arrival
 	draw_circle(project(position),5,Color("70deff"))
-	draw_string(font,Vector2(24,20),"北 ↑   蓝点：你 / 遗迹入口   暗处：尚未走过",HORIZONTAL_ALIGNMENT_LEFT,-1,13,GameUIStyle.TEXT_MAIN)
+	draw_string(font,Vector2(24,20),"北 ↑  蓝点：你/入口  橙叉：未取遗骸  暗处：未探索",HORIZONTAL_ALIGNMENT_LEFT,-1,13,GameUIStyle.TEXT_MAIN)

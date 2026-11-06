@@ -1,0 +1,54 @@
+{
+  "date": "2026-11-06",
+  "base_revision": "a0c716cb88d1f3160bdf82adec9b56c800b613f8",
+  "content": {
+    "encounters": 22,
+    "human_enemies": 21,
+    "quests": 8,
+    "new_equipment_models": 9,
+    "total_frontier_equipment_models": 13
+  },
+  "targeted": {
+    "passed": 4,
+    "total": 4,
+    "logs": "/tmp/mygame-tests-khgwadl0"
+  },
+  "regression": {
+    "state": "passed",
+    "command": "python3 tools/run_tests.py --suite all --jobs 2",
+    "logs": "/tmp/mygame-tests-tw1p2qki",
+    "passed": 57,
+    "total": 57
+  },
+  "visual": {
+    "renderer": "Godot 4.6.3 OpenGL compatibility / Mesa llvmpipe via isolated Xorg dummy display",
+    "profile": "Isolated; persistence disabled; AI frozen; scripted positioning, defeat and collection.",
+    "checks": [
+      "Actual gear on living named enemy",
+      "Actual E input opens corpse UI",
+      "Player wears recovered identical gear",
+      "No atlas-baked unowned weapons"
+    ],
+    "script_errors": 0,
+    "known_driver_warning": "VSync change unsupported by software display; no gameplay diagnostics."
+  },
+  "limitations": [
+    "No natural new-save full journey or new balance comparison this round.",
+    "No Windows native interactive run."
+  ],
+  "package_documentation_links": 28,
+  "final_incremental": {
+    "passed": 3,
+    "total": 3,
+    "tests": [
+      "grayriver_loot",
+      "grayriver_journey",
+      "grayriver_salvage"
+    ],
+    "logs": "/tmp/mygame-tests-ooeuzbdu"
+  },
+  "import": {
+    "state": "passed",
+    "logs": "/tmp/grayriver-loot-final-import.log"
+  }
+}

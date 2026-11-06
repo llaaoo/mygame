@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="EquipmentData" format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/equipment_data.gd" id="item"]
+[ext_resource type="Script" path="res://gameplay/inventory/data/casting_equipment_profile.gd" id="profile"]
+[sub_resource type="Resource" id="Profile"]
+script = ExtResource("profile")
+[resource]
+script = ExtResource("item")
+id = "river_foreman_coat"
+display_name = "矿务工头甲"
+description = "蓝色工区甲。力量+1，受伤降低12%，移动速度-8；甲上仍钉着运料编号。"
+slot_type = 1
+item_type = 1
+icon_atlas_index = 6
+stackable = true
+max_stack = 99
+stat_modifiers = {"strength": 1, "move_speed": -8}
+combat_modifiers = {"damage_reduction": 0.12}
+world_shape = "coat"
+world_color = Color(0.28627, 0.48627, 0.57255, 1)
+casting_profile = SubResource("Profile")
