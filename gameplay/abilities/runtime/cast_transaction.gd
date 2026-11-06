@@ -58,7 +58,12 @@ func reserve(plan: CastPlan) -> bool:
 			if not accepted:
 				return false
 			consumed[requirement.id] = true
-	return pay(plan.cost, plan.material_costs)
+	if not pay(plan.cost, plan.material_costs): return false
+	for component in plan.components:
+		if not component.material_id.is_empty():
+			supplies.configure(plan.action.get_id(), "")
+			break
+	return true
 
 func pay(cost: int, materials: Dictionary = {}) -> bool:
 	return (not mana or mana.use_mp(cost)) and (not supplies or supplies.pay(materials))

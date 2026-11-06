@@ -11,6 +11,7 @@ var catalog: Dictionary = {}
 var crafting_recipes: Dictionary = {}
 var _transaction: Dictionary = {}
 var _notification_pending := false
+var discarded_legacy_selection := false
 
 func _init() -> void:
 	for id in MATERIAL_IDS:
@@ -108,8 +109,13 @@ func describe_cost(costs: Dictionary) -> String:
 		parts.append("%s ×%d（持有%d）" % [title(id), int(costs[id]), count(id)])
 	return "、".join(parts)
 
-func serialize() -> Dictionary:
-	return {"amounts": amounts.duplicate(), "selected": selected.duplicate()}
+func clear_selection() -> void:
+	if selected.is_empty(): return
+	selected.clear()
+	_notify_changed()
+
+func serialize(persistent := false) -> Dictionary:
+	return {"amounts": amounts.duplicate(), "selected": {} if persistent else selected.duplicate()}
 
 func restore(data: Dictionary) -> void:
 	amounts.clear()
@@ -119,9 +125,7 @@ func restore(data: Dictionary) -> void:
 			var amount := maxi(0, int(data.amounts[id]))
 			if id in ["clean_water", "dirty_water"]: amount = mini(amount, maxi(0, SurvivalCatalog.WATER_CAPACITY - SurvivalCatalog.water_count(self)))
 			amounts[id] = amount
-	for id in data.get("selected", {}):
-		if catalog.has(data.selected[id]):
-			selected[id] = data.selected[id]
+	discarded_legacy_selection = not data.get("selected", {}).is_empty()
 	_notify_changed()
 
 func _notify_changed() -> void:

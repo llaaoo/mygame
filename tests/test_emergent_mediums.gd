@@ -88,6 +88,7 @@ func _run() -> void:
 	other.skill_type = SkillData.SkillType.BUFF
 	_check(not supplies.catalog.frost_salt.supports(other.id, other.id, other), "Material property selector ignored delivery type")
 	# Surface poison must not be removed by its own water hit subscriber.
+	supplies.configure("water_call", "venom_extract")
 	var poison_water: SkillData = supplies.plan(water, water).skill
 	var buffs := player.get_node("BuffManager") as BuffManager
 	buffs.apply_buff(load("res://gameplay/abilities/data/poison.tres"))

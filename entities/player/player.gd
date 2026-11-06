@@ -412,6 +412,7 @@ func heal(amount: int) -> void:
 	health_component.heal(maxi(0, int(round(amount * multiplier))))
 
 func cancel_region_actions() -> void:
+	skill_manager.combinations.supplies.clear_selection()
 	if field_work:
 		field_work.cancel("区域切换：作业取消")
 		field_work.close_panel()

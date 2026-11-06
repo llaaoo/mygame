@@ -83,6 +83,7 @@ func _run() -> void:
 	await _cast(4)
 	var mana := game.player.mana_component.mp
 	resin = supplies.count("resin")
+	supplies.configure("ignite", "resin")
 	_check(sm.use_slot(5, game.player, Vector2.RIGHT), "Reconfiguration test failed to start")
 	supplies.configure("ignite", "")
 	await create_timer(0.4).timeout
@@ -90,6 +91,7 @@ func _run() -> void:
 	await _sandbox()
 	# Stock disappearing during preparation cannot consume mana or create a field.
 	ash = supplies.count("ash")
+	supplies.configure("fire_sigil", "ash")
 	_check(sm.use_slot(4, game.player, Vector2.RIGHT), "Stock revalidation did not start")
 	supplies.pay({"ash": ash})
 	await create_timer(1.0).timeout
@@ -192,7 +194,7 @@ func _run() -> void:
 	_check(_puzzle("magic.bramble_cache").completed and supplies.count("sap") == cache_count, "Solved world cache repeated reward")
 	await _travel("camp")
 	supplies.configure("ignite", "resin")
-	var saved := supplies.serialize()
+	var saved := supplies.serialize(true)
 	_check(SaveManager.instance.save_game(2), "Spell material save failed")
 	game.queue_free()
 	current_scene = null

@@ -51,6 +51,7 @@ func _run() -> void:
 	check(after.instance == snapshot.instance and after.instance.source_ref.get_ref() == player and is_equal_approx(after.remaining, snapshot.remaining * .5) and is_equal_approx(buffs.get_speed_multiplier(), 1.3), "Partial consumption replaced the source, refreshed lifetime or removed mobility")
 	check(player.mana_component.mp == before - 15 and supplies.count("frost_salt") == 19, "Partial cast charged wrong costs")
 	controller.cooldowns.clear()
+	supplies.configure("water_call", "frost_salt")
 	check(sm.use_source("slot_0", player, context), "Repeated partial cast failed")
 	controller.tick(.4)
 	check(is_equal_approx(buffs.capture_status("frost_stride").remaining, snapshot.remaining * .25), "Repeated release refreshed rather than halved the remaining time")
@@ -74,6 +75,7 @@ func _run() -> void:
 	var reject := RejectingExecutor.new()
 	sm.add_child(reject)
 	sm.executor = reject
+	supplies.configure("water_call", "frost_salt")
 	check(sm.use_source("slot_0", player, context), "Rollback preparation failed")
 	controller.tick(.4)
 	check(buffs.capture_status("frost_stride").remaining == snapshot.remaining and buffs.status_version("frost_stride") == revision and notifications[0] == 0 and player.mana_component.mp == before and supplies.count("frost_salt") == salt, "Rejected partial release leaked lifetime, revision, facts or costs")
