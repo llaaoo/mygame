@@ -100,24 +100,7 @@ func _apply_melee_hit(target: Node2D) -> void:
 
 	# 发射 ON_HIT（带 melee/player 标签，供 TriggeredEffect 匹配）
 	# report_hit() 内部已调用 take_damage()
-	var tags: Array[String] = ["melee", "player"]
-	var buffs := _entity.get_node_or_null("BuffManager") as BuffManager
-	var imbued_tags: Array[String] = buffs.get_attack_tags() if buffs else []
-	var skill: SkillData = null
-	if not imbued_tags.is_empty():
-		for tag in imbued_tags:
-			if tag not in tags:
-				tags.append(tag)
-		skill = SkillData.new()
-		skill.id = "imbued_melee"
-		skill.display_name = "元素近战"
-		skill.tags = tags
-	var surface := SurfaceManager.instance
-	if surface and not imbued_tags.is_empty():
-		var cell := Vector2i(floori(target.global_position.x / 64), floori(target.global_position.y / 64))
-		if surface.get_surface(cell).get("state", "dry") != "dry":
-			surface.apply_tags(cell, tags, "元素近战")
-	CombatExecutor.report_hit(_entity, target, attack_damage, target.global_position, skill, tags)
+	ActorCombatModel.melee_contact(_entity,target,attack_damage,["melee","player"])
 
 	# 更新 trace 最终伤害
 	var trace := CombatDebugger.active()

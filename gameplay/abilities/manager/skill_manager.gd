@@ -226,7 +226,7 @@ func get_cooldown_total(source: String) -> float:
 ## Validate the same explicit request that execution will accept.
 func can_start(source: String, caster: Node2D, context: CastContext) -> bool:
 	var inst := _find_instance(source)
-	if not context or _executing or not inst or not knows_action(inst.data) or inst.data.combination_only:
+	if not context or not context.has_valid_target() or _executing or not inst or not knows_action(inst.data) or inst.data.combination_only:
 		return false
 	if combinations and combinations.handles(inst.data):
 		return combinations.preview(inst.data, caster, context.empower).ready
@@ -294,7 +294,7 @@ func _execute(skill: SkillData, source: String, caster: Node2D, direction: Vecto
 
 
 func _execute_with_context(skill: SkillData, source: String, caster: Node2D, ctx: CastContext, channel_cost: int = -1) -> bool:
-	if not ctx or _executing or not knows_action(skill):
+	if not ctx or not ctx.has_valid_target() or _executing or not knows_action(skill):
 		return false
 	if skill.combination_only:
 		return false

@@ -12,6 +12,8 @@
 
 [ext_resource type="Script" path="res://gameplay/frontier/grayriver_game.gd" id="12_mvp"]
 
+[ext_resource type="Resource" path="res://content/characters/explorer.tres" id="character"]
+
 [sub_resource type="GDScript" id="GDScript_272bh"]
 script/source = "extends Node
 ## 自动注册输入映射（运行时 fallback，避免手动配置 Input Map）
@@ -56,7 +58,7 @@ script = ExtResource("12_mvp")
 position = Vector2(-720, -430)
 debug_items = false
 exploration_mode = true
-melee_damage_multiplier = 0.6
+character_definition = ExtResource("character")
 
 [node name="SkillManager" type="Node" parent="Player" unique_id=1978715642]
 script = ExtResource("5_4c57u")

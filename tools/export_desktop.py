@@ -16,14 +16,15 @@ OUT = ROOT / "dist"
 
 def copy_documentation(folder):
     # Keep source filenames so relative links also work in the standalone ZIP.
-    for name in ["LOCAL_PLAYTEST.md", "GRAYRIVER_FRONTIER.md", "GRAYRIVER_PLAYTEST.md"]:
+    for name in ["LOCAL_PLAYTEST.md", "GRAYRIVER_FRONTIER.md", "GRAYRIVER_PLAYTEST.md", "SHARED_CHARACTERS.md"]:
         shutil.copy2(ROOT / "docs" / name, folder / name)
     shutil.copy2(folder / "LOCAL_PLAYTEST.md", folder / "README.md")
     shutil.copy2(folder / "GRAYRIVER_PLAYTEST.md", folder / "PLAYTEST.md")
     images = folder / "playtests"
     images.mkdir()
-    for path in (ROOT / "docs/playtests").glob("grayriver_*.png"):
-        shutil.copy2(path, images / path.name)
+    for pattern in ["grayriver_*.png", "shared_character_*.png"]:
+        for path in (ROOT / "docs/playtests").glob(pattern):
+            shutil.copy2(path, images / path.name)
     shutil.copytree(ROOT / "docs/validation", folder / "validation")
 
 

@@ -77,10 +77,7 @@ func _trigger(synergy: SkillSynergyData, event: CombatEvent) -> void:
 
 
 func _cast_triggered_skill(skill_id: String, target: Node2D) -> void:
-	var player := _owner_entity as Player
-	if not player:
-		return
-	var manager := player.skill_manager
+	var manager := _owner_entity.get_node_or_null("SkillManager") as SkillManager
 	if not manager or not manager.pool or not manager.executor:
 		return
 	var skill := manager.pool.get_skill(skill_id)

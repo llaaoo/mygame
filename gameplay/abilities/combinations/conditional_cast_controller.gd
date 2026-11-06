@@ -237,7 +237,7 @@ func preview(skill: SkillData, actor: Node2D, empower: bool = false) -> CastPlan
 	return result
 
 func start(skill: SkillData, actor: Node2D, context: CastContext, source: String) -> bool:
-	if not skill or skill.combination_only or not get_parent().knows_action(skill): return false
+	if not skill or not context or not context.has_valid_target() or skill.combination_only or not get_parent().knows_action(skill): return false
 	if get_tree().paused or _dead(actor) or ("ui_blocked" in actor and actor.ui_blocked):
 		return false
 	var plan := preview(skill, actor, context.empower)
@@ -250,6 +250,8 @@ func start(skill: SkillData, actor: Node2D, context: CastContext, source: String
 	if not skill.field_type.is_empty() and not _can_place(actor, actor.global_position, plan.placement_radius):
 		_message("铭刻位置被障碍物阻挡")
 		return false
+	plan.requires_live_target=context.requires_live_target
+	plan.live_target=context.target
 	plan.action = skill
 	plan.source = source
 	plan.actor = actor
@@ -313,6 +315,9 @@ func tick(delta: float) -> void:
 	if owner_actor and _dead(owner_actor):
 		clear_field()
 	if pending.is_empty():
+		return
+	if pending.requires_live_target and not CastContext.target_available(pending.live_target):
+		cancel("目标失效：准备取消")
 		return
 	var actor: Node2D = pending.actor
 	var inst: SkillInstance = get_parent().get_instance(pending.source)

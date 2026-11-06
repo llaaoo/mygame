@@ -1,6 +1,7 @@
 class_name ExplorationEnemyProfile
 extends Resource
-## Optional ordinary-enemy behavior. HP, speed and position belong to the encounter.
+## AI role/appearance/timing. Character definitions own attributes when present;
+## legacy encounters retain their HP, speed and melee parameters.
 @export var id: String
 @export var title: String
 @export_enum("哨兵", "士兵", "重兵") var appearance_preset := 0

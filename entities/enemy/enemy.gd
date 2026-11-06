@@ -1,6 +1,14 @@
 extends CharacterBody2D
 class_name Enemy
 
+@export var character_definition: ActorCharacterData
+var base_move_speed := 120.0
+var melee_damage_multiplier := 1.0
+var mana_component: ManaComponent
+var character_brain: EnemyCharacterBrain
+var _character_synergies: SkillSynergyResolver
+var _player_search: Timer
+
 @export var max_hp: int = 30
 @export var move_speed: float = 120.0
 @export var detect_range: float = 200.0
@@ -93,12 +101,41 @@ func _ready() -> void:
 	health_component.regen_rate = 0.0
 	health_component.died.connect(_on_died)
 	_apply_stats_to_health()
-	_setup_ranged_skill()
+	if character_definition:
+		_setup_character()
+	else:
+		_setup_ranged_skill()
 	_apply_preset(enemy_type)
 	_apply_visuals()
+	if character_definition: enemy_name=character_definition.title
 	_setup_state_chart()
 	call_deferred("_subscribe_revenge_events")
 	call_deferred("_find_player")
+
+
+func _setup_character() -> void:
+	mana_component=ManaComponent.new()
+	mana_component.name="ManaComponent"
+	add_child(mana_component)
+	var equipment:=EquipmentManager.new()
+	equipment.name="EquipmentManager"
+	add_child(equipment)
+	ActorCombatModel.initialize_body(self,character_definition)
+	_apply_stats()
+	ActorCombatModel.configure_actions(self,character_definition)
+	ActorCombatModel.configure_equipment(self,character_definition)
+	health_component.hp=health_component.max_hp
+	mana_component.mp=mana_component.max_mp
+	stats_component.stat_changed.connect(func(_key,_value):_apply_stats())
+	character_brain=EnemyCharacterBrain.new(self)
+	var status:=preload("res://entities/enemy/enemy_character_status.gd").new()
+	status.actor=self
+	add_child(status)
+
+func _apply_stats() -> void:
+	if not character_definition or not is_instance_valid(mana_component): return
+	ActorCombatModel.rebuild(self)
+	max_hp=health_component.max_hp
 
 
 func _setup_ranged_skill() -> void:
@@ -117,6 +154,10 @@ func _subscribe_revenge_events() -> void:
 		await get_tree().process_frame
 		_subscribe_revenge_events()
 		return
+	if character_definition and not _character_synergies:
+		_character_synergies=SkillSynergyResolver.new()
+		add_child(_character_synergies)
+		_character_synergies.setup(self)
 	bus.subscribe(CombatEvent.Type.ON_HIT, _on_got_hit)
 	bus.subscribe(CombatEvent.Type.ON_KILL, _on_target_killed)
 
@@ -203,6 +244,7 @@ func poll_actions() -> Array[Action]:
 		return actions
 
 	var dist := global_position.distance_to(target.global_position)
+	if character_brain: return character_brain.choose(target)
 	match _current_state_name():
 		"Chase":
 			if _should_move_during_chase(dist):
@@ -223,6 +265,7 @@ func poll_actions() -> Array[Action]:
 
 func resolve_action(action: Action) -> void:
 	if attack_preparation and attack_preparation.busy(): return
+	if character_definition and skill_manager.combinations.is_busy(): return
 	if not ActionResolver.validate(self, action):
 		return
 
@@ -234,7 +277,10 @@ func resolve_action(action: Action) -> void:
 		Action.ActionType.CAST:
 			var target := _get_current_target()
 			var direction := action.direction
-			attack_preparation.begin(target, direction, ranged_windup, 0, func(): skill_manager.use_hand(action.skill_source, self, direction), "ranged")
+			var context := action.cast_context
+			attack_preparation.begin(target, direction, ranged_windup, 0, func():
+				if not skill_manager.use_source(action.skill_source,self,context) and character_brain: character_brain.refused()
+			, "ranged")
 		Action.ActionType.MELEE:
 			_do_melee_attack()
 
@@ -309,6 +355,12 @@ func _on_attack_physics(delta: float) -> void:
 		state_chart.send_event("player_out_of_range")
 		return
 
+	if character_brain:
+		for action in poll_actions():
+			resolve_action(action)
+			if action.action_type==Action.ActionType.MELEE: _attack_timer=0
+		return
+
 	if ai_role == AIRole.RANGED and dist < attack_range * 0.7:
 		resolve_action(Action.move((global_position - target.global_position).normalized() * 0.7, self))
 		return
@@ -355,6 +407,9 @@ func _is_out_of_leash(target: Node2D) -> bool:
 
 
 func _begin_return_home() -> void:
+	if character_definition:
+		skill_manager.combinations.cancel("目标失效：准备取消")
+		attack_preparation.cancel()
 	_revenge_target = null
 	_returning_home = true
 	_suspicion_timer = suspicion_duration
@@ -422,9 +477,9 @@ func _resolve_melee_hit(target: Node2D) -> void:
 	if exec_inst:
 		exec_inst.begin_hit_sequence()
 
-	CombatExecutor.report_hit(self, target, attack_damage, target.global_position, null, ["melee", "enemy"])
+	ActorCombatModel.melee_contact(self,target,attack_damage,["melee","enemy"])
 
-	var splash_dmg := int(attack_damage * MELEE_SPLASH_DAMAGE)
+	var splash_dmg := 0 if character_definition else int(attack_damage * MELEE_SPLASH_DAMAGE)
 	if splash_dmg > 0:
 		for body in get_tree().get_nodes_in_group("enemy"):
 			if body == self or body == target:
@@ -443,6 +498,7 @@ func _resolve_melee_hit(target: Node2D) -> void:
 
 
 func _process(delta: float) -> void:
+	if character_brain: character_brain.tick(delta)
 	if not attack_ready:
 		_attack_ready_remaining = maxf(0, _attack_ready_remaining - delta)
 		if _attack_ready_remaining == 0:
@@ -507,8 +563,13 @@ func _find_player() -> void:
 		return
 	player = get_tree().get_first_node_in_group("player") as Player
 	if not player:
-		await get_tree().create_timer(0.5).timeout
-		_find_player()
+		if not _player_search:
+			_player_search=Timer.new()
+			_player_search.one_shot=true
+			_player_search.wait_time=.5
+			_player_search.timeout.connect(_find_player)
+			add_child(_player_search)
+		_player_search.start()
 
 
 func get_player_direction() -> Vector2:
@@ -529,6 +590,9 @@ func take_damage(amount: int) -> void:
 
 
 func _on_died() -> void:
+	if character_definition:
+		skill_manager.combinations.cancel("死亡")
+		skill_manager.combinations.clear_field()
 	if attack_preparation: attack_preparation.cancel()
 	if player and rewards_enabled:
 		CombatExecutor.report_exp_bonus(player, 30 + stats_component.level * 10)
@@ -551,3 +615,11 @@ func _spawn_drop() -> void:
 	if drop is ManaPickup: drop.mana_amount = mana_drop_amount
 	get_parent().add_child.call_deferred(drop)
 	drop.global_position = global_position
+
+func _exit_tree() -> void:
+	if CombatEventBus.instance:
+		CombatEventBus.instance.unsubscribe(CombatEvent.Type.ON_HIT,_on_got_hit)
+		CombatEventBus.instance.unsubscribe(CombatEvent.Type.ON_KILL,_on_target_killed)
+	if character_definition and is_instance_valid(skill_manager) and skill_manager.combinations:
+		skill_manager.combinations.cancel("离区")
+		skill_manager.combinations.clear_field()

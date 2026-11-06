@@ -7,3 +7,5 @@ extends Resource
 @export var speed: float = 105.0
 @export var boss: bool = false
 @export var profile: ExplorationEnemyProfile
+
+@export var character: ActorCharacterData

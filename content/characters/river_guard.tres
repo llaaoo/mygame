@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ActorCharacterData" format=3]
+[ext_resource type="Script" path="res://gameplay/characters/actor_character_data.gd" id="data"]
+[ext_resource type="Script" path="res://gameplay/abilities/loadout/skill_loadout.gd" id="loadout"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/focus_data.tres" id="focus"]
+[sub_resource type="Resource" id="Loadout"]
+script = ExtResource("loadout")
+slots = Array[String](["focus"])
+[resource]
+script = ExtResource("data")
+id = "river_guard"
+title = "流亡守备兵"
+strength = 4
+intelligence = 3
+agility = 8
+endurance = 2
+base_move_speed = 100.0
+melee_multiplier = 0.6
+skills = [ExtResource("focus")]
+loadout = SubResource("Loadout")

@@ -6,11 +6,6 @@ var _on_kill_effect: OnKillBonusExp = null
 var _on_hit_effect: TriggeredEffect = null
 var _on_buff_expire_cast: GenericTriggeredCast = null  ## 通用：Buff过期→释放技能
 var _on_kill_fire_trigger: GenericTriggeredCast = null  ## 火系击杀→烈焰风暴
-var _on_hit_fire_status: OnHitApplyStatus = null  ## 持有引用防 GC
-var _on_hit_ice_status: OnHitApplyStatus = null   ## 冰→冻结
-var _on_hit_poison_status: OnHitApplyStatus = null  ## 毒→中毒
-var _on_hit_water_status: OnHitApplyStatus = null   ## 水→潮湿
-var _on_hit_chain: OnHitChain = null                ## 闪电→连锁
 var _synergy_resolver: SkillSynergyResolver = null
 var _low_hp_triggers: Array[LowHpTriggerData] = []
 var _low_hp_cooldowns: Dictionary = {}  ## trigger → 剩余冷却秒数
@@ -40,26 +35,6 @@ func _setup_event_bus() -> void:
 
 	# 技能熟练度系统（上古卷轴式）
 	_setup_mastery()
-
-	# ON_HIT 火焰技能 → 挂 burning 状态
-	_on_hit_fire_status = OnHitApplyStatus.create("fire", ElementCatalog.definition("fire").hit_status_paths[0])
-	_register_triggered_effects(_on_hit_fire_status)
-
-	# ON_HIT 冰霜技能 → 挂 frozen 减速
-	_on_hit_ice_status = OnHitApplyStatus.create("ice", ElementCatalog.definition("ice").hit_status_paths[0])
-	_register_triggered_effects(_on_hit_ice_status)
-
-	# ON_HIT 毒素技能 → 挂 poison DOT
-	_on_hit_poison_status = OnHitApplyStatus.create("poison", ElementCatalog.definition("poison").hit_status_paths[0])
-	_register_triggered_effects(_on_hit_poison_status)
-
-	# ON_HIT 水系技能 → 挂 wet，供闪电和冰系联动
-	_on_hit_water_status = OnHitApplyStatus.create("water", ElementCatalog.definition("water").hit_status_paths[0])
-	_register_triggered_effects(_on_hit_water_status)
-
-	# ON_HIT 闪电技能 → 连锁弹射
-	_on_hit_chain = OnHitChain.create("lightning", 120.0, 3, 0.6)
-	_register_triggered_effects(_on_hit_chain)
 
 	_synergy_resolver = SkillSynergyResolver.new()
 	_synergy_resolver.name = "SkillSynergyResolver"

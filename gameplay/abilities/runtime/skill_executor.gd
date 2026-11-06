@@ -519,14 +519,12 @@ func remove_modifiers_of_class(class_name_str: String) -> void:
 
 func _apply_mastery_damage_bonuses(base_damage: int, skill: SkillData, caster: Node2D) -> int:
 	var player := caster as Player
-	if not player:
-		return base_damage
 	var multiplier := 1.0
-	if player.mastery_manager:
+	if player and player.mastery_manager:
 		multiplier += player.mastery_manager.get_modifier_value("damage.all")
 		for tag in skill.tags:
 			multiplier += player.mastery_manager.get_modifier_value("damage.%s" % tag)
-	var equipment := player.get_node_or_null("EquipmentManager") as EquipmentManager
+	var equipment := caster.get_node_or_null("EquipmentManager") as EquipmentManager
 	if equipment:
 		multiplier += equipment.get_modifier_value("damage.all")
 		for tag in skill.tags:
@@ -539,11 +537,9 @@ func _apply_mastery_damage_bonuses(base_damage: int, skill: SkillData, caster: N
 
 func _get_buff_duration_with_mastery(buff: Buff, caster: Node2D) -> float:
 	var player := caster as Player
-	if not player:
-		return buff.duration
-	var equipment := player.get_node_or_null("EquipmentManager") as EquipmentManager
+	var equipment := caster.get_node_or_null("EquipmentManager") as EquipmentManager
 	var delta := equipment.casting_value("boon_duration_bonus") if equipment and buff.can_empower else 0.0
-	if not player.mastery_manager:
+	if not player or not player.mastery_manager:
 		return maxf(0, buff.duration * maxf(0.25, 1 + delta))
 	delta += player.mastery_manager.get_modifier_value("buff.duration.all")
 	if not buff.status_id.is_empty():

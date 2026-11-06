@@ -65,6 +65,7 @@ func _spawn_enemy(spec: ExplorationEncounterData, layout: RefCounted, index: int
 				break
 	enemy.position = point
 	if not boss:
+		enemy.character_definition = spec.character
 		enemy.enemy_type = spec.profile.appearance_preset if spec.profile else (2 if game.region_id == "gate" and index == 0 else 0)
 		enemy.ai_role = int(spec.profile.role if spec.profile else spec.role) as Enemy.AIRole
 		if spec.profile:
@@ -78,14 +79,16 @@ func _spawn_enemy(spec: ExplorationEncounterData, layout: RefCounted, index: int
 	var hp := int(spec.hp)
 	if boss and game.progress.choices.get("waterworks_choice", "") == "cooling":
 		hp = int(hp * 0.75)
-	enemy.max_hp = hp
-	enemy.health_component.max_hp = hp
-	enemy.health_component.hp = hp
+	if not enemy.character_definition:
+		enemy.max_hp = hp
+		enemy.health_component.max_hp = hp
+		enemy.health_component.hp = hp
 	enemy.detect_range = 440
-	enemy.move_speed = float(spec.speed)
-	enemy.attack_damage = 9 if not boss else 15
+	if not enemy.character_definition:
+		enemy.move_speed = float(spec.speed)
+		enemy.attack_damage = 9 if not boss else 15
 	if not boss and spec.profile:
-		enemy.attack_damage = spec.profile.melee_damage
+		if not enemy.character_definition: enemy.attack_damage = spec.profile.melee_damage
 		enemy.melee_windup = spec.profile.melee_windup
 		enemy.melee_recovery = spec.profile.melee_recovery
 		enemy.ranged_windup = spec.profile.ranged_windup

@@ -1,0 +1,44 @@
+{
+  "date": "2026-11-06",
+  "base_revision": "9ccbf7c7318b5724321f431d9088a48ac8078aeb",
+  "recovery": {
+    "thread_id": "01a1a478-8f31-7215-a759-4d3ee570a019",
+    "source": "Source-writing commands retained in the original chat, replayed in order against the original main revision.",
+    "scope": "Completed shared-character implementation through layered-field enablement. The final command rejected before execution is excluded.",
+    "original_graphical_artifacts_recovered": false
+  },
+  "prior_validation": {
+    "source": "Original chat record; original logs are unavailable in this environment.",
+    "regression_passed": 55,
+    "regression_total": 55,
+    "graphical_playtest": "Original record describes interrupt, paid sigil/focus/fireball, sideways avoidance and melee fallback; not repeated during recovery."
+  },
+  "current_targeted": {
+    "passed": 4,
+    "total": 4,
+    "tests": [
+      "shared_characters",
+      "enemy_preparation",
+      "player_components",
+      "rpg_attributes"
+    ],
+    "logs": "/tmp/mygame-tests-ny0x5ap3"
+  },
+  "current_regression": {
+    "state": "passed",
+    "command": "python3 tools/run_tests.py --suite all --jobs 2",
+    "logs": "/tmp/mygame-tests-1fhg65tq",
+    "passed": 55,
+    "total": 55
+  },
+  "desktop_packages": "Not rebuilt during source recovery.",
+  "current_import": {
+    "state": "passed",
+    "diagnostics": 0,
+    "logs": "/tmp/shared-character-recovery-import.log"
+  },
+  "package_documentation": {
+    "state": "passed",
+    "relative_links_checked": 20
+  }
+}

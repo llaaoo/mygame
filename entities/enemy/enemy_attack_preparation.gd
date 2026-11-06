@@ -12,11 +12,13 @@ var remaining := 0.0
 var duration := 0.0
 var recovery := 0.0
 var _impact: Callable
+var _starting_health := 0
 
 func busy() -> bool: return remaining > 0 or recovery > 0
 
 func begin(victim: Node2D, facing: Vector2, seconds: float, after: float, callback: Callable, style: String, center := Vector2.ZERO, size := 0.0) -> bool:
 	if busy() or not actor._is_valid_target(victim): return false
+	_starting_health=actor.health_component.hp
 	target = victim
 	world = CastContext.default_world(actor)
 	direction = facing.normalized()
@@ -43,6 +45,9 @@ func _physics_process(delta: float) -> void: tick(delta)
 func tick(delta: float) -> void:
 	if not busy(): return
 	if not is_instance_valid(actor) or actor.is_queued_for_deletion() or actor.health_component.is_dead or not actor._is_valid_target(target) or not is_instance_valid(world) or CastContext.default_world(actor) != world:
+		cancel()
+		return
+	if actor.character_definition and actor.health_component.hp<_starting_health:
 		cancel()
 		return
 	if remaining > 0:
