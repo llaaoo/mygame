@@ -1,6 +1,7 @@
 class_name ExplorationProgress
 extends RefCounted
 
+var journey: Dictionary = {}
 var trial_runs: Array[Dictionary] = []
 var element_clues: Dictionary = {}
 var verified_reactions: Dictionary = {}
@@ -33,11 +34,17 @@ func claim(id: String, title: String, text: String, new_actions: Array, new_spel
 	return true
 
 func serialize_save_data() -> Dictionary:
-	return {"survival_state": survival_state.duplicate(true), "trial_runs": trial_runs.duplicate(true), "element_clues": element_clues.duplicate(), "verified_reactions": verified_reactions.duplicate(), "equipment_owned": equipment_owned.duplicate(), "equipment_loadout": equipment_loadout.duplicate(), "actions": actions.duplicate(), "spell_rules": spell_rules.duplicate(), "claims": claims.duplicate(), "cleared": cleared.duplicate(), "journal": journal.duplicate(true), "completed": completed, "deaths": deaths, "world_states": world_states.duplicate(true), "loadout": loadout.duplicate(true), "character_state": character_state.duplicate(true), "visited": visited.duplicate(), "choices": choices.duplicate(), "casting_supplies": casting_supplies.duplicate(true)}
+	return {"journey": journey.duplicate(true), "survival_state": survival_state.duplicate(true), "trial_runs": trial_runs.duplicate(true), "element_clues": element_clues.duplicate(), "verified_reactions": verified_reactions.duplicate(), "equipment_owned": equipment_owned.duplicate(), "equipment_loadout": equipment_loadout.duplicate(), "actions": actions.duplicate(), "spell_rules": spell_rules.duplicate(), "claims": claims.duplicate(), "cleared": cleared.duplicate(), "journal": journal.duplicate(true), "completed": completed, "deaths": deaths, "world_states": world_states.duplicate(true), "loadout": loadout.duplicate(true), "character_state": character_state.duplicate(true), "visited": visited.duplicate(), "choices": choices.duplicate(), "casting_supplies": casting_supplies.duplicate(true)}
 
 func validate_save_data(value: Variant) -> bool:
 	if not value is Dictionary:
 		return false
+	var location = value.get("journey", {})
+	if not location is Dictionary: return false
+	if not location.is_empty():
+		if not location.get("region") is String or not location.get("position") is Array or location.position.size() != 2: return false
+		for coordinate in location.position:
+			if typeof(coordinate) not in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(coordinate)) or absf(float(coordinate)) > 100000: return false
 	if not SurvivalNeeds.valid(value.get("survival_state", {})): return false
 	if not value.get("completed", false) is bool or not value.get("deaths", 0) is int:
 		return false
@@ -122,6 +129,7 @@ func validate_save_data(value: Variant) -> bool:
 	return true
 
 func deserialize_save_data(data: Dictionary) -> void:
+	journey = data.get("journey", {}).duplicate(true)
 	survival_state = data.get("survival_state", {}).duplicate(true)
 	trial_runs.assign(data.get("trial_runs", []))
 	while trial_runs.size() > 10: trial_runs.pop_front()

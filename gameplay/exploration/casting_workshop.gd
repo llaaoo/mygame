@@ -21,7 +21,7 @@ func show_materials() -> void:
 			continue
 		var material_id := str(supplies.selected.get(id, ""))
 		buttons.append({"title": skill.display_name + " · " + (supplies.title(material_id) if not material_id.is_empty() else "基础"), "callback": show_action.bind(skill)})
-	buttons.append({"title": "营地加工", "disabled": game.region_id != "camp", "callback": show_crafts})
+	buttons.append({"title": "营地加工", "disabled": not game.is_at_base(), "callback": show_crafts})
 	buttons.append({"title": "调和台回收" + ("" if recycling_available() else "（需营地修复）"), "disabled": not recycling_available(), "callback": show_recycling})
 	buttons.append({"title": "继续探索", "callback": game.ui.close_modal})
 	game.ui.show_panel("施法材料与本次选择", text, buttons)
@@ -53,7 +53,7 @@ func _configure(skill: SkillData, id: String) -> void:
 	show_action(skill)
 
 func show_crafts() -> void:
-	if game.region_id != "camp":
+	if not game.is_at_base():
 		return
 	var supplies: CastingSupplies = game.player.skill_manager.combinations.supplies
 	var text := "使用探索获得的原料加工成品。休息不补满材料，已搜刮的固定来源不会重复发放。基础火、霜法术始终可不带材料使用。\n\n"
@@ -67,12 +67,12 @@ func show_crafts() -> void:
 	game.ui.show_panel("营地施法工作台", text, buttons)
 
 func _craft(id: String) -> void:
-	if game.region_id == "camp" and game.player.skill_manager.combinations.supplies.craft(id):
+	if game.is_at_base() and game.player.skill_manager.combinations.supplies.craft(id):
 		game._save_progress()
 	show_crafts()
 
 func recycling_available() -> bool:
-	return game.region_id == "camp" and not game._switching and not game.player.health_component.is_dead and game.progress.claims.has(AlchemyRepairService.REPAIRED)
+	return game.is_at_base() and not game._switching and not game.player.health_component.is_dead and game.progress.claims.has(AlchemyRepairService.REPAIRED)
 
 func recycle(id: String) -> bool:
 	if not recycling_available(): return false

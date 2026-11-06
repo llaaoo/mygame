@@ -1,0 +1,1268 @@
+{
+  "version": 1,
+  "regions": [
+    {
+      "id": "camp",
+      "title": "灰河谷",
+      "size": [
+        9600,
+        7200
+      ],
+      "entry": [
+        -3700,
+        2100
+      ],
+      "open_field": true,
+      "description": "从河谷镇出发，沿道路、河岸与山口自由探索。G地图；J日志；N补给。",
+      "notes": [
+        {
+          "id": "river.travel",
+          "title": "测绘员艾妲：河谷行路图",
+          "pos": [
+            -3100,
+            2100
+          ],
+          "text": "河谷镇在西南，西北是林地与山脚矿道，东北为旧监狱，东边是工区，下游有湿地。北侧石桥和南侧浅滩始终可通行，中部木桥修复后能缩短往返。地图只标记实际到过的地点；G查看。任务板就在这里。",
+          "requires_clear": false
+        },
+        {
+          "id": "river.handbook",
+          "title": "行路者的施法手册",
+          "pos": [
+            -3500,
+            2400
+          ],
+          "text": "先学水引（4）与泼洒树脂。水引可清洗燃烧、中毒，普通魔法水不能随意装成饮用水。M为本次动作选素材，成功使用后清空。镇内可加工已经学会的材料配方；首批学会灰烬与树脂制剂。",
+          "requires_clear": false,
+          "template": "camp/material_handbook",
+          "crafts": [
+            "ash",
+            "resin"
+          ]
+        },
+        {
+          "id": "river.pack",
+          "title": "离镇口粮袋",
+          "pos": [
+            -3850,
+            2300
+          ],
+          "text": "一次性口粮、原料与水袋。N主动吃喝，回镇不会自动补满。镇中篝火可短休或充分休整，缺补给时提供粗食。",
+          "requires_clear": false,
+          "materials": {
+            "ration": 2,
+            "grain": 3,
+            "herb": 2,
+            "clean_water": 4,
+            "charcoal": 3,
+            "crystal": 3,
+            "sap": 3
+          }
+        },
+        {
+          "id": "river.fire",
+          "title": "林间旧猎营：火阵",
+          "pos": [
+            -3000,
+            -1200
+          ],
+          "text": "学会铭刻火阵。先在空地布阵，完成后站在阵内用火花触发火球；剩余充能可以继续使用，离开或充能耗尽不会自动补阵。猎营西侧的旧窖藏着档案。",
+          "requires_clear": false,
+          "template": "yard/fire_knowledge"
+        },
+        {
+          "id": "river.focus",
+          "title": "苔石祈坛：凝神",
+          "pos": [
+            -2350,
+            -2000
+          ],
+          "text": "水引铺脚下水，再Shift凝神可准备流息；普通动作保留持续防护，Shift请求消费适配恩赐。此处学习霜盐和守护粉的制造。",
+          "requires_clear": false,
+          "template": "sanctum/focus_knowledge",
+          "crafts": [
+            "frost_salt",
+            "ward_powder"
+          ],
+          "equipment": [
+            "soul_amulet"
+          ]
+        },
+        {
+          "id": "river.soul",
+          "title": "山路行者遗札：残魂",
+          "pos": [
+            -1700,
+            -2100
+          ],
+          "text": "战死守卫留下短暂残魂。靠近汲魂（K编组）获得蕴魂，再以Shift基础动作兑现。临时准备随离区清理。",
+          "requires_clear": false,
+          "template": "yard/soul_knowledge"
+        },
+        {
+          "id": "valley.bridge_beams",
+          "title": "遗失的桥梁撑木",
+          "pos": [
+            -2150,
+            -650
+          ],
+          "text": "找回撑木，已记入任务行囊。中部桥头的支撑机构卡死，带撑木回去清障架设可恢复近路。这个发现不重复发奖。",
+          "requires_clear": false,
+          "materials": {
+            "sap": 3
+          }
+        },
+        {
+          "id": "river.frost",
+          "title": "湖岸凝霜记录",
+          "pos": [
+            700,
+            -2400
+          ],
+          "text": "学会霜阵。水系也能凝霜控制；冻结保持减速，冲击能打碎冰面恢复水路。北岸石桥保持开放。",
+          "requires_clear": false,
+          "template": "drain/frost_knowledge"
+        },
+        {
+          "id": "river.venom",
+          "title": "湿地药师：污染观察",
+          "pos": [
+            650,
+            1900
+          ],
+          "text": "毒区可以限制靠近，火花可以引燃毒地；清洁水可洗毒，污染水不可。学会毒雾和毒性萃取制造，自己也承担危险。",
+          "requires_clear": false,
+          "template": "drain/venom_knowledge",
+          "crafts": [
+            "venom_extract"
+          ]
+        },
+        {
+          "id": "survival.drain_recipe",
+          "title": "药师食谱：苦叶炖汤",
+          "pos": [
+            1550,
+            2400
+          ],
+          "text": "烤饼1、苦叶1、饮用水1，在锅边制成炖汤。替换原食物，兼顾需求与回复；清水仍要从实际水源取得。",
+          "requires_clear": false,
+          "materials": {
+            "grain": 2,
+            "herb": 2
+          }
+        },
+        {
+          "id": "river.industrial",
+          "title": "工区运料清单",
+          "pos": [
+            2500,
+            1200
+          ],
+          "text": "工区曾给监狱运送燃料和晶砂。现在上游排污泵封死，湿地取水口被污染；档案室图纸记录了检修步骤。",
+          "requires_clear": false,
+          "materials": {
+            "charcoal": 4,
+            "crystal": 4,
+            "sap": 4
+          }
+        },
+        {
+          "id": "river.supply",
+          "title": "废驿站行囊",
+          "pos": [
+            -1750,
+            200
+          ],
+          "text": "补给只领取一次。这里的追猎者会沿旧路靠近，先观察退路，再选择冻住、破冰或用毒地限制。",
+          "requires_clear": false,
+          "materials": {
+            "frost_salt": 2,
+            "venom_extract": 2,
+            "storm_dust": 2
+          }
+        }
+      ],
+      "stations": [
+        {
+          "id": "river.well",
+          "title": "河谷镇水井",
+          "pos": [
+            -3700,
+            1800
+          ],
+          "kind": "water",
+          "clean": true
+        },
+        {
+          "id": "river.stove",
+          "title": "镇中炉灶",
+          "pos": [
+            -3400,
+            1800
+          ],
+          "kind": "cook",
+          "lit": true
+        },
+        {
+          "id": "river.grain",
+          "title": "南郊遗田：谷粮",
+          "pos": [
+            -2200,
+            2100
+          ],
+          "kind": "forage",
+          "harvest": {
+            "grain": 2
+          }
+        },
+        {
+          "id": "river.herb",
+          "title": "林缘苦叶丛",
+          "pos": [
+            -3200,
+            -300
+          ],
+          "kind": "forage",
+          "harvest": {
+            "herb": 2
+          }
+        },
+        {
+          "id": "river.spring",
+          "title": "林间岩泉",
+          "pos": [
+            -3300,
+            -1700
+          ],
+          "kind": "water",
+          "clean": true
+        },
+        {
+          "id": "river.marsh_water",
+          "title": "湿地取水口：泵修复后改善",
+          "pos": [
+            960,
+            2368
+          ],
+          "kind": "water",
+          "cleaned_by_claim": "alchemy.pump_open"
+        },
+        {
+          "id": "river.outpost_pot",
+          "title": "驿站前哨锅位",
+          "pos": [
+            -1500,
+            500
+          ],
+          "kind": "cook",
+          "heat_offset": [
+            -96,
+            -64
+          ],
+          "required_claims": [
+            "river.outpost"
+          ]
+        },
+        {
+          "id": "river.marsh_herb",
+          "title": "湿地苦叶丛",
+          "pos": [
+            1800,
+            2100
+          ],
+          "kind": "forage",
+          "harvest": {
+            "herb": 2
+          }
+        }
+      ],
+      "patches": [
+        {
+          "pos": [
+            960,
+            2368
+          ],
+          "state": "poisoned",
+          "radius": 64,
+          "duration": 600,
+          "disabled_by_claim": "alchemy.pump_open"
+        },
+        {
+          "pos": [
+            300,
+            2400
+          ],
+          "state": "wet",
+          "radius": 96,
+          "duration": 600
+        },
+        {
+          "pos": [
+            700,
+            -2400
+          ],
+          "state": "frozen",
+          "radius": 64,
+          "duration": 600
+        },
+        {
+          "pos": [
+            2752,
+            640
+          ],
+          "state": "wet",
+          "radius": 96,
+          "duration": 600
+        }
+      ],
+      "puzzles": [
+        {
+          "template": "alchemy/pump",
+          "pos": [
+            2752,
+            640
+          ]
+        },
+        {
+          "id": "river.bridge_fixed",
+          "title": "断桥支撑机构",
+          "pos": [
+            130,
+            500
+          ],
+          "required_claims": [
+            "valley.bridge_beams"
+          ],
+          "hint": "撑木到位后，可以站定4秒，以树液2、炭屑1架设；也可先凝霜再用冲击拆开旧锁。北侧石桥与南侧浅滩始终可绕行。",
+          "completion_text": "中部木桥已修复，河谷东西之间多了一条近路。",
+          "routes": [
+            {
+              "steps": [
+                "ice",
+                "impact"
+              ]
+            }
+          ],
+          "work": [
+            {
+              "id": "repair",
+              "title": "清障架设木桥",
+              "duration": 4,
+              "material_costs": {
+                "sap": 2,
+                "charcoal": 1
+              }
+            }
+          ]
+        },
+        {
+          "id": "river.conductor",
+          "title": "工区水路闸",
+          "pos": [
+            2944,
+            640
+          ],
+          "hint": "分流阀补水后，让闸所在格实际导电保持半秒；直接命中干地无效。可以冻结断路、破冰接回；站在干燥落脚点。",
+          "routes": [
+            {
+              "required_surface": "electrified",
+              "hold_seconds": 0.5
+            }
+          ],
+          "materials": {
+            "storm_dust": 2,
+            "crystal": 3
+          }
+        }
+      ],
+      "facilities": [
+        {
+          "id": "river.outpost",
+          "title": "废驿站检修前哨",
+          "pos": [
+            -1500,
+            350
+          ],
+          "service": "outpost",
+          "requires_clear": true,
+          "description": "清理附近守卫后，炭屑2、谷粮2，站定3秒搭设。提供短休和锅位，烹饪仍需燃料或真实火源。",
+          "assembly": {
+            "id": "build_outpost",
+            "title": "搭设驿站前哨",
+            "duration": 3,
+            "material_costs": {
+              "charcoal": 2,
+              "grain": 2
+            }
+          }
+        },
+        {
+          "template": "alchemy/facility",
+          "pos": [
+            -2900,
+            1900
+          ]
+        }
+      ],
+      "valves": [
+        {
+          "id": "river.valve",
+          "title": "工区水路分流阀",
+          "pos": [
+            2432,
+            512
+          ],
+          "paths": [
+            {
+              "title": "北槽",
+              "points": [
+                [
+                  2560,
+                  640
+                ],
+                [
+                  2624,
+                  640
+                ],
+                [
+                  2688,
+                  640
+                ],
+                [
+                  2752,
+                  640
+                ],
+                [
+                  2816,
+                  640
+                ],
+                [
+                  2880,
+                  640
+                ],
+                [
+                  2944,
+                  640
+                ]
+              ]
+            },
+            {
+              "title": "南槽",
+              "points": [
+                [
+                  2560,
+                  640
+                ],
+                [
+                  2560,
+                  704
+                ],
+                [
+                  2624,
+                  704
+                ],
+                [
+                  2688,
+                  704
+                ],
+                [
+                  2752,
+                  704
+                ],
+                [
+                  2816,
+                  704
+                ],
+                [
+                  2880,
+                  704
+                ],
+                [
+                  2944,
+                  704
+                ],
+                [
+                  2944,
+                  640
+                ]
+              ]
+            }
+          ]
+        }
+      ],
+      "exits": [
+        {
+          "title": "进入林下档案窖",
+          "pos": [
+            -2600,
+            -1800
+          ],
+          "target": "river_archive"
+        },
+        {
+          "title": "进入山脚矿道",
+          "pos": [
+            -1300,
+            -2800
+          ],
+          "target": "river_mine"
+        },
+        {
+          "title": "进入余烬旧监狱",
+          "pos": [
+            3300,
+            -1600
+          ],
+          "target": "river_prison"
+        }
+      ],
+      "encounters": [
+        {
+          "pos": [
+            -1700,
+            300
+          ],
+          "profile": "hunter",
+          "hp": 38,
+          "speed": 135,
+          "group": "road",
+          "id": "camp.road.1"
+        },
+        {
+          "pos": [
+            -1300,
+            50
+          ],
+          "profile": "sentry",
+          "hp": 32,
+          "speed": 105,
+          "group": "road",
+          "id": "camp.road.2"
+        },
+        {
+          "pos": [
+            -2600,
+            -1100
+          ],
+          "profile": "guard",
+          "hp": 42,
+          "speed": 105,
+          "group": "forest",
+          "id": "camp.forest.3"
+        },
+        {
+          "pos": [
+            -2200,
+            -1500
+          ],
+          "profile": "hunter",
+          "hp": 38,
+          "speed": 135,
+          "group": "forest",
+          "id": "camp.forest.4"
+        },
+        {
+          "pos": [
+            1100,
+            -2300
+          ],
+          "profile": "sentry",
+          "hp": 36,
+          "speed": 105,
+          "group": "lake",
+          "id": "camp.lake.5"
+        },
+        {
+          "pos": [
+            1250,
+            2100
+          ],
+          "profile": "hunter",
+          "hp": 42,
+          "speed": 135,
+          "group": "marsh",
+          "id": "camp.marsh.6"
+        },
+        {
+          "pos": [
+            1550,
+            1850
+          ],
+          "profile": "sentry",
+          "hp": 34,
+          "speed": 105,
+          "group": "marsh",
+          "id": "camp.marsh.7"
+        },
+        {
+          "pos": [
+            2600,
+            800
+          ],
+          "profile": "guard",
+          "hp": 50,
+          "speed": 105,
+          "group": "mill",
+          "id": "camp.mill.8"
+        },
+        {
+          "pos": [
+            3100,
+            900
+          ],
+          "profile": "sentry",
+          "hp": 38,
+          "speed": 105,
+          "group": "mill",
+          "id": "camp.mill.9"
+        },
+        {
+          "pos": [
+            3000,
+            -1300
+          ],
+          "profile": "guard",
+          "hp": 54,
+          "speed": 105,
+          "group": "prison_road",
+          "id": "camp.prison_road.10"
+        },
+        {
+          "pos": [
+            3550,
+            -1100
+          ],
+          "profile": "hunter",
+          "hp": 44,
+          "speed": 135,
+          "group": "prison_road",
+          "id": "camp.prison_road.11"
+        }
+      ]
+    },
+    {
+      "id": "river_archive",
+      "title": "林下档案窖",
+      "size": [
+        2000,
+        1400
+      ],
+      "entry": [
+        -820,
+        0
+      ],
+      "room_type": "barracks",
+      "description": "沿旧档案寻找水工图纸、回响与食品记录；出口始终开放。",
+      "notes": [
+        {
+          "id": "river.pulse",
+          "title": "搬运工的震荡记录",
+          "pos": [
+            -780,
+            400
+          ],
+          "text": "震荡（1）可以破冰。先观察目标已有状态，普通近战可以保留冻结控制。",
+          "requires_clear": false,
+          "template": "archive/pulse_knowledge"
+        },
+        {
+          "id": "alchemy.schematic",
+          "title": "水工与调和台图纸",
+          "pos": [
+            600,
+            -420
+          ],
+          "text": "读懂泵与调压器的检修。外部工区取泵芯、矿道取调压器，再回镇组装；法术、属性和材料途径都可实际尝试。",
+          "requires_clear": false
+        },
+        {
+          "id": "river.echo",
+          "title": "封存回响刻板",
+          "pos": [
+            600,
+            400
+          ],
+          "text": "学会回响铭印，在后续基本动作上亲手触发不同结果。回响墨制造也记在这里。",
+          "requires_clear": false,
+          "template": "sanctum/echo_knowledge",
+          "crafts": [
+            "echo_ink"
+          ]
+        },
+        {
+          "id": "survival.archive_recipe",
+          "title": "伙房旧谱：醒神茶",
+          "pos": [
+            -500,
+            -450
+          ],
+          "text": "苦叶1、饮用水1在锅边煮茶，可处理疲劳和当前中毒。野外火源失效不会继续免费烹饪。",
+          "requires_clear": false,
+          "materials": {
+            "herb": 2
+          }
+        },
+        {
+          "id": "river.dossier",
+          "title": "监狱封锁名册",
+          "pos": [
+            800,
+            100
+          ],
+          "text": "水工守卫仍听命于旧监狱的火焰领主。查明工区污染后，可沿北岸或东侧驿道深入。",
+          "requires_clear": true
+        }
+      ],
+      "encounters": [
+        {
+          "pos": [
+            -100,
+            100
+          ],
+          "profile": "guard",
+          "hp": 46,
+          "id": "river_archive.river_archive.1"
+        },
+        {
+          "pos": [
+            300,
+            -250
+          ],
+          "profile": "guard",
+          "hp": 46,
+          "id": "river_archive.river_archive.2"
+        },
+        {
+          "pos": [
+            600,
+            160
+          ],
+          "profile": "sentry",
+          "hp": 34,
+          "id": "river_archive.river_archive.3"
+        }
+      ],
+      "exits": [
+        {
+          "title": "返回林地",
+          "pos": [
+            -850,
+            0
+          ],
+          "target": "camp",
+          "arrival": [
+            -2600,
+            -1660
+          ]
+        }
+      ],
+      "patches": [
+        {
+          "pos": [
+            64,
+            128
+          ],
+          "state": "wet",
+          "radius": 64,
+          "duration": 600
+        }
+      ],
+      "obstacles": [
+        {
+          "position": [
+            0,
+            -440
+          ],
+          "size": [
+            500,
+            90
+          ],
+          "kind": "stack"
+        },
+        {
+          "position": [
+            300,
+            420
+          ],
+          "size": [
+            320,
+            80
+          ],
+          "kind": "barricade"
+        }
+      ]
+    },
+    {
+      "id": "river_mine",
+      "title": "山脚凝霜矿道",
+      "size": [
+        2200,
+        1500
+      ],
+      "entry": [
+        -920,
+        0
+      ],
+      "room_type": "traps",
+      "description": "矿水、冰面与干燥石脊交错，雷电可沿连通矿水扩散。",
+      "notes": [
+        {
+          "id": "river.storm",
+          "title": "矿师导电记录",
+          "pos": [
+            780,
+            -460
+          ],
+          "text": "学会雷阵，获得节律护手；雷晶粉制造记录可改变本次水引。导电既伤敌也伤自己。",
+          "requires_clear": false,
+          "template": "cistern/storm_knowledge",
+          "crafts": [
+            "storm_dust"
+          ]
+        },
+        {
+          "id": "river.mine_cache",
+          "title": "晶脉样本",
+          "pos": [
+            -750,
+            400
+          ],
+          "text": "一次性晶砂和施法素材；可回镇加工。",
+          "requires_clear": false,
+          "materials": {
+            "crystal": 8,
+            "frost_salt": 2,
+            "storm_dust": 2
+          }
+        }
+      ],
+      "encounters": [
+        {
+          "pos": [
+            -100,
+            150
+          ],
+          "profile": "hunter",
+          "hp": 48,
+          "id": "river_mine.river_mine.1"
+        },
+        {
+          "pos": [
+            500,
+            320
+          ],
+          "profile": "sentry",
+          "hp": 38,
+          "id": "river_mine.river_mine.2"
+        }
+      ],
+      "exits": [
+        {
+          "title": "返回山路",
+          "pos": [
+            -950,
+            0
+          ],
+          "target": "camp",
+          "arrival": [
+            -1300,
+            -2650
+          ]
+        }
+      ],
+      "puzzles": [
+        {
+          "template": "alchemy/regulator",
+          "pos": [
+            704,
+            -256
+          ]
+        }
+      ],
+      "patches": [
+        {
+          "pos": [
+            0,
+            192
+          ],
+          "state": "wet",
+          "radius": 96,
+          "duration": 600
+        },
+        {
+          "pos": [
+            128,
+            192
+          ],
+          "state": "frozen",
+          "radius": 64,
+          "duration": 600
+        }
+      ],
+      "obstacles": [
+        {
+          "position": [
+            -250,
+            -450
+          ],
+          "size": [
+            800,
+            140
+          ],
+          "kind": "pillar"
+        },
+        {
+          "position": [
+            200,
+            550
+          ],
+          "size": [
+            700,
+            110
+          ],
+          "kind": "pillar"
+        }
+      ]
+    },
+    {
+      "id": "river_prison",
+      "title": "余烬旧监狱",
+      "size": [
+        2800,
+        1800
+      ],
+      "entry": [
+        -1200,
+        0
+      ],
+      "room_type": "boss",
+      "description": "两侧通廊通向领主厅；可以先找安全位置准备，随时沿原入口撤回河谷。",
+      "notes": [
+        {
+          "id": "river.nova",
+          "title": "霜阵震荡研究",
+          "pos": [
+            -1100,
+            600
+          ],
+          "text": "霜阵内震荡产生寒霜新星；阵外震荡仍可破冰。同一个动作由现场条件决定结果。",
+          "requires_clear": false,
+          "template": "cistern/nova_knowledge"
+        },
+        {
+          "id": "river.prison_reserve",
+          "title": "看守的封存储备",
+          "pos": [
+            -1000,
+            -600
+          ],
+          "text": "一次性施法材料，沿途知识和材料来源可用于多种准备。",
+          "requires_clear": false,
+          "template": "powder/powder_supply",
+          "heal": false
+        }
+      ],
+      "encounters": [
+        {
+          "pos": [
+            -450,
+            450
+          ],
+          "profile": "guard",
+          "hp": 54,
+          "id": "river_prison.river_prison.1"
+        },
+        {
+          "pos": [
+            -400,
+            -450
+          ],
+          "profile": "sentry",
+          "hp": 40,
+          "id": "river_prison.river_prison.2"
+        },
+        {
+          "pos": [
+            750,
+            0
+          ],
+          "boss": true,
+          "hp": 280,
+          "speed": 90,
+          "id": "river_prison.river_prison.3"
+        }
+      ],
+      "exits": [
+        {
+          "title": "返回监狱外道",
+          "pos": [
+            -1220,
+            0
+          ],
+          "target": "camp",
+          "arrival": [
+            3300,
+            -1430
+          ]
+        }
+      ],
+      "obstacles": [
+        {
+          "position": [
+            0,
+            -560
+          ],
+          "size": [
+            170,
+            450
+          ],
+          "kind": "wall"
+        },
+        {
+          "position": [
+            0,
+            560
+          ],
+          "size": [
+            170,
+            450
+          ],
+          "kind": "wall"
+        }
+      ]
+    }
+  ],
+  "landmarks": [
+    {
+      "id": "town",
+      "title": "河谷镇",
+      "pos": [
+        -3500,
+        2100
+      ],
+      "description": "井水、炉灶、训练、加工与任务。北向林地，东向木桥，南向浅滩。"
+    },
+    {
+      "id": "forest",
+      "title": "苔石林地",
+      "pos": [
+        -2700,
+        -1500
+      ],
+      "description": "猎营、岩泉与档案窖；林缘可采苦叶。"
+    },
+    {
+      "id": "mine",
+      "title": "山脚矿道",
+      "pos": [
+        -1300,
+        -2800
+      ],
+      "description": "凝霜矿水与旧调压器，连接材料与雷电知识。"
+    },
+    {
+      "id": "lake",
+      "title": "北部蓄水湖",
+      "pos": [
+        700,
+        -2300
+      ],
+      "description": "北侧石桥可过河，湖岸留下凝霜记录。"
+    },
+    {
+      "id": "marsh",
+      "title": "下游湿地",
+      "pos": [
+        1000,
+        2200
+      ],
+      "description": "浅滩可涉水，污染与上游泵有关。"
+    },
+    {
+      "id": "mill",
+      "title": "废弃水工区",
+      "pos": [
+        2750,
+        700
+      ],
+      "description": "排污泵、分流阀与水路闸。"
+    },
+    {
+      "id": "prison",
+      "title": "余烬旧监狱",
+      "pos": [
+        3300,
+        -1600
+      ],
+      "description": "旧水工守卫的命令源头。"
+    },
+    {
+      "id": "road",
+      "title": "旧驿路",
+      "pos": [
+        -1500,
+        350
+      ],
+      "description": "可以搭设前哨，木桥连通东西。"
+    }
+  ],
+  "roads": [
+    [
+      [
+        -3600,
+        2100
+      ],
+      [
+        -3500,
+        0
+      ],
+      [
+        -3000,
+        -1200
+      ],
+      [
+        -2600,
+        -1800
+      ],
+      [
+        -1300,
+        -2800
+      ],
+      [
+        200,
+        -1500
+      ],
+      [
+        3300,
+        -1600
+      ],
+      [
+        2800,
+        700
+      ],
+      [
+        2800,
+        2400
+      ],
+      [
+        1000,
+        2400
+      ],
+      [
+        300,
+        2400
+      ],
+      [
+        -2000,
+        2100
+      ],
+      [
+        -3600,
+        2100
+      ]
+    ],
+    [
+      [
+        -3500,
+        1800
+      ],
+      [
+        -1800,
+        350
+      ],
+      [
+        130,
+        500
+      ],
+      [
+        2800,
+        700
+      ]
+    ],
+    [
+      [
+        -2600,
+        -1800
+      ],
+      [
+        200,
+        -1500
+      ]
+    ],
+    [
+      [
+        200,
+        -1500
+      ],
+      [
+        200,
+        500
+      ]
+    ],
+    [
+      [
+        2800,
+        700
+      ],
+      [
+        3300,
+        -1600
+      ]
+    ]
+  ],
+  "quests": [
+    {
+      "id": "river_water",
+      "title": "清水重新流向下游",
+      "description": "调查工区并解封排污泵，改善湿地取水口，回镇报告。",
+      "required_claims": [
+        "alchemy.pump_open",
+        "river.industrial"
+      ],
+      "points": 1
+    },
+    {
+      "id": "river_bridge",
+      "title": "接回旧驿路",
+      "description": "在西侧林缘找回撑木，处理断桥支撑机构，恢复东西近路。",
+      "required_claims": [
+        "valley.bridge_beams",
+        "river.bridge_fixed"
+      ],
+      "points": 1
+    },
+    {
+      "id": "river_research",
+      "title": "灰河谷的旧知识",
+      "description": "阅读林间火阵、湖岸凝霜、矿道导电与湿地毒理记录。",
+      "required_claims": [
+        "river.fire",
+        "river.frost",
+        "river.storm",
+        "river.venom"
+      ],
+      "points": 2
+    },
+    {
+      "id": "river_alchemy",
+      "title": "重启镇中调和台",
+      "description": "在档案窖读图纸，工区取泵芯，矿道取调压器，回镇组装。",
+      "required_claims": [
+        "alchemy.repaired"
+      ],
+      "points": 1
+    },
+    {
+      "id": "river_warden",
+      "title": "结束监狱的封锁",
+      "description": "取得档案窖名册，击败旧监狱守卫与领主，再回镇报告。",
+      "required_claims": [
+        "river.dossier"
+      ],
+      "required_clears": [
+        "river_prison"
+      ],
+      "points": 2
+    }
+  ]
+}

@@ -148,7 +148,7 @@ func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 		if not region or region.id.is_empty() or region.title.is_empty():
 			_fail(catalog.chapter, "Invalid region")
 			continue
-		var layout := RunRoomGenerator.new().generate_room(region.seed, 0, region.room_type)
+		var layout := region.make_layout()
 		region.reserve_interaction_space(layout)
 		for point in region.interaction_points():
 			if not layout.contains_offset(point.pos, 30):

@@ -5,6 +5,8 @@ signal region_changed(id: String)
 var catalog := ExplorationContentCatalog.new()
 const SAVE_SLOT := 2
 const SECTION := "exploration_mvp"
+var save_slot := SAVE_SLOT
+var save_section := SECTION
 
 var progress := ExplorationProgress.new()
 var player: Player
@@ -55,12 +57,12 @@ func _bootstrap() -> void:
 	for rule in player.skill_manager.combinations.rules:
 		player.skill_manager.pool.add_skill(rule.result_skill)
 	var saves := SaveManager.instance
-	saves.active_slot = SAVE_SLOT
+	saves.active_slot = save_slot
 	saves.progress_only = true
-	saves.register_section(SECTION, progress)
+	saves.register_section(save_section, progress)
 	saves.progress_reload_requested.connect(reload_progress)
 	saves.before_save.connect(_sync_progress)
-	progress.deserialize_save_data(saves.read_extension(SAVE_SLOT, SECTION))
+	progress.deserialize_save_data(saves.read_extension(save_slot, save_section))
 	var load_status := saves.last_read.status
 	player.skill_manager.combinations.supplies.restore(progress.casting_supplies)
 	GameRuntime.instance.get_world_runtime().state_manager.set_all_states(progress.world_states)
@@ -104,7 +106,8 @@ func _bootstrap() -> void:
 	_restore_loadout()
 	_restore_character()
 	equipment_service.restore()
-	_change_region("camp")
+	var start := start_location()
+	_change_region(start.region, start.position)
 	ready_for_play = true
 	player.skill_manager.hand_changed.connect(func(_source: String): _queue_save())
 	player.skill_manager.slot_changed.connect(func(_slot: int): _queue_save())
@@ -145,11 +148,11 @@ func _change_region(destination: String, arrival: Vector2 = Vector2.INF) -> void
 	region_root = Node2D.new()
 	region_root.name = "ExplorationRegion"
 	GameRuntime.instance.get_region_session().mount(region_root, self)
-	var layout := _generator.generate_room(current_data.seed, 0, current_data.room_type)
+	var layout := current_data.make_layout()
 	current_data.reserve_interaction_space(layout)
-	if destination == "camp":
+	if destination == "camp" and not current_data.open_field:
 		layout.obstacles.clear()
-	_renderer.build(region_root, layout)
+	render_terrain(layout)
 	region_root.add_child(preload("res://gameplay/exploration/surface_overlay.gd").new())
 	player.global_position = layout.entry_offset
 	if arrival.is_finite() and layout.is_point_clear(arrival, 20):
@@ -164,9 +167,10 @@ func _change_region(destination: String, arrival: Vector2 = Vector2.INF) -> void
 		camera.limit_bottom = ceili(frame.y)
 		camera.reset_smoothing()
 		camera.force_update_scroll()
-	if destination == "camp":
+	if destination == "camp" or survival._awaiting_vitals:
 		_restore_player()
 		survival.camp_arrival(previous_hp, previous_mp, was_dead)
+	if destination == "camp":
 		_build_camp()
 	else:
 		_build_props(layout)
@@ -222,7 +226,7 @@ func _use_exit(entry: ExplorationExitData) -> void:
 	if region_id == "boss" and entry.target == "camp" and progress.completed:
 		ui.show_panel("监狱封锁已解除", "你击败了火焰领主，完成这次探索。\n\n已掌握的技能、法术组合、发现记录与捷径已保存。可以返回营地探索遗漏支路，或在暂停菜单重置遭遇再试不同组合。", [{"title": "返回营地", "callback": func(): ui.close_modal(); request_travel("camp")}])
 		return
-	request_travel(entry.target)
+	request_travel(entry.target, entry.arrival)
 
 func _on_enemy_died(enemy: Enemy, generation: int) -> void:
 	if not GameRuntime.instance.get_region_session().is_current(generation):
@@ -259,7 +263,7 @@ func _on_player_died() -> void:
 	ui.show_panel("远征中断", "返回营地后恢复半数生命和法力，并保留最低饱食饮水。到篝火主动休整或吃粗食，库存不会免费补满。已学知识、已清理区域和发现记录保留；未清理遭遇重新开始。", [{"title": "返回营地", "callback": func(): ui.close_modal(); request_travel("camp")}], true)
 
 func reload_progress() -> void:
-	var data := SaveManager.instance.read_extension(SAVE_SLOT, SECTION)
+	var data := SaveManager.instance.read_extension(save_slot, save_section)
 	if not SaveManager.instance.last_read.usable():
 		ui.notify("没有可读取的有效存档，当前旅程与原存档已保留。")
 		return
@@ -275,7 +279,8 @@ func reload_progress() -> void:
 	equipment_service.restore()
 	knowledge.restore_clues()
 	survival.restore(progress.survival_state)
-	request_travel("camp")
+	var start := start_location()
+	request_travel(start.region, start.position)
 
 func _on_spell_object_solved(spec: SpellPuzzleData) -> void:
 	if progress.claims.has(spec.id):
@@ -358,3 +363,13 @@ func _add_discovery(entry: ExplorationDiscoveryData) -> void:
 func _process(delta: float) -> void:
 	if progress_service:
 		progress_service.tick(delta)
+
+func render_terrain(layout: RunRoomLayout) -> void:
+	_renderer.build(region_root, layout)
+
+func is_at_base() -> bool: return region_id == "camp"
+func has_hostiles_near(_point: Vector2) -> bool: return not active_enemies.is_empty()
+func is_area_cleared(_point: Vector2) -> bool: return progress.cleared.has(region_id)
+func knowledge_changed() -> void: pass
+func journey_location() -> Dictionary: return {}
+func start_location() -> Dictionary: return {"region": "camp", "position": Vector2.INF}
