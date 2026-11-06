@@ -52,6 +52,19 @@ func validate_save_data(value: Variant) -> bool:
 			if not run.get(key) is int or int(run[key]) < 0: return false
 		if not run.get("work_actions", 0) is int or int(run.get("work_actions", 0)) < 0: return false
 		if not run.get("materials") is Dictionary or not run.get("regions") is Array or not run.get("initial") is Dictionary or not run.get("final") is Dictionary: return false
+		for counter in ["work_attempts", "work_interruptions"]:
+			if not run.get(counter, {}) is Dictionary: return false
+			for amount in run.get(counter, {}).values():
+				if not amount is int or amount < 0: return false
+		if not run.get("recovery", {}) is Dictionary: return false
+		for resource in run.get("recovery", {}).values():
+			if not resource is Dictionary: return false
+			for amount in resource.values():
+				if typeof(amount) not in [TYPE_FLOAT, TYPE_INT] or not is_finite(float(amount)) or amount < 0: return false
+		for key in ["cast_steps", "surface_steps"]:
+			if not run.get(key, []) is Array or run.get(key, []).size() > 128: return false
+			for step in run.get(key, []):
+				if not step is Dictionary: return false
 		for snapshot in [run.initial, run.final]:
 			if not SurvivalNeeds.valid(snapshot.get("survival", {})): return false
 			if not snapshot.get("equipment", []) is Array: return false

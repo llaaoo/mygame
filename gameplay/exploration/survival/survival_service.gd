@@ -50,8 +50,10 @@ func apply_recovery() -> void:
 	var recovery := needs.recovery()
 	game.player.health_component.regen_multiplier = recovery.health_multiplier
 	game.player.health_component.regen_bonus = recovery.health_bonus
+	game.player.health_component.regen_bonus_sources = {"food": recovery.health_bonus}
 	game.player.mana_component.regen_multiplier = recovery.mana_multiplier
 	game.player.mana_component.regen_bonus = recovery.mana_bonus
+	game.player.mana_component.regen_bonus_sources = {"food": .5 if needs.meal == "broth" and needs.meal_remaining > 0 else 0.0, "water": .5 if needs.water_remaining > 0 else 0.0, "tea": 1.0 if needs.tea_remaining > 0 else 0.0}
 
 func exert(amount: float) -> void:
 	needs.exert(amount, game.player.stats_component.effective_stat("endurance"))
@@ -249,10 +251,15 @@ func _complete(option: FieldWorkMethod, node: Node2D, spec: SurvivalStationData)
 			needs.nutrition = maxf(0, needs.nutrition - (20 if full else 5))
 			needs.hydration = maxf(0, needs.hydration - (25 if full else 10))
 			needs.fatigue = 0 if full else maxf(0, needs.fatigue - 25)
-			if full: game._restore_player()
+			if full:
+				var hp := game.player.health_component.hp
+				var mp := game.player.mana_component.mp
+				game._restore_player()
+				game.player.health_component.recovered.emit(float(maxi(0, game.player.health_component.hp - hp)), "rest")
+				game.player.mana_component.recovered.emit(float(maxi(0, game.player.mana_component.mp - mp)), "rest")
 			else:
-				game.player.heal(40)
-				game.player.restore_mp(30)
+				game.player.heal(40, "rest")
+				game.player.restore_mp(30, "rest")
 	var notify := supplies.finish_transaction(true)
 	apply_recovery()
 	if notify.is_valid(): notify.call()

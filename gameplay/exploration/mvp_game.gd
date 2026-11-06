@@ -31,6 +31,7 @@ var workshop: CastingWorkshop
 var field_sites: FieldWorkSites
 var alchemy: AlchemyRepairService
 var survival: SurvivalService
+var retreat: ExpeditionRetreat
 var _generator := RunRoomGenerator.new()
 var _renderer := PrisonArena.new()
 
@@ -70,6 +71,8 @@ func _bootstrap() -> void:
 	progress_service.save_failed.connect(ui.notify)
 	progress_service.changed.connect(presenter._update_objective)
 	ui.travel_requested.connect(request_travel)
+	retreat = ExpeditionRetreat.new(self)
+	ui.retreat_requested.connect(retreat.begin)
 	ui.replay_requested.connect(replay_encounters)
 	ui.practice_requested.connect(progress_service.practice_encounters)
 	ui.practice_available = can_practice

@@ -15,6 +15,7 @@ QUICK = ["save_system", "save_recovery", "skill_catalog", "skill_upgrades", "roo
 INTEGRATION = [
     "field_work",
     "material_intent",
+    "retreat_ledger",
     "survival_needs",
     "survival_world",
     "survival_rest",

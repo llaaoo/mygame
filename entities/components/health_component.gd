@@ -11,8 +11,10 @@ extends Node
 @export var regen_rate: float = 3.0
 var regen_multiplier := 1.0
 var regen_bonus := 0.0
+var regen_bonus_sources: Dictionary = {}
 
 ## 信号
+signal recovered(actual: float, source: String)
 signal health_changed(current_hp: int, max_hp: int)
 signal died
 
@@ -62,7 +64,9 @@ func tick(delta: float) -> void:
 		var heal_amt := int(_regen_accumulator)
 		if heal_amt > 0:
 			_regen_accumulator -= heal_amt
-			hp = mini(max_hp, hp + heal_amt)
+			var actual := mini(max_hp - hp, heal_amt)
+			hp += actual
+			RecoveryAccounting.regeneration(recovered, actual, regen_rate, regen_bonus_sources)
 			health_changed.emit(hp, max_hp)
 
 
@@ -126,10 +130,13 @@ func _start_invincibility() -> void:
 	_invincibility_family = _active_family if _hit_group_depth > 0 or _group_damaged else ""
 
 
-func heal(amount: int) -> void:
-	hp = mini(max_hp, hp + amount)
+func heal(amount: int, source := "skill") -> void:
+	var actual := mini(max_hp - hp, maxi(0, amount))
+	hp += actual
 	health_changed.emit(hp, max_hp)
-	_emit_heal_event(amount)
+	if actual > 0:
+		recovered.emit(float(actual), source)
+		_emit_heal_event(actual)
 
 
 ## ── 事件发射 → CombatExecutor（唯一权威入口） ──
