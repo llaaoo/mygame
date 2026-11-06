@@ -79,6 +79,11 @@ func _setup_runtimes() -> void:
 	# === CombatRuntime（CombatExecutor + CombatEventBus 统一归 GameRuntime 管理） ===
 	_setup_combat_runtime()
 
+	if not has_node("ElementHitBindings"):
+		var elements := preload("res://gameplay/combat/on_hit/element_hit_bindings.gd").new()
+		elements.name="ElementHitBindings"
+		add_child(elements)
+
 	# === WorldRuntime（如果场景中已有则复用，否则创建） ===
 	if has_node("WorldRuntime"):
 		world_runtime = $WorldRuntime as WorldRuntime

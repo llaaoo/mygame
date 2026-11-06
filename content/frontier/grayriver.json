@@ -569,10 +569,9 @@
             300
           ],
           "profile": "hunter",
-          "hp": 38,
-          "speed": 135,
           "group": "road",
-          "id": "camp.road.1"
+          "id": "camp.road.1",
+          "character": "hunter"
         },
         {
           "pos": [
@@ -580,10 +579,9 @@
             50
           ],
           "profile": "sentry",
-          "hp": 32,
-          "speed": 105,
           "group": "road",
-          "id": "camp.road.2"
+          "id": "camp.road.2",
+          "character": "caster"
         },
         {
           "pos": [
@@ -591,10 +589,9 @@
             -1100
           ],
           "profile": "guard",
-          "hp": 42,
-          "speed": 105,
           "group": "forest",
-          "id": "camp.forest.3"
+          "id": "camp.forest.3",
+          "character": "guard"
         },
         {
           "pos": [
@@ -602,10 +599,9 @@
             -1500
           ],
           "profile": "hunter",
-          "hp": 38,
-          "speed": 135,
           "group": "forest",
-          "id": "camp.forest.4"
+          "id": "camp.forest.4",
+          "character": "hunter"
         },
         {
           "pos": [
@@ -613,10 +609,9 @@
             -2300
           ],
           "profile": "sentry",
-          "hp": 36,
-          "speed": 105,
           "group": "lake",
-          "id": "camp.lake.5"
+          "id": "camp.lake.5",
+          "character": "caster"
         },
         {
           "pos": [
@@ -624,10 +619,9 @@
             2100
           ],
           "profile": "hunter",
-          "hp": 42,
-          "speed": 135,
           "group": "marsh",
-          "id": "camp.marsh.6"
+          "id": "camp.marsh.6",
+          "character": "hunter"
         },
         {
           "pos": [
@@ -635,10 +629,9 @@
             1850
           ],
           "profile": "sentry",
-          "hp": 34,
-          "speed": 105,
           "group": "marsh",
-          "id": "camp.marsh.7"
+          "id": "camp.marsh.7",
+          "character": "caster"
         },
         {
           "pos": [
@@ -646,10 +639,9 @@
             800
           ],
           "profile": "guard",
-          "hp": 50,
-          "speed": 105,
           "group": "mill",
-          "id": "camp.mill.8"
+          "id": "camp.mill.8",
+          "character": "guard"
         },
         {
           "pos": [
@@ -657,10 +649,9 @@
             900
           ],
           "profile": "sentry",
-          "hp": 38,
-          "speed": 105,
           "group": "mill",
-          "id": "camp.mill.9"
+          "id": "camp.mill.9",
+          "character": "caster"
         },
         {
           "pos": [
@@ -668,10 +659,9 @@
             -1300
           ],
           "profile": "guard",
-          "hp": 54,
-          "speed": 105,
           "group": "prison_road",
-          "id": "camp.prison_road.10"
+          "id": "camp.prison_road.10",
+          "character": "guard"
         },
         {
           "pos": [
@@ -679,10 +669,9 @@
             -1100
           ],
           "profile": "hunter",
-          "hp": 44,
-          "speed": 135,
           "group": "prison_road",
-          "id": "camp.prison_road.11"
+          "id": "camp.prison_road.11",
+          "character": "hunter"
         }
       ],
       "deliveries": [
@@ -852,8 +841,8 @@
             100
           ],
           "profile": "guard",
-          "hp": 46,
-          "id": "river_archive.river_archive.1"
+          "id": "river_archive.river_archive.1",
+          "character": "guard"
         },
         {
           "pos": [
@@ -861,8 +850,8 @@
             -250
           ],
           "profile": "guard",
-          "hp": 46,
-          "id": "river_archive.river_archive.2"
+          "id": "river_archive.river_archive.2",
+          "character": "guard"
         },
         {
           "pos": [
@@ -870,8 +859,8 @@
             160
           ],
           "profile": "sentry",
-          "hp": 34,
-          "id": "river_archive.river_archive.3"
+          "id": "river_archive.river_archive.3",
+          "character": "caster"
         }
       ],
       "exits": [
@@ -975,8 +964,8 @@
             150
           ],
           "profile": "hunter",
-          "hp": 48,
-          "id": "river_mine.river_mine.1"
+          "id": "river_mine.river_mine.1",
+          "character": "hunter"
         },
         {
           "pos": [
@@ -984,8 +973,8 @@
             320
           ],
           "profile": "sentry",
-          "hp": 38,
-          "id": "river_mine.river_mine.2"
+          "id": "river_mine.river_mine.2",
+          "character": "caster"
         }
       ],
       "exits": [
@@ -1101,8 +1090,8 @@
             450
           ],
           "profile": "guard",
-          "hp": 54,
-          "id": "river_prison.river_prison.1"
+          "id": "river_prison.river_prison.1",
+          "character": "guard"
         },
         {
           "pos": [
@@ -1110,8 +1099,8 @@
             -450
           ],
           "profile": "sentry",
-          "hp": 40,
-          "id": "river_prison.river_prison.2"
+          "id": "river_prison.river_prison.2",
+          "character": "caster"
         },
         {
           "pos": [

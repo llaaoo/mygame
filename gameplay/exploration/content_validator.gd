@@ -476,6 +476,9 @@ func _validate_surface_reference(owner: Resource, field: String, state: String, 
 		_fail(owner, "%s: invalid duration/radius (%s, %s)" % [field, duration, radius])
 
 func _validate_enemy_profile(encounter: ExplorationEncounterData, profiles: Dictionary) -> void:
+	if encounter.character:
+		if encounter.boss: _fail(encounter,"Boss cannot use an ordinary character definition")
+		for error in encounter.character.validation_errors(): _fail(encounter.character,error)
 	var profile := encounter.profile
 	if not profile: return
 	if encounter.boss:

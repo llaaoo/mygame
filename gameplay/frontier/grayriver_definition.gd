@@ -59,7 +59,8 @@ static func build() -> ExplorationChapterData:
 		for raw in entry.get("encounters", []):
 			var encounter := ExplorationEncounterData.new()
 			encounter.pos = vector(raw.pos)
-			encounter.hp = int(raw.hp)
+			encounter.hp = int(raw.get("hp",1))
+			if raw.has("character"): encounter.character=load("res://content/characters/river_%s.tres"%raw.character)
 			encounter.speed = float(raw.get("speed", 105))
 			encounter.boss = raw.get("boss", false)
 			if raw.has("profile"): encounter.profile = load("res://content/exploration/enemies/%s.tres" % raw.profile)

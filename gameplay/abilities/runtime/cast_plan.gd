@@ -1,5 +1,8 @@
 class_name CastPlan
 extends RefCounted
+
+var requires_live_target := false
+var live_target: Node2D
 ## Shared by preview, accepted preparation and commit. Resources are read-only definitions.
 var components: Array[CastComponent] = []
 var skill: SkillData

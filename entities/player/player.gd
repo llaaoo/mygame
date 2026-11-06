@@ -36,6 +36,7 @@ const PLAYER_SKILL_IDS: Array[String] = [
 
 ## ── 移动基础值（最终速度 = 基础 + 敏捷加成） ──
 @export var base_move_speed: float = 300.0
+@export var character_definition: ActorCharacterData
 
 ## ── 背包 ──
 @export var inventory: Inventory
@@ -124,6 +125,8 @@ func _ready() -> void:
 		_create_mana_component()
 	mana_component.mp_changed.connect(_on_mp_changed)
 
+	# Attributes share the same body definition/formula as authored NPCs.
+	if character_definition: ActorCombatModel.initialize_body(self, character_definition)
 	# 属性系统
 	_apply_stats()
 	stats_component.stat_changed.connect(_on_stat_changed)
@@ -137,6 +140,9 @@ func _ready() -> void:
 
 	# 技能初始化
 	_setup_skills()
+	if character_definition:
+		if not character_definition.skills.is_empty(): ActorCombatModel.configure_actions(self, character_definition)
+		ActorCombatModel.configure_equipment(self, character_definition)
 
 	# 战斗事件总线（如果有则复用，没有则创建）
 	_setup_event_bus()
@@ -182,11 +188,7 @@ func _ready() -> void:
 ## ── 属性系统 ──
 
 func _apply_stats() -> void:
-	stats_component._recalculate_all()
-	var buffs := get_node("BuffManager") as BuffManager
-	buffs.set_base_attributes({"max_hp": 50 + stats_component.max_hp_bonus, "max_mana": stats_component.max_mana, "attack_damage": roundi((10 + stats_component.physical_damage) * melee_damage_multiplier), "move_speed": base_move_speed + stats_component.move_speed_bonus})
-	health_component.hp = clampi(health_component.hp, 0 if health_component.is_dead else 1, health_component.max_hp)
-	mana_component.mp = clampi(mana_component.mp, 0, mana_component.max_mp)
+	ActorCombatModel.rebuild(self)
 
 func _on_stat_changed(_stat_name: String, _new_value: int) -> void:
 	_apply_stats()
@@ -252,28 +254,7 @@ func _setup_skills() -> void:
 
 ## 配置伤害管线（分阶段：FLAT → MULTIPLY → OVERRIDE → FINAL）
 func _setup_damage_modifiers() -> void:
-	var executor := skill_manager.executor
-	if not executor:
-		return
-
-	# Stage FLAT: 属性缩放 — 智力 → 魔法伤害
-	var stat_mod := StatScalingModifier.new()
-	stat_mod.stat_name = "magic_damage"
-	stat_mod.ratio = 1.0  # fallback，技能自身的 damage_scaling 优先
-	executor.add_modifier(stat_mod)
-
-	# Stage MULTIPLY: 火焰增伤 +20%（示例：火系天赋/装备）
-	# var fire_mod := TagMultiplierModifier.new()
-	# fire_mod.required_tags = ["fire"]
-	# fire_mod.multiplier = 1.2
-	# executor.add_modifier(fire_mod)
-
-	# Stage OVERRIDE: 火焰免疫（示例：Boss 词缀）
-	# var fire_immune := TagMultiplierModifier.new()
-	# fire_immune.required_tags = ["fire"]
-	# fire_immune.multiplier = 0.0
-	# fire_immune.stage = DamageModifier.Stage.OVERRIDE
-	# executor.add_modifier(fire_immune)
+	ActorCombatModel.setup_scaling(skill_manager)
 
 ## 场景级服务由Player装配，事件与熟练度绑定由PlayerCombatBindings管理。
 var quest_manager: QuestManager = null

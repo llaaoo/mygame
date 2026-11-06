@@ -15,6 +15,8 @@
 [ext_resource type="Script" uid="uid://bina3ctxqpy1c" path="res://entities/components/health_component.gd" id="12_a1qjk"]
 [ext_resource type="Script" uid="uid://dw6d243ux5jl4" path="res://entities/components/combat_component.gd" id="13_j3ovn"]
 
+[ext_resource type="Resource" path="res://content/characters/player.tres" id="character"]
+
 [sub_resource type="CircleShape2D" id="CircleShape2D_26q78"]
 
 [node name="Player" type="CharacterBody2D" unique_id=87503594]
@@ -22,6 +24,7 @@ collision_layer = 2
 collision_mask = 3
 script = ExtResource("1_8fjmc")
 inventory = ExtResource("2_7thud")
+character_definition = ExtResource("character")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=2127702988]
 texture_filter = 1

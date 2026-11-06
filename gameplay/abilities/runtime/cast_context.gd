@@ -14,6 +14,15 @@ var charge_power: float = 1.0          ## 蓄力倍率（0.0~1.0，1.0=满蓄）
 var batch: SkillExecutionBatch
 var family_id := ""
 var empower := false
+var requires_live_target := false
+
+static func target_available(victim) -> bool:
+	if not is_instance_valid(victim) or victim.is_queued_for_deletion(): return false
+	var health := victim.get_node_or_null("HealthComponent") as HealthComponent
+	return not health or not health.is_dead
+
+func has_valid_target() -> bool:
+	return not requires_live_target or target_available(target)
 
 
 ## 快捷构造：仅需 caster + direction

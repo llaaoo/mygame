@@ -317,3 +317,5 @@ A—D批次实现与验收，包含施法/状态事务、命中结果、周期�
 
 - [灰河谷：地区设计与建设](GRAYRIVER_FRONTIER.md)
 - [灰河谷：正常角色试玩与交付边界](GRAYRIVER_PLAYTEST.md)
+
+- [共用角色模板与人形敌人](SHARED_CHARACTERS.md)
