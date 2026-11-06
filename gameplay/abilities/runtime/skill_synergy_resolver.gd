@@ -2,6 +2,7 @@ class_name SkillSynergyResolver
 extends Node
 signal reaction_triggered(title: String, position: Vector2)
 signal reaction_observed(id: String, position: Vector2)
+signal reaction_recorded(details: Dictionary)
 
 var _owner_entity: Node2D = null
 var _cooldowns: Dictionary = {}
@@ -68,6 +69,7 @@ func _trigger(synergy: SkillSynergyData, event: CombatEvent) -> void:
 		if target_buffs:
 			target_buffs.remove_status(synergy.required_target_status)
 	if damage > 0 or synergy.consume_target_status:
+		reaction_recorded.emit({"reaction": "hit:" + synergy.id, "skill": event.skill.get_id(), "source": event.skill.display_name, "tags": event.data.get("tags", []).duplicate(), "prior_target_statuses": event.data.get("target_statuses_before", []).duplicate(), "required_status": synergy.required_target_status, "consumed": synergy.consume_target_status, "position": [event.target.global_position.x, event.target.global_position.y]})
 		reaction_observed.emit(synergy.id, event.target.global_position)
 		reaction_triggered.emit("灭火" if synergy.id == "steam_burst" and damage == 0 else synergy.display_name, event.target.global_position)
 	if not synergy.triggered_skill_id.is_empty():

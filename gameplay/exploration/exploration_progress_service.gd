@@ -175,8 +175,8 @@ func discover(entry: ExplorationDiscoveryData) -> bool:
 	game.player.skill_manager.combinations.supplies.grant(entry.materials)
 	_apply_knowledge()
 	if entry.heal:
-		game.player.heal(60)
-		game.player.restore_mp(60)
+		game.player.heal(60, "discovery")
+		game.player.restore_mp(60, "discovery")
 	_save_progress()
 	changed.emit()
 	return true

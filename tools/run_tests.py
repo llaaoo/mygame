@@ -18,6 +18,7 @@ INTEGRATION = [
     "retreat_ledger",
     "enemy_preparation",
     "field_outpost",
+    "expedition_feedback",
     "survival_needs",
     "survival_world",
     "survival_rest",

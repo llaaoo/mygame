@@ -44,6 +44,7 @@ steps = PackedStringArray("fire", "impact")
 [sub_resource type="Resource" id="Resource_x0mar"]
 script = ExtResource("1_pn3v5")
 id = "pulse_knowledge"
+intro_text = "已掌握震荡（1）。用它打碎冰面或冻结目标，可换取伤害、恢复水路，也会失去剩余减速控制。"
 equipment = Array[String](["keeper_ring"])
 title = "震荡与焰环"
 text = "已掌握震荡（1）。阵外是近身能量冲击；火阵内变成以法阵为中心的范围喷发。与火球共用两次法阵资源，群敌近身时再选择使用。"

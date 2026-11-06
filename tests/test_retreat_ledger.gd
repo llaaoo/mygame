@@ -51,6 +51,15 @@ func run() -> void:
 	check(report.work_attempts.retreat == 2 and report.work_interruptions.retreat == 1 and report.work_actions == 1, "Retreat attempt/interrupt counters incorrect")
 	check(game.progress.validate_save_data(game.progress.serialize_save_data()), "New ledger shape cannot save")
 	check(not game.retreat.reason().is_empty(), "Camp allowed redundant retreat")
+	game._change_region("powder")
+	for enemy in game.active_enemies: enemy.process_mode = Node.PROCESS_MODE_DISABLED
+	p.health_component.hp = 90
+	p.mana_component.mp = 10
+	game.trial_recorder.start("冻结控制")
+	var supply: ExplorationDiscoveryData = game.current_data.discoveries[0]
+	check(game.progress_service.discover(supply) and not game.progress_service.discover(supply), "Discovery supply repeated")
+	check(game.trial_recorder.run.recovery.hp.discovery == 10 and game.trial_recorder.run.recovery.mp.discovery == 50, "Discovery recovery has wrong source or counts overflow")
+	game.trial_recorder.finish()
 	await fixture.close()
 	if errors.is_empty(): print("Retreat ledger passed: live menu transition, duration/damage, no charge/refill, actual/clamped recovery, transaction rollback, source shares and compatible persistence")
 	quit(0 if errors.is_empty() else 1)

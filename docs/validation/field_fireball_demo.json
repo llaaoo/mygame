@@ -1,0 +1,42 @@
+[
+  {
+    "action": "fire_sigil",
+    "effect": "铭刻火阵",
+    "event": "cast",
+    "game_seconds": 387.098251415558,
+    "materials": {},
+    "mp": 8,
+    "real_seconds": 1028.169,
+    "region": "camp"
+  },
+  {
+    "action": "ignite",
+    "effect": "火球术",
+    "event": "cast",
+    "game_seconds": 389.622398748891,
+    "materials": {},
+    "mp": 12,
+    "real_seconds": 1030.704,
+    "region": "camp"
+  },
+  {
+    "action": "ignite",
+    "effect": "火球术",
+    "event": "cast",
+    "game_seconds": 392.28614974889,
+    "materials": {},
+    "mp": 12,
+    "real_seconds": 1033.367,
+    "region": "camp"
+  },
+  {
+    "action": "ignite",
+    "effect": "火花",
+    "event": "cast",
+    "game_seconds": 395.295836304446,
+    "materials": {},
+    "mp": 4,
+    "real_seconds": 1118.496,
+    "region": "camp"
+  }
+]

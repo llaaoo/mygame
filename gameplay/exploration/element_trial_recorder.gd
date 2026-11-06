@@ -16,7 +16,7 @@ func _ready() -> void:
 	game.player.health_component.recovered.connect(_on_recovery.bind("hp"))
 	game.player.mana_component.recovered.connect(_on_recovery.bind("mp"))
 	SurfaceManager.instance.reaction_occurred.connect(_on_surface)
-	(game.player.get_node("SkillSynergyResolver") as SkillSynergyResolver).reaction_observed.connect(_on_hit_reaction)
+	(game.player.get_node("SkillSynergyResolver") as SkillSynergyResolver).reaction_recorded.connect(_on_hit_reaction)
 	CombatExecutor.instance.damage_applied.connect(_on_damage)
 	game.region_changed.connect(_on_region)
 
@@ -35,7 +35,7 @@ func start(label: String) -> bool:
 	run = {"recovery": {"hp": {}, "mp": {}}, "work_attempts": {}, "work_interruptions": {}, "cast_steps": [], "surface_steps": [], "label": label, "seconds": 0.0, "casts": 0, "melee": 0, "damage_dealt": 0, "damage_taken": 0, "mana_spent": 0, "materials": {}, "regions": [game.region_id], "initial": _snapshot(), "final": {}, "result": "进行中"}
 	active = true
 	game.ui.close_modal()
-	game.ui.notify("开始记录：" + label + "。按自己的配置探索；J可结束记录。按实际配置和补给计量。")
+	game.ui.notify("开始记录：" + label + "。此项仅记录操作，不应用装备、素材、Buff或连招；J可结束记录。")
 	return true
 
 func finish(result: String = "手动结束") -> Dictionary:
@@ -73,8 +73,8 @@ func _on_work_cancelled(method: FieldWorkMethod, _reason: String) -> void:
 func _on_surface(id: String, cell: Vector2i, source: String) -> void:
 	if active and run.surface_steps.size() < 128: run.surface_steps.append({"reaction": id, "cell": [cell.x, cell.y], "source": source})
 
-func _on_hit_reaction(id: String, point: Vector2) -> void:
-	if active and run.surface_steps.size() < 128: run.surface_steps.append({"reaction": "hit:" + id, "position": [point.x, point.y], "source": "实际命中反应"})
+func _on_hit_reaction(details: Dictionary) -> void:
+	if active and run.surface_steps.size() < 128: run.surface_steps.append(details.duplicate(true))
 
 func _on_melee() -> void:
 	if active: run.melee += 1
@@ -98,12 +98,18 @@ func _finish_and_show() -> void:
 	show_page()
 
 func show_page() -> void:
-	var text := "实验路线\n营地→外院→档案室→外院→火药库→排水回廊→蓄水机房→营地。目标20—30分钟，实际用时由记录校准。\n\n档案室先试保留冻结与破冰；排水回廊试清洗、蒸汽庇护与污染；机房试阀门、断路和接回。档案室晶簇可由火花→震荡或凝霜→震荡处理，回廊封匣也可由实际蒸汽保持半秒解开；机房仍需要实际连通的导电水域。三处机关分别开放东北侧独立返营捷径，旧返程继续可用。三份实地观察与机关成果可在营地交付“狱中复核”。实验补给只领一次，基本战斗与原有出口不依赖某一种消耗品。回营地可换装备，K编组、M选材料。\n\n配置建议\n冻结控制：水引配霜盐或用霜阵施法，普通近战保留冻结减速；用走位和霜行维持空间。\n破冰兑现：先准备冻结，再以阵外震荡换取碎冰伤害并失去剩余控制。\n导电布场：先看水路与干地，再以雷晶粉水引或雷阵施法导电；留出自己的干燥落脚点。\n污染引燃：毒雾或毒水制造持续压力，等待或用火花兑现；清洁水与污染水用途不同。\n\n当前工具\n"
-	text += "\n新增检修目标：营地东北调和台→档案室图纸→回廊泵芯与机房调压器→营地组装。现场作业不暂停，可先控场再站定操作；解封后E取件。J显示步骤。\n"
+	var text := "实验记录\n这些名称只标记实际操作，不会装备方案、准备恩赐或自动施法。先观察身边条件，再亲手使用已学基础动作；记录保留成本、失败与世界变化。\n\n已到达的实验地点\n"
+	for id in ["camp", "yard", "archive", "powder", "drain", "cistern"]:
+		if game.progress.visited.has(id): text += game.catalog.regions[id].title + "\n"
+	if game.progress.claims.has("field.archive_observation"): text += "\n档案室观察：保留冻结减速，或用阵外震荡兑现伤害并接回水路。\n"
+	if game.progress.claims.has("field.drain_observation"): text += "\n回廊观察：清洁水、蒸汽与污染用途不同，自己也要承担危险地面。\n"
+	if game.progress.claims.has("field.cistern_observation"): text += "\n机房观察：干地断路，冻结可切断连接，破冰恢复通路。\n"
+	if game.progress.claims.has("alchemy.started"): text += "\n检修委托详见J：解封与取件分开，现场作业不暂停；可先创造安全窗口再站定。\n"
+	text += "\n当前工具\n"
 	for id in ["water_call", "pulse", "frost_sigil", "storm_sigil", "venom_mist"]:
 		var skill := game.player.skill_manager.pool.get_skill(id)
-		text += "%s：%s\n" % [skill.display_name, "已学，K可编组" if game.progress.actions.has(id) else "尚未掌握，沿路线查阅记录"]
-	text += "\n三条检修捷径解锁后，营地可直接返场。已清理区域按Esc可重试本区，耗材照常消耗，击杀没有经验、掉落或残魂；探索进度保留。\n\n记录包含实际施法、近战与作业次数、已提交MP与材料消耗、造成伤害、自身受伤、游戏内用时和起止配置。菜单暂停时间不计入；由环境造成且无法归因玩家的伤害不计入造成伤害。初始属性/装备/补给保存在记录中，比较时应使用相近预算。最多保留10次；按自己的配置与补给开始。\n"
+		if game.progress.actions.has(id): text += skill.display_name + "：已学，K可编组\n"
+	text += "\n已经发现并解锁的检修通路可直接返场。已清理区域按Esc可重试本区，耗材照常消耗，击杀没有经验、掉落或残魂；探索进度保留。\n\n记录包含实际施法、近战与作业次数、已提交MP与材料消耗、造成伤害、自身受伤、游戏内用时和起止配置。菜单暂停时间不计入；由环境造成且无法归因玩家的伤害不计入造成伤害。初始属性/装备/补给保存在记录中，比较时应使用相近预算。最多保留10次；开始按钮只给记录命名，不修改动作、库存、装备、恩赐或世界。\n"
 	if active:
 		text += "\n正在记录：%s · %.1f秒 · 施法/近战合计%d次\n" % [run.label, GameRuntime.instance.get_simulation_runtime().elapsed_time - _started, int(run.casts) + int(run.melee)]
 	for entry in game.progress.trial_runs:
@@ -115,6 +121,13 @@ func show_page() -> void:
 			equipment_titles.append(game.catalog.equipment[id].display_name if game.catalog.equipment.has(id) else "其他装备")
 		text += "\n%s · %.1f秒 · %s\n施法%d / 近战%d / 作业%d · 造成%d / 受伤%d · MP%d\n材料：%s\n路线：%s\n起始装备：%s\n" % [entry.label, entry.seconds, entry.result, entry.casts, entry.melee, entry.get("work_actions", 0), entry.damage_dealt, entry.damage_taken, entry.mana_spent, _material_text(entry.materials), "→".join(region_titles), "、".join(equipment_titles) if not equipment_titles.is_empty() else "无"]
 		text += "实际恢复（按来源）：" + JSON.stringify(entry.get("recovery", {})) + "\n作业尝试/中断：" + JSON.stringify(entry.get("work_attempts", {})) + " / " + JSON.stringify(entry.get("work_interruptions", {})) + "\n"
+		var steps: Array = entry.get("cast_steps", [])
+		if not steps.is_empty():
+			text += "实际过程（最近8次）：\n"
+			for step in steps.slice(maxi(0, steps.size() - 8)):
+				text += str(step.action) + " → " + str(step.result) + "\n" + "；".join(step.get("explanation", [])) + "\n"
+		for step in entry.get("surface_steps", []).slice(0, 8):
+			text += "实际反应：" + str(step.reaction) + " · " + str(step.source) + "\n"
 		var stats: Dictionary = entry.initial.get("stats", {})
 		text += "起始上限：生命%d / 法力%d；力%d 智%d 敏%d 耐%d\n起始材料：%s\n" % [entry.initial.get("max_hp", 0), entry.initial.get("max_mp", 0), stats.get("strength", 0), stats.get("intelligence", 0), stats.get("agility", 0), stats.get("endurance", 0), _material_text(entry.initial.get("supplies", {}).get("amounts", {}))]
 		if entry.initial != entry.final: text += "过程中配置或库存发生变化，起止状态均已记录。\n"
