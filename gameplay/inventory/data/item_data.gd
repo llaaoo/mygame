@@ -2,7 +2,7 @@ class_name ItemData
 extends Resource
 ## 物品数据基类 — 所有物品（装备、消耗品、材料）继承此 Resource
 ##
-## 每个物品实例是一个 .tres 文件，可在编辑器中可视化编辑
+## .tres files are immutable definitions; ItemInstance owns identity and quantities.
 
 ## 物品类型枚举
 enum ItemType {
@@ -14,6 +14,7 @@ enum ItemType {
 
 ## 唯一标识符（推荐格式："iron_helmet"）
 @export var id: String = ""
+@export_range(0,100,0.05) var weight := 0.2
 
 ## 显示名称
 @export var display_name: String = "未命名物品"

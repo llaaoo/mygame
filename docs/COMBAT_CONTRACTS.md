@@ -9,7 +9,9 @@
 
 ---
 
-## 当前执行边界（2026-11-04）
+## 当前执行边界（2026-11-06）
+
+物理动作新增共用 ActorActionController：体力在接受攻击/闪避时消费，前摇后命中，格挡/闪避资格在直接命中的 ON_HIT 前判定；稳定性和重击仍走同一 CombatExecutor。详见 [RPG 基座](./RPG_FOUNDATION.md)。
 
 本文从属于[ARCHITECTURE](./ARCHITECTURE.md)。以下契约约束领域职责，已实现的公开同步请求/查询允许跨服务调用；延迟世界工作才使用带区域scope的CommandBus。
 

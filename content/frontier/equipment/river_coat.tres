@@ -6,6 +6,7 @@ script = ExtResource("profile")
 [resource]
 script = ExtResource("item")
 id = "river_coat"
+weight = 4
 display_name = "旧驿路皮甲"
 description = "磨旧的棕色皮甲。受到的伤害降低8%。"
 slot_type = 1

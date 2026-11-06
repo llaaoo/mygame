@@ -17,6 +17,18 @@ func poll_universal_actions() -> Array[Action]:
 		return []
 
 	var actions: Array[Action] = []
+	var tactical:=player.actor_context and player.actor_context.rules.tactical_combat
+	var heavy:=tactical and Input.is_action_just_pressed("heavy_attack") and not _pointer_over_interface()
+	if tactical:
+		for pair in [[Action.ActionType.GUARD,"guard"],[Action.ActionType.SPRINT,"sprint"]]:
+			var state:=Action.new()
+			state.action_type=pair[0]; state.source=player; state.direction=player.get_mouse_direction()
+			state.params["held"]=Input.is_action_pressed(pair[1])
+			actions.append(state)
+		if Input.is_action_just_pressed("drop_pack"):
+			var drop:=Action.new(); drop.action_type=Action.ActionType.DROP_PACK; drop.source=player; actions.append(drop)
+		if heavy:
+			var hit:=Action.melee(player); hit.action_type=Action.ActionType.HEAVY_ATTACK; hit.direction=player.get_mouse_direction(); actions.append(hit)
 
 	# 移动
 	var input_dir := Input.get_vector("move_left", "move_right", "move_up", "move_down")
@@ -28,11 +40,14 @@ func poll_universal_actions() -> Array[Action]:
 		actions.append(Action.dodge(input_dir if input_dir.length() > 0.1 else player.facing_direction, player))
 
 	# 近战（左键 = 无左手技能时直接近战）
-	if Input.is_action_just_pressed("attack") and not player.skill_manager.has_left_spell() and not _pointer_over_interface():
-		actions.append(Action.melee(player))
+	if Input.is_action_just_pressed("attack") and not player.skill_manager.has_left_spell() and not _pointer_over_interface() and not heavy:
+		var hit:=Action.melee(player)
+		hit.direction=player.get_mouse_direction()
+		actions.append(hit)
 
 	# 技能（左手/右手/快捷键1-6）
 	for pair in [["left", "attack"], ["right", "skill"]]:
+		if heavy and pair[0]=="left": continue
 		_poll_universal_cast(actions, pair[0], pair[1])
 	for i in range(SkillManager.MAX_SLOTS):
 		_poll_universal_cast(actions, "slot_%d" % i, "skill_%d" % (i + 1))
@@ -54,7 +69,7 @@ func _poll_universal_cast(actions: Array[Action], source: String, input_action: 
 	var action := Action.cast(source, player.get_mouse_direction(), player)
 	action.params["release"] = released
 	var skill := _get_skill_for_source(source)
-	var quick := get_tree().current_scene is GrayriverGame and FrontierControls.quick_cast and skill.cast_type not in ["charge","channel"]
+	var quick := player.actor_context and player.actor_context.rules.modern_controls and ControlPreferences.quick_cast and skill.cast_type not in ["charge","channel"]
 	if quick and released: return
 	action.params["quick_cast"] = quick
 	action.cast_context = CastContext.at_position(player, CastContext.ground_point(player, player.get_global_mouse_position(), skill.cast_distance), skill) if skill.ground_targeted else CastContext.simple(player, action.direction, skill)
@@ -62,6 +77,9 @@ func _poll_universal_cast(actions: Array[Action], source: String, input_action: 
 	actions.append(action)
 
 func resolve_action(action: Action) -> void:
+	if player.actor_context and player.actor_context.actions.active() and not action.params.get("authorized",false):
+		player.actor_context.actions.try_action(action)
+		return
 	if player.field_work:
 		if action.action_type == Action.ActionType.INTERACT and player.field_work.interact(): return
 		if action.action_type in [Action.ActionType.MOVE, Action.ActionType.DODGE, Action.ActionType.MELEE, Action.ActionType.CAST]:

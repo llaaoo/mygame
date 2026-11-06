@@ -1,7 +1,7 @@
 class_name SurvivalService
 extends Node
 ## Scene adapter for provisions, live work and the single persistent needs model.
-var game: MVPGame
+var game: CampaignGame
 var needs := SurvivalNeeds.new()
 var _loaded_vitals: Dictionary = {}
 var _awaiting_vitals := false
@@ -47,13 +47,7 @@ func tick(delta: float) -> void:
 		game._queue_save()
 
 func apply_recovery() -> void:
-	var recovery := needs.recovery()
-	game.player.health_component.regen_multiplier = recovery.health_multiplier
-	game.player.health_component.regen_bonus = recovery.health_bonus
-	game.player.health_component.regen_bonus_sources = {"food": recovery.health_bonus}
-	game.player.mana_component.regen_multiplier = recovery.mana_multiplier
-	game.player.mana_component.regen_bonus = recovery.mana_bonus
-	game.player.mana_component.regen_bonus_sources = {"food": .5 if needs.meal == "broth" and needs.meal_remaining > 0 else 0.0, "water": .5 if needs.water_remaining > 0 else 0.0, "tea": 1.0 if needs.tea_remaining > 0 else 0.0}
+	NeedsRecovery.apply(game.player,needs)
 
 func exert(amount: float) -> void:
 	needs.exert(amount, game.player.stats_component.effective_stat("endurance"))
@@ -109,8 +103,8 @@ func description() -> String:
 	return text
 
 func show_page() -> void:
-	if game is GrayriverGame and game.hub:
-		game.hub.open("supplies")
+	if game.session and game.session.supply_page.is_valid():
+		game.session.supply_page.call()
 		return
 	var recovery := needs.recovery()
 	var text := status_line() + "\n" + timers_line() + "\n\n"
@@ -258,25 +252,35 @@ func _reason(option: FieldWorkMethod, node: Node2D, spec: SurvivalStationData) -
 			if parts[0] == "rest" and (parts.size() != 2 or parts[1] not in ["short", "full"]): return "未知休整方式"
 		_:
 			return "未知补给操作"
+	if parts[0]=="eat": return "" if supplies.can_pay_combat(option.material_costs) else "先把食物移入随身口袋"
 	return "" if supplies.can_pay(option.material_costs) else "材料不足"
 
 func _complete(option: FieldWorkMethod, node: Node2D, spec: SurvivalStationData) -> bool:
 	if not _reason(option, node, spec).is_empty(): return false
 	var parts := option.id.split(":")
 	supplies.begin_transaction()
-	if not supplies.pay(option.material_costs):
+	if not supplies.pay(option.material_costs,option.id.begins_with("eat:")):
 		supplies.finish_transaction(false)
 		return false
+	var outputs: Dictionary={}
+	if parts[0]=="cook": outputs={SurvivalCatalog.RECIPES[parts[1]].output:1}
+	elif parts[0]=="fill": outputs={parts[1]:int(parts[2])}
+	elif parts[0]=="harvest": outputs=spec.harvest
+	var before: Dictionary={}
+	for key in outputs: before[key]=supplies.count(key)
+	supplies.grant(outputs)
+	for key in outputs:
+		if supplies.count(key)-before[key]!=outputs[key]:
+			supplies.finish_transaction(false)
+			game.ui.notify("空间不足，未消耗材料。")
+			return false
 	match parts[0]:
 		"eat":
 			needs.consume(parts[1])
 			var buffs := game.player.get_node("BuffManager") as BuffManager
 			if parts[1] == "tea": buffs.remove_status("poison")
 			if parts[1] == "dirty_water": buffs.apply_buff(load("res://gameplay/abilities/data/poison.tres"))
-		"cook": supplies.grant({SurvivalCatalog.RECIPES[parts[1]].output: 1})
-		"fill": supplies.grant({parts[1]: int(parts[2])})
 		"harvest":
-			supplies.grant(spec.harvest)
 			needs.harvests[spec.id] = 240.0
 		"basic":
 			needs.nutrition = maxf(needs.nutrition, 60)

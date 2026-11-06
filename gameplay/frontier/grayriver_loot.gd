@@ -6,20 +6,30 @@ var corpses: Dictionary = {}
 
 func _init(owner_game: GrayriverGame) -> void: game = owner_game
 
-static func snapshot(enemy: Enemy) -> Dictionary:
+static func snapshot(enemy: CharacterBody2D) -> Dictionary:
 	var equipment := {}
+	if enemy.actor_context and enemy.actor_context.items and enemy.actor_context.rules.physical_inventory:
+		var context: ActorContext=enemy.actor_context
+		var materials: Dictionary={}
+		var sources: Array[String]=context.items.actor_containers(context.id)
+		sources.append(context.id+".gear")
+		for source in sources:
+			for entry in context.items.entries(source):
+				var category: Dictionary=equipment if context.items.definitions.get(entry.definition) is EquipmentData else materials
+				category[entry.definition]=int(category.get(entry.definition,0))+entry.quantity
+		return {"equipment":equipment,"materials":materials}
 	var manager := enemy.get_node_or_null("EquipmentManager") as EquipmentManager
 	if manager:
 		for item in manager.get_all_equipped(): equipment[item.id] = int(equipment.get(item.id, 0)) + 1
 	var materials := {}
 	if enemy.skill_manager and enemy.skill_manager.combinations:
 		for id in enemy.skill_manager.combinations.supplies.amounts:
-			var amount := enemy.skill_manager.combinations.supplies.count(id)
+			var amount: int = enemy.skill_manager.combinations.supplies.count(id)
 			if amount > 0: materials[id] = amount
 	return {"equipment": equipment, "materials": materials}
 
-func record_enemy(enemy: Enemy) -> void:
-	if game.practice_active or not (enemy.rewards_enabled or enemy.get_meta("story_loot_eligible",false)): return
+func record_enemy(enemy: CharacterBody2D) -> void:
+	if game.practice_active or not enemy.actor_context or not enemy.actor_context.loot_eligible: return
 	var id := str(enemy.get_meta("frontier_claim", ""))
 	if id.is_empty() or game.progress.loot_records.has(id): return
 	var record := snapshot(enemy)
@@ -34,6 +44,7 @@ func mount_region() -> void:
 		if game.progress.loot_records[id].region == game.region_id: _mount(id)
 
 func _mount(id: String) -> void:
+	_ensure_source(id)
 	if corpses.has(id) and is_instance_valid(corpses[id]): return
 	var record: Dictionary = game.progress.loot_records[id]
 	var corpse := GrayriverLootCorpse.new()
@@ -76,6 +87,7 @@ func _take_and_show(id: String, kind: String, item: String) -> void:
 
 func take(id: String, kind := "", item_id := "") -> int:
 	if not _available(id) or kind not in ["","equipment","materials"]: return 0
+	if game.rules.physical_inventory: return _take_instances(id,kind,item_id)
 	var record: Dictionary = game.progress.loot_records[id]
 	var taken := 0
 	var supplies := game.survival.supplies
@@ -118,19 +130,54 @@ func inspect_actor(enemy: Enemy) -> void:
 	game.ui.show_panel(enemy.enemy_name+" · 观察",text,[{"title":"继续行动","callback":game.ui.close_modal}])
 
 static func valid_records(value: Variant) -> bool:
-	if not value is Dictionary or value.size() > 512: return false
-	for id in value:
-		var record = value[id]
-		if not id is String or not id.begins_with("river.enemy.") or not record is Dictionary: return false
-		if record.get("region", "") not in ["camp","river_archive","river_mine","river_prison"] or not record.get("title") is String: return false
-		var point = record.get("position")
-		if not point is Array or point.size() != 2: return false
-		for n in point:
-			if typeof(n) not in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(n)) or absf(float(n)) > 100000: return false
-		for kind in ["equipment","materials"]:
-			if not record.get(kind) is Dictionary: return false
-			for key in record[kind]:
-				if not key is String or not record[kind][key] is int or record[kind][key] <= 0 or record[kind][key] > 999: return false
-				if kind == "materials" and not CastingSupplies.known_item(key): return false
-				if kind == "equipment" and key not in GrayriverItems.EQUIPMENT_IDS and key not in ["keeper_ring","cadence_gloves","soul_amulet","covenant_ring"]: return false
-	return true
+	return LootSchema.valid_records(value)
+
+func _ensure_source(id: String) -> void:
+	if not game.rules.physical_inventory: return
+	var store:=game.session.inventory
+	if store.containers.has(id+".gear"): return
+	store.ensure_actor(id)
+	var record: Dictionary=game.progress.loot_records[id]
+	store.begin_batch()
+	for key in record.equipment: store.receive(id,key,int(record.equipment[key]),true)
+	for key in record.materials: store.receive(id,key,int(record.materials[key]),true)
+	store.end_batch()
+func _refresh_record(id: String) -> void:
+	var store:=game.session.inventory
+	var record: Dictionary=game.progress.loot_records[id]
+	record.equipment.clear(); record.materials.clear()
+	var sources:=store.actor_containers(id)
+	sources.append(id+".gear")
+	for source in sources:
+		for entry in store.entries(source):
+			var kind: String="equipment" if store.definitions.get(entry.definition) is EquipmentData else "materials"
+			record[kind][entry.definition]=int(record[kind].get(entry.definition,0))+entry.quantity
+func _take_instances(id: String,kind: String,key: String) -> int:
+	_ensure_source(id)
+	var store:=game.session.inventory
+	var taken:=0
+	store.begin_batch()
+	var sources:=store.actor_containers(id)
+	sources.append(id+".gear")
+	for source in sources:
+		for entry in store.entries(source):
+			var category: String="equipment" if store.definitions.get(entry.definition) is EquipmentData else "materials"
+			if not kind.is_empty() and kind!=category or not key.is_empty() and key!=entry.definition: continue
+			var destinations: Array[String]=[]
+			if category=="equipment": destinations.append("player.pack")
+			else: destinations=store.actor_containers("player")
+			if category=="equipment" and not store.containers["player.pack"].attached: continue
+			for destination in destinations:
+				var current:=store.item(entry.uid)
+				if not current or store.locate(entry.uid)!=source: break
+				var result:=store.commit(store.preview(source,destination,entry.uid,current.quantity,true))
+				taken+=result.moved
+	_refresh_record(id)
+	if taken>0:
+		game.progress.claims["loot."+id]=true
+		(corpses[id] as GrayriverLootCorpse).refresh()
+	store.end_batch()
+	if taken>0:
+		game.survival.supplies.changed.emit()
+		game._save_progress()
+	return taken

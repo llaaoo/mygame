@@ -7,3 +7,7 @@ var status_accepted := false
 var rejection := ""
 var attempted_damage := 0
 var damage_dealt := 0
+
+var blocked := false
+var guard_broken := false
+var impact_applied := 0.0

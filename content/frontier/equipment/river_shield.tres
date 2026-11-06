@@ -6,6 +6,7 @@ script = ExtResource("profile")
 [resource]
 script = ExtResource("item")
 id = "river_shield"
+weight = 3
 display_name = "旧桥守望盾"
 description = "盾面留有桥梁印记。受伤降低8%，移动速度-6。"
 slot_type = 5

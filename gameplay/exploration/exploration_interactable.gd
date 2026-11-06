@@ -1,6 +1,7 @@
 class_name ExplorationInteractable
 extends Node2D
 
+var world_art := false
 var title := "交互"
 var tint := Color(0.95, 0.7, 0.25)
 var callback: Callable
@@ -9,6 +10,8 @@ var _label: Label
 var _player: Node2D
 var _label_time := 0.0
 var _near := false
+var provider: InteractionProvider
+var _visitor: Node2D
 
 func _ready() -> void:
 	match kind:
@@ -18,9 +21,21 @@ func _ready() -> void:
 	add_to_group("interactable")
 	var interaction := Interactable.new()
 	interaction.name = "Interactable"
-	interaction.set_callback(func(_actor: Node2D):
-		if callback.is_valid():
-			callback.call())
+	provider=InteractionProvider.new()
+	provider.available=func(_id: String):
+		return is_instance_valid(_visitor) and is_inside_tree() and _visitor.global_position.distance_to(global_position)<80
+	provider.options=func(_id: String):
+		var option:=InteractionOption.new()
+		option.id="interact"; option.title=title
+		option.request=func():
+			if not callback.is_valid(): return false
+			callback.call()
+			return true
+		return [option]
+	add_child(provider)
+	interaction.set_callback(func(actor: Node2D):
+		_visitor=actor
+		provider.execute(str(actor.get_instance_id()),"interact"))
 	add_child(interaction)
 	_label = Label.new()
 	_label.position = Vector2(-100, -47)
@@ -57,7 +72,7 @@ func _update_proximity() -> void:
 	_label.modulate.a = 1.0 if near else .7
 
 func _draw() -> void:
-	if get_tree().current_scene is GrayriverGame:
+	if world_art:
 		_draw_frontier()
 		return
 	if _near: draw_arc(Vector2.ZERO, 25, 0, TAU, 32, Color(tint, .35), 1, true)

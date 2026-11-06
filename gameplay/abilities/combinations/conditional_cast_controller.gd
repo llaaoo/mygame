@@ -230,7 +230,7 @@ func preview(skill: SkillData, actor: Node2D, empower: bool = false) -> CastPlan
 			result.reason = "附近没有残魂：击败守卫后靠近残魂，再使用汲魂"
 		elif buffs.get_stack_count("soul_charge") >= buffs.stack_limit(skill.buff_resource):
 			result.reason = "蕴魂已满：先以Shift组合兑现，再汲取残魂"
-	if not supplies.can_pay(result.material_costs):
+	if not supplies.can_pay_combat(result.material_costs):
 		result.reason = "施法材料不足：" + supplies.describe_cost(result.material_costs)
 	if skill.combination_only: result.reason = "组合结果须通过基础动作与现场条件触发"
 	result.ready = result.reason.is_empty()
@@ -355,7 +355,7 @@ func _commit() -> void:
 	if mana and mana.mp < int(plan.cost):
 		cancel("组合总法力不足，未扣费")
 		return
-	if not supplies.can_pay(plan.material_costs):
+	if not supplies.can_pay_combat(plan.material_costs):
 		cancel("组合材料已不足，未扣费")
 		return
 	var placement: bool = not plan.action.field_type.is_empty()

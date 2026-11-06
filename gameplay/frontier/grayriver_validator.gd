@@ -22,7 +22,9 @@ static func validate(raw: Dictionary) -> Array[String]:
 						if original.id==parts[1]:found=true
 				if not found:errors.append(field+".notes[%d].template: unknown '%s'"%[j,note.template])
 		for encounter in region.get("encounters",[]):
-			if encounter.has("character") and encounter.character not in GrayriverItems.CHARACTER_IDS: errors.append(field+".encounters.character: unknown '"+str(encounter.character)+"'")
+			if encounter.has("character"):
+				var key:=str(encounter.character)
+				if not key.is_valid_identifier() or not ResourceLoader.exists("res://content/characters/river_%s.tres"%key): errors.append(field+".encounters.character: unknown '"+key+"'")
 			var id:=str(encounter.get("id",""))
 			if id.is_empty() or enemy_ids.has(id):errors.append(field+".encounters.id: missing/duplicate '"+id+"'")
 			enemy_ids[id]=true

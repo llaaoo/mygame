@@ -12,10 +12,20 @@ func tick(delta: float) -> void:
 func refused() -> void: _reposition = 1.0
 func choose(target: Node2D) -> Array[Action]:
 	var result: Array[Action] = []
-	if _clock>0 or actor.attack_preparation.busy(): return result
+	if _clock>0 or actor.attack_preparation.busy() or actor.actor_context and actor.actor_context.actions.busy(): return result
 	_clock = INTERVAL
 	var controller := actor.skill_manager.combinations
 	var dist := actor.global_position.distance_to(target.global_position)
+	if actor.actor_context and actor.actor_context.actions.active():
+		var actions:=actor.actor_context.actions
+		if actions.stamina.current<24:
+			if dist>actor.attack_range*2 and actions.item_request.is_valid() and actor.actor_context.items.can_pay(actor.actor_context.id,{"clean_water":1},true):
+				var use:=Action.new(); use.action_type=Action.ActionType.USE_ITEM; use.skill_id="clean_water"; return [use]
+			var guard:=Action.new(); guard.action_type=Action.ActionType.GUARD; guard.params["held"]=dist<actor.attack_range*1.7; guard.direction=actor.get_target_direction()
+			return [guard,Action.move(-actor.get_target_direction()*.5,actor)]
+		if dist>actor.attack_range and actor.actor_context.region.navigation:
+			var route:=actor.actor_context.region.navigation.direction(actor.position,target.position)
+			if route.length_squared()>.01 and not actor.surface_awareness.should_evade and actor.ai_role==Enemy.AIRole.MELEE: return [Action.move(route,actor)]
 	if actor.surface_awareness.should_evade:
 		controller.cancel("危险地面：移动中断准备")
 		return [Action.move(actor.surface_awareness.direction,actor)]
@@ -52,7 +62,7 @@ func choose(target: Node2D) -> Array[Action]:
 					if rule.required_field_type!="fire" or not controller.learned_rules.has(rule.id): continue
 					var shot_cost:=actor.skill_manager.effective_mana_cost(rule.result_skill,actor,rule.mana_cost)
 					if actor.mana_component.mp>=placement_plan.cost+shot_cost: return [placement]
-	if actor.ai_role!=Enemy.AIRole.RANGED and not buffs.has_buff("focus"):
+	if actor.ai_role==Enemy.AIRole.MELEE and not buffs.has_buff("focus"):
 		var focus := cast("focus",target)
 		if focus: return [focus]
 	# No usable spell: approach for an ordinary weapon hit; never conjure resources.

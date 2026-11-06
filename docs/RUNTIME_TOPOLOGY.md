@@ -18,7 +18,7 @@ GameRuntime
 └── WorldTime            NPC日程使用的世界时钟
 ```
 
-UI是角色/场景装配的表现组件集合，不要求一个名为UIRuntime的全局节点。旧房间的RunManager与探索的MVPGame保留各自流程，共用区域生命周期。
+UI是角色/场景装配的表现组件集合，不要求一个名为UIRuntime的全局节点。旧房间 RunManager 与战役 CampaignGame 保留各自流程，共用区域生命周期。战役新增 Session/World/Interface 装配，ActorContext 和 RegionContext 注入角色依赖，详见 [RPG 基座](./RPG_FOUNDATION.md)。
 
 ## 一次施法
 

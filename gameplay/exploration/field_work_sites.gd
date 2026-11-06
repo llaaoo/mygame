@@ -1,8 +1,8 @@
 class_name FieldWorkSites
 extends RefCounted
 ## Scene adapter: every real site uses one completion/payment authority.
-var game: MVPGame
-func _init(owner_game: MVPGame) -> void: game = owner_game
+var game: CampaignGame
+func _init(owner_game: CampaignGame) -> void: game = owner_game
 
 func reason(site: SpellWorldObject) -> String:
 	if game._switching or not is_instance_valid(site) or not site.is_inside_tree() or site.get_parent() != game.region_root or site.spec not in game.current_data.spell_objects: return "设备已不可用"

@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/item_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "grain"
+display_name = "谷粮"
+description = "随身物资；数量与位置保存在真实容器中。"
+weight = 0.2
+stackable = true
+max_stack = 99

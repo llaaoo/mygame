@@ -1,6 +1,8 @@
 class_name ExplorationProgress
 extends RefCounted
 
+var condition_query: ConditionQuery
+var foundation: Dictionary={}
 var tracked_quest := ""
 var waypoint: Dictionary = {}
 var story_actors: Dictionary = {}
@@ -39,12 +41,22 @@ func claim(id: String, title: String, text: String, new_actions: Array, new_spel
 	return true
 
 func serialize_save_data() -> Dictionary:
-	return {"tracked_quest": tracked_quest, "waypoint": waypoint.duplicate(true), "story_actors": story_actors.duplicate(true), "equipment_counts": equipment_counts.duplicate(), "loot_records": loot_records.duplicate(true), "journey": journey.duplicate(true), "survival_state": survival_state.duplicate(true), "trial_runs": trial_runs.duplicate(true), "element_clues": element_clues.duplicate(), "verified_reactions": verified_reactions.duplicate(), "equipment_owned": equipment_owned.duplicate(), "equipment_loadout": equipment_loadout.duplicate(), "actions": actions.duplicate(), "spell_rules": spell_rules.duplicate(), "claims": claims.duplicate(), "cleared": cleared.duplicate(), "journal": journal.duplicate(true), "completed": completed, "deaths": deaths, "world_states": world_states.duplicate(true), "loadout": loadout.duplicate(true), "character_state": character_state.duplicate(true), "visited": visited.duplicate(), "choices": choices.duplicate(), "casting_supplies": casting_supplies.duplicate(true)}
+	return {"foundation":foundation.duplicate(true),"tracked_quest": tracked_quest, "waypoint": waypoint.duplicate(true), "story_actors": story_actors.duplicate(true), "equipment_counts": equipment_counts.duplicate(), "loot_records": loot_records.duplicate(true), "journey": journey.duplicate(true), "survival_state": survival_state.duplicate(true), "trial_runs": trial_runs.duplicate(true), "element_clues": element_clues.duplicate(), "verified_reactions": verified_reactions.duplicate(), "equipment_owned": equipment_owned.duplicate(), "equipment_loadout": equipment_loadout.duplicate(), "actions": actions.duplicate(), "spell_rules": spell_rules.duplicate(), "claims": claims.duplicate(), "cleared": cleared.duplicate(), "journal": journal.duplicate(true), "completed": completed, "deaths": deaths, "world_states": world_states.duplicate(true), "loadout": loadout.duplicate(true), "character_state": character_state.duplicate(true), "visited": visited.duplicate(), "choices": choices.duplicate(), "casting_supplies": casting_supplies.duplicate(true)}
 
 func validate_save_data(value: Variant) -> bool:
 	if not value is Dictionary:
 		return false
-	if not GrayriverLoot.valid_records(value.get("loot_records", {})): return false
+	if not CampaignSession.valid_snapshot(value.get("foundation",{})): return false
+	if condition_query and condition_query.items:
+		if value.get("foundation",{}).has("inventory") and not condition_query.items.valid_definitions(value.foundation.inventory): return false
+	if not LootSchema.valid_records(value.get("loot_records", {})): return false
+	if condition_query and not condition_query.regions.is_empty():
+		for record in value.get("loot_records",{}).values():
+			if not condition_query.regions.has(record.region): return false
+		for record in value.get("foundation",{}).get("actors",{}).values():
+			if not condition_query.regions.has(record.region): return false
+		for container in value.get("foundation",{}).get("inventory",{}).get("containers",{}).values():
+			if not container.attached and not condition_query.regions.has(container.region): return false
 	var counts = value.get("equipment_counts", {})
 	if not counts is Dictionary: return false
 	for id in counts:
@@ -56,7 +68,7 @@ func validate_save_data(value: Variant) -> bool:
 		if not mark.get("position") is Array or mark.position.size()!=2: return false
 		for n in mark.position:
 			if typeof(n) not in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(n)) or absf(float(n))>100000: return false
-	if not GrayriverStories.valid_states(value.get("story_actors", {})): return false
+	if not CampaignSnapshotSchema.valid_legacy_actors(value.get("story_actors", {})): return false
 	var location = value.get("journey", {})
 	if not location is Dictionary: return false
 	if not location.is_empty():
@@ -147,6 +159,7 @@ func validate_save_data(value: Variant) -> bool:
 	return true
 
 func deserialize_save_data(data: Dictionary) -> void:
+	foundation=data.get("foundation",{}).duplicate(true)
 	tracked_quest = data.get("tracked_quest", "")
 	waypoint = data.get("waypoint", {}).duplicate(true)
 	story_actors = data.get("story_actors", {}).duplicate(true)

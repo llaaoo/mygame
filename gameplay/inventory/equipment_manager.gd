@@ -6,6 +6,9 @@ signal loadout_changed
 signal set_bonuses_changed
 
 var _equipped: Dictionary = {}
+var inventory_store: InventoryService
+var actor_id := ""
+var _store_loadout: Dictionary={}
 var loadout_revision := 0
 var _applied_buff: Buff
 var _combat_modifiers: Dictionary = {}
@@ -17,6 +20,10 @@ var _active_set_bonuses: Array[Dictionary] = []
 
 
 func equip(equipment: EquipmentData) -> bool:
+	if inventory_store and equipment:
+		var uid:=inventory_store.find_owned(actor_id,equipment.id)
+		if uid.is_empty(): return get_equipment(equipment.slot_type)==equipment
+		return inventory_store.equip(actor_id,uid).accepted
 	if not equipment:
 		return false
 	var slot := int(equipment.slot_type)
@@ -30,6 +37,7 @@ func equip(equipment: EquipmentData) -> bool:
 
 
 func unequip(slot: int) -> bool:
+	if inventory_store: return inventory_store.unequip(actor_id,slot).accepted
 	if not _equipped.has(slot):
 		return false
 	_equipped.erase(slot)
@@ -40,6 +48,9 @@ func unequip(slot: int) -> bool:
 
 
 func clear_all() -> void:
+	if inventory_store:
+		for slot in inventory_store.equipped(actor_id): inventory_store.unequip(actor_id,int(slot))
+		return
 	var occupied := _equipped.keys()
 	_equipped.clear()
 	_rebuild_loadout_effects()
@@ -187,3 +198,23 @@ func partial_boon_cost(candidate: EquipmentData = null) -> int:
 			var value: int = item.casting_profile.partial_boon_mana_cost
 			cost = value if cost < 0 else mini(cost, value)
 	return cost
+
+func bind_inventory(store: InventoryService,id: String) -> void:
+	if inventory_store and inventory_store.changed.is_connected(_refresh_from_store): inventory_store.changed.disconnect(_refresh_from_store)
+	inventory_store=store
+	actor_id=id
+	_store_loadout={"initial":""}
+	inventory_store.changed.connect(_refresh_from_store)
+	_refresh_from_store()
+func _refresh_from_store() -> void:
+	var worn:=inventory_store.equipped(actor_id)
+	if worn==_store_loadout: return
+	_store_loadout=worn
+	_equipped.clear()
+	for slot in worn:
+		var instance:=inventory_store.item(worn[slot])
+		if instance: _equipped[int(slot)]=inventory_store.definitions.get(instance.definition_id)
+	_rebuild_loadout_effects()
+	loadout_changed.emit()
+func _exit_tree() -> void:
+	if inventory_store and inventory_store.changed.is_connected(_refresh_from_store): inventory_store.changed.disconnect(_refresh_from_store)

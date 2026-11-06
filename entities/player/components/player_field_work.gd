@@ -97,7 +97,7 @@ func start_selected() -> bool:
 	player.casting.cancel_all()
 	_last_hp = player.health_component.hp
 	var equipment := player.get_node("EquipmentManager") as EquipmentManager
-	pending = {"method": method, "fingerprint": method.fingerprint(), "remaining": method.duration, "duration": method.duration, "position": player.global_position, "attributes": player.stats_component.primary_values(), "equipment": equipment.loadout_revision}
+	pending = {"method": method, "fingerprint": method.fingerprint(), "remaining": method.duration * _efficiency(), "duration": method.duration * _efficiency(), "position": player.global_position, "attributes": player.stats_component.primary_values(), "equipment": equipment.loadout_revision}
 	player.state_machine.transition_to("work")
 	work_started.emit(method)
 	_refresh_panel()
@@ -184,3 +184,6 @@ func _refresh_panel() -> void:
 			if not method.material_costs.is_empty(): text += " · " + player.skill_manager.combinations.supplies.describe_cost(method.material_costs)
 		text += "\n"
 	panel.display(text + _guide + "\nQ切换 · E开始 · Esc收起\n战斗继续进行")
+
+func _efficiency() -> float:
+	return player.mastery_manager.activity_efficiency(SkillMastery.School.CRAFTING) if player.mastery_manager else 1.0

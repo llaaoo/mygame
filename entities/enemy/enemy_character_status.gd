@@ -29,6 +29,9 @@ func _process(delta: float) -> void:
 		_label.modulate=Color("a5d5bd") if actor.story_truce else Color.WHITE
 	queue_redraw()
 func _draw() -> void:
+	if actor.actor_context and actor.actor_context.rules.tactical_combat:
+		draw_rect(Rect2(-23,-30,46,3),Color(.1,.1,.1,.8))
+		draw_rect(Rect2(-23,-30,46*actor.actor_context.actions.stability.current/100,3),Color("a5b4b6"))
 	for entry in [[actor.health_component.hp,actor.health_component.max_hp,-42,Color(.8,.25,.18)],[actor.mana_component.mp,actor.mana_component.max_mp,-36,Color(.2,.5,.9)]]:
 		draw_rect(Rect2(-23,entry[2],46,4),Color(.1,.1,.1,.8))
 		draw_rect(Rect2(-23,entry[2],46*clampf(float(entry[0])/entry[1],0,1),4),entry[3])

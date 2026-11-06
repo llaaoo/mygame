@@ -7,6 +7,9 @@ enum School {
 	RESTORATION,
 	ALTERATION,
 	ILLUSION,
+	MELEE,
+	DEFENSE,
+	CRAFTING,
 }
 
 @export var skill_id: String = ""

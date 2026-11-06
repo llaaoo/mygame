@@ -1,14 +1,6 @@
 class_name KillObjective
 extends QuestObjective
-
 @export var target_tag: String = "enemy"
-
-
-func on_event(ev: CombatEvent) -> bool:
-	if ev.type != CombatEvent.Type.ON_KILL:
-		return false
-	if not target_tag.is_empty():
-		if ev.target == null or not ev.target.is_in_group(target_tag):
-			return false
-	current += 1
-	return true
+func progress_for_event(event: CombatEvent) -> int:
+ if event.type!=CombatEvent.Type.ON_KILL or not event.data.get("reward_eligible",true): return 0
+ return 1 if target_tag.is_empty() or is_instance_valid(event.target) and event.target.is_in_group(target_tag) else 0

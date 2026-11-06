@@ -469,3 +469,8 @@ SurfaceManager               ──正交──    (不涉及)
 ```
 
 两个契约体系的唯一共享基础设施：**CombatExecutor**。其他所有系统正交。如果出现第三个共享点，需要重新审计。
+
+
+## 战役所有权与区域能力（2026-11-06）
+
+战役 Session 保存真实物品容器、角色伤势、需求与关系；RegionContext 提供活动根、generation 和导航。放下的背包按原容器在原区域恢复，遗骸取实际剩余物品；模板只用于首次创建。服务 NPC 也绑定 ActorContext，交互提交重校验距离/关系/日程。详见 [RPG 基座](./RPG_FOUNDATION.md)。

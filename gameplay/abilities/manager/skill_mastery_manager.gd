@@ -428,3 +428,11 @@ func _make_trigger_perk(
 	perk.trigger_required_tag = required_tag
 	perk.trigger_required_buff_name = required_buff_name
 	return perk
+
+func record_activity(kind: String,amount := 1.0) -> void:
+	var school: int={"melee_hit":SkillMastery.School.MELEE,"hit_blocked":SkillMastery.School.DEFENSE,"recipe_crafted":SkillMastery.School.CRAFTING}.get(kind,-1)
+	if school<0 or amount<=0: return
+	_add_xp(_ensure_mastery(school),amount)
+func activity_efficiency(school: SkillMastery.School) -> float:
+	var mastery:=_masteries.get(school) as SkillMastery
+	return clampf(1.0-(mastery.level-1)*.005,.85,1.0) if mastery else 1.0

@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/item_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "resin"
+display_name = "树脂制剂"
+description = "强化火球或魂焰矢：飞行减慢20%，命中留下半径80的6秒燃烧区，额外4 MP。"
+weight = 0.1
+stackable = true
+max_stack = 99

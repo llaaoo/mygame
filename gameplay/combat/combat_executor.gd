@@ -56,7 +56,7 @@ func _exit_tree() -> void:
 
 ## 报告命中 — 唯一伤害入口（事件 + 扣血）
 ## 所有命中源（Projectile/AoE/近战/陷阱/DOT）只能通过此方法造成伤害
-static func report_hit(caster: Node2D, target: Node2D, damage: int, position: Vector2, skill: SkillData = null, tags: Array = [], family_id: String = "") -> HitResult:
+static func report_hit(caster: Node2D, target: Node2D, damage: int, position: Vector2, skill: SkillData = null, tags: Array = [], family_id: String = "", impact: float = 0.0) -> HitResult:
 	var context := HitContext.new(caster, target, damage, position, skill, tags, family_id)
 	var result := HitResult.new()
 	result.attempted_damage = context.damage
@@ -73,6 +73,10 @@ static func report_hit(caster: Node2D, target: Node2D, damage: int, position: Ve
 	if not result.accepted:
 		result.rejection = "invincible"
 		return result
+	var capabilities:=target.get("actor_context") as ActorContext if "actor_context" in target else null
+	if capabilities and capabilities.actions and result.damage_accepted:
+		capabilities.actions.defend(context,result,impact if impact>0 else skill.impact_power if skill and skill.impact_power>0 else 35.0 if "impact" in context.tags else 0.0)
+		if not result.accepted: return result
 	var before := health.hp if health else 0
 	if health:
 		health.begin_hit_group(family_id, context.periodic)

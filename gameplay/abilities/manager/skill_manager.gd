@@ -235,7 +235,7 @@ func can_start(source: String, caster: Node2D, context: CastContext) -> bool:
 	var mana := caster.get_node_or_null("ManaComponent") as ManaComponent
 	var plan := combinations.build_plan(inst.data, caster, context.empower) if combinations else null
 	var cost := plan.cost if plan else _get_effective_mana_cost(inst.data, caster)
-	return inst.is_ready() and (not mana or mana.mp >= cost) and (not plan or combinations.supplies.can_pay(plan.material_costs))
+	return inst.is_ready() and (not mana or mana.mp >= cost) and (not plan or combinations.supplies.can_pay_combat(plan.material_costs))
 
 func use_source(source: String, caster: Node2D, context: CastContext) -> bool:
 	var inst := _find_instance(source)

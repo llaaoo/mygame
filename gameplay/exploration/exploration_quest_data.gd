@@ -7,6 +7,7 @@ extends Resource
 @export var required_claims: PackedStringArray
 @export var required_clears: PackedStringArray
 @export var attribute_points := 1
+@export var conditions: Array[WorldCondition]=[]
 @export var approaches: Array[ExplorationQuestApproachData] = []
 
 func find_approach(approach_id: String) -> ExplorationQuestApproachData:
@@ -26,6 +27,8 @@ func has_available_approach(progress: ExplorationProgress, stats: StatsComponent
 	return false
 
 func is_complete(progress: ExplorationProgress) -> bool:
+	for condition in conditions:
+		if not condition.satisfied(progress.condition_query): return false
 	for key in required_claims:
 		if not progress.claims.has(key):
 			return false

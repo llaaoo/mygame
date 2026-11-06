@@ -22,6 +22,15 @@ func _ready() -> void:
 	tracker.offset_top=20
 	tracker.offset_bottom=122
 	root.add_child(tracker)
+	var status:=PanelContainer.new()
+	status.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
+	status.offset_left=18; status.offset_right=278; status.offset_top=184; status.offset_bottom=266
+	status.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	status.add_theme_stylebox_override("panel",GameUIStyle.surface_style())
+	root.add_child(status)
+	var actor_status:=preload("res://gameplay/foundation/ui/actor_status_view.tscn").instantiate() as ActorStatusView
+	actor_status.context=game.player.actor_context
+	status.add_child(actor_status)
 	var prompt:=PanelContainer.new()
 	prompt.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
 	prompt.offset_left=-210

@@ -276,10 +276,12 @@ func _on_perk_unlocked(_school: int, perk_id: String) -> void:
 		_register_triggered_effects(trigger)
 
 func _on_skill_used_for_mastery(_source: String, skill: SkillData) -> void:
+	if player.actor_context and not player.actor_context.reward_eligible: return
 	if player.mastery_manager:
 		player.mastery_manager.on_skill_cast(skill)
 
 func _on_player_hit_for_mastery(ev: CombatEvent) -> void:
+	if player.actor_context and not player.actor_context.reward_eligible: return
 	if "dot" in ev.data.get("tags", []):
 		return
 	if ev.source != player:
@@ -300,6 +302,7 @@ func _on_player_hit_for_mastery(ev: CombatEvent) -> void:
 		player.mastery_manager.on_deal_damage(school, damage)
 
 func _on_player_kill_for_mastery(ev: CombatEvent) -> void:
+	if player.actor_context and not player.actor_context.reward_eligible: return
 	if ev.source != player:
 		return
 	if not player.mastery_manager:

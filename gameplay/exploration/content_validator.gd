@@ -209,7 +209,7 @@ func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 					var outcome: String=GrayriverStories.PEOPLE[actor_id].claim
 					_claim(claims,outcome,encounter)
 					completion_claims[outcome]=true
-			_validate_enemy_profile(encounter, profiles)
+			_validate_enemy_profile(encounter, profiles,catalog.spell_rules)
 			if encounter.character:
 				for item in encounter.character.equipment:
 					if item and not catalog.equipment.has(item.id): _fail(encounter.character,"Unknown worn equipment: "+item.id)
@@ -487,10 +487,10 @@ func _validate_surface_reference(owner: Resource, field: String, state: String, 
 	if not is_finite(duration) or duration <= 0 or not is_finite(radius) or radius < 0:
 		_fail(owner, "%s: invalid duration/radius (%s, %s)" % [field, duration, radius])
 
-func _validate_enemy_profile(encounter: ExplorationEncounterData, profiles: Dictionary) -> void:
+func _validate_enemy_profile(encounter: ExplorationEncounterData, profiles: Dictionary,rules: Dictionary) -> void:
 	if encounter.character:
 		if encounter.boss: _fail(encounter,"Boss cannot use an ordinary character definition")
-		for error in encounter.character.validation_errors(): _fail(encounter.character,error)
+		for error in encounter.character.validation_errors(rules): _fail(encounter.character,error)
 	var profile := encounter.profile
 	if not profile: return
 	if encounter.boss:

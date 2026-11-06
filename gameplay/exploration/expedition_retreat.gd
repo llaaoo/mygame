@@ -1,7 +1,7 @@
 class_name ExpeditionRetreat
 extends RefCounted
-var game: MVPGame
-func _init(owner_game: MVPGame) -> void: game = owner_game
+var game: CampaignGame
+func _init(owner_game: CampaignGame) -> void: game = owner_game
 func begin() -> void:
 	game.ui.close_modal()
 	if not reason().is_empty():

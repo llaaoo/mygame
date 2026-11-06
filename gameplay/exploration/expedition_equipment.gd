@@ -1,8 +1,8 @@
 class_name ExpeditionEquipment
 extends RefCounted
-var game: MVPGame
+var game: CampaignGame
 
-func _init(owner_game: MVPGame) -> void:
+func _init(owner_game: CampaignGame) -> void:
 	game = owner_game
 
 func grant(entry: ExplorationDiscoveryData) -> bool:
@@ -16,6 +16,9 @@ func grant(entry: ExplorationDiscoveryData) -> bool:
 	return changed
 
 func restore() -> void:
+	if game.player.inventory and game.player.inventory.store:
+		_manager()._refresh_from_store()
+		return
 	var manager := _manager()
 	manager.clear_all()
 	# Migrate only once: old ownership flags represented already-awarded discoveries.
@@ -61,6 +64,7 @@ func unequip(slot: int) -> bool:
 	return true
 
 func count(id: String) -> int:
+	if game.player.inventory and game.player.inventory.store: return game.player.inventory.store.count("player",id,true)
 	return int(game.progress.equipment_counts.get(id,1 if game.progress.equipment_owned.get(id,false) else 0))
 
 func has_pending_rewards(entry: ExplorationDiscoveryData) -> bool:
@@ -73,7 +77,7 @@ func receive(id: String, amount: int) -> int:
 	if not item or amount <= 0 or not game.player.inventory: return 0
 	var accepted := game.player.inventory.add_item(item,mini(amount,999-count(id)))
 	if accepted > 0:
-		game.progress.equipment_counts[id] = count(id)+accepted
+		game.progress.equipment_counts[id] = count(id) if game.player.inventory.store else count(id)+accepted
 		game.progress.equipment_owned[id] = true
 	return accepted
 
@@ -94,6 +98,7 @@ func _fits_loadout(slot: int, candidate: EquipmentData = null) -> bool:
 	return true
 
 func _reconcile_inventory() -> void:
+	if game.player.inventory and game.player.inventory.store: return
 	var inventory := game.player.inventory
 	if not inventory: return
 	for item: EquipmentData in game.catalog.equipment.values():
@@ -104,12 +109,15 @@ func _reconcile_inventory() -> void:
 		var quantity := maxi(0,count(id)-(1 if active and active.id == id else 0))
 		inventory.add_item(item,quantity)
 
+func manager() -> EquipmentManager:
+	return _manager()
+
 func _manager() -> EquipmentManager:
 	return game.player.get_node("EquipmentManager") as EquipmentManager
 
 func show_equipment() -> void:
-	if game is GrayriverGame and game.hub:
-		game.hub.open("equipment")
+	if game.session and game.session.equipment_page.is_valid():
+		game.session.equipment_page.call()
 		return
 	var text := "在营地整备。装备有明确取舍，同槽只能选择一件；已拥有物品保留，重置遭遇不重复发奖。I背包也可查看装备。\n\n" + build_summary()
 	var buttons: Array[Dictionary] = []
@@ -165,7 +173,7 @@ func build_summary(candidate: EquipmentData = null) -> String:
 	return text
 
 func change_reason() -> String:
-	if game is GrayriverGame:
-		if game.player.health_component.is_dead or game.player.field_work.is_busy() or game.player.skill_manager.combinations.is_busy() or not game.player.casting.aiming_sources.is_empty(): return "先结束当前动作，再手动换装。"
+	if game.rules.field_equipment:
+		if game.player.health_component.is_dead or game.player.field_work.is_busy() or (game.player.actor_context and game.player.actor_context.actions.busy()) or game.player.skill_manager.combinations.is_busy() or not game.player.casting.aiming_sources.is_empty(): return "先结束当前动作，再手动换装。"
 		return "附近有敌人，先脱离战斗再换装。" if game.has_hostiles_near(game.player.position) else ""
 	return "返回营地整备。" if not game.is_at_base() else ""

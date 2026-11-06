@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/foundation/ui/binding_editor.gd" id="1"]
+[node name="BindingEditor" type="VBoxContainer"]
+script = ExtResource("1")
+size_flags_horizontal = 3
+theme_override_constants/separation = 6

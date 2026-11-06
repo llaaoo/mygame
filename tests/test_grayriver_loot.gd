@@ -21,7 +21,9 @@ func run() -> void:
 	check(guard.get_node("Sprite2D").self_modulate.a == 0,"Atlas still depicts unowned baked equipment")
 	check(gear.get_all_equipped() == visual.items and gear.get_equipment(EquipmentData.SlotType.LEFT_HAND).id == "river_shield","Wearer appearance does not read its real equipment")
 	# A changed runtime loadout must be recovered, not the original template.
+	game.session.inventory.receive(str(guard.get_meta("frontier_claim")),"river_spear",1)
 	gear.equip(game.catalog.equipment.river_spear)
+	game.session.inventory.remove_from(str(guard.get_meta("frontier_claim"))+".pack","river_sabre",1)
 	check(visual.items.any(func(item): return item.id == "river_spear"),"Equipment swap did not update wearer appearance")
 	var snapshot := GrayriverLoot.snapshot(guard)
 	check(not snapshot.equipment.has("river_sabre") and snapshot.equipment.has("river_spear"),"Death snapshot was generated from a template")

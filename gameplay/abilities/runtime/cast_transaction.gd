@@ -66,7 +66,7 @@ func reserve(plan: CastPlan) -> bool:
 	return true
 
 func pay(cost: int, materials: Dictionary = {}) -> bool:
-	return (not mana or mana.use_mp(cost)) and (not supplies or supplies.pay(materials))
+	return (not mana or mana.use_mp(cost)) and (not supplies or supplies.pay(materials,true))
 
 func commit() -> void:
 	_finish(true)

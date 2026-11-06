@@ -33,59 +33,27 @@ func open(tab := "quests", source := "") -> void:
 	selected=""
 	filter_index=0
 	_open=true
-	var root := VBoxContainer.new()
-	root.add_theme_constant_override("separation",10)
-	var tabs := HBoxContainer.new()
-	root.add_child(tabs)
+	var root:=preload("res://gameplay/foundation/ui/expedition_screen.tscn").instantiate() as ExpeditionScreen
+	var tabs:=root.tabs
 	for key in TABS:
 		var button := W.button(TABS[key],open.bind(key,""))
 		button.toggle_mode=true
 		button.button_pressed=page == key
 		tabs.add_child(button)
 	if page == "loot": root.add_child(W.label("遗骸 · 未取走的东西会留在原处。F尽量取走全部；点击选择，Esc关闭。",13,true))
-	var tools := HBoxContainer.new()
-	root.add_child(tools)
-	_search=LineEdit.new()
-	_search.placeholder_text="搜索名称、说明或任务…"
-	_search.size_flags_horizontal=Control.SIZE_EXPAND_FILL
-	_search.clear_button_enabled=true
+	var tools:=root.tools
+	_search=root.search
 	_search.text_changed.connect(func(value: String): query=value; _refresh_rows())
-	tools.add_child(_search)
 	if page in ["equipment","supplies","quests"]:
 		var filter := OptionButton.new()
 		var choices: Array = ["全部","持有","已装备","武器","防具","饰物"] if page == "equipment" else ["全部","可使用","材料"] if page == "supplies" else ["进行中","可交付","已完成","全部"]
 		for title in choices: filter.add_item(title)
 		filter.item_selected.connect(func(index: int): filter_index=index; _refresh_rows())
 		tools.add_child(filter)
-	_status=W.label("",12,true)
-	root.add_child(_status)
-	var columns := HBoxContainer.new()
-	columns.add_theme_constant_override("separation",16)
-	columns.size_flags_vertical=Control.SIZE_EXPAND_FILL
-	root.add_child(columns)
-	var left := ScrollContainer.new()
-	left.custom_minimum_size=Vector2(250,270)
-	left.size_flags_horizontal=Control.SIZE_EXPAND_FILL
-	left.size_flags_stretch_ratio=.8
-	left.size_flags_vertical=Control.SIZE_EXPAND_FILL
-	left.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED
-	left.follow_focus=true
-	columns.add_child(left)
-	_rows=VBoxContainer.new()
-	_rows.size_flags_horizontal=Control.SIZE_EXPAND_FILL
-	_rows.add_theme_constant_override("separation",6)
-	left.add_child(_rows)
-	var right := ScrollContainer.new()
-	right.custom_minimum_size=Vector2(310,270)
-	right.size_flags_horizontal=Control.SIZE_EXPAND_FILL
-	right.size_flags_stretch_ratio=1.4
-	right.size_flags_vertical=Control.SIZE_EXPAND_FILL
-	right.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED
-	columns.add_child(right)
-	_detail=VBoxContainer.new()
-	_detail.add_theme_constant_override("separation",12)
-	_detail.size_flags_horizontal=Control.SIZE_EXPAND_FILL
-	right.add_child(_detail)
+	_status=root.status
+	GameUIStyle.apply_label(_status,12,GameUIStyle.TEXT_MUTED)
+	_rows=root.rows
+	_detail=root.detail
 	if page == "loot":
 		root.add_child(W.button("F  尽量全部取走",take_all))
 	game.ui.show_view("灰河谷  /  "+("战利品" if page == "loot" else TABS.get(page,"旅程")),root)
@@ -99,7 +67,7 @@ func entries() -> Array[Dictionary]:
 			for id in game.catalog.equipment:
 				var item: EquipmentData=game.catalog.equipment[id]
 				var count:=game.equipment_service.count(id)
-				var equipped:=game.equipment_service._manager().get_equipment(item.slot_type)==item
+				var equipped:=game.equipment_service.manager().get_equipment(item.slot_type)==item
 				if filter_index == 1 and count == 0 or filter_index == 2 and not equipped: continue
 				if filter_index == 3 and item.slot_type not in [5,6]: continue
 				if filter_index == 4 and item.slot_type > 4: continue
@@ -181,7 +149,7 @@ func _show_detail() -> void:
 			var id: String=entry.get("item",entry.id)
 			var item:=game.catalog.equipment.get(id) as EquipmentData
 			if item:
-				var current:=game.equipment_service._manager().get_equipment(item.slot_type)
+				var current:=game.equipment_service.manager().get_equipment(item.slot_type)
 				var compare:=W.card(_detail,"与当前装备比较",current.display_name if current else "当前同槽为空")
 				compare.add_child(W.label(W.comparison(current,item),13))
 				if page=="equipment":
@@ -199,6 +167,14 @@ func _show_detail() -> void:
 			if page=="loot": _detail.add_child(W.button("取走这一项",_take_selected.bind(entry.kind,id)))
 		"supplies":
 			var id: String=entry.id
+			var store:=game.session.inventory
+			var pocket:=store.count_in("player.pocket",id)
+			var packed:=store.count_in("player.pack",id)
+			card.add_child(W.label("随身口袋 ×%d · 背包 ×%d\n战斗施法与进食只使用随身口袋。"%[pocket,packed],13,true))
+			var reason:=game.equipment_service.change_reason()
+			if not reason.is_empty(): card.add_child(W.label(reason,13,true))
+			_detail.add_child(W.button("移一份到随身口袋",_repack.bind(id,true),packed==0 or not reason.is_empty()))
+			_detail.add_child(W.button("移一份到背包",_repack.bind(id,false),pocket==0 or not reason.is_empty()))
 			if SurvivalCatalog.FOODS.has(id):
 				var food: Dictionary=SurvivalCatalog.FOODS[id]
 				card.add_child(W.label("饱食 %+.0f · 饮水 %+.0f · 疲劳 %+.0f\n持续 %.0f秒"%[food.nutrition,food.hydration,food.fatigue,food.duration],14))
@@ -228,7 +204,8 @@ func _show_detail() -> void:
 			toggle.toggled.connect(func(value: bool):
 				if not FrontierControls.set_quick_cast(value): game.ui.notify("本次设置已生效，但未保存到磁盘。"))
 			card.add_child(toggle)
-			card.add_child(W.label("关闭时按住预览、松开施放。蓄力与引导仍需按住；Shift只表示显式消费恩赐。每次只执行一个基础动作，不自动组合。\n\nWASD 移动 · 空格闪避 · E交互\n1—6 基础动作 · 7烤饼 · 8清水 · 9茶 · 0炖汤\nTab 远征面板 · J委托 · I/O装备 · N补给 · G地图\n地图滚轮缩放、中键/右键拖动、左键放路标。",14))
+			card.add_child(preload("res://gameplay/foundation/ui/binding_editor.tscn").instantiate())
+			card.add_child(W.label("关闭时按住预览、松开施放。蓄力与引导仍需按住；Shift只表示显式消费恩赐。每次只执行一个基础动作，不自动组合。\n\nWASD 移动 · 空格闪避 · E交互\n1—6 基础动作 · 7烤饼 · 8清水 · 9茶 · 0炖汤\nTab 远征面板 · J委托 · I/O装备 · N补给 · G地图\nV按住格挡 · Alt冲刺 · Ctrl+左键重击 · B放下背包\n地图滚轮缩放、中键/右键拖动、左键放路标。",14))
 
 func _pin(id: String) -> void:
 	game.guidance.pin(id)
@@ -252,3 +229,21 @@ func take_all() -> void:
 	var taken:=game.loot.take(loot_id)
 	game.ui.notify("收好%d件物品，未能携带的留在原处。"%taken if taken>0 else "没有取走物品，检查背包与水囊容量。")
 	_refresh_rows()
+
+func _repack(id: String,to_pocket: bool) -> void:
+	if not game.equipment_service.change_reason().is_empty(): return
+	var store:=game.session.inventory
+	if not store.containers["player.pack"].attached:
+		game.ui.notify("先拾回背包再整理物品。")
+		return
+	var source:="player.pack" if to_pocket else "player.pocket"
+	var destination:="player.pocket" if to_pocket else "player.pack"
+	for row in store.entries(source):
+		if row.definition!=id: continue
+		var result:=store.commit(store.preview(source,destination,row.uid,1))
+		if not result.accepted: game.ui.notify("目标容器没有足够空间。")
+		else:
+			game.survival.supplies.changed.emit()
+			game._save_progress()
+		_refresh_rows()
+		return
