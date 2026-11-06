@@ -216,6 +216,8 @@ MVP 使用独立的 `user://save_2.sav`，不会读取或覆盖旧房间模式�
 
 ## 验证与开发
 
+测试与验证在云环境中执行。GitHub Actions 已停用，原工作流保留在 [备份目录](.github/disabled-workflows/README.md)，推送和 PR 不再自动触发测试。
+
 统一运行入口会隔离存档并保留日志：
 
 ```bash
