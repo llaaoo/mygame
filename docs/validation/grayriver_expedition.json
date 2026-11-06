@@ -251,7 +251,9 @@
       "python tools/run_tests.py --tests frontier_expedition frontier_projects --timeout 45",
       "python tools/run_tests.py --tests frontier_expedition grayriver_loot grayriver_salvage --timeout 45"
     ],
-    "purpose": "Final needs panel, compact supply belt and hostility/reward persistence checks"
+    "purpose": "Final needs panel, compact supply belt and hostility/reward persistence checks",
+    "passed": 5,
+    "total": 5
   },
   "graphics": {
     "renderer": "gl_compatibility, software Mesa / Xorg dummy",
@@ -263,5 +265,13 @@
     "script_errors": 0,
     "driver_warning": "VSync changes unsupported by dummy graphics driver",
     "scope": "Staged isolated saves, frozen simulation, explicit inventory/positions; actual pointer click starts timed work. Not a natural campaign or balance acceptance."
+  },
+  "cold_committed_source": {
+    "revision": "d6e02df",
+    "method": "git archive HEAD into a fresh directory without .godot or user saves",
+    "import": "passed, Godot recovery import",
+    "command": "python tools/run_tests.py --tests frontier_expedition frontier_projects grayriver_loot grayriver_salvage content startup --timeout 45 --jobs 2",
+    "passed": 6,
+    "total": 6
   }
 }
