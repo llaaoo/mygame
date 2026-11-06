@@ -3,6 +3,10 @@ extends CanvasLayer
 
 @export var columns: int = 5
 
+var page_request: Callable
+var equip_request: Callable
+var unequip_request: Callable
+var change_reason: Callable
 var inventory: Inventory
 var equipment_manager: EquipmentManager
 
@@ -51,9 +55,8 @@ func _input(event: InputEvent) -> void:
 	elif event.keycode == KEY_I:
 		if get_tree().paused and not visible:
 			return
-		var scene := get_tree().current_scene
-		if scene is GrayriverGame and scene.hub:
-			scene.hub.handle_shortcut(KEY_I)
+		if page_request.is_valid():
+			page_request.call()
 		else: toggle()
 		get_viewport().set_input_as_handled()
 
@@ -174,7 +177,7 @@ func _refresh_summary() -> void:
 	var equipped_count := equipment_manager.get_all_equipped().size()
 	_summary.text = "装备战力  %d    已装备  %d / %d" % [equipment_manager.get_total_power_score(), equipped_count, SLOT_BUTTON_MAP.size()]
 	var lines: Array[String] = []
-	if get_tree().current_scene is MVPGame:
+	if change_reason.is_valid():
 		_summary.text = "已装备 %d件 · 营地可换装 · O查看构筑取舍" % equipped_count
 	for entry in equipment_manager.get_set_summaries():
 		var data := entry.data as EquipmentSetData
@@ -199,9 +202,8 @@ func _on_equip_clicked(slot_type: int) -> void:
 	if not inventory or not equipment_manager:
 		return
 	var item := equipment_manager.get_equipment(slot_type)
-	var scene := get_tree().current_scene
-	if scene is MVPGame and scene.equipment_service:
-		scene.equipment_service.unequip(slot_type)
+	if unequip_request.is_valid():
+		unequip_request.call(slot_type)
 		_refresh_all()
 		return
 	if item and inventory.has_space(item):
@@ -226,10 +228,7 @@ func _on_slot_dropped(target: SlotButton, data: Dictionary) -> void:
 func _swap_inventory_slots(a: int, b: int) -> void:
 	if a == b:
 		return
-	var slot_a := inventory.get_slot(a)
-	var slot_b := inventory.get_slot(b)
-	inventory.set_slot(a, slot_b.item, slot_b.quantity)
-	inventory.set_slot(b, slot_a.item, slot_a.quantity)
+	inventory.swap_slots(a,b)
 	_refresh_all()
 
 
@@ -242,9 +241,8 @@ func _inventory_to_equip(inventory_index: int, equipment_slot: int) -> void:
 	var item := slot.item as EquipmentData
 	if item.slot_type != equipment_slot:
 		return
-	var scene := get_tree().current_scene
-	if scene is MVPGame and scene.equipment_service:
-		scene.equipment_service.equip(item.id)
+	if equip_request.is_valid():
+		equip_request.call(item.id)
 		_refresh_all()
 		return
 	var old := equipment_manager.get_equipment(equipment_slot)
@@ -255,5 +253,4 @@ func _inventory_to_equip(inventory_index: int, equipment_slot: int) -> void:
 	_refresh_all()
 
 func _can_change_equipment() -> bool:
-	var scene := get_tree().current_scene
-	return scene.equipment_service.change_reason().is_empty() if scene is MVPGame else true
+	return str(change_reason.call()).is_empty() if change_reason.is_valid() else true

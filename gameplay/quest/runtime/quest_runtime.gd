@@ -6,6 +6,7 @@ enum QuestState { NOT_STARTED, ACTIVE, COMPLETED, FAILED }
 var data: QuestData
 var state: QuestState = QuestState.NOT_STARTED
 var current_stage: int = 0
+var _progress: Dictionary={}
 
 
 func start() -> void:
@@ -23,7 +24,7 @@ func restore(stage_index: int, progress: Array) -> void:
 	for stage in data.stages:
 		for obj in stage.objectives:
 			if index < progress.size():
-				obj.current = clampi(int(progress[index]), 0, obj.required_count)
+				_progress[obj] = clampi(int(progress[index]), 0, obj.required_count)
 			index += 1
 	_activate_current_stage_objectives()
 
@@ -54,7 +55,7 @@ func get_progress() -> Array[int]:
 	if data.stages.is_empty():
 		return result
 	for obj in _current_stage_data().objectives:
-		result.append(obj.current)
+		result.append(int(_progress.get(obj,0)))
 	return result
 
 
@@ -62,14 +63,14 @@ func get_all_progress() -> Array[int]:
 	var result: Array[int] = []
 	for stage in data.stages:
 		for obj in stage.objectives:
-			result.append(obj.current)
+			result.append(int(_progress.get(obj,0)))
 	return result
 
 
 func _reset_all_objectives() -> void:
 	for stage in data.stages:
 		for obj in stage.objectives:
-			obj.reset()
+			_progress[obj]=0
 
 
 func _current_stage_data() -> QuestStageData:
@@ -77,9 +78,9 @@ func _current_stage_data() -> QuestStageData:
 
 
 func _try_progress(obj: QuestObjective, ev: CombatEvent) -> void:
-	if obj.is_completed():
+	if int(_progress.get(obj,0))>=obj.required_count:
 		return
-	obj.on_event(ev)
+	_progress[obj]=mini(obj.required_count,int(_progress.get(obj,0))+obj.progress_for_event(ev))
 
 
 func _activate_current_stage_objectives() -> void:
@@ -87,13 +88,13 @@ func _activate_current_stage_objectives() -> void:
 		return
 	var tree := Engine.get_main_loop() as SceneTree
 	for obj in _current_stage_data().objectives:
-		obj.on_stage_activated(tree)
+		_progress[obj]=maxi(int(_progress.get(obj,0)),obj.initial_progress(tree))
 
 
 func _all_done() -> bool:
 	if data.stages.is_empty():
 		return false
 	for obj in _current_stage_data().objectives:
-		if not obj.is_completed():
+		if int(_progress.get(obj,0))<obj.required_count:
 			return false
 	return true

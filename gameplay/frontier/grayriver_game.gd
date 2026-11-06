@@ -1,5 +1,5 @@
 class_name GrayriverGame
-extends MVPGame
+extends CampaignGame
 const TOWN := Rect2(-4600,1100,2400,2200)
 var hub: FrontierHub
 var guidance: FrontierGuidance
@@ -12,6 +12,7 @@ var resuming_journey := false
 var _location_clock := 0.0
 var _discovery_clock := 0.0
 func _ready() -> void:
+	rules=preload("res://content/foundation/frontier_rules.tres")
 	FrontierControls.load_preferences()
 	hub=FrontierHub.new(self)
 	guidance=FrontierGuidance.new(self)
@@ -35,7 +36,7 @@ func _build_camp() -> void:
 	_add_interaction("镇中篝火：休整与粗食",Vector2(-3500,2100),Callable(),"mechanism")
 	var rest := region_root.get_child(region_root.get_child_count()-1) as ExplorationInteractable
 	survival.mount_rest(rest)
-	_add_interaction("镇中训练：分配属性",Vector2(-3300,2350),_show_training,"person")
+	_mount_trainer(Vector2(-3300,2350),_show_training)
 	_add_interaction("施法工作台：加工已学配方",Vector2(-3100,1800),workshop.show_crafts,"mechanism")
 	_add_interaction("艾妲的委托板",Vector2(-2900,2200),_show_quests,"person")
 	_add_interaction("手动整备装备",Vector2(-3300,2100),equipment_service.show_equipment,"mechanism")
@@ -48,20 +49,20 @@ func _spawn_enemy(spec: ExplorationEncounterData, layout: RefCounted, index: int
 	var enemy := active_enemies.back() as Enemy
 	enemy.set_meta("frontier_claim",id)
 	enemy.set_meta("frontier_group",spec.get_meta("group",region_id))
+	if not enemy.actor_context: session.bind_actor(enemy,id,{}, {},enemy.rewards_enabled)
 	stories.mount(enemy)
 func _on_enemy_died(enemy: Enemy, generation: int) -> void:
 	if not GameRuntime.instance.get_region_session().is_current(generation): return
+	session.mark_dead(enemy)
 	stories.died(enemy)
-	loot.record_enemy(enemy)
 	if not practice_active: progress.claims[enemy.get_meta("frontier_claim", "river.enemy.unknown")] = true
 	super._on_enemy_died(enemy,generation)
 	_save_progress()
 func is_at_base() -> bool:
-	return region_id == "camp" and is_instance_valid(player) and TOWN.has_point(player.global_position)
+	return is_instance_valid(player) and rules.is_base(region_id,player.global_position)
 func has_hostiles_near(point: Vector2) -> bool:
-	for enemy in active_enemies:
-		if is_instance_valid(enemy) and not enemy.health_component.is_dead and not enemy.story_truce and enemy.global_position.distance_to(point)<500: return true
-	return false
+	return session.has_hostiles_near("player",point) if session else false
+
 func is_area_cleared(point: Vector2) -> bool:
 	if region_id != "camp": return progress.cleared.has(region_id)
 	var relevant := false
@@ -126,6 +127,10 @@ func discovered_places() -> String:
 
 func _bootstrap() -> void:
 	await super._bootstrap()
+	session.equipment_page=hub.open.bind("equipment","")
+	session.supply_page=hub.open.bind("supplies","")
+	session.sync_extra=stories.sync
+	if player.inventory_panel: player.inventory_panel.page_request=hub.handle_shortcut.bind(KEY_I)
 	ui.pause_provider = show_valley_pause
 	ui.map_provider = show_map
 	ui.journal_action=hub.open.bind("quests","")
@@ -189,3 +194,20 @@ func _clear_temporary() -> void:
 	stories.sync()
 	stories.actors.clear()
 	super._clear_temporary()
+
+func inspect_actor(actor: Enemy) -> void:
+	loot.inspect_actor(actor)
+
+func record_actor_loot(actor: CharacterBody2D) -> void:
+	loot.record_enemy(actor)
+
+func _mount_trainer(point: Vector2,request: Callable) -> void:
+	var id:="river.enemy.service.trainer"
+	var configure_actor:=func(actor: CharacterBody2D):
+		var npc:=actor as ServiceNPC
+		npc.schedule=load("res://content/foundation/trainer_schedule.tres")
+		npc.locations={"work":point,"rest":Vector2(-3960,2680)}
+		npc.hour_query=session.hour_query; npc.service_request=request; npc.notify=session.notify; npc.lookup_actor=session.actor_for_id
+		npc.set_meta("frontier_claim",id)
+	var npc:=session.mount_actor(load("res://gameplay/foundation/service_npc.tscn"),id,point,configure_actor)
+	if npc: session.relations.memberships[id]="civilian"

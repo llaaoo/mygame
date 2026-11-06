@@ -156,7 +156,7 @@ class Root:
 
 	func serialize() -> Dictionary:
 		return {
-			"version": 3,
+			"version": SaveRepository.VERSION,
 			"meta": meta.serialize(),
 			"player": player.serialize(),
 			"world": world.serialize(),

@@ -1,11 +1,11 @@
 class_name Action
-extends Resource
+extends RefCounted
 ## 通用 Action — Player/Enemy/NPC/Boss 共享的意图数据
 ##
 ## 设计原则:
 ##   1. 纯数据 — 不包含任何执行逻辑
 ##   2. 统一类型 — 所有实体通过相同的 ActionType 表达意图
-##   3. 可序列化 — Resource 类型，可存储/网络传输
+##   3. 运行时请求 — RefCounted，不作为共享 Resource 保存
 ##
 ## 数据流:
 ##   Input/Brain/Schedule → Action → ActionResolver → RuntimeRequest → RuntimeExecute
@@ -18,11 +18,15 @@ enum ActionType {
 	CAST,          ## 技能释放（skill_id + direction 有效）
 	INTERACT,      ## 交互（按 E）
 	DODGE,         ## 闪避
-	USE_ITEM,      ## 使用物品（预留）
+	USE_ITEM,      ## 真实耗时物品使用
+	HEAVY_ATTACK,
+	GUARD,
+	SPRINT,
+	DROP_PACK,
 }
 
 ## ── 核心字段 ──
-@export var action_type: ActionType = ActionType.IDLE
+var action_type: ActionType = ActionType.IDLE
 
 ## 发起者
 var source: Node2D = null

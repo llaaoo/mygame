@@ -35,7 +35,7 @@ func start_quest(data: QuestData) -> bool:
 			return false
 
 	var runtime := QuestRuntime.new()
-	runtime.data = data.duplicate(true) as QuestData
+	runtime.data = data
 	runtime.start()
 	_active_quests.append(runtime)
 	quest_started.emit(runtime.data.quest_id)
@@ -101,7 +101,7 @@ func restore_active_quests(states: Array) -> void:
 		if data == null or _completed_quests.has(data.quest_id):
 			continue
 		var runtime := QuestRuntime.new()
-		runtime.data = data.duplicate(true) as QuestData
+		runtime.data = data
 		runtime.restore(int(entry.get("stage", 0)), entry.get("progress", []))
 		_active_quests.append(runtime)
 		quest_started.emit(runtime.data.quest_id)

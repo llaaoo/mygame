@@ -48,7 +48,7 @@ func _run() -> void:
 	await _interact("寒霜铭刻记录")
 	game.ui.close_modal()
 	_check(sm.known_actions.has("frost_sigil"), "Frost sigil not learned")
-	var pool_ui: SkillPoolUI = game.get_node("SkillPoolUI")
+	var pool_ui: SkillPoolUI = game.interface_root.get_node("SkillPoolUI")
 	_check(pool_ui._combination_description(sm.pool.get_skill("frost_bolt")).contains("霜阵"), "Frost recipe UI shows the wrong field")
 	_check(pool_ui._combination_description(sm.pool.get_skill("fire_sigil_burst")).contains("震荡"), "Burst recipe UI shows the wrong trigger")
 	await _clear_encounter()

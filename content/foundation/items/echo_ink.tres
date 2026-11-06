@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/item_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "echo_ink"
+display_name = "回响墨"
+description = "回响铭印的必需媒介；也可让回响三重矢每发或魂焰矢额外穿透1个目标，额外3 MP。"
+weight = 0.1
+stackable = true
+max_stack = 99

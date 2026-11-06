@@ -12,8 +12,7 @@ static func build() -> ExplorationChapterData:
 	var chapter := ExplorationChapterData.new()
 	chapter.actions.assign(source.chapter.actions)
 	chapter.spell_rules.assign(source.chapter.spell_rules)
-	chapter.equipment.assign(source.chapter.equipment)
-	chapter.equipment.append_array(GrayriverItems.equipment())
+	chapter.equipment.assign(ItemCatalog.default_catalog().equipment())
 	var definition := data()
 	for entry in definition.regions:
 		var region := ExplorationRegionData.new()

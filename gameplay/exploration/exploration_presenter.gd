@@ -1,8 +1,8 @@
 class_name ExplorationPresenter
 extends RefCounted
-var game: MVPGame
+var game: CampaignGame
 
-func _init(owner_game: MVPGame) -> void:
+func _init(owner_game: CampaignGame) -> void:
 	game = owner_game
 
 func show_arrival() -> void:

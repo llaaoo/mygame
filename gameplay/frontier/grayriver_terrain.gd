@@ -1,7 +1,7 @@
 class_name GrayriverTerrain
 extends Node2D
 ## Low-node-count authored geography. Deep water collides; bridges and the ford are gaps.
-var game: MVPGame
+var game: CampaignGame
 var layout: RunRoomLayout
 var roads: Array = []
 var _clock := 0.0
@@ -22,9 +22,18 @@ func _ready() -> void:
 	lake_shape.shape=shape
 	lake_body.add_child(lake_shape)
 	add_child(lake_body)
+	var navigation:=game.session.region.navigation
+	if navigation:
+		for x in range(-2,36):
+			for y in range(-82,-58):
+				var point:=Vector2(x,y)*RegionNavigation.CELL
+				if ((point-Vector2(650,-2800))/Vector2(720,440)).length()<=1:
+					navigation.set_obstacle(Rect2(point,Vector2.ONE*RegionNavigation.CELL),true)
 	var size := layout.arena_size
 	for wall in [{"position":Vector2(0,-size.y/2-20),"size":Vector2(size.x,40)},{"position":Vector2(0,size.y/2+20),"size":Vector2(size.x,40)},{"position":Vector2(-size.x/2-20,0),"size":Vector2(40,size.y)},{"position":Vector2(size.x/2+20,0),"size":Vector2(40,size.y)}]: _body(wall.position,wall.size,"Boundary")
-	if not game.progress.claims.has("river.bridge_fixed"): bridge_body = _body(Vector2(300,500),Vector2(260,400),"BrokenBridge")
+	if not game.progress.claims.has("river.bridge_fixed"):
+		bridge_body = _body(Vector2(300,500),Vector2(260,400),"BrokenBridge")
+		if navigation: navigation.set_obstacle(Rect2(170,300,260,400).grow(20),true)
 	var center := SurfaceManager.cell_at(Vector2(300,2400))
 	for x in range(-4,5):
 		for y in range(-4,5):
@@ -47,6 +56,7 @@ func _process(delta: float) -> void:
 	if is_instance_valid(bridge_body) and game.progress.claims.has("river.bridge_fixed"):
 		bridge_body.queue_free()
 		bridge_body = null
+		if game.session.region.navigation: game.session.region.navigation.set_obstacle(Rect2(170,300,260,400).grow(20),false)
 		queue_redraw()
 	_clock += delta
 	if _clock < 1: return

@@ -1,5 +1,6 @@
 extends CharacterBody2D
 class_name Enemy
+var actor_context: ActorContext
 
 @export var character_definition: ActorCharacterData
 var base_move_speed := 120.0
@@ -132,8 +133,7 @@ func _setup_character() -> void:
 		var interaction := Interactable.new()
 		interaction.name = "Interactable"
 		interaction.set_callback(func(_actor: Node2D):
-			var scene := get_tree().current_scene as GrayriverGame
-			if scene: scene.loot.inspect_actor(self))
+			if actor_context and actor_context.inspect_requested.is_valid(): actor_context.inspect_requested.call(self))
 		add_child(interaction)
 	health_component.hp=health_component.max_hp
 	mana_component.mp=mana_component.max_mp
@@ -181,10 +181,7 @@ func _on_got_hit(ev: CombatEvent) -> void:
 	if ev.source is Player:
 		if story_truce:
 			story_truce=false
-			var scene:=get_tree().current_scene as GrayriverGame
-			if scene and not scene.active_enemies.has(self):
-				scene.active_enemies.append(self)
-				scene.progress.cleared.erase(scene.region_id)
+			if actor_context and actor_context.hostile_requested.is_valid(): actor_context.hostile_requested.call(self)
 		_revenge_target = ev.source
 		_returning_home = false
 		return
@@ -211,6 +208,7 @@ func _on_target_killed(ev: CombatEvent) -> void:
 
 func _get_current_target() -> Node2D:
 	if story_truce: return null
+	if actor_context and actor_context.relations.attitude(actor_context.id,"player")=="friendly" and not _is_valid_target(_revenge_target): return null
 	if _is_valid_target(_revenge_target):
 		return _revenge_target
 	if _is_valid_target(player) and global_position.distance_to(player.global_position) <= detect_range * 1.35:
@@ -282,6 +280,11 @@ func poll_actions() -> Array[Action]:
 
 
 func resolve_action(action: Action) -> void:
+	if actor_context and actor_context.actions.active() and action.action_type in [Action.ActionType.MOVE,Action.ActionType.MELEE,Action.ActionType.HEAVY_ATTACK,Action.ActionType.GUARD,Action.ActionType.USE_ITEM]:
+		if action.action_type==Action.ActionType.MELEE: action.direction=get_target_direction()
+		actor_context.actions.try_action(action)
+		return
+	if actor_context and actor_context.actions.active() and actor_context.actions.busy(): return
 	if attack_preparation and attack_preparation.busy(): return
 	if character_definition and skill_manager.combinations.is_busy(): return
 	if not ActionResolver.validate(self, action):
@@ -470,6 +473,7 @@ func _get_patrol_world_point(index: int) -> Vector2:
 
 
 func _move_towards_point(target_point: Vector2) -> void:
+	if actor_context and actor_context.actions.active() and actor_context.actions.busy(): return
 	if attack_preparation and attack_preparation.busy(): return
 	var dir := target_point - global_position
 	if dir.length_squared() <= 1.0:

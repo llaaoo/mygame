@@ -6,6 +6,7 @@ script = ExtResource("profile")
 [resource]
 script = ExtResource("item")
 id = "river_foreman_coat"
+weight = 6
 display_name = "矿务工头甲"
 description = "蓝色工区甲。力量+1，受伤降低12%，移动速度-8；甲上仍钉着运料编号。"
 slot_type = 1

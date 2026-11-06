@@ -2,7 +2,7 @@ class_name ElementTrialRecorder
 extends Node
 ## Measurements describe actual committed play, not projected combo counts.
 const LABELS := ["冻结控制", "破冰兑现", "导电布场", "污染引燃"]
-var game: MVPGame
+var game: CampaignGame
 var active := false
 var run: Dictionary = {}
 var _started := 0.0

@@ -1,11 +1,18 @@
 [gd_resource type="Resource" script_class="EquipmentData" format=3]
 [ext_resource type="Script" path="res://gameplay/inventory/data/equipment_data.gd" id="item"]
 [ext_resource type="Script" path="res://gameplay/inventory/data/casting_equipment_profile.gd" id="profile"]
+[ext_resource type="Script" path="res://gameplay/foundation/data/attack_profile.gd" id="attack"]
 [sub_resource type="Resource" id="Profile"]
 script = ExtResource("profile")
+[sub_resource type="Resource" id="Attack"]
+script = ExtResource("attack")
+reach = 82.0
+impact = 22.0
 [resource]
+attack_profile = SubResource("Attack")
 script = ExtResource("item")
 id = "river_survey_spear"
+weight = 2.5
 display_name = "测路铜矛"
 description = "铜绿矛头与测路刻痕。近战攻击+4；从携带它的测路者身上完整回收。"
 slot_type = 6

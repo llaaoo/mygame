@@ -6,6 +6,7 @@ script = ExtResource("profile")
 [resource]
 script = ExtResource("item")
 id = "river_boots"
+weight = 1
 display_name = "湿地绑腿靴"
 description = "青灰绑腿包住鞋口。移动速度+8，不提供毒免疫。"
 slot_type = 3

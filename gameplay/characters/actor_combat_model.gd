@@ -66,11 +66,14 @@ static func melee_contact(actor: Node2D, target: Node2D, damage: int, base_tags:
 		skill.id="imbued_melee"
 		skill.display_name="元素近战"
 		skill.tags=tags
-	var surface := SurfaceManager.instance
-	if surface and not imbued_tags.is_empty():
-		var cell := SurfaceManager.cell_at(target.global_position)
-		if surface.get_surface(cell).get("state","dry")!="dry": surface.apply_tags(cell,tags,"元素近战")
+	if not imbued_tags.is_empty(): apply_melee_surface(target,tags)
 	CombatExecutor.report_hit(actor,target,damage,target.global_position,skill,tags)
+
+static func apply_melee_surface(target: Node2D,tags: Array[String]) -> void:
+	var surface:=SurfaceManager.instance
+	if not surface: return
+	var cell:=SurfaceManager.cell_at(target.global_position)
+	if surface.get_surface(cell).get("state","dry")!="dry": surface.apply_tags(cell,tags,"元素近战")
 
 static func incoming_damage(actor: Node2D, amount: int) -> int:
 	if amount <= 0: return 0

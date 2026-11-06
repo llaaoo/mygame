@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/item_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "storm_dust"
+display_name = "雷晶粉"
+description = "铭刻雷阵的必需媒介；雷矢或水系投射物变三发散射，每发伤害70%；造水同时导电，可能波及自己与相连水域，额外4 MP。"
+weight = 0.1
+stackable = true
+max_stack = 99

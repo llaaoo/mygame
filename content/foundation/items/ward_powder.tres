@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/item_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "ward_powder"
+display_name = "守护粉"
+description = "延长凝神恩赐、共鸣护盾、先祖护佑或净魂保护4秒，额外2 MP；不延长蕴魂或回响印记。"
+weight = 0.1
+stackable = true
+max_stack = 99

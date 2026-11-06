@@ -91,6 +91,7 @@ func _bootstrap() -> void:
 	await get_tree().process_frame
 	_scene_root = get_tree().current_scene
 	_player = get_tree().get_first_node_in_group("player") as Player
+	_player.world_provider=func(): return _room_root
 	if not _scene_root or not _player:
 		push_warning("[RunManager] Player or scene root missing; roguelite loop disabled.")
 		return

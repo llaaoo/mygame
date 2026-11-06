@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/item_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "frost_salt"
+display_name = "霜盐"
+description = "冰/水投射物或范围法术适配：寒霜弹穿透+1、范围半径+30；造水先凝成冰面，额外2 MP。"
+weight = 0.1
+stackable = true
+max_stack = 99

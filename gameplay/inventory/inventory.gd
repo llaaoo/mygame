@@ -10,6 +10,8 @@ extends Resource
 
 ## 物品槽位数组（索引 → {item: ItemData, quantity: int}）
 var _slots: Array[Dictionary] = []
+var store: InventoryService
+var container_id := ""
 
 
 func _init() -> void:
@@ -25,6 +27,9 @@ func _resize_slots() -> void:
 
 ## 添加物品（返回成功数量，0=背包满）
 func add_item(item: ItemData, quantity: int = 1) -> int:
+	if store:
+		store.register_definition(item)
+		return store.receive_into(container_id,item.id,quantity)
 	if quantity <= 0: return 0
 	var added = 0
 	var remaining = quantity
@@ -59,6 +64,7 @@ func add_item(item: ItemData, quantity: int = 1) -> int:
 
 ## 移除物品
 func remove_item(item: ItemData, quantity: int = 1) -> int:
+	if store: return store.remove_from(container_id,item.id,quantity)
 	var removed = 0
 	for i in range(capacity - 1, -1, -1):
 		var slot = _slots[i]
@@ -76,6 +82,10 @@ func remove_item(item: ItemData, quantity: int = 1) -> int:
 
 ## 获取指定槽位
 func get_slot(index: int) -> Dictionary:
+	if store:
+		var rows:=store.entries(container_id)
+		if index>=0 and index<rows.size(): return {"item":store.definitions.get(rows[index].definition),"quantity":rows[index].quantity,"uid":rows[index].uid}
+		return {"item":null,"quantity":0}
 	if index >= 0 and index < capacity:
 		return _slots[index]
 	return {"item": null, "quantity": 0}
@@ -83,6 +93,7 @@ func get_slot(index: int) -> Dictionary:
 
 ## 获取物品总数量
 func get_item_count(item: ItemData) -> int:
+	if store: return store.count_in(container_id,item.id)
 	var count = 0
 	for slot in _slots:
 		if slot.item == item:
@@ -92,12 +103,18 @@ func get_item_count(item: ItemData) -> int:
 
 ## 设置指定槽位（用于拖拽交换）
 func set_slot(index: int, item: ItemData, quantity: int) -> void:
+	if store:
+		var existing:=get_slot(index)
+		if existing.item: store.remove_from(container_id,existing.item.id,existing.quantity)
+		if item: add_item(item,quantity)
+		return
 	if index >= 0 and index < capacity:
 		_slots[index] = {"item": item, "quantity": quantity}
 
 
 ## 是否有足够空间
 func has_space(item: ItemData, quantity: int = 1) -> bool:
+	if store: return store.space(container_id,item.id)>=quantity
 	var space = 0
 	if item.stackable:
 		for slot in _slots:
@@ -109,7 +126,22 @@ func has_space(item: ItemData, quantity: int = 1) -> bool:
 	return space >= quantity
 
 func empty_slot_count() -> int:
+	if store: return maxi(0,capacity-store.entries(container_id).size())
 	var count := 0
 	for slot in _slots:
 		if not slot.item: count += 1
 	return count
+
+func bind_container(service: InventoryService, id: String) -> void:
+	store=service
+	container_id=id
+	_slots.clear()
+
+func swap_slots(a: int,b: int) -> void:
+	if store:
+		var items: Array=store.containers[container_id].items
+		if a>=0 and b>=0 and a<items.size() and b<items.size():
+			var old=items[a]; items[a]=items[b]; items[b]=old
+		return
+	if a>=0 and b>=0 and a<_slots.size() and b<_slots.size():
+		var old=_slots[a]; _slots[a]=_slots[b]; _slots[b]=old

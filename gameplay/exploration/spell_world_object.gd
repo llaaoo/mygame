@@ -3,6 +3,7 @@ extends Area2D
 ## Spell puzzles consume hit events, including zero-damage utility hits.
 signal solved(spec: SpellPuzzleData)
 signal inspected(spec: SpellPuzzleData, completed: bool)
+var world_art := false
 var spec: SpellPuzzleData
 var completed := false
 var part_taken := false
@@ -111,18 +112,18 @@ func _refresh() -> void:
 	queue_redraw()
 
 func _update_focus() -> void:
-	if not get_tree().current_scene is GrayriverGame: return
+	if not world_art: return
 	var player:=get_tree().get_first_node_in_group("player") as Player
 	_label.visible=is_instance_valid(player) and player.input_controller.interaction_target()==self
 
 func _draw() -> void:
-	if not completed and (not get_tree().current_scene is GrayriverGame or _label.visible):
+	if not completed and (not world_art or _label.visible):
 		for route in spec.routes:
 			if route.required_surface.is_empty(): continue
 			var corner := Vector2(SurfaceManager.cell_at(global_position + route.surface_offset)) * 64 - global_position
 			draw_rect(Rect2(corner, Vector2(64,64)), Color(.5,.8,.9,.2))
 			draw_rect(Rect2(corner, Vector2(64,64)), Color(.5,.8,.9,.7), false, 2)
-	if get_tree().current_scene is GrayriverGame:
+	if world_art:
 		var tint:=GameUIStyle.SUCCESS if completed else GameUIStyle.GOLD
 		if spec.id=="river.north_beacon":
 			if _label.visible: draw_arc(Vector2.ZERO,38,0,TAU,32,tint,1,true)

@@ -1,0 +1,13 @@
+[gd_scene load_steps=5 format=3]
+[ext_resource type="Script" path="res://gameplay/foundation/actor_components.gd" id="1"]
+[ext_resource type="Script" path="res://gameplay/foundation/stamina_component.gd" id="2"]
+[ext_resource type="Script" path="res://gameplay/foundation/stability_component.gd" id="3"]
+[ext_resource type="Script" path="res://gameplay/foundation/actor_action_controller.gd" id="4"]
+[node name="ActorComponents" type="Node"]
+script = ExtResource("1")
+[node name="Stamina" type="Node" parent="."]
+script = ExtResource("2")
+[node name="Stability" type="Node" parent="."]
+script = ExtResource("3")
+[node name="Actions" type="Node2D" parent="."]
+script = ExtResource("4")

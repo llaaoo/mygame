@@ -1,7 +1,7 @@
 class_name ElementKnowledge
 extends Node
 ## Knowledge is an observation ledger. It never gates world reactions.
-var game: MVPGame
+var game: CampaignGame
 
 func _ready() -> void:
 	var surfaces := GameRuntime.instance.get_simulation_runtime().get_surface_manager()

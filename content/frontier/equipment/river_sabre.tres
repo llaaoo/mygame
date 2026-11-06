@@ -1,11 +1,18 @@
 [gd_resource type="Resource" script_class="EquipmentData" format=3]
 [ext_resource type="Script" path="res://gameplay/inventory/data/equipment_data.gd" id="item"]
 [ext_resource type="Script" path="res://gameplay/inventory/data/casting_equipment_profile.gd" id="profile"]
+[ext_resource type="Script" path="res://gameplay/foundation/data/attack_profile.gd" id="attack"]
 [sub_resource type="Resource" id="Profile"]
 script = ExtResource("profile")
+[sub_resource type="Resource" id="Attack"]
+script = ExtResource("attack")
+reach = 56.0
+impact = 20.0
 [resource]
+attack_profile = SubResource("Attack")
 script = ExtResource("item")
 id = "river_sabre"
+weight = 1.5
 display_name = "驿路短刀"
 description = "刀身缺口清晰可见。近战攻击+2；守备兵与拾取者使用同一加成。"
 slot_type = 6

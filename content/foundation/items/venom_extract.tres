@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/item_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "venom_extract"
+display_name = "毒性萃取"
+description = "毒雾的必需媒介；冰/水投射物或范围法术附毒，造水形成毒地、失去洗毒用途，额外3 MP。"
+weight = 0.1
+stackable = true
+max_stack = 99

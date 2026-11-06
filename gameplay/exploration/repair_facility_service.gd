@@ -1,8 +1,8 @@
 class_name RepairFacilityService
 extends RefCounted
 ## Fixed facility construction shares the live-work/payment/lifecycle boundary.
-var game: MVPGame
-func _init(owner_game: MVPGame) -> void: game = owner_game
+var game: CampaignGame
+func _init(owner_game: CampaignGame) -> void: game = owner_game
 
 func mount(spec: RepairFacilityData) -> void:
 	var node := game.builder._add_interaction(spec.title, spec.pos, Callable(), "mechanism")

@@ -18,14 +18,15 @@ func mount(enemy: Enemy) -> void:
  if not PEOPLE.has(id) or game.practice_active or game.progress.choices.get("river.rehearsal","")=="yes": return
  actors[id]=enemy
  var state: Dictionary=game.progress.story_actors.get(id,{})
- enemy.story_truce=state.get("attitude","watching")!="hostile"
+ if not game.session.actor_records.has(id): enemy.story_truce=state.get("attitude","watching")!="hostile"
  enemy.set_meta("story_loot_eligible",true)
- if state.has("materials"):
+ if state.has("materials") and not enemy.actor_context.restored_inventory:
   enemy.skill_manager.combinations.supplies.amounts=state.materials.duplicate()
   enemy.health_component.hp=clampi(int(state.hp),1,enemy.health_component.max_hp)
  if game.progress.claims.has(PEOPLE[id].claim):
   enemy.rewards_enabled=false
   if enemy.story_truce: game.active_enemies.erase(enemy)
+ enemy.actor_context.reward_eligible=enemy.rewards_enabled
 func sync() -> void:
  for id in actors:
   if not is_instance_valid(actors[id]): continue
@@ -72,6 +73,7 @@ func act(enemy: Enemy, method: String) -> bool:
  var person: Dictionary=PEOPLE[id]
  if method=="fight":
   enemy.story_truce=false
+  game.session.relations.set_attitude(id,"player","hostile")
   if not game.active_enemies.has(enemy): game.active_enemies.append(enemy)
   game.progress.cleared.erase(game.region_id)
   game.ui.close_modal()
@@ -93,13 +95,21 @@ func act(enemy: Enemy, method: String) -> bool:
  var own:=game.survival.supplies
  var stock:=enemy.skill_manager.combinations.supplies
  if not own.can_pay(costs) or not stock.can_pay(reward): return false
- own.begin_transaction(); stock.begin_transaction()
- own.pay(costs); stock.pay(reward); own.grant(reward); stock.grant(costs)
- var notify:=own.finish_transaction(true)
- var other_notify:=stock.finish_transaction(true)
+ var notify: Callable
+ var other_notify: Callable
+ if own.inventory_store and stock.inventory_store==own.inventory_store:
+  if not own.inventory_store.exchange(own.actor_id,stock.actor_id,costs,reward).accepted: return false
+  notify=own.changed.emit
+  other_notify=stock.changed.emit
+ else:
+  own.begin_transaction(); stock.begin_transaction()
+  own.pay(costs); stock.pay(reward); own.grant(reward); stock.grant(costs)
+  notify=own.finish_transaction(true)
+  other_notify=stock.finish_transaction(true)
  if method!="trade":
   game.progress.claim(person.claim,person.title,"你与"+enemy.enemy_name+"达成协议。其装备与剩余物资仍归本人持有。",[],[])
   enemy.story_truce=true
+  game.session.relations.set_attitude(id,"player","friendly")
   enemy._revenge_target=null
   enemy.attack_preparation.cancel()
   enemy.skill_manager.combinations.cancel("停战")

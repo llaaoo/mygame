@@ -23,12 +23,16 @@ func run() -> void:
 	var bolt:=load("res://gameplay/abilities/data/ignite_data.tres") as SkillData
 	check(peer.skill_manager.executor.resolve_damage(bolt,CastContext.simple(peer,Vector2.RIGHT,bolt))==player.skill_manager.executor.resolve_damage(bolt,CastContext.simple(player,Vector2.RIGHT,bolt)),"Same stats produce different magic damage")
 	var gear:=load("res://content/exploration/equipment/cadence_gloves.tres") as EquipmentData
+	game.session.inventory.register_definition(gear)
+	game.session.inventory.receive("player",gear.id,1)
 	(player.get_node("EquipmentManager") as EquipmentManager).equip(gear)
 	(peer.get_node("EquipmentManager") as EquipmentManager).equip(gear)
 	var damage_gear:=EquipmentData.new()
 	damage_gear.id="parity_fire_ring"
 	damage_gear.slot_type=EquipmentData.SlotType.RING
 	damage_gear.combat_modifiers={"damage.fire":.5}
+	game.session.inventory.register_definition(damage_gear)
+	game.session.inventory.receive("player",damage_gear.id,1)
 	for body in [player,peer]: (body.get_node("EquipmentManager") as EquipmentManager).equip(damage_gear)
 	var player_damage:=player.skill_manager.executor.resolve_damage(bolt,CastContext.simple(player,Vector2.RIGHT,bolt))
 	check(player_damage>bolt.damage+int(player.stats_component.magic_damage*bolt.damage_scaling) and peer.skill_manager.executor.resolve_damage(bolt,CastContext.simple(peer,Vector2.RIGHT,bolt))==player_damage,"Equipment spell damage is restricted to player controllers")

@@ -1,8 +1,8 @@
 class_name ExplorationRegionBuilder
 extends RefCounted
-var game: MVPGame
+var game: CampaignGame
 
-func _init(owner_game: MVPGame) -> void:
+func _init(owner_game: CampaignGame) -> void:
 	game = owner_game
 
 func _build_camp() -> void:
@@ -51,7 +51,7 @@ func _spawn_enemy(spec: ExplorationEncounterData, layout: RefCounted, index: int
 	var enemy := load("res://entities/boss/fire_lord.tscn" if boss else "res://entities/enemy/enemy.tscn").instantiate() as Enemy
 	enemy.name = "Encounter_%d" % index
 	enemy.rewards_enabled = rewards
-	enemy.physical_loot = game is GrayriverGame
+	enemy.physical_loot = game.rules.physical_inventory
 	enemy.health_drop_amount = 8
 	enemy.mana_drop_amount = 12
 	var point: Vector2 = spec.pos
@@ -98,9 +98,11 @@ func _spawn_enemy(spec: ExplorationEncounterData, layout: RefCounted, index: int
 		enemy.ranged_preferred_range = spec.profile.ranged_preferred_range
 	enemy.died.connect(game._on_enemy_died.bind(enemy, GameRuntime.instance.get_region_session().generation), CONNECT_ONE_SHOT)
 	game.active_enemies.append(enemy)
+	if game.session and not game.rules.physical_inventory: game.session.bind_actor(enemy,"actor.%s.%d"%[game.region_id,index])
 
 func _add_interaction(title: String, point: Vector2, callback: Callable, kind: String = "note") -> ExplorationInteractable:
 	var node := ExplorationInteractable.new()
+	node.world_art=game.rules.world_interaction_art
 	node.title = title
 	node.kind = kind
 	node.position = point

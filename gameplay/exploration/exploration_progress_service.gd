@@ -1,12 +1,12 @@
 class_name ExplorationProgressService
 extends RefCounted
-var game: MVPGame
+var game: CampaignGame
 signal save_failed(message: String)
 signal changed
 var _save_dirty := false
 var _save_delay := 0.0
 
-func _init(owner_game: MVPGame) -> void:
+func _init(owner_game: CampaignGame) -> void:
 	game = owner_game
 
 func _queue_save() -> void:
@@ -86,11 +86,12 @@ func _save_progress() -> void:
 		save_failed.emit("保存未完成，当前进度仍保留在内存。原存档已保留，可按F5重试。")
 
 func _sync_progress() -> void:
-	if game is GrayriverGame and game.stories: game.stories.sync()
+	if game.session and game.session.sync_extra.is_valid(): game.session.sync_extra.call()
 	# Include already emitted world facts even when saving before the next runtime frame.
 	GameRuntime.instance.get_command_bus().flush_world_facts()
 	if game.equipment_service:
 		game.equipment_service.sync()
+	if game.session: game.progress.foundation=game.session.snapshot()
 	game.progress.journey = game.journey_location()
 	if game.survival: game.progress.survival_state = game.survival.serialize()
 	game.progress.casting_supplies = game.player.skill_manager.combinations.supplies.serialize(true)
@@ -124,6 +125,7 @@ func practice_encounters() -> bool:
 	if not game.can_practice(): return false
 	game.ui.close_modal()
 	game.practice_active = true
+	if game.session: game.session.set_player_rewards(false)
 	var layout := game.current_data.make_layout()
 	game.current_data.reserve_interaction_space(layout)
 	for i in range(game.current_data.encounters.size()):

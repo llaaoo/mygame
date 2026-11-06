@@ -37,6 +37,11 @@ func _process(delta: float) -> void:
 
 func _draw() -> void:
 	if manager:
+		var wearer:=get_parent()
+		var context:=wearer.get("actor_context") as ActorContext if "actor_context" in wearer else null
+		if context and context.rules.physical_inventory and context.items.containers.get(context.id+".pack",{}).get("attached",false):
+			draw_rect(Rect2(-17,-12,9,23),Color("665238"))
+			draw_line(Vector2(-13,-10),Vector2(-13,10),Color("b39964"),2)
 		draw_set_transform(Vector2(0,sin(_walk_phase)))
 		var shirt := Color("546f79") if get_parent().is_in_group("player") else Color("75685a")
 		draw_circle(Vector2(0,16),15,Color(0,0,0,.22))

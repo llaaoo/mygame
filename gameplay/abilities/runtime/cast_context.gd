@@ -61,11 +61,7 @@ static func at_position(caster: Node2D, position: Vector2, skill: SkillData) -> 
 
 ## Region-owned effects expire with their region. Explicit callers can override world.
 static func default_world(actor: Node) -> Node:
-	if GameRuntime.instance:
-		var session := GameRuntime.instance.get_region_session()
-		if session and is_instance_valid(session.active_root):
-			return session.active_root
-	return actor.get_tree().current_scene if actor and actor.is_inside_tree() else null
+	return WorldScope.resolve(actor)
 
 ## One bounded point used by input, aiming and conditional preparation.
 static func ground_point(actor: Node2D, requested: Vector2, max_range: float) -> Vector2:

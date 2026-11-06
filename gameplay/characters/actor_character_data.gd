@@ -18,7 +18,7 @@ extends Resource
 @export var materials: Dictionary = {}
 @export var equipment: Array[EquipmentData] = []
 
-func validation_errors() -> Array[String]:
+func validation_errors(available_rules: Variant = null) -> Array[String]:
 	var errors: Array[String] = []
 	if level<1 or level>100: errors.append("Invalid character level")
 	if id.is_empty() or title.is_empty(): errors.append("Missing character id/title")
@@ -36,12 +36,11 @@ func validation_errors() -> Array[String]:
 		if loadout.slots.size()>SkillManager.MAX_SLOTS: errors.append("Too many action slots")
 		for action in [loadout.left_hand,loadout.right_hand]+Array(loadout.slots):
 			if not str(action).is_empty() and not known.has(action): errors.append("Unknown equipped action: "+str(action))
-	var chapter := load("res://content/exploration/chapter.tres") as ExplorationChapterData
-	var rules := {}
-	for rule in chapter.spell_rules: rules[rule.id] = rule
-	for id_rule in combinations:
-		if not rules.has(id_rule): errors.append("Unknown combination: "+id_rule)
-		elif not known.has(rules[id_rule].trigger_action_id): errors.append("Unknown combination trigger: "+id_rule)
+	# Cross-resource references are validated by the catalog owner, not a fixed chapter.
+	if available_rules is Dictionary:
+		for id_rule in combinations:
+			if not available_rules.has(id_rule): errors.append("Unknown combination: "+id_rule)
+			elif not known.has(available_rules[id_rule].trigger_action_id): errors.append("Unknown combination trigger: "+id_rule)
 	for item in materials:
 		if not CastingSupplies.known_item(str(item)) or not materials[item] is int or materials[item]<0: errors.append("Invalid carried material: "+str(item))
 	var slots := {}

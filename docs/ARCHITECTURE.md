@@ -1,6 +1,6 @@
 # 项目架构与维护边界
 
-2026-11-04。本文件定义当前边界；[运行时拓扑](./RUNTIME_TOPOLOGY.md)说明时序，[战斗契约](./COMBAT_CONTRACTS.md)与[世界契约](./WORLD_CONTRACTS.md)说明领域规则。[重构进展](./REFACTOR_PROGRESS.md)记录验收范围。早期项目分析文档保留为历史资料。
+2026-11-06。RPG 所有权与角色组合升级见 [RPG 基座](./RPG_FOUNDATION.md)。本文件定义当前边界；[运行时拓扑](./RUNTIME_TOPOLOGY.md)说明时序，[战斗契约](./COMBAT_CONTRACTS.md)与[世界契约](./WORLD_CONTRACTS.md)说明领域规则。[重构进展](./REFACTOR_PROGRESS.md)记录验收范围。早期项目分析文档保留为历史资料。
 
 ## 请求、查询与事实
 
@@ -20,7 +20,10 @@ UI可以调用领域服务请求训练、制造、交付或施法，由服务验
 | `SkillManager` | 动作知识、编组、冷却及公开施法请求 |
 | `ConditionalCastController` | 条件规划、准备、重校验与提交；按能力字段管理任意元素动作 |
 | `BuffManager` | 状态实例、版本、事务通知和属性重算 |
-| `MVPGame` | 探索启动、区域切换、遭遇完成、死亡与恢复的场景编排 |
+| `CampaignGame` | 战役装配与探索流程，创建 Session、World、Interface；MVPGame 为旧入口适配 |
+| `CampaignSession` | 战役库存、关系、事实、角色记录及 RegionContext 的所有者 |
+| `ActorComponents` | 共用体力、稳定性与动作执行；由 ActorContext 注入能力 |
+| `InventoryService` | 实例、容器、穿戴与交易的唯一写入边界 |
 | `ExplorationProgressService` | 知识、发现、成长、委托、世界选择、奖励与保存同步 |
 | `ExplorationPresenter` | 展示进度和规则，向进度服务提交操作请求 |
 | `ExplorationRegionBuilder` | 将区域资源装配为遭遇、发现与交互节点 |

@@ -1,5 +1,7 @@
 extends CharacterBody2D
 class_name Player
+var actor_context: ActorContext
+var world_provider: Callable
 
 const PLAYER_SKILL_IDS: Array[String] = [
 	"fireball",
@@ -75,6 +77,7 @@ var mana_component: ManaComponent = null
 var ui_blocked: bool = false:
 	set(value):
 		ui_blocked = value
+		if value and actor_context and actor_context.actions: actor_context.actions.clear_input()
 		if value and field_work:
 			field_work.cancel("打开菜单：作业取消")
 			field_work.close_panel()
@@ -98,6 +101,7 @@ var cancel_aim: bool:
 var state_machine: Node
 
 func _enter_tree() -> void:
+	InputBindings.install()
 	# 必须在 _ready 之前注册，否则第一帧 _input 可能触发 Missing action 错误
 	_register_interact_key()
 	for i in range(4, SkillManager.MAX_SLOTS):
@@ -109,6 +113,7 @@ func _enter_tree() -> void:
 			InputMap.action_add_event(action_name, event)
 
 func _ready() -> void:
+	if inventory: inventory=inventory.duplicate(true) as Inventory
 	casting = PlayerCastingController.new(self)
 	add_child(casting)
 	input_controller = PlayerInputController.new(self)
@@ -317,13 +322,13 @@ func _setup_summon_manager() -> void:
 	summon_manager = sm
 
 func _setup_inventory_panel() -> void:
-	var panel = get_tree().current_scene.get_node_or_null("InventoryPanel")
+	var panel = WorldScope.presentation(self).get_node_or_null("InventoryPanel")
 	if not panel:
 		var panel_scene = load("res://ui/inventory_panel.tscn") as PackedScene
 		if panel_scene:
 			panel = panel_scene.instantiate()
 			panel.name = "InventoryPanel"
-			get_tree().current_scene.add_child.call_deferred(panel)
+			WorldScope.presentation(self).add_child.call_deferred(panel)
 
 	if panel and panel is InventoryPanel:
 		inventory_panel = panel
@@ -334,16 +339,16 @@ func _setup_inventory_panel() -> void:
 			_add_test_items()
 
 func _setup_boss_bar() -> void:
-	if get_tree().current_scene.get_node_or_null("BossHPBar"):
+	if WorldScope.presentation(self).get_node_or_null("BossHPBar"):
 		return
 	var bar := BossHPBar.new()
 	bar.name = "BossHPBar"
-	get_tree().current_scene.add_child.call_deferred(bar)
+	WorldScope.presentation(self).add_child.call_deferred(bar)
 
 func _setup_skill_pool_ui() -> void:
 	var ui := SkillPoolUI.new()
 	ui.name = "SkillPoolUI"
-	get_tree().current_scene.add_child.call_deferred(ui)
+	WorldScope.presentation(self).add_child.call_deferred(ui)
 	ui.setup(_skill_pool, skill_manager)
 
 func _add_test_items() -> void:
@@ -392,6 +397,7 @@ func heal(amount: int, source := "skill") -> void:
 	health_component.heal(maxi(0, int(round(amount * multiplier))), source)
 
 func cancel_region_actions() -> void:
+	if actor_context and actor_context.actions: actor_context.actions.cancel("region_left")
 	skill_manager.combinations.supplies.clear_selection()
 	if field_work:
 		field_work.cancel("区域切换：作业取消")

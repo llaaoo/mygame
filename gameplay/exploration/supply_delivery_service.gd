@@ -1,7 +1,7 @@
 class_name SupplyDeliveryService
 extends RefCounted
-var game: MVPGame
-func _init(owner_game: MVPGame) -> void: game=owner_game
+var game: CampaignGame
+func _init(owner_game: CampaignGame) -> void: game=owner_game
 func mount(spec: DeliverySiteData) -> void:
 	var node:=game._add_interaction(spec.title,spec.pos,Callable(),"person")
 	node.callback=inspect.bind(node,spec)
