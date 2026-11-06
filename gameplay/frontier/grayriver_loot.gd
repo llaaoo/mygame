@@ -75,6 +75,8 @@ func take(id: String, kind := "", item_id := "") -> int:
 	if not _available(id) or kind not in ["","equipment","materials"]: return 0
 	var record: Dictionary = game.progress.loot_records[id]
 	var taken := 0
+	var supplies := game.survival.supplies
+	supplies.begin_transaction()
 	for category in ["equipment","materials"]:
 		if not kind.is_empty() and kind != category: continue
 		var entries: Dictionary = record[category]
@@ -85,7 +87,6 @@ func take(id: String, kind := "", item_id := "") -> int:
 			if category == "equipment":
 				added = game.equipment_service.receive(key,amount)
 			else:
-				var supplies := game.survival.supplies
 				var before := supplies.count(key)
 				supplies.grant({key:amount})
 				added = supplies.count(key)-before
@@ -93,9 +94,11 @@ func take(id: String, kind := "", item_id := "") -> int:
 			taken += added
 			if amount == added: entries.erase(key)
 			else: entries[key] = amount-added
+	var notify := supplies.finish_transaction(taken > 0)
 	if taken > 0:
 		game.progress.claims["loot."+id] = true
 		(corpses[id] as GrayriverLootCorpse).refresh()
+		if notify.is_valid(): notify.call()
 		game._save_progress()
 	return taken
 

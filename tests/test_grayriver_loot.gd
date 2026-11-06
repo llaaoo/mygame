@@ -52,7 +52,12 @@ func run() -> void:
 	inventory.remove_item(blocker,inventory.capacity)
 	check(game.progress_service.discover(note) and game.equipment_service.count("soul_amulet") == 1 and not game.equipment_service.has_pending_rewards(note),"Revisiting discovery did not deliver retained equipment")
 	check(not game.progress_service.discover(note) and game.equipment_service.count("soul_amulet") == 1,"Discovery source awarded its equipment twice")
+	var observed_totals: Array[int] = []
+	var watch := func(): observed_totals.append(game.survival.supplies.count("charcoal")+int(game.progress.loot_records[id].materials.get("charcoal",0)))
+	game.survival.supplies.changed.connect(watch)
 	check(game.loot.take(id) > 0 and game.loot.take(id) == 0,"Repeat retrieval duplicated contents")
+	game.survival.supplies.changed.disconnect(watch)
+	check(observed_totals == [2],"Transfer published a duplicated source/destination balance before both sides committed")
 	var hunter := find_enemy(game,"river.enemy.camp.forest.4")
 	game.player.position = hunter.position
 	hunter.take_damage(1000)

@@ -38,17 +38,31 @@
   ],
   "package_documentation_links": 28,
   "final_incremental": {
-    "passed": 3,
-    "total": 3,
+    "passed": 4,
+    "total": 4,
     "tests": [
       "grayriver_loot",
+      "grayriver_salvage",
       "grayriver_journey",
-      "grayriver_salvage"
+      "status_transactions"
     ],
-    "logs": "/tmp/mygame-tests-ooeuzbdu"
+    "logs": "/tmp/mygame-tests-nx_sxp5m"
   },
   "import": {
     "state": "passed",
     "logs": "/tmp/grayriver-loot-final-import.log"
+  },
+  "cold_source": {
+    "revision": "b9b84dff4acf80db87442a6692d68113c57049ff",
+    "import": "passed",
+    "passed": 3,
+    "total": 3,
+    "tests": [
+      "grayriver_loot",
+      "grayriver_salvage",
+      "startup"
+    ],
+    "logs": "/tmp/mygame-tests-fgg31a1t",
+    "source": "/tmp/grayriver-loot-clean-final-trisaouc/project"
   }
 }
