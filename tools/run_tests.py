@@ -17,6 +17,7 @@ INTEGRATION = [
     "grayriver_foundation",
     "grayriver_content",
     "grayriver_journey",
+    "grayriver_routes",
     "material_intent",
     "retreat_ledger",
     "enemy_preparation",

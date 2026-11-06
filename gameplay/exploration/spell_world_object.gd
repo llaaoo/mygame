@@ -108,6 +108,12 @@ func _refresh() -> void:
 	queue_redraw()
 
 func _draw() -> void:
+	if not completed:
+		for route in spec.routes:
+			if route.required_surface.is_empty(): continue
+			var corner := Vector2(SurfaceManager.cell_at(global_position + route.surface_offset)) * 64 - global_position
+			draw_rect(Rect2(corner, Vector2(64,64)), Color(.5,.8,.9,.2))
+			draw_rect(Rect2(corner, Vector2(64,64)), Color(.5,.8,.9,.7), false, 2)
 	var color := Color(0.4, 0.9, 0.65) if completed else Color(0.8, 0.6, 1.0)
 	draw_circle(Vector2.ZERO, 23, Color(color, 0.18))
 	draw_rect(Rect2(-18, -18, 36, 36), color, false, 2)

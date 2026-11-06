@@ -1,0 +1,144 @@
+{
+  "date": "2026-11-06",
+  "method": "Fresh isolated save, live AI, normal actors, OS keyboard/mouse; read-only observer. Contains diagnostic pauses and operator waits, not a blind-play timing/balance benchmark.",
+  "initial_caps": {
+    "hp": 100,
+    "mp": 60
+  },
+  "earned_training": {
+    "strength": 1,
+    "intelligence": 2,
+    "endurance": 2
+  },
+  "final_attributes": {
+    "agility": 10,
+    "endurance": 12,
+    "intelligence": 12,
+    "strength": 11
+  },
+  "final_caps": {
+    "hp": 110,
+    "mp": 66
+  },
+  "saved_result": {
+    "actions": 11,
+    "completed": true,
+    "deaths": 0,
+    "defeated_encounters": 19,
+    "equipment": [
+      "keeper_ring",
+      "soul_amulet",
+      "cadence_gloves",
+      "covenant_ring"
+    ],
+    "journey": {
+      "position": [
+        -2908.16015625,
+        2193.33984375
+      ],
+      "region": "camp"
+    },
+    "quests": [
+      "quest.river_relief",
+      "quest.river_water",
+      "quest.river_research",
+      "quest.river_alchemy",
+      "quest.river_bridge",
+      "quest.river_warden"
+    ],
+    "spell_rules": 24,
+    "verified_reactions": [
+      "surface:wet_fire",
+      "surface:wet_ice",
+      "surface:wet_lightning",
+      "surface:wet_poison",
+      "surface:poisoned_fire"
+    ]
+  },
+  "committed_casts": {
+    "铭刻火阵": 5,
+    "火球术": 4,
+    "水引〔水域〕": 4,
+    "火花": 4,
+    "水引〔水域→冰面〕": 1,
+    "凝神": 2,
+    "震荡": 1,
+    "水引〔水域→导电水域〕": 1,
+    "水引〔水域→毒地〕": 1,
+    "铭刻霜阵": 1,
+    "寒霜新星": 1
+  },
+  "committed_cast_mp": 179,
+  "field_operations": {
+    "dry_meal": 1,
+    "eat:ration": 1,
+    "eat:clean_water": 2,
+    "fill:clean_water:2": 1,
+    "assemble": 1,
+    "rest:full": 1,
+    "cook:ration": 1,
+    "cook:broth": 1,
+    "eat:broth": 1,
+    "build_outpost": 1,
+    "rest:short": 1,
+    "repair": 1,
+    "retreat": 1
+  },
+  "recorded_cast_and_work_costs": {
+    "clean_water": 4,
+    "ration": 3,
+    "frost_salt": 1,
+    "storm_dust": 1,
+    "grain": 3,
+    "herb": 1,
+    "broth": 1,
+    "charcoal": 3,
+    "sap": 2,
+    "venom_extract": 1
+  },
+  "actual_recovery": {
+    "mp:natural": 150.71428571428572,
+    "hp:natural": 188.1999999999999,
+    "mp:drop": 31.0,
+    "hp:drop": 80.0,
+    "hp:food": 17.799999999999997,
+    "mp:water": 2.285714285714287,
+    "hp:rest": 24.0,
+    "mp:rest": 0.0,
+    "mp:food": 1.0
+  },
+  "final_inventory": {
+    "ash": 2,
+    "broth": 0,
+    "charcoal": 11,
+    "clean_water": 2,
+    "crystal": 21,
+    "echo_ink": 5,
+    "frost_salt": 2,
+    "grain": 4,
+    "herb": 6,
+    "ration": 0,
+    "resin": 2,
+    "sap": 22,
+    "storm_dust": 7,
+    "venom_extract": 4,
+    "ward_powder": 2
+  },
+  "timing_benchmark": null,
+  "retreat_interruption_observed": true,
+  "limitations": [
+    "Four tactics were not compared from an identical checkpoint in this region.",
+    "Material economy and first-time player duration need further playtests.",
+    "Native Windows interactive validation unavailable."
+  ],
+  "workshop_crafting": {
+    "formula": "frost_salt",
+    "inputs": {
+      "crystal": 2
+    },
+    "output": {
+      "frost_salt": 1
+    },
+    "included_in_recorded_cast_and_work_costs": false
+  }
+}
