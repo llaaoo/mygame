@@ -19,3 +19,6 @@ icon_atlas_index = 11
 stat_modifiers = {}
 combat_modifiers = {"mana_cost.all": 0.15}
 casting_profile = SubResource("Profile")
+
+world_shape = "gloves"
+world_color = Color(0.8,0.55,0.25,1)

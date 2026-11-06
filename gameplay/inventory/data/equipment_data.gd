@@ -26,6 +26,9 @@ enum SlotType {
 @export_multiline var special_effect_text: String = ""
 @export var casting_profile: CastingEquipmentProfile
 @export var on_equip_buff: PackedScene
+## Shared world appearance, used by wearers and their recoverable equipment.
+@export_enum("none", "blade", "spear", "staff", "shield", "coat", "boots", "gloves", "amulet", "ring") var world_shape := "none"
+@export var world_color := Color("b6b9ae")
 
 
 func get_icon_texture() -> Texture2D:

@@ -9,3 +9,5 @@ extends Resource
 @export var profile: ExplorationEnemyProfile
 
 @export var character: ActorCharacterData
+
+@export var optional_encounter := false

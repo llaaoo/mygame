@@ -179,21 +179,22 @@ func inspect_discovery(entry: ExplorationDiscoveryData, node: ExplorationInterac
 		game.ui.notify("先清除守卫，再靠近这里调查。")
 		return
 	var first_read := not game.progress.claims.has(entry.id)
-	var previous_ownership := game.progress.equipment_owned.duplicate()
 	if game.progress_service.discover(entry):
 		if is_instance_valid(node): node.set_title(entry.title + "（已记录）")
 		if entry.id == "cartographer_rescued":
 			game.ui.notify("测绘员已沿清理过的道路返回营地。回去交付委托可领取成长奖励。")
-		if entry.hide_when_claimed and is_instance_valid(node):
+		if entry.hide_when_claimed and is_instance_valid(node) and not game.equipment_service.has_pending_rewards(entry):
 			node.queue_free()
 	var brief := first_read and not full and not entry.intro_text.is_empty()
 	var text := entry.intro_text + "\n\n完整用法已记入J日志，可随时回看。" if brief else entry.text
 	var buttons: Array[Dictionary] = [{"title": "记入日志，继续探索", "callback": game.ui.close_modal}]
 	if brief: buttons.append({"title": "查看完整记录", "callback": inspect_discovery.bind(entry, null, true)})
+	if not entry.equipment.is_empty(): text += "\n\n背包已满时，装备保留在原处，再次调查即可领取。"
 	for id in entry.equipment:
 		var item := game.catalog.equipment.get(id) as EquipmentData
 		if item:
-			text += "\n\n%s装备：%s\n%s\n按O查看构筑与来源，返回营地整备。" % ["已拥有" if previous_ownership.get(id, false) else "获得", item.display_name, item.description]
+			var received := game.progress.claims.has("equipment."+entry.id+"."+id)
+			text += "\n\n%s：%s\n%s\n按O查看装备与来源，返回镇中整备。" % ["已领取装备" if received else "装备留在此处（背包已满）", item.display_name, item.description]
 			buttons.append({"title": "查看：" + item.display_name, "callback": game.equipment_service.show_detail.bind(id)})
 	game.ui.show_panel(entry.title, text, buttons)
 

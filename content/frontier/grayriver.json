@@ -211,6 +211,40 @@
           ],
           "text": "浅滩可向西返回河谷镇，向东进入湿地与旧工区。水会附着潮湿，雷电可沿连通水面传播；保留干燥落脚点。污染水需要处理后饮用。",
           "requires_clear": false
+        },
+        {
+          "id": "river.caravan_manifest",
+          "title": "被截的运料单",
+          "kind": "note",
+          "pos": [
+            -1950,
+            750
+          ],
+          "text": "运料单把镇中修复所需的炭屑、晶砂与树液列得清楚。守望者洛恩仍带着短刀、棕甲与桥纹盾；矿道运料官持铜绿长矛、穿蓝色工头甲；旧监狱执事佩金铜刀与盾。靠近按E可观察实物。击败后搜刮遗骸，装备与剩余货物原样留下，不会变成随机回血球。米菈旁的老水工也接受你从别处找来的同类材料。"
+        },
+        {
+          "id": "river.salvage_cache",
+          "title": "倾覆货车：封存材料箱",
+          "kind": "cache",
+          "pos": [
+            -1950,
+            950
+          ],
+          "materials": {
+            "charcoal": 2,
+            "sap": 2
+          },
+          "text": "车厢内固定留着炭屑2与树液2。小路可以绕过路口守卫，把能用的原料先带回去；货物只取一次。"
+        },
+        {
+          "id": "river.old_watch",
+          "title": "洛恩留下的桥头札记",
+          "kind": "note",
+          "pos": [
+            -2200,
+            450
+          ],
+          "text": "洛恩曾经守桥，如今依然举着桥纹盾截留运料。他的盾让他更耐打，却拖慢脚步。可以利用近战锁向前摇从侧面绕开；不打算交战，也能沿西侧找回散落材料。穿戴的取舍对你也一样有效。"
         }
       ],
       "stations": [
@@ -672,6 +706,17 @@
           "group": "prison_road",
           "id": "camp.prison_road.11",
           "character": "hunter"
+        },
+        {
+          "pos": [
+            -1700,
+            650
+          ],
+          "profile": "guard",
+          "group": "road",
+          "id": "camp.bridge_keeper",
+          "character": "bridge_keeper",
+          "optional": true
         }
       ],
       "deliveries": [
@@ -706,6 +751,36 @@
             "grain": 2,
             "herb": 1
           }
+        },
+        {
+          "id": "river.salvage_delivery",
+          "title": "老水工索砾：补回运料",
+          "pos": [
+            -3750,
+            2600
+          ],
+          "description": "运料被截以后，镇里的工具一直缺料。交付炭屑2、晶砂1与树液1，站定2秒，成功才扣物品。可以从敌人行囊搜刮，也可以寻找倾覆货车和矿工样品箱，或使用已有加工回收系统。不会凭空复制敌人装备。",
+          "required_claims": [
+            "river.caravan_manifest"
+          ],
+          "methods": [
+            {
+              "id": "return_cargo",
+              "title": "交付实际携带的修复原料",
+              "duration": 2.0,
+              "material_costs": {
+                "charcoal": 2,
+                "crystal": 1,
+                "sap": 1
+              }
+            }
+          ],
+          "rewards": {
+            "grain": 2,
+            "herb": 2
+          },
+          "completion_text": "索砾收好了修复原料，交给你谷粮2与苦叶2。艾妲可以记录运料恢复。",
+          "already_text": "运料已经补齐。货物只交一次，谷粮和苦叶也不会重复发放。"
         }
       ],
       "events": [
@@ -955,6 +1030,28 @@
             "frost_salt": 2,
             "storm_dust": 2
           }
+        },
+        {
+          "id": "river.quartermaster_note",
+          "title": "矿工的欠货记录",
+          "pos": [
+            -820,
+            260
+          ],
+          "text": "芮克把两份晶砂装进随身袋，铜绿测路矛和蓝甲也是他的工作装备。已用掉的补给不会凭空补回。搜刮后未拿走的东西会留在矿道，死亡、离开和读档不把它们重新抽签。"
+        },
+        {
+          "id": "river.miners_stash",
+          "title": "矿工留下的样品箱",
+          "kind": "cache",
+          "pos": [
+            -760,
+            570
+          ],
+          "materials": {
+            "crystal": 2
+          },
+          "text": "箱中固定有晶砂2。矿工留了备用样品，读懂运料单后，可以用这些物资回镇交付，无需一定击败运料官。"
         }
       ],
       "encounters": [
@@ -975,6 +1072,17 @@
           "profile": "sentry",
           "id": "river_mine.river_mine.2",
           "character": "caster"
+        },
+        {
+          "pos": [
+            420,
+            -220
+          ],
+          "profile": "hunter",
+          "group": "mine",
+          "id": "river_mine.quartermaster",
+          "character": "mine_quartermaster",
+          "optional": true
         }
       ],
       "exits": [
@@ -1081,6 +1189,15 @@
           "requires_clear": false,
           "template": "powder/powder_supply",
           "heal": false
+        },
+        {
+          "id": "river.veteran_order",
+          "title": "封锁执事的旧命令",
+          "pos": [
+            -1050,
+            150
+          ],
+          "text": "赫铎佩着金铜色的封锁刀，穿蓝色工头甲、举旧桥纹盾。刀强化近战但拖慢移动，甲与盾会降低受伤；这些都是实物效果。击败后可拿走同一套装备，回镇手动换装，而不是领取另一套随机奖励。"
         }
       ],
       "encounters": [
@@ -1101,6 +1218,17 @@
           "profile": "sentry",
           "id": "river_prison.river_prison.2",
           "character": "caster"
+        },
+        {
+          "pos": [
+            80,
+            -450
+          ],
+          "profile": "guard",
+          "group": "prison",
+          "id": "river_prison.veteran",
+          "character": "prison_veteran",
+          "optional": true
         },
         {
           "pos": [
@@ -1225,6 +1353,15 @@
         350
       ],
       "description": "可以搭设前哨，木桥连通东西。"
+    },
+    {
+      "id": "caravan_wreck",
+      "title": "倾覆货车",
+      "pos": [
+        -1950,
+        950
+      ],
+      "description": "被截的运料线与遗落材料箱。"
     }
   ],
   "roads": [
@@ -1391,6 +1528,26 @@
       "description": "把实际食品交到镇中米菈手里。可以带烤饼与清水，也可在学会炖汤后亲手制作再交付。",
       "required_claims": [
         "river.relief"
+      ],
+      "points": 1
+    },
+    {
+      "id": "river_salvage",
+      "title": "截断的运料线",
+      "description": "读被截的运料单，搜刮敌人剩余货物或沿西侧寻找货车、矿工样品箱，向镇中索砾交付真实原料。",
+      "required_claims": [
+        "river.caravan_manifest",
+        "river.salvage_delivery"
+      ],
+      "points": 1
+    },
+    {
+      "id": "river_quartermaster",
+      "title": "矿道运料官的去向",
+      "description": "找到矿工的欠货记录，并亲自从运料官遗骸取回至少一件剩余物品，回镇向艾妲报告。",
+      "required_claims": [
+        "river.quartermaster_note",
+        "loot.river.enemy.river_mine.quartermaster"
       ],
       "points": 1
     }

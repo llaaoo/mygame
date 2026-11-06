@@ -61,6 +61,11 @@ func _draw() -> void:
 	draw_circle(Vector2.ZERO, 19, Color(tint, 0.18))
 	draw_arc(Vector2.ZERO, 20, 0, TAU, 32, tint, 2, true)
 	match kind:
+		"cache":
+			draw_rect(Rect2(-12,-8,24,18),Color("76573c"))
+			draw_rect(Rect2(-12,-8,24,18),tint,false,2)
+			draw_line(Vector2(-12,-2),Vector2(12,-2),tint,2)
+			draw_rect(Rect2(-2,-4,4,7),tint)
 		"person":
 			draw_circle(Vector2(0, -6), 5, tint)
 			draw_line(Vector2(0, 0), Vector2(0, 10), tint, 3)

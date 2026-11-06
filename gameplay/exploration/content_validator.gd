@@ -200,7 +200,14 @@ func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 				else:
 					method_ids[method.id]=true
 		for encounter in region.encounters:
+			if encounter.has_meta("persistent_id"):
+				var corpse_claim := "loot.river.enemy."+str(encounter.get_meta("persistent_id"))
+				_claim(claims,corpse_claim,encounter)
+				completion_claims[corpse_claim] = true
 			_validate_enemy_profile(encounter, profiles)
+			if encounter.character:
+				for item in encounter.character.equipment:
+					if item and not catalog.equipment.has(item.id): _fail(encounter.character,"Unknown worn equipment: "+item.id)
 			if encounter.hp <= 0 or encounter.speed <= 0 or encounter.role not in [0, 1, 2]:
 				_fail(encounter, "Invalid encounter")
 		for event in region.events:

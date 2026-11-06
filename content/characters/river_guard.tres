@@ -2,6 +2,8 @@
 [ext_resource type="Script" path="res://gameplay/characters/actor_character_data.gd" id="data"]
 [ext_resource type="Script" path="res://gameplay/abilities/loadout/skill_loadout.gd" id="loadout"]
 [ext_resource type="Resource" path="res://gameplay/abilities/data/focus_data.tres" id="focus"]
+[ext_resource type="Resource" path="res://content/frontier/equipment/river_sabre.tres" id="river_sabre"]
+[ext_resource type="Resource" path="res://content/frontier/equipment/river_coat.tres" id="river_coat"]
 [sub_resource type="Resource" id="Loadout"]
 script = ExtResource("loadout")
 slots = Array[String](["focus"])
@@ -17,3 +19,5 @@ base_move_speed = 100.0
 melee_multiplier = 0.6
 skills = [ExtResource("focus")]
 loadout = SubResource("Loadout")
+equipment = [ExtResource("river_sabre"), ExtResource("river_coat")]
+materials = {"ration": 1}

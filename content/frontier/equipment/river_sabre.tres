@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="EquipmentData" format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/equipment_data.gd" id="item"]
+[ext_resource type="Script" path="res://gameplay/inventory/data/casting_equipment_profile.gd" id="profile"]
+[sub_resource type="Resource" id="Profile"]
+script = ExtResource("profile")
+[resource]
+script = ExtResource("item")
+id = "river_sabre"
+display_name = "驿路短刀"
+description = "刀身缺口清晰可见。近战攻击+2；守备兵与拾取者使用同一加成。"
+slot_type = 6
+item_type = 1
+icon_atlas_index = 18
+stackable = true
+max_stack = 99
+stat_modifiers = {"attack_damage": 2}
+combat_modifiers = {}
+world_shape = "blade"
+world_color = Color(0.71765, 0.75294, 0.77647, 1)
+casting_profile = SubResource("Profile")

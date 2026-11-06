@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="EquipmentData" format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/equipment_data.gd" id="item"]
+[ext_resource type="Script" path="res://gameplay/inventory/data/casting_equipment_profile.gd" id="profile"]
+[sub_resource type="Resource" id="Profile"]
+script = ExtResource("profile")
+[resource]
+script = ExtResource("item")
+id = "river_survey_spear"
+display_name = "测路铜矛"
+description = "铜绿矛头与测路刻痕。近战攻击+4；从携带它的测路者身上完整回收。"
+slot_type = 6
+item_type = 1
+icon_atlas_index = 18
+stackable = true
+max_stack = 99
+stat_modifiers = {"attack_damage": 4}
+combat_modifiers = {}
+world_shape = "spear"
+world_color = Color(0.36078, 0.75294, 0.73725, 1)
+casting_profile = SubResource("Profile")

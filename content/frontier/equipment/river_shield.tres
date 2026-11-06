@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="EquipmentData" format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/equipment_data.gd" id="item"]
+[ext_resource type="Script" path="res://gameplay/inventory/data/casting_equipment_profile.gd" id="profile"]
+[sub_resource type="Resource" id="Profile"]
+script = ExtResource("profile")
+[resource]
+script = ExtResource("item")
+id = "river_shield"
+display_name = "旧桥守望盾"
+description = "盾面留有桥梁印记。受伤降低8%，移动速度-6。"
+slot_type = 5
+item_type = 1
+icon_atlas_index = 24
+stackable = true
+max_stack = 99
+stat_modifiers = {"move_speed": -6}
+combat_modifiers = {"damage_reduction": 0.08}
+world_shape = "shield"
+world_color = Color(0.64314, 0.5451, 0.33333, 1)
+casting_profile = SubResource("Profile")

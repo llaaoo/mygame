@@ -16,7 +16,7 @@ OUT = ROOT / "dist"
 
 def copy_documentation(folder):
     # Keep source filenames so relative links also work in the standalone ZIP.
-    for name in ["LOCAL_PLAYTEST.md", "GRAYRIVER_FRONTIER.md", "GRAYRIVER_PLAYTEST.md", "SHARED_CHARACTERS.md"]:
+    for name in ["LOCAL_PLAYTEST.md", "GRAYRIVER_FRONTIER.md", "GRAYRIVER_PLAYTEST.md", "SHARED_CHARACTERS.md", "GRAYRIVER_LOOT.md"]:
         shutil.copy2(ROOT / "docs" / name, folder / name)
     shutil.copy2(folder / "LOCAL_PLAYTEST.md", folder / "README.md")
     shutil.copy2(folder / "GRAYRIVER_PLAYTEST.md", folder / "PLAYTEST.md")

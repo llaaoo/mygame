@@ -1,12 +1,14 @@
 class_name GrayriverGame
 extends MVPGame
 const TOWN := Rect2(-4600,1100,2400,2200)
+var loot: GrayriverLoot
 var definition: Dictionary
 var terrain: GrayriverTerrain
 var resuming_journey := false
 var _location_clock := 0.0
 var _discovery_clock := 0.0
 func _ready() -> void:
+	loot = GrayriverLoot.new(self)
 	definition = GrayriverDefinition.data()
 	catalog = ExplorationContentCatalog.new(GrayriverDefinition.build())
 	save_slot = 3
@@ -40,6 +42,7 @@ func _spawn_enemy(spec: ExplorationEncounterData, layout: RefCounted, index: int
 	enemy.set_meta("frontier_group",spec.get_meta("group",region_id))
 func _on_enemy_died(enemy: Enemy, generation: int) -> void:
 	if not GameRuntime.instance.get_region_session().is_current(generation): return
+	loot.record_enemy(enemy)
 	if not practice_active: progress.claims[enemy.get_meta("frontier_claim", "river.enemy.unknown")] = true
 	super._on_enemy_died(enemy,generation)
 	_save_progress()
@@ -137,3 +140,13 @@ func open_prototype() -> void:
 	_save_progress()
 	ui.close_modal()
 	get_tree().change_scene_to_file("res://mvp.tscn")
+
+func _change_region(destination: String, arrival: Vector2 = Vector2.INF) -> void:
+	super._change_region(destination,arrival)
+	# New optional encounters remain available in regions cleared by older saves.
+	if destination != "camp" and progress.cleared.has(destination):
+		var layout := current_data.make_layout()
+		current_data.reserve_interaction_space(layout)
+		for i in range(current_data.encounters.size()):
+			if current_data.encounters[i].optional_encounter: _spawn_enemy(current_data.encounters[i],layout,i)
+	loot.mount_region()
