@@ -54,7 +54,7 @@
 
 ## 本地包与验证边界
 
-`tools/export_desktop.py`从干净已提交源码生成Windows/Linux本地包，构建副本只禁用编辑器插件；每次导出执行Linux启动、PE/PCK及ZIP完整性检查，源码版本与校验值见`SOURCE.json`和`dist/manifest.json`。不上传或发布。
+`tools/export_desktop.py`从干净已提交源码生成Windows/Linux本地包，构建副本只禁用编辑器插件；每次导出执行Linux启动、PE/PCK及ZIP完整性检查，源码版本与校验值见`SOURCE.json`和`dist/manifest.json`。包内附地区设计、操作说明、试玩数据和截图，保留独立可读的相对链接。不上传或发布。
 
 Windows原生交互尚未验证。当前画面沿用原型表现；未加入完整居民日程、贸易经济或第二片地区。材料余量偏宽松，首玩时长和四种战术的同检查点对照仍需专门试玩；本次不据诊断等待调整恢复/掉落常量，也不宣称已达到20—30分钟目标。
 
