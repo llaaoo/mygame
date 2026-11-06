@@ -8,3 +8,7 @@ extends Resource
 @export_multiline var description: String
 @export var required_claims: PackedStringArray = []
 @export var assembly: FieldWorkMethod
+
+@export_enum("recycling", "outpost") var service := "recycling"
+@export var requires_clear := false
+@export_multiline var completion_text := ""

@@ -6,8 +6,6 @@ func _init(owner_game: MVPGame) -> void:
 	game = owner_game
 
 func _build_camp() -> void:
-	for facility in game.current_data.facilities:
-		game.alchemy.mount(facility)
 	_add_interaction("元素实验：路线与配置记录", Vector2(-260, -240), game.trial_recorder.show_page, "note")
 	var rest := _add_interaction("篝火：休整与粗食", Vector2(-150, 50), Callable(), "mechanism")
 	game.survival.mount_rest(rest)
@@ -117,8 +115,8 @@ func _add_discovery(entry: ExplorationDiscoveryData) -> void:
 
 func build_element_objects() -> void:
 	var surfaces := GameRuntime.instance.get_simulation_runtime().get_surface_manager()
-	for station in game.current_data.survival_stations:
-		game.survival.mount(station)
+	for facility in game.current_data.facilities: game.alchemy.mount(facility)
+	mount_available_stations()
 	for patch in game.current_data.surface_patches:
 		if not patch.disabled_by_claim.is_empty() and game.progress.claims.has(patch.disabled_by_claim): continue
 		surfaces.apply_area(game.region_root.to_global(patch.pos), patch.radius, [], "authored:" + game.region_id, patch.state, patch.duration)
@@ -138,3 +136,14 @@ func build_element_objects() -> void:
 			game._queue_save()
 			game.ui.notify("水路已切换。只补充清洁水，冰、毒、电与火的变化保留；旧水自然消退。"))
 		game.region_root.add_child(valve)
+
+func mount_available_stations() -> void:
+	for station in game.current_data.survival_stations:
+		var available := true
+		for id in station.required_claims:
+			if not game.progress.claims.has(id): available = false
+		if not available: continue
+		var mounted := false
+		for node in game.region_root.get_children():
+			if node.has_meta("survival_station") and node.get_meta("survival_station") == station: mounted = true
+		if not mounted: game.survival.mount(station)

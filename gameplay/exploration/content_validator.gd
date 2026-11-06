@@ -180,11 +180,14 @@ func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 			_validate_materials(station, station.harvest, supplies)
 		for facility in region.facilities:
 			_claim(claims, facility.id, facility)
-			_claim(claims, facility.start_claim, facility)
+			if not facility.start_claim.is_empty(): _claim(claims, facility.start_claim, facility)
 			completion_claims[facility.id] = true
-			completion_claims[facility.start_claim] = true
-			if region.id != "camp" or facility.title.is_empty() or facility.description.is_empty() or facility.required_claims.is_empty(): _fail(facility, "Invalid camp repair facility")
-			if not facility.assembly.validation_error().is_empty() or not facility.assembly.material_costs.is_empty(): _fail(facility, "assembly: invalid free work method")
+			if not facility.start_claim.is_empty(): completion_claims[facility.start_claim] = true
+			if facility.title.is_empty() or facility.description.is_empty() or facility.service not in ["recycling", "outpost"]: _fail(facility, "Invalid repair facility")
+			if facility.service == "recycling" and (region.id != "camp" or facility.required_claims.is_empty()): _fail(facility, "Invalid camp recycling facility")
+			if not facility.assembly or not facility.assembly.validation_error().is_empty(): _fail(facility, "assembly: invalid work method")
+			elif facility.service == "recycling" and not facility.assembly.material_costs.is_empty(): _fail(facility, "assembly: recycling repair must remain free")
+			else: _validate_materials(facility, facility.assembly.material_costs, supplies)
 		for encounter in region.encounters:
 			_validate_enemy_profile(encounter, profiles)
 			if encounter.hp <= 0 or encounter.speed <= 0 or encounter.role not in [0, 1, 2]:
@@ -242,6 +245,8 @@ func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 	var return_points: Array[Vector2] = []
 	for region in catalog.chapter.regions:
 		for station in region.survival_stations:
+			for id in station.required_claims:
+				if not completion_claims.has(id): _fail(station, "required_claims: unknown facility marker " + id)
 			if not station.cleaned_by_claim.is_empty() and not completion_claims.has(station.cleaned_by_claim): _fail(station, "cleaned_by_claim: unknown completion marker")
 		for patch in region.surface_patches:
 			if not patch.disabled_by_claim.is_empty() and not completion_claims.has(patch.disabled_by_claim): _fail(patch, "disabled_by_claim: unknown completion marker '%s'" % patch.disabled_by_claim)

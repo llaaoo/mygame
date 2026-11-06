@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="SurvivalStationData" format=3]
+[ext_resource type="Script" path="res://gameplay/exploration/survival/survival_station_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "survival.station.drain_pot"
+title = "前哨锅位：仍需火源"
+pos = Vector2(-352, -112)
+kind = "cook"
+heat_offset = Vector2(-96, -64)
+required_claims = PackedStringArray("outpost.drain_built")

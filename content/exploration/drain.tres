@@ -33,6 +33,10 @@
 [ext_resource type="Resource" path="res://content/survival/drain_herb.tres" id="survival_drain_herb"]
 [ext_resource type="Resource" path="res://content/survival/drain_recipe.tres" id="survival_drain_recipe"]
 
+[ext_resource type="Resource" path="res://content/exploration/fieldwork/drain_outpost.tres" id="outpost"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/repair_facility_data.gd" id="facility_type"]
+[ext_resource type="Resource" path="res://content/survival/drain_pot.tres" id="outpost_pot"]
+
 [sub_resource type="Resource" id="field_steam_hold"]
 script = ExtResource("7_kfmxl")
 required_surface = "steam"
@@ -154,4 +158,6 @@ spell_objects = Array[ExtResource("6_fpipr")]([SubResource("Resource_6dacc"), Su
 exits = Array[ExtResource("4_ovc10")]([SubResource("Resource_pxhbf"), SubResource("Resource_scj00"), ExtResource("field_return")])
 surface_patches = Array[ExtResource("exp_type_surface_patches")]([ExtResource("exp_drain_pool"), ExtResource("exp_drain_poison")])
 fixed_props = Array[ExtResource("exp_type_fixed_props")]([ExtResource("exp_drain_fence")])
-survival_stations = Array[ExtResource("survival_type")]([ExtResource("survival_drain_water"), ExtResource("survival_drain_herb")])
+survival_stations = Array[ExtResource("survival_type")]([ExtResource("survival_drain_water"), ExtResource("survival_drain_herb"), ExtResource("outpost_pot")])
+
+facilities = Array[ExtResource("facility_type")]([ExtResource("outpost")])

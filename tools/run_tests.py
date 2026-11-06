@@ -17,6 +17,7 @@ INTEGRATION = [
     "material_intent",
     "retreat_ledger",
     "enemy_preparation",
+    "field_outpost",
     "survival_needs",
     "survival_world",
     "survival_rest",
