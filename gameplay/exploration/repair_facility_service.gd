@@ -16,6 +16,8 @@ func _refresh(node: ExplorationInteractable, spec: RepairFacilityData) -> void:
 
 func inspect(node: ExplorationInteractable, spec: RepairFacilityData) -> void:
 	if not _valid(node, spec): return
+	game.progress.claims["seen." + spec.id] = true
+	game._queue_save()
 	if game.progress.claims.has(spec.id):
 		if spec.service == "outpost": game.survival.inspect_field_rest(node)
 		else: game.workshop.show_recycling()

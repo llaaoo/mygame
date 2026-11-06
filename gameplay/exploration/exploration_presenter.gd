@@ -10,7 +10,7 @@ func show_arrival() -> void:
 	var title := "余烬监狱 · 初次远征" if first_visit else "余烬监狱 · 继续旅程"
 	var text := "先读营地材料手册，取得水引，再去外院寻找火阵记录。\n\n这次先试一条规律：火花在火阵内变为火球，阵外仍是近身火花。按住动作键观察范围，松开施放。\n\n左键近战，右键火花，空格闪避，E调查；J日志，M材料，K编组，O装备。"
 	if not first_visit:
-		text = "监狱封锁已解除，可以回访遗漏支路或比较不同配置。" if game.progress.completed else "已恢复你的知识、装备、材料与探索进度。"
+		text = "监狱封锁已解除，可以回访遗漏支路或尝试不同操作。" if game.progress.completed else "已恢复你的知识、装备、材料与探索进度。"
 		var reports: Array[String] = []
 		for quest in game.quests:
 			if (quest.is_complete(game.progress) or quest.has_available_approach(game.progress, game.player.stats_component)) and not game.progress.claims.has("quest." + quest.id): reports.append(quest.title)
@@ -122,17 +122,30 @@ func _choose_world_event(entry: ExplorationWorldEventData, choice: ExplorationWo
 		shortcut.name = "WaterworksShortcut"
 
 func journal_text() -> String:
-	var text := "行动提示\n左键近战；右键/6火花；1震荡、2凝神、3霜阵、4水引、5火阵需探索学习。雷阵与泼洒树脂用K编组；M配置材料，营地工作台加工。J关闭日志。\n\n法术联动\n已有动作可以通过元素、材料、恩赐、法阵和装备改变用途。点击“元素关系”查看已读线索与实际验证；未验证的高级关系不会提前列出。\n\n路线与清理进度\n营地 → 外院 → 火药库 → 重卫关隘 → 熔炉大厅\n外院 → 军械档案 → 静默祈堂\n火药库 → 排水回廊 → 蓄水机房\n"
+	var text := "行动提示\n左键近战；右键/6火花；1震荡、2凝神、3霜阵、4水引、5火阵需探索学习。雷阵与泼洒树脂用K编组；M选择本次材料，营地工作台加工。J关闭日志。\n\n法术联动\n已有动作可以通过元素、材料、恩赐、法阵和装备改变用途。点击“元素关系”查看已读线索与实际验证；未验证的高级关系不会提前列出。\n\n路线与清理进度\n仅列出已经到达的地点；现场调查可发现新支路。\n"
 	for id in game.catalog.regions:
+		if not game.progress.visited.has(id): continue
 		var data: ExplorationRegionData = game.catalog.regions[id]
 		var state := "已清理" if game.progress.cleared.has(id) else ("已探索" if game.progress.visited.has(id) else "未探索")
 		text += "%s · %s\n" % [data.title, state]
 	text += "\n机关检修捷径\n"
 	for region: ExplorationRegionData in game.catalog.regions.values():
+		if not game.progress.visited.has(region.id): continue
 		for exit in region.exits:
 			if exit.target == "camp" and not exit.required_claims.is_empty():
 				text += region.title + " · " + exit.title + ("：已开启，营地可直达返场\n" if exit.claims_satisfied(game.progress) else "：待解开对应机关\n" + exit.locked_message + "\n")
-	text += "\n" + game.alchemy.status_text() + "\n"
+
+	text += "\n已发现补给与建设\n"
+	for region: ExplorationRegionData in game.catalog.regions.values():
+		for station in region.survival_stations:
+			if game.progress.claims.has("seen." + station.id): text += region.title + " · " + station.title + "\n"
+		for facility in region.facilities:
+			if game.progress.claims.has("seen." + facility.id) or game.progress.claims.has(facility.id):
+				text += region.title + " · " + facility.title + ("：已建成\n" if game.progress.claims.has(facility.id) else "：待建设\n" + facility.description + "\n")
+	text += "\n未取部件\n"
+	for pair in [[AlchemyRepairService.PUMP, "alchemy.pump_taken", "排水回廊泵芯"], [AlchemyRepairService.REGULATOR, "alchemy.regulator_taken", "蓄水机房调压器"]]:
+		if game.progress.claims.has(pair[0]) and not game.progress.claims.has(pair[1]): text += "□ " + pair[2] + "：已解封，靠近设备E取件\n"
+	if game.progress.claims.has("alchemy.started") or game.progress.claims.has("alchemy.schematic"): text += "\n" + game.alchemy.status_text() + "\n"
 	text += "\n远征生存（N补给）\n" + game.survival.description() + "\n"
 	text += "\n本区试战\n在已清理区域按Esc，可单独重试当地敌人。耗材照常消耗，击杀无经验、掉落或残魂；知识、机关、委托和其他区域进度保持。\n"
 	text += "\n保留与兑现\n普通施法保留恩赐；Shift请求消费适配恩赐，形态与总成本见技能槽预览。节律护手可改为部分消费：保留当前剩余时长50%，较弱伤害倍率，每份另加3 MP。蕴魂、回响和护盾不受部分消费影响。\n"
@@ -150,7 +163,7 @@ func journal_text() -> String:
 	match str(game.progress.choices.get("waterworks_choice", "")):
 		"cooling": text += "冷却熔炉：新遭遇的领主生命 -25%，火抗降至10%。\n"
 		"conduit": text += "魔力导流：进入区域后法力回复由3提高到5 MP/秒。\n"
-		_: text += "尚未重启。深入排水回廊的蓄水机房调查。\n"
+		_: text += "尚未重启。继续调查已发现的支路与设备。\n"
 	text += "\n发现记录\n"
 	for note in game.progress.journal:
 		text += "\n%s\n%s\n" % [note.title, note.text]

@@ -1,0 +1,274 @@
+{
+  "method": "Fresh empty profile; continuous process, no save reload, normal UI/OS inputs and read-only event telemetry. Stops at completed chapter return to camp before any subsequent rest.",
+  "active_seconds": 382.333954415559,
+  "initial_hp": 100,
+  "initial_mp": 60,
+  "final_hp": 16,
+  "final_mp": 60,
+  "final_max_hp": 120,
+  "final_max_mp": 60,
+  "final_attributes": {
+    "agility": 10,
+    "endurance": 14,
+    "intelligence": 10,
+    "strength": 10
+  },
+  "unspent_earned_points": 15,
+  "known_actions": [
+    "echo_mark",
+    "fire_sigil",
+    "focus",
+    "frost_sigil",
+    "ignite",
+    "oil_flask",
+    "pulse",
+    "soul_harvest",
+    "storm_sigil",
+    "venom_mist",
+    "water_call"
+  ],
+  "cleared": [
+    "archive",
+    "boss",
+    "cistern",
+    "drain",
+    "gate",
+    "powder",
+    "sanctum",
+    "yard"
+  ],
+  "claims": [
+    "alchemy.pump_open",
+    "alchemy.pump_taken",
+    "alchemy.regulator_open",
+    "alchemy.regulator_taken",
+    "alchemy.repaired",
+    "alchemy.schematic",
+    "alchemy.started",
+    "camp_guide",
+    "cartographer_rescued",
+    "drain_crystals",
+    "echo_knowledge",
+    "experiment.archive_trial_supply",
+    "experiment.cistern_trial_supply",
+    "experiment.drain_trial_supply",
+    "field.archive_observation",
+    "field.cistern_observation",
+    "field.drain_observation",
+    "fire_knowledge",
+    "focus_knowledge",
+    "frost_knowledge",
+    "gate_supply",
+    "magic.charged_crystal",
+    "magic.thermal_cache",
+    "magic.waterworks_conductor",
+    "material_handbook",
+    "nova_knowledge",
+    "outpost.drain_built",
+    "powder_charcoal",
+    "powder_supply",
+    "pulse_knowledge",
+    "quest.alchemy_repair",
+    "quest.field_research",
+    "quest.rescue",
+    "quest.research",
+    "quest.waterworks",
+    "sanctum_sap",
+    "sanctum_supply",
+    "seen.alchemy.repaired",
+    "seen.outpost.drain_built",
+    "seen.survival.station.camp_stove",
+    "soul_knowledge",
+    "storm_knowledge",
+    "survival.archive_recipe",
+    "survival.drain_recipe",
+    "survival.pack",
+    "venom_knowledge",
+    "waterworks_choice"
+  ],
+  "deaths": 0,
+  "committed_casts": 15,
+  "actual_mp_spent": 72,
+  "actual_damage_taken": 297,
+  "actual_recovery": {
+    "hp": {
+      "natural": 59.0,
+      "drop": 24.0,
+      "discovery": 54.0,
+      "rest": 44.0,
+      "food": 32.0
+    },
+    "mp": {
+      "natural": 65.28571428571423,
+      "rest": 0.0,
+      "water": 6.714285714285722
+    }
+  },
+  "work_attempts": {
+    "retreat": 2,
+    "rest:full": 2,
+    "eat:ration": 2,
+    "eat:clean_water": 2,
+    "cook:tea": 1,
+    "build_outpost": 1,
+    "rest:short": 1,
+    "assemble": 1
+  },
+  "work_completed": {
+    "retreat": 2,
+    "rest:full": 2,
+    "eat:ration": 2,
+    "eat:clean_water": 2,
+    "cook:tea": 1,
+    "build_outpost": 1,
+    "rest:short": 1,
+    "assemble": 1
+  },
+  "work_interruptions": {},
+  "inventory_spent": {
+    "ration": 2,
+    "clean_water": 3,
+    "herb": 1,
+    "charcoal": 2,
+    "grain": 2,
+    "storm_dust": 1
+  },
+  "inventory_record_start_after_camp_books": {
+    "ash": 2,
+    "charcoal": 4,
+    "clean_water": 4,
+    "crystal": 6,
+    "frost_salt": 2,
+    "grain": 3,
+    "herb": 2,
+    "ration": 2,
+    "resin": 2,
+    "sap": 6,
+    "storm_dust": 3
+  },
+  "inventory_final": {
+    "ash": 2,
+    "charcoal": 16,
+    "clean_water": 1,
+    "crystal": 32,
+    "echo_ink": 5,
+    "frost_salt": 11,
+    "grain": 3,
+    "herb": 4,
+    "ration": 0,
+    "resin": 4,
+    "sap": 26,
+    "storm_dust": 11,
+    "tea": 1,
+    "venom_extract": 8,
+    "ward_powder": 2
+  },
+  "final_survival": {
+    "fatigue": 4.63089306435553,
+    "harvests": {},
+    "hp": 16,
+    "hydration": 84.538052416752,
+    "meal": "ration",
+    "meal_remaining": 135.903412299662,
+    "mp": 60,
+    "nutrition": 97.6062359914857,
+    "tea_remaining": 0.0,
+    "water_remaining": 77.9288962626253
+  },
+  "cast_steps": [
+    {
+      "action": "ignite",
+      "result": "火花",
+      "mp": 4,
+      "materials": {}
+    },
+    {
+      "action": "pulse",
+      "result": "震荡",
+      "mp": 3,
+      "materials": {}
+    },
+    {
+      "action": "water_call",
+      "result": "水引〔水域〕",
+      "mp": 5,
+      "materials": {}
+    },
+    {
+      "action": "ignite",
+      "result": "火花",
+      "mp": 4,
+      "materials": {}
+    },
+    {
+      "action": "water_call",
+      "result": "水引〔水域〕",
+      "mp": 5,
+      "materials": {}
+    },
+    {
+      "action": "pulse",
+      "result": "震荡",
+      "mp": 3,
+      "materials": {}
+    },
+    {
+      "action": "water_call",
+      "result": "水引〔水域〕",
+      "mp": 5,
+      "materials": {}
+    },
+    {
+      "action": "ignite",
+      "result": "火花",
+      "mp": 4,
+      "materials": {}
+    },
+    {
+      "action": "water_call",
+      "result": "水引〔水域〕",
+      "mp": 5,
+      "materials": {}
+    },
+    {
+      "action": "ignite",
+      "result": "火花",
+      "mp": 4,
+      "materials": {}
+    },
+    {
+      "action": "water_call",
+      "result": "水引〔水域→导电水域〕",
+      "mp": 9,
+      "materials": {
+        "storm_dust": 1
+      }
+    },
+    {
+      "action": "ignite",
+      "result": "火花",
+      "mp": 4,
+      "materials": {}
+    },
+    {
+      "action": "ignite",
+      "result": "火花",
+      "mp": 4,
+      "materials": {}
+    },
+    {
+      "action": "water_call",
+      "result": "水引〔水域〕",
+      "mp": 5,
+      "materials": {}
+    },
+    {
+      "action": "focus",
+      "result": "流息",
+      "mp": 8,
+      "materials": {}
+    }
+  ],
+  "hp_balance_error": 0.0,
+  "mp_balance_error": -5.684341886080802e-14
+}

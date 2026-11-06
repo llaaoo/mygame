@@ -1,0 +1,946 @@
+{
+  "method": "Read-only observer with external keyboard/mouse input; each case loads the same legitimately earned disk checkpoint. No actor, inventory, enemy, state, or progress mutation. Practice uses the existing UI and grants no kill rewards.",
+  "checkpoint_sha256": "03ab401ddc2c8fc39e11857289fde3de1c0e0e5013ea739a8205dcfab2cba441",
+  "cases": {
+    "control": {
+      "initial": {
+        "hp": 120,
+        "mp": 60,
+        "max_hp": 120,
+        "max_mp": 60,
+        "attributes": {
+          "agility": 10,
+          "endurance": 14,
+          "intelligence": 10,
+          "strength": 10
+        },
+        "points": 15,
+        "supplies": {
+          "amounts": {
+            "ash": 2,
+            "charcoal": 16,
+            "clean_water": 1,
+            "crystal": 32,
+            "echo_ink": 5,
+            "frost_salt": 11,
+            "grain": 3,
+            "herb": 4,
+            "ration": 0,
+            "resin": 4,
+            "sap": 26,
+            "storm_dust": 11,
+            "tea": 1,
+            "venom_extract": 8,
+            "ward_powder": 2
+          },
+          "selected": {}
+        },
+        "survival": {
+          "fatigue": 0.0586342128,
+          "harvests": {},
+          "hp": 120,
+          "hydration": 50.3056847636317,
+          "meal": "ration",
+          "meal_remaining": 67.1246146767663,
+          "mp": 60,
+          "nutrition": 74.4151051967453,
+          "tea_remaining": 0.0,
+          "water_remaining": 9.11272181144687
+        }
+      },
+      "seconds_to_last_enemy_hit": 6.74,
+      "actual_mp_spent": 7,
+      "actual_casts": 1,
+      "materials": {
+        "frost_salt": 1
+      },
+      "actual_damage_taken": 42,
+      "actual_recovery": {
+        "hp": {},
+        "mp": {
+          "natural": 5.999999999999998,
+          "water": 1.0000000000000009
+        }
+      },
+      "final_hp": 78,
+      "final_mp": 60,
+      "dead": false,
+      "enemies_remaining": 0,
+      "work_events": [],
+      "committed_melee": 8,
+      "actual_reactions": [
+        {
+          "cell": [
+            3,
+            -2
+          ],
+          "reaction": "wet_ice",
+          "source": "水引"
+        },
+        {
+          "cell": [
+            4,
+            -3
+          ],
+          "reaction": "wet_ice",
+          "source": "水引"
+        },
+        {
+          "cell": [
+            4,
+            -2
+          ],
+          "reaction": "wet_ice",
+          "source": "水引"
+        },
+        {
+          "cell": [
+            4,
+            -1
+          ],
+          "reaction": "wet_ice",
+          "source": "水引"
+        },
+        {
+          "cell": [
+            5,
+            -4
+          ],
+          "reaction": "wet_ice",
+          "source": "水引"
+        },
+        {
+          "cell": [
+            5,
+            -3
+          ],
+          "reaction": "wet_ice",
+          "source": "水引"
+        },
+        {
+          "cell": [
+            5,
+            -2
+          ],
+          "reaction": "wet_ice",
+          "source": "水引"
+        },
+        {
+          "cell": [
+            5,
+            -1
+          ],
+          "reaction": "wet_ice",
+          "source": "水引"
+        },
+        {
+          "cell": [
+            5,
+            0
+          ],
+          "reaction": "wet_ice",
+          "source": "水引"
+        },
+        {
+          "cell": [
+            6,
+            -3
+          ],
+          "reaction": "wet_ice",
+          "source": "水引"
+        },
+        {
+          "cell": [
+            6,
+            -2
+          ],
+          "reaction": "wet_ice",
+          "source": "水引"
+        },
+        {
+          "cell": [
+            6,
+            -1
+          ],
+          "reaction": "wet_ice",
+          "source": "水引"
+        },
+        {
+          "cell": [
+            7,
+            -2
+          ],
+          "reaction": "wet_ice",
+          "source": "水引"
+        }
+      ],
+      "cast_steps": [
+        {
+          "action": "water_call",
+          "explanation": [
+            "基础动作：水引",
+            "霜盐：冰/水投射物或范围法术适配：寒霜弹穿透+1、范围半径+30；造水先凝成冰面，额外2 MP。",
+            "水引〔水·凝霜〕，半径135；水域→冰面",
+            "总计7 MP；准备0.25秒；霜盐 ×1（持有11）"
+          ],
+          "result": "水引〔水域→冰面〕"
+        }
+      ]
+    },
+    "shatter": {
+      "initial": {
+        "hp": 120,
+        "mp": 60,
+        "max_hp": 120,
+        "max_mp": 60,
+        "attributes": {
+          "agility": 10,
+          "endurance": 14,
+          "intelligence": 10,
+          "strength": 10
+        },
+        "points": 15,
+        "supplies": {
+          "amounts": {
+            "ash": 2,
+            "charcoal": 16,
+            "clean_water": 1,
+            "crystal": 32,
+            "echo_ink": 5,
+            "frost_salt": 11,
+            "grain": 3,
+            "herb": 4,
+            "ration": 0,
+            "resin": 4,
+            "sap": 26,
+            "storm_dust": 11,
+            "tea": 1,
+            "venom_extract": 8,
+            "ward_powder": 2
+          },
+          "selected": {}
+        },
+        "survival": {
+          "fatigue": 0.0591019653333333,
+          "harvests": {},
+          "hp": 120,
+          "hydration": 50.3110947962175,
+          "meal": "ration",
+          "meal_remaining": 67.3979654848471,
+          "mp": 60,
+          "nutrition": 74.4187118851359,
+          "tea_remaining": 0.0,
+          "water_remaining": 9.38607261952769
+        }
+      },
+      "seconds_to_last_enemy_hit": 7.017,
+      "actual_mp_spent": 10,
+      "actual_casts": 2,
+      "materials": {
+        "frost_salt": 1
+      },
+      "actual_damage_taken": 42,
+      "actual_recovery": {
+        "hp": {},
+        "mp": {
+          "natural": 6.857142857142855,
+          "water": 1.142857142857144
+        }
+      },
+      "final_hp": 78,
+      "final_mp": 58,
+      "dead": false,
+      "enemies_remaining": 0,
+      "work_events": [],
+      "committed_melee": 5,
+      "actual_reactions": [
+        {
+          "cell": [
+            3,
+            -2
+          ],
+          "reaction": "wet_ice",
+          "source": "水引"
+        },
+        {
+          "cell": [
+            4,
+            -3
+          ],
+          "reaction": "wet_ice",
+          "source": "水引"
+        },
+        {
+          "cell": [
+            4,
+            -2
+          ],
+          "reaction": "wet_ice",
+          "source": "水引"
+        },
+        {
+          "cell": [
+            4,
+            -1
+          ],
+          "reaction": "wet_ice",
+          "source": "水引"
+        },
+        {
+          "cell": [
+            5,
+            -4
+          ],
+          "reaction": "wet_ice",
+          "source": "水引"
+        },
+        {
+          "cell": [
+            5,
+            -3
+          ],
+          "reaction": "wet_ice",
+          "source": "水引"
+        },
+        {
+          "cell": [
+            5,
+            -2
+          ],
+          "reaction": "wet_ice",
+          "source": "水引"
+        },
+        {
+          "cell": [
+            5,
+            -1
+          ],
+          "reaction": "wet_ice",
+          "source": "水引"
+        },
+        {
+          "cell": [
+            5,
+            0
+          ],
+          "reaction": "wet_ice",
+          "source": "水引"
+        },
+        {
+          "cell": [
+            6,
+            -3
+          ],
+          "reaction": "wet_ice",
+          "source": "水引"
+        },
+        {
+          "cell": [
+            6,
+            -2
+          ],
+          "reaction": "wet_ice",
+          "source": "水引"
+        },
+        {
+          "cell": [
+            6,
+            -1
+          ],
+          "reaction": "wet_ice",
+          "source": "水引"
+        },
+        {
+          "cell": [
+            7,
+            -2
+          ],
+          "reaction": "wet_ice",
+          "source": "水引"
+        },
+        {
+          "cell": [
+            6,
+            -3
+          ],
+          "reaction": "frozen_impact",
+          "source": "震荡"
+        },
+        {
+          "consumed": true,
+          "position": [
+            386.815551757812,
+            -144.567031860352
+          ],
+          "prior_target_statuses": [
+            "frozen",
+            "wet"
+          ],
+          "reaction": "hit:shatter",
+          "required_status": "frozen",
+          "skill": "pulse",
+          "source": "震荡",
+          "tags": [
+            "arcane",
+            "aoe",
+            "impact"
+          ]
+        }
+      ],
+      "cast_steps": [
+        {
+          "action": "water_call",
+          "explanation": [
+            "基础动作：水引",
+            "霜盐：冰/水投射物或范围法术适配：寒霜弹穿透+1、范围半径+30；造水先凝成冰面，额外2 MP。",
+            "水引〔水·凝霜〕，半径135；水域→冰面",
+            "总计7 MP；准备0.25秒；霜盐 ×1（持有11）"
+          ],
+          "result": "水引〔水域→冰面〕"
+        },
+        {
+          "action": "pulse",
+          "explanation": [
+            "基础动作：震荡",
+            "震荡〔奥术〕，半径45",
+            "总计3 MP；准备0.25秒；无材料消耗"
+          ],
+          "result": "震荡"
+        }
+      ]
+    },
+    "conduction": {
+      "initial": {
+        "hp": 120,
+        "mp": 60,
+        "max_hp": 120,
+        "max_mp": 60,
+        "attributes": {
+          "agility": 10,
+          "endurance": 14,
+          "intelligence": 10,
+          "strength": 10
+        },
+        "points": 15,
+        "supplies": {
+          "amounts": {
+            "ash": 2,
+            "charcoal": 16,
+            "clean_water": 1,
+            "crystal": 32,
+            "echo_ink": 5,
+            "frost_salt": 11,
+            "grain": 3,
+            "herb": 4,
+            "ration": 0,
+            "resin": 4,
+            "sap": 26,
+            "storm_dust": 11,
+            "tea": 1,
+            "venom_extract": 8,
+            "ward_powder": 2
+          },
+          "selected": {}
+        },
+        "survival": {
+          "fatigue": 0.0586740553581529,
+          "harvests": {},
+          "hp": 120,
+          "hydration": 50.3046386793575,
+          "meal": "ration",
+          "meal_remaining": 67.0823807864343,
+          "mp": 60,
+          "nutrition": 74.4144078072291,
+          "tea_remaining": 0.0,
+          "water_remaining": 9.070487921115
+        }
+      },
+      "seconds_to_last_enemy_hit": 5.414,
+      "actual_mp_spent": 9,
+      "actual_casts": 1,
+      "materials": {
+        "storm_dust": 1
+      },
+      "actual_damage_taken": 46,
+      "actual_recovery": {
+        "hp": {},
+        "mp": {
+          "natural": 7.714285714285712,
+          "water": 1.285714285714287
+        }
+      },
+      "final_hp": 74,
+      "final_mp": 60,
+      "dead": false,
+      "enemies_remaining": 0,
+      "work_events": [],
+      "committed_melee": 7,
+      "actual_reactions": [
+        {
+          "cell": [
+            4,
+            -3
+          ],
+          "reaction": "wet_lightning",
+          "source": "水引"
+        }
+      ],
+      "cast_steps": [
+        {
+          "action": "water_call",
+          "explanation": [
+            "基础动作：水引",
+            "雷晶粉：铭刻雷阵的必需媒介；雷矢或水系投射物变三发散射，每发伤害70%；造水同时导电，可能波及自己与相连水域，额外4 MP。",
+            "水引〔水／雷〕，半径105；水域→导电水域",
+            "总计9 MP；准备0.25秒；雷晶粉 ×1（持有11）"
+          ],
+          "result": "水引〔水域→导电水域〕"
+        }
+      ]
+    },
+    "ignition": {
+      "initial": {
+        "hp": 120,
+        "mp": 60,
+        "max_hp": 120,
+        "max_mp": 60,
+        "attributes": {
+          "agility": 10,
+          "endurance": 14,
+          "intelligence": 10,
+          "strength": 10
+        },
+        "points": 15,
+        "supplies": {
+          "amounts": {
+            "ash": 2,
+            "charcoal": 16,
+            "clean_water": 1,
+            "crystal": 32,
+            "echo_ink": 5,
+            "frost_salt": 11,
+            "grain": 3,
+            "herb": 4,
+            "ration": 0,
+            "resin": 4,
+            "sap": 26,
+            "storm_dust": 11,
+            "tea": 1,
+            "venom_extract": 8,
+            "ward_powder": 2
+          },
+          "selected": {}
+        },
+        "survival": {
+          "fatigue": 0.0383727543111111,
+          "harvests": {},
+          "hp": 120,
+          "hydration": 50.3556412652176,
+          "meal": "ration",
+          "meal_remaining": 67.6448871515136,
+          "mp": 60,
+          "nutrition": 74.448409531136,
+          "tea_remaining": 0.0,
+          "water_remaining": 9.63299428619438
+        }
+      },
+      "seconds_to_last_enemy_hit": 5.708,
+      "actual_mp_spent": 12,
+      "actual_casts": 2,
+      "materials": {
+        "venom_extract": 1
+      },
+      "actual_damage_taken": 46,
+      "actual_recovery": {
+        "hp": {},
+        "mp": {
+          "natural": 1.714285714285714,
+          "water": 0.285714285714286
+        }
+      },
+      "final_hp": 74,
+      "final_mp": 50,
+      "dead": false,
+      "enemies_remaining": 0,
+      "work_events": [],
+      "committed_melee": 3,
+      "actual_reactions": [
+        {
+          "cell": [
+            4,
+            -3
+          ],
+          "reaction": "wet_poison",
+          "source": "水引"
+        },
+        {
+          "cell": [
+            4,
+            -2
+          ],
+          "reaction": "wet_poison",
+          "source": "水引"
+        },
+        {
+          "cell": [
+            4,
+            -1
+          ],
+          "reaction": "wet_poison",
+          "source": "水引"
+        },
+        {
+          "cell": [
+            5,
+            -3
+          ],
+          "reaction": "wet_poison",
+          "source": "水引"
+        },
+        {
+          "cell": [
+            5,
+            -2
+          ],
+          "reaction": "wet_poison",
+          "source": "水引"
+        },
+        {
+          "cell": [
+            5,
+            -1
+          ],
+          "reaction": "wet_poison",
+          "source": "水引"
+        },
+        {
+          "cell": [
+            6,
+            -3
+          ],
+          "reaction": "wet_poison",
+          "source": "水引"
+        },
+        {
+          "cell": [
+            6,
+            -2
+          ],
+          "reaction": "wet_poison",
+          "source": "水引"
+        },
+        {
+          "cell": [
+            6,
+            -1
+          ],
+          "reaction": "wet_poison",
+          "source": "水引"
+        },
+        {
+          "cell": [
+            5,
+            -3
+          ],
+          "reaction": "poisoned_fire",
+          "source": "火花"
+        }
+      ],
+      "cast_steps": [
+        {
+          "action": "water_call",
+          "explanation": [
+            "基础动作：水引",
+            "毒性萃取：毒雾的必需媒介；冰/水投射物或范围法术附毒，造水形成毒地、失去洗毒用途，额外3 MP。",
+            "水引〔水／毒〕，半径105；水域→毒地",
+            "总计8 MP；准备0.25秒；毒性萃取 ×1（持有8）"
+          ],
+          "result": "水引〔水域→毒地〕"
+        },
+        {
+          "action": "ignite",
+          "explanation": [
+            "基础动作：火花",
+            "火花〔火〕，半径28",
+            "总计4 MP；准备0.25秒；无材料消耗"
+          ],
+          "result": "火花"
+        }
+      ]
+    },
+    "melee": {
+      "initial": {
+        "hp": 120,
+        "mp": 60,
+        "max_hp": 120,
+        "max_mp": 60,
+        "attributes": {
+          "agility": 10,
+          "endurance": 14,
+          "intelligence": 10,
+          "strength": 10
+        },
+        "points": 15,
+        "supplies": {
+          "amounts": {
+            "ash": 2,
+            "charcoal": 16,
+            "clean_water": 1,
+            "crystal": 32,
+            "echo_ink": 5,
+            "frost_salt": 11,
+            "grain": 3,
+            "herb": 4,
+            "ration": 0,
+            "resin": 4,
+            "sap": 26,
+            "storm_dust": 11,
+            "tea": 1,
+            "venom_extract": 8,
+            "ward_powder": 2
+          },
+          "selected": {}
+        },
+        "survival": {
+          "fatigue": 0.0574292320777297,
+          "harvests": {},
+          "hp": 120,
+          "hydration": 50.3195165289439,
+          "meal": "ration",
+          "meal_remaining": 67.6277636531974,
+          "mp": 60,
+          "nutrition": 74.4243263736201,
+          "tea_remaining": 0.0,
+          "water_remaining": 9.61587078787786
+        }
+      },
+      "seconds_to_last_enemy_hit": 3.948,
+      "actual_mp_spent": 0,
+      "actual_casts": 0,
+      "materials": {},
+      "actual_damage_taken": 14,
+      "actual_recovery": {
+        "hp": {},
+        "mp": {}
+      },
+      "final_hp": 106,
+      "final_mp": 60,
+      "dead": false,
+      "enemies_remaining": 0,
+      "work_events": []
+    },
+    "spark": {
+      "initial": {
+        "hp": 120,
+        "mp": 60,
+        "max_hp": 120,
+        "max_mp": 60,
+        "attributes": {
+          "agility": 10,
+          "endurance": 14,
+          "intelligence": 10,
+          "strength": 10
+        },
+        "points": 15,
+        "supplies": {
+          "amounts": {
+            "ash": 2,
+            "charcoal": 16,
+            "clean_water": 1,
+            "crystal": 32,
+            "echo_ink": 5,
+            "frost_salt": 11,
+            "grain": 3,
+            "herb": 4,
+            "ration": 0,
+            "resin": 4,
+            "sap": 26,
+            "storm_dust": 11,
+            "tea": 1,
+            "venom_extract": 8,
+            "ward_powder": 2
+          },
+          "selected": {}
+        },
+        "survival": {
+          "fatigue": 0.0586826071365079,
+          "harvests": {},
+          "hp": 120,
+          "hydration": 50.3238922791541,
+          "meal": "ration",
+          "meal_remaining": 67.9201909769107,
+          "mp": 60,
+          "nutrition": 74.427243540427,
+          "tea_remaining": 0.0,
+          "water_remaining": 9.90829811159118
+        }
+      },
+      "seconds_to_last_enemy_hit": 13.061,
+      "actual_mp_spent": 20,
+      "actual_casts": 5,
+      "materials": {},
+      "actual_damage_taken": 74,
+      "actual_recovery": {
+        "hp": {},
+        "mp": {
+          "natural": 8.857142857142854,
+          "water": 1.142857142857144
+        }
+      },
+      "final_hp": 46,
+      "final_mp": 50,
+      "dead": false,
+      "enemies_remaining": 0,
+      "work_events": []
+    },
+    "retained": {
+      "initial": {
+        "hp": 120,
+        "mp": 60,
+        "max_hp": 120,
+        "max_mp": 60,
+        "attributes": {
+          "agility": 10,
+          "endurance": 14,
+          "intelligence": 10,
+          "strength": 10
+        },
+        "points": 15,
+        "supplies": {
+          "amounts": {
+            "ash": 2,
+            "charcoal": 16,
+            "clean_water": 1,
+            "crystal": 32,
+            "echo_ink": 5,
+            "frost_salt": 11,
+            "grain": 3,
+            "herb": 4,
+            "ration": 0,
+            "resin": 4,
+            "sap": 26,
+            "storm_dust": 11,
+            "tea": 1,
+            "venom_extract": 8,
+            "ward_powder": 2
+          },
+          "selected": {}
+        },
+        "survival": {
+          "fatigue": 0.0627845127111111,
+          "harvests": {},
+          "hp": 120,
+          "hydration": 50.3102292908842,
+          "meal": "ration",
+          "meal_remaining": 67.6605424848473,
+          "mp": 60,
+          "nutrition": 74.4181348815803,
+          "tea_remaining": 0.0,
+          "water_remaining": 9.6486496195277
+        }
+      },
+      "seconds_to_last_enemy_hit": 5.608,
+      "actual_mp_spent": 13,
+      "actual_casts": 2,
+      "materials": {},
+      "actual_damage_taken": 39,
+      "actual_recovery": {
+        "hp": {},
+        "mp": {
+          "natural": 6.857142857142855,
+          "water": 1.142857142857144
+        }
+      },
+      "final_hp": 81,
+      "final_mp": 55,
+      "dead": false,
+      "enemies_remaining": 0,
+      "work_events": []
+    },
+    "retreat": {
+      "initial": {
+        "hp": 120,
+        "mp": 60,
+        "max_hp": 120,
+        "max_mp": 60,
+        "attributes": {
+          "agility": 10,
+          "endurance": 14,
+          "intelligence": 10,
+          "strength": 10
+        },
+        "points": 15,
+        "supplies": {
+          "amounts": {
+            "ash": 2,
+            "charcoal": 16,
+            "clean_water": 1,
+            "crystal": 32,
+            "echo_ink": 5,
+            "frost_salt": 11,
+            "grain": 3,
+            "herb": 4,
+            "ration": 0,
+            "resin": 4,
+            "sap": 26,
+            "storm_dust": 11,
+            "tea": 1,
+            "venom_extract": 8,
+            "ward_powder": 2
+          },
+          "selected": {}
+        },
+        "survival": {
+          "fatigue": 0.0574791858031746,
+          "harvests": {},
+          "hp": 120,
+          "hydration": 50.3200712150429,
+          "meal": "ration",
+          "meal_remaining": 67.6559527546887,
+          "mp": 60,
+          "nutrition": 74.4246961643528,
+          "tea_remaining": 0.0,
+          "water_remaining": 9.64405988936897
+        }
+      },
+      "seconds_to_last_enemy_hit": null,
+      "actual_mp_spent": 7,
+      "actual_casts": 1,
+      "materials": {
+        "frost_salt": 1
+      },
+      "actual_damage_taken": 14,
+      "actual_recovery": {
+        "hp": {
+          "natural": 1.5,
+          "food": 1.5
+        },
+        "mp": {
+          "natural": 5.999999999999998,
+          "water": 1.0000000000000009
+        }
+      },
+      "final_hp": 109,
+      "final_mp": 60,
+      "dead": false,
+      "enemies_remaining": 0,
+      "work_events": [
+        {
+          "event": "work_attempt",
+          "game_seconds": 7.08149311111111,
+          "method": "retreat",
+          "real_seconds": 13.422,
+          "region": "archive"
+        },
+        {
+          "costs": {},
+          "event": "work",
+          "game_seconds": 10.0814931111111,
+          "method": "retreat",
+          "real_seconds": 16.34,
+          "region": "archive"
+        }
+      ]
+    }
+  }
+}

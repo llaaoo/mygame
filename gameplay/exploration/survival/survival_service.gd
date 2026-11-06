@@ -37,7 +37,7 @@ func tick(delta: float) -> void:
 	_save_time += delta
 	if _ui_time >= .25:
 		_ui_time = 0
-		game.ui.set_survival_status(status_line())
+		game.ui.set_survival_status(status_line() + ("\n" + timers_line() if not timers_line().is_empty() else ""))
 		var tier := str(needs.nutrition <= 20) + str(needs.hydration <= 20) + str(needs.fatigue >= 60) + str(needs.fatigue >= 85)
 		if tier != _notice_tier:
 			if not _notice_tier.is_empty(): game.ui.notify(status_line() + "\nN查看补给、恢复变化和休整。")
@@ -84,7 +84,14 @@ func camp_arrival(hp: int, mp: int, was_dead: bool) -> void:
 	game.player.health_component.health_changed.emit(game.player.health_component.hp, game.player.health_component.max_hp)
 	game.player.mana_component.notify_changed()
 	apply_recovery()
-	game.ui.set_survival_status(status_line())
+	game.ui.set_survival_status(status_line() + ("\n" + timers_line() if not timers_line().is_empty() else ""))
+
+func timers_line() -> String:
+	var parts: Array[String] = []
+	if needs.meal_remaining > 0: parts.append("食物%.0fs" % needs.meal_remaining)
+	if needs.water_remaining > 0: parts.append("饮水%.0fs" % needs.water_remaining)
+	if needs.tea_remaining > 0: parts.append("茶%.0fs" % needs.tea_remaining)
+	return " · ".join(parts)
 
 func status_line() -> String:
 	return "饱食%.0f · 饮水%.0f · 疲劳%.0f%s" % [needs.nutrition, needs.hydration, needs.fatigue, " · 疲惫" if needs.fatigue >= 85 else " · 困倦" if needs.fatigue >= 60 else ""]
@@ -102,16 +109,28 @@ func description() -> String:
 	return text
 
 func show_page() -> void:
-	var text := description() + "\n\n行囊\n"
+	var recovery := needs.recovery()
+	var text := status_line() + "\n" + timers_line() + "\n\n"
+	var demands: Array[String] = []
+	if needs.nutrition <= 20: demands.append("饱食不足：食品可改善生命回复")
+	if needs.hydration <= 20: demands.append("饮水不足：饮水可改善法力回复")
+	if needs.fatigue >= 60: demands.append("疲劳影响准备：茶或休整可缓解")
+	text += "；".join(demands) if not demands.is_empty() else "当前需求稳定，可按下一场遭遇选择补给。"
+	text += "\n额外恢复：生命%.1f/秒，法力%.1f/秒（受原回复延迟约束）。\n使用补给需要站定，移动或受伤会打断，成功才消费。\n\n可用补给\n" % [recovery.health_bonus, recovery.mana_bonus]
 	var buttons: Array[Dictionary] = []
-	for id in SurvivalCatalog.TITLES:
-		text += "%s ×%d\n" % [supplies.title(id), supplies.count(id)]
-		if SurvivalCatalog.FOODS.has(id):
-			text += SurvivalCatalog.FOODS[id].text + "\n"
-			buttons.append({"title": "使用：" + supplies.title(id), "disabled": supplies.count(id) < 1, "callback": begin_eating.bind(id)})
-	buttons.append({"title": "倒掉未净化水", "disabled": supplies.count("dirty_water") < 1, "callback": begin_discard})
+	for id in SurvivalCatalog.FOODS:
+		if supplies.count(id) < 1: continue
+		text += "%s ×%d · %s\n" % [supplies.title(id), supplies.count(id), SurvivalCatalog.FOODS[id].text]
+		buttons.append({"title": "使用：" + supplies.title(id), "callback": begin_eating.bind(id)})
+	if buttons.is_empty(): text += "没有可直接使用的补给。可寻找已发现的水源、采集点、锅位或返回营地整备。\n"
+	text += "\n原料：谷粮%d · 苦叶%d · 水袋%d/%d\n" % [supplies.count("grain"), supplies.count("herb"), SurvivalCatalog.water_count(supplies), SurvivalCatalog.WATER_CAPACITY]
+	buttons.append({"title": "详细规则与休整说明", "callback": show_rules})
+	if supplies.count("dirty_water") > 0: buttons.append({"title": "倒掉未净化水", "callback": begin_discard})
 	buttons.append({"title": "继续探索", "callback": game.ui.close_modal})
 	game.ui.show_panel("远征补给 · 饮食与休整", text, buttons)
+
+func show_rules() -> void:
+	game.ui.show_panel("远征补给 · 详细规则", description(), [{"title": "返回补给", "callback": show_page}, {"title": "继续探索", "callback": game.ui.close_modal}])
 
 func method(id: String, title: String, duration: float, costs: Dictionary = {}) -> FieldWorkMethod:
 	var result := FieldWorkMethod.new()
@@ -164,6 +183,9 @@ func inspect_rest(node: ExplorationInteractable) -> void:
 	_open(node, [method("rest:short", "短休3秒：生命+40/法力+30/疲劳-25", 3), method("rest:full", "充分休整6秒：恢复生命法力/疲劳归零", 6), method("basic", "营地粗食2秒：饱食与饮水至少60", 2)], "短休消耗饱食5、饮水10；充分休整消耗饱食20、饮水25。粗食不产生物品或额外恢复Buff，补给耗尽时仍可整备。")
 
 func inspect(node: ExplorationInteractable, spec: SurvivalStationData) -> void:
+	if not _available(node, spec): return
+	game.progress.claims["seen." + spec.id] = true
+	game._queue_save()
 	var options: Array[FieldWorkMethod] = []
 	var guide := ""
 	match spec.kind:
@@ -274,6 +296,6 @@ func _complete(option: FieldWorkMethod, node: Node2D, spec: SurvivalStationData)
 	apply_recovery()
 	if notify.is_valid(): notify.call()
 	game._save_progress()
-	game.ui.set_survival_status(status_line())
+	game.ui.set_survival_status(status_line() + ("\n" + timers_line() if not timers_line().is_empty() else ""))
 	game.ui.notify("完成：" + option.title + "\n" + status_line())
 	return true

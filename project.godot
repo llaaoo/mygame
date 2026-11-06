@@ -12,7 +12,7 @@ config_version=5
 
 config/name="Study"
 run/main_scene="res://mvp.tscn"
-config/features=PackedStringArray("4.6", "Forward Plus")
+config/features=PackedStringArray("4.6", "GL Compatibility")
 config/icon="res://icon.svg"
 
 [autoload]
@@ -113,4 +113,5 @@ skill_4={
 
 environment/defaults/default_clear_color=Color(0.025, 0.035, 0.045, 1)
 
-rendering_device/driver.windows="d3d12"
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"

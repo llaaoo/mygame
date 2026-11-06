@@ -71,6 +71,11 @@ func _run() -> void:
 	var point := boss.attack_preparation.point
 	game.player.position += Vector2(0, 200)
 	check(boss.attack_preparation.point == point, "Boss AOE follows player during warning")
+	var boss_buffs := boss.get_node("BuffManager") as BuffManager
+	boss_buffs.apply_buff(load("res://gameplay/abilities/data/frozen.tres"), game.player)
+	boss.health_component.hp = 1
+	boss._check_phase(1, boss.health_component.max_hp)
+	check(is_equal_approx(boss.move_speed, boss.boss_data.move_speed * 1.8 * .3), "Boss rage overwrote frozen speed")
 	boss.health_component.is_dead = true
 	boss.attack_preparation.tick(.75)
 	check(not boss.attack_preparation.busy(), "Dead Boss retained pending attack")

@@ -82,6 +82,8 @@ func _run() -> void:
 		player.health_component.invincible = false
 		CombatExecutor.report_hit(target, player, 12, player.global_position, null, ["melee", "enemy"])
 		var result := game.trial_recorder.finish("自动化配置回归")
+		if label in ["破冰兑现", "污染引燃"]:
+			check(result.surface_steps.any(func(step): return step.has("skill") and not step.get("prior_target_statuses", []).is_empty() and step.get("consumed", false)), "Reaction history lost actual tool, prior condition or consumption")
 		check(result.regions == ["camp", "archive"] and result.seconds > 0 and result.casts > 0, "Recorder lost elapsed time, operations or region sequence")
 		check(result.mana_spent == mana - player.mana_component.mp and result.materials.size() > 0 and result.damage_dealt > 0 and result.damage_taken >= 12, "Recorder did not measure actual costs and accepted damage")
 		check(result.initial.max_hp == 1000 and result.initial.supplies.amounts.frost_salt == 20, "Comparable trial did not retain its starting budget")

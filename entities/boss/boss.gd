@@ -104,7 +104,6 @@ func _on_chase_physics(delta: float) -> void:
 			_cast_skill(boss_data.active_skill_id)
 
 	if _rage_mode:
-		move_speed = boss_data.move_speed * 1.8 if boss_data else 160.0
 		attack_cooldown = 0.6
 
 	super._on_chase_physics(delta)
@@ -131,6 +130,8 @@ func _check_phase(_current_hp: int, max_hp: int) -> void:
 
 	if ratio < 0.25 and not _rage_mode:
 		_rage_mode = true
+		# Change the base once; ongoing freeze/speed effects still rebuild normally.
+		(get_node("BuffManager") as BuffManager).set_base_attributes({"move_speed": boss_data.move_speed * 1.8})
 		print("👹 [%s] 进入狂暴模式！" % boss_data.boss_name)
 
 	var bar := get_tree().get_first_node_in_group("boss_bar")

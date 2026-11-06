@@ -5,3 +5,8 @@
 /demo/
 /godot_state_charts_examples/
 /addons/limboai/bin/~*.dll
+
+# Local desktop artifacts (never published automatically)
+/dist/
+
+__pycache__/
