@@ -3,6 +3,7 @@ extends MVPGame
 const TOWN := Rect2(-4600,1100,2400,2200)
 var definition: Dictionary
 var terrain: GrayriverTerrain
+var resuming_journey := false
 var _location_clock := 0.0
 var _discovery_clock := 0.0
 func _ready() -> void:
@@ -63,6 +64,7 @@ func start_location() -> Dictionary:
 	var saved := progress.journey
 	if saved.is_empty() or not catalog.regions.has(saved.get("region","")) or progress.survival_state.get("hp",100)<=0:
 		return {"region":"camp","position":Vector2.INF}
+	resuming_journey=true
 	return {"region":saved.region,"position":GrayriverDefinition.vector(saved.position)}
 func can_practice() -> bool:
 	return region_id != "camp" and super.can_practice()
@@ -76,6 +78,7 @@ func _process(delta: float) -> void:
 		_queue_save()
 	if _discovery_clock>=.5:
 		_discovery_clock=0
+		_update_objective()
 		if region_id == "camp":
 			var cell:=Vector2i(floori(player.position.x/512),floori(player.position.y/512))
 			for x in range(-1,2):
@@ -89,12 +92,6 @@ func _process(delta: float) -> void:
 		progress.completed=true
 		_save_progress()
 		ui.notify("灰河谷通路已恢复。你仍可探索遗漏地点、处理委托或回访设施。")
-func _unhandled_input(event: InputEvent) -> void:
-	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_G and ready_for_play:
-		if ui.modal_locked: return
-		if is_instance_valid(ui.modal): ui.close_modal()
-		else: show_map()
-		get_viewport().set_input_as_handled()
 func show_map() -> void:
 	ui.show_panel("灰河谷行路图","",[{"title":"继续探索","callback":ui.close_modal}])
 	var scroll:=ui._modal_panel.find_child("BodyScroll",true,false) as ScrollContainer
@@ -114,6 +111,7 @@ func discovered_places() -> String:
 func _bootstrap() -> void:
 	await super._bootstrap()
 	ui.pause_provider = show_valley_pause
+	ui.map_provider = show_map
 func show_valley_pause() -> void:
 	ui.show_panel("灰河谷 · 暂停","野外连续行走，遗迹沿实际入口往返。G只记录亲自到过的地点。\n\n撤回镇中需现场站定3秒，移动、攻击、施法或受伤打断；不治疗、不补货。F5保存当前地点与进度，F9读取。已击败敌人和永久成果保留。",[{"title":"继续旅程","callback":ui.close_modal},{"title":"查看行路图","callback":show_map},{"title":"现场撤回河谷镇","disabled":is_at_base(),"callback":retreat.begin},{"title":"重试遗迹（无击杀奖励）","disabled":not can_practice(),"callback":progress_service.practice_encounters},{"title":"重置河谷遭遇（无击杀奖励）","callback":replay_encounters}])
 func replay_encounters() -> void:
@@ -124,3 +122,13 @@ func replay_encounters() -> void:
 	progress.cleared.clear()
 	progress.choices["river.rehearsal"] = "yes"
 	request_travel("camp")
+
+func knowledge_changed() -> void:
+	if not is_instance_valid(player): return
+	var supplies:=player.skill_manager.combinations.supplies
+	supplies.restrict_crafting=true
+	supplies.known_recipes.clear()
+	for region: ExplorationRegionData in catalog.regions.values():
+		for note in region.discoveries:
+			if progress.claims.has(note.id):
+				for id in note.get_meta("crafting_recipes",[]):supplies.known_recipes[id]=true

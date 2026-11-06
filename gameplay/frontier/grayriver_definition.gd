@@ -41,10 +41,21 @@ static func build() -> ExplorationChapterData:
 			note.pos = vector(raw.pos)
 			note.requires_clear = raw.get("requires_clear", false)
 			note.heal = raw.get("heal", false)
+			note.kind = raw.get("kind",note.kind)
 			if raw.has("materials"): note.materials = amounts(raw.materials)
 			if raw.has("equipment"): note.equipment.assign(raw.equipment)
 			note.set_meta("crafting_recipes", raw.get("crafts", []))
 			region.discoveries.append(note)
+		for raw in entry.get("deliveries", []):
+			var site:=DeliverySiteData.new()
+			site.id=raw.id
+			site.title=raw.title
+			site.pos=vector(raw.pos)
+			site.description=raw.description
+			site.rewards=amounts(raw.get("rewards",{}))
+			site.required_claims=PackedStringArray(raw.get("required_claims",[]))
+			for work_data in raw.methods:site.methods.append(work_method(work_data))
+			region.delivery_sites.append(site)
 		for raw in entry.get("encounters", []):
 			var encounter := ExplorationEncounterData.new()
 			encounter.pos = vector(raw.pos)
@@ -107,6 +118,26 @@ static func build() -> ExplorationChapterData:
 				facility.assembly = work_method(raw.assembly)
 			facility.pos = vector(raw.pos)
 			region.facilities.append(facility)
+		for raw in entry.get("props", []):
+			var prop:=ExplorationPropData.new()
+			prop.id=raw.id
+			prop.pos=vector(raw.pos)
+			prop.scene=load("res://world/object/%s.tscn" % raw.scene)
+			region.fixed_props.append(prop)
+		for raw in entry.get("events", []):
+			var event:=ExplorationWorldEventData.new()
+			event.id=raw.id
+			event.title=raw.title
+			event.text=raw.text
+			event.pos=vector(raw.pos)
+			event.required_claims=PackedStringArray(raw.get("required_claims",[]))
+			for choice_data in raw.choices:
+				var choice:=ExplorationWorldChoiceData.new()
+				choice.id=choice_data.id
+				choice.title=choice_data.title
+				choice.text=choice_data.text
+				event.choices.append(choice)
+			region.events.append(event)
 		for raw in entry.get("valves", []):
 			var valve := SurfaceValveData.new()
 			valve.id = raw.id

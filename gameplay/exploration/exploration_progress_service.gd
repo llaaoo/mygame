@@ -155,6 +155,8 @@ func claim_quest(quest: ExplorationQuestData, approach_id: String = "") -> bool:
 func choose_world_event(entry: ExplorationWorldEventData, choice: ExplorationWorldChoiceData) -> bool:
 	if entry not in game.current_data.events or choice not in entry.choices or game.has_hostiles_near(entry.pos):
 		return false
+	for id in entry.required_claims:
+		if not game.progress.claims.has(id): return false
 	game.progress.choices[entry.id] = choice.id
 	var record := choice.title + "：" + choice.text
 	if not game.progress.claim(entry.id, entry.title, record, [], []):

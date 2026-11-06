@@ -188,6 +188,17 @@ func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 			if not facility.assembly or not facility.assembly.validation_error().is_empty(): _fail(facility, "assembly: invalid work method")
 			elif facility.service == "recycling" and not facility.assembly.material_costs.is_empty(): _fail(facility, "assembly: recycling repair must remain free")
 			else: _validate_materials(facility, facility.assembly.material_costs, supplies)
+		for site in region.delivery_sites:
+			_claim(claims, site.id, site)
+			completion_claims[site.id] = true
+			if site.title.is_empty() or site.description.is_empty() or site.methods.is_empty(): _fail(site, "Missing delivery data")
+			_validate_materials(site, site.rewards, supplies)
+			var method_ids: Dictionary = {}
+			for method in site.methods:
+				if method: _validate_materials(method, method.material_costs, supplies)
+				if not method or not method.validation_error().is_empty() or method.material_costs.is_empty() or method_ids.has(method.id): _fail(site,"Invalid delivery method")
+				else:
+					method_ids[method.id]=true
 		for encounter in region.encounters:
 			_validate_enemy_profile(encounter, profiles)
 			if encounter.hp <= 0 or encounter.speed <= 0 or encounter.role not in [0, 1, 2]:
@@ -253,6 +264,12 @@ func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 		for facility in region.facilities:
 			for id in facility.required_claims:
 				if not completion_claims.has(id): _fail(facility, "required_claims: unknown facility prerequisite '%s'" % id)
+		for event in region.events:
+			for id in event.required_claims:
+				if not completion_claims.has(id): _fail(event,"Unknown event prerequisite: "+id)
+		for site in region.delivery_sites:
+			for id in site.required_claims:
+				if not completion_claims.has(id): _fail(site,"Unknown delivery prerequisite: "+id)
 		for puzzle in region.spell_objects:
 			for id in puzzle.required_claims:
 				if not completion_claims.has(id): _fail(puzzle, "required_claims: unknown work prerequisite '%s'" % id)
@@ -399,6 +416,7 @@ func _validate_entries(chapter: ExplorationChapterData) -> bool:
 			resources.append_array(region.surface_patches)
 			resources.append_array(region.fixed_props)
 			resources.append_array(region.facilities)
+			resources.append_array(region.delivery_sites)
 			resources.append_array(region.survival_stations)
 			for facility in region.facilities:
 				if facility: resources.append(facility.assembly)

@@ -19,6 +19,7 @@ var _message_time := 0.0
 var progress: ExplorationProgress
 var modal_locked := false
 var journal_provider: Callable
+var map_provider: Callable
 var pause_provider: Callable
 var practice_available: Callable
 var _heading_panel: PanelContainer
@@ -140,6 +141,11 @@ func _unhandled_input(event: InputEvent) -> void:
 			close_modal()
 		else:
 			show_journal()
+		get_viewport().set_input_as_handled()
+	elif event.keycode == KEY_G and map_provider.is_valid():
+		if modal_locked: return
+		if is_instance_valid(modal): close_modal()
+		else: map_provider.call()
 		get_viewport().set_input_as_handled()
 	elif event.keycode == KEY_M:
 		if modal_locked:

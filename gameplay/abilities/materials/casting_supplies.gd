@@ -9,6 +9,8 @@ var amounts: Dictionary = {}
 var selected: Dictionary = {}
 var catalog: Dictionary = {}
 var crafting_recipes: Dictionary = {}
+var restrict_crafting := false
+var known_recipes: Dictionary = {}
 var _transaction: Dictionary = {}
 var _notification_pending := false
 var discarded_legacy_selection := false
@@ -59,7 +61,7 @@ func configure(action_id: String, material_id: String) -> void:
 
 func craft(id: String) -> bool:
 	var recipe := crafting_recipes.get(id) as CraftingRecipe
-	if not recipe or not can_pay(recipe.inputs):
+	if not recipe or not knows_recipe(id) or not can_pay(recipe.inputs):
 		return false
 	begin_transaction()
 	pay(recipe.inputs)
@@ -71,7 +73,7 @@ func craft(id: String) -> bool:
 
 func recycle_preview(id: String) -> Dictionary:
 	var recipe := crafting_recipes.get(id) as CraftingRecipe
-	if not recipe or not catalog.has(id) or recipe.output_id != id or recipe.output_count <= 0 or recipe.inputs.is_empty(): return {}
+	if not recipe or not knows_recipe(id) or not catalog.has(id) or recipe.output_id != id or recipe.output_count <= 0 or recipe.inputs.is_empty(): return {}
 	for input in recipe.inputs:
 		if (not catalog.has(input) and not RAW_TITLES.has(input)) or not recipe.inputs[input] is int or int(recipe.inputs[input]) <= 0: return {}
 	return {"costs": {recipe.output_id: 2 * recipe.output_count}, "returns": recipe.inputs.duplicate()}
@@ -149,3 +151,6 @@ func finish_transaction(commit: bool) -> Callable:
 	var notify := commit and _notification_pending
 	_notification_pending = false
 	return changed.emit if notify else Callable()
+
+func knows_recipe(id: String) -> bool:
+	return crafting_recipes.has(id) and (not restrict_crafting or known_recipes.has(id))

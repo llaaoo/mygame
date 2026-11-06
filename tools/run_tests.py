@@ -15,6 +15,8 @@ QUICK = ["save_system", "save_recovery", "skill_catalog", "skill_upgrades", "roo
 INTEGRATION = [
     "field_work",
     "grayriver_foundation",
+    "grayriver_content",
+    "grayriver_journey",
     "material_intent",
     "retreat_ledger",
     "enemy_preparation",

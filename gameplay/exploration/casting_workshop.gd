@@ -60,8 +60,8 @@ func show_crafts() -> void:
 	var buttons: Array[Dictionary] = []
 	for id in supplies.crafting_recipes:
 		var costs: Dictionary = supplies.crafting_recipes[id].inputs
-		text += "%s ×1 ← %s\n" % [supplies.title(id), supplies.describe_cost(costs)]
-		buttons.append({"title": "加工：" + supplies.title(id), "disabled": not supplies.can_pay(costs), "callback": _craft.bind(id)})
+		text += "%s%s ×1 ← %s\n" % [supplies.title(id), "（尚未学习，探索记录可解锁）" if not supplies.knows_recipe(id) else "", supplies.describe_cost(costs)]
+		buttons.append({"title": "加工：" + supplies.title(id), "disabled": not supplies.knows_recipe(id) or not supplies.can_pay(costs), "callback": _craft.bind(id)})
 	buttons.append({"title": "材料与配置", "callback": show_materials})
 	buttons.append({"title": "继续探索", "callback": game.ui.close_modal})
 	game.ui.show_panel("营地施法工作台", text, buttons)

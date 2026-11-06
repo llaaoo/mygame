@@ -31,6 +31,7 @@ var knowledge: ElementKnowledge
 var trial_recorder: ElementTrialRecorder
 var workshop: CastingWorkshop
 var field_sites: FieldWorkSites
+var deliveries: SupplyDeliveryService
 var alchemy: AlchemyRepairService
 var survival: SurvivalService
 var retreat: ExpeditionRetreat
@@ -85,6 +86,7 @@ func _bootstrap() -> void:
 	workshop = CastingWorkshop.new(self)
 	field_sites = FieldWorkSites.new(self)
 	alchemy = AlchemyRepairService.new(self)
+	deliveries = SupplyDeliveryService.new(self)
 	survival = SurvivalService.new()
 	survival.game = self
 	player.survival = survival
@@ -200,7 +202,7 @@ func _change_region(destination: String, arrival: Vector2 = Vector2.INF) -> void
 		_add_interaction(entry.title, entry.pos, _use_exit.bind(entry), "passage")
 	if destination == "camp" and progress.cleared.has("gate"):
 		_add_interaction("捷径：重卫关隘", Vector2(0, 280), func(): request_travel("gate"), "passage")
-	if destination == "camp" and progress.choices.has("waterworks_choice"):
+	if destination == "camp" and catalog.regions.has("cistern") and progress.choices.has("waterworks_choice"):
 		_add_interaction("捷径：蓄水机房", Vector2(-300, 280), func(): request_travel("cistern"), "passage")
 	if destination == "cistern" and progress.choices.has("waterworks_choice"):
 		var shortcut := _add_interaction("检修梯：返回营地", Vector2(0, 300), func(): request_travel("camp"), "passage")

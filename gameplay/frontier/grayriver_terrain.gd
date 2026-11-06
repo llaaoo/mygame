@@ -11,6 +11,17 @@ func _ready() -> void:
 	z_index = -115
 	roads = GrayriverDefinition.data().roads
 	for obstacle in layout.obstacles: _body(obstacle.position, obstacle.size, "Terrain")
+	var lake_body:=StaticBody2D.new()
+	lake_body.collision_layer=1
+	lake_body.collision_mask=0
+	var lake_shape:=CollisionShape2D.new()
+	var shape:=ConvexPolygonShape2D.new()
+	var points:=PackedVector2Array()
+	for i in range(48):points.append(Vector2(650,-2800)+Vector2(cos(i*TAU/48),sin(i*TAU/48))*Vector2(700,420))
+	shape.points=points
+	lake_shape.shape=shape
+	lake_body.add_child(lake_shape)
+	add_child(lake_body)
 	var size := layout.arena_size
 	for wall in [{"position":Vector2(0,-size.y/2-20),"size":Vector2(size.x,40)},{"position":Vector2(0,size.y/2+20),"size":Vector2(size.x,40)},{"position":Vector2(-size.x/2-20,0),"size":Vector2(40,size.y)},{"position":Vector2(size.x/2+20,0),"size":Vector2(40,size.y)}]: _body(wall.position,wall.size,"Boundary")
 	if not game.progress.claims.has("river.bridge_fixed"): bridge_body = _body(Vector2(300,500),Vector2(260,400),"BrokenBridge")

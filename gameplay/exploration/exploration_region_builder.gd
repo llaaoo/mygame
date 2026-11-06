@@ -114,6 +114,7 @@ func _add_discovery(entry: ExplorationDiscoveryData) -> void:
 	node.callback = game.presenter.inspect_discovery.bind(entry, node)
 
 func build_element_objects() -> void:
+	for spec in game.current_data.delivery_sites: game.deliveries.mount(spec)
 	var surfaces := GameRuntime.instance.get_simulation_runtime().get_surface_manager()
 	for facility in game.current_data.facilities: game.alchemy.mount(facility)
 	mount_available_stations()

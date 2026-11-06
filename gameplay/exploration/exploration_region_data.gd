@@ -17,6 +17,7 @@ extends Resource
 @export var valves: Array[SurfaceValveData] = []
 @export var surface_patches: Array[SurfacePatchData] = []
 @export var fixed_props: Array[ExplorationPropData] = []
+@export var delivery_sites: Array[DeliverySiteData] = []
 @export var facilities: Array[RepairFacilityData] = []
 @export var survival_stations: Array[SurvivalStationData] = []
 @export var exits: Array[ExplorationExitData] = []
@@ -39,6 +40,7 @@ func interaction_points() -> Array[Resource]:
 	points.append_array(valves)
 	points.append_array(fixed_props)
 	points.append_array(facilities)
+	points.append_array(delivery_sites)
 	points.append_array(survival_stations)
 	for station in survival_stations:
 		if station and station.kind == "cook":

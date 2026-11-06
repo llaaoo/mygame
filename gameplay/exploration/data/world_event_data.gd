@@ -6,3 +6,5 @@ extends Resource
 @export var text: String
 @export var pos: Vector2 = Vector2.ZERO
 @export var choices: Array[ExplorationWorldChoiceData] = []
+
+@export var required_claims: PackedStringArray = []
