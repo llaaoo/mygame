@@ -8,6 +8,7 @@ var family := ""
 var tags: Array[String]=["physical","projectile"]
 var statuses: Array[Buff]=[]
 var travelled := 0.0
+var damage := 0
 func _physics_process(delta: float) -> void:
 	if not context or not is_instance_valid(context.actor) or not context.region.available(): queue_free(); return
 	var distance:=minf(profile.reach-travelled,profile.projectile_speed*delta)
@@ -19,8 +20,7 @@ func _physics_process(delta: float) -> void:
 		if target and not target.has_method("take_damage"): target=target.owner as Node2D
 		if target and target.has_method("take_damage"):
 			var skill:=SkillData.new(); skill.id="weapon_arrow"; skill.tags=tags.duplicate(); skill.contact_statuses=statuses.duplicate()
-			var damage: int=context.actor.combat_component.attack_damage if not "attack_damage" in context.actor else context.actor.attack_damage
-			CombatExecutor.report_hit(context.actor,target,roundi(damage*profile.damage_multiplier),hit.position,skill,skill.tags,family,profile.impact)
+			CombatExecutor.report_hit(context.actor,target,damage,hit.position,skill,skill.tags,family,profile.impact,profile)
 		queue_free(); return
 	global_position+=direction*distance; travelled+=distance
 	if travelled>=profile.reach: queue_free()

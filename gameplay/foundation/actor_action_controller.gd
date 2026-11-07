@@ -17,6 +17,15 @@ var facing := Vector2.DOWN
 var movement := Vector2.ZERO
 var guarding := false
 var sprinting := false
+const PARRY_WINDOW := .18
+const PARRY_RETRY := .65
+var guard_age := 99.0
+var parry_retry := 0.0
+var counter_remaining := 0.0
+var counter_strike := false
+var _parry_spent := true
+var _push_remaining := 0.0
+var _push_velocity:=Vector2.ZERO
 var profile: AttackProfile
 var _hit_targets: Dictionary={}
 var _family := ""
@@ -79,7 +88,12 @@ func try_action(action: Action) -> OperationResult:
 				_cancel_work()
 				_cancel_cast()
 				if context.spray: context.spray.stop()
-			guarding=bool(action.params.get("held",false)) and not busy() and can_guard()
+			var next_guard:=bool(action.params.get("held",false)) and not busy() and can_guard()
+			if next_guard and not guarding:
+				guard_age=0
+				_parry_spent=parry_retry>0
+				parry_retry=PARRY_RETRY
+			guarding=next_guard
 			if guarding and action.direction.length_squared()>.01: facing=action.direction.normalized()
 			return OperationResult.success()
 		Action.ActionType.SPRINT:
@@ -125,6 +139,12 @@ func try_action(action: Action) -> OperationResult:
 			var ammo_uid:=context.items.ready_uid(context.id,candidate.ammo_id) if not candidate.ammo_id.is_empty() else ""
 			if not candidate.ammo_id.is_empty() and ammo_uid.is_empty(): return OperationResult.reject("ammunition")
 			stamina.spend(cost)
+			counter_strike=counter_remaining>0 and candidate.projectile_speed==0
+			if counter_strike:
+				candidate=candidate.duplicate(true) as AttackProfile
+				candidate.damage_multiplier*=1.25; candidate.impact*=1.4
+				counter_remaining=0
+			if not input_provider.is_valid(): movement=Vector2.ZERO
 			profile=candidate; attack_weapon_uid=weapon_uid; _launched=false; _ammo_uid=ammo_uid
 			combo_weapon=weapon_uid
 			combo_index=(next_combo+1)%weapon.moveset.attacks.size() if weapon and weapon.moveset and action.action_type==Action.ActionType.MELEE else 0
@@ -138,11 +158,12 @@ func try_action(action: Action) -> OperationResult:
 			_attack_sequence+=1
 			_family="weapon.%s.%d"%[context.id,_attack_sequence]
 			guarding=false
+			if context.facts: context.facts.publish("physical_action_started",context.id,{"family":_family,"technique":action.skill_id if action.action_type==Action.ActionType.TECHNIQUE else "","weapon_uid":attack_weapon_uid,"stamina":cost,"counter":counter_strike})
 			return OperationResult.success()
 		Action.ActionType.DODGE:
 			if busy() and mode!="attack": return OperationResult.reject("busy")
 			if mode=="attack" and elapsed<profile.windup+profile.active: return OperationResult.reject("committed_attack")
-			if not stamina.spend(20*burden_cost()): return OperationResult.reject("stamina")
+			if not stamina.spend(20*burden_cost()*clampf(1+equipment_value("dodge_cost"),.6,1.5)): return OperationResult.reject("stamina")
 			_cancel_work(); _cancel_cast()
 			needs.exert(.5,context.actor.get_node("StatsComponent").effective_stat("endurance"))
 			mode="dodge"; elapsed=0; remaining=.35
@@ -160,6 +181,9 @@ func advance(delta: float) -> void:
 	var actor:=context.actor
 	if actor.get_node("HealthComponent").is_dead:
 		cancel("dead"); return
+	guard_age=guard_age+delta if guarding else 99.0
+	parry_retry=maxf(0,parry_retry-delta)
+	counter_remaining=maxf(0,counter_remaining-delta)
 	combo_remaining=maxf(0,combo_remaining-delta)
 	_move_age+=delta
 	if _move_age>.3 and not input_provider.is_valid(): movement=Vector2.ZERO
@@ -174,10 +198,15 @@ func advance(delta: float) -> void:
 		needs.tick(delta,stats.effective_stat("endurance") if stats else 10,context.rules.is_base(context.region.id,actor.position))
 		NeedsRecovery.apply(actor,needs)
 	multiplier=(.35 if needs.hydration<=20 else 1.0)*(.5 if needs.fatigue>=85 else .75 if needs.fatigue>=60 else 1.0)
-	bonus=(2.0 if needs.water_remaining>0 else 0.0)+(2.0 if needs.meal_remaining>0 else 0.0)
+	bonus=(2.0 if needs.water_remaining>0 else 0.0)+(2.0 if needs.meal_remaining>0 else 0.0)+equipment_value("stamina_recovery")
 	stamina.configure(stats.effective_stat("endurance") if stats else 10,multiplier,bonus)
 	stamina.advance(delta,guarding)
 	stability.advance(delta)
+	if _push_remaining>0:
+		var pushed:=minf(delta,_push_remaining)
+		actor.move_and_collide(_push_velocity*pushed)
+		_push_remaining=maxf(0,_push_remaining-delta)
+	if mode=="attack" and str(context.items.equipped(context.id).get(str(EquipmentData.SlotType.RIGHT_HAND),""))!=attack_weapon_uid: cancel("weapon_changed")
 	var old_elapsed:=elapsed
 	if busy():
 		elapsed+=delta
@@ -221,10 +250,33 @@ func _launch_arrow() -> void:
 		return
 	_ammo_uid=""
 	var arrow:=WeaponArrow.new(); arrow.context=context; arrow.profile=profile; arrow.direction=facing; arrow.family=_family
+	arrow.damage=roundi(float(context.actor.get("attack_damage") if "attack_damage" in context.actor else context.actor.combat_component.attack_damage)*profile.damage_multiplier)
 	var coating:=context.items.coating(attack_weapon_uid)
 	if coating:
 		arrow.tags.append_array(coating.payload.tags); arrow.statuses=coating.payload.statuses.duplicate()
 	context.region.root.add_child(arrow); arrow.global_position=context.actor.global_position
+func equipment_value(key: String) -> float:
+	var equipment:=context.actor.get_node_or_null("EquipmentManager") as EquipmentManager
+	return equipment.get_modifier_value(key) if equipment else 0.0
+func attack_observation() -> Dictionary:
+	if mode!="attack" or not profile: return {}
+	return {"serial":_attack_sequence,"windup":maxf(0,profile.windup-elapsed),"reach":profile.reach,"heavy":profile.guard_pressure>1 or profile.windup>=.35}
+func is_preparing() -> bool:
+	var manager:=context.actor.get_node("SkillManager") as SkillManager
+	var preparing:=manager.combinations.is_busy() or mode in ["item","aim_item","spray"] or mode=="attack" and profile and profile.projectile_speed>0 and elapsed<profile.windup
+	if "casting" in context.actor and context.actor.casting:
+		var casting: PlayerCastingController=context.actor.casting
+		preparing=preparing or not casting._charging_source.is_empty() or not casting._channeling_source.is_empty()
+	return preparing or context.preparation_query.is_valid() and bool(context.preparation_query.call())
+func resolve_strike(hit: HitContext,result: HitResult) -> void:
+	if not hit.strike or result.blocked or not result.damage_accepted or result.damage_dealt<=0: return
+	if hit.strike.interrupts_preparation and hit.was_preparing:
+		interrupt(.35); result.interrupted=true
+	if hit.strike.push_distance>0 and is_instance_valid(hit.source):
+		var direction: Vector2=context.actor.global_position-hit.source.global_position
+		if direction.is_zero_approx(): direction=-facing
+		_push_remaining=.18; _push_velocity=direction.normalized()*hit.strike.push_distance/.18
+		result.pushed=true
 func _scan_contacts() -> void:
 	var actor:=context.actor
 	var shape:=CircleShape2D.new()
@@ -243,6 +295,7 @@ func _scan_contacts() -> void:
 func contact(target: Node2D) -> HitResult:
 	var rejected:=HitResult.new()
 	if mode!="attack" or elapsed<profile.windup or elapsed>profile.windup+profile.active or not is_instance_valid(target) or target==context.actor: return rejected
+	if str(context.items.equipped(context.id).get(str(EquipmentData.SlotType.RIGHT_HAND),""))!=attack_weapon_uid: return rejected
 	var offset:=target.global_position-context.actor.global_position
 	if offset.length()>profile.reach or not offset.is_zero_approx() and facing.dot(offset.normalized())<cos(deg_to_rad(profile.angle_degrees*.5)): return rejected
 	var ray:=PhysicsRayQueryParameters2D.create(context.actor.global_position,target.global_position,1,[context.actor.get_rid()])
@@ -266,7 +319,7 @@ func contact(target: Node2D) -> HitResult:
 		ActorCombatModel.apply_melee_surface(target,tags)
 	skill.tags=tags
 	var damage:=roundi(float(context.actor.get("attack_damage") if "attack_damage" in context.actor else context.actor.combat_component.attack_damage)*profile.damage_multiplier)
-	var result:=CombatExecutor.report_hit(context.actor,target,damage,target.global_position,skill,tags,_family,profile.impact)
+	var result:=CombatExecutor.report_hit(context.actor,target,damage,target.global_position,skill,tags,_family,profile.impact,profile)
 	if result.damage_dealt>0 and context.reward_eligible and context.facts and (not "rewards_enabled" in target or target.rewards_enabled): context.facts.publish("melee_hit",context.id,{"target":str(id),"damage":result.damage_dealt,"family":_family})
 	return result
 func defend(hit: HitContext,result: HitResult,impact: float) -> void:
@@ -274,18 +327,22 @@ func defend(hit: HitContext,result: HitResult,impact: float) -> void:
 	if mode=="dodge" and elapsed>=.08 and elapsed<=.22:
 		result.accepted=false; result.damage_accepted=false; result.status_accepted=false; result.rejection="dodge"
 		return
+	impact*=1-clampf(equipment_value("impact_resistance"),0,.4)
 	var physical: bool="melee" in hit.tags or "physical" in hit.tags
 	if guarding and physical and is_instance_valid(hit.source):
 		var direction: Vector2=hit.source.global_position-context.actor.global_position
 		if direction.is_zero_approx() or facing.dot(direction.normalized())>=cos(deg_to_rad(60)):
 			var manager:=context.actor.get_node_or_null("EquipmentManager") as EquipmentManager
 			var shield:=manager and manager.get_all_equipped().any(func(item): return item.world_shape=="shield")
-			var cost:=maxf(1,impact)*(.4 if shield else .6)*activity_efficiency(SkillMastery.School.DEFENSE)
+			var cost:=maxf(1,impact)*(.4 if shield else .6)*activity_efficiency(SkillMastery.School.DEFENSE)*(hit.strike.guard_pressure if hit.strike else 1.0)
 			if stamina.spend(cost):
 				result.blocked=true
+				result.parried=guard_age<=PARRY_WINDOW and not _parry_spent and (not hit.strike or hit.strike.guard_pressure<=1.0)
+				if result.parried:
+					_parry_spent=true; counter_remaining=.85
 				hit.damage=roundi(hit.damage*(0.0 if shield else .4))
 				if shield: result.status_accepted=false
-				impact*=.5 if shield else .8
+				impact=0 if result.parried else impact*(.5 if shield else .8)
 				if context.reward_eligible and context.facts: context.facts.publish("hit_blocked",context.id,{"impact":impact,"family":hit.family_id})
 			else:
 				stamina.current=0
@@ -297,6 +354,7 @@ func defend(hit: HitContext,result: HitResult,impact: float) -> void:
 		if duration>0: interrupt(duration)
 func interrupt(seconds: float) -> void:
 	combo_remaining=0; combo_index=0; _ammo_uid=""
+	counter_remaining=0; counter_strike=false; _push_remaining=0
 	if context.item_actions: context.item_actions.cancel()
 	if context.spray: context.spray.stop()
 	_cancel_work(); _cancel_cast()
@@ -305,6 +363,7 @@ func interrupt(seconds: float) -> void:
 	mode="stagger"; elapsed=0; remaining=duration
 func cancel(_reason := "cancelled") -> void:
 	combo_remaining=0; combo_index=0; _ammo_uid=""
+	counter_remaining=0; counter_strike=false; _push_remaining=0
 	operation_id+=1
 	mode="idle"; remaining=0; elapsed=0
 	_hit_targets.clear()
@@ -317,6 +376,7 @@ func burden_cost() -> float:
 func burden_speed() -> float:
 	return clampf(1.0/burden_cost(),.35,1)
 func _cancel_cast() -> void:
+	if context.cancel_preparation.is_valid(): context.cancel_preparation.call()
 	var manager:=context.actor.get_node_or_null("SkillManager") as SkillManager
 	if manager and manager.combinations: manager.combinations.cancel("动作中断准备")
 	if "casting" in context.actor and context.actor.casting: context.actor.casting.cancel_all()
@@ -328,7 +388,9 @@ func _draw() -> void:
 	if not active(): return
 	if mode=="attack" and elapsed<profile.windup:
 		var angle:=facing.angle()
-		draw_arc(Vector2.ZERO,profile.reach,angle-deg_to_rad(profile.angle_degrees*.5),angle+deg_to_rad(profile.angle_degrees*.5),20,Color(1,.7,.3,.6),2,true)
+		draw_arc(Vector2.ZERO,profile.reach,angle-deg_to_rad(profile.angle_degrees*.5),angle+deg_to_rad(profile.angle_degrees*.5),20,Color(1,.35,.18,.65) if profile.guard_pressure>1 or profile.windup>=.35 else Color(1,.7,.3,.6),2,true)
+	if mode=="attack": _draw_weapon_motion()
+	if counter_remaining>0: draw_arc(Vector2.ZERO,34,0,TAU*counter_remaining/.85,24,Color("e0bf70"),2,true)
 	if guarding: draw_arc(Vector2.ZERO,30,facing.angle()-PI/3,facing.angle()+PI/3,16,Color(.5,.8,1),3,true)
 
 func activity_efficiency(school: SkillMastery.School) -> float:
@@ -349,3 +411,40 @@ func rest_elapsed(seconds: float) -> void:
 	cancel("rest_time")
 	stamina.advance(seconds)
 	stability.advance(seconds)
+
+func _draw_weapon_motion() -> void:
+	var manager:=context.actor.get_node_or_null("EquipmentManager") as EquipmentManager
+	var weapon:=manager.get_equipment(EquipmentData.SlotType.RIGHT_HAND) if manager else null
+	var color:=weapon.world_color if weapon else Color("c6a17e")
+	var coating:=context.items.coating(attack_weapon_uid)
+	if coating: color=color.lerp(coating.payload.color,.8)
+	if counter_strike: color=color.lerp(Color("f3d58a"),.55)
+	var before:=elapsed<profile.windup
+	var active_phase:=elapsed>=profile.windup and elapsed<profile.windup+profile.active
+	var progress:=clampf(elapsed/maxf(.001,profile.windup),0,1) if before else clampf((elapsed-profile.windup)/profile.active,0,1) if active_phase else 1-clampf((elapsed-profile.windup-profile.active)/maxf(.001,profile.recovery),0,1)
+	var angle:=facing.angle()
+	var length:=profile.reach*(.42+.2*progress if before else 1.0 if active_phase else .4+.6*progress)
+	if profile.motion in ["slash","sweep"]:
+		var span:=deg_to_rad(profile.angle_degrees*.5)
+		angle+=(-span*(.4+.6*progress)) if before else lerpf(-span,span,progress) if active_phase else span*progress
+	var direction:=Vector2.from_angle(angle)
+	if profile.motion=="shot":
+		draw_set_transform(Vector2.ZERO,facing.angle())
+		draw_arc(Vector2(12,0),18,-PI/2,PI/2,16,color,3,true)
+		var string_point:=Vector2(10-9*progress,0)
+		draw_polyline(PackedVector2Array([Vector2(12,-18),string_point,Vector2(12,18)]),Color("dacead"),1,true)
+		draw_line(string_point,string_point+Vector2(25,0),Color("ded1a7"),2,true)
+		draw_set_transform(Vector2.ZERO)
+		return
+	if active_phase:
+		draw_arc(Vector2.ZERO,profile.reach,facing.angle()-deg_to_rad(profile.angle_degrees*.5),facing.angle()+deg_to_rad(profile.angle_degrees*.5),24,Color(color,.13),2,true)
+		if profile.motion in ["slash","sweep"]: draw_arc(Vector2.ZERO,profile.reach,facing.angle()-deg_to_rad(profile.angle_degrees*.5),angle,18,Color(color,.24),5,true)
+		else: draw_line(direction*12,direction*profile.reach,Color(color,.25),7,true)
+	var start:=direction*10
+	var tip:=direction*length
+	if not weapon: draw_circle(tip,5,color); return
+	draw_line(start,tip,Color("302d27"),6,true)
+	draw_line(start,tip,color,3 if weapon.world_shape!="staff" else 5,true)
+	if weapon.world_shape=="staff": draw_circle(tip,5,color.lightened(.25))
+	elif weapon.world_shape=="spear": draw_colored_polygon(PackedVector2Array([tip+direction*2,tip-direction*10+direction.orthogonal()*4,tip-direction*10-direction.orthogonal()*4]),color.lightened(.25))
+	else: draw_line(start+direction*6-direction.orthogonal()*5,start+direction*6+direction.orthogonal()*5,Color("aa894b"),3,true)

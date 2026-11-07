@@ -16,13 +16,17 @@ func _process(delta: float) -> void:
 	if _clock>0:return
 	_clock=.1
 	var plan := actor.skill_manager.combinations.pending
-	_label.text=actor.enemy_name+"\nMP %d/%d"%[actor.mana_component.mp,actor.mana_component.max_mp]
+	var physical:=actor.actor_context.actions if actor.actor_context else null
+	var in_combat:=not actor.story_truce and physical and (physical.busy() or physical.guarding or is_instance_valid(actor.player) and actor.player.actor_context and (actor.player.actor_context.actions.busy() or actor.player.actor_context.actions.guarding or actor.player.actor_context.actions.counter_remaining>0))
+	_label.position.y=-76 if in_combat else -98
+	_label.text=actor.enemy_name
+	if not in_combat: _label.text+="\nMP %d/%d"%[actor.mana_component.mp,actor.mana_component.max_mp]
 	for entry in (actor.get_node("BuffManager") as BuffManager).get_active_buff_entries():
 		if entry.status_id in ["ember_focus","focus","frost_stride","resonant_guard"]:
 			_label.text+=" · "+entry.name
 	if not plan.is_empty():
 		_label.text+="\n"+plan.action.display_name+(" → "+plan.effect_label if plan.action.display_name!=plan.effect_label else "")
-	if actor.physical_loot:
+	if actor.physical_loot and not in_combat:
 		_label.text += "\n[F] 交涉 · 停战中" if actor.story_truce else "\n[F] 观察穿戴与行囊"
 	if is_instance_valid(actor.player):
 		_label.visible = actor.position.distance_to(actor.player.position) < 260

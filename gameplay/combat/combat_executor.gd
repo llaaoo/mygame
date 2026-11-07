@@ -65,8 +65,9 @@ static func same_combat_owner(source: Node2D, target: Node2D) -> bool:
 	var target_owner: Node2D=target.get_combat_owner() if target.has_method("get_combat_owner") else target
 	return is_instance_valid(source_owner) and source_owner==target_owner and (source_owner!=source or target_owner!=target)
 
-static func report_hit(caster: Node2D, target: Node2D, damage: int, position: Vector2, skill: SkillData = null, tags: Array = [], family_id: String = "", impact: float = 0.0) -> HitResult:
+static func report_hit(caster: Node2D, target: Node2D, damage: int, position: Vector2, skill: SkillData = null, tags: Array = [], family_id: String = "", impact: float = 0.0, strike: AttackProfile = null) -> HitResult:
 	var context := HitContext.new(caster, target, damage, position, skill, tags, family_id)
+	context.strike=strike
 	var result := HitResult.new()
 	result.attempted_damage = context.damage
 	if not is_instance_valid(target) or not target.has_method("take_damage"):
@@ -87,6 +88,7 @@ static func report_hit(caster: Node2D, target: Node2D, damage: int, position: Ve
 		return result
 	var capabilities:=target.get("actor_context") as ActorContext if "actor_context" in target else null
 	if capabilities and capabilities.actions and result.damage_accepted:
+		context.was_preparing=capabilities.actions.is_preparing()
 		capabilities.actions.defend(context,result,impact if impact>0 else skill.impact_power if skill and skill.impact_power>0 else 35.0 if "impact" in context.tags else 0.0)
 		if not result.accepted: return _complete_defense(target,result)
 	var before := health.hp if health else 0
@@ -116,6 +118,8 @@ static func report_hit(caster: Node2D, target: Node2D, damage: int, position: Ve
 	if is_instance_valid(health):
 		result.damage_dealt = maxi(0, before - health.hp)
 		health.end_hit_group()
+	if capabilities and capabilities.actions and result.damage_dealt>0 and is_instance_valid(target) and (not health or not health.is_dead):
+		capabilities.actions.resolve_strike(context,result)
 	if instance:
 		instance._current_family = previous_family
 		instance._current_hit = previous_hit
@@ -124,8 +128,8 @@ static func report_hit(caster: Node2D, target: Node2D, damage: int, position: Ve
 
 static func _complete_defense(target: Node2D,result: HitResult) -> HitResult:
 	# Presentation observes final outcomes after hit-group/resource settlement.
-	if instance and (result.blocked or result.guard_broken or result.rejection=="dodge"):
-		var outcome: Dictionary={"blocked":result.blocked,"guard_broken":result.guard_broken,"dodged":result.rejection=="dodge","damage":result.damage_dealt}
+	if instance and (result.blocked or result.guard_broken or result.rejection=="dodge" or result.interrupted or result.pushed):
+		var outcome: Dictionary={"parried":result.parried,"interrupted":result.interrupted,"pushed":result.pushed,"blocked":result.blocked,"guard_broken":result.guard_broken,"dodged":result.rejection=="dodge","damage":result.damage_dealt}
 		outcome.make_read_only()
 		instance.defense_resolved.emit(target,outcome)
 	return result

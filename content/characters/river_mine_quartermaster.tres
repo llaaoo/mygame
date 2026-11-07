@@ -6,11 +6,13 @@
 [ext_resource type="Resource" path="res://content/frontier/equipment/river_boots.tres" id="river_boots"]
 [ext_resource type="Resource" path="res://content/frontier/equipment/river_survey_spear.tres" id="river_survey_spear"]
 [ext_resource type="Resource" path="res://content/frontier/equipment/river_foreman_coat.tres" id="river_foreman_coat"]
+[ext_resource type="Resource" path="res://content/tactics/pressure.tres" id="temperament"]
 [sub_resource type="Resource" id="Loadout"]
 script = ExtResource("loadout")
 slots = Array[String](["focus"])
 [resource]
 script = ExtResource("data")
+temperament = ExtResource("temperament")
 id = "river_mine_quartermaster"
 title = "矿道运料官·芮克"
 strength = 3

@@ -8,6 +8,9 @@ var rejection := ""
 var attempted_damage := 0
 var damage_dealt := 0
 
+var parried := false
+var interrupted := false
+var pushed := false
 var blocked := false
 var guard_broken := false
 var impact_applied := 0.0

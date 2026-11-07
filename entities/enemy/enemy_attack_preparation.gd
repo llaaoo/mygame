@@ -14,6 +14,8 @@ var recovery := 0.0
 var _impact: Callable
 var _starting_health := 0
 
+func is_preparing() -> bool: return remaining>0
+
 func busy() -> bool: return remaining > 0 or recovery > 0
 
 func begin(victim: Node2D, facing: Vector2, seconds: float, after: float, callback: Callable, style: String, center := Vector2.ZERO, size := 0.0) -> bool:
