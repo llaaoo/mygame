@@ -21,6 +21,7 @@ var _actor_status: ActorStatusView
 
 
 func _ready() -> void:
+	GameUIStyle.install_theme(get_window())
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	layer = GameUIStyle.LAYER_HUD
 	add_to_group("hud_ui")

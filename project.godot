@@ -31,10 +31,6 @@ window/stretch/mode="canvas_items"
 
 enabled=PackedStringArray("res://addons/dialogue_manager/plugin.cfg", "res://addons/godot_mcp/plugin.cfg", "res://addons/godot_state_charts/plugin.cfg")
 
-[gui]
-
-theme/custom="res://ui/themes/grayriver.tres"
-
 [input]
 
 ui_left={

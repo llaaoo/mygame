@@ -27,7 +27,7 @@
 
 ## 实现边界
 
-- `ui/themes/grayriver.tres`与`GameUIStyle`负责全局主题；`InterfaceIcons`只选择显示符号。
+- `ui/themes/grayriver.tres`与`GameUIStyle`负责全局主题（HUD/远征UI进入树时安装到游戏Window，避免项目首导入在字体未导入时提前加载主题）；`InterfaceIcons`只选择显示符号。
 - `ExpeditionScreen`提供复用的导航/搜索/列表/详情/页脚场景。Hub和Workshop填充查询结果，领域服务独占资源与进度写入。
 - `FrontierArt`只裁切和绘制纹理；地理、碰撞、导航与介质维护仍归原服务。`ActorStatusView`接收显式角色上下文，兼容战役在HUD进入树后完成绑定。
 - 引入素材的许可、来源、修改与散列见[第三方素材](../content/art/THIRD_PARTY_ASSETS.md)。游戏内也提供署名入口。

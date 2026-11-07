@@ -191,3 +191,8 @@ static func keycap(text: String) -> Label:
 	label.custom_minimum_size=Vector2(24,22)
 	apply_label(label,12,TEXT_MAIN)
 	return label
+
+static func install_theme(window: Window) -> void:
+	# Project custom themes load before first-import fonts exist. Install only
+	# when a real game UI enters the tree, after imported resources are available.
+	if window.theme==null: window.theme=load("res://ui/themes/grayriver.tres") as Theme

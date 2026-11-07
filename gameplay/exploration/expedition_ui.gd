@@ -34,6 +34,7 @@ var _terrain_time := 0.0
 var _survival_label: Label
 
 func _ready() -> void:
+	GameUIStyle.install_theme(get_window())
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	layer = GameUIStyle.LAYER_RUN
 	var panel := PanelContainer.new()
