@@ -54,7 +54,8 @@ func run() -> void:
  game.loot.inspect("river.enemy.river_mine.quartermaster")
  await frames()
  var key:=InputEventKey.new()
- key.keycode=KEY_F
+ key.keycode=KEY_E
+ key.physical_keycode=KEY_E
  key.pressed=true
  Input.parse_input_event(key)
  await frames()

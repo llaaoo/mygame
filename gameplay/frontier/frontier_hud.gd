@@ -90,10 +90,10 @@ func _process(delta: float) -> void:
 	interact.get_parent().visible=is_instance_valid(target) and not game.player.health_component.is_dead and not get_tree().paused
 	if is_instance_valid(target):
 		var title: String=target.title if "title" in target else target.enemy_name if target is Enemy else target.spec.title if target is SpellWorldObject else "调查"
-		interact.text="E  "+title
+		interact.text=InputBindings.label("interact")+"  "+title
 func _unhandled_input(event: InputEvent) -> void:
 	if not event is InputEventKey or event.echo or game.ui.modal_locked: return
-	if event.pressed and event.keycode==KEY_F and is_instance_valid(game.ui.modal) and game.ui.modal.get_meta("frontier_page","")=="loot":
+	if event.is_action_pressed("loot_all") and is_instance_valid(game.ui.modal) and game.ui.modal.get_meta("frontier_page","")=="loot":
 		game.hub.take_all(); get_viewport().set_input_as_handled()
 	elif not get_tree().paused and event.keycode in KEYS:
 		var index:=KEYS.find(event.keycode)

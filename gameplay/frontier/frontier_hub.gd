@@ -40,7 +40,7 @@ func open(tab := "quests", source := "") -> void:
 		button.toggle_mode=true
 		button.button_pressed=page == key
 		tabs.add_child(button)
-	if page == "loot": root.add_child(W.label("遗骸 · 未取走的东西会留在原处。F尽量取走全部；点击选择，Esc关闭。",13,true))
+	if page == "loot": root.add_child(W.label("遗骸 · 未取走的东西会留在原处。E尽量取走全部；点击选择，Esc关闭。",13,true))
 	var tools:=root.tools
 	_search=root.search
 	_search.text_changed.connect(func(value: String): query=value; _refresh_rows())
@@ -55,7 +55,7 @@ func open(tab := "quests", source := "") -> void:
 	_rows=root.rows
 	_detail=root.detail
 	if page == "loot":
-		root.add_child(W.button("F  尽量全部取走",take_all))
+		root.add_child(W.button("E  尽量全部取走",take_all))
 	game.ui.show_view("灰河谷  /  "+("战利品" if page == "loot" else TABS.get(page,"旅程")),root)
 	game.ui.modal.set_meta("frontier_page",page)
 	_refresh_rows()
@@ -230,7 +230,7 @@ func _show_detail() -> void:
 				if not FrontierControls.set_quick_cast(value): game.ui.notify("本次设置已生效，但未保存到磁盘。"))
 			card.add_child(toggle)
 			card.add_child(preload("res://gameplay/foundation/ui/binding_editor.tscn").instantiate())
-			card.add_child(W.label("关闭时按住预览、松开施放。蓄力与引导仍需按住；Shift只表示显式消费恩赐。每次只执行一个基础动作，不自动组合。\n\nWASD 移动 · 空格闪避 · E交互\n1—6 基础动作 · 7/8/9/0 可绑定物品（默认食物）\nTab 远征面板 · J委托 · I/O装备 · N补给 · G地图\nV按住格挡 · Alt冲刺 · Ctrl+左键重击 · B放下背包\n地图滚轮缩放、中键/右键拖动、左键放路标。",14))
+			card.add_child(W.label("关闭时按住预览、松开施放。蓄力与引导仍需按住；Shift只表示显式消费恩赐。每次只执行一个基础动作，不自动组合。\n\nWASD 移动 · 空格闪避 · F交互\nQ/R与1—6 基础动作 · 7/8/9/0 可绑定物品（默认食物）\nTab 远征面板 · J委托 · I/O装备 · N补给 · G地图\n右键按住格挡 · Alt冲刺 · Ctrl+左键重击 · B放下背包\n地图滚轮缩放、中键/右键拖动、左键放路标。",14))
 
 func _pin(id: String) -> void:
 	game.guidance.pin(id)

@@ -42,7 +42,7 @@ func observe_health(hp: int,_maximum: int) -> void:
 func observe_fact(fact: Dictionary) -> void:
 	if fact.kind=="melee_hit" and fact.source=="player": melee_hits.append({"t":active_time,"data":fact.data.duplicate(true)})
 func observe_cast(plan: CastPlan) -> void:
-	casts.append({"t":active_time,"action":plan.action.get_id(),"result":plan.skill.get_id(),"rule":plan.rule_id,"mp_cost":plan.cost,"materials":plan.material_costs.duplicate(),"position":[game.player.position.x,game.player.position.y],"mp_after":game.player.mana_component.mp})
+	casts.append({"t":active_time,"action":plan.action.get_id(),"result":plan.skill.get_id(),"rule":plan.rule_id,"mp_cost":plan.cost,"charge_power":plan.charge_power,"materials":plan.material_costs.duplicate(),"position":[game.player.position.x,game.player.position.y],"mp_after":game.player.mana_component.mp})
 func write_json(name: String,data: Variant) -> void:
 	var f:=FileAccess.open(output.path_join(name),FileAccess.WRITE)
 	f.store_string(JSON.stringify(data,"  "))
@@ -97,6 +97,25 @@ func click(label: String) -> String:
 	Input.parse_input_event(event); await settle(2)
 	event=event.duplicate(); event.pressed=false; Input.parse_input_event(event); await settle(4)
 	return ""
+func label_click(label: String) -> String:
+	var target: Control
+	for node in root.find_children("*","Label",true,false):
+		if node.text==label and node.is_visible_in_tree(): target=node; break
+	if not target: return "missing_label: "+label
+	var parent:=target.get_parent()
+	while parent:
+		if parent is ScrollContainer: parent.ensure_control_visible(target)
+		parent=parent.get_parent()
+	await settle(3)
+	var point:=target.get_global_rect().get_center()
+	if not root.get_visible_rect().has_point(point): return "label_outside_viewport"
+	if DisplayServer.get_name()!="headless": Input.warp_mouse(point)
+	var motion:=InputEventMouseMotion.new(); motion.position=point; motion.global_position=point
+	Input.parse_input_event(motion); Input.flush_buffered_events(); await settle(3)
+	var event:=InputEventMouseButton.new(); event.position=point; event.global_position=point; event.button_index=MOUSE_BUTTON_LEFT; event.pressed=true
+	Input.parse_input_event(event); Input.flush_buffered_events(); await settle(3)
+	event=event.duplicate(); event.pressed=false; Input.parse_input_event(event); await settle(3)
+	return ""
 func screen(name: String) -> void:
 	if DisplayServer.get_name()=="headless": return
 	await process_frame; await RenderingServer.frame_post_draw
@@ -130,7 +149,7 @@ func snapshot() -> Dictionary:
 	var slots: Array[String]=[]
 	for i in range(6):
 		var inst:=actor.skill_manager.get_slot(i); slots.append(inst.data.get_id() if inst else "")
-	return {"active_seconds":active_time,"wall_usec":Time.get_ticks_usec(),"paused":paused,"simulation":GameRuntime.instance.is_processing(),"player":{"position":[actor.position.x,actor.position.y],"hp":actor.health_component.hp,"mp":actor.mana_component.mp,"damage_taken":damage_taken,"stamina":actor.actor_context.actions.stamina.current,"mode":actor.actor_context.actions.mode,"dead":actor.health_component.is_dead,"base":game.is_at_base()},"materials":actor.skill_manager.combinations.supplies.amounts,"items":game.session.inventory.entries("player.pocket"),"gear":game.session.inventory.entries("player.gear"),"pack":game.session.inventory.entries("player.pack"),"runtime_scripts":runtime_scripts(),"claims":game.progress.claims.keys(),"known_actions":actor.skill_manager.known_actions,"selected":actor.skill_manager.combinations.supplies.selected,"fields":fields,"slots":slots,"tracker":game.frontier_hud.tracker.text,"objective":game.ui.objective.text,"notice":game.ui.message.text,"modal_texts":texts,"buttons":buttons,"enemies":enemies,"casts":casts,"melee_hits":melee_hits,"save_path":ProjectSettings.globalize_path("user://save_3.sav"),"display":DisplayServer.get_name()}
+	return {"active_seconds":active_time,"wall_usec":Time.get_ticks_usec(),"paused":paused,"simulation":GameRuntime.instance.is_processing(),"player":{"position":[actor.position.x,actor.position.y],"hp":actor.health_component.hp,"mp":actor.mana_component.mp,"damage_taken":damage_taken,"stamina":actor.actor_context.actions.stamina.current,"mode":actor.actor_context.actions.mode,"dead":actor.health_component.is_dead,"base":game.is_at_base(),"guarding":actor.actor_context.actions.guarding,"charge_source":actor.casting._charging_source,"channel_source":actor.casting._channeling_source},"materials":actor.skill_manager.combinations.supplies.amounts,"items":game.session.inventory.entries("player.pocket"),"gear":game.session.inventory.entries("player.gear"),"pack":game.session.inventory.entries("player.pack"),"runtime_scripts":runtime_scripts(),"claims":game.progress.claims.keys(),"known_actions":actor.skill_manager.known_actions,"selected":actor.skill_manager.combinations.supplies.selected,"fields":fields,"slots":slots,"hands":{"q":actor.skill_manager.left_hand.data.get_id() if actor.skill_manager.left_hand else "","r":actor.skill_manager.right_hand.data.get_id() if actor.skill_manager.right_hand else ""},"tracker":game.frontier_hud.tracker.text,"objective":game.ui.objective.text,"notice":game.ui.message.text,"modal_texts":texts,"buttons":buttons,"enemies":enemies,"casts":casts,"melee_hits":melee_hits,"save_path":ProjectSettings.globalize_path("user://save_3.sav"),"display":DisplayServer.get_name()}
 func move_input(direction: Vector2) -> void:
 	for pair in [[KEY_D,direction.x>.35],[KEY_A,direction.x<-.35],[KEY_S,direction.y>.35],[KEY_W,direction.y<-.35]]:
 		if bool(held.get(pair[0],false))!=bool(pair[1]): key_event(pair[0],pair[1])
@@ -172,7 +191,21 @@ func execute(request: Dictionary) -> void:
 	var op:=str(request.get("op","state"))
 	match op:
 		"key": await tap(OS.find_keycode_from_string(str(request.key)))
+		"hold_key", "release_key":
+			key_event(OS.find_keycode_from_string(str(request.key)),op=="hold_key"); await settle(2)
+		"hold_mouse", "release_mouse":
+			var event:=InputEventMouseButton.new(); event.position=root.get_mouse_position(); event.button_index=MOUSE_BUTTON_RIGHT if request.get("button","right")=="right" else MOUSE_BUTTON_LEFT; event.pressed=op=="hold_mouse"
+			Input.parse_input_event(event); await settle(3)
+		"point_click":
+			var point:=Vector2(request.point[0],request.point[1])
+			if DisplayServer.get_name()!="headless": Input.warp_mouse(point)
+			var motion:=InputEventMouseMotion.new(); motion.position=point; motion.global_position=point
+			Input.parse_input_event(motion); Input.flush_buffered_events(); await settle(3)
+			var event:=InputEventMouseButton.new(); event.position=point; event.global_position=point; event.button_index=MOUSE_BUTTON_LEFT; event.pressed=true
+			Input.parse_input_event(event); Input.flush_buffered_events(); await settle(3)
+			event=event.duplicate(); event.pressed=false; Input.parse_input_event(event); await settle(3)
 		"click": error=await click(str(request.label))
+		"label_click": error=await label_click(str(request.label))
 		"walk": error=await walk(Vector2(request.point[0],request.point[1]),float(request.get("tolerance",24)),float(request.get("seconds",45)))
 		"duel": error=await duel(str(request.get("style","basic")),str(request.get("target","river.enemy.camp.forest.3")))
 		"aim": aim(Vector2(request.point[0],request.point[1])); await settle(2)

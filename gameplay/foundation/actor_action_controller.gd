@@ -62,6 +62,9 @@ func try_action(action: Action) -> OperationResult:
 				if actor.get_node("SkillManager").combinations.is_busy(): actor.get_node("SkillManager").combinations.cancel("移动中断准备")
 			return OperationResult.success()
 		Action.ActionType.GUARD:
+			if bool(action.params.get("held",false)):
+				_cancel_cast()
+				if context.spray: context.spray.stop()
 			guarding=bool(action.params.get("held",false)) and not busy() and can_guard()
 			if guarding and action.direction.length_squared()>.01: facing=action.direction.normalized()
 			return OperationResult.success()

@@ -23,7 +23,7 @@ func _process(delta: float) -> void:
 	if not plan.is_empty():
 		_label.text+="\n"+plan.action.display_name+(" → "+plan.effect_label if plan.action.display_name!=plan.effect_label else "")
 	if actor.physical_loot:
-		_label.text += "\n[E] 交涉 · 停战中" if actor.story_truce else "\n[E] 观察穿戴与行囊"
+		_label.text += "\n[F] 交涉 · 停战中" if actor.story_truce else "\n[F] 观察穿戴与行囊"
 	if is_instance_valid(actor.player):
 		_label.visible = actor.position.distance_to(actor.player.position) < 260
 		_label.modulate=Color("a5d5bd") if actor.story_truce else Color.WHITE

@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="SpellOperationData" load_steps=4 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/operations/spell_operation_data.gd" id="data"]
+[ext_resource type="Resource" path="res://content/spell_operations/sustain.tres" id="action"]
+[ext_resource type="Resource" path="res://content/spell_operations/payloads/legacy_ice_storm.tres" id="ice_storm"]
+[resource]
+script = ExtResource("data")
+action = ExtResource("action")
+aliases = PackedStringArray("ice_storm")
+payloads = [ExtResource("ice_storm")]

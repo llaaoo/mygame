@@ -1,0 +1,657 @@
+{
+  "source_baseline": "0f3a5bd26f52ab65c78706979fb4a262b43216b7",
+  "platform": "Linux Godot 4.6.3, native Xorg dummy, llvmpipe OpenGL, 1152x648",
+  "method": "Script-guided actual InputEvent keyboard/pointer events and UI clicks by visible labels. Existing game-generated save and ordinary inventory; normal AI retained. Nearby guard was already dead: this is input/consumption verification, not a combat balance trial.",
+  "stages": {
+    "40-keyboard-equipped": {
+      "player": {
+        "base": true,
+        "channel_source": "",
+        "charge_source": "",
+        "damage_taken": 0,
+        "dead": false,
+        "guarding": false,
+        "hp": 100,
+        "mode": "idle",
+        "mp": 60,
+        "position": [
+          -3113.244140625,
+          1862.29296875
+        ],
+        "stamina": 100.0
+      },
+      "materials": {
+        "ash": 2,
+        "charcoal": 1,
+        "clean_water": 4,
+        "cloth": 1,
+        "crystal": 6,
+        "fire_stone": 2,
+        "frost_salt": 2,
+        "grain": 3,
+        "herb": 2,
+        "poison_rag": 1,
+        "ration": 3,
+        "resin": 2,
+        "sap": 9,
+        "storm_dust": 3
+      },
+      "fields": [],
+      "selected": {},
+      "hands": {
+        "q": "project",
+        "r": "ignite"
+      },
+      "casts": []
+    },
+    "43-real-guard-cancel": {
+      "player": {
+        "base": false,
+        "channel_source": "",
+        "charge_source": "",
+        "damage_taken": 0,
+        "dead": false,
+        "guarding": true,
+        "hp": 100,
+        "mode": "idle",
+        "mp": 52,
+        "position": [
+          -3074.3525390625,
+          -1199.90844726562
+        ],
+        "stamina": 100.0
+      },
+      "materials": {
+        "ash": 2,
+        "charcoal": 1,
+        "clean_water": 4,
+        "cloth": 1,
+        "crystal": 6,
+        "fire_stone": 1,
+        "frost_salt": 2,
+        "grain": 3,
+        "herb": 2,
+        "poison_rag": 1,
+        "ration": 3,
+        "resin": 2,
+        "sap": 9,
+        "storm_dust": 3
+      },
+      "fields": [
+        {
+          "charges": 2,
+          "position": [
+            -3074.3525390625,
+            -1199.90844726562
+          ],
+          "remaining": 13.9882877777778,
+          "type": "fire"
+        }
+      ],
+      "selected": {
+        "inscribe": "ember",
+        "project": "charged_fireball"
+      },
+      "hands": {
+        "q": "project",
+        "r": "ignite"
+      },
+      "casts": [
+        {
+          "action": "inscribe",
+          "materials": {
+            "fire_stone": 1
+          },
+          "mp_after": 52,
+          "mp_cost": 8,
+          "position": [
+            -3074.3525390625,
+            -1199.90844726562
+          ],
+          "result": "inscribe",
+          "rule": "",
+          "t": 121.085534151515
+        }
+      ]
+    },
+    "44-no-payment-on-cancel": {
+      "player": {
+        "base": false,
+        "channel_source": "",
+        "charge_source": "",
+        "damage_taken": 0,
+        "dead": false,
+        "guarding": false,
+        "hp": 100,
+        "mode": "idle",
+        "mp": 52,
+        "position": [
+          -3074.3525390625,
+          -1199.90844726562
+        ],
+        "stamina": 100.0
+      },
+      "materials": {
+        "ash": 2,
+        "charcoal": 1,
+        "clean_water": 4,
+        "cloth": 1,
+        "crystal": 6,
+        "fire_stone": 1,
+        "frost_salt": 2,
+        "grain": 3,
+        "herb": 2,
+        "poison_rag": 1,
+        "ration": 3,
+        "resin": 2,
+        "sap": 9,
+        "storm_dust": 3
+      },
+      "fields": [
+        {
+          "charges": 2,
+          "position": [
+            -3074.3525390625,
+            -1199.90844726562
+          ],
+          "remaining": 13.6179303333333,
+          "type": "fire"
+        }
+      ],
+      "selected": {
+        "inscribe": "ember",
+        "project": "charged_fireball"
+      },
+      "hands": {
+        "q": "project",
+        "r": "ignite"
+      },
+      "casts": [
+        {
+          "action": "inscribe",
+          "materials": {
+            "fire_stone": 1
+          },
+          "mp_after": 52,
+          "mp_cost": 8,
+          "position": [
+            -3074.3525390625,
+            -1199.90844726562
+          ],
+          "result": "inscribe",
+          "rule": "",
+          "t": 121.085534151515
+        }
+      ]
+    },
+    "51-real-charged-projectile": {
+      "player": {
+        "base": false,
+        "channel_source": "",
+        "charge_source": "",
+        "damage_taken": 0,
+        "dead": false,
+        "guarding": false,
+        "hp": 100,
+        "mode": "idle",
+        "mp": 24,
+        "position": [
+          -3074.3525390625,
+          -1199.90844726562
+        ],
+        "stamina": 100.0
+      },
+      "materials": {
+        "ash": 2,
+        "clean_water": 4,
+        "cloth": 1,
+        "crystal": 6,
+        "frost_salt": 2,
+        "grain": 3,
+        "herb": 2,
+        "poison_rag": 1,
+        "ration": 3,
+        "resin": 2,
+        "sap": 9,
+        "storm_dust": 3
+      },
+      "fields": [
+        {
+          "charges": 1,
+          "position": [
+            -3074.3525390625,
+            -1199.90844726562
+          ],
+          "remaining": 13.4187223333333,
+          "type": "fire"
+        }
+      ],
+      "selected": {
+        "inscribe": "ember",
+        "project": "ember_orb"
+      },
+      "hands": {
+        "q": "project",
+        "r": "ignite"
+      },
+      "casts": [
+        {
+          "action": "inscribe",
+          "materials": {
+            "fire_stone": 1
+          },
+          "mp_after": 48,
+          "mp_cost": 8,
+          "position": [
+            -3074.3525390625,
+            -1199.90844726562
+          ],
+          "result": "inscribe",
+          "rule": "",
+          "t": 1.19302666666667
+        },
+        {
+          "action": "project",
+          "materials": {
+            "charcoal": 1
+          },
+          "mp_after": 24,
+          "mp_cost": 24,
+          "position": [
+            -3074.3525390625,
+            -1199.90844726562
+          ],
+          "result": "project",
+          "rule": "",
+          "t": 2.57695366666667
+        }
+      ]
+    },
+    "52-left-weapon": {
+      "player": {
+        "base": false,
+        "channel_source": "",
+        "charge_source": "",
+        "damage_taken": 0,
+        "dead": false,
+        "guarding": false,
+        "hp": 100,
+        "mode": "attack",
+        "mp": 24,
+        "position": [
+          -3074.3525390625,
+          -1199.90844726562
+        ],
+        "stamina": 88.0
+      },
+      "materials": {
+        "ash": 2,
+        "clean_water": 4,
+        "cloth": 1,
+        "crystal": 6,
+        "frost_salt": 2,
+        "grain": 3,
+        "herb": 2,
+        "poison_rag": 1,
+        "ration": 3,
+        "resin": 2,
+        "sap": 9,
+        "storm_dust": 3
+      },
+      "fields": [
+        {
+          "charges": 1,
+          "position": [
+            -3074.3525390625,
+            -1199.90844726562
+          ],
+          "remaining": 13.2614503333333,
+          "type": "fire"
+        }
+      ],
+      "selected": {
+        "inscribe": "ember",
+        "project": "ember_orb"
+      },
+      "hands": {
+        "q": "project",
+        "r": "ignite"
+      },
+      "casts": [
+        {
+          "action": "inscribe",
+          "materials": {
+            "fire_stone": 1
+          },
+          "mp_after": 48,
+          "mp_cost": 8,
+          "position": [
+            -3074.3525390625,
+            -1199.90844726562
+          ],
+          "result": "inscribe",
+          "rule": "",
+          "t": 1.19302666666667
+        },
+        {
+          "action": "project",
+          "materials": {
+            "charcoal": 1
+          },
+          "mp_after": 24,
+          "mp_cost": 24,
+          "position": [
+            -3074.3525390625,
+            -1199.90844726562
+          ],
+          "result": "project",
+          "rule": "",
+          "t": 2.57695366666667
+        }
+      ]
+    },
+    "53-right-guard": {
+      "player": {
+        "base": false,
+        "channel_source": "",
+        "charge_source": "",
+        "damage_taken": 0,
+        "dead": false,
+        "guarding": true,
+        "hp": 100,
+        "mode": "idle",
+        "mp": 24,
+        "position": [
+          -3074.3525390625,
+          -1199.90844726562
+        ],
+        "stamina": 92.0000000000001
+      },
+      "materials": {
+        "ash": 2,
+        "clean_water": 4,
+        "cloth": 1,
+        "crystal": 6,
+        "frost_salt": 2,
+        "grain": 3,
+        "herb": 2,
+        "poison_rag": 1,
+        "ration": 3,
+        "resin": 2,
+        "sap": 9,
+        "storm_dust": 3
+      },
+      "fields": [
+        {
+          "charges": 1,
+          "position": [
+            -3074.3525390625,
+            -1199.90844726562
+          ],
+          "remaining": 12.0645423333333,
+          "type": "fire"
+        }
+      ],
+      "selected": {
+        "inscribe": "ember",
+        "project": "ember_orb"
+      },
+      "hands": {
+        "q": "project",
+        "r": "ignite"
+      },
+      "casts": [
+        {
+          "action": "inscribe",
+          "materials": {
+            "fire_stone": 1
+          },
+          "mp_after": 48,
+          "mp_cost": 8,
+          "position": [
+            -3074.3525390625,
+            -1199.90844726562
+          ],
+          "result": "inscribe",
+          "rule": "",
+          "t": 1.19302666666667
+        },
+        {
+          "action": "project",
+          "materials": {
+            "charcoal": 1
+          },
+          "mp_after": 24,
+          "mp_cost": 24,
+          "position": [
+            -3074.3525390625,
+            -1199.90844726562
+          ],
+          "result": "project",
+          "rule": "",
+          "t": 2.57695366666667
+        }
+      ]
+    }
+  },
+  "casts": [
+    {
+      "action": "inscribe",
+      "materials": {
+        "fire_stone": 1
+      },
+      "mp_after": 48,
+      "mp_cost": 8,
+      "position": [
+        -3074.3525390625,
+        -1199.90844726562
+      ],
+      "result": "inscribe",
+      "rule": "",
+      "t": 1.19302666666667
+    },
+    {
+      "action": "project",
+      "materials": {
+        "charcoal": 1
+      },
+      "mp_after": 24,
+      "mp_cost": 24,
+      "position": [
+        -3074.3525390625,
+        -1199.90844726562
+      ],
+      "result": "project",
+      "rule": "",
+      "t": 2.57695366666667
+    },
+    {
+      "action": "ignite",
+      "materials": {},
+      "mp_after": 12,
+      "mp_cost": 12,
+      "position": [
+        -3074.3525390625,
+        -1199.90844726562
+      ],
+      "result": "fireball",
+      "rule": "fire_sigil_fireball",
+      "t": 4.67645255555555
+    }
+  ],
+  "reload_same": {
+    "materials": true,
+    "items": true,
+    "pack": true,
+    "gear": true,
+    "claims": true,
+    "known_actions": true,
+    "hands": true,
+    "slots": true
+  },
+  "reloaded": {
+    "player": {
+      "base": false,
+      "channel_source": "",
+      "charge_source": "",
+      "damage_taken": 0,
+      "dead": false,
+      "guarding": false,
+      "hp": 100,
+      "mode": "idle",
+      "mp": 12,
+      "position": [
+        -3074.3525390625,
+        -1199.90844726562
+      ],
+      "stamina": 100.0
+    },
+    "materials": {
+      "ash": 2,
+      "clean_water": 4,
+      "cloth": 1,
+      "crystal": 6,
+      "frost_salt": 2,
+      "grain": 3,
+      "herb": 2,
+      "poison_rag": 1,
+      "ration": 3,
+      "resin": 2,
+      "sap": 9,
+      "storm_dust": 3
+    },
+    "items": [
+      {
+        "definition": "ash",
+        "properties": {},
+        "quantity": 2,
+        "uid": "item.61"
+      },
+      {
+        "definition": "crystal",
+        "properties": {},
+        "quantity": 6,
+        "uid": "item.63"
+      },
+      {
+        "definition": "frost_salt",
+        "properties": {},
+        "quantity": 2,
+        "uid": "item.64"
+      },
+      {
+        "definition": "resin",
+        "properties": {},
+        "quantity": 2,
+        "uid": "item.65"
+      },
+      {
+        "definition": "sap",
+        "properties": {},
+        "quantity": 9,
+        "uid": "item.66"
+      },
+      {
+        "definition": "storm_dust",
+        "properties": {},
+        "quantity": 3,
+        "uid": "item.67"
+      },
+      {
+        "definition": "ration",
+        "properties": {},
+        "quantity": 3,
+        "uid": "item.68"
+      },
+      {
+        "definition": "grain",
+        "properties": {},
+        "quantity": 3,
+        "uid": "item.69"
+      },
+      {
+        "definition": "herb",
+        "properties": {},
+        "quantity": 2,
+        "uid": "item.70"
+      },
+      {
+        "definition": "clean_water",
+        "properties": {},
+        "quantity": 4,
+        "uid": "item.71"
+      }
+    ],
+    "pack": [
+      {
+        "definition": "poison_rag",
+        "properties": {},
+        "quantity": 1,
+        "uid": "item.12"
+      },
+      {
+        "definition": "river_coat",
+        "properties": {},
+        "quantity": 1,
+        "uid": "item.15"
+      },
+      {
+        "definition": "cloth",
+        "properties": {},
+        "quantity": 1,
+        "uid": "item.11"
+      }
+    ],
+    "gear": [
+      {
+        "definition": "river_sabre",
+        "properties": {},
+        "quantity": 1,
+        "uid": "item.14"
+      }
+    ],
+    "fields": [],
+    "selected": {},
+    "hands": {
+      "q": "project",
+      "r": "ignite"
+    },
+    "slots": [
+      "disperse",
+      "",
+      "",
+      "water_call",
+      "inscribe",
+      "ignite"
+    ],
+    "known_actions": {
+      "fire_sigil": true,
+      "ignite": true,
+      "oil_flask": true,
+      "project": true,
+      "water_call": true
+    }
+  },
+  "native_controlled_input": {
+    "passed": true,
+    "window": [
+      960,
+      600
+    ],
+    "script": "tests/test_keyboard_casting.gd",
+    "method": "Controlled fixture; real key/mouse events and native pointer warp; GUI events use Viewport local coordinates. Not a natural combat/budget run.",
+    "warning": "Changing VSync unsupported by llvmpipe driver; no script errors.",
+    "archive_revision": "fc391b0e411ee4e7186b6969ec4c2ac884b4c21e",
+    "exit_code": 0
+  },
+  "clean_archive_regression": {
+    "revision": "fc391b0e411ee4e7186b6969ec4c2ac884b4c21e",
+    "command": "python3 tools/run_tests.py --suite all --jobs 4",
+    "cold_import": true,
+    "passed": 71,
+    "total": 71,
+    "exit_code": 0,
+    "log": "keyboard_legacy_regression.txt",
+    "log_sha256": "253cd68b3f77f69bc894b172ec0b1516a6af482f0a69caebc35f2b370ebb650d"
+  }
+}

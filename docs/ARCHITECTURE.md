@@ -68,3 +68,5 @@ UI可以调用领域服务请求训练、制造、交付或施法，由服务验
 2026-11-07：新增 [物品动作、喷洒与真实来源](./ITEM_ACTIONS_AND_REACTIONS.md)，描述共用物品执行器、逐瓶余量、武器涂层、明确来源与临时能量的职责和验证。
 
 2026-11-07：当前接入与历史内容区分见[项目使用审计](PROJECT_USAGE_AUDIT.md)。输入默认项与用户改键统一由`InputBindings.install()`在Player入树时装配；场景不另行注册。探索战役使用`ExplorationProgressService`，不创建旧`QuestManager/QuestTracker`或禁用的`RunManager`；旧main入口仍保留房间与NPC任务验证。
+
+技能输入与历史能力迁移见[LEGACY_SKILL_INTEGRATION](LEGACY_SKILL_INTEGRATION.md)。旧left/right存储键保留兼容，输入解释为Q/R独立槽；新操作继续经过SpellOperationData、CastPlan和同一事务，不另建技能或材料执行链。

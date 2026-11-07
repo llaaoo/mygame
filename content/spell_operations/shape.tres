@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="data"]
+[resource]
+script = ExtResource("data")
+id = "shape"
+operation_id = "shape"
+display_name = "塑形"
+description = "站定塑形；M选择材料与真实法阵或残魂。区域效果固定于释放位置，召唤物临时存在，不掉永久物资。"
+conditional_cast = true
+mp_cost = 24
+cooldown = 8.0
+preparation = 0.8
+damage = 0
+damage_scaling = 0.0
+icon_atlas_index = 29
+school = 1

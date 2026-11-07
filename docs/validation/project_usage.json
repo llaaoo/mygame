@@ -17,7 +17,7 @@
     "core": 17,
     "entities": 27,
     "gameplay": 219,
-    "tests": 71,
+    "tests": 73,
     "tools": 25,
     "ui": 14,
     "world": 27
@@ -466,6 +466,10 @@
     },
     {
       "file": "gameplay/frontier/grayriver_definition.gd",
+      "expression": "res://content/spell_operations/%s.tres"
+    },
+    {
+      "file": "gameplay/frontier/grayriver_definition.gd",
       "expression": "res://world/object/%s.tscn"
     },
     {
@@ -486,6 +490,14 @@
     },
     {
       "file": "gameplay/run/run_manager.gd",
+      "expression": "res://gameplay/abilities/data/%s_data.tres"
+    },
+    {
+      "file": "tests/test_legacy_operation_coverage.gd",
+      "expression": "res://gameplay/abilities/data/%s_data.tres"
+    },
+    {
+      "file": "tests/test_legacy_operation_coverage.gd",
       "expression": "res://gameplay/abilities/data/%s_data.tres"
     },
     {

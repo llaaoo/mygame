@@ -367,10 +367,11 @@ func _perform_dash(skill: SkillData, ctx: CastContext) -> void:
 	if skill.buff_resource:
 		target_pos = _find_shadow_step_target(body, ctx.direction, skill.dash_distance)
 
+	target_pos=body.global_position+(target_pos-body.global_position).limit_length(skill.dash_distance)
 	var tween := body.create_tween()
 	_movement_tweens = _movement_tweens.filter(func(active: Tween): return active.is_valid() and active.is_running())
 	_movement_tweens.append(tween)
-	tween.tween_property(body, "global_position", target_pos,
+	tween.tween_method(_move_dash.bind(body), body.global_position, target_pos,
 		body.global_position.distance_to(target_pos) / skill.dash_speed
 	).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
 
@@ -382,6 +383,11 @@ func _perform_dash(skill: SkillData, ctx: CastContext) -> void:
 		_record_buff_trace(buff_preview, ctx.caster.name)
 
 		tween.tween_callback(_apply_dash_buff.bind(skill, ctx.caster))
+
+
+func _move_dash(point: Vector2, body: CharacterBody2D) -> void:
+	if is_instance_valid(body) and body.is_inside_tree():
+		body.move_and_collide(point-body.global_position)
 
 
 func _find_shadow_step_target(body: CharacterBody2D, direction: Vector2, max_dist: float) -> Vector2:

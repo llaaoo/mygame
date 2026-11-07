@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="data"]
+[resource]
+script = ExtResource("data")
+id = "step"
+operation_id = "step"
+display_name = "移形"
+description = "以真实材料和脚下凝能阵交换位移；短移、突袭与长移由所选材料决定，墙体阻挡。"
+conditional_cast = true
+mp_cost = 18
+cooldown = 6.0
+preparation = 0.15
+damage = 0
+damage_scaling = 0.0
+icon_atlas_index = 23
+school = 4

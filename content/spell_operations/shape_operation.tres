@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="SpellOperationData" load_steps=14 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/operations/spell_operation_data.gd" id="data"]
+[ext_resource type="Resource" path="res://content/spell_operations/shape.tres" id="action"]
+[ext_resource type="Resource" path="res://content/spell_operations/payloads/legacy_magma_pool.tres" id="magma_pool"]
+[ext_resource type="Resource" path="res://content/spell_operations/payloads/legacy_flame_storm.tres" id="flame_storm"]
+[ext_resource type="Resource" path="res://content/spell_operations/payloads/legacy_blizzard.tres" id="blizzard"]
+[ext_resource type="Resource" path="res://content/spell_operations/payloads/legacy_storm_field.tres" id="storm_field"]
+[ext_resource type="Resource" path="res://content/spell_operations/payloads/legacy_static_nova.tres" id="static_nova"]
+[ext_resource type="Resource" path="res://content/spell_operations/payloads/legacy_miasma_ring.tres" id="miasma_ring"]
+[ext_resource type="Resource" path="res://content/spell_operations/payloads/legacy_venom_burst.tres" id="venom_burst"]
+[ext_resource type="Resource" path="res://content/spell_operations/payloads/legacy_radiant_aegis.tres" id="radiant_aegis"]
+[ext_resource type="Resource" path="res://content/spell_operations/payloads/legacy_summon_golem.tres" id="summon_golem"]
+[ext_resource type="Resource" path="res://content/spell_operations/payloads/legacy_summon_skeleton.tres" id="summon_skeleton"]
+[ext_resource type="Resource" path="res://content/spell_operations/payloads/legacy_summon_wisp.tres" id="summon_wisp"]
+[resource]
+script = ExtResource("data")
+action = ExtResource("action")
+aliases = PackedStringArray("magma_pool", "flame_storm", "blizzard", "storm_field", "static_nova", "miasma_ring", "venom_burst", "radiant_aegis", "summon_golem", "summon_skeleton", "summon_wisp")
+payloads = [ExtResource("magma_pool"), ExtResource("flame_storm"), ExtResource("blizzard"), ExtResource("storm_field"), ExtResource("static_nova"), ExtResource("miasma_ring"), ExtResource("venom_burst"), ExtResource("radiant_aegis"), ExtResource("summon_golem"), ExtResource("summon_skeleton"), ExtResource("summon_wisp")]

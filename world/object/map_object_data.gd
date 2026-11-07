@@ -10,7 +10,7 @@ extends Resource
 ## 交互属性
 @export var tags: Array[String] = []         ## ["wooden","flammable","obstacle"]
 @export var reactions: Array[String] = []    ## 响应的技能标签 ["fire","ice","lightning"]
-@export var is_interactable: bool = false    ## 是否可按E键交互（宝箱、门）
+@export var is_interactable: bool = false    ## 是否可按F键交互（宝箱、门）
 @export var is_persistent: bool = true       ## 是否持久化状态
 
 ## 破坏后果

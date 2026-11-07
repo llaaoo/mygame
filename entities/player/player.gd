@@ -324,6 +324,7 @@ func _setup_boss_bar() -> void:
 
 func _setup_skill_pool_ui() -> void:
 	var ui := SkillPoolUI.new()
+	skill_pool_ui=ui
 	ui.name = "SkillPoolUI"
 	WorldScope.presentation(self).add_child.call_deferred(ui)
 	ui.setup(_skill_pool, skill_manager)

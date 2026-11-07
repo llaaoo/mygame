@@ -125,10 +125,16 @@ func _build_ui() -> void:
 	left_vbox.add_child(_hint_label)
 
 	# ── 右侧：双手 + 快捷键槽 ──
+	var right_scroll:=ScrollContainer.new()
+	right_scroll.custom_minimum_size.x=300
+	right_scroll.size_flags_vertical=Control.SIZE_EXPAND_FILL
+	right_scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED
+	main_hbox.add_child(right_scroll)
 	var right_vbox := VBoxContainer.new()
 	right_vbox.custom_minimum_size = Vector2(285, 0)
 	right_vbox.add_theme_constant_override("separation", 4)
-	main_hbox.add_child(right_vbox)
+	right_vbox.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	right_scroll.add_child(right_vbox)
 
 	var detail_panel := PanelContainer.new()
 	detail_panel.custom_minimum_size = Vector2(285, 118)
@@ -144,9 +150,9 @@ func _build_ui() -> void:
 	_detail_box.add_theme_constant_override("separation", 4)
 	detail_margin.add_child(_detail_box)
 
-	right_vbox.add_child(_make_section_label("双手法术"))
-	_add_equip_slot(right_vbox, "left", "左手")
-	_add_equip_slot(right_vbox, "right", "右手")
+	right_vbox.add_child(_make_section_label("独立施法键（不占鼠标）"))
+	_add_equip_slot(right_vbox, "left", "施法 "+InputBindings.label("cast_left"))
+	_add_equip_slot(right_vbox, "right", "施法 "+InputBindings.label("skill"))
 
 	right_vbox.add_child(_make_section_label("快捷法术"))
 	for i in range(6):
@@ -195,6 +201,7 @@ func _add_equip_slot(parent: Control, source: String, label: String) -> void:
 	sub_lbl.text = label
 	info.add_child(sub_lbl)
 
+	for child in panel.find_children("*","Control",true,false): child.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	panel.gui_input.connect(_on_slot_clicked.bind(source))
 	panel.mouse_filter = Control.MOUSE_FILTER_STOP
 
@@ -312,6 +319,8 @@ func _refresh_detail() -> void:
 
 
 func _format_skill_stats(skill: SkillData) -> String:
+	if not skill.operation_id.is_empty():
+		return "M选择实物与来源，查看本次费用、范围和效果。\n蓄力/引导按住所编组键，其余按设置按下或松开施放。"
 	var lines: Array[String] = [
 		"%s · T%d · %s" % [_type_name(skill.skill_type), skill.tier, skill.role],
 		"伤害 %d  |  法力 %d  |  冷却 %.1fs" % [skill.damage, skill.mp_cost, skill.cooldown],
@@ -379,13 +388,16 @@ func _make_skill_card(skill: SkillData) -> PanelContainer:
 
 	var tp := Label.new()
 	tp.text = "%s · %s" % [_type_name(skill.skill_type), "%d 路" % skill.upgrades.size() if unlocked else "Lv.%d" % _unlock_level(skill)]
-	if skill.combination_only:
+	if not skill.operation_id.is_empty():
+		tp.text="基础操作 · M选来源"
+	elif skill.combination_only:
 		tp.text = "组合结果"
 	tp.add_theme_font_size_override("font_size", 9)
 	tp.add_theme_color_override("font_color", _type_color(skill.skill_type))
 	tp.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	vbox.add_child(tp)
 
+	for child in card.find_children("*","Control",true,false): child.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	card.gui_input.connect(_on_card_clicked.bind(skill))
 	card.mouse_filter = Control.MOUSE_FILTER_STOP
 	card.tooltip_text = "%s\n%s\n%s" % [skill.description, skill.mechanics, "已解锁" if unlocked else "%s Lv.%d 解锁" % [_school_name(skill.school), _unlock_level(skill)]]

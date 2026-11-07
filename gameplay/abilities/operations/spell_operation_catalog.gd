@@ -3,6 +3,7 @@ extends Resource
 @export var operations: Array[SpellOperationData]=[]
 @export var rules: Array[SpellCombinationRule]=[]
 @export var recipes: Array[CraftingRecipe]=[]
+const LEGACY_ACTIONS := {"fireball":"ignite","frost_lance":"ignite","lightning_bolt":"ignite","ice_explosion":"pulse"}
 static var _default: SpellOperationCatalog
 static func default_catalog() -> SpellOperationCatalog:
 	if not _default: _default=load("res://content/spell_operations/catalog.tres") as SpellOperationCatalog
@@ -12,6 +13,7 @@ func operation(id: String) -> SpellOperationData:
 		if entry.action.operation_id==id: return entry
 	return null
 func canonical(id: String) -> String:
+	if LEGACY_ACTIONS.has(id): return LEGACY_ACTIONS[id]
 	for entry in operations:
 		if id in entry.aliases: return entry.action.get_id()
 	return id

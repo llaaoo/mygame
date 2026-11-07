@@ -37,6 +37,8 @@ func knows_action(skill: SkillData) -> bool:
 		var registry := SpellOperationCatalog.default_catalog()
 		if registry.canonical(id) != id:
 			return false
+		for previous in registry.LEGACY_ACTIONS:
+			if registry.LEGACY_ACTIONS[previous]==id and known_actions.has(previous): return true
 		var operation := registry.operation(skill.operation_id)
 		if operation:
 			if not restrict_actions or known_actions.has(id):
@@ -379,11 +381,16 @@ func _execute_with_context(skill: SkillData, source: String, caster: Node2D, ctx
 		return false
 
 	var plan := combinations.build_plan(skill, caster, ctx.empower) if combinations else CastPlan.new()
+	if not skill.operation_id.is_empty() and combinations:
+		plan=combinations.preview_pulse(skill,caster,ctx.empower,channel_cost) if channel_cost>=0 else combinations.preview(skill,caster,ctx.empower)
+		if not plan.ready:
+			if exec_inst: exec_inst.enter_phase(CombatPhase.Phase.IDLE)
+			return false
 	if not combinations:
 		plan.skill = skill
 		plan.cost = _get_effective_mana_cost(skill, caster)
 		plan.cooldown = _get_effective_cooldown(skill, caster)
-	if channel_cost >= 0:
+	if channel_cost >= 0 and skill.operation_id.is_empty():
 		plan.cost = maxi(0, plan.cost - _get_effective_mana_cost(skill, caster) + channel_cost)
 	plan.actor = caster
 	plan.action = skill

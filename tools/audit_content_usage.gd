@@ -36,10 +36,13 @@ func run() -> void:
 	for id in npc_sources:
 		for source in npc_sources[id]: add_source(published,id,source)
 	var results: Dictionary={}
+	var payload_results: Dictionary={}
 	for operation in operations.operations:
 		if not player_sources.has(operation.action.get_id()): continue
 		for payload in operation.payloads:
-			if payload.effect: add_source(published,payload.effect.get_id(),operation.action.get_id()+"."+payload.id)
+			if payload.effect:
+				add_source(published,payload.effect.get_id(),operation.action.get_id()+"."+payload.id)
+				add_source(payload_results,payload.effect.get_id(),operation.action.get_id()+"."+payload.id)
 	for rule in chapter.spell_rules:
 		if rule_sources.has(rule.id): results[rule.result_skill.get_id()]=rule.id; published[rule.result_skill.get_id()]=[rule.id]
 	for rule in operations.rules:
@@ -66,7 +69,7 @@ func run() -> void:
 	for id in supplies.crafting_recipes:
 		if not recipe_sources.has(id): missing_recipes.append(id)
 	missing_recipes.sort()
-	var report:={"kind":"authored_resource_sources","scope":"Grayriver definitions; not a runtime coverage or dead-code proof","regions":chapter.regions.size(),"quests":chapter.quests.size(),"player_actions_with_world_sources":player_sources,"npc_actions_with_sources":npc_sources,"conditional_results_with_sources":results,"known_pool_definition_count":definitions.size(),"pool_entries_without_direct_current_source":without_source,"all_authored_skill_definition_count":authored.size(),"authored_skills_without_direct_current_source":authored_without_source,"legacy_room_skill_rewards":RunManager.SKILL_REWARD_IDS,"note":"Entries without direct sources may belong to legacy room rewards, skill trees, dynamic elemental knowledge or tools; do not delete from this list alone.","current_equipment":keys(current_gear),"legacy_equipment":keys(legacy_gear),"equipment_world_sources":gear_sources,"crafting_recipe_count":supplies.crafting_recipes.size(),"crafting_recipe_world_sources":recipe_sources,"recipes_without_note_source":missing_recipes}
+	var report:={"kind":"authored_resource_sources","scope":"Grayriver definitions; not a runtime coverage or dead-code proof","regions":chapter.regions.size(),"quests":chapter.quests.size(),"player_actions_with_world_sources":player_sources,"npc_actions_with_sources":npc_sources,"conditional_results_with_sources":results,"operation_payload_effects_with_sources":payload_results,"known_pool_definition_count":definitions.size(),"pool_entries_without_direct_current_source":without_source,"all_authored_skill_definition_count":authored.size(),"authored_skills_without_direct_current_source":authored_without_source,"legacy_room_skill_rewards":RunManager.SKILL_REWARD_IDS,"legacy_coverage":JSON.parse_string(FileAccess.get_file_as_string("res://content/spell_operations/legacy_coverage.json")),"note":"Entries without direct sources may belong to legacy room rewards, skill trees, dynamic elemental knowledge or tools; do not delete from this list alone.","current_equipment":keys(current_gear),"legacy_equipment":keys(legacy_gear),"equipment_world_sources":gear_sources,"crafting_recipe_count":supplies.crafting_recipes.size(),"crafting_recipe_world_sources":recipe_sources,"recipes_without_note_source":missing_recipes}
 	var path:="res://docs/validation/project_content_usage.json"
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--output="): path=arg.trim_prefix("--output=")
