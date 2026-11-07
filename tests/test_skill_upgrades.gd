@@ -49,13 +49,11 @@ func _init() -> void:
 	var equippable := load("res://gameplay/abilities/data/shadow_bolt_data.tres") as SkillData
 	pool.add_skill(equippable)
 	var manager := SkillManager.new()
-	manager._slots.resize(SkillManager.MAX_SLOTS)
 	manager.pool = pool
 	manager.equip_slot(0, equippable)
 	manager.upgrade_source("slot_0", "power")
 	var manager_state := manager.serialize_skill_state()
 	var restored_manager := SkillManager.new()
-	restored_manager._slots.resize(SkillManager.MAX_SLOTS)
 	restored_manager.pool = pool
 	restored_manager.restore_skill_state(manager_state)
 	if restored_manager.get_slot(0).get_upgrade_rank("power") != 1:

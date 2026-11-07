@@ -16,7 +16,7 @@ enum ActionType {
 	MOVE,          ## 移动（direction 有效）
 	MELEE,         ## 近战攻击
 	CAST,          ## 技能释放（skill_id + direction 有效）
-	INTERACT,      ## 交互（按 E）
+	INTERACT,      ## 交互（默认F）
 	DODGE,         ## 闪避
 	USE_ITEM,      ## 真实耗时物品使用
 	HEAVY_ATTACK,
@@ -40,7 +40,7 @@ var direction: Vector2 = Vector2.ZERO
 ## 技能 ID（CAST 使用）
 var skill_id: String = ""
 
-## 技能来源槽位（CAST 使用）："left" / "right" / "slot_0"~"slot_3"
+## 快捷来源标识（CAST/USE_ITEM使用），由QuickslotLoadout定义。
 var skill_source: String = ""
 
 ## 扩展参数

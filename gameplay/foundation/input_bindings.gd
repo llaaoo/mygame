@@ -3,16 +3,15 @@ extends RefCounted
 ## Gameplay defaults and user overrides have one owner. Menu-only bindings can
 ## overlap world bindings; UI ownership prevents them firing in both contexts.
 const PATH := "user://actor_bindings.cfg"
-const LAYOUT_VERSION := 3
+const LAYOUT_VERSION := 4
 const KEYS := {
 	"move_left":KEY_A,"move_right":KEY_D,"move_up":KEY_W,"move_down":KEY_S,
 	"dodge":KEY_SPACE,"interact":KEY_F,"loot_all":KEY_T,"field_method":KEY_C,
-	"skill_1":KEY_E,"skill_2":KEY_2,"skill_3":KEY_3,
+	"skill_1":KEY_1,"skill_2":KEY_2,"skill_3":KEY_3,
 	"skill_4":KEY_4,"skill_5":KEY_5,"skill_6":KEY_6,
-	"cast_left":KEY_Q,"skill":KEY_R,"sprint":KEY_ALT,"drop_pack":KEY_B,
-	"quick_item_1":KEY_Z,"quick_item_2":KEY_X,"quick_item_3":KEY_9,"quick_item_4":KEY_0,
+	"cast_left":KEY_Q,"cast_e":KEY_E,"skill":KEY_R,"sprint":KEY_ALT,"drop_pack":KEY_B,
+	"quick_item_1":KEY_7,"quick_item_2":KEY_8,"quick_item_3":KEY_9,"quick_item_4":KEY_0,
 }
-const SECONDARY_KEYS := {"skill_1":KEY_1,"quick_item_1":KEY_7,"quick_item_2":KEY_8}
 const MENU_KEYS := [KEY_TAB,KEY_ESCAPE,KEY_J,KEY_G,KEY_M,KEY_N,KEY_O,KEY_I,KEY_K,KEY_F5,KEY_F9]
 static var loaded := false
 static func _key(code: Key) -> InputEventKey:
@@ -22,7 +21,6 @@ static func defaults() -> Dictionary:
 	var result: Dictionary={}
 	for action in KEYS:
 		result[action]=[_key(KEYS[action])]
-		if SECONDARY_KEYS.has(action): result[action].append(_key(SECONDARY_KEYS[action]))
 	for action in ["attack","guard","heavy_attack"]:
 		var event:=InputEventMouseButton.new()
 		event.button_index=MOUSE_BUTTON_RIGHT if action=="guard" else MOUSE_BUTTON_LEFT
@@ -63,6 +61,7 @@ static func install() -> void:
 			var code: int=event.physical_keycode if event is InputEventKey else 0
 			if version<2 and action=="interact" and code==KEY_E: continue
 			if version<3 and (action=="loot_all" and code==KEY_E or action=="skill_1" and code==KEY_1): continue
+			if version==3 and action=="skill_1" and code==KEY_E: continue
 			var duplicate:=false
 			for other in overrides:
 				if context(other)==context(action) and _same(event,overrides[other]): duplicate=true
@@ -124,3 +123,10 @@ static func labels(action: String) -> String:
 static func label(action: String) -> String:
 	var bindings:=InputMap.action_get_events(action)
 	return bindings[0].as_text().replace(" (Physical)","").replace(" - Physical","") if not bindings.is_empty() else "—"
+
+static func action_for_source(source: String) -> String:
+	if source=="left": return "cast_left"
+	if source=="quick_e": return "cast_e"
+	if source=="right": return "skill"
+	if source.begins_with("item_"): return "quick_item_%d"%(int(source.trim_prefix("item_"))+1)
+	return "skill_%d"%(int(source.trim_prefix("slot_"))+1)

@@ -4,6 +4,7 @@ extends Node2D
 var context: ActorContext
 var aim_query: Callable
 var projectile_factory: Callable
+var input_source := ""
 var uid := ""
 var weapon_uid := ""
 var profile: ItemUseDefinition
@@ -15,7 +16,7 @@ var hp := 0
 var generation := 0
 var operation_id := 0
 func busy() -> bool: return not uid.is_empty()
-func begin(id: String,aim := false,requested_direction:=Vector2.ZERO) -> bool:
+func begin(id: String,aim := false,requested_direction:=Vector2.ZERO,shortcut_source := "") -> bool:
 	if busy() or context.actions.busy() or not available(): return false
 	if context.actor.get_node("SkillManager").combinations.is_busy(): return false
 	var source:=context.items.item(id)
@@ -28,6 +29,7 @@ func begin(id: String,aim := false,requested_direction:=Vector2.ZERO) -> bool:
 	weapon_uid=str(context.items.equipped(context.id).get(str(EquipmentData.SlotType.RIGHT_HAND),""))
 	if profile.kind==ItemUseDefinition.Kind.COATING and weapon_uid.is_empty(): return false
 	if context.actions.stamina.current<profile.stamina: return false
+	input_source=shortcut_source
 	uid=selected; origin=context.actor.position; hp=context.actor.get_node("HealthComponent").hp; generation=context.region.generation
 	operation_id=context.actions.operation_id
 	direction=requested_direction.normalized() if requested_direction.length_squared()>.01 else context.actions.facing
@@ -46,7 +48,7 @@ func confirm() -> bool:
 	aiming=false; origin=context.actor.position; context.actions.mode="item"; remaining=profile.duration; queue_redraw()
 	return true
 func cancel() -> void:
-	uid=""; aiming=false
+	uid=""; input_source=""; aiming=false
 	if context and context.actions and context.actions.mode in ["item","aim_item"]: context.actions.cancel("item_cancelled")
 	queue_redraw()
 func _input(event: InputEvent) -> void:

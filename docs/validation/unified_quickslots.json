@@ -1,0 +1,79 @@
+{
+  "baseline": "09f963c84eec7c1fae13cea8892e50ccb875cfe6",
+  "input_layout_version": 4,
+  "save_version": 7,
+  "shortcuts": {
+    "keys": [
+      "Q",
+      "E",
+      "R",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8",
+      "9",
+      "0"
+    ],
+    "default_aliases": false,
+    "binding_owner": "QuickslotLoadout",
+    "old_session_belt": "legacy import/read projection only; not written to new saves"
+  },
+  "inventory_counts": {
+    "actions": 11,
+    "effect_definitions": 82,
+    "food_effects": 5,
+    "hit_reactions": 9,
+    "manufacturing_recipes": 20,
+    "material_item_ids": 26,
+    "modifier_materials": 7,
+    "operations": 8,
+    "payloads": 49,
+    "rules": 37,
+    "status_ids": 28,
+    "surface_reactions": 16,
+    "surfaces": 8,
+    "survival_recipes": 4,
+    "usable_item_definitions": 10
+  },
+  "focused": {
+    "status": "passed",
+    "checks": [
+      "input_bindings",
+      "cast_refactor",
+      "controls_workflow",
+      "unified_quickslots",
+      "world_pointer_input",
+      "shared_characters",
+      "enemy_preparation",
+      "ui_system",
+      "playtest_iteration",
+      "skill_upgrades",
+      "item_actions",
+      "spray_channel",
+      "save_system",
+      "save_recovery",
+      "field_work",
+      "frontier_projects",
+      "content"
+    ]
+  },
+  "native": {
+    "status": "pending final archive verification"
+  },
+  "cold_archive": {
+    "status": "pending"
+  },
+  "limits": [
+    "Controlled knowledge, material grants and placement; no natural route or balance acceptance",
+    "Normal AI restored for the input phase; restart comparisons freeze enemies in the fixture",
+    "Player regeneration fixed for exact MP/item assertions",
+    "No controller or radial menu; software Xorg/llvmpipe display is not target hardware performance"
+  ],
+  "review": "docs/SPELL_SYSTEM_REVIEW.md",
+  "inventory": "docs/review/spell_inventory.json",
+  "github_actions": "kept disabled"
+}

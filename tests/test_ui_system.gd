@@ -29,7 +29,7 @@ func _run() -> void:
 		_check(status.get_global_rect().end.x <= run_top.get_global_rect().position.x, "HUD overlaps run objective")
 		_check(skill_panel.get_global_rect().end.y <= root.size.y, "skill bar leaves viewport")
 		var skill_bar := hud.get("skill_bar") as SkillBar
-		_check(skill_bar != null and (skill_bar.get("_sources") as Array).size() == 8, "skill bar must expose 2 hand and 6 quick slots")
+		_check(skill_bar != null and (skill_bar.get("_sources") as Array).size() == 9 and "quick_e" in skill_bar._sources and "slot_0" in skill_bar._sources, "skill bar must expose independent Q/E/R and six numeric shortcuts")
 
 	var inventory := scene.get_node_or_null("InventoryPanel") as CanvasLayer
 	var skill_pool := scene.get_node_or_null("SkillPoolUI") as CanvasLayer
@@ -87,7 +87,7 @@ func _test_expedition_layout() -> void:
 	_check(status.get_global_rect().end.x <= game.ui._heading_panel.get_global_rect().position.x, "Expedition heading overlaps resources at minimum width")
 	var bar := hud.get("skill_bar") as SkillBar
 	_check(bar._hint_panel.get_global_rect().end.y <= bar.global_position.y, "Cast information overlaps skill slots")
-	var tooltip := bar._panels[1]._make_custom_tooltip(bar._panels[1].tooltip_text) as Control
+	var tooltip := bar._panels[bar._sources.find("right")]._make_custom_tooltip(bar._panels[bar._sources.find("right")].tooltip_text) as Control
 	root.add_child(tooltip)
 	for i in range(2): await process_frame
 	_check(tooltip.size.x <= 400 and tooltip.size.y <= 480, "Skill tooltip covers the viewport")

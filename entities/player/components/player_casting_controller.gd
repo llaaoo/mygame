@@ -9,6 +9,8 @@ var _charge_skill: SkillData = null     ## 正在蓄力的技能数据
 var _channeling_source: String = ""     ## 正在引导的槽位
 var _channel_payload_signature := 0
 var _channel_empower := false
+var _channel_revision := -1
+var _charge_revision := -1
 var _channel_skill: SkillData = null    ## 正在引导的技能
 var _channel_mana_total := 0.0
 var _channel_timer: float = 0.0         ## tick 累加器
@@ -63,6 +65,7 @@ func _charge_source_matches(source: String) -> bool:
 
 func _begin_charge(source: String, skill: SkillData) -> void:
 	_charging_source = source
+	_charge_revision=player.skill_manager.shortcuts.revision(source)
 	_charge_skill = skill
 	_charge_power = 0.0
 	show_aim(source, skill)
@@ -77,6 +80,7 @@ func _cancel_charge() -> void:
 
 func _begin_channel(source: String, skill: SkillData, empower := false) -> void:
 	_channeling_source = source
+	_channel_revision=player.skill_manager.shortcuts.revision(source)
 	_channel_skill = skill
 	_channel_empower=empower
 	_channel_payload_signature = _payload_signature(skill)
@@ -95,7 +99,8 @@ func _cancel_channel() -> void:
 
 func _payload_signature(skill: SkillData) -> int:
 	var supplies:=player.skill_manager.combinations.supplies
-	return hash([supplies.selected.get(skill.get_id(),""),supplies.prepared_uids.get(skill.get_id(),"")])
+	var choice:=player.skill_manager.shortcuts.selection(_channeling_source)
+	return hash(choice) if not choice.is_empty() else hash([supplies.selected.get(skill.get_id(),""),supplies.prepared_uids.get(skill.get_id(),""),supplies.modifiers.get(skill.get_id(),"")])
 
 func _channel_tick(mana_cost: int) -> bool:
 	if not _channel_skill or not _is_equipped(_channeling_source, _channel_skill):
@@ -103,6 +108,8 @@ func _channel_tick(mana_cost: int) -> bool:
 	if not _channel_skill.operation_id.is_empty() and _payload_signature(_channel_skill)!=_channel_payload_signature: return false
 	var ctx := CastContext.simple(player, player.get_mouse_direction(), _channel_skill)
 	ctx.empower=_channel_empower
+	ctx.selection=player.skill_manager.shortcuts.selection(_channeling_source)
+	ctx.binding_revision=_channel_revision
 	return player.skill_manager.use_channel_tick(_channeling_source, player, ctx, mana_cost)
 
 func cast_hand_charged(hand: String, charge_power: float) -> bool:
@@ -119,9 +126,9 @@ func tick(delta: float) -> void:
 	if player.health_component.is_dead:
 		cancel_all()
 		return
-	if _charge_skill and not _is_equipped(_charging_source, _charge_skill):
+	if _charge_skill and (not _is_equipped(_charging_source, _charge_skill) or player.skill_manager.shortcuts.revision(_charging_source)!=_charge_revision):
 		cancel_source(_charging_source)
-	if _channel_skill and not _is_equipped(_channeling_source, _channel_skill):
+	if _channel_skill and (not _is_equipped(_channeling_source, _channel_skill) or player.skill_manager.shortcuts.revision(_channeling_source)!=_channel_revision):
 		cancel_source(_channeling_source)
 	_aim_refresh -= delta
 	if _aim_refresh <= 0 and not aiming_sources.is_empty():
@@ -174,7 +181,7 @@ func show_aim(_source: String, skill: SkillData) -> void:
 	if not skill or not _aim_line or not _aim_dot:
 		return
 	if player.skill_manager.combinations and player.skill_manager.combinations.handles(skill):
-		skill = player.skill_manager.combinations.preview(skill, player, Input.is_key_pressed(KEY_SHIFT)).skill
+		skill = player.skill_manager.preview_source(_source, Input.is_key_pressed(KEY_SHIFT)).skill
 
 	_aim_ground_targeted = skill.ground_targeted
 	if not _aim_ground_targeted and _aim_ring:

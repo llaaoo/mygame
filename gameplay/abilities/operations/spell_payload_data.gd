@@ -1,6 +1,7 @@
 class_name SpellPayloadData
 extends Resource
-## What is carried into an operation. No delivery geometry or executable scripts.
+## Substance or explicit effect blueprint. The operation owns input/timing;
+## an optional SkillData effect supplies existing geometry/status execution.
 @export var id := ""
 @export var title := ""
 @export_multiline var description := ""

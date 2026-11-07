@@ -37,11 +37,8 @@ var _icon_keys: Array = []
 
 func setup(sm: SkillManager) -> void:
 	_skill_manager = sm
-	_skill_manager.hand_changed.connect(_on_hand_changed)
-	_skill_manager.slot_changed.connect(_on_slot_changed)
+	_skill_manager.binding_changed.connect(func(_source: String): _refresh_all(); _invalidate_previews())
 	_skill_manager.cooldown_changed.connect(_on_cooldown)
-	_skill_manager.hand_changed.connect(_invalidate_previews)
-	_skill_manager.slot_changed.connect(_invalidate_previews)
 	_skill_manager.skill_upgraded.connect(_invalidate_previews)
 	_skill_manager.cast_committed.connect(_invalidate_previews)
 	_skill_manager.combinations.supplies.changed.connect(_invalidate_previews)
@@ -58,13 +55,8 @@ func _build() -> void:
 	_cost_labels.clear(); _affinity_strips.clear(); _icon_keys.clear()
 	_panels.clear(); _icons.clear(); _masks.clear(); _bind_labels.clear(); _cd_labels.clear(); _sources.clear()
 
-	# 左手
-	_add_item("left", "Q", HAND_SIZE)
-	# 右手
-	_add_item("right", "R", HAND_SIZE)
-	# 快捷键 1-6
-	for i in range(6):
-		_add_item("slot_%d" % i, str(i + 1), SLOT_SIZE)
+	for source in QuickslotLoadout.COMBAT_SOURCES:
+		_add_item(source,InputBindings.label(InputBindings.action_for_source(source)),SLOT_SIZE)
 
 	_refresh_all()
 	_hint_panel = PanelContainer.new()
@@ -102,6 +94,7 @@ func _process(_delta: float) -> void:
 	_preview_elapsed += _delta
 	if _preview_elapsed < 0.1: return
 	_preview_elapsed = 0.0
+	_refresh_items()
 	var controller := _skill_manager.combinations
 	var actor := _skill_manager.get_parent() as Player
 	var source := actor.casting.aimed_source() if actor else ""
@@ -116,8 +109,12 @@ func _process(_delta: float) -> void:
 		return
 	_combination_hint.show()
 	var previews: Dictionary = {}
-	var hint_key := hash([hint_instance.base_data, hint_instance.upgrade_ranks])
-	previews[hint_key] = controller.preview(action, _skill_manager.get_parent(), empower)
+	var hint_source:=source if not source.is_empty() and _skill_manager.get_instance(source) else "right"
+	if not _skill_manager.get_instance(hint_source):
+		for candidate in _sources:
+			if _skill_manager.get_instance(candidate)==hint_instance: hint_source=candidate; break
+	var hint_key := hash([hint_instance.base_data, hint_instance.upgrade_ranks,_skill_manager.shortcuts.selection(hint_source)])
+	previews[hint_key] = _skill_manager.preview_source(hint_source, empower)
 	var plan: CastPlan = previews[hint_key]
 	var action_name: String = action.display_name
 	if not controller.pending.is_empty():
@@ -144,19 +141,19 @@ func _process(_delta: float) -> void:
 	_hint_panel.size = Vector2(466, 0)
 	_hint_panel.global_position = global_position + Vector2(0, -_hint_panel.size.y - 12)
 	for i in range(_sources.size()):
-		_bind_labels[i].text=InputBindings.label("cast_left" if _sources[i]=="left" else "skill" if _sources[i]=="right" else "skill_%d"%(int(_sources[i].trim_prefix("slot_"))+1))
+		_bind_labels[i].text=InputBindings.label(InputBindings.action_for_source(_sources[i]))
 		var instance := _skill_manager.get_instance(_sources[i])
 		var preview: CastPlan
 		if instance and (controller.handles(instance.data) or not instance.data.operation_id.is_empty()):
-			var key := hash([instance.base_data, instance.upgrade_ranks])
+			var key := hash([instance.base_data, instance.upgrade_ranks,_skill_manager.shortcuts.selection(_sources[i])])
 			if not previews.has(key):
-				previews[key] = controller.preview(instance.data, _skill_manager.get_parent(), empower)
+				previews[key] = _skill_manager.preview_source(_sources[i], empower)
 			preview = previews[key]
 			var comparison_key := str(key) + ":comparison"
 			if not previews.has(comparison_key):
-				var alternate := controller.preview(instance.data, _skill_manager.get_parent(), not empower)
-				previews[comparison_key] = instance.data.display_name + "\n\n普通 · " + _brief_plan(alternate if empower else preview) + "\n\nShift · " + _brief_plan(preview if empower else alternate) + "\n\n数字为本次MP费用 · M查看完整材料与条件"
-			var binding: String="cast_left" if _sources[i]=="left" else "skill" if _sources[i]=="right" else "skill_%d"%(int(_sources[i].trim_prefix("slot_"))+1)
+				var alternate := _skill_manager.preview_source(_sources[i], not empower)
+				previews[comparison_key] = instance.data.display_name + "\n\n普通 · " + _brief_plan(alternate if empower else preview) + "\n\nShift · " + _brief_plan(preview if empower else alternate) + "\n\n数字为本次MP费用 · K配置此槽，未固定来源时跟随M"
+			var binding:=InputBindings.action_for_source(_sources[i])
 			_panels[i].tooltip_text = "按键："+InputBindings.labels(binding)+"\n"+previews[comparison_key]
 		if preview:
 			var icon_key: Variant = instance.data.icon if instance.data.icon else instance.data.icon_atlas_index
@@ -248,12 +245,8 @@ func _refresh_all() -> void:
 func _refresh_idx(idx: int) -> void:
 	var src := _sources[idx]
 	var skill: SkillData = null
-	match src:
-		"left":  skill = _skill_manager.left_hand.data if _skill_manager.left_hand else null
-		"right": skill = _skill_manager.right_hand.data if _skill_manager.right_hand else null
-		_:
-			var inst := _skill_manager.get_slot(src.trim_prefix("slot_").to_int())
-			skill = inst.data if inst else null
+	var instance:=_skill_manager.get_instance(src)
+	if instance: skill=instance.data
 
 	var icon := _icons[idx]
 	_icon_keys[idx] = (skill.icon if skill.icon else skill.icon_atlas_index) if skill else null
@@ -269,12 +262,13 @@ func _refresh_idx(idx: int) -> void:
 	_cost_labels[idx].text = str(skill.mp_cost) if skill else ""
 	_cost_labels[idx].tooltip_text = "本次法力费用"
 	_bind_labels[idx].visible = true
-	_bind_labels[idx].text=InputBindings.label("cast_left" if src=="left" else "skill" if src=="right" else "skill_%d"%(int(src.trim_prefix("slot_"))+1))
+	_bind_labels[idx].text=InputBindings.label(InputBindings.action_for_source(src))
 	_panels[idx].tooltip_text = "%s\n%s" % [skill.display_name, skill.description] if skill else "空槽"
 	_update_cooldown(idx)
 
 
 func _update_cooldown(idx: int, plan: CastPlan = null) -> void:
+	if _skill_manager.shortcuts.binding(_sources[idx]).get("kind","")=="item": return
 	var state := _skill_manager.get_cooldown_state(_sources[idx], plan)
 	var remaining: float = state.remaining
 	var total: float = state.duration
@@ -292,18 +286,6 @@ func _update_cooldown(idx: int, plan: CastPlan = null) -> void:
 		cd_label.visible = false
 
 
-func _on_hand_changed(_hand: String) -> void:
-	for i in range(_sources.size()):
-		if _sources[i] == "left" or _sources[i] == "right":
-			_refresh_idx(i)
-
-
-func _on_slot_changed(_idx: int) -> void:
-	for i in range(_sources.size()):
-		if _sources[i].begins_with("slot_"):
-			_refresh_idx(i)
-
-
 func _on_cooldown(source: String, _remaining: float, _total: float) -> void:
 	for i in range(_sources.size()):
 		if _sources[i] == source:
@@ -317,3 +299,15 @@ func _brief_plan(plan: CastPlan) -> String:
 	if not boon.is_empty(): text += "\n" + boon
 	if not plan.ready: text += "\n" + plan.reason
 	return text
+
+func _refresh_items() -> void:
+	for i in range(_sources.size()):
+		_bind_labels[i].text=InputBindings.label(InputBindings.action_for_source(_sources[i]))
+		var binding:=_skill_manager.shortcuts.binding(_sources[i])
+		if binding.get("kind","")!="item": continue
+		var view:=QuickslotView.item_state(_skill_manager.get_parent(),binding)
+		_icons[i].texture=view.icon; _icons[i].modulate=Color.WHITE if view.ready else GameUIStyle.TEXT_DISABLED
+		_cost_labels[i].text="×%d"%view.count
+		_cd_labels[i].text=str(view.title).left(3); _cd_labels[i].visible=view.icon==null
+		_panels[i].tooltip_text=view.title+"\n"+view.detail
+		_masks[i].visible=false; _affinity_strips[i].color=GameUIStyle.GOLD

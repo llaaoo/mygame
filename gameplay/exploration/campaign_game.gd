@@ -141,12 +141,13 @@ func _bootstrap() -> void:
 	_restore_loadout()
 	_restore_character()
 	equipment_service.restore()
+	session.equip_item=equipment_service.equip
 	session.bind_actor(player,"player",progress.equipment_counts,progress.equipment_loadout)
 	var start := start_location()
 	_change_region(start.region, start.position)
 	ready_for_play = true
 	player.skill_manager.hand_changed.connect(func(_source: String): _queue_save())
-	player.skill_manager.slot_changed.connect(func(_slot: int): _queue_save())
+	player.skill_manager.binding_changed.connect(func(_source: String): _queue_save())
 	player.skill_manager.combinations.supplies.changed.connect(_queue_save)
 	(player.get_node("EquipmentManager") as EquipmentManager).loadout_changed.connect(_queue_save)
 	presenter.show_arrival()
@@ -317,6 +318,7 @@ func reload_progress() -> void:
 	GameRuntime.instance.get_world_runtime().state_manager.set_all_states(progress.world_states)
 	_apply_knowledge()
 	_restore_loadout()
+	session.restore_shortcuts(player)
 	_restore_character()
 	equipment_service.restore()
 	knowledge.restore_clues()

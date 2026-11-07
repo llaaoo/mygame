@@ -104,9 +104,9 @@ func run() -> void:
 	check(rows.any(func(row): return row.uid==partial and "1剂" in row.subtitle),"Corpse hid partial bottle state")
 	check(game.loot.take(enemy_id,"materials","venom_sprayer",partial)==1 and store.item(partial).properties.doses==1 and store.locate(partial).begins_with("player."),"Looting changed the chosen bottle or refilled it")
 	check(store.item(enemy_weapon).properties.coating.id=="poison_rag","Death replaced the actual coated weapon")
-	check(game.session.bind_belt(0,"venom_bottle","throw") and game.session.snapshot().belt[0].method=="throw","Item binding did not persist")
+	check(game.session.bind_belt(0,"venom_bottle","throw") and game.player.skill_manager.serialize_skill_state().item_0.item_id=="venom_bottle","Item binding did not persist")
 	var repo:=SaveRepository.new()
-	for version in range(1,6): check(repo.migrate({"version":version,"player":{}}).version==6,"Old save did not migrate")
+	for version in range(1,7): check(repo.migrate({"version":version,"player":{}}).version==SaveRepository.VERSION,"Old save did not migrate")
 	check(use.begin("poison_rag"),"Save test coating refused"); use.advance(1.2)
 	var saved_coating:=store.item(weapon).properties.duplicate(true)
 	var saved_clock:=store.clock_seconds

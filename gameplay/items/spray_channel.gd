@@ -8,20 +8,24 @@ var source := ""
 var uid := ""
 var skill: SkillData
 var payload_id := ""
+var selection: Dictionary={}
+var binding_revision := -1
+var follows_global := false
 var direction:=Vector2.RIGHT
 var timer := 0.0
 var hp := 0
 var generation := 0
 var operation_id := 0
-func start(action: SkillData,binding: String,aim: Vector2) -> bool:
-	if active: return true
+func start(action: SkillData,binding: String,aim: Vector2,choice: Dictionary={}) -> bool:
+	if active: return source==binding and selection==choice
 	if get_tree().paused or context.actions.busy() or not context.region.available(): return false
 	var manager:=context.actor.get_node("SkillManager") as SkillManager
-	if manager.combinations.is_busy() or not manager.can_act(context.actor) or context.actor.get_node("HealthComponent").is_dead or "ui_blocked" in context.actor and context.actor.ui_blocked: return false
-	var preview:=manager.combinations.preview(action,context.actor)
+	if not manager.knows_action(action) or manager.combinations.is_busy() or not manager.can_act(context.actor) or context.actor.get_node("HealthComponent").is_dead or "ui_blocked" in context.actor and context.actor.ui_blocked: return false
+	var preview:=manager.combinations.preview(action,context.actor,false,choice)
 	if not preview.ready or preview.instance_costs.is_empty(): return false
 	uid=preview.instance_costs[0].uid
-	skill=action; source=binding; payload_id=str(manager.combinations.supplies.selected.get(action.get_id(),""))
+	skill=action; source=binding; selection=choice.duplicate(true); follows_global=choice.is_empty(); binding_revision=manager.shortcuts.revision(binding)
+	payload_id=str(choice.get("payload",manager.combinations.supplies.selected.get(action.get_id(),"")))
 	direction=aim.normalized() if aim.length_squared()>.01 else context.actions.facing
 	timer=preview.preparation; hp=context.actor.get_node("HealthComponent").hp; generation=context.region.generation; operation_id=context.actions.operation_id
 	active=true; context.actions.mode="spray"; context.actions.remaining=100000
@@ -44,7 +48,11 @@ func advance(delta: float) -> void:
 		var next:=Vector2(aim_query.call())
 		if next.is_finite() and next.length_squared()>.01: direction=next.normalized()
 	var manager:=actor.get_node("SkillManager") as SkillManager
-	if manager.get_instance(source)==null or manager.get_instance(source).data!=skill or str(manager.combinations.supplies.selected.get(skill.get_id(),""))!=payload_id: stop(); return
+	if manager.shortcuts.revision(source)!=binding_revision: stop(); return
+	var binding:=manager.shortcuts.binding(source)
+	if binding.get("kind","")=="skill" and (manager.get_instance(source)==null or manager.get_instance(source).data!=skill): stop(); return
+	if binding.get("kind","")=="item" and binding.get("uid","")!=uid: stop(); return
+	if follows_global and str(manager.combinations.supplies.selected.get(skill.get_id(),""))!=payload_id: stop(); return
 	timer-=delta
 	while timer<=.000001 and active:
 		if not pulse(): stop(); return
@@ -53,7 +61,7 @@ func advance(delta: float) -> void:
 func pulse() -> bool:
 	if not active or not context.region.available(generation) or context.actions.operation_id!=operation_id: return false
 	var manager:=context.actor.get_node("SkillManager") as SkillManager
-	var plan:=manager.combinations.build_plan(skill,context.actor)
+	var plan:=manager.combinations.build_plan(skill,context.actor,false,selection)
 	if not plan.operation_reason.is_empty() or plan.instance_costs.is_empty() or plan.instance_costs[0].uid!=uid or not manager.executor.can_execute(plan.skill,context.actor): return false
 	plan.actor=context.actor; plan.action=skill; plan.source=source
 	var transaction:=CastTransaction.new(context.actor,manager.combinations.supplies,CastTransaction.allocate_id())

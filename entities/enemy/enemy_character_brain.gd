@@ -80,7 +80,7 @@ func choose(target: Node2D) -> Array[Action]:
 
 func find_source(id: String) -> String:
 	if actor.skill_manager.material_operations: id=SpellOperationCatalog.default_catalog().canonical(id)
-	for source in ["left","right","slot_0","slot_1","slot_2","slot_3","slot_4","slot_5"]:
+	for source in QuickslotLoadout.SOURCES:
 		var instance := actor.skill_manager.get_instance(source)
 		if instance and instance.data.get_id()==id: return source
 	return ""

@@ -66,10 +66,10 @@ func entries() -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	match page:
 		"actions":
-			result.append({"id":"loadout","title":"技能编组","text":"用鼠标选择已学动作，再选择Q/E/R或数字槽。E与1是同一个槽的两个按键。","subtitle":"战斗准备"})
+			result.append({"id":"loadout","title":"快捷栏编组","text":"用鼠标选择已学动作，再选择Q/E/R或数字槽。E和1是两个独立快捷槽；动作和物品均可绑定。","subtitle":"战斗准备"})
 			result.append({"id":"sources","title":"材料与释放来源","text":"选择真实材料、法阵或残魂；选择本身不扣物资，不自动准备组合。","subtitle":"施法准备"})
 			result.append({"id":"crafts","title":"制作配方","text":"查看已学配方与原料。到附近施法工作台交互，再用鼠标加工；口袋与背包余量来自同一库存。","subtitle":"营地加工"})
-			result.append({"id":"supplies","title":"饮食与背包","text":"用鼠标使用、换装和整理；Z/X或7/8快速使用前两个口袋物品，9/0保留其余物品。","subtitle":"生存整备"})
+			result.append({"id":"supplies","title":"饮食与背包","text":"用鼠标使用、换装和整理；Q/E/R与1—0均可绑定动作或物品；用鼠标编组后，按对应键使用。","subtitle":"生存整备"})
 			var target:=game.player.input_controller.interaction_target(true)
 			result.append({"id":"nearby","title":"附近交互","text":"点击与F使用同一交互请求，不远程开启设施。","subtitle":target.title if is_instance_valid(target) and "title" in target else "靠近设施、人物或遗骸"})
 		"equipment":
@@ -169,7 +169,7 @@ func _show_detail() -> void:
 	match page:
 		"actions":
 			match entry.id:
-				"loadout": _detail.add_child(W.button("打开技能编组",_open_loadout))
+				"loadout": _detail.add_child(W.button("打开快捷栏编组",_open_loadout))
 				"sources": _detail.add_child(W.button("选择释放来源",game.workshop.show_materials))
 				"supplies": _detail.add_child(W.button("打开物品与补给",open.bind("supplies","")))
 				"crafts":
@@ -194,6 +194,7 @@ func _show_detail() -> void:
 					var reason:=game.equipment_service.change_reason()
 					if not reason.is_empty(): _detail.add_child(W.label(reason,13,true))
 					_detail.add_child(W.button("卸下装备" if entry.get("equipped",false) else "装备这件",_change_equipment.bind(id,bool(entry.get("equipped",false)),str(entry.get("uid",""))),not reason.is_empty() or game.equipment_service.count(id)<=0))
+					if not str(entry.get("uid","")).is_empty(): _binding_picker(id,str(entry.uid))
 					if game.equipment_service.count(id)==0:
 						var sources: Dictionary={}
 						for region: ExplorationRegionData in game.catalog.regions.values():
@@ -229,7 +230,7 @@ func _show_detail() -> void:
 				if use.kind==ItemUseDefinition.Kind.SPRAY: _detail.add_child(W.button("装填这瓶喷剂",_prepare_sprayer.bind(id,str(entry.get("uid","")))))
 				if use.kind!=ItemUseDefinition.Kind.SPRAY: _detail.add_child(W.button("瞄准投掷" if use.kind==ItemUseDefinition.Kind.THROWABLE else "涂附当前主手武器",_use_item.bind(str(entry.get("uid",id)),use.kind==ItemUseDefinition.Kind.THROWABLE)))
 			if SurvivalCatalog.FOODS.has(id) or definition and definition.use_profile:
-				for i in range(4): _detail.add_child(W.button("绑定到快捷物品 "+InputBindings.label("quick_item_%d"%(i+1)),_bind_item.bind(i,id,"throw" if definition and definition.use_profile and definition.use_profile.kind==ItemUseDefinition.Kind.THROWABLE else "use")))
+				_binding_picker(id,str(entry.get("uid","")) if definition and definition.use_profile and definition.use_profile.kind==ItemUseDefinition.Kind.SPRAY else "")
 			_detail.add_child(W.button("查看本次施法材料",func(): game.workshop.show_materials()))
 		"quests":
 			var quest: ExplorationQuestData
@@ -255,7 +256,7 @@ func _show_detail() -> void:
 				if not FrontierControls.set_quick_cast(value): game.ui.notify("本次设置已生效，但未保存到磁盘。"))
 			card.add_child(toggle)
 			card.add_child(preload("res://gameplay/foundation/ui/binding_editor.tscn").instantiate())
-			card.add_child(W.label("关闭时按住预览、松开施放。蓄力与引导仍需按住；Shift只表示显式消费恩赐。每次只执行一个基础动作，不自动组合。\n\nWASD 移动 · 空格闪避 · F交互\nQ/E/R与数字键 基础动作 · Z/X或7/8快捷物品 · 9/0其余物品\nTab 远征面板 · J委托 · I/O装备 · N补给 · G地图\n右键按住格挡 · Alt冲刺 · Ctrl+左键重击 · B放下背包\n地图滚轮缩放、中键/右键拖动、左键放路标。",14))
+			card.add_child(W.label("关闭时按住预览、松开施放。蓄力与引导仍需按住；Shift只表示显式消费恩赐。每次只执行一个基础动作，不自动组合。\n\nWASD 移动 · 空格闪避 · F交互\nQ/E/R与1—0 独立快捷槽 · K绑定动作或物品\nTab 远征面板 · J委托 · I/O装备 · N补给 · G地图\n右键按住格挡 · Alt冲刺 · Ctrl+左键重击 · B放下背包\n地图滚轮缩放、中键/右键拖动、左键放路标。",14))
 
 func _open_loadout() -> void:
 	game.ui.close_modal()
@@ -312,9 +313,15 @@ func _use_item(id: String,aim: bool) -> void:
 	game.ui.close_modal()
 	game.player.actor_context.actions.input_suppressed=.15
 	if not game.player.actor_context.item_actions.begin(id,aim,game.player.get_mouse_direction()): game.ui.notify("无法使用：检查口袋、武器和当前动作。")
-func _bind_item(index: int,id: String,method: String) -> void:
-	game.session.bind_belt(index,id,method)
-	game.ui.notify("已绑定到"+["7","8","9","0"][index]+"："+game.survival.supplies.title(id)+("。按住瞄准，松开出手；右键取消。" if method=="throw" else "。"))
+func _binding_picker(id: String,uid: String) -> void:
+	var row:=HBoxContainer.new(); _detail.add_child(row)
+	var picker:=OptionButton.new(); picker.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	for source in QuickslotLoadout.SOURCES: picker.add_item(InputBindings.label(InputBindings.action_for_source(source)))
+	row.add_child(picker)
+	row.add_child(W.button("绑定所选快捷槽",func():
+		var source: String=QuickslotLoadout.SOURCES[picker.selected]
+		var ok:=game.player.skill_manager.shortcuts.bind_item(source,id,uid)
+		game.ui.notify("已绑定到"+InputBindings.label(InputBindings.action_for_source(source))+"："+game.survival.supplies.title(id) if ok else "无法绑定这件物品。")))
 
 func _prepare_sprayer(id: String,uid: String) -> void:
-	if game.session.prepare_sprayer("player",id,uid): game.ui.notify("已选择这瓶喷剂；编组喷洒动作后按住对应技能键使用。")
+	if game.session.prepare_sprayer("player",id,uid): game.ui.notify("已选择这瓶喷剂；可编组喷洒，或在K直接把这瓶绑定到快捷槽，按住使用。")

@@ -63,6 +63,7 @@ func try_action(action: Action) -> OperationResult:
 			return OperationResult.success()
 		Action.ActionType.GUARD:
 			if bool(action.params.get("held",false)):
+				_cancel_work()
 				_cancel_cast()
 				if context.spray: context.spray.stop()
 			guarding=bool(action.params.get("held",false)) and not busy() and can_guard()
@@ -84,9 +85,10 @@ func try_action(action: Action) -> OperationResult:
 			if legacy_request.is_valid(): legacy_request.call(action)
 			return OperationResult.success()
 		Action.ActionType.USE_ITEM:
-			if busy() or not item_request.is_valid(): return OperationResult.reject("busy")
-			if not item_request.call(action.skill_id): return OperationResult.reject("unavailable")
-			if not context.item_actions.busy() and SurvivalCatalog.FOODS.has(action.skill_id):
+			if not item_request.is_valid(): return OperationResult.reject("unavailable")
+			if not action.params.get("release",false) and (busy() or "field_work" in actor and actor.field_work and actor.field_work.is_busy()): return OperationResult.reject("busy")
+			if not item_request.call(action): return OperationResult.reject("unavailable")
+			if not ("field_work" in actor and actor.field_work) and not context.item_actions.busy() and SurvivalCatalog.FOODS.has(action.skill_id):
 				mode="item"; elapsed=0; remaining=SurvivalCatalog.FOODS[action.skill_id].seconds; movement=Vector2.ZERO
 			return OperationResult.success()
 		Action.ActionType.MELEE,Action.ActionType.HEAVY_ATTACK:

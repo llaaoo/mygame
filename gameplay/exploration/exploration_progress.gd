@@ -141,12 +141,9 @@ func validate_save_data(value: Variant) -> bool:
 	for selection in supplies.get("selected", {}).values():
 		if not selection is String:
 			return false
-	for entry in value.get("loadout", {}).values():
-		if not entry is Dictionary or not entry.get("skill_id", "") is String or not entry.get("upgrades", {}) is Dictionary:
-			return false
-		for rank in entry.get("upgrades", {}).values():
-			if typeof(rank) not in [TYPE_INT, TYPE_FLOAT]:
-				return false
+	for source in value.get("loadout",{}):
+		if source not in QuickslotLoadout.SOURCES and source!="__configured": return false
+		if not QuickslotLoadout.valid_entry(value.loadout[source]): return false
 	for key in ["element_clues", "verified_reactions"]:
 		for id in value.get(key, {}):
 			if not id is String or not value[key][id] is bool: return false

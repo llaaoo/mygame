@@ -1,6 +1,9 @@
 class_name CastPlan
 extends RefCounted
 
+var selection: Dictionary={}
+var binding_revision := -1
+
 var requires_live_target := false
 var live_target: Node2D
 ## Shared by preview, accepted preparation and commit. Resources are read-only definitions.
