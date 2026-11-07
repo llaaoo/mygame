@@ -35,7 +35,7 @@
 
 ## 验证与重现
 
-`tests/test_visual_interface.gd`直接启动隔离新档，以真实键鼠检查战役资源绑定、情境HUD、13槽独立滚动、M来源页、地图、800×600窗口内菜单；保留正常AI、角色属性和资源，不授予内容或瞬移。
+`tests/test_visual_interface.gd`直接启动隔离新档，以真实键鼠检查战役资源绑定、情境HUD、13槽独立滚动、WASD走到镇中手册并F阅读、M来源页与喷洒选材不扣料、地图、800×600窗口内菜单；保留正常AI、角色属性和资源，不授予内容或瞬移。
 
 `controls_workflow`、`unified_quickslots`、`world_pointer_input`继续覆盖鼠标菜单/加工/物品、独立E/1、固定来源、取消、UID和保存恢复、鼠标按键不穿透。`ui_system`覆盖长文滚动、焦点、窗口缩放、模态取消与锁定提示。`rpg_attributes`改为核对属性悬停文案中的有效敏捷，避免要求HUD重新常驻全部属性。
 
