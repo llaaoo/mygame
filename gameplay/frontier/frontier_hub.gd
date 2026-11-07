@@ -41,8 +41,12 @@ func open(tab := "quests", source := "") -> void:
 		var button := W.button(TABS[key],open.bind(key,""))
 		button.toggle_mode=true
 		button.button_pressed=page == key
+		button.alignment=HORIZONTAL_ALIGNMENT_LEFT
+		button.icon=GameUIStyle.icon({"actions":"anvil","quests":"compass","equipment":"swords","supplies":"backpack","knowledge":"book-open","settings":"settings"}[key])
+		button.expand_icon=true; button.add_theme_constant_override("icon_max_width",18)
+		GameUIStyle.apply_button(button,GameUIStyle.GOLD,page==key)
 		tabs.add_child(button)
-	if page == "loot": root.add_child(W.label("遗骸 · 未取走的东西会留在原处。%s尽量取走全部；点击选择，Esc关闭。"%InputBindings.label("loot_all"),13,true))
+	if page == "loot": root.footer.add_child(W.label("遗骸 · 未取走的东西会留在原处。%s尽量取走全部；点击选择，Esc关闭。"%InputBindings.label("loot_all"),13,true))
 	var tools:=root.tools
 	_search=root.search
 	_search.text_changed.connect(func(value: String): query=value; _refresh_rows())
@@ -57,7 +61,7 @@ func open(tab := "quests", source := "") -> void:
 	_rows=root.rows
 	_detail=root.detail
 	if page == "loot":
-		root.add_child(W.button(InputBindings.label("loot_all")+"  尽量全部取走",take_all))
+		root.footer.add_child(W.button(InputBindings.label("loot_all")+"  尽量全部取走",take_all))
 	game.ui.show_view("灰河谷  /  "+("战利品" if page == "loot" else TABS.get(page,"旅程")),root)
 	game.ui.modal.set_meta("frontier_page",page)
 	_refresh_rows()
@@ -116,7 +120,8 @@ func entries() -> Array[Dictionary]:
 			result.append({"id":"overview","title":"旅程总览与施法资料","text":game.presenter.journal_text(),"subtitle":"地点 · 设施 · 未取战利品"})
 			for entry in game.progress.journal: result.append({"id":entry.id,"title":entry.title,"text":entry.text,"subtitle":"亲历记录"})
 		"settings":
-			result.append({"id":"controls","title":"施法与快捷操作","text":"操作设置","subtitle":"按下施法 / 松开施法"})
+			result.append({"id":"controls","title":"施法与快捷操作","text":"操作设置","subtitle":"键位 · 输入偏好"})
+			result.append({"id":"credits","title":"素材与许可","text":"Kenney Tiny Town · CC0\nLucide Icons · ISC / MIT\nNoto Sans SC · SIL Open Font License 1.1\n\n所有新增素材均可用于商业项目，保留对应许可与署名。","subtitle":"视觉素材来源"})
 		"loot":
 			if game.progress.loot_records.has(loot_id): result=game.loot.instance_entries(loot_id)
 	return result
@@ -134,6 +139,7 @@ func _refresh_rows() -> void:
 		button.alignment=HORIZONTAL_ALIGNMENT_LEFT
 		button.toggle_mode=true
 		button.button_pressed=entry.id==selected
+		GameUIStyle.apply_button(button,GameUIStyle.ACCENT,entry.id==selected)
 		button.custom_minimum_size.y=58
 		button.clip_text=true
 		if entry.get("icon"):
@@ -147,7 +153,9 @@ func _refresh_rows() -> void:
 func _select(id: String) -> void:
 	selected=id
 	for child in _rows.get_children():
-		if child is Button: child.button_pressed=child.name=="Entry_"+id.replace(":","_")
+		if child is Button:
+			child.button_pressed=child.name=="Entry_"+id.replace(":","_")
+			GameUIStyle.apply_button(child,GameUIStyle.ACCENT,child.button_pressed)
 	_show_detail()
 
 func _show_detail() -> void:
@@ -219,11 +227,16 @@ func _show_detail() -> void:
 				card.add_child(W.label("饱食 %+.0f · 饮水 %+.0f · 疲劳 %+.0f\n持续 %.0f秒"%[food.nutrition,food.hydration,food.fatigue,food.duration],14))
 				_detail.add_child(W.button("使用一份",_use_supply.bind(id)))
 			elif game.survival.supplies.catalog.has(id): card.add_child(W.label(game.survival.supplies.catalog[id].description,14))
+			var uses: Array[String]=[]
+			var used_operations: Dictionary={}
 			for operation in SpellOperationCatalog.default_catalog().operations:
 				for payload in operation.payloads:
-					if payload.material_id!=id: continue
-					card.add_child(W.label("用于："+operation.action.display_name+"\n"+payload.describe(),13,true))
-					_detail.add_child(W.button("查看释放介质选项",game.workshop.show_action.bind(operation.action),not game.player.skill_manager.knows_action(operation.action)))
+					if payload.material_id==id:
+						uses.append(operation.action.display_name+" · "+payload.title)
+						used_operations[operation.action.get_id()]=operation.action
+			if not uses.is_empty():
+				W.disclosure(_detail,"施法用途 · %d种"%uses.size(),"\n".join(uses))
+				for action: SkillData in used_operations.values(): _detail.add_child(W.button("配置"+action.display_name,game.workshop.show_action.bind(action),not game.player.skill_manager.knows_action(action)))
 			var definition:=store.definitions.get(id) as ItemData
 			if definition and definition.use_profile:
 				var use:=definition.use_profile
@@ -249,6 +262,7 @@ func _show_detail() -> void:
 			_detail.add_child(W.button("查看实验路线记录",game.trial_recorder.show_page))
 			_detail.add_child(W.button("查看已学制造配方",game.workshop.show_crafts))
 		"settings":
+			if entry.id=="credits": return
 			var toggle:=CheckButton.new()
 			toggle.text="按下即施放普通基础动作"
 			toggle.button_pressed=FrontierControls.quick_cast

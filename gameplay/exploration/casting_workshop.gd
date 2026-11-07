@@ -6,29 +6,46 @@ func _init(owner_game: Node) -> void:
 	game = owner_game
 
 func show_materials() -> void:
-	var supplies: CastingSupplies = game.player.skill_manager.combinations.supplies
-	var text := "施法材料\n"
-	for id in supplies.crafting_recipes:
-		text += "%s ×%d\n" % [supplies.title(id), supplies.count(id)]
-	text += "\n原料\n"
-	for id in CastingSupplies.RAW_TITLES:
-		text += "%s ×%d\n" % [supplies.title(id), supplies.count(id)]
-	text += "\n释放介质选定后可重复使用，每次手动施放都消耗实物，耗尽不自动换料。额外改造素材只作用于本次施法，成功后清除；中断不扣料，不适配则不消费。离区、死亡和读档清除选择。相容的法阵和印记可共同响应，总费用相加；资源不足或准备条件改变，整次动作取消。特殊施法的必需材料不能关闭。\n\n按M开关；K可编组铭刻法阵、喷洒介质、震荡、凝神等基础动作。互斥增益按优先级选择一个，同优先级取后布的阵；护盾爆破先于回响脉冲。悬停技能槽查看本次全部结果与总费用。"
-	var buttons: Array[Dictionary] = []
+	var screen:=preload("res://gameplay/foundation/ui/expedition_screen.tscn").instantiate() as ExpeditionScreen
+	screen.get_node("Navigation/Caption").text="释放准备"
+	screen.tabs.add_child(FoundationWidgets.button("快捷栏编组",func(): game.ui.close_modal(); game.player.skill_pool_ui.open()))
+	screen.tabs.add_child(FoundationWidgets.button("营地加工",show_crafts,not game.is_at_base()))
+	screen.tabs.add_child(FoundationWidgets.button("调和台回收",show_recycling,not recycling_available()))
+	screen.status.text="选择基础动作 · 查看真实费用与释放来源"
+	screen.search.placeholder_text="搜索已学动作…"
+	screen.search.text_changed.connect(func(value: String): _source_rows(screen,value))
+	game.ui.show_view("材料与释放来源",screen)
+	_source_rows(screen,"")
+
+func _source_rows(screen: ExpeditionScreen,query: String) -> void:
+	FoundationWidgets.clear(screen.rows)
+	var first: SkillData
 	for skill: SkillData in game.player.skill_manager.pool.skills:
 		if not skill or skill.combination_only or not game.player.skill_manager.knows_action(skill): continue
-		var id:=skill.get_id()
-		var material_id:=str(supplies.selected.get(id,""))
-		var label:=supplies.title(material_id) if not material_id.is_empty() else "基础"
-		if not skill.operation_id.is_empty():
-			var operation:=SpellOperationCatalog.default_catalog().operation(skill.operation_id)
-			var payload:=operation.payload(str(supplies.selected.get(id,operation.default_payload)))
-			label=payload.title if payload else "未装填"
-		buttons.append({"title":skill.display_name+" · "+label,"callback":show_action.bind(skill)})
-	buttons.append({"title": "营地加工", "disabled": not game.is_at_base(), "callback": show_crafts})
-	buttons.append({"title": "调和台回收" + ("" if recycling_available() else "（需营地修复）"), "disabled": not recycling_available(), "callback": show_recycling})
-	buttons.append({"title": "继续探索", "callback": game.ui.close_modal})
-	game.ui.show_panel("施法材料与本次选择", text, buttons)
+		if not query.is_empty() and not skill.display_name.contains(query): continue
+		if not first: first=skill
+		var button:=FoundationWidgets.button(skill.display_name,_source_detail.bind(screen,skill))
+		button.alignment=HORIZONTAL_ALIGNMENT_LEFT
+		button.icon=InterfaceIcons.skill(skill); button.expand_icon=true; button.add_theme_constant_override("icon_max_width",22)
+		screen.rows.add_child(button)
+	if first: _source_detail(screen,first)
+	else:
+		FoundationWidgets.clear(screen.detail)
+		screen.detail.add_child(FoundationWidgets.label("没有符合条件的已学动作。",16,true))
+
+func _source_detail(screen: ExpeditionScreen,skill: SkillData) -> void:
+	FoundationWidgets.clear(screen.detail)
+	var controller: ConditionalCastController=game.player.skill_manager.combinations
+	var plan:=controller.preview(skill,game.player)
+	var card:=FoundationWidgets.card(screen.detail,skill.display_name,skill.description)
+	card.add_child(FoundationWidgets.label("本次 → "+plan.effect_label,18))
+	card.add_child(FoundationWidgets.label("%d MP · 准备 %.2f秒"%[plan.cost,plan.preparation],14,true))
+	if not plan.material_costs.is_empty(): card.add_child(FoundationWidgets.label(controller.supplies.describe_cost(plan.material_costs),14))
+	if not plan.ready: card.add_child(FoundationWidgets.label(plan.reason,14))
+	var configure:=FoundationWidgets.button("配置："+skill.display_name,show_action.bind(skill))
+	configure.icon=GameUIStyle.icon("chevron-right"); configure.expand_icon=true; configure.add_theme_constant_override("icon_max_width",18)
+	screen.detail.add_child(configure)
+	FoundationWidgets.disclosure(screen.detail,"来源与消耗规则","选择不扣物资。成功释放才结算真实来源；耗尽或失效会拒绝，不自动换料。K可将来源固定到单个快捷槽，M只设置未固定槽位的本次选择。组合条件需亲手准备，额外修饰只作用于一次施法。")
 
 func show_action(skill: SkillData) -> void:
 	if not skill.operation_id.is_empty():
@@ -60,23 +77,81 @@ func _configure(skill: SkillData, id: String) -> void:
 	show_action(skill)
 
 func show_crafts() -> void:
-	if not game.is_at_base():
-		return
-	var supplies: CastingSupplies = game.player.skill_manager.combinations.supplies
-	var text := "使用探索获得的原料加工成品。休息不补满材料，已搜刮的固定来源不会重复发放。凝能阵无需材料；元素法阵与喷洒按选定介质消费实物。\n\n"
-	var buttons: Array[Dictionary] = []
-	for id in supplies.crafting_recipes:
-		var costs: Dictionary = supplies.crafting_recipes[id].inputs
-		text += "%s%s ×1 ← %s\n" % [supplies.title(id), "（尚未学习，探索记录可解锁）" if not supplies.knows_recipe(id) else "", supplies.describe_cost(costs)]
-		buttons.append({"title": "加工：" + supplies.title(id), "disabled": not supplies.knows_recipe(id) or not supplies.can_pay(costs), "callback": _craft.bind(id)})
-	buttons.append({"title": "材料与配置", "callback": show_materials})
-	buttons.append({"title": "继续探索", "callback": game.ui.close_modal})
-	game.ui.show_panel("营地施法工作台", text, buttons)
+	var selected:=""
+	var query:=""
+	if not game.is_at_base(): return
+	var supplies: CastingSupplies=game.player.skill_manager.combinations.supplies
+	var screen:=preload("res://gameplay/foundation/ui/expedition_screen.tscn").instantiate() as ExpeditionScreen
+	screen.get_node("Navigation/Caption").text="工作台"
+	screen.tabs.add_child(FoundationWidgets.label("配方加工",20))
+	screen.tabs.add_child(FoundationWidgets.label("探索解锁配方
+制造消费真实材料
+休息不会补货",13,true))
+	screen.search.text=query
+	screen.search.placeholder_text="查找配方或原料…"
+	var selection:=selected
+	if selection.is_empty():
+		for id in supplies.crafting_recipes:
+			if supplies.knows_recipe(id): selection=id; break
+	screen.set_meta("selected_recipe",selection)
+	var refresh:=func(value: String): _craft_rows(screen,str(screen.get_meta("selected_recipe","")),value)
+	screen.search.text_changed.connect(refresh)
+	screen.status.text="%d项配方 · 选择一项查看产出和原料"%supplies.crafting_recipes.size()
+	screen.footer.add_child(FoundationWidgets.button("材料与配置",show_materials))
+	screen.footer.add_child(FoundationWidgets.button("继续探索",game.ui.close_modal))
+	game.ui.show_view("营地施法工作台",screen)
+	_craft_rows(screen,selection,query)
 
-func _craft(id: String) -> void:
-	if game.is_at_base() and game.player.skill_manager.combinations.supplies.craft(id):
-		game._save_progress()
-	show_crafts()
+func _craft_rows(screen: ExpeditionScreen, selected: String, query: String) -> void:
+	FoundationWidgets.clear(screen.rows)
+	var supplies: CastingSupplies=game.player.skill_manager.combinations.supplies
+	var recipe_ids:=supplies.crafting_recipes.keys()
+	recipe_ids.sort_custom(func(a: String,b: String):
+		if supplies.knows_recipe(a)!=supplies.knows_recipe(b): return supplies.knows_recipe(a)
+		return supplies.title(a)<supplies.title(b))
+	for id in recipe_ids:
+		var recipe: CraftingRecipe=supplies.crafting_recipes[id]
+		if not query.is_empty() and not (supplies.title(id)+supplies.describe_cost(recipe.inputs)).to_lower().contains(query.to_lower()): continue
+		var learned:=supplies.knows_recipe(id)
+		var button:=FoundationWidgets.button(supplies.title(id)+"
+"+("原料齐备" if supplies.can_pay(recipe.inputs) else "缺少原料") if learned else supplies.title(id)+"
+尚未学会",_craft_select.bind(screen,id))
+		button.alignment=HORIZONTAL_ALIGNMENT_LEFT
+		button.clip_text=true
+		GameUIStyle.apply_button(button,GameUIStyle.ACCENT,id==selected)
+		screen.rows.add_child(button)
+	_craft_detail(screen,selected)
+
+func _craft_select(screen: ExpeditionScreen,id: String) -> void:
+	screen.set_meta("selected_recipe",id)
+	_craft_rows(screen,id,screen.search.text)
+
+func _craft_detail(screen: ExpeditionScreen,id: String) -> void:
+	FoundationWidgets.clear(screen.detail)
+	var supplies: CastingSupplies=game.player.skill_manager.combinations.supplies
+	if not supplies.crafting_recipes.has(id):
+		screen.detail.add_child(FoundationWidgets.label("寻找探索记录，学习第一份配方。",16,true))
+		return
+	var recipe: CraftingRecipe=supplies.crafting_recipes[id]
+	var card:=FoundationWidgets.card(screen.detail,supplies.title(id),"产出 ×%d · 持有 %d"%[recipe.output_count,supplies.count(id)])
+	var definition:=ItemCatalog.default_catalog().definition(id)
+	if definition: card.add_child(FoundationWidgets.label(definition.description,14))
+	card.add_child(HSeparator.new())
+	card.add_child(FoundationWidgets.label("所需原料",15))
+	for material in recipe.inputs:
+		var count:=supplies.count(material)
+		var line:=FoundationWidgets.label("%s    %d / %d"%[supplies.title(material),count,recipe.inputs[material]],14)
+		if count<int(recipe.inputs[material]): line.add_theme_color_override("font_color",GameUIStyle.GOLD)
+		card.add_child(line)
+	if not supplies.knows_recipe(id): card.add_child(FoundationWidgets.label("尚未学会 · 探索记录可解锁",14,true))
+	var action:=FoundationWidgets.button("加工："+supplies.title(id),_craft_selected.bind(screen,id),not supplies.knows_recipe(id) or not supplies.can_pay(recipe.inputs))
+	action.icon=GameUIStyle.icon("anvil"); action.expand_icon=true; action.add_theme_constant_override("icon_max_width",20)
+	screen.detail.add_child(action)
+
+func _craft_selected(screen: ExpeditionScreen,id: String) -> void:
+	# Same domain transaction as keyboard interaction; the view only refreshes its snapshot.
+	if game.is_at_base() and game.player.skill_manager.combinations.supplies.craft(id): game._save_progress()
+	_craft_rows(screen,id,screen.search.text)
 
 func recycling_available() -> bool:
 	return game.is_at_base() and not game._switching and not game.player.health_component.is_dead and game.progress.claims.has(AlchemyRepairService.REPAIRED)
@@ -109,27 +184,44 @@ func show_payloads(skill: SkillData) -> void:
 	var manager: SkillManager=game.player.skill_manager
 	var supplies:=manager.combinations.supplies
 	var operation:=SpellOperationCatalog.default_catalog().operation(skill.operation_id)
+	var screen:=preload("res://gameplay/foundation/ui/expedition_screen.tscn").instantiate() as ExpeditionScreen
+	screen.get_node("Navigation/Caption").text="来源选择"
+	screen.tabs.add_child(FoundationWidgets.label(skill.display_name,20))
+	screen.tabs.add_child(FoundationWidgets.button("返回材料总览",show_materials))
+	screen.status.text="选择后保留 · 不自动换料 · 成功释放才消费"
+	screen.search.placeholder_text="查找介质…"
+	var selected:=str(supplies.selected.get(skill.get_id(),operation.default_payload))
+	var refresh:=func(query: String):
+		FoundationWidgets.clear(screen.rows)
+		for payload in operation.payloads:
+			if not query.is_empty() and not payload.title.contains(query): continue
+			var current:=selected==payload.id
+			var button:=FoundationWidgets.button(("✓ 当前：" if current else "选择：")+payload.title,_select_payload.bind(skill,payload.id),not manager.knows_action(skill))
+			button.alignment=HORIZONTAL_ALIGNMENT_LEFT
+			button.clip_text=true
+			GameUIStyle.apply_button(button,GameUIStyle.ACCENT,current)
+			screen.rows.add_child(button)
+	screen.search.text_changed.connect(refresh)
+	var payload:=operation.payload(selected)
 	var plan:=manager.combinations.preview(skill,game.player)
-	var text:=skill.description+"\n\n本次："+plan.effect_label+"\n%d MP · 准备%.2f秒\n"%[plan.cost,plan.preparation]+("可释放" if plan.ready else plan.reason)+"\n"
-	var buttons: Array[Dictionary]=[]
-	for payload in operation.payloads:
-		var unlocked:=manager.knows_action(skill)
+	var card:=FoundationWidgets.card(screen.detail,payload.title if payload else "未装填",skill.description)
+	card.add_child(FoundationWidgets.label("%d MP · 准备 %.2f秒"%[plan.cost,plan.preparation],16))
+	if payload:
+		card.add_child(FoundationWidgets.label(payload.describe(),14))
 		var cost:="无需材料" if payload.material_id.is_empty() else supplies.describe_cost({payload.material_id:payload.quantity})
-		if payload.source_kind=="field": cost="消耗脚下"+FireSigil.title_for(payload.source_field)+"的1次实际充能"
-		if payload.source_kind=="soul": cost="消耗附近的1个真实残魂"
+		if payload.source_kind=="field": cost="脚下"+FireSigil.title_for(payload.source_field)+" · 消耗1次实际充能"
+		if payload.source_kind=="soul": cost="附近真实残魂 · 消耗1个"
 		if skill.operation_id=="disperse": cost="每0.5秒：2 MP＋该瓶1剂；每瓶3剂"
-		if supplies.inventory_store and not payload.material_id.is_empty(): cost+=" · 口袋%d"%supplies.inventory_store.count(supplies.actor_id,payload.material_id,false,true)
-		text+="\n"+payload.title+("（尚未学会）" if not unlocked else "")+"\n"+cost+(" · 额外%d MP"%payload.extra_mana if payload.extra_mana>0 else "")+"\n"+payload.describe()+"\n"
-		var current:=str(supplies.selected.get(skill.get_id(),operation.default_payload))==payload.id
-		buttons.append({"title":("✓ 当前：" if current else "选择：")+payload.title,"disabled":not unlocked,"focused":current,"callback":_select_payload.bind(skill,payload.id)})
+		card.add_child(FoundationWidgets.label(cost,14,true))
+	if not plan.ready: card.add_child(FoundationWidgets.label(plan.reason,14))
 	for material: CastingMaterialData in supplies.catalog.values():
 		if not material.supports(skill.get_id(),plan.skill.get_id(),plan.skill): continue
 		var current:=str(supplies.modifiers.get(skill.get_id(),""))==material.id
-		buttons.append({"title":("✓ 本次修饰：" if current else "本次修饰：")+material.title,"callback":_select_modifier.bind(skill,material.id)})
-	if supplies.modifiers.has(skill.get_id()): buttons.append({"title":"清除本次修饰","callback":_select_modifier.bind(skill,"")})
-	text+="\n每次手动施放成功才消耗口袋实物；选定介质会保留，方便连续施放。离区/死亡/读档清除选择。物资不足不会自动换成别的介质。N可在安全时整理物资。喷剂需先制造：清水喷剂使用制造时装入的水，不会直接吸走水囊；按住技能键喷洒，松开即停。毒地可以被清洗或点燃。"
-	buttons.append({"title":"返回材料总览","callback":show_materials})
-	game.ui.show_panel("释放介质："+skill.display_name,text,buttons)
+		screen.detail.add_child(FoundationWidgets.button(("✓ 本次修饰：" if current else "本次修饰：")+material.title,_select_modifier.bind(skill,material.id)))
+	if supplies.modifiers.has(skill.get_id()): screen.detail.add_child(FoundationWidgets.button("清除本次修饰",_select_modifier.bind(skill,"")))
+	FoundationWidgets.disclosure(screen.detail,"操作与实物规则","介质选定后保留，离区、死亡或读档清除。物资不足不会自动换料。喷洒需先制造喷剂；按住所编组键持续释放，松开即停。K固定来源的快捷槽不受M影响。")
+	game.ui.show_view("释放介质："+skill.display_name,screen)
+	refresh.call("")
 
 func _select_payload(skill: SkillData,id: String) -> void:
 	var manager: SkillManager=game.player.skill_manager

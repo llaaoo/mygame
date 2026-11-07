@@ -1,17 +1,17 @@
 class_name ExpeditionScreen
-extends VBoxContainer
-## Declarative, independently previewable screen; a presenter binds data and requests.
-var tabs: HBoxContainer:
-	get: return $Tabs
+extends HBoxContainer
+## The shell owns layout; presenters still own queries and domain requests.
+var tabs: VBoxContainer:
+	get: return $Navigation/Tabs
 var tools: HBoxContainer:
-	get: return $Tools
+	get: return $Content/Tools
 var search: LineEdit:
-	get: return $Tools/Search
+	get: return $Content/Tools/Search
 var status: Label:
-	get: return $Status
+	get: return $Content/Status
 var rows: VBoxContainer:
-	get: return $Columns/List/Rows
+	get: return $Content/Columns/List/Rows
 var detail: VBoxContainer:
-	get: return $Columns/Details/Detail
+	get: return $Content/Columns/Details/Detail
 var footer: HBoxContainer:
-	get: return $Footer
+	get: return $Content/Footer

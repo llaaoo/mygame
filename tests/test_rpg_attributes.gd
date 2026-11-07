@@ -48,7 +48,7 @@ func run() -> void:
 	var supplies := controller.supplies.serialize()
 	buffs.apply_buff(agile, player)
 	check(stats.effective_stat("agility") == 14 and stats.meets_requirements({"strength": 14}) and not stats.meets_requirements({"strength": 14, "intelligence": 14}) and not stats.meets_requirements({"bad": 1}), "Effective attribute checks ignored Buffs or AND semantics")
-	check("AGI 14" in game.get_node("HUDLayer").stats_label.text, "HUD disagreed with effective Buff attributes")
+	check("敏捷 14" in game.get_node("HUDLayer").stats_label.tooltip_text, "HUD disagreed with effective Buff attributes")
 	controller.tick(1)
 	check(controller.pending.is_empty() and player.mana_component.mp == mana and supplies == controller.supplies.serialize() and "未扣费" in controller.last_message, "Attribute change during preparation leaked resources")
 	controller.tick(.4)

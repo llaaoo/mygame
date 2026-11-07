@@ -20,12 +20,12 @@ static func button(text: String, action: Callable, disabled := false) -> Button:
 static func card(host: Node, title: String, subtitle := "") -> VBoxContainer:
 	var panel := PanelContainer.new()
 	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	panel.add_theme_stylebox_override("panel",GameUIStyle.surface_style())
+	panel.add_theme_stylebox_override("panel",GameUIStyle.quiet_panel(.36))
 	host.add_child(panel)
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation",8)
 	panel.add_child(box)
-	box.add_child(label(title,18))
+	box.add_child(label(title,20))
 	if not subtitle.is_empty(): box.add_child(label(subtitle,13,true))
 	return box
 static func clear(node: Node) -> void:
@@ -66,3 +66,11 @@ static func comparison(current: EquipmentData, candidate: EquipmentData) -> Stri
 		var suffix := "%" if percentage else ""
 		text += "%s   %.0f%s → %.0f%s  (%+.0f%s)\n" % [labels.get(key,key),a*factor,suffix,b*factor,suffix,(b-a)*factor,suffix]
 	return text+"没有直接属性差异。" if keys.is_empty() else text
+
+static func disclosure(host: Node,title: String,text: String) -> void:
+	var button_node:=Button.new(); button_node.text="＋ "+title
+	button_node.alignment=HORIZONTAL_ALIGNMENT_LEFT
+	GameUIStyle.apply_button(button_node)
+	host.add_child(button_node)
+	var body:=label(text,14,true); body.visible=false; host.add_child(body)
+	button_node.pressed.connect(func(): body.visible=not body.visible; button_node.text=("− " if body.visible else "＋ ")+title)

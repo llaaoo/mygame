@@ -1,0 +1,12 @@
+Project provenance notice (not an upstream license file)
+
+Tiny Town by Kenney (https://kenney.nl/assets/tiny-town)
+Kenney identifies this asset pack as Creative Commons CC0 / public domain.
+License: https://creativecommons.org/publicdomain/zero/1.0/
+Commercial use, modification and redistribution are permitted; attribution is
+not required by CC0. This project voluntarily credits Kenney.
+
+The unmodified packed 192x176 PNG was obtained from the public mirror recorded
+in ../visual_assets.json. That mirror's ASSET_MAP.md identifies Tiny Town and
+CC0. The author's asset listing/support corroborate the license. This notice
+records provenance and does not imply Kenney endorses this project.

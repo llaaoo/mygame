@@ -17,9 +17,11 @@ var skill_tree_ui: SkillTreeUI = null
 var level_up_ui: LevelUpUI = null
 
 var _death_active: bool = false
+var _actor_status: ActorStatusView
 
 
 func _ready() -> void:
+	GameUIStyle.install_theme(get_window())
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	layer = GameUIStyle.LAYER_HUD
 	add_to_group("hud_ui")
@@ -48,13 +50,14 @@ func _build_status_panel(root: Control) -> void:
 	var panel := PanelContainer.new()
 	panel.name = "StatusPanel"
 	panel.anchor_left = 0.0
-	panel.anchor_top = 0.0
-	panel.offset_left = 4
-	panel.offset_top = 4
-	panel.offset_right = 264
-	panel.offset_bottom = 98
-	panel.custom_minimum_size = Vector2(260, 94)
-	panel.add_theme_stylebox_override("panel", GameUIStyle.panel_style(0.88, 5))
+	panel.anchor_top = 1.0
+	panel.anchor_bottom = 1.0
+	panel.offset_left = 20
+	panel.offset_top = -178
+	panel.offset_right = 272
+	panel.offset_bottom = -22
+	panel.custom_minimum_size = Vector2(252, 150)
+	panel.add_theme_stylebox_override("panel", GameUIStyle.quiet_panel(.56))
 	root.add_child(panel)
 
 	var vbox := VBoxContainer.new()
@@ -66,7 +69,7 @@ func _build_status_panel(root: Control) -> void:
 	vbox.add_child(title_row)
 
 	var title := Label.new()
-	title.text = "探索者"
+	title.text = "行者"
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	GameUIStyle.apply_label(title, 15, GameUIStyle.GOLD)
 	title_row.add_child(title)
@@ -77,25 +80,29 @@ func _build_status_panel(root: Control) -> void:
 	title_row.add_child(stats_label)
 
 	health_bar = _make_bar(GameUIStyle.HEALTH)
-	health_label = _add_resource_row(vbox, "HP", health_bar, GameUIStyle.HEALTH)
+	health_label = _add_resource_row(vbox, "生命", health_bar, GameUIStyle.HEALTH)
 
 	mana_bar = _make_bar(GameUIStyle.MANA)
-	mana_label = _add_resource_row(vbox, "MP", mana_bar, GameUIStyle.MANA)
+	mana_label = _add_resource_row(vbox, "法力", mana_bar, GameUIStyle.MANA)
 
-	xp_bar = _make_bar(GameUIStyle.XP)
-	_add_resource_row(vbox, "XP", xp_bar, GameUIStyle.XP)
+	_actor_status=ActorStatusView.new()
+	_actor_status.compact=true
+	vbox.add_child(_actor_status)
+	xp_bar=_make_bar(GameUIStyle.XP)
+	GameUIStyle.apply_progress(xp_bar,GameUIStyle.XP,2)
+	xp_bar.modulate.a=.45
+	vbox.add_child(xp_bar)
 
 
 func _build_right_stack(root: Control) -> void:
 	var stack := VBoxContainer.new()
 	stack.name = "RightStatusStack"
-	stack.anchor_left = 1.0
-	stack.anchor_right = 1.0
-	stack.anchor_top = 0.0
-	stack.offset_left = -218
-	stack.offset_right = -4
-	stack.offset_top = 4
-	stack.offset_bottom = 220
+	stack.anchor_top = 1.0
+	stack.anchor_bottom = 1.0
+	stack.offset_left = 24
+	stack.offset_right = 298
+	stack.offset_top = -288
+	stack.offset_bottom = -218
 	stack.add_theme_constant_override("separation", 6)
 	root.add_child(stack)
 
@@ -114,15 +121,15 @@ func _build_skill_bar(root: Control) -> void:
 	panel.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
 	panel.offset_left = -256
 	panel.offset_right = 256
-	panel.offset_top = -82
-	panel.offset_bottom = -12
-	panel.add_theme_stylebox_override("panel", GameUIStyle.panel_style(0.90, 6))
+	panel.offset_top = -78
+	panel.offset_bottom = -20
+	panel.add_theme_stylebox_override("panel", GameUIStyle.quiet_panel(.48))
 	root.add_child(panel)
 
 	skill_bar = SkillBar.new()
 	skill_bar.name = "SkillBar"
 	skill_bar.alignment = BoxContainer.ALIGNMENT_CENTER
-	skill_bar.add_theme_constant_override("separation", 6)
+	skill_bar.add_theme_constant_override("separation", 5)
 	panel.add_child(skill_bar)
 
 
@@ -131,17 +138,21 @@ func _add_resource_row(parent: VBoxContainer, label_text: String, bar: ProgressB
 	row.add_theme_constant_override("separation", 8)
 	parent.add_child(row)
 
-	var label := Label.new()
-	label.custom_minimum_size = Vector2(24, 0)
-	label.text = label_text
-	GameUIStyle.apply_label(label, 11, color)
-	row.add_child(label)
+	var glyph:=TextureRect.new()
+	glyph.texture=GameUIStyle.icon("heart" if label_text=="生命" else "droplet")
+	glyph.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
+	glyph.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	glyph.custom_minimum_size=Vector2(18,18)
+	glyph.modulate=color.lightened(.25)
+	glyph.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	glyph.tooltip_text=label_text
+	row.add_child(glyph)
 
 	bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(bar)
 
 	var value := Label.new()
-	value.custom_minimum_size = Vector2(58, 0)
+	value.custom_minimum_size = Vector2(54, 0)
 	value.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	GameUIStyle.apply_label(value, 12, GameUIStyle.TEXT_MAIN)
 	row.add_child(value)
@@ -182,6 +193,7 @@ func _connect_player() -> void:
 	if buffs and not buffs.buffs_changed.is_connected(_update_stats_display):
 		buffs.buffs_changed.connect(_update_stats_display)
 
+	if _actor_status: _actor_status.context=player.actor_context
 	buff_ui.setup(player)
 	summon_ui.setup(player)
 	_setup_skill_tree_ui()
@@ -295,9 +307,13 @@ func _update_stats_display() -> void:
 	if not player or not stats_label:
 		return
 	var s := player.stats_component
-	stats_label.text = "Lv.%d STR %d INT %d AGI %d END %d" % [
-		s.level, s.effective_stat("strength"), s.effective_stat("intelligence"), s.effective_stat("agility"), s.effective_stat("endurance"),
-	]
+	stats_label.text = "等级 %d"%s.level
+	stats_label.tooltip_text="力量 %d · 智力 %d · 敏捷 %d · 耐力 %d"%[s.effective_stat("strength"),s.effective_stat("intelligence"),s.effective_stat("agility"),s.effective_stat("endurance")]
 	if xp_bar:
 		xp_bar.max_value = max(1, s.exp_to_next)
 		xp_bar.value = s.experience
+
+func _process(_delta: float) -> void:
+	# Campaign actor binding completes after the base HUD enters the tree.
+	if _actor_status and is_instance_valid(player) and _actor_status.context!=player.actor_context:
+		_actor_status.context=player.actor_context
