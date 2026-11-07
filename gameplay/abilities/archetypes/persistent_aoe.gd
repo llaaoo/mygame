@@ -148,6 +148,11 @@ func _on_area_entered(area: Area2D) -> void:
 func _try_hit(target: Node, from_tick: bool = false) -> void:
 	if not target or target == caster or not target.has_method("take_damage"):
 		return
+	if _skill and "spray" in _skill.tags and is_instance_valid(caster):
+		var origin: Vector2=get_meta("delivery_origin",caster.global_position)
+		if target is Node2D:
+			var ray:=PhysicsRayQueryParameters2D.create(origin,target.global_position,1,[caster.get_rid()] if caster is CollisionObject2D else [])
+			if not get_world_2d().direct_space_state.intersect_ray(ray).is_empty(): return
 	var target_id := target.get_instance_id()
 	var hits := int(_hit_counts.get(target_id, 0))
 	if hits >= _max_hits_per_target:

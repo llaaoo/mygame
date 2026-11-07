@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="ItemCatalog" load_steps=32 format=3]
+[gd_resource type="Resource" script_class="ItemCatalog" load_steps=35 format=3]
 [ext_resource type="Script" path="res://gameplay/foundation/data/item_catalog.gd" id="catalog"]
 [ext_resource type="Resource" path="res://content/foundation/items/charcoal.tres" id="item0"]
 [ext_resource type="Resource" path="res://content/foundation/items/sap.tres" id="item1"]
@@ -30,6 +30,9 @@
 [ext_resource type="Resource" path="res://content/exploration/equipment/covenant_ring.tres" id="item27"]
 [ext_resource type="Resource" path="res://content/exploration/equipment/keeper_ring.tres" id="item28"]
 [ext_resource type="Resource" path="res://content/exploration/equipment/soul_amulet.tres" id="item29"]
+[ext_resource type="Resource" path="res://content/foundation/items/fire_stone.tres" id="extra0"]
+[ext_resource type="Resource" path="res://content/foundation/items/paralytic_extract.tres" id="extra1"]
+[ext_resource type="Resource" path="res://content/foundation/items/potent_venom.tres" id="extra2"]
 [resource]
 script = ExtResource("catalog")
-items = [ExtResource("item0"), ExtResource("item1"), ExtResource("item2"), ExtResource("item3"), ExtResource("item4"), ExtResource("item5"), ExtResource("item6"), ExtResource("item7"), ExtResource("item8"), ExtResource("item9"), ExtResource("item10"), ExtResource("item11"), ExtResource("item12"), ExtResource("item13"), ExtResource("item14"), ExtResource("item15"), ExtResource("item16"), ExtResource("item17"), ExtResource("item18"), ExtResource("item19"), ExtResource("item20"), ExtResource("item21"), ExtResource("item22"), ExtResource("item23"), ExtResource("item24"), ExtResource("item25"), ExtResource("item26"), ExtResource("item27"), ExtResource("item28"), ExtResource("item29")]
+items = [ExtResource("item0"), ExtResource("item1"), ExtResource("item2"), ExtResource("item3"), ExtResource("item4"), ExtResource("item5"), ExtResource("item6"), ExtResource("item7"), ExtResource("item8"), ExtResource("item9"), ExtResource("item10"), ExtResource("item11"), ExtResource("item12"), ExtResource("item13"), ExtResource("item14"), ExtResource("item15"), ExtResource("item16"), ExtResource("item17"), ExtResource("item18"), ExtResource("item19"), ExtResource("item20"), ExtResource("item21"), ExtResource("item22"), ExtResource("item23"), ExtResource("item24"), ExtResource("item25"), ExtResource("item26"), ExtResource("item27"), ExtResource("item28"), ExtResource("item29"), ExtResource("extra0"), ExtResource("extra1"), ExtResource("extra2")]

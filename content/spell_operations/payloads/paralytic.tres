@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="SpellPayloadData" load_steps=3 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/operations/spell_payload_data.gd" id="1"]
+[ext_resource type="Resource" path="res://content/spell_operations/statuses/paralysis.tres" id="s0"]
+[resource]
+script = ExtResource("1")
+id = "paralytic"
+title = "麻痹喷洒"
+description = "短暂限制移动与发起动作，不造成毒伤，也不生成毒地。清水可洗除。"
+material_id = "paralytic_extract"
+tags = ["control", "spray"]
+field_type = ""
+field_charges = 2
+field_duration = 15.0
+surface = ""
+surface_duration = 8.0
+extra_mana = 2
+color = Color(0.85,0.7,0.3,0.8)
+statuses = [ExtResource("s0")]

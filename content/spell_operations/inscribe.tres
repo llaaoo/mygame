@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+conditional_cast = true
+id = "inscribe"
+operation_id = "inscribe"
+display_name = "铭刻法阵"
+description = "以选定介质在脚下铭刻法阵。M选择凝能、火石、霜盐或雷晶粉；法阵由后续亲手执行的基础动作触发。"
+mechanics = "8 MP；准备0.8秒；材料只在完成时扣除。"
+skill_type = 1
+field_type = "arcane"
+preparation = 0.8
+mp_cost = 8
+cooldown = 8.0
+damage = 0
+damage_scaling = 0.0
+icon_atlas_index = 5

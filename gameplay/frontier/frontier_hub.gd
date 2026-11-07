@@ -180,6 +180,11 @@ func _show_detail() -> void:
 				card.add_child(W.label("饱食 %+.0f · 饮水 %+.0f · 疲劳 %+.0f\n持续 %.0f秒"%[food.nutrition,food.hydration,food.fatigue,food.duration],14))
 				_detail.add_child(W.button("使用一份",_use_supply.bind(id)))
 			elif game.survival.supplies.catalog.has(id): card.add_child(W.label(game.survival.supplies.catalog[id].description,14))
+			for operation in SpellOperationCatalog.default_catalog().operations:
+				for payload in operation.payloads:
+					if payload.material_id!=id: continue
+					card.add_child(W.label("用于："+operation.action.display_name+"\n"+payload.describe(),13,true))
+					_detail.add_child(W.button("查看释放介质选项",game.workshop.show_action.bind(operation.action),not game.player.skill_manager.knows_action(operation.action)))
 			_detail.add_child(W.button("查看本次施法材料",func(): game.workshop.show_materials()))
 		"quests":
 			var quest: ExplorationQuestData

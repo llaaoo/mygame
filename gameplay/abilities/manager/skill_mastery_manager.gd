@@ -88,6 +88,7 @@ func get_spells_for_school(school: SkillMastery.School) -> Array[SkillData]:
 	if not player or not player.skill_manager or not player.skill_manager.pool:
 		return result
 	for skill in player.skill_manager.pool.skills:
+		if skill and player.skill_manager.material_operations and SpellOperationCatalog.default_catalog().canonical(skill.get_id())!=skill.get_id(): continue
 		if skill and skill.school == school:
 			result.append(skill)
 	result.sort_custom(func(a: SkillData, b: SkillData):

@@ -43,6 +43,9 @@ func _execute(ev: CombatEvent) -> void:
 		push_warning("[OnHitApplyStatus] 无法加载: %s" % status_buff_path)
 		return
 
+	if ev.skill:
+		for override in ev.skill.contact_statuses:
+			if override.status_id==buff.status_id: return
 	if required_skill_tag in ["water", "ice"]:
 		buff_manager.remove_status("burning")
 	if required_skill_tag == "water" and (not ev.skill or "poison" not in ev.skill.tags):

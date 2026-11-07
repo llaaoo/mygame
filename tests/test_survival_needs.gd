@@ -41,7 +41,7 @@ func _init() -> void:
 	supplies.grant({"clean_water": 3, "dirty_water": 4, "grain": 3})
 	check(SurvivalCatalog.water_count(supplies) == 4 and supplies.count("grain") == 3, "Shared waterskin capacity failed")
 	supplies.configure("water_call", "ration")
-	check(not supplies.selected.has("water_call") and supplies.catalog.size() == 7 and supplies.crafting_recipes.size() == 7, "Provisions became casting materials or inflated manufacturing catalogs")
+	check(not supplies.selected.has("water_call") and supplies.catalog.size() == 7 and supplies.crafting_recipes.size() == CastingSupplies.MATERIAL_IDS.size()+SpellOperationCatalog.default_catalog().recipes.size(), "Provisions became casting materials or inflated manufacturing catalogs")
 	var original := supplies.serialize()
 	supplies.begin_transaction()
 	supplies.pay({"grain": 1})

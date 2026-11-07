@@ -59,6 +59,7 @@ func reserve(plan: CastPlan) -> bool:
 				return false
 			consumed[requirement.id] = true
 	if not pay(plan.cost, plan.material_costs): return false
+	if not plan.action.operation_id.is_empty(): return true # Prepared ammunition stays selected; every cast still pays.
 	for component in plan.components:
 		if not component.material_id.is_empty():
 			supplies.configure(plan.action.get_id(), "")

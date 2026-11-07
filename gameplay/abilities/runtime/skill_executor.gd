@@ -259,6 +259,7 @@ func _spawn_projectile(scene: PackedScene, skill: SkillData, ctx: CastContext, d
 	if "damage" in instance:
 		instance.damage = damage
 	instance.set_meta("skill_data", skill)
+	instance.set_meta("delivery_origin",ctx.caster.global_position)
 	instance.set_meta("execution_family", ctx.family_id)
 	if owns_trace:
 		instance.set_meta("_combat_trace", CombatDebugger.active())
@@ -339,6 +340,7 @@ func _execute_aoe(skill: SkillData, ctx: CastContext) -> bool:
 			instance.set_caster(ctx.caster)
 
 	instance.set_meta("skill_data", skill)
+	instance.set_meta("delivery_origin",ctx.caster.global_position)
 	instance.set_meta("execution_family", ctx.family_id)
 	instance.set_meta("_combat_trace", CombatDebugger.active())
 	# 蓄力视觉：AoE 大小随倍率

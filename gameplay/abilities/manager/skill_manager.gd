@@ -18,11 +18,49 @@ signal skill_upgraded(source: String, skill: SkillData, upgrade_id: String, rank
 var pool: SkillPool = null                 ## 技能池（ID索引）
 var executor: SkillExecutor = null         ## 执行器（计算+执行）
 var combinations: ConditionalCastController
+var material_operations := false
 var restrict_actions := false
 var known_actions: Dictionary = {}
 
 func knows_action(skill: SkillData) -> bool:
-	return skill != null and (not restrict_actions or known_actions.has(skill.get_id()))
+	if not skill: return false
+	if material_operations:
+		var registry:=SpellOperationCatalog.default_catalog()
+		if registry.canonical(skill.get_id())!=skill.get_id(): return false
+		var operation:=registry.operation(skill.operation_id)
+		if operation:
+			if not restrict_actions or known_actions.has(skill.get_id()): return true
+			for alias in operation.aliases+operation.knowledge_actions:
+				if known_actions.has(alias): return true
+			return false
+	return not restrict_actions or known_actions.has(skill.get_id())
+
+func canonical_action(skill: SkillData) -> SkillData:
+	if not material_operations or not skill: return skill
+	var id:=SpellOperationCatalog.default_catalog().canonical(skill.get_id())
+	return pool.get_skill(id) if pool and id!=skill.get_id() else skill
+
+func enable_material_operations() -> void:
+	if material_operations: return
+	material_operations=true
+	if not pool: pool=SkillPool.new()
+	# Skill pools are per actor. Definitions remain shared and immutable.
+	for operation in SpellOperationCatalog.default_catalog().operations: pool.add_skill(operation.action)
+	if left_hand: equip_hand("left",left_hand.data)
+	if right_hand: equip_hand("right",right_hand.data)
+	var seen: Dictionary={}
+	for i in range(MAX_SLOTS):
+		if not _slots[i]: continue
+		var next:=canonical_action(_slots[i].data)
+		if not next.operation_id.is_empty() and seen.has(next.get_id()): _slots[i]=null; slot_changed.emit(i)
+		else:
+			seen[next.get_id()]=true
+			equip_slot(i,next)
+	# A material-free rune still needs an explicit triggering action.
+	for rule in SpellOperationCatalog.default_catalog().rules:
+		combinations.rules.append(rule)
+		combinations.learned_rules[rule.id]=true
+	combinations.rule_index.rebuild(combinations.rules)
 
 ## ── 左右手（SkillInstance 包装） ──
 var left_hand: SkillInstance = null
@@ -98,6 +136,7 @@ func apply_loadout(loadout: SkillLoadout) -> void:
 ## ── 装备管理 ──
 
 func equip_hand(hand: String, skill: SkillData) -> void:
+	skill=canonical_action(skill)
 	if skill and not knows_action(skill):
 		return
 	if skill and skill.combination_only:
@@ -123,6 +162,7 @@ func unequip_hand(hand: String) -> SkillData:
 
 
 func equip_slot(idx: int, skill: SkillData) -> void:
+	skill=canonical_action(skill)
 	if skill and not knows_action(skill):
 		return
 	if skill and skill.combination_only:
@@ -193,6 +233,8 @@ func restore_skill_state(saved_state: Dictionary) -> void:
 		if inst:
 			inst.restore_upgrades(entry.get("upgrades", {}))
 
+	if material_operations: normalize_operation_loadout()
+
 
 func has_left_spell() -> bool:
 	return left_hand != null
@@ -225,6 +267,7 @@ func get_cooldown_total(source: String) -> float:
 
 ## Validate the same explicit request that execution will accept.
 func can_start(source: String, caster: Node2D, context: CastContext) -> bool:
+	if not can_act(caster): return false
 	var inst := _find_instance(source)
 	if not context or not context.has_valid_target() or _executing or not inst or not knows_action(inst.data) or inst.data.combination_only:
 		return false
@@ -294,6 +337,7 @@ func _execute(skill: SkillData, source: String, caster: Node2D, direction: Vecto
 
 
 func _execute_with_context(skill: SkillData, source: String, caster: Node2D, ctx: CastContext, channel_cost: int = -1) -> bool:
+	if not can_act(caster): return false
 	if not ctx or not ctx.has_valid_target() or _executing or not knows_action(skill):
 		return false
 	if skill.combination_only:
@@ -403,3 +447,15 @@ func initialize(pool_res: SkillPool) -> void:
 		if pool_res and i < pool_res.skills.size():
 			_slots[i] = SkillInstance.new(pool_res.skills[i])
 			slot_changed.emit(i)
+
+func can_act(actor: Node2D) -> bool:
+	var buffs:=actor.get_node_or_null("BuffManager") as BuffManager
+	return not buffs or not buffs.prevents_actions()
+
+func normalize_operation_loadout() -> void:
+	var seen: Dictionary={}
+	for i in range(MAX_SLOTS):
+		var inst:=get_slot(i)
+		if not inst or inst.data.operation_id.is_empty(): continue
+		if seen.has(inst.data.get_id()): unequip_slot(i)
+		else: seen[inst.data.get_id()]=true

@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="Buff" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/status/buff.gd" id="1"]
+[resource]
+script = ExtResource("1")
+status_id = "washing"
+display_name = "冲洗"
+duration = 0.1
+tick_interval = 1.0
+tick_damage = 0
+prevents_actions = false
+speed_multiplier = 1.0
+cleanse_statuses = ["poison", "paralysis", "burning"]

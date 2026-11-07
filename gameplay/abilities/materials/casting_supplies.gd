@@ -28,12 +28,13 @@ func _init() -> void:
 	for id in MATERIAL_IDS:
 		catalog[id] = load("res://content/casting_materials/%s.tres" % id)
 		crafting_recipes[id] = load("res://content/crafting/%s.tres" % id)
+	for recipe in SpellOperationCatalog.default_catalog().recipes: crafting_recipes[recipe.id]=recipe
 
 func count(id: String) -> int:
 	return int(amounts.get(id, 0))
 
 func title(id: String) -> String:
-	return catalog[id].title if catalog.has(id) else str(RAW_TITLES.get(id, SurvivalCatalog.TITLES.get(id, id)))
+	return catalog[id].title if catalog.has(id) else str(RAW_TITLES.get(id, SurvivalCatalog.TITLES.get(id, ItemCatalog.default_catalog().definition(id).display_name if ItemCatalog.default_catalog().definition(id) else id)))
 
 static func known_item(id: String) -> bool:
 	return id in MATERIAL_IDS or RAW_TITLES.has(id) or SurvivalCatalog.TITLES.has(id) or ItemCatalog.default_catalog().definition(id)!=null and not ItemCatalog.default_catalog().definition(id) is EquipmentData
@@ -92,9 +93,9 @@ func craft(id: String) -> bool:
 
 func recycle_preview(id: String) -> Dictionary:
 	var recipe := crafting_recipes.get(id) as CraftingRecipe
-	if not recipe or not knows_recipe(id) or not catalog.has(id) or recipe.output_id != id or recipe.output_count <= 0 or recipe.inputs.is_empty(): return {}
+	if not recipe or not knows_recipe(id) or (not catalog.has(id) and not ItemCatalog.default_catalog().definition(id)) or recipe.output_id != id or recipe.output_count <= 0 or recipe.inputs.is_empty(): return {}
 	for input in recipe.inputs:
-		if (not catalog.has(input) and not RAW_TITLES.has(input)) or not recipe.inputs[input] is int or int(recipe.inputs[input]) <= 0: return {}
+		if not known_item(input) or not recipe.inputs[input] is int or int(recipe.inputs[input]) <= 0: return {}
 	return {"costs": {recipe.output_id: 2 * recipe.output_count}, "returns": recipe.inputs.duplicate()}
 
 func recycle(id: String) -> bool:
@@ -116,7 +117,8 @@ func recycle(id: String) -> bool:
 	if notify.is_valid(): notify.call()
 	return true
 
-func plan(action: SkillData, base: SkillData, include_required: bool = true, preparation_material: String = "") -> Dictionary:
+func plan(action: SkillData, base: SkillData, include_required: bool = true, preparation_material: String = "", manager: SkillManager = null) -> Dictionary:
+	if not action.operation_id.is_empty(): return operation_plan(action,manager)
 	var costs: Dictionary = {}
 	var material_id := str(selected.get(action.get_id(), ""))
 	var optional: CastingMaterialData = catalog.get(material_id)
@@ -199,3 +201,25 @@ func _set_amount(id: String, amount: int) -> void:
 	var current:=count(id)
 	if amount>current: inventory_store.receive(actor_id,id,amount-current)
 	elif amount<current: inventory_store.pay(actor_id,{id:current-amount})
+
+func select_payload(action: SkillData,payload_id: String,manager: SkillManager) -> bool:
+	var operation:=SpellOperationCatalog.default_catalog().operation(action.operation_id)
+	var payload:=operation.payload(payload_id) if operation else null
+	if not payload or not manager.knows_action(action): return false
+	selected[action.get_id()]=payload_id
+	_notify_changed()
+	return true
+
+func operation_plan(action: SkillData,manager: SkillManager) -> Dictionary:
+	var entry:=SpellOperationCatalog.default_catalog().operation(action.operation_id)
+	var choice:=str(selected.get(action.get_id(),entry.default_payload if entry else ""))
+	var medium:=entry.payload(choice) if entry else null
+	var result: Dictionary={"skill":action,"costs":{},"material_id":"","extra_mana":0,"field_bonus":0.0,"reason":"请选择释放介质","payload":medium}
+	if not medium: return result
+	result.skill=entry.compose(medium)
+	result.extra_mana=medium.extra_mana
+	result.reason="" if manager and manager.knows_action(action) else "尚未掌握这个基础动作"
+	if not medium.material_id.is_empty():
+		result.material_id=medium.material_id
+		result.costs={medium.material_id:medium.quantity}
+	return result

@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="Buff" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/status/buff.gd" id="1"]
+[resource]
+script = ExtResource("1")
+status_id = "poison"
+display_name = "浓缩毒素"
+duration = 8
+category = 2
+tick_interval = 1.0
+tick_damage = 6
+prevents_actions = false
+speed_multiplier = 1.0

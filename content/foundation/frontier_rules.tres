@@ -2,6 +2,7 @@
 [ext_resource type="Script" path="res://gameplay/foundation/data/ruleset_definition.gd" id="1"]
 [resource]
 script = ExtResource("1")
+material_operations = true
 physical_inventory = true
 modern_controls = true
 field_equipment = true

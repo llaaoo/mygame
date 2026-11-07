@@ -8,25 +8,32 @@ func _init(owner_game: Node) -> void:
 func show_materials() -> void:
 	var supplies: CastingSupplies = game.player.skill_manager.combinations.supplies
 	var text := "施法材料\n"
-	for id in CastingSupplies.MATERIAL_IDS:
+	for id in supplies.crafting_recipes:
 		text += "%s ×%d\n" % [supplies.title(id), supplies.count(id)]
 	text += "\n原料\n"
 	for id in CastingSupplies.RAW_TITLES:
 		text += "%s ×%d\n" % [supplies.title(id), supplies.count(id)]
-	text += "\n为本次基础动作选择一种素材：实际使用成功后清除；中断不扣料并保留选择，不适配则不消费。离区、死亡和读档清除选择。相容的法阵和印记可共同响应，总费用相加；资源不足或准备条件改变，整次动作取消。特殊施法的必需材料不能关闭。\n\n按M开关；K可编组雷阵、回响铭印、毒雾等动作。互斥增益按优先级选择一个，同优先级取后布的阵；护盾爆破先于回响脉冲。悬停技能槽查看本次全部结果与总费用。"
+	text += "\n释放介质选定后可重复使用，每次手动施放都消耗实物，耗尽不自动换料。额外改造素材只作用于本次施法，成功后清除；中断不扣料，不适配则不消费。离区、死亡和读档清除选择。相容的法阵和印记可共同响应，总费用相加；资源不足或准备条件改变，整次动作取消。特殊施法的必需材料不能关闭。\n\n按M开关；K可编组铭刻法阵、喷洒介质、震荡、凝神等基础动作。互斥增益按优先级选择一个，同优先级取后布的阵；护盾爆破先于回响脉冲。悬停技能槽查看本次全部结果与总费用。"
 	var buttons: Array[Dictionary] = []
-	for id in game.player.skill_manager.known_actions:
-		var skill: SkillData = game.player.skill_manager.pool.get_skill(id)
-		if not skill:
-			continue
-		var material_id := str(supplies.selected.get(id, ""))
-		buttons.append({"title": skill.display_name + " · " + (supplies.title(material_id) if not material_id.is_empty() else "基础"), "callback": show_action.bind(skill)})
+	for skill: SkillData in game.player.skill_manager.pool.skills:
+		if not skill or skill.combination_only or not game.player.skill_manager.knows_action(skill): continue
+		var id:=skill.get_id()
+		var material_id:=str(supplies.selected.get(id,""))
+		var label:=supplies.title(material_id) if not material_id.is_empty() else "基础"
+		if not skill.operation_id.is_empty():
+			var operation:=SpellOperationCatalog.default_catalog().operation(skill.operation_id)
+			var payload:=operation.payload(str(supplies.selected.get(id,operation.default_payload)))
+			label=payload.title if payload else "未装填"
+		buttons.append({"title":skill.display_name+" · "+label,"callback":show_action.bind(skill)})
 	buttons.append({"title": "营地加工", "disabled": not game.is_at_base(), "callback": show_crafts})
 	buttons.append({"title": "调和台回收" + ("" if recycling_available() else "（需营地修复）"), "disabled": not recycling_available(), "callback": show_recycling})
 	buttons.append({"title": "继续探索", "callback": game.ui.close_modal})
 	game.ui.show_panel("施法材料与本次选择", text, buttons)
 
 func show_action(skill: SkillData) -> void:
+	if not skill.operation_id.is_empty():
+		show_payloads(skill)
+		return
 	var controller: ConditionalCastController = game.player.skill_manager.combinations
 	var supplies := controller.supplies
 	var text := "%s\n%s\n\n%s\n\n" % [skill.display_name, skill.description, controller.describe_comparison(skill, game.player)]
@@ -56,7 +63,7 @@ func show_crafts() -> void:
 	if not game.is_at_base():
 		return
 	var supplies: CastingSupplies = game.player.skill_manager.combinations.supplies
-	var text := "使用探索获得的原料加工成品。休息不补满材料，已搜刮的固定来源不会重复发放。基础火、霜法术始终可不带材料使用。\n\n"
+	var text := "使用探索获得的原料加工成品。休息不补满材料，已搜刮的固定来源不会重复发放。凝能阵无需材料；元素法阵与喷洒按选定介质消费实物。\n\n"
 	var buttons: Array[Dictionary] = []
 	for id in supplies.crafting_recipes:
 		var costs: Dictionary = supplies.crafting_recipes[id].inputs
@@ -85,7 +92,7 @@ func show_recycling() -> void:
 	var supplies: CastingSupplies = game.player.skill_manager.combinations.supplies
 	var text := "消耗两批成品，返还一批原制造配方投入。每次只处理一份，不递归拆解、不补满材料；精炼灰等中间成品原样返还。\n\n"
 	var buttons: Array[Dictionary] = []
-	for id in CastingSupplies.MATERIAL_IDS:
+	for id in supplies.crafting_recipes:
 		var preview := supplies.recycle_preview(id)
 		if preview.is_empty(): continue
 		text += "消耗：%s\n返还：%s\n\n" % [supplies.describe_cost(preview.costs), supplies.describe_cost(preview.returns)]
@@ -97,3 +104,26 @@ func show_recycling() -> void:
 func _recycle(id: String) -> void:
 	if not recycle(id): game.ui.notify("回收条件已变化，未扣除材料。")
 	show_recycling()
+
+func show_payloads(skill: SkillData) -> void:
+	var manager: SkillManager=game.player.skill_manager
+	var supplies:=manager.combinations.supplies
+	var operation:=SpellOperationCatalog.default_catalog().operation(skill.operation_id)
+	var plan:=manager.combinations.preview(skill,game.player)
+	var text:=skill.description+"\n\n本次："+plan.effect_label+"\n%d MP · 准备%.2f秒\n"%[plan.cost,plan.preparation]+("可释放" if plan.ready else plan.reason)+"\n"
+	var buttons: Array[Dictionary]=[]
+	for payload in operation.payloads:
+		var unlocked:=manager.knows_action(skill)
+		var cost:="无需材料" if payload.material_id.is_empty() else supplies.describe_cost({payload.material_id:payload.quantity})
+		if supplies.inventory_store and not payload.material_id.is_empty(): cost+=" · 口袋%d"%supplies.inventory_store.count(supplies.actor_id,payload.material_id,false,true)
+		text+="\n"+payload.title+("（尚未学会）" if not unlocked else "")+"\n"+cost+(" · 额外%d MP"%payload.extra_mana if payload.extra_mana>0 else "")+"\n"+payload.describe()+"\n"
+		var current:=str(supplies.selected.get(skill.get_id(),operation.default_payload))==payload.id
+		buttons.append({"title":("✓ 当前：" if current else "选择：")+payload.title,"disabled":not unlocked,"focused":current,"callback":_select_payload.bind(skill,payload.id)})
+	text+="\n每次手动施放成功才消耗口袋实物；选定介质会保留，方便连续施放。离区/死亡/读档清除选择。物资不足不会自动换成别的介质。N可在安全时整理物资。喷洒清水会减少饮水库存；毒地可以被清洗或点燃。"
+	buttons.append({"title":"返回材料总览","callback":show_materials})
+	game.ui.show_panel("释放介质："+skill.display_name,text,buttons)
+
+func _select_payload(skill: SkillData,id: String) -> void:
+	var manager: SkillManager=game.player.skill_manager
+	manager.combinations.supplies.select_payload(skill,id,manager)
+	show_payloads(skill)

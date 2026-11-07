@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/item_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "paralytic_extract"
+display_name = "麻痹萃取"
+description = "喷洒后短时麻痹，不造成中毒伤害；清水可洗除。"
+weight = 0.2
+stackable = true
+max_stack = 99

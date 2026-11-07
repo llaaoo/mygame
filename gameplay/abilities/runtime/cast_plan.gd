@@ -26,6 +26,7 @@ var partial_boons: Array[String] = []
 var infusions: Array[String] = []
 var explanation: Array[CastExplanationStep] = []
 var effect_label := ""
+var operation_reason := ""
 var reason := ""
 var ready := false
 var action: SkillData

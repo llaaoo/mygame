@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="SpellOperationCatalog" load_steps=8 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/operations/spell_operation_catalog.gd" id="1"]
+[ext_resource type="Resource" path="res://content/spell_operations/inscribe_operation.tres" id="inscribe"]
+[ext_resource type="Resource" path="res://content/spell_operations/disperse_operation.tres" id="disperse"]
+[ext_resource type="Resource" path="res://content/crafting/fire_stone.tres" id="r0"]
+[ext_resource type="Resource" path="res://content/crafting/paralytic_extract.tres" id="r1"]
+[ext_resource type="Resource" path="res://content/crafting/potent_venom.tres" id="r2"]
+[ext_resource type="Resource" path="res://content/spell_operations/arcane_pulse.tres" id="arcane"]
+[resource]
+script = ExtResource("1")
+rules = [ExtResource("arcane")]
+operations = [ExtResource("inscribe"), ExtResource("disperse")]
+recipes = [ExtResource("r0"), ExtResource("r1"), ExtResource("r2")]

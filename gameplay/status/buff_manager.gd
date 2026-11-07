@@ -386,3 +386,8 @@ func reconcile_stack_limits() -> void:
 			_touch_status(instance.definition.status_id)
 			_rebuild_attributes()
 			_notify_stacks(instance.definition, removed, limit, "capacity_changed")
+
+func prevents_actions() -> bool:
+	for instance in _instances:
+		if instance.definition.prevents_actions: return true
+	return false

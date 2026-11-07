@@ -280,6 +280,7 @@ func poll_actions() -> Array[Action]:
 
 
 func resolve_action(action: Action) -> void:
+	if not skill_manager.can_act(self): return
 	if actor_context and actor_context.actions.active() and action.action_type in [Action.ActionType.MOVE,Action.ActionType.MELEE,Action.ActionType.HEAVY_ATTACK,Action.ActionType.GUARD,Action.ActionType.USE_ITEM]:
 		if action.action_type==Action.ActionType.MELEE: action.direction=get_target_direction()
 		actor_context.actions.try_action(action)

@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="SpellPayloadData" load_steps=3 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/operations/spell_payload_data.gd" id="1"]
+[ext_resource type="Resource" path="res://content/spell_operations/statuses/washing.tres" id="s0"]
+[resource]
+script = ExtResource("1")
+id = "water"
+title = "清水喷洒"
+description = "消耗饮用水，洗除燃烧、中毒与麻痹；喷出后不能再饮用。残水仍可导电或受污染。"
+material_id = "clean_water"
+tags = ["water", "spray"]
+field_type = ""
+field_charges = 2
+field_duration = 15.0
+surface = "wet"
+surface_duration = 8.0
+extra_mana = 0
+color = Color(0.3,0.65,1,0.8)
+statuses = [ExtResource("s0")]

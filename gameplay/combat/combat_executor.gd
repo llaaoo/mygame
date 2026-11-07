@@ -1,6 +1,7 @@
 class_name CombatExecutor
 extends Node
 signal damage_applied(source: Node2D, target: Node2D, amount: int)
+signal harmful_contact_applied(source: Node2D,target: Node2D)
 ## 战斗执行器 — 唯一控制流入口
 ##
 ## 原则（Single Authority Rule）：
@@ -94,6 +95,11 @@ static func report_hit(caster: Node2D, target: Node2D, damage: int, position: Ve
 		instance._enforce_emit(CombatEvent.Type.ON_HIT, caster, target, data, skill)
 	else:
 		_emit_direct(CombatEvent.Type.ON_HIT, caster, target, data, skill)
+	if not context.periodic and result.status_accepted and target_buffs and skill:
+		var harmful:=false
+		for status in skill.contact_statuses:
+			if target_buffs.apply_buff(status,caster,skill) and status.is_harmful(): harmful=true
+		if harmful and instance: instance.harmful_contact_applied.emit(caster,target)
 	if result.damage_accepted and is_instance_valid(target):
 		_apply_damage(target, int(round(context.damage * context.incoming_multiplier)), context.tags, caster)
 	if is_instance_valid(health):

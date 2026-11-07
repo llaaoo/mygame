@@ -89,7 +89,7 @@ func run() -> void:
 	read("river.pulse");read("river.echo");read("alchemy.schematic");read("survival.archive_recipe")
 	await fixture.travel("river_mine")
 	read("river.storm")
-	check(supplies.known_recipes.size()==7,"All seven material formulas cannot be learned")
+	check(supplies.known_recipes.size()==supplies.crafting_recipes.size(),"All authored material formulas cannot be learned")
 	var regulator:=site("alchemy.regulator_open")
 	p.position=regulator.position+Vector2(10,0)
 	await cast("water_call",regulator.position)
