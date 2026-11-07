@@ -9,8 +9,9 @@ func _ready() -> void:
 	call_deferred("_start_burning_forest_quest")
 
 
-func _process(_delta: float) -> void:
-	if Input.is_action_just_pressed("ui_cancel"):
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("ui_cancel"):
+		get_viewport().set_input_as_handled()
 		_restore_overworld()
 
 
@@ -47,8 +48,7 @@ func _start_burning_forest_quest() -> void:
 
 
 func _restore_overworld() -> void:
-	var gr := GameRuntime.instance
-	if not gr or not gr.get_region_runtime():
-		push_error("BurningForest: RegionRuntime unavailable")
-		return
-	gr.get_region_runtime().ensure_region(OVERWORLD_PATH, OVERWORLD_RETURN_MARKER)
+	var runtime := GameRuntime.instance
+	var regions := runtime.get_region_runtime() if runtime else null
+	if regions and regions.get_current_region() == self:
+		regions.ensure_region(OVERWORLD_PATH, OVERWORLD_RETURN_MARKER)

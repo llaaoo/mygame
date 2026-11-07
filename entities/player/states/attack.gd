@@ -1,5 +1,5 @@
-extends State
 class_name PlayerAttackState
+extends State
 
 @export var attack_duration: float = 0.3
 var attack_timer: float = 0.0

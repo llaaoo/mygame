@@ -2,6 +2,8 @@ class_name PlayerCombatBindings
 extends Node
 
 var player: Player
+var _bus: CombatEventBus
+var _quest_tracker: QuestTracker
 var _on_kill_effect: OnKillBonusExp = null
 var _on_hit_effect: TriggeredEffect = null
 var _on_buff_expire_cast: GenericTriggeredCast = null  ## 通用：Buff过期→释放技能
@@ -24,9 +26,12 @@ func _setup_event_bus() -> void:
 	# ⚠️ 必须 await，否则 _ensure_runtime_ready 内部 yield 后后续代码立即执行，
 	# 此时 CombatEventBus.instance 为 null，subscribe_static 静默失败
 	await _ensure_runtime_ready()
+	if not is_inside_tree() or is_queued_for_deletion():
+		return
+	_bus = RuntimeRegistration.combat_bus_for(self)
 
 	# ON_KILL 对敌人 → 额外经验（持有引用防止 Resource GC）
-	_on_kill_effect = OnKillBonusExp.create_for_player(15)
+	_on_kill_effect = OnKillBonusExp.create_for_player(player, 15)
 	_register_triggered_effects(_on_kill_effect)
 
 	# 低血量触发器（配置化，DEFAULT_LOW_HP_TRIGGERS 可扩展）
@@ -39,7 +44,7 @@ func _setup_event_bus() -> void:
 	_synergy_resolver = SkillSynergyResolver.new()
 	_synergy_resolver.name = "SkillSynergyResolver"
 	player.add_child(_synergy_resolver)
-	_synergy_resolver.setup(player)
+	_synergy_resolver.setup(player, _bus)
 	_synergy_resolver.reaction_triggered.connect(_show_reaction)
 
 	# EffectGraph：ON_HIT 火焰技能
@@ -52,14 +57,14 @@ func _setup_event_bus() -> void:
 	_setup_quest_manager()
 
 func _ensure_runtime_ready() -> void:
-	var runtime := GameRuntime.instance
+	var runtime := RuntimeRegistration.runtime_for(self)
 	if runtime and not runtime.get_combat_executor():
 		await runtime.runtimes_ready
 
 func _register_triggered_effects(effect: TriggeredEffect) -> void:
 	if effect not in _owned_effects:
 		_owned_effects.append(effect)
-	effect.register()
+	effect.register(_bus)
 	print("⚡ 已注册触发效果: ", effect.get_script().get_global_name())
 
 func _create_buff_expire_trigger() -> GenericTriggeredCast:
@@ -197,18 +202,14 @@ func _setup_combat_debugger() -> void:
 func _setup_quest_manager() -> void:
 	if player.quest_manager:
 		return
-	player.quest_manager = QuestManager.new()
+	player.quest_manager = QuestManager.new(player)
 	player.quest_manager.name = "QuestManager"
-	player.get_parent().add_child.call_deferred(player.quest_manager)
+	player.add_child(player.quest_manager)
 
-	# 任务追踪 UI
-	var tracker := QuestTracker.new()
-	tracker.name = "QuestTracker"
-	player.get_parent().add_child.call_deferred(tracker)
-	call_deferred("_setup_quest_tracker", tracker)
-
-func _setup_quest_tracker(tracker: QuestTracker) -> void:
-	tracker.setup(player.quest_manager)
+	_quest_tracker = QuestTracker.new()
+	_quest_tracker.name = "QuestTracker"
+	player.get_parent().add_child(_quest_tracker)
+	_quest_tracker.setup(player.quest_manager)
 
 func _tag_quest_objects() -> void:
 	# 给场景中的 NPC 和 Chest 加 quest 标签
@@ -231,9 +232,9 @@ func _setup_mastery() -> void:
 	player.skill_manager.skill_used.connect(_on_skill_used_for_mastery)
 
 	# 命中时加 XP（按伤害）
-	if CombatEventBus.instance:
-		CombatEventBus.instance.subscribe(CombatEvent.Type.ON_HIT, _on_player_hit_for_mastery)
-		CombatEventBus.instance.subscribe(CombatEvent.Type.ON_KILL, _on_player_kill_for_mastery)
+	if is_instance_valid(_bus):
+		_bus.subscribe(CombatEvent.Type.ON_HIT, _on_player_hit_for_mastery)
+		_bus.subscribe(CombatEvent.Type.ON_KILL, _on_player_kill_for_mastery)
 	_rebuild_perk_triggers()
 
 func _rebuild_perk_triggers() -> void:
@@ -326,11 +327,15 @@ func tick(delta: float) -> void:
 		_low_hp_cooldowns[trigger] = maxf(0, float(_low_hp_cooldowns[trigger]) - delta)
 
 func _exit_tree() -> void:
+	if is_instance_valid(_quest_tracker):
+		_quest_tracker.queue_free()
+	_quest_tracker = null
 	for effect in _owned_effects:
 		effect.unregister()
-	if CombatEventBus.instance:
-		CombatEventBus.instance.unsubscribe(CombatEvent.Type.ON_HIT, _on_player_hit_for_mastery)
-		CombatEventBus.instance.unsubscribe(CombatEvent.Type.ON_KILL, _on_player_kill_for_mastery)
+	if is_instance_valid(_bus):
+		_bus.unsubscribe(CombatEvent.Type.ON_HIT, _on_player_hit_for_mastery)
+		_bus.unsubscribe(CombatEvent.Type.ON_KILL, _on_player_kill_for_mastery)
+	_bus = null
 
 func _show_reaction(title: String, position: Vector2) -> void:
 	var world := CastContext.default_world(player)

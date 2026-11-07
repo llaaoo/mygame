@@ -37,6 +37,7 @@ const MAX_CHAIN_LENGTH: int = 10
 var _chain_count: int = 0
 var _current_family := ""
 var _current_hit: HitContext
+var _event_bus: CombatEventBus
 
 ## ── TriggeredEffect 冷却表（所有权上交） ──
 ## key = TriggeredEffect Resource, value = remaining simulated seconds (float)
@@ -44,8 +45,8 @@ var _current_hit: HitContext
 var _trigger_cooldowns: Dictionary = {}
 
 
-func _ready() -> void:
-	instance = self
+func _init(bus: CombatEventBus = null) -> void:
+	_event_bus = bus
 
 
 func _exit_tree() -> void:
@@ -182,8 +183,8 @@ func _enforce_emit(type: CombatEvent.Type, source: Node2D, target: Node2D, data:
 		return
 
 	# 4. 委托给总线
-	var bus := CombatEventBus.instance
-	if not bus:
+	var bus := _event_bus if is_instance_valid(_event_bus) else CombatEventBus.instance
+	if not is_instance_valid(bus):
 		return
 
 	# 记录事件

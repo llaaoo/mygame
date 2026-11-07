@@ -22,23 +22,22 @@ func _init() -> void:
 func _ready() -> void:
 	state_manager.name = "WorldStateManager"
 	add_child(state_manager)
-	_connect_to_bus()
 
 
-func _connect_to_bus() -> void:
-	# 通过 GameRuntime.instance 获取 CommandBus（不再硬编码路径）
-	var gr := GameRuntime.instance
-	if gr:
-		command_bus = gr.get_command_bus()
-	
-	if command_bus:
-		command_bus.subscribe_for_target(RuntimeCommand.TYPE_DESTROYED, RuntimeCommand.Target.WORLD, _on_destroyed_command)
-		command_bus.subscribe_for_target(RuntimeCommand.TYPE_RESPAWN_REQUEST, RuntimeCommand.Target.WORLD, _on_respawn_request)
-		command_bus.subscribe_for_target("CHUNK_LOAD_REQUEST", RuntimeCommand.Target.WORLD, _on_chunk_load_request)
-	else:
-		# 延迟重试：GameRuntime 可能尚未初始化完成
-		await get_tree().process_frame
-		_connect_to_bus()
+func bind_command_bus(bus: CommandBus) -> void:
+	command_bus = bus
+	bus.subscribe_for_target(RuntimeCommand.TYPE_DESTROYED, RuntimeCommand.Target.WORLD, _on_destroyed_command)
+	bus.subscribe_for_target(RuntimeCommand.TYPE_RESPAWN_REQUEST, RuntimeCommand.Target.WORLD, _on_respawn_request)
+	bus.subscribe_for_target("CHUNK_LOAD_REQUEST", RuntimeCommand.Target.WORLD, _on_chunk_load_request)
+
+
+func _exit_tree() -> void:
+	if not is_instance_valid(command_bus):
+		return
+	command_bus.unsubscribe(RuntimeCommand.TYPE_DESTROYED, _on_destroyed_command)
+	command_bus.unsubscribe(RuntimeCommand.TYPE_RESPAWN_REQUEST, _on_respawn_request)
+	command_bus.unsubscribe("CHUNK_LOAD_REQUEST", _on_chunk_load_request)
+	command_bus = null
 
 
 ## 注册 MapObject（场景加载时调用）

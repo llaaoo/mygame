@@ -3,9 +3,9 @@ extends RefCounted
 ## Authoritative instance/container store. Legacy inventories are views over this store.
 signal changed
 var definitions: Dictionary = {}
-var containers: Dictionary = {}
 var next_uid := 1
 var clock_seconds := 0.0
+var _containers: Dictionary = {}
 var _instances: Dictionary={}
 var _locations: Dictionary={}
 var _pending_facts: Array[Dictionary]=[]
@@ -16,19 +16,95 @@ var _dirty := false
 func register_definition(item: ItemData) -> void:
 	if item and not item.id.is_empty(): definitions[item.id]=item
 func ensure_container(id: String,owner: String,kind: String,capacity: int) -> void:
-	if containers.has(id): return
-	containers[id]={"owner":owner,"kind":kind,"capacity":capacity,"revision":0,"items":[],"equipped":{},"region":"","position":[],"attached":true}
+	if _containers.has(id): return
+	_containers[id]={"owner":owner,"kind":kind,"capacity":capacity,"revision":0,"items":[],"equipped":{},"region":"","position":[],"attached":true}
 func ensure_actor(id: String) -> void:
 	ensure_container(id+".pocket",id,"pocket",rules.pocket_capacity if rules else 12)
 	ensure_container(id+".pack",id,"pack",rules.pack_capacity if rules else 30)
 	ensure_container(id+".gear",id,"gear",9)
 func actor_containers(actor: String,pocket_only := false) -> Array[String]:
 	var ids: Array[String]=[actor+".pocket"]
-	if not pocket_only and containers.has(actor+".pack") and containers[actor+".pack"].attached: ids.append(actor+".pack")
+	if not pocket_only and _containers.has(actor+".pack") and _containers[actor+".pack"].attached: ids.append(actor+".pack")
 	return ids
+
+
+func has_container(id: String) -> bool:
+	return _containers.has(id)
+
+
+func is_attached(id: String) -> bool:
+	return _containers.get(id, {}).get("attached", false)
+
+
+func container_revision(id: String) -> int:
+	return _containers.get(id, {}).get("revision", -1)
+
+
+func dropped_pack_ids(region: String) -> Array[String]:
+	var result: Array[String] = []
+	for id: String in _containers:
+		var record: Dictionary = _containers[id]
+		if record.kind == "pack" and not record.attached and record.region == region:
+			result.append(id)
+	return result
+
+
+func dropped_pack_position(id: String) -> Vector2:
+	var position: Array = _containers.get(id, {}).get("position", [])
+	return Vector2(position[0], position[1]) if position.size() == 2 else Vector2.ZERO
+
+
+func drop_pack(actor: String, region: String, position: Vector2) -> bool:
+	var id := actor + ".pack"
+	if not is_attached(id) or region.is_empty() or not position.is_finite():
+		return false
+	var record: Dictionary = _containers[id]
+	if record.owner != actor or record.kind != "pack":
+		return false
+	record.attached = false
+	record.region = region
+	record.position = [position.x, position.y]
+	_touch(id)
+	return true
+
+
+func recover_pack(actor: String, id: String) -> bool:
+	if id != actor + ".pack" or not has_container(id) or is_attached(id):
+		return false
+	var record: Dictionary = _containers[id]
+	if record.owner != actor or record.kind != "pack":
+		return false
+	record.attached = true
+	record.region = ""
+	record.position = []
+	_touch(id)
+	return true
+
+
+func discard_actor_containers(actor: String) -> void:
+	for id: String in _containers.keys():
+		if _containers[id].owner != actor:
+			continue
+		for entry: ItemInstance in _containers[id].items:
+			_unindex(entry)
+		_containers.erase(id)
+
+
+func swap_slots(id: String, from_index: int, to_index: int) -> void:
+	var items: Array = _containers.get(id, {}).get("items", [])
+	if from_index == to_index or from_index < 0 or to_index < 0:
+		return
+	if from_index >= items.size() or to_index >= items.size():
+		return
+	var original: ItemInstance = items[from_index]
+	items[from_index] = items[to_index]
+	items[to_index] = original
+	_touch(id)
+
+
 func entries(id: String) -> Array[Dictionary]:
 	var result: Array[Dictionary]=[]
-	for item: ItemInstance in containers.get(id,{}).get("items",[]): result.append(item.snapshot())
+	for item: ItemInstance in _containers.get(id,{}).get("items",[]): result.append(item.snapshot())
 	return result
 func item(uid: String) -> ItemInstance:
 	var value:=_instance(uid)
@@ -43,7 +119,7 @@ func _unindex(entry: ItemInstance) -> void:
 	_locations.erase(entry.uid)
 func count_in(id: String,key: String) -> int:
 	var count:=0
-	for entry: ItemInstance in containers.get(id,{}).get("items",[]):
+	for entry: ItemInstance in _containers.get(id,{}).get("items",[]):
 		if entry.definition_id==key: count+=entry.quantity
 	return count
 func count(actor: String,key: String,include_equipped := false,pocket_only := false) -> int:
@@ -55,7 +131,7 @@ func count(actor: String,key: String,include_equipped := false,pocket_only := fa
 func material_amounts(actor: String) -> Dictionary:
 	var result: Dictionary={}
 	for id in actor_containers(actor):
-		for entry: ItemInstance in containers.get(id,{}).get("items",[]):
+		for entry: ItemInstance in _containers.get(id,{}).get("items",[]):
 			if CastingSupplies.known_item(entry.definition_id): result[entry.definition_id]=int(result.get(entry.definition_id,0))+entry.quantity
 	return result
 func set_materials(actor: String,amounts: Dictionary) -> void:
@@ -63,10 +139,10 @@ func set_materials(actor: String,amounts: Dictionary) -> void:
 	begin_batch()
 	for id in [actor+".pocket",actor+".pack"]:
 		var remove: Array=[]
-		for entry: ItemInstance in containers[id].items:
+		for entry: ItemInstance in _containers[id].items:
 			if CastingSupplies.known_item(entry.definition_id): remove.append(entry)
 		for entry in remove:
-			containers[id].items.erase(entry)
+			_containers[id].items.erase(entry)
 			_unindex(entry)
 		_touch(id)
 	for key in amounts:
@@ -77,10 +153,10 @@ func _stack_limit(key: String) -> int:
 	if data and data.use_profile and data.use_profile.kind==ItemUseDefinition.Kind.SPRAY: return 1
 	return 1 if data is EquipmentData else maxi(1,data.max_stack) if data and data.stackable else 99 if CastingSupplies.known_item(key) else 1
 func space(id: String,key: String,properties: Dictionary = {}) -> int:
-	if not containers.has(id): return 0
+	if not _containers.has(id): return 0
 	var limit:=_stack_limit(key)
-	var total:=maxi(0,int(containers[id].capacity)-containers[id].items.size())*limit
-	for entry: ItemInstance in containers[id].items:
+	var total:=maxi(0,int(_containers[id].capacity)-_containers[id].items.size())*limit
+	for entry: ItemInstance in _containers[id].items:
 		if entry.definition_id==key and entry.properties==properties: total+=maxi(0,limit-entry.quantity)
 	return total
 func receive(actor: String,key: String,amount: int,migration := false) -> int:
@@ -90,7 +166,7 @@ func receive(actor: String,key: String,amount: int,migration := false) -> int:
 	var ids: Array[String]=[]
 	if data is EquipmentData or not CastingSupplies.known_item(key): ids.append(actor+".pack")
 	else: ids=actor_containers(actor)
-	if ids==[actor+".pack"] and not containers[actor+".pack"].attached and not migration: return 0
+	if ids==[actor+".pack"] and not _containers[actor+".pack"].attached and not migration: return 0
 	if key in ["clean_water","dirty_water"]:
 		amount=mini(amount,maxi(0,(rules.maximum_water if rules else 4)-count(actor,"clean_water")-count(actor,"dirty_water")))
 	var added:=0
@@ -110,7 +186,7 @@ func _insert(id: String,key: String,amount: int,uid := "",properties: Dictionary
 	var uids: Array[String]=[]
 	var limit:=_stack_limit(key)
 	if limit>1:
-		for entry: ItemInstance in containers[id].items:
+		for entry: ItemInstance in _containers[id].items:
 			if entry.definition_id!=key or entry.properties!=properties: continue
 			var add:=mini(amount,maxi(0,limit-entry.quantity))
 			entry.quantity+=add
@@ -124,7 +200,7 @@ func _insert(id: String,key: String,amount: int,uid := "",properties: Dictionary
 		entry.definition_id=key
 		entry.quantity=mini(amount,limit)
 		entry.properties=properties.duplicate(true)
-		containers[id].items.append(entry)
+		_containers[id].items.append(entry)
 		_index(id,entry)
 		uids.append(entry.uid)
 		amount-=entry.quantity
@@ -141,13 +217,13 @@ func pay(actor: String,costs: Dictionary,pocket_only := false) -> bool:
 	for key in costs:
 		var remaining:=int(costs[key])
 		for id in actor_containers(actor,pocket_only):
-			for entry: ItemInstance in containers[id].items.duplicate():
+			for entry: ItemInstance in _containers[id].items.duplicate():
 				if entry.definition_id!=key: continue
 				var amount:=mini(remaining,entry.quantity)
 				entry.quantity-=amount
 				remaining-=amount
 				if entry.quantity==0:
-					containers[id].items.erase(entry)
+					_containers[id].items.erase(entry)
 					_unindex(entry)
 				_touch(id)
 				if remaining==0: break
@@ -157,17 +233,17 @@ func pay(actor: String,costs: Dictionary,pocket_only := false) -> bool:
 func preview(source: String,destination: String,uid: String,quantity: int,partial := false) -> TransferPlan:
 	var plan:=TransferPlan.new()
 	plan.source=source; plan.destination=destination; plan.item_uid=uid; plan.quantity=quantity; plan.partial=partial
-	plan.source_revision=int(containers.get(source,{}).get("revision",-1))
-	plan.destination_revision=int(containers.get(destination,{}).get("revision",-1))
+	plan.source_revision=int(_containers.get(source,{}).get("revision",-1))
+	plan.destination_revision=int(_containers.get(destination,{}).get("revision",-1))
 	return plan
 func commit(plan: TransferPlan) -> OperationResult:
-	if not plan or plan.source==plan.destination or not containers.has(plan.source) or not containers.has(plan.destination): return OperationResult.reject("invalid_container")
-	if containers[plan.source].revision!=plan.source_revision or containers[plan.destination].revision!=plan.destination_revision: return OperationResult.reject("stale_plan")
+	if not plan or plan.source==plan.destination or not _containers.has(plan.source) or not _containers.has(plan.destination): return OperationResult.reject("invalid_container")
+	if _containers[plan.source].revision!=plan.source_revision or _containers[plan.destination].revision!=plan.destination_revision: return OperationResult.reject("stale_plan")
 	var entry:=_instance(plan.item_uid)
 	if not entry or locate(entry.uid)!=plan.source or plan.quantity<=0 or plan.quantity>entry.quantity: return OperationResult.reject("invalid_quantity")
 	var accepted:=mini(plan.quantity,space(plan.destination,entry.definition_id,entry.properties))
-	if entry.definition_id in ["clean_water","dirty_water"] and containers[plan.source].owner!=containers[plan.destination].owner:
-		var owner: String=containers[plan.destination].owner
+	if entry.definition_id in ["clean_water","dirty_water"] and _containers[plan.source].owner!=_containers[plan.destination].owner:
+		var owner: String=_containers[plan.destination].owner
 		accepted=mini(accepted,maxi(0,(rules.maximum_water if rules else 4)-count(owner,"clean_water")-count(owner,"dirty_water")))
 	if accepted<=0 or not plan.partial and accepted!=plan.quantity: return OperationResult.reject("capacity")
 	var key:=entry.definition_id
@@ -176,15 +252,15 @@ func commit(plan: TransferPlan) -> OperationResult:
 	begin_batch()
 	entry.quantity-=accepted
 	if entry.quantity==0:
-		containers[plan.source].items.erase(entry)
+		_containers[plan.source].items.erase(entry)
 		_unindex(entry)
-		for slot in containers[plan.source].equipped.keys():
-			if containers[plan.source].equipped[slot]==entry.uid: containers[plan.source].equipped.erase(slot)
+		for slot in _containers[plan.source].equipped.keys():
+			if _containers[plan.source].equipped[slot]==entry.uid: _containers[plan.source].equipped.erase(slot)
 	_touch(plan.source)
 	var result:=OperationResult.success(accepted)
 	result.item_uids=_insert(plan.destination,key,accepted,uid,properties)
 	end_batch()
-	_publish("item_transferred",containers[plan.source].owner,{"from":plan.source,"to":plan.destination,"definition":key,"quantity":accepted,"uids":result.item_uids})
+	_publish("item_transferred",_containers[plan.source].owner,{"from":plan.source,"to":plan.destination,"definition":key,"quantity":accepted,"uids":result.item_uids})
 	return result
 func exchange(a: String,b: String,costs: Dictionary,returns: Dictionary) -> OperationResult:
 	if a==b or not can_pay(a,costs) or not can_pay(b,returns): return OperationResult.reject("insufficient_items")
@@ -204,7 +280,7 @@ func exchange(a: String,b: String,costs: Dictionary,returns: Dictionary) -> Oper
 					var entry:=scratch._instance(row.uid)
 					var uid: String=entry.uid
 					if take==entry.quantity:
-						scratch.containers[source].items.erase(entry)
+						scratch._containers[source].items.erase(entry)
 						scratch._unindex(entry)
 					else:
 						entry.quantity-=take
@@ -234,51 +310,51 @@ func exchange(a: String,b: String,costs: Dictionary,returns: Dictionary) -> Oper
 	begin_batch()
 	restore_actor(a,committed); restore_actor(b,committed)
 	for id in committed.containers: _touch(id)
-	for row in outgoing: _publish("item_transferred",containers[row.source].owner,{"from":row.source,"to_actor":row.actor,"definition":row.key,"quantity":row.quantity,"uid":row.uid})
+	for row in outgoing: _publish("item_transferred",_containers[row.source].owner,{"from":row.source,"to_actor":row.actor,"definition":row.key,"quantity":row.quantity,"uid":row.uid})
 	_publish("trade_committed",a,{"partner":b,"costs":costs,"returns":returns})
 	end_batch()
 	return OperationResult.success()
 func equipped(actor: String) -> Dictionary:
-	return containers.get(actor+".gear",{}).get("equipped",{}).duplicate()
+	return _containers.get(actor+".gear",{}).get("equipped",{}).duplicate()
 func equip(actor: String,uid: String) -> OperationResult:
 	var entry:=_instance(uid)
 	var data:=definitions.get(entry.definition_id) as EquipmentData if entry else null
 	var source:=locate(uid)
 	if not data or source not in actor_containers(actor): return OperationResult.reject("not_owned")
 	var gear:=actor+".gear"
-	var old_uid: String=containers[gear].equipped.get(str(data.slot_type),"")
+	var old_uid: String=_containers[gear].equipped.get(str(data.slot_type),"")
 	begin_batch()
 	if not old_uid.is_empty():
 		var old:=_instance(old_uid)
-		if space(source,old.definition_id)==0 and containers[source].items.size()>=int(containers[source].capacity):
+		if space(source,old.definition_id)==0 and _containers[source].items.size()>=int(_containers[source].capacity):
 			# Incoming item frees its own slot before the displaced one is returned.
-			containers[source].items.erase(entry)
-			containers[gear].items.erase(old)
-			containers[gear].items.append(entry)
-			containers[source].items.append(old)
+			_containers[source].items.erase(entry)
+			_containers[gear].items.erase(old)
+			_containers[gear].items.append(entry)
+			_containers[source].items.append(old)
 		else:
-			containers[gear].items.erase(old)
-			containers[source].items.append(old)
-			containers[source].items.erase(entry)
-			containers[gear].items.append(entry)
+			_containers[gear].items.erase(old)
+			_containers[source].items.append(old)
+			_containers[source].items.erase(entry)
+			_containers[gear].items.append(entry)
 	else:
-		containers[source].items.erase(entry)
-		containers[gear].items.append(entry)
+		_containers[source].items.erase(entry)
+		_containers[gear].items.append(entry)
 	_index(gear,entry)
 	if not old_uid.is_empty(): _locations[old_uid]=source
-	containers[gear].equipped[str(data.slot_type)]=uid
+	_containers[gear].equipped[str(data.slot_type)]=uid
 	_touch(source); _touch(gear)
 	end_batch()
 	_publish("equipment_changed",actor,{"uid":uid,"slot":data.slot_type})
 	return OperationResult.success(1)
 func unequip(actor: String,slot: int) -> OperationResult:
 	var gear:=actor+".gear"
-	var uid: String=containers.get(gear,{}).get("equipped",{}).get(str(slot),"")
+	var uid: String=_containers.get(gear,{}).get("equipped",{}).get(str(slot),"")
 	if uid.is_empty(): return OperationResult.reject("empty_slot")
 	return commit(preview(gear,actor+".pack",uid,1))
 func find_owned(actor: String,key: String) -> String:
 	for id in actor_containers(actor):
-		for entry: ItemInstance in containers.get(id,{}).get("items",[]):
+		for entry: ItemInstance in _containers.get(id,{}).get("items",[]):
 			if entry.definition_id==key: return entry.uid
 	return ""
 func weight(actor: String) -> float:
@@ -286,19 +362,19 @@ func weight(actor: String) -> float:
 	var ids:=actor_containers(actor)
 	ids.append(actor+".gear")
 	for id in ids:
-		for entry: ItemInstance in containers.get(id,{}).get("items",[]):
+		for entry: ItemInstance in _containers.get(id,{}).get("items",[]):
 			var data:=definitions.get(entry.definition_id) as ItemData
 			if data: total+=data.weight*entry.quantity
 	return total
 func snapshot() -> Dictionary:
 	var saved: Dictionary={}
-	for id in containers:
-		var record: Dictionary=containers[id].duplicate(true)
+	for id in _containers:
+		var record: Dictionary=_containers[id].duplicate(true)
 		record.items=entries(id)
 		saved[id]=record
 	return {"next_uid":next_uid,"containers":saved}
 func restore(data: Dictionary) -> void:
-	containers.clear()
+	_containers.clear()
 	_instances.clear(); _locations.clear()
 	next_uid=int(data.get("next_uid",1))
 	for id in data.get("containers",{}):
@@ -309,12 +385,12 @@ func restore(data: Dictionary) -> void:
 			instances.append(entry)
 			_index(id,entry)
 		record.items=instances
-		containers[id]=record
+		_containers[id]=record
 func restore_actor(actor: String,data: Dictionary) -> void:
-	for id in containers.keys():
-		if containers[id].owner==actor:
-			for entry: ItemInstance in containers[id].items: _unindex(entry)
-			containers.erase(id)
+	for id in _containers.keys():
+		if _containers[id].owner==actor:
+			for entry: ItemInstance in _containers[id].items: _unindex(entry)
+			_containers.erase(id)
 	for id in data.containers:
 		if data.containers[id].owner!=actor: continue
 		var record: Dictionary=data.containers[id].duplicate(true)
@@ -324,7 +400,7 @@ func restore_actor(actor: String,data: Dictionary) -> void:
 			instances.append(entry)
 			_index(id,entry)
 		record.items=instances
-		containers[id]=record
+		_containers[id]=record
 	# Never rewind the allocator: an interrupted operation may have issued IDs.
 	next_uid=maxi(next_uid,int(data.next_uid))
 func begin_batch() -> void: _batch_depth+=1
@@ -341,7 +417,7 @@ func end_batch(publish := true) -> void:
 			changed.emit()
 		elif not publish: _pending_facts.clear()
 func _touch(id: String) -> void:
-	containers[id].revision+=1
+	_containers[id].revision+=1
 	_dirty=true
 	if _batch_depth==0: end_batch()
 static func valid_snapshot(data: Variant) -> bool:
@@ -352,6 +428,8 @@ static func valid_snapshot(data: Variant) -> bool:
 		var c=data.containers[id]
 		if not id is String or id.is_empty() or not c is Dictionary or not c.get("owner") is String or c.get("kind","") not in ["pocket","pack","gear","cache"] or not c.get("capacity") is int or c.capacity<1 or c.capacity>100000 or not c.get("items") is Array or c.items.size()>100000 or not c.get("equipped") is Dictionary: return false
 		if not c.get("revision") is int or c.revision<0 or not c.get("attached") is bool or not c.get("region") is String or not c.get("position") is Array: return false
+		if not c.attached and (c.kind != "pack" or c.region.is_empty() or c.position.size() != 2):
+			return false
 		if not c.position.is_empty():
 			if c.position.size()!=2: return false
 			for n in c.position:
@@ -369,20 +447,20 @@ static func valid_snapshot(data: Variant) -> bool:
 			used[uid]=true
 	return data.next_uid>highest
 func receive_into(id: String,key: String,amount: int,migration := false) -> int:
-	if not containers.has(id) or not definitions.has(key) or amount<=0: return 0
+	if not _containers.has(id) or not definitions.has(key) or amount<=0: return 0
 	var accepted:=amount if migration else mini(amount,space(id,key))
 	if accepted>0: _insert(id,key,accepted)
 	return accepted
 func remove_from(id: String,key: String,amount: int) -> int:
-	if amount<=0 or not containers.has(id): return 0
+	if amount<=0 or not _containers.has(id): return 0
 	var removed:=0
 	begin_batch()
-	for entry: ItemInstance in containers[id].items.duplicate():
+	for entry: ItemInstance in _containers[id].items.duplicate():
 		if entry.definition_id!=key: continue
 		var taken:=mini(amount-removed,entry.quantity)
 		entry.quantity-=taken; removed+=taken
 		if entry.quantity==0:
-			containers[id].items.erase(entry)
+			_containers[id].items.erase(entry)
 			_unindex(entry)
 		_touch(id)
 		if removed==amount: break
@@ -391,9 +469,9 @@ func remove_from(id: String,key: String,amount: int) -> int:
 
 func snapshot_owners(owners: Array) -> Dictionary:
 	var saved: Dictionary={}
-	for id in containers:
-		if containers[id].owner not in owners: continue
-		var record: Dictionary=containers[id].duplicate(true)
+	for id in _containers:
+		if _containers[id].owner not in owners: continue
+		var record: Dictionary=_containers[id].duplicate(true)
 		record.items=entries(id)
 		saved[id]=record
 	return {"next_uid":next_uid,"containers":saved}
@@ -420,7 +498,8 @@ func valid_definitions(data: Dictionary) -> bool:
 			if container.kind=="gear":
 				if not definition is EquipmentData or container.equipped.get(str(definition.slot_type),"")!=row.uid: return false
 				slots[str(definition.slot_type)]=row.uid
-		if container.kind=="gear" and slots!=container.equipped: return false
+		if container.kind == "gear" and slots != container.equipped:
+			return false
 	return true
 
 func ready_uid(actor: String,key: String) -> String:
@@ -430,14 +509,14 @@ func ready_uid(actor: String,key: String) -> String:
 func spend_instance(actor: String,uid: String,property: String,amount: int,revision := -1) -> bool:
 	var source:=locate(uid)
 	var entry:=_instance(uid)
-	if not entry or source!=actor+".pocket" or amount<=0 or revision>=0 and containers[source].revision!=revision: return false
+	if not entry or source!=actor+".pocket" or amount<=0 or revision>=0 and _containers[source].revision!=revision: return false
 	var value:=entry.quantity if property=="quantity" else int(entry.properties.get(property,0))
 	if value<amount: return false
 	if property=="quantity": entry.quantity-=amount
 	elif property=="doses": entry.properties.doses=value-amount
 	else: return false
 	if value==amount:
-		containers[source].items.erase(entry)
+		_containers[source].items.erase(entry)
 		_unindex(entry)
 	_touch(source)
 	_publish("item_used",actor,{"uid":uid,"property":property,"amount":amount})

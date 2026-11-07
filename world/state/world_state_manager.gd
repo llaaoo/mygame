@@ -39,9 +39,8 @@ func unregister(object_id: String) -> void:
 ## 更新状态（由 MapObject 调用）
 func update_state(object_id: String, state_data: Dictionary) -> void:
 	var old: String = _object_states.get(object_id, {}).get("state", "INTACT")
-	var next_state: Dictionary = _object_states.get(object_id, {}).duplicate()
-	for key in state_data:
-		next_state[key] = state_data[key]
+	var next_state: Dictionary = _object_states.get(object_id, {}).duplicate(true)
+	next_state.merge(state_data.duplicate(true), true)
 	_object_states[object_id] = next_state
 	var new: String = next_state.get("state", "INTACT")
 	
@@ -51,17 +50,17 @@ func update_state(object_id: String, state_data: Dictionary) -> void:
 
 ## 获取状态
 func get_state(object_id: String) -> Dictionary:
-	return _object_states.get(object_id, {})
+	return _object_states.get(object_id, {}).duplicate(true)
 
 
 ## 获取全部状态快照（供 SaveManager 序列化）
 func get_all_states() -> Dictionary:
-	return _object_states.duplicate()
+	return _object_states.duplicate(true)
 
 
 ## 批量恢复状态（供 SaveManager 反序列化）
 func set_all_states(data: Dictionary) -> void:
-	_object_states = data.duplicate()
+	_object_states = data.duplicate(true)
 
 
 ## 获取区域内所有状态
@@ -71,7 +70,7 @@ func get_states_in_radius(pos: Vector2, radius: float, spatial_index: WorldSpati
 	for obj in objects:
 		var id: String = obj.get_object_id()
 		if _object_states.has(id):
-			result[id] = _object_states[id]
+			result[id] = get_state(id)
 	return result
 
 

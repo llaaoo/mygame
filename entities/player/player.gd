@@ -1,5 +1,5 @@
-extends CharacterBody2D
 class_name Player
+extends CharacterBody2D
 var actor_context: ActorContext
 var world_provider: Callable
 
@@ -76,14 +76,11 @@ var mana_component: ManaComponent = null
 ## ── UI 面板打开时阻止游戏输入 ──
 var ui_blocked: bool = false:
 	set(value):
+		if ui_blocked == value:
+			return
 		ui_blocked = value
-		if value and actor_context and actor_context.actions:
-			actor_context.actions.clear_input()
-			if actor_context.item_actions: actor_context.item_actions.cancel()
-			if actor_context.spray: actor_context.spray.stop()
-		if value and field_work:
-			field_work.cancel("打开菜单：作业取消")
-			field_work.close_panel()
+		if value:
+			cancel_active_input("打开菜单：动作取消")
 
 ## ── 运行时移动速度（基础 + 敏捷加成） ──
 var move_speed: float = 300.0
@@ -96,11 +93,6 @@ var field_work: PlayerFieldWork
 var survival: SurvivalService
 var aiming_sources: Dictionary:
 	get: return casting.aiming_sources if casting else {}
-var cancel_aim: bool:
-	get: return casting.cancel_aim if casting else false
-	set(value):
-		if casting:
-			casting.cancel_aim = value
 var state_machine: Node
 
 func _enter_tree() -> void:
@@ -398,6 +390,23 @@ func heal(amount: int, source := "skill") -> void:
 	var equipment := get_node_or_null("EquipmentManager") as EquipmentManager
 	var multiplier := 1.0 + (equipment.get_modifier_value("healing_received") if equipment else 0.0)
 	health_component.heal(maxi(0, int(round(amount * multiplier))), source)
+
+func cancel_active_input(reason: String) -> void:
+	if casting:
+		casting.cancel_all()
+	if skill_manager and skill_manager.combinations:
+		skill_manager.combinations.cancel(reason)
+	if actor_context:
+		if actor_context.actions:
+			actor_context.actions.clear_input()
+		if actor_context.item_actions:
+			actor_context.item_actions.cancel()
+		if actor_context.spray:
+			actor_context.spray.stop()
+	if field_work:
+		field_work.cancel(reason)
+		field_work.close_panel()
+
 
 func cancel_region_actions() -> void:
 	if actor_context and actor_context.actions: actor_context.actions.cancel("region_left")

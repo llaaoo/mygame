@@ -1,8 +1,6 @@
 class_name RunManager
 extends Node
 
-@export var enabled: bool = true
-
 const NORMAL_ROOM_COUNT := 4
 const REWARD_CHOICES := 3
 const ARENA_CENTER := Vector2(6000, 6000)
@@ -42,6 +40,10 @@ const RELIC_REWARDS: Array[Dictionary] = [
 	{"id": "relic_iron_heart", "title": "铁心护符", "description": "最大生命 +30，并恢复生命。", "type": "relic", "relic_id": "iron_heart"},
 ]
 
+@export var enabled := true
+@export var _player: Player
+@export var runtime: GameRuntime
+
 var state := RunState.new()
 var meta = RUN_META_SCRIPT.new()
 var persist_meta: bool = true
@@ -49,8 +51,6 @@ var _rng := RandomNumberGenerator.new()
 var _room_generator = ROOM_GENERATOR_SCRIPT.new()
 var _room_plan: Array = []
 var _current_layout: RefCounted = null
-var _player: Player = null
-var _scene_root: Node = null
 var _room_root: Node2D = null
 var _alive_enemies: Array[Node] = []
 var _overlay_layer: CanvasLayer = null
@@ -79,7 +79,7 @@ func _ready() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if not event.is_action_pressed("ui_cancel"):
+	if not owns_active_room() or not event.is_action_pressed("ui_cancel"):
 		return
 	if state.status not in [RunState.Status.RUNNING, RunState.Status.BOSS]:
 		return
@@ -88,12 +88,8 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _bootstrap() -> void:
-	await get_tree().process_frame
-	_scene_root = get_tree().current_scene
-	_player = get_tree().get_first_node_in_group("player") as Player
-	_player.world_provider=func(): return _room_root
-	if not _scene_root or not _player:
-		push_warning("[RunManager] Player or scene root missing; roguelite loop disabled.")
+	if not _player or not runtime or not runtime.get_region_session():
+		push_warning("[RunManager] Missing player or game runtime.")
 		return
 
 	if not _player.died.is_connected(_on_player_died):
@@ -127,9 +123,15 @@ func start_run_with_seed(run_seed: int) -> void:
 	if not _meta_bonus_applied:
 		_apply_meta_starting_bonus()
 		_meta_bonus_applied = true
-	_remove_existing_encounter_actors()
 	_update_meta_display()
 	_spawn_normal_room()
+
+
+func owns_active_room() -> bool:
+	if not is_instance_valid(_room_root) or not is_instance_valid(runtime):
+		return false
+	var session := runtime.get_region_session()
+	return session != null and session.active_root == _room_root
 
 
 func get_current_room_summary() -> Dictionary:
@@ -147,16 +149,6 @@ func get_current_room_summary() -> Dictionary:
 		"prop_count": _current_layout.props.size(),
 		"enemy_count": _current_layout.enemy_offsets.size(),
 	}
-
-
-func _remove_existing_encounter_actors() -> void:
-	for node in get_tree().get_nodes_in_group("enemy"):
-		if node != _player and is_instance_valid(node):
-			node.queue_free()
-	for node in get_tree().get_nodes_in_group("boss"):
-		if is_instance_valid(node):
-			node.queue_free()
-	_alive_enemies.clear()
 
 
 func _spawn_normal_room() -> void:
@@ -239,12 +231,14 @@ func _layout_for_room(index: int, room_type: String) -> RefCounted:
 
 
 func _rebuild_room(layout: RefCounted) -> void:
-	if _room_root and is_instance_valid(_room_root):
-		GameRuntime.instance.get_region_session().leave(_room_root, _player)
+	var session := runtime.get_region_session()
+	_alive_enemies.clear()
+	if is_instance_valid(session.active_root):
+		session.leave(session.active_root, _player)
 
 	_room_root = Node2D.new()
 	_room_root.name = "RunArena_%s_%d" % [layout.template_id, state.room_index + 1]
-	GameRuntime.instance.get_region_session().mount(_room_root, _scene_root)
+	session.mount(_room_root, get_parent())
 
 	_build_floor(layout)
 	_build_walls(layout.arena_size)
@@ -493,11 +487,17 @@ func _track_enemy(enemy: Node) -> void:
 
 
 func _on_enemy_died(enemy: Node) -> void:
+	if enemy not in _alive_enemies:
+		return
 	_alive_enemies.erase(enemy)
-	call_deferred("_check_room_clear")
+	var generation := runtime.get_region_session().generation
+	_check_room_clear.call_deferred(generation)
 
 
-func _check_room_clear() -> void:
+func _check_room_clear(generation: int = -1) -> void:
+	var session := runtime.get_region_session()
+	if not owns_active_room() or (generation >= 0 and not session.is_current(generation)):
+		return
 	_alive_enemies = _alive_enemies.filter(func(node: Node) -> bool:
 		return node != null and is_instance_valid(node) and not node.is_queued_for_deletion()
 	)
@@ -781,6 +781,8 @@ func _complete_run() -> void:
 
 
 func _on_player_died() -> void:
+	if not owns_active_room():
+		return
 	if state.status == RunState.Status.CLEARED or state.status == RunState.Status.FAILED:
 		return
 	state.status = RunState.Status.FAILED

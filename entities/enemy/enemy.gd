@@ -1,5 +1,5 @@
-extends CharacterBody2D
 class_name Enemy
+extends CharacterBody2D
 var actor_context: ActorContext
 
 @export var character_definition: ActorCharacterData
@@ -7,6 +7,7 @@ var base_move_speed := 120.0
 var melee_damage_multiplier := 1.0
 var mana_component: ManaComponent
 var character_brain: EnemyCharacterBrain
+var _combat_bus: CombatEventBus
 var _character_synergies: SkillSynergyResolver
 var _player_search: Timer
 
@@ -160,17 +161,17 @@ func _setup_ranged_skill() -> void:
 
 
 func _subscribe_revenge_events() -> void:
-	var bus := CombatEventBus.instance
-	if not bus:
-		await get_tree().process_frame
-		_subscribe_revenge_events()
+	if not is_inside_tree() or is_queued_for_deletion():
+		return
+	_combat_bus = RuntimeRegistration.combat_bus_for(self)
+	if not is_instance_valid(_combat_bus):
 		return
 	if character_definition and not _character_synergies:
 		_character_synergies=SkillSynergyResolver.new()
 		add_child(_character_synergies)
-		_character_synergies.setup(self)
-	bus.subscribe(CombatEvent.Type.ON_HIT, _on_got_hit)
-	bus.subscribe(CombatEvent.Type.ON_KILL, _on_target_killed)
+		_character_synergies.setup(self, _combat_bus)
+	_combat_bus.subscribe(CombatEvent.Type.ON_HIT, _on_got_hit)
+	_combat_bus.subscribe(CombatEvent.Type.ON_KILL, _on_target_killed)
 
 
 func _on_got_hit(ev: CombatEvent) -> void:
@@ -640,9 +641,10 @@ func _spawn_drop() -> void:
 	drop.global_position = global_position
 
 func _exit_tree() -> void:
-	if CombatEventBus.instance:
-		CombatEventBus.instance.unsubscribe(CombatEvent.Type.ON_HIT,_on_got_hit)
-		CombatEventBus.instance.unsubscribe(CombatEvent.Type.ON_KILL,_on_target_killed)
+	if is_instance_valid(_combat_bus):
+		_combat_bus.unsubscribe(CombatEvent.Type.ON_HIT, _on_got_hit)
+		_combat_bus.unsubscribe(CombatEvent.Type.ON_KILL, _on_target_killed)
+	_combat_bus = null
 	if character_definition and is_instance_valid(skill_manager) and skill_manager.combinations:
 		skill_manager.combinations.cancel("离区")
 		skill_manager.combinations.clear_field()

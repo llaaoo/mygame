@@ -35,18 +35,28 @@ extends Resource
 ## 最大递归深度（0=不允许链式触发，1=允许触发1层新事件）
 @export var max_recursion: int = 0
 
+var _registered_bus: CombatEventBus
+var _registered_type: CombatEvent.Type
+
 ## ── 运行时（冷却状态已上交 CombatExecutor） ──
 
 
 ## 注册到事件总线
-func register() -> void:
-	CombatEventBus.subscribe_static(trigger_type, _on_event)
+func register(bus: CombatEventBus) -> void:
+	if bus == _registered_bus and trigger_type == _registered_type:
+		return
+	unregister()
+	if not is_instance_valid(bus):
+		return
+	_registered_bus = bus
+	_registered_type = trigger_type
+	_registered_bus.subscribe(_registered_type, _on_event)
 
 
-## 从事件总线注销
 func unregister() -> void:
-	if CombatEventBus.instance:
-		CombatEventBus.instance.unsubscribe(trigger_type, _on_event)
+	if is_instance_valid(_registered_bus):
+		_registered_bus.unsubscribe(_registered_type, _on_event)
+	_registered_bus = null
 
 
 ## 内部回调：递归守卫 → 可用性查询 → 条件/图 → 冷却提交 → 执行

@@ -7,11 +7,14 @@ extends TriggeredEffect
 
 @export var bonus_exp: int = 15
 
+var _recipient: WeakRef
+
 
 ## 静态工厂：创建带默认条件的实例
-static func create_for_player(exp: int = 15) -> OnKillBonusExp:
+static func create_for_player(player: Player, exp: int = 15) -> OnKillBonusExp:
 	var effect := OnKillBonusExp.new()
 	effect.bonus_exp = exp
+	effect._recipient = weakref(player)
 	effect.trigger_type = CombatEvent.Type.ON_KILL
 	effect.scope_source = "global"
 	effect.max_recursion = 0
@@ -28,8 +31,8 @@ static func create_for_player(exp: int = 15) -> OnKillBonusExp:
 func _execute(ev: CombatEvent) -> void:
 	if not ev.data.get("reward_eligible", true): return
 	# 击杀奖励发放给玩家（副作用收敛到 CombatExecutor）
-	var player := ev.target.get_tree().get_first_node_in_group("player") as Player
-	if not player:
+	var player := _recipient.get_ref() as Player if _recipient else null
+	if not is_instance_valid(player) or not player.is_inside_tree():
 		return
 
 	CombatExecutor.report_exp_bonus(player, bonus_exp)

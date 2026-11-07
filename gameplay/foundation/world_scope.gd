@@ -6,13 +6,18 @@ static func resolve(actor: Node) -> Node:
 	if "world_provider" in actor and actor.world_provider.is_valid(): return actor.world_provider.call()
 	if "actor_context" in actor and actor.actor_context:
 		return actor.actor_context.world()
-	var node:=actor
-	while node.get_parent() and not node.get_parent() is Window:
+	var node := actor
+	while node:
+		if node.has_meta("region_generation"):
+			return node
 		if node.has_method("get_active_region"):
-			var root: Node=node.get_active_region()
-			if is_instance_valid(root): return root
-		node=node.get_parent()
-	return node
+			var root: Node = node.get_active_region()
+			if is_instance_valid(root):
+				return root
+		if not node.get_parent() or node.get_parent() is Window:
+			return node
+		node = node.get_parent()
+	return null
 static func presentation(actor: Node) -> Node:
 	var node:=actor
 	while node.get_parent() and not node.get_parent() is Window:

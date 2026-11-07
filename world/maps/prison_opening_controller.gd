@@ -12,7 +12,7 @@ extends Node
 var _killed_guards: int = 0
 var _chest_opened: bool = false
 var _exit_unlocked: bool = false
-var _bus_retry_count: int = 0
+var _bus: CombatEventBus
 
 
 func _ready() -> void:
@@ -20,24 +20,23 @@ func _ready() -> void:
 
 
 func _setup_opening_loop() -> void:
+	if not is_inside_tree() or is_queued_for_deletion():
+		return
 	_setup_prisoner()
 	_setup_groups()
 	_lock_exit()
 
-	if not CombatEventBus.instance:
-		_bus_retry_count += 1
-		if _bus_retry_count < 10:
-			call_deferred("_setup_opening_loop")
-		return
-	_bus_retry_count = 0
-	CombatEventBus.instance.subscribe(CombatEvent.Type.ON_INTERACT, _on_interact)
-	CombatEventBus.instance.subscribe(CombatEvent.Type.ON_KILL, _on_kill)
+	_bus = RuntimeRegistration.combat_bus_for(self)
+	if is_instance_valid(_bus):
+		_bus.subscribe(CombatEvent.Type.ON_INTERACT, _on_interact)
+		_bus.subscribe(CombatEvent.Type.ON_KILL, _on_kill)
 
 
 func _exit_tree() -> void:
-	if CombatEventBus.instance:
-		CombatEventBus.instance.unsubscribe(CombatEvent.Type.ON_INTERACT, _on_interact)
-		CombatEventBus.instance.unsubscribe(CombatEvent.Type.ON_KILL, _on_kill)
+	if is_instance_valid(_bus):
+		_bus.unsubscribe(CombatEvent.Type.ON_INTERACT, _on_interact)
+		_bus.unsubscribe(CombatEvent.Type.ON_KILL, _on_kill)
+	_bus = null
 
 
 func _setup_prisoner() -> void:

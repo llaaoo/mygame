@@ -135,7 +135,7 @@ static func valid_records(value: Variant) -> bool:
 func _ensure_source(id: String) -> void:
 	if not game.rules.physical_inventory: return
 	var store:=game.session.inventory
-	if store.containers.has(id+".gear"): return
+	if store.has_container(id + ".gear"): return
 	store.ensure_actor(id)
 	var record: Dictionary=game.progress.loot_records[id]
 	store.begin_batch()
@@ -167,7 +167,7 @@ func _take_instances(id: String,kind: String,key: String,selected_uid := "") -> 
 			var destinations: Array[String]=[]
 			if category=="equipment": destinations.append("player.pack")
 			else: destinations=store.actor_containers("player")
-			if category=="equipment" and not store.containers["player.pack"].attached: continue
+			if category=="equipment" and not store.is_attached("player.pack"): continue
 			for destination in destinations:
 				var current:=store.item(entry.uid)
 				if not current or store.locate(entry.uid)!=source: break

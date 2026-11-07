@@ -64,7 +64,7 @@ func run() -> void:
 		await fixture.travel("river_archive")
 		if cycle==0: game.progress.story_actors[guard_id].materials={"ration":90}
 		await fixture.travel("camp",origin)
-		check(store.entries("player.pack")==bag_rows and not store.containers["player.pack"].attached,"Travel copied or silently recovered dropped pack")
+		check(store.entries("player.pack")==bag_rows and not store.is_attached("player.pack"),"Travel copied or silently recovered dropped pack")
 		check(session.actors.size()==14,"Travel accumulated actor registrations")
 		check(sim.entity_ticker_count()==baseline,"Travel accumulated entity tickers")
 	npc=session.actor_for_id(npc_id) as ServiceNPC

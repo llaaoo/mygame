@@ -3,7 +3,6 @@ extends Node
 
 var player: Player
 var aiming_sources: Dictionary = {}
-var cancel_aim: bool = false
 var _charging_source: String = ""       ## 正在蓄力的槽位
 var _charge_power: float = 0.0          ## 当前蓄力倍率
 var _charge_skill: SkillData = null     ## 正在蓄力的技能数据
@@ -91,7 +90,7 @@ func _cancel_channel() -> void:
 	_channel_mana_total = 0.0
 
 func _channel_tick(mana_cost: int) -> bool:
-	if not _channel_skill:
+	if not _channel_skill or not _is_equipped(_channeling_source, _channel_skill):
 		return false
 	var ctx := CastContext.simple(player, player.get_mouse_direction(), _channel_skill)
 	return player.skill_manager.use_channel_tick(_channeling_source, player, ctx, mana_cost)
@@ -110,6 +109,10 @@ func tick(delta: float) -> void:
 	if player.health_component.is_dead:
 		cancel_all()
 		return
+	if _charge_skill and not _is_equipped(_charging_source, _charge_skill):
+		cancel_source(_charging_source)
+	if _channel_skill and not _is_equipped(_channeling_source, _channel_skill):
+		cancel_source(_channeling_source)
 	_aim_refresh -= delta
 	if _aim_refresh <= 0 and not aiming_sources.is_empty():
 		_aim_refresh = .1
@@ -227,6 +230,21 @@ func hide_aim() -> void:
 	if _aim_ring: _aim_ring.hide()
 	if _aim_line: _aim_line.visible = false
 	if _aim_dot: _aim_dot.visible = false
+
+func _is_equipped(source: String, skill: SkillData) -> bool:
+	var slot := player.skill_manager.get_instance(source)
+	return slot != null and slot.data == skill
+
+
+func cancel_source(source: String) -> void:
+	if _charge_source_matches(source):
+		_cancel_charge()
+	if _channeling_source == source:
+		_cancel_channel()
+	aiming_sources.erase(source)
+	if aiming_sources.is_empty():
+		hide_aim()
+
 
 func cancel_all() -> void:
 	_cancel_charge()

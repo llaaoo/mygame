@@ -1,8 +1,9 @@
 extends CanvasLayer
 
-var death_screen: Control = null
+@export var player: Player
+@export var run_manager: RunManager
 
-var player: Player = null
+var death_screen: Control = null
 var health_bar: ProgressBar = null
 var health_label: Label = null
 var mana_bar: ProgressBar = null
@@ -23,8 +24,7 @@ func _ready() -> void:
 	layer = GameUIStyle.LAYER_HUD
 	add_to_group("hud_ui")
 	_build_ui()
-	await get_tree().process_frame
-	_connect_player()
+	_connect_player.call_deferred()
 
 
 func _build_ui() -> void:
@@ -157,14 +157,7 @@ func _make_bar(color: Color) -> ProgressBar:
 
 
 func _connect_player() -> void:
-	player = get_tree().get_first_node_in_group("player") as Player
-	if not player:
-		var root := get_tree().current_scene
-		player = root.get_node_or_null("Player") as Player if root else null
-
-	if not player:
-		await get_tree().create_timer(1.0).timeout
-		_connect_player()
+	if not is_instance_valid(player) or not player.is_node_ready():
 		return
 
 	if not player.health_changed.is_connected(_on_health_changed):
@@ -201,8 +194,8 @@ func _setup_skill_tree_ui() -> void:
 		return
 	skill_tree_ui = SkillTreeUI.new()
 	skill_tree_ui.name = "SkillTreeUI"
-	get_tree().current_scene.add_child.call_deferred(skill_tree_ui)
-	skill_tree_ui.call_deferred("setup", player)
+	add_child(skill_tree_ui)
+	skill_tree_ui.setup(player)
 
 
 func _on_health_changed(current_hp: int, max_hp: int) -> void:
@@ -218,16 +211,18 @@ func _on_mp_changed(current_mp: int, max_mp: int) -> void:
 
 
 func _on_player_died() -> void:
-	var scene := get_tree().current_scene
-	if scene and scene.has_method("get_active_region"):
-		return # Exploration owns recovery and its modal UI.
-	var run_manager := scene.get_node_or_null("RunManager") as RunManager if scene else null
-	if run_manager and run_manager.state.status in [RunState.Status.RUNNING, RunState.Status.BOSS, RunState.Status.REWARD]:
+	if player.exploration_mode:
+		return # The campaign owns recovery and its modal UI.
+	if run_manager and run_manager.owns_active_room() and run_manager.state.status in [RunState.Status.RUNNING, RunState.Status.BOSS, RunState.Status.REWARD]:
 		return
 	_death_active = true
-	for child in get_tree().current_scene.get_children():
+	for child in get_parent().get_children():
 		if child is CanvasLayer and child != self:
 			child.hide()
+	if skill_tree_ui:
+		skill_tree_ui.hide()
+	if level_up_ui:
+		level_up_ui.hide()
 
 	if death_screen:
 		death_screen.queue_free()
@@ -265,7 +260,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _on_retry_pressed() -> void:
 	get_tree().paused = false
-	get_tree().change_scene_to_file("res://main.tscn")
+	get_tree().reload_current_scene()
 
 
 func _on_stat_changed(_stat_name: String, _new_value: int) -> void:
@@ -288,8 +283,8 @@ func _setup_level_up_ui() -> void:
 		return
 	level_up_ui = lui_scene.instantiate() as LevelUpUI
 	level_up_ui.name = "LevelUpUI"
-	get_tree().current_scene.add_child.call_deferred(level_up_ui)
-	level_up_ui.call_deferred("setup", player.stats_component)
+	add_child(level_up_ui)
+	level_up_ui.setup(player.stats_component)
 	if not level_up_ui.allocation_confirmed.is_connected(_update_stats_display):
 		level_up_ui.allocation_confirmed.connect(_update_stats_display)
 

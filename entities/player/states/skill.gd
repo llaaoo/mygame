@@ -1,5 +1,5 @@
-extends State
 class_name PlayerSkillState
+extends State
 
 @export var skill_duration: float = 0.4
 var skill_timer: float = 0.0

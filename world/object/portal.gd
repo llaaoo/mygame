@@ -1,5 +1,5 @@
-extends Area2D
 class_name Portal
+extends Area2D
 
 @export var target_path: String = ""
 @export var target_label: String = "Enter"
@@ -32,6 +32,12 @@ func _on_body_entered(body: Node2D) -> void:
 		_do_region_transition()
 		return
 
+	_change_scene.call_deferred()
+
+
+func _change_scene() -> void:
+	if not is_inside_tree() or is_queued_for_deletion() or locked:
+		return
 	var packed := load(target_path) as PackedScene
 	if packed:
 		get_tree().change_scene_to_packed(packed)
@@ -54,11 +60,13 @@ func is_locked() -> bool:
 
 
 func _do_region_transition() -> void:
-	var gr := GameRuntime.instance
-	if not gr or not gr.get_region_runtime():
-		push_error("Portal: RegionRuntime unavailable")
+	var runtime := GameRuntime.instance
+	var regions := runtime.get_region_runtime() if runtime else null
+	if not regions:
 		return
-	gr.get_region_runtime().ensure_region(target_path, target_marker_id)
+	var current := regions.get_current_region()
+	if current and current.is_ancestor_of(self):
+		regions.ensure_region(target_path, target_marker_id)
 
 
 func _update_visual() -> void:

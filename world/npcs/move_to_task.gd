@@ -13,11 +13,11 @@ var _started: bool = false
 var _speed: float = 80.0
 
 
-func setup(npc: Node2D, agent: NavigationAgent2D, marker_id: String) -> void:
+func setup(npc: Node2D, agent: NavigationAgent2D, marker: WorldMarker) -> void:
 	_npc = npc
 	_agent = agent
-	target_marker = marker_id
-	_target_pos = MarkerRegistry.get_position(marker_id)
+	target_marker = marker.marker_id
+	_target_pos = marker.global_position
 	_agent.target_position = _target_pos
 	_started = false
 

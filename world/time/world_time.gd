@@ -16,24 +16,15 @@ var _last_printed_hour: int = -1
 
 
 func _ready() -> void:
-	instance = self
 	# 禁用独立 _process，改为 SimulationRuntime 统一驱动
 	process_mode = Node.PROCESS_MODE_DISABLED
-	call_deferred("_register_with_simulation")
+	RuntimeRegistration.register_ticker(self)
 	print("⏰ WorldTime 启动: %02d:00" % int(hour))
 
 
-## 注册到 SimulationRuntime（统一 tick）
-func _register_with_simulation() -> void:
-	var gr := GameRuntime.instance
-	if not gr:
-		call_deferred("_register_with_simulation")
-		return
-	var sim := gr.get_simulation_runtime()
-	if not sim:
-		call_deferred("_register_with_simulation")
-		return
-	sim.register_ticker(self)
+func _exit_tree() -> void:
+	if instance == self:
+		instance = null
 
 
 ## 统一 tick 入口（由 SimulationRuntime 驱动，替代独立 _process）

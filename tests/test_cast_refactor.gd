@@ -163,9 +163,32 @@ func _run() -> void:
 	bus.emit(CombatEvent.create(CombatEvent.Type.ON_HEAL, null, null))
 	bus.emit(CombatEvent.create(CombatEvent.Type.ON_HEAL, null, null))
 	_check(once_calls[0] == 1 and bus.get_listener_count() == 0, "One-shot subscription repeated under nested emission")
+
+	var detached_calls := [0]
+	var detached := func(_event: CombatEvent) -> void:
+		detached_calls[0] += 1
+	bus.subscribe(CombatEvent.Type.ON_HEAL, func(_event: CombatEvent) -> void:
+		bus.unsubscribe(CombatEvent.Type.ON_HEAL, detached))
+	bus.subscribe(CombatEvent.Type.ON_HEAL, detached)
+	bus.emit(CombatEvent.create(CombatEvent.Type.ON_HEAL, null, null))
+	_check(detached_calls[0] == 0, "A removed subscriber still ran later in the same dispatch")
+
+	bus.clear_all()
+	bus.subscribe(CombatEvent.Type.ON_HEAL, func(_event: CombatEvent) -> void: bus.clear_all())
+	bus.subscribe(CombatEvent.Type.ON_HEAL, detached)
+	bus.emit(CombatEvent.create(CombatEvent.Type.ON_HEAL, null, null))
+	_check(detached_calls[0] == 0 and bus.get_listener_count() == 0, "Clearing a bus did not cancel the remaining dispatch")
+
+	var bound_effect := TriggeredEffect.new()
+	bound_effect.trigger_type = CombatEvent.Type.ON_HEAL
+	bound_effect.register(bus)
+	bound_effect.trigger_type = CombatEvent.Type.ON_KILL
+	bound_effect.unregister()
+	_check(bus.get_listener_count() == 0, "Effect unregistered from the wrong bus or event")
 	bus.free()
 
 	var counted := CountingController.new()
+	counted.setup(sm, player)
 	sm.add_child(counted)
 	sm.combinations = counted
 	controller.queue_free()

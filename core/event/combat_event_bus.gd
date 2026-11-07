@@ -22,40 +22,38 @@ const MAX_DEPTH_HARD: int = 5
 
 
 ## ── 订阅表 ──
-## key = CombatEvent.Type (int), value = Array[Callable]
+## key = CombatEvent.Type (int), value = Dictionary[Callable, bool]
 var _listeners: Dictionary = {}
 var _once_callbacks: Dictionary = {}
 var _subscription_serial := 0
 
 
-func _ready() -> void:
-	instance = self
-
-
 func _exit_tree() -> void:
 	if instance == self:
 		instance = null
+	clear_all()
 
 
 ## ── 订阅 ──
 
 func subscribe(event_type: CombatEvent.Type, callback: Callable) -> void:
+	if not callback.is_valid():
+		return
 	if not _listeners.has(event_type):
-		_listeners[event_type] = []
-	var arr: Array = _listeners[event_type]
-	if callback not in arr:
-		arr.append(callback)
+		_listeners[event_type] = {}
+	var listeners: Dictionary = _listeners[event_type]
+	listeners[callback] = true
 
 
 func unsubscribe(event_type: CombatEvent.Type, callback: Callable) -> void:
-	if not _listeners.has(event_type):
-		return
-	var arr: Array = _listeners[event_type]
-	arr.erase(callback)
+	var listeners: Dictionary = _listeners.get(event_type, {})
+	listeners.erase(callback)
 
 
 ## 一次性订阅（触发后自动移除）
 func once(event_type: CombatEvent.Type, callback: Callable) -> void:
+	if not callback.is_valid():
+		return
 	_subscription_serial += 1
 	var wrapper := _dispatch_once.bind(_subscription_serial)
 	_once_callbacks[_subscription_serial] = {"type": event_type, "callback": callback, "wrapper": wrapper}
@@ -74,36 +72,22 @@ func _dispatch_once(event: CombatEvent, id: int) -> void:
 ## ── 发射 ──
 
 func emit(ev: CombatEvent) -> void:
-	if not _listeners.has(ev.type):
+	var listeners: Dictionary = _listeners.get(ev.type, {})
+	if listeners.is_empty():
 		return
-
-	# 硬上限防火墙
 	if _emit_depth >= MAX_DEPTH_HARD:
 		push_warning("[CombatEventBus] emit blocked: max depth %d reached" % MAX_DEPTH_HARD)
 		return
 
-	# 递归深度 +1
 	_emit_depth += 1
-
-	# 复制列表，防止回调中修改订阅表
-	var arr: Array = _listeners[ev.type].duplicate()
-	var pruned := false
-	for cb in arr:
-		# 容错：跳过已释放的回调
-		if not (cb as Callable).is_valid():
-			pruned = true
+	# Snapshot the order, while honoring unsubscription during this dispatch.
+	for callback: Callable in listeners.keys():
+		if not listeners.has(callback):
 			continue
-		cb.call(ev)
-
-	# 清理无效回调
-	if pruned:
-		var clean: Array = []
-		for cb in _listeners[ev.type]:
-			if (cb as Callable).is_valid():
-				clean.append(cb)
-		_listeners[ev.type] = clean
-
-	# 递归深度 -1
+		if not callback.is_valid():
+			listeners.erase(callback)
+			continue
+		callback.call(ev)
 	_emit_depth -= 1
 
 
@@ -127,6 +111,9 @@ static func once_static(event_type: CombatEvent.Type, callback: Callable) -> voi
 ## ── 工具 ──
 
 func clear_all() -> void:
+	# An in-flight emit holds its bucket. Clear it before dropping the outer map.
+	for listeners: Dictionary in _listeners.values():
+		listeners.clear()
 	_listeners.clear()
 	_once_callbacks.clear()
 
@@ -135,8 +122,8 @@ func get_listener_count(event_type: CombatEvent.Type = -1) -> int:
 	if event_type == -1:
 		var total := 0
 		for arr in _listeners.values():
-			total += (arr as Array).size()
+			total += (arr as Dictionary).size()
 		return total
 	if not _listeners.has(event_type):
 		return 0
-	return (_listeners[event_type] as Array).size()
+	return (_listeners[event_type] as Dictionary).size()

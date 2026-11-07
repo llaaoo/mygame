@@ -1,94 +1,102 @@
 class_name RegionRuntime
 extends Node
+## Adapts packed map travel to the shared region lifecycle.
 
 signal region_changed(region_path: String)
 
-const _PERSISTENT_ROOT_CHILDREN := {
-	"Player": true,
-	"HUDLayer": true,
-	"InputSetup": true,
-	"GameRuntime": true,
-}
-
-var _current_region_path: String = ""
+var _session: RegionSession
+var _mount_parent: Node
+var _player: Player
+var _switching := false
 
 
-func _ready() -> void:
-	call_deferred("_capture_initial_region")
+func setup(session: RegionSession, mount_parent: Node, player: Player, initial_region: Node2D) -> void:
+	_session = session
+	_mount_parent = mount_parent
+	_player = player
+	if initial_region:
+		_session.adopt(initial_region)
+	if _player:
+		_player.world_provider = get_current_region
 
 
-func get_current_region() -> Node:
-	var runtime := GameRuntime.instance
-	if runtime and runtime.get_region_session() and is_instance_valid(runtime.get_region_session().active_root):
-		return runtime.get_region_session().active_root
-	var root := get_tree().current_scene
-	if not root:
+func _exit_tree() -> void:
+	if is_instance_valid(_player) and _player.world_provider == get_current_region:
+		_player.world_provider = Callable()
+
+
+func get_current_region() -> Node2D:
+	if not _session:
 		return null
-	for child in root.get_children():
-		if child is Node2D and not _PERSISTENT_ROOT_CHILDREN.has(child.name):
-			return child
+	var region := _session.active_root
+	if is_instance_valid(region) and region.is_inside_tree() and not region.is_queued_for_deletion():
+		return region
 	return null
 
 
 func get_current_region_path() -> String:
-	var runtime := GameRuntime.instance
-	if runtime and runtime.get_region_session() and is_instance_valid(runtime.get_region_session().active_root):
-		return runtime.get_region_session().active_root.scene_file_path
-	if not _current_region_path.is_empty():
-		return _current_region_path
 	var region := get_current_region()
 	return region.scene_file_path if region else ""
 
 
 func ensure_region(region_path: String, spawn_marker_id: String = "") -> bool:
-	if region_path.is_empty():
+	if _switching or region_path.is_empty() or not _can_place_player():
+		return false
+	if not is_instance_valid(_mount_parent) or not _mount_parent.is_inside_tree():
 		return false
 
-	var current := get_current_region()
-	if current and current.scene_file_path == region_path:
-		_current_region_path = region_path
-		await get_tree().process_frame
-		_place_player(spawn_marker_id)
-		return true
-
-	var packed := load(region_path) as PackedScene
-	if not packed:
-		push_error("RegionRuntime: failed to load %s" % region_path)
-		return false
-
-	var root := get_tree().current_scene
-	if not root:
-		return false
-
-	var runtime := GameRuntime.instance
-	if not runtime:
-		return false
-	runtime.get_region_session().leave(current, get_tree().get_first_node_in_group("player"))
-	var new_region := packed.instantiate() as Node2D
-	if not new_region:
-		return false
-	runtime.get_region_session().mount(new_region, root)
+	_switching = true
+	var generation := _session.generation
+	# Portals call from Area2D.body_entered. Change physics nodes outside that callback.
 	await get_tree().process_frame
+	if not is_inside_tree() or not _session.is_current(generation) or not _can_place_player():
+		_switching = false
+		return false
 
-	_current_region_path = new_region.scene_file_path if not new_region.scene_file_path.is_empty() else region_path
-	_place_player(spawn_marker_id)
-	region_changed.emit(_current_region_path)
+	var succeeded := _switch_region(region_path, spawn_marker_id)
+	_switching = false
+	return succeeded
+
+
+func _can_place_player() -> bool:
+	return is_instance_valid(_player) and _player.is_inside_tree() and not _player.is_queued_for_deletion()
+
+
+func _switch_region(region_path: String, spawn_marker_id: String) -> bool:
+	var current := get_current_region()
+	var next := current
+	if not current or current.scene_file_path != region_path:
+		next = _instantiate_region(region_path)
+		if not next:
+			return false
+
+	var marker: WorldMarker
+	if not spawn_marker_id.is_empty():
+		marker = MarkerRegistry.find_marker(spawn_marker_id, next)
+		if not marker:
+			if next != current:
+				next.free()
+			return false
+
+	if next != current:
+		_session.leave(current, _player)
+		_session.mount(next, _mount_parent)
+	if marker:
+		_player.global_position = marker.global_position
+	if next != current:
+		region_changed.emit(next.scene_file_path)
 	return true
 
 
-func _capture_initial_region() -> void:
-	var region := get_current_region()
-	if region:
-		_current_region_path = region.scene_file_path
-
-
-func _place_player(spawn_marker_id: String) -> void:
-	if spawn_marker_id.is_empty():
-		return
-	var player := get_tree().get_first_node_in_group("player") as Node2D
-	if not player:
-		return
-	if MarkerRegistry.has(spawn_marker_id):
-		player.global_position = MarkerRegistry.get_position(spawn_marker_id)
-	else:
-		push_warning("RegionRuntime: missing spawn marker '%s'" % spawn_marker_id)
+func _instantiate_region(region_path: String) -> Node2D:
+	if not ResourceLoader.exists(region_path, "PackedScene"):
+		return null
+	var packed := ResourceLoader.load(region_path, "PackedScene") as PackedScene
+	if not packed or not packed.can_instantiate():
+		return null
+	var instance := packed.instantiate()
+	if instance is Node2D:
+		return instance
+	if instance:
+		instance.free()
+	return null

@@ -10,6 +10,7 @@ static var instance: SaveManager
 
 var active_slot: int = 1
 var _sections: Dictionary = {}
+var _loading := false
 var progress_only := false
 signal progress_reload_requested
 signal before_save
@@ -54,6 +55,8 @@ func _input(event: InputEvent) -> void:
 
 
 func save_game(slot: int) -> bool:
+	if _loading:
+		return false
 	before_save.emit()
 	active_slot = slot
 	var root := SaveData.Root.new()
@@ -80,17 +83,25 @@ func read_extension(slot: int, section_id: String) -> Dictionary:
 	return value.duplicate(true) if value is Dictionary else {}
 
 func load_game(slot: int) -> void:
+	if _loading:
+		return
 	var result := read_slot(slot)
 	if not result.usable():
 		return
-	_cleanup_transient()
 	var root := SaveData.Root.deserialize(result.data)
+	_loading = true
+	# Region departure flushes old world facts. Apply the saved snapshot afterwards.
+	var region_ready := await _restore_region(root.meta)
+	if not region_ready:
+		_loading = false
+		return
+	_cleanup_transient()
 	_restore_world(root.world)
-	await _restore_region(root.meta)
 	_restore_player(root.player)
 	_restore_quests(root.quest)
 	_restore_extensions(root.extensions)
 	active_slot = slot
+	_loading = false
 	print("SaveManager: loaded %s" % _path(slot))
 
 
@@ -281,11 +292,12 @@ func _restore_player(p: SaveData.PlayerData) -> void:
 		player._apply_stats()
 		sc.stat_changed.emit("strength", sc.strength)
 
-	if player.inventory:
+	if player.inventory and not player.inventory.store:
 		for i: int in range(player.inventory.capacity):
 			player.inventory.set_slot(i, null, 0)
 		for entry: Dictionary in p.inventory_items:
-			var item := load(entry["path"]) as ItemData
+			var path: String = entry["path"]
+			var item := load(path) as ItemData if not path.is_empty() and ResourceLoader.exists(path) else null
 			if item:
 				player.inventory.set_slot(entry["slot"], item, entry["quantity"])
 
@@ -324,7 +336,8 @@ func _restore_player(p: SaveData.PlayerData) -> void:
 	# Equipment is rebuilt after ordinary buffs because restore_state() clears runtime buffs first.
 	if equipment:
 		for entry: Dictionary in p.equipment_items:
-			var item := load(str(entry.get("path", ""))) as EquipmentData
+			var path: String = entry.get("path", "")
+			var item := load(path) as EquipmentData if not path.is_empty() and ResourceLoader.exists(path) else null
 			if item:
 				equipment.equip(item)
 		if player.health_component:
@@ -344,15 +357,14 @@ func _restore_world(w: SaveData.WorldData) -> void:
 		WorldTime.instance.hour = w.world_time_hour
 
 
-func _restore_region(meta: SaveData.MetaData) -> void:
+func _restore_region(meta: SaveData.MetaData) -> bool:
 	if meta.region_id.is_empty():
-		return
-	var gr := GameRuntime.instance
-	if not gr or not gr.get_region_runtime():
-		return
-	await gr.get_region_runtime().ensure_region(meta.region_id)
-	if gr.world_runtime:
-		gr.world_runtime.restore_registered_objects()
+		return true
+	var runtime := GameRuntime.instance
+	var regions := runtime.get_region_runtime() if runtime else null
+	if not regions:
+		return false
+	return await regions.ensure_region(meta.region_id)
 
 
 func _restore_quests(q: SaveData.QuestSave) -> void:

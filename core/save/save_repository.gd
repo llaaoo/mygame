@@ -104,22 +104,165 @@ func _read_file(path: String) -> ReadResult:
 func _valid_shape(data: Dictionary) -> bool:
 	if not data.get("version", 1) is int:
 		return false
-	for key in ["meta", "player", "world", "quest"]:
-		if not data.get(key) is Dictionary:
+	for key in ["meta", "player", "world", "quest", "extensions"]:
+		if not data.get(key, {} if key == "extensions" else null) is Dictionary:
 			return false
-	if not data.get("extensions", {}) is Dictionary:
+
+	var extensions: Dictionary = data.get("extensions", {})
+	for section in extensions:
+		if not section is String or not extensions[section] is Dictionary:
+			return false
+		if section_validators.has(section) and not section_validators[section].call(extensions[section]):
+			return false
+
+	return (
+		_valid_fields(data.meta, {
+			"version": TYPE_INT, "timestamp": TYPE_INT, "play_time": TYPE_FLOAT,
+			"player_level": TYPE_INT, "region_id": TYPE_STRING,
+		})
+		and _valid_player(data.player)
+		and _valid_world(data.world)
+		and _valid_quests(data.quest)
+	)
+
+
+func _valid_player(player: Dictionary) -> bool:
+	if not _valid_fields(player, {
+		"position": TYPE_DICTIONARY, "hp": TYPE_INT, "max_hp": TYPE_INT,
+		"mp": TYPE_INT, "max_mp": TYPE_INT, "level": TYPE_INT, "experience": TYPE_INT,
+		"exp_to_next": TYPE_INT, "attribute_points": TYPE_INT, "strength": TYPE_INT,
+		"intelligence": TYPE_INT, "agility": TYPE_INT, "endurance": TYPE_INT,
+		"skill_left": TYPE_STRING, "skill_right": TYPE_STRING, "skill_slots": TYPE_ARRAY,
+		"skill_cooldowns": TYPE_DICTIONARY, "skill_upgrade_state": TYPE_DICTIONARY,
+		"mastery_state": TYPE_DICTIONARY, "inventory_items": TYPE_ARRAY,
+		"equipment_items": TYPE_ARRAY, "buff_state": TYPE_ARRAY,
+	}):
 		return false
-	for section in section_validators:
-		if data.get("extensions", {}).has(section) and not section_validators[section].call(data.extensions[section]):
+	if player.get("max_hp", 100) < 1 or player.get("max_mp", 50) < 0:
+		return false
+	var position: Dictionary = player.get("position", {})
+	if not _valid_fields(position, {"x": TYPE_FLOAT, "y": TYPE_FLOAT}):
+		return false
+	if not Vector2(position.get("x", 0.0), position.get("y", 0.0)).is_finite():
+		return false
+	if not _valid_array(player.get("skill_slots", []), TYPE_STRING):
+		return false
+
+	var cooldowns: Dictionary = player.get("skill_cooldowns", {})
+	for source in cooldowns:
+		if not source is String or not _valid_number(cooldowns[source]) or cooldowns[source] < 0:
 			return false
-	var player: Dictionary = data.player
-	for key in ["position", "skill_cooldowns", "skill_upgrade_state", "mastery_state"]:
-		if not player.get(key, {}) is Dictionary:
+
+	var upgrades: Dictionary = player.get("skill_upgrade_state", {})
+	for source in upgrades:
+		if not source is String or not upgrades[source] is Dictionary:
 			return false
-	for key in ["inventory_items", "equipment_items", "skill_slots", "buff_state"]:
-		if not player.get(key, []) is Array:
+		var slot: Dictionary = upgrades[source]
+		if not _valid_fields(slot, {"skill_id": TYPE_STRING, "upgrades": TYPE_DICTIONARY}):
 			return false
-	return data.world.get("object_states", {}) is Dictionary and data.quest.get("active", []) is Array and data.quest.get("completed", []) is Array
+		var ranks: Dictionary = slot.get("upgrades", {})
+		for id in ranks:
+			if not id is String or not ranks[id] is int or ranks[id] < 0:
+				return false
+
+	for item in player.get("inventory_items", []):
+		if not item is Dictionary or not item.has_all(["path", "slot", "quantity"]):
+			return false
+		if not _valid_fields(item, {"path": TYPE_STRING, "slot": TYPE_INT, "quantity": TYPE_INT}):
+			return false
+		if item.slot < 0 or item.quantity < 1:
+			return false
+
+	for item in player.get("equipment_items", []):
+		if not item is Dictionary or not _valid_fields(item, {"path": TYPE_STRING, "slot": TYPE_INT}):
+			return false
+
+	for buff in player.get("buff_state", []):
+		if not buff is Dictionary or not _valid_fields(buff, {
+			"resource_path": TYPE_STRING, "runtime_id": TYPE_STRING, "duration": TYPE_FLOAT,
+			"remaining": TYPE_FLOAT, "stacks": TYPE_INT, "tick_elapsed": TYPE_FLOAT,
+			"source_magic": TYPE_FLOAT,
+		}):
+			return false
+	return _valid_mastery(player.get("mastery_state", {}))
+
+
+func _valid_mastery(data: Dictionary) -> bool:
+	if not _valid_fields(data, {"masteries": TYPE_DICTIONARY, "unlocked_perks": TYPE_DICTIONARY}):
+		return false
+	var masteries: Dictionary = data.get("masteries", {})
+	for school in masteries:
+		if not _valid_school_key(school) or not masteries[school] is Dictionary:
+			return false
+		if not _valid_fields(masteries[school], {
+			"level": TYPE_INT, "xp": TYPE_FLOAT, "xp_to_next": TYPE_FLOAT, "perk_points": TYPE_INT,
+		}):
+			return false
+	var perks: Dictionary = data.get("unlocked_perks", {})
+	for school in perks:
+		if not _valid_school_key(school) or not _valid_array(perks[school], TYPE_STRING):
+			return false
+	return true
+
+
+func _valid_school_key(value: Variant) -> bool:
+	return value is int or (value is String and value.is_valid_int())
+
+
+func _valid_world(world: Dictionary) -> bool:
+	if not _valid_fields(world, {"object_states": TYPE_DICTIONARY, "world_time_hour": TYPE_FLOAT}):
+		return false
+	var states: Dictionary = world.get("object_states", {})
+	for id in states:
+		if not id is String or not states[id] is Dictionary:
+			return false
+		if not _valid_fields(states[id], {
+			"state": TYPE_STRING, "hp": TYPE_INT, "max_hp": TYPE_INT, "respawn_at": TYPE_FLOAT,
+		}):
+			return false
+	return true
+
+
+func _valid_quests(quest: Dictionary) -> bool:
+	if not _valid_fields(quest, {"active": TYPE_ARRAY, "completed": TYPE_ARRAY}):
+		return false
+	if not _valid_array(quest.get("completed", []), TYPE_STRING):
+		return false
+	for entry in quest.get("active", []):
+		if not entry is Dictionary or not _valid_fields(entry, {
+			"resource_path": TYPE_STRING, "quest_id": TYPE_STRING,
+			"stage": TYPE_INT, "progress": TYPE_ARRAY,
+		}):
+			return false
+		if not _valid_array(entry.get("progress", []), TYPE_INT):
+			return false
+	return true
+
+
+func _valid_fields(data: Dictionary, types: Dictionary) -> bool:
+	for key in types:
+		if not data.has(key):
+			continue # Older versions omit optional fields, so readers apply their defaults.
+		if types[key] == TYPE_FLOAT:
+			if not _valid_number(data[key]):
+				return false
+		elif typeof(data[key]) != types[key]:
+			return false
+	return true
+
+
+func _valid_number(value: Variant) -> bool:
+	return (value is int or value is float) and is_finite(float(value))
+
+
+func _valid_array(data: Variant, element_type: int) -> bool:
+	if not data is Array:
+		return false
+	for value in data:
+		if typeof(value) != element_type:
+			return false
+	return true
+
 
 func _write_file(path: String, data: Dictionary) -> Error:
 	var file := FileAccess.open(path, FileAccess.WRITE)

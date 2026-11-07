@@ -63,7 +63,7 @@ func bind_actor(actor: CharacterBody2D,id: String,legacy_counts: Dictionary = {}
 	components.configure(context)
 	if "survival" in actor and actor.survival: context.actions.needs=actor.survival.needs
 	if rules.physical_inventory:
-		var existed:=inventory.containers.has(id+".gear")
+		var existed:=inventory.has_container(id + ".gear")
 		context.restored_inventory=existed
 		inventory.ensure_actor(id)
 		var manager:=actor.get_node_or_null("EquipmentManager") as EquipmentManager
@@ -132,25 +132,23 @@ func leave_region() -> void:
 	for id in actors.keys():
 		if id=="player": continue
 		var actor: Object=actors[id].get_ref()
-		if is_instance_valid(actor): actor.actor_context.dispose()
+		if is_instance_valid(actor):
+			actor.actor_context.dispose()
+		if id.begins_with("trial."):
+			inventory.discard_actor_containers(id)
 		actors.erase(id)
 	for id in relations.memberships.keys():
 		if id.begins_with("trial."): relations.memberships.erase(id)
 	for key in relations.personal.keys():
 		if key.begins_with("trial.") or "|trial." in key: relations.personal.erase(key)
-	for id in inventory.containers.keys():
-		if id.begins_with("trial."):
-			for item: ItemInstance in inventory.containers[id].items: inventory._unindex(item)
-			inventory.containers.erase(id)
 	_pack_nodes.clear()
 	region.leave()
 func mount_region(id: String,root: Node2D,layout: RunRoomLayout) -> void:
 	region.id=id; region.root=root
 	region.navigation=RegionNavigation.new()
 	region.navigation.configure(layout)
-	for container_id in inventory.containers:
-		var container: Dictionary=inventory.containers[container_id]
-		if container.kind=="pack" and not container.attached and container.region==id: _mount_pack(container_id)
+	for container_id in inventory.dropped_pack_ids(id):
+		_mount_pack(container_id)
 func mark_dead(actor: CharacterBody2D) -> void:
 	if not actor.actor_context.persistent: return
 	var id: String=actor.actor_context.id
@@ -163,10 +161,8 @@ func drop_pack(actor_id: String) -> bool:
 	var actor: Node2D=actors[actor_id].get_ref()
 	if not is_instance_valid(actor) or not region.available(): return false
 	var id:=actor_id+".pack"
-	if not inventory.containers[id].attached: return false
-	inventory.containers[id].attached=false
-	inventory.containers[id].region=region.id
-	inventory.containers[id].position=[actor.position.x,actor.position.y]
+	if not inventory.drop_pack(actor_id, region.id, actor.position):
+		return false
 	_mount_pack(id)
 	facts.publish("pack_dropped",actor_id,{"container":id})
 	if save_requested.is_valid(): save_requested.call()
@@ -175,16 +171,16 @@ func _mount_pack(id: String) -> void:
 	if _pack_nodes.has(id): return
 	var pack:=DroppedPack.new()
 	pack.service=self; pack.container_id=id
-	var pos: Array=inventory.containers[id].position
-	pack.position=Vector2(pos[0],pos[1])
+	pack.position = inventory.dropped_pack_position(id)
 	region.root.add_child(pack)
 	_pack_nodes[id]=pack
 func recover_pack(actor_id: String,id: String) -> bool:
-	if not actors.has(actor_id) or not inventory.containers.has(id) or not _pack_nodes.has(id): return false
+	if not actors.has(actor_id) or not _pack_nodes.has(id): return false
 	var actor: Node2D=actors[actor_id].get_ref()
 	var pack:=_pack_nodes[id] as Node2D
-	if not is_instance_valid(actor) or not is_instance_valid(pack) or actor.position.distance_to(pack.position)>=80 or inventory.containers[id].owner!=actor_id: return false
-	inventory.containers[id].attached=true
+	if not is_instance_valid(actor) or not is_instance_valid(pack) or actor.position.distance_to(pack.position)>=80: return false
+	if not inventory.recover_pack(actor_id, id):
+		return false
 	pack.queue_free(); _pack_nodes.erase(id)
 	facts.publish("pack_recovered",actor_id,{"container":id})
 	if save_requested.is_valid(): save_requested.call()

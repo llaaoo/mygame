@@ -77,7 +77,7 @@ func run() -> void:
 	var bonus := ExtraHazard.new()
 	bonus.trigger_type = CombatEvent.Type.ON_HIT
 	bonus.scope_source = "global"
-	bonus.register()
+	bonus.register(GameRuntime.instance.combat_event_bus)
 	player.health_component.invincible = false
 	var before := player.health_component.hp
 	CombatExecutor.report_hit(null, player, 10, player.position, null, ["dot", "poison"])

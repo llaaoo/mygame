@@ -63,10 +63,14 @@ script = ExtResource("6_efxa6")
 [node name="InputSetup" type="Node" parent="." unique_id=2019032865]
 script = SubResource("GDScript_272bh")
 
-[node name="HUDLayer" parent="." unique_id=1720897277 instance=ExtResource("5_7mycd")]
+[node name="HUDLayer" parent="." unique_id=1720897277 node_paths=PackedStringArray("player", "run_manager") instance=ExtResource("5_7mycd")]
+player = NodePath("../Player")
+run_manager = NodePath("../RunManager")
 
-[node name="GameRuntime" type="Node" parent="." unique_id=2108780999]
+[node name="GameRuntime" type="Node" parent="." unique_id=2108780999 node_paths=PackedStringArray("legacy_player", "legacy_region")]
 script = ExtResource("8_dg77c")
+legacy_player = NodePath("../Player")
+legacy_region = NodePath("../Overworld")
 
 [node name="WorldRuntime" type="Node" parent="GameRuntime" unique_id=808621723]
 script = ExtResource("9_ycdy4")
@@ -74,5 +78,7 @@ script = ExtResource("9_ycdy4")
 [node name="SimulationRuntime" type="Node" parent="GameRuntime" unique_id=752857783]
 script = ExtResource("10_w48qg")
 
-[node name="RunManager" type="Node" parent="." unique_id=1852905512]
+[node name="RunManager" type="Node" parent="." unique_id=1852905512 node_paths=PackedStringArray("_player", "runtime")]
 script = ExtResource("11_run")
+_player = NodePath("../Player")
+runtime = NodePath("../GameRuntime")
