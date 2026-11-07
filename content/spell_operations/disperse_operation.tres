@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="SpellOperationData" load_steps=8 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/operations/spell_operation_data.gd" id="1"]
+[ext_resource type="Resource" path="res://content/spell_operations/disperse.tres" id="action"]
+[ext_resource type="Resource" path="res://content/spell_operations/payloads/water.tres" id="water"]
+[ext_resource type="Resource" path="res://content/spell_operations/payloads/venom.tres" id="venom"]
+[ext_resource type="Resource" path="res://content/spell_operations/payloads/potent.tres" id="potent"]
+[ext_resource type="Resource" path="res://content/spell_operations/payloads/paralytic.tres" id="paralytic"]
+[ext_resource type="Resource" path="res://content/spell_operations/payloads/resin.tres" id="resin"]
+[resource]
+script = ExtResource("1")
+action = ExtResource("action")
+aliases = PackedStringArray("venom_mist", "poison_cloud", "oil_flask")
+knowledge_actions = PackedStringArray("water_call")
+default_payload = ""
+payloads = [ExtResource("water"), ExtResource("venom"), ExtResource("potent"), ExtResource("paralytic"), ExtResource("resin")]

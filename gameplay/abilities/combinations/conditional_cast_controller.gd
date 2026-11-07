@@ -71,7 +71,7 @@ func build_plan(skill: SkillData, actor: Node2D, empower: bool = false) -> CastP
 	var stats := actor.get_node_or_null("StatsComponent") as StatsComponent
 	if stats: result.signature.append(["attributes", stats.primary_values()])
 	var survival: SurvivalService = actor.survival if "survival" in actor else null
-	var fatigue_factor := survival.needs.preparation_multiplier() if survival else 1.0
+	var fatigue_factor: float = survival.needs.preparation_multiplier() if survival else actor.actor_context.actions.needs.preparation_multiplier() if "actor_context" in actor and actor.actor_context and actor.actor_context.actions else 1.0
 	result.signature.append(["fatigue", fatigue_factor])
 	var equipment := actor.get_node_or_null("EquipmentManager") as EquipmentManager
 	if equipment:
@@ -103,8 +103,12 @@ func build_plan(skill: SkillData, actor: Node2D, empower: bool = false) -> CastP
 			elif not component.substitute_material.is_empty():
 				condition = supplies.title(component.substitute_material) + "×1替代地面（不附加投射物改造）"
 			result.explanation.append(CastExplanationStep.new("combination", component.rule_id, condition + " → " + component.skill.display_name))
-		var material := supplies.plan(skill, component.skill, i == 0, component.substitute_material)
-		if not material.material_id.is_empty():
+		var material := supplies.plan(skill, component.skill, i == 0, component.substitute_material,get_parent())
+		if not skill.operation_id.is_empty():
+			result.operation_reason=str(material.get("reason",""))
+			var payload:=material.get("payload") as SpellPayloadData
+			if payload: result.explanation.append(CastExplanationStep.new("payload",payload.id,payload.title+"："+payload.describe()))
+		elif not material.material_id.is_empty():
 			var entry: CastingMaterialData = supplies.catalog[material.material_id]
 			var purpose := "替代地面准备恩赐，不附加投射物改造；额外%d MP（修正前）" % entry.extra_mana if not component.substitute_material.is_empty() else entry.description
 			result.explanation.append(CastExplanationStep.new("material", entry.id, entry.title + "：" + purpose))
@@ -232,6 +236,8 @@ func preview(skill: SkillData, actor: Node2D, empower: bool = false) -> CastPlan
 			result.reason = "蕴魂已满：先以Shift组合兑现，再汲取残魂"
 	if not supplies.can_pay_combat(result.material_costs):
 		result.reason = "施法材料不足：" + supplies.describe_cost(result.material_costs)
+	if not result.operation_reason.is_empty(): result.reason=result.operation_reason
+	if not get_parent().can_act(actor): result.reason="麻痹中，无法施法"
 	if skill.combination_only: result.reason = "组合结果须通过基础动作与现场条件触发"
 	result.ready = result.reason.is_empty()
 	return result
@@ -247,7 +253,7 @@ func start(skill: SkillData, actor: Node2D, context: CastContext, source: String
 	var scope := _scope(actor)
 	if not scope:
 		return false
-	if not skill.field_type.is_empty() and not _can_place(actor, actor.global_position, plan.placement_radius):
+	if not plan.skill.field_type.is_empty() and not _can_place(actor, actor.global_position, plan.placement_radius):
 		_message("铭刻位置被障碍物阻挡")
 		return false
 	plan.requires_live_target=context.requires_live_target
@@ -331,13 +337,15 @@ func tick(delta: float) -> void:
 	if not is_instance_valid(pending.scope) or pending.scope != _scope(actor):
 		cancel("区域已改变")
 		return
+	if not get_parent().can_act(actor):
+		cancel("受控：准备取消"); return
 	if _health(actor) < pending.health:
 		cancel("受到伤害：准备取消")
 		return
 	if "ui_blocked" in actor and actor.ui_blocked:
 		cancel("操作已中断")
 		return
-	if not pending.action.field_type.is_empty() and actor.global_position.distance_to(pending.position) > 24:
+	if not pending.skill.field_type.is_empty() and actor.global_position.distance_to(pending.position) > 24:
 		cancel("移动：铭刻取消")
 		return
 	pending.remaining -= delta
@@ -348,7 +356,7 @@ func _commit() -> void:
 	var plan := pending
 	var actor: Node2D = plan.actor
 	var selected := build_plan(plan.action, actor, plan.empower)
-	if selected.signature != plan.signature:
+	if selected.signature != plan.signature or not selected.operation_reason.is_empty():
 		cancel("组合条件或素材已改变，未扣费")
 		return
 	var mana := actor.get_node_or_null("ManaComponent") as ManaComponent
@@ -358,7 +366,7 @@ func _commit() -> void:
 	if not supplies.can_pay_combat(plan.material_costs):
 		cancel("组合材料已不足，未扣费")
 		return
-	var placement: bool = not plan.action.field_type.is_empty()
+	var placement: bool = not plan.skill.field_type.is_empty()
 	if placement and not _can_place(actor, plan.position, plan.placement_radius):
 		cancel("铭刻位置被阻挡")
 		return
@@ -374,9 +382,10 @@ func _commit() -> void:
 	if ok and placement:
 		var next := SIGIL.new()
 		next.caster = actor
-		next.field_type = plan.action.field_type
+		next.field_type = plan.skill.field_type
+		next.charges=plan.skill.field_charges
 		next.radius = plan.placement_radius
-		next.remaining = plan.placement_duration + float(plan.field_bonus)
+		next.remaining = (clampf(plan.skill.field_duration+plan.placement_duration-15,5,40) if not plan.action.operation_id.is_empty() else plan.placement_duration) + float(plan.field_bonus)
 		if allow_layered_fields:
 			clear_field_type(next.field_type)
 		else:

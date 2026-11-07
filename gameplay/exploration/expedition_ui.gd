@@ -274,7 +274,7 @@ func show_panel(title: String, text: String, buttons: Array[Dictionary], locked:
 		GameUIStyle.apply_button(button)
 		button.pressed.connect(entry.callback)
 		button_host.add_child(button)
-		if not button.disabled and first_button == null: first_button = button
+		if not button.disabled and (first_button == null or entry.get("focused",false)): first_button = button
 	_layout_modal()
 	if first_button: first_button.call_deferred("grab_focus")
 	GameUIStyle.begin_modal(modal)

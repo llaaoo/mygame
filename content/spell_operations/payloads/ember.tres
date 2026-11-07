@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="SpellPayloadData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/operations/spell_payload_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "ember"
+title = "火石阵"
+description = "火石提供火阵介质；由之后亲手执行的火花、震荡或凝神按已知关系触发。"
+material_id = "fire_stone"
+tags = ["fire", "field"]
+field_type = "fire"
+field_charges = 2
+field_duration = 15.0
+surface = ""
+surface_duration = 8.0
+extra_mana = 0
+color = Color(1,0.5,0.2,1)
+statuses = []

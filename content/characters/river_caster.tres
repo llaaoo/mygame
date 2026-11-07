@@ -25,4 +25,4 @@ skills = [ExtResource("fire_sigil"), ExtResource("ignite"), ExtResource("focus")
 loadout = SubResource("Loadout")
 combinations = PackedStringArray("fire_sigil_fireball", "fire_sigil_focus")
 equipment = [ExtResource("gloves"), ExtResource("river_staff")]
-materials = {"ward_powder": 1}
+materials = {"ward_powder": 1, "fire_stone": 2}

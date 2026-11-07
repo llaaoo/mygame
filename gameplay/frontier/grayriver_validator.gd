@@ -3,6 +3,7 @@ extends RefCounted
 static func validate(raw: Dictionary) -> Array[String]:
 	var errors: Array[String]=[]
 	var source:=ExplorationContentCatalog.new()
+	var recipes:=CastingSupplies.new().crafting_recipes
 	var ids:Dictionary={}
 	var enemy_ids:Dictionary={}
 	for i in range(raw.get("regions",[]).size()):
@@ -13,7 +14,7 @@ static func validate(raw: Dictionary) -> Array[String]:
 		for j in range(region.get("notes",[]).size()):
 			var note:Dictionary=region.notes[j]
 			for id in note.get("crafts",[]):
-				if id not in CastingSupplies.MATERIAL_IDS:errors.append(field+".notes[%d].crafts: unknown '%s'"%[j,id])
+				if not recipes.has(id):errors.append(field+".notes[%d].crafts: unknown '%s'"%[j,id])
 			if note.has("template"):
 				var parts:=str(note.template).split("/")
 				var found:=false

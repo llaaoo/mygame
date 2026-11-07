@@ -2,7 +2,7 @@ class_name SaveRepository
 extends RefCounted
 ## Owns file validation, migration and replacement. Never restores gameplay state.
 
-const VERSION := 4
+const VERSION := 5
 enum Status { MISSING, VALID, RECOVERED, INVALID, UNSUPPORTED_VERSION, IO_ERROR }
 var section_validators: Dictionary = {}
 
@@ -64,6 +64,9 @@ func migrate(raw: Dictionary) -> Dictionary:
 				data["player"] = player_data
 			3:
 				# v4 adds optional authoritative campaign snapshots; old fields remain valid migration input.
+				data["extensions"]=data.get("extensions",{})
+			4:
+				# Operation IDs and new item definitions require the v5 content reader.
 				data["extensions"]=data.get("extensions",{})
 		version += 1
 		data["version"] = version

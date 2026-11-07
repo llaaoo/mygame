@@ -69,6 +69,7 @@ func choose(target: Node2D) -> Array[Action]:
 	return [Action.move(actor.get_target_direction(),actor)]
 
 func find_source(id: String) -> String:
+	if actor.skill_manager.material_operations: id=SpellOperationCatalog.default_catalog().canonical(id)
 	for source in ["left","right","slot_0","slot_1","slot_2","slot_3","slot_4","slot_5"]:
 		var instance := actor.skill_manager.get_instance(source)
 		if instance and instance.data.get_id()==id: return source
@@ -77,6 +78,9 @@ func cast(id: String,target: Node2D,empower:=false,at_self:=false) -> Action:
 	var source := find_source(id)
 	if source.is_empty(): return null
 	var skill := actor.skill_manager.get_instance(source).data
+	if actor.skill_manager.material_operations and not skill.operation_id.is_empty():
+		var payload: String={"fire_sigil":"ember","frost_sigil":"frost","storm_sigil":"storm","venom_mist":"venom","poison_cloud":"venom","oil_flask":"resin"}.get(id,"")
+		if not payload.is_empty(): actor.skill_manager.combinations.supplies.select_payload(skill,payload,actor.skill_manager)
 	var context := CastContext.at_position(actor,actor.global_position if at_self else target.global_position,skill)
 	context.target=target
 	context.requires_live_target=true

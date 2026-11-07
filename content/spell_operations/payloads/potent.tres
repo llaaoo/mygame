@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="SpellPayloadData" load_steps=3 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/operations/spell_payload_data.gd" id="1"]
+[ext_resource type="Resource" path="res://content/spell_operations/statuses/potent_toxin.tres" id="s0"]
+[resource]
+script = ExtResource("1")
+id = "potent"
+title = "浓毒喷洒"
+description = "浓缩毒素更强、更持久，直接附着目标；不铺设普通毒地。"
+material_id = "potent_venom"
+tags = ["poison", "spray"]
+field_type = ""
+field_charges = 2
+field_duration = 15.0
+surface = ""
+surface_duration = 8.0
+extra_mana = 3
+color = Color(0.65,0.9,0.15,0.9)
+statuses = [ExtResource("s0")]

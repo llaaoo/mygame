@@ -31,6 +31,8 @@ UI可以调用领域服务请求训练、制造、交付或施法，由服务验
 
 ## 技能与状态
 
+2026-11-07：灰河谷通过 `SpellOperationData + SpellPayloadData` 区分释放动作和材料效果，复用 CastPlan、事务、命中与表面反应。详见 [基础动作与释放介质](./MATERIAL_SPELL_OPERATIONS.md)。
+
 `CastContext`保留施法者、来源、方向、目标、世界、蓄力和强化意图；`ActionResolver`与执行使用同一上下文。`CastPlan / CastComponent / CastStatusRequirement`表达确定结果和条件版本。预览不扣资源，准备提交时重新验证；`SpellRuleIndex`按动作与作用域预索引规则，同帧UI复用预览。
 
 普通施法和条件施法共用费用策略、材料/恩赐规划、执行器与 `CastTransaction`。事务暂存法力、材料、状态消费和效果，全部接受后统一通知；失败恢复状态与计时，不广播消费或施法事实。引导脉冲复用普通事务，按累计引导费用结算整数法力，失败停止。

@@ -548,3 +548,8 @@ AoE 的 trace 生命周期 = AoE 实例的生命周期。命中事件持续记�
 HitContext在命中前固定投射物条件减伤倍率；命中事件仍以未扣该倍率的主伤害计算反应，主伤害及附加伤害在统一写入口各乘一次。蒸汽不作用于近战、范围或DOT，既有通用伤害减免仍独立应用。CombatExecutor的damage_applied信号报告实际生命损失，用于只读实验记录；不额外发起命中或重复扣血。SkillManager在资源和效果全部接受后按整次动作发布cast_committed，多个结果不重复统计成本。
 
 投射物条件减伤还要排除实际melee命中标签；附魔近战沿用临时SkillData时，不能因旧默认SkillType而被误判为远程投射物。
+
+
+## 材料接触状态（2026-11-07）
+
+释放介质在运行时 SkillData.contact_statuses 携带具体药效。CombatExecutor 在先前状态快照和 ON_HIT 之后、主体伤害之前，按 status_accepted 施加；元素默认挂状态不覆盖同 ID 的材料定义。由此新挂毒不能冒充命中前已有的毒。控制效果通过 Buff.prevents_actions 同时限制共用物理动作和施法入口；有害接触即使零直接伤害也通知战役关系服务。详见 [基础动作与释放介质](./MATERIAL_SPELL_OPERATIONS.md)。

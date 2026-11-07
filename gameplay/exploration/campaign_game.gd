@@ -136,6 +136,7 @@ func _bootstrap() -> void:
 	quests.assign(catalog.chapter.quests)
 	player.died.connect(_on_player_died)
 	_apply_knowledge()
+	if rules.material_operations: player.skill_manager.enable_material_operations()
 	_restore_loadout()
 	_restore_character()
 	equipment_service.restore()

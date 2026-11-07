@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/item_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "fire_stone"
+display_name = "火石"
+description = "刻阵时消耗，构成有两次充能的火阵。"
+weight = 0.2
+stackable = true
+max_stack = 99

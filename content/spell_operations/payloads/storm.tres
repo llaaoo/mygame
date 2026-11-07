@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="SpellPayloadData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/operations/spell_payload_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "storm"
+title = "雷晶阵"
+description = "雷晶粉提供雷阵介质；由后续基础动作与已知反应决定释放结果。"
+material_id = "storm_dust"
+tags = ["lightning", "field"]
+field_type = "storm"
+field_charges = 2
+field_duration = 15.0
+surface = ""
+surface_duration = 8.0
+extra_mana = 1
+color = Color(0.8,0.6,1,1)
+statuses = []

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="SpellPayloadData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/operations/spell_payload_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "arcane"
+title = "凝能阵"
+description = "不耗材料；只有一次充能，需以震荡手动触发。"
+material_id = ""
+tags = ["arcane", "field"]
+field_type = "arcane"
+field_charges = 1
+field_duration = 10.0
+surface = ""
+surface_duration = 8.0
+extra_mana = 0
+color = Color(0.6,0.65,1,1)
+statuses = []

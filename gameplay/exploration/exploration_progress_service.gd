@@ -35,8 +35,16 @@ func _apply_knowledge() -> void:
 	var previous := sm.known_actions.duplicate()
 	sm.known_actions = game.progress.actions.duplicate()
 	sm.combinations.learned_rules = game.progress.spell_rules.duplicate()
+	if sm.material_operations:
+		for rule in SpellOperationCatalog.default_catalog().rules: sm.combinations.learned_rules[rule.id]=true
 	for pair in [["pulse", 0], ["focus", 1], ["frost_sigil", 2], ["water_call", 3], ["fire_sigil", 4], ["ignite", 5]]:
 		if game.progress.actions.has(pair[0]) and (previous.is_empty() or not previous.has(pair[0])):
+			if sm.material_operations:
+				var canonical:=SpellOperationCatalog.default_catalog().canonical(pair[0])
+				var equipped:=false
+				for i in range(SkillManager.MAX_SLOTS):
+					if sm.get_slot(i) and sm.get_slot(i).data.get_id()==canonical: equipped=true
+				if equipped: continue
 			var slot: int = pair[1]
 			if sm.get_slot(slot) != null:
 				slot = -1
@@ -46,6 +54,11 @@ func _apply_knowledge() -> void:
 						break
 			if slot >= 0:
 				sm.equip_slot(slot, sm.pool.get_skill(pair[0]))
+	if sm.material_operations and game.progress.actions.has("water_call") and not previous.has("water_call"):
+		for i in range(SkillManager.MAX_SLOTS):
+			if sm.get_slot(i)==null:
+				sm.equip_slot(i,sm.pool.get_skill("disperse"))
+				break
 	if previous.is_empty():
 		sm.equip_hand("right", sm.pool.get_skill("ignite"))
 

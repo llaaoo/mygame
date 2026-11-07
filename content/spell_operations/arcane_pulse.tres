@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="SpellCombinationRule" load_steps=3 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/combinations/spell_combination_rule.gd" id="1"]
+[ext_resource type="Resource" path="res://content/spell_operations/arcane_burst.tres" id="2"]
+[resource]
+script = ExtResource("1")
+id = "arcane_pulse"
+trigger_action_id = "pulse"
+required_field_type = "arcane"
+result_skill = ExtResource("2")
+mana_cost = 8
+cooldown = 3.0

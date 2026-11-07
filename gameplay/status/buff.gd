@@ -24,6 +24,7 @@ enum StackBehavior { REFRESH, INTENSITY, INDEPENDENT }
 @export var tick_heal: int = 0
 @export var tick_damage: int = 0
 @export var tick_damage_scaling: float = 0.0
+@export var prevents_actions := false
 @export var speed_multiplier: float = 1.0
 @export var damage_taken_multiplier: float = 1.0
 @export var incoming_projectile_multiplier := 1.0
@@ -107,7 +108,10 @@ func describe() -> String:
 	return "%s: %s%s" % [name, effect_str, duration_str]
 
 static func status_title(id: String) -> String:
-	return {"burning": "燃烧", "poison": "中毒", "shocked": "感电", "frozen": "冻结", "wet": "潮湿", "soul_charge": "蕴魂", "clear_mind": "清明", "ancestral_ward": "先祖护佑"}.get(id, id)
+	return {"burning": "燃烧", "poison": "中毒", "paralysis": "麻痹", "washing": "冲洗", "shocked": "感电", "frozen": "冻结", "wet": "潮湿", "soul_charge": "蕴魂", "clear_mind": "清明", "ancestral_ward": "先祖护佑"}.get(id, id)
 
 static func _stat_title(key: String) -> String:
 	return {"attack_damage": "近战攻击", "strength": "力量", "intelligence": "智力", "agility": "敏捷", "endurance": "耐力", "max_hp": "生命上限", "max_mp": "法力上限"}.get(key, key)
+
+func is_harmful() -> bool:
+	return prevents_actions or tick_damage>0 or category in [Category.DEBUFF,Category.CONTROL]

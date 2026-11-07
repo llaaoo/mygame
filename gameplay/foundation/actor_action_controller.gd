@@ -41,6 +41,8 @@ func try_action(action: Action) -> OperationResult:
 	var actor:=context.actor if context else null
 	if not actor or actor.get_node("HealthComponent").is_dead: return OperationResult.reject("dead")
 	if not active(): return OperationResult.success()
+	var buffs:=actor.get_node_or_null("BuffManager") as BuffManager
+	if buffs and buffs.prevents_actions(): return OperationResult.reject("controlled")
 	if "ui_blocked" in actor and actor.ui_blocked: return OperationResult.reject("interface")
 	if mode=="item" and (action.action_type in [Action.ActionType.MELEE,Action.ActionType.HEAVY_ATTACK,Action.ActionType.DODGE,Action.ActionType.CAST] or action.action_type==Action.ActionType.MOVE and action.direction.length_squared()>.01): cancel("other_action")
 	match action.action_type:
@@ -117,6 +119,8 @@ func advance(delta: float) -> void:
 	if _move_age>.3 and not input_provider.is_valid(): movement=Vector2.ZERO
 	_buffer_time=maxf(0,_buffer_time-delta)
 	if _buffer_time==0: _buffer=null
+	var status:=actor.get_node_or_null("BuffManager") as BuffManager
+	if status and status.prevents_actions(): cancel("controlled")
 	var stats:=actor.get_node_or_null("StatsComponent") as StatsComponent
 	var multiplier:=1.0
 	var bonus:=0.0

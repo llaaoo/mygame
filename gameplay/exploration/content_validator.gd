@@ -124,7 +124,7 @@ func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 		if material.supported_tags.is_empty() != material.supported_types.is_empty():
 			_fail(material, "Incomplete material property selector")
 	for recipe: CraftingRecipe in supplies.crafting_recipes.values():
-		if recipe.inputs.is_empty() or recipe.output_count <= 0 or not supplies.catalog.has(recipe.output_id):
+		if recipe.inputs.is_empty() or recipe.output_count <= 0 or not CastingSupplies.known_item(recipe.output_id):
 			_fail(recipe, "Invalid manufacturing output/inputs")
 		_validate_materials(recipe, recipe.inputs, supplies)
 	if catalog.equipment.size() != catalog.chapter.equipment.size():

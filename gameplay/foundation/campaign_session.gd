@@ -89,6 +89,7 @@ func bind_actor(actor: CharacterBody2D,id: String,legacy_counts: Dictionary = {}
 		if manager: manager.bind_inventory(inventory,id)
 		if "inventory" in actor and actor.inventory: actor.inventory.bind_container(inventory,id+".pack")
 	if rules.physical_inventory and actor_records.has(id): _restore_actor(actor,actor_records[id])
+	if rules.material_operations: actor.get_node("SkillManager").enable_material_operations()
 	if rules.tactical_combat and actor is Player:
 		actor.state_machine.process_mode=Node.PROCESS_MODE_DISABLED
 		context.actions.input_provider=actor.input_controller.poll_universal_actions
@@ -237,9 +238,13 @@ static func valid_snapshot(data: Variant) -> bool:
 	return true
 
 func observe_combat(executor: CombatExecutor) -> void:
-	if executor: executor.damage_applied.connect(_on_damage)
+	if executor:
+		executor.damage_applied.connect(_on_damage)
+		executor.harmful_contact_applied.connect(_on_hostile_contact)
 func _on_damage(source: Node2D,target: Node2D,amount: int) -> void:
-	if amount<=0 or not is_instance_valid(source) or not is_instance_valid(target) or source==target: return
+	if amount>0: _on_hostile_contact(source,target)
+func _on_hostile_contact(source: Node2D,target: Node2D) -> void:
+	if not is_instance_valid(source) or not is_instance_valid(target) or source==target: return
 	if target.is_queued_for_deletion() or target.get_node("HealthComponent").is_dead: return
 	if not "actor_context" in source or not "actor_context" in target or not source.actor_context or not target.actor_context: return
 	var a: ActorContext=source.actor_context
