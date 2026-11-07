@@ -59,5 +59,13 @@
     "Software-rendered Xorg display; no physical keyboard, GPU performance or human ergonomics acceptance",
     "No controller or radial-menu implementation"
   ],
-  "github_actions": "Kept disabled"
+  "github_actions": "Kept disabled",
+  "additional_global_pointer_verification": {
+    "test": "tests/test_world_pointer_input.gd",
+    "headless": "1/1 passed",
+    "native_exit_code": 0,
+    "native_pass": "Passive HUD passes melee; nearby and belt buttons receive Input.parse_input_event/global mouse state without weapon attack",
+    "fixture": "Controlled enemy and station placement; enemy AI frozen to isolate input dispatch, separate from the normal-AI controls workflow",
+    "log": "docs/validation/controls_pointer_native.txt"
+  }
 }
