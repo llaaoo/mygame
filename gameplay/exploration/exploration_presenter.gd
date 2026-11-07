@@ -148,7 +148,7 @@ func journal_text() -> String:
 				text += region.title + " · " + facility.title + ("：已建成\n" if game.progress.claims.has(facility.id) else "：待建设\n" + facility.description + "\n")
 	text += "\n未取部件\n"
 	for pair in [[AlchemyRepairService.PUMP, "alchemy.pump_taken", "排水回廊泵芯"], [AlchemyRepairService.REGULATOR, "alchemy.regulator_taken", "蓄水机房调压器"]]:
-		if game.progress.claims.has(pair[0]) and not game.progress.claims.has(pair[1]): text += "□ " + pair[2] + "：已解封，靠近设备E取件\n"
+		if game.progress.claims.has(pair[0]) and not game.progress.claims.has(pair[1]): text += "□ " + pair[2] + "：已解封，靠近设备F取件\n"
 	if game.progress.claims.has("alchemy.started") or game.progress.claims.has("alchemy.schematic"): text += "\n" + game.alchemy.status_text() + "\n"
 	text += "\n远征生存（N补给）\n" + game.survival.description() + "\n"
 	text += "\n本区试战\n在已清理区域按Fsc，可单独重试当地敌人。耗材照常消耗，击杀无经验、掉落或残魂；知识、机关、委托和其他区域进度保持。\n"
