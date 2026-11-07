@@ -108,6 +108,10 @@ func _draw_frontier() -> void:
 	draw_circle(Vector2.ZERO,22,Color(0,0,0,.22))
 	draw_set_transform(Vector2.ZERO)
 	if _near: draw_arc(Vector2.ZERO,26,0,TAU,32,Color(tint,.7),1,true)
+	var resource_station:=get_meta("survival_station") as SurvivalStationData if has_meta("survival_station") else null
+	if resource_station and resource_station.kind=="forage":
+		_draw_resource(resource_station)
+		return
 	match kind:
 		"person":
 			draw_rect(Rect2(-8,0,6,18),Color("353c3a"))
@@ -124,22 +128,6 @@ func _draw_frontier() -> void:
 			var station:=get_meta("survival_station") as SurvivalStationData if has_meta("survival_station") else null
 			if get_meta("survival_rest",false):
 				_draw_hearth(Vector2.ZERO,true)
-				return
-			if station and station.kind=="forage":
-				var ready: bool=harvest_ready_query.call() if harvest_ready_query.is_valid() else true
-				var shade:=Color.WHITE if ready else Color(.4,.4,.4)
-				if station.harvest.has("charcoal"):
-					draw_line(Vector2(-25,7),Vector2(22,-9),Color("66503a")*shade,16,true)
-					draw_circle(Vector2(-25,7),8,Color("ab9061")*shade)
-					draw_line(Vector2(-17,0),Vector2(19,-12),Color("89734e")*shade,3,true)
-				elif station.harvest.has("crystal") or station.harvest.has("frost_salt"):
-					var c:=Color("b8dbe3") if station.harvest.has("frost_salt") else Color("92a9bb")
-					draw_colored_polygon(PackedVector2Array([Vector2(-25,10),Vector2(-21,-9),Vector2(1,-18),Vector2(23,-4),Vector2(27,12)]),Color("5d6668")*shade)
-					for x in [-12,3,15]: draw_colored_polygon(PackedVector2Array([Vector2(x-6,3),Vector2(x,-22-abs(x)*.4),Vector2(x+6,-3)]),c*shade)
-				else:
-					for x in [-14,0,14]:
-						draw_line(Vector2(x,12),Vector2(x,-10),Color("78885b")*shade,3,true)
-						draw_circle(Vector2(x,-12),7,Color("9ba16b")*shade)
 				return
 			if station and station.kind=="water":
 				texture_filter=CanvasItem.TEXTURE_FILTER_NEAREST
@@ -170,3 +158,19 @@ func _draw_hearth(point: Vector2, lit: bool) -> void:
 		for radius in [48,34,22]: draw_circle(point,radius,Color(1,.55,.18,.035))
 		draw_colored_polygon(PackedVector2Array([point+Vector2(-13,1),point+Vector2(-8,-23),point+Vector2(-1,-16),point+Vector2(5,-35),point+Vector2(13,1)]),Color("d68d49"))
 		draw_colored_polygon(PackedVector2Array([point+Vector2(-7,2),point+Vector2(1,-18),point+Vector2(7,2)]),Color("eec780"))
+
+func _draw_resource(station: SurvivalStationData) -> void:
+	var ready: bool=harvest_ready_query.call() if harvest_ready_query.is_valid() else true
+	var shade:=Color.WHITE if ready else Color(.4,.4,.4)
+	if station.harvest.has("charcoal"):
+		draw_line(Vector2(-25,7),Vector2(22,-9),Color("66503a")*shade,16,true)
+		draw_circle(Vector2(-25,7),8,Color("ab9061")*shade)
+		draw_line(Vector2(-17,0),Vector2(19,-12),Color("89734e")*shade,3,true)
+	elif station.harvest.has("crystal") or station.harvest.has("frost_salt"):
+		var c:=Color("b8dbe3") if station.harvest.has("frost_salt") else Color("92a9bb")
+		draw_colored_polygon(PackedVector2Array([Vector2(-25,10),Vector2(-21,-9),Vector2(1,-18),Vector2(23,-4),Vector2(27,12)]),Color("5d6668")*shade)
+		for x in [-12,3,15]: draw_colored_polygon(PackedVector2Array([Vector2(x-6,3),Vector2(x,-22-abs(x)*.4),Vector2(x+6,-3)]),c*shade)
+	else:
+		for x in [-14,0,14]:
+			draw_line(Vector2(x,12),Vector2(x,-10),Color("78885b")*shade,3,true)
+			draw_circle(Vector2(x,-12),7,Color("9ba16b")*shade)
