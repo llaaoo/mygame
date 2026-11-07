@@ -22,6 +22,7 @@ var journal_provider: Callable
 var map_provider: Callable
 var pause_provider: Callable
 var practice_available: Callable
+var menu_action: Callable
 var journal_action: Callable
 var shortcut_action: Callable
 var _modal_extent := Vector2(760,548)
@@ -60,9 +61,12 @@ func _ready() -> void:
 	footer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	footer.add_theme_stylebox_override("panel", GameUIStyle.panel_style(.85, 4))
 	add_child(footer)
-	var controls := _label("J 日志 M 材料 O 装备\nN 补给 K 编组 Esc 暂停", 11)
-	GameUIStyle.apply_label(controls, 11, GameUIStyle.TEXT_MUTED)
-	footer.add_child(controls)
+	var menu:=Button.new()
+	menu.text="Tab  远征菜单"
+	menu.tooltip_text="鼠标进入装备、补给、技能和制作；Esc返回"
+	GameUIStyle.apply_button(menu)
+	menu.pressed.connect(show_menu)
+	footer.add_child(menu)
 	var needs_panel := PanelContainer.new()
 	needs_panel.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
 	needs_panel.offset_left = 20
@@ -178,6 +182,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		else:
 			equipment_requested.emit()
 		get_viewport().set_input_as_handled()
+
+func show_menu() -> void:
+	if menu_action.is_valid(): menu_action.call()
+	else: show_journal()
 
 func close_modal() -> void:
 	if is_instance_valid(modal):

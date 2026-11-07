@@ -1,10 +1,10 @@
 # 📚 项目文档索引
 
-> 版本: v3.1 | 最后更新: 2026-11-06
+> 版本: v3.1 | 最后更新: 2026-11-07
 
 ---
 
-当前阅读入口：[技能能力迁移与新键位](LEGACY_SKILL_INTEGRATION.md)、[项目使用审计](PROJECT_USAGE_AUDIT.md)、[灰河谷首玩验证](GRAYRIVER_FIRST30.md)、[架构边界](ARCHITECTURE.md)。下方早期分析与各轮交付记录含历史范围，不能当作当前接入清单。
+当前阅读入口：[战斗、探索与鼠标整备](CONTROL_SCHEME.md)、[技能能力迁移与新键位](LEGACY_SKILL_INTEGRATION.md)、[项目使用审计](PROJECT_USAGE_AUDIT.md)、[灰河谷首玩验证](GRAYRIVER_FIRST30.md)、[架构边界](ARCHITECTURE.md)。下方早期分析与各轮交付记录含历史范围，不能当作当前接入清单。
 
 ## 文档层级
 

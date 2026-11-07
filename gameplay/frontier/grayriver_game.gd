@@ -133,6 +133,7 @@ func _bootstrap() -> void:
 	if player.inventory_panel: player.inventory_panel.page_request=hub.handle_shortcut.bind(KEY_I)
 	ui.pause_provider = show_valley_pause
 	ui.map_provider = show_map
+	ui.menu_action=hub.open.bind("actions","")
 	ui.journal_action=hub.open.bind("quests","")
 	ui.shortcut_action=hub.handle_shortcut
 	frontier_hud=FrontierHUD.new()

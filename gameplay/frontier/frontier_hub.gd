@@ -2,7 +2,7 @@ class_name FrontierHub
 extends RefCounted
 ## A single, searchable expedition screen. Domain services own all mutations.
 const W := preload("res://gameplay/frontier/frontier_widgets.gd")
-const TABS := {"quests":"委托与旅程","equipment":"装备","supplies":"物品与补给","knowledge":"知识","settings":"操作设置"}
+const TABS := {"actions":"整备与制作","quests":"委托与旅程","equipment":"装备","supplies":"物品与补给","knowledge":"知识","settings":"操作设置"}
 var game: GrayriverGame
 var page := "quests"
 var query := ""
@@ -17,9 +17,11 @@ var _open := false
 
 func _init(owner_game: GrayriverGame) -> void: game=owner_game
 func handle_shortcut(key: int) -> bool:
-	var target: String = {KEY_J:"quests",KEY_O:"equipment",KEY_I:"equipment",KEY_N:"supplies",KEY_TAB:"quests"}.get(key,"")
+	var target: String = {KEY_J:"quests",KEY_O:"equipment",KEY_I:"equipment",KEY_N:"supplies",KEY_TAB:"actions"}.get(key,"")
 	if target.is_empty(): return false
-	if key == KEY_TAB and is_instance_valid(game.ui.modal): return false
+	if key==KEY_TAB and is_instance_valid(game.ui.modal):
+		if game.ui.modal.get_meta("frontier_page","").is_empty(): return false
+		game.ui.close_modal(); _open=false; return true
 	if is_instance_valid(game.ui.modal) and game.ui.modal.get_meta("frontier_page","")==target:
 		game.ui.close_modal()
 		_open=false
@@ -40,7 +42,7 @@ func open(tab := "quests", source := "") -> void:
 		button.toggle_mode=true
 		button.button_pressed=page == key
 		tabs.add_child(button)
-	if page == "loot": root.add_child(W.label("遗骸 · 未取走的东西会留在原处。E尽量取走全部；点击选择，Esc关闭。",13,true))
+	if page == "loot": root.add_child(W.label("遗骸 · 未取走的东西会留在原处。%s尽量取走全部；点击选择，Esc关闭。"%InputBindings.label("loot_all"),13,true))
 	var tools:=root.tools
 	_search=root.search
 	_search.text_changed.connect(func(value: String): query=value; _refresh_rows())
@@ -55,7 +57,7 @@ func open(tab := "quests", source := "") -> void:
 	_rows=root.rows
 	_detail=root.detail
 	if page == "loot":
-		root.add_child(W.button("E  尽量全部取走",take_all))
+		root.add_child(W.button(InputBindings.label("loot_all")+"  尽量全部取走",take_all))
 	game.ui.show_view("灰河谷  /  "+("战利品" if page == "loot" else TABS.get(page,"旅程")),root)
 	game.ui.modal.set_meta("frontier_page",page)
 	_refresh_rows()
@@ -63,6 +65,13 @@ func open(tab := "quests", source := "") -> void:
 func entries() -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	match page:
+		"actions":
+			result.append({"id":"loadout","title":"技能编组","text":"用鼠标选择已学动作，再选择Q/E/R或数字槽。E与1是同一个槽的两个按键。","subtitle":"战斗准备"})
+			result.append({"id":"sources","title":"材料与释放来源","text":"选择真实材料、法阵或残魂；选择本身不扣物资，不自动准备组合。","subtitle":"施法准备"})
+			result.append({"id":"crafts","title":"制作配方","text":"查看已学配方与原料。到附近施法工作台交互，再用鼠标加工；口袋与背包余量来自同一库存。","subtitle":"营地加工"})
+			result.append({"id":"supplies","title":"饮食与背包","text":"用鼠标使用、换装和整理；Z/X或7/8快速使用前两个口袋物品，9/0保留其余物品。","subtitle":"生存整备"})
+			var target:=game.player.input_controller.interaction_target(true)
+			result.append({"id":"nearby","title":"附近交互","text":"点击与F使用同一交互请求，不远程开启设施。","subtitle":target.title if is_instance_valid(target) and "title" in target else "靠近设施、人物或遗骸"})
 		"equipment":
 			for id in game.catalog.equipment:
 				var item: EquipmentData=game.catalog.equipment[id]
@@ -158,6 +167,22 @@ func _show_detail() -> void:
 	var card:=W.card(_detail,entry.title,entry.subtitle)
 	card.add_child(W.label(entry.text,14))
 	match page:
+		"actions":
+			match entry.id:
+				"loadout": _detail.add_child(W.button("打开技能编组",_open_loadout))
+				"sources": _detail.add_child(W.button("选择释放来源",game.workshop.show_materials))
+				"supplies": _detail.add_child(W.button("打开物品与补给",open.bind("supplies","")))
+				"crafts":
+					var supplies:=game.survival.supplies
+					for id in supplies.crafting_recipes:
+						if supplies.knows_recipe(id): card.add_child(W.label(supplies.title(id)+" ← "+supplies.describe_cost(supplies.crafting_recipes[id].inputs),13,true))
+					var target:=game.player.input_controller.interaction_target(true)
+					if target is ExplorationInteractable and target.callback==game.workshop.show_crafts: _detail.add_child(W.button("使用附近工作台",_interact.bind(weakref(target))))
+					else: card.add_child(W.label("靠近施法工作台后，可按F或点击屏幕中的交互按钮。",13,true))
+				"nearby":
+					var target:=game.player.input_controller.interaction_target(true)
+					if is_instance_valid(target): _detail.add_child(W.button("使用附近目标",_interact.bind(weakref(target))))
+					else: card.add_child(W.label("当前没有足够近的交互目标。",13,true))
 		"equipment","loot":
 			var id: String=entry.get("item",entry.id)
 			var item:=game.catalog.equipment.get(id) as EquipmentData
@@ -204,7 +229,7 @@ func _show_detail() -> void:
 				if use.kind==ItemUseDefinition.Kind.SPRAY: _detail.add_child(W.button("装填这瓶喷剂",_prepare_sprayer.bind(id,str(entry.get("uid","")))))
 				if use.kind!=ItemUseDefinition.Kind.SPRAY: _detail.add_child(W.button("瞄准投掷" if use.kind==ItemUseDefinition.Kind.THROWABLE else "涂附当前主手武器",_use_item.bind(str(entry.get("uid",id)),use.kind==ItemUseDefinition.Kind.THROWABLE)))
 			if SurvivalCatalog.FOODS.has(id) or definition and definition.use_profile:
-				for i in range(4): _detail.add_child(W.button("绑定到快捷物品 "+["7","8","9","0"][i],_bind_item.bind(i,id,"throw" if definition and definition.use_profile and definition.use_profile.kind==ItemUseDefinition.Kind.THROWABLE else "use")))
+				for i in range(4): _detail.add_child(W.button("绑定到快捷物品 "+InputBindings.label("quick_item_%d"%(i+1)),_bind_item.bind(i,id,"throw" if definition and definition.use_profile and definition.use_profile.kind==ItemUseDefinition.Kind.THROWABLE else "use")))
 			_detail.add_child(W.button("查看本次施法材料",func(): game.workshop.show_materials()))
 		"quests":
 			var quest: ExplorationQuestData
@@ -230,8 +255,18 @@ func _show_detail() -> void:
 				if not FrontierControls.set_quick_cast(value): game.ui.notify("本次设置已生效，但未保存到磁盘。"))
 			card.add_child(toggle)
 			card.add_child(preload("res://gameplay/foundation/ui/binding_editor.tscn").instantiate())
-			card.add_child(W.label("关闭时按住预览、松开施放。蓄力与引导仍需按住；Shift只表示显式消费恩赐。每次只执行一个基础动作，不自动组合。\n\nWASD 移动 · 空格闪避 · F交互\nQ/R与1—6 基础动作 · 7/8/9/0 可绑定物品（默认食物）\nTab 远征面板 · J委托 · I/O装备 · N补给 · G地图\n右键按住格挡 · Alt冲刺 · Ctrl+左键重击 · B放下背包\n地图滚轮缩放、中键/右键拖动、左键放路标。",14))
+			card.add_child(W.label("关闭时按住预览、松开施放。蓄力与引导仍需按住；Shift只表示显式消费恩赐。每次只执行一个基础动作，不自动组合。\n\nWASD 移动 · 空格闪避 · F交互\nQ/E/R与数字键 基础动作 · Z/X或7/8快捷物品 · 9/0其余物品\nTab 远征面板 · J委托 · I/O装备 · N补给 · G地图\n右键按住格挡 · Alt冲刺 · Ctrl+左键重击 · B放下背包\n地图滚轮缩放、中键/右键拖动、左键放路标。",14))
 
+func _open_loadout() -> void:
+	game.ui.close_modal()
+	game.player.skill_pool_ui.open()
+func _interact(reference: WeakRef) -> void:
+	var target:=reference.get_ref() as Node2D
+	if not is_instance_valid(target) or game.player.input_controller.interaction_target(true)!=target:
+		game.ui.notify("目标已不在附近。")
+		return
+	game.ui.close_modal()
+	if not game.player.input_controller.request_interaction(target): game.ui.notify("当前无法交互，请结束动作后重试。")
 func _pin(id: String) -> void:
 	game.guidance.pin(id)
 	_refresh_rows()
