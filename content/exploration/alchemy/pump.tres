@@ -26,5 +26,5 @@ pickup_claim = "alchemy.pump_taken"
 pickup_title = "泵芯"
 work_methods = Array[ExtResource("3")]([SubResource("force")])
 routes = Array[ExtResource("2")]([SubResource("thermal"), SubResource("frozen")])
-hint = "需先读档案室图纸。力量14可站定2秒撬拆；也可实际命中火→水→冲击，或凝霜→冲击。作业不暂停，受伤打断。解封会用清洁水冲净旧毒区，也失去借毒阻敌的机会。随后靠近E取泵芯。"
-completion_text = "排污泵已解封：旧毒源停止，清洁水冲洗旧毒区。靠近E取泵芯；尚未自动取件。"
+hint = "需先读档案室图纸。力量14可站定2秒撬拆；也可实际命中火→水→冲击，或凝霜→冲击。作业不暂停，受伤打断。解封会用清洁水冲净旧毒区，也失去借毒阻敌的机会。随后靠近F取泵芯。"
+completion_text = "排污泵已解封：旧毒源停止，清洁水冲洗旧毒区。靠近F取泵芯；尚未自动取件。"

@@ -11,6 +11,7 @@ func frames(n:=4) -> void:
 		await process_frame
 func pointer(point: Vector2) -> void:
 	pointer_position=point
+	if DisplayServer.get_name()!="headless": Input.warp_mouse(point)
 	var event:=InputEventMouseMotion.new(); event.position=point; event.global_position=point; Input.parse_input_event(event)
 	Input.flush_buffered_events()
 	await frames()
@@ -42,7 +43,28 @@ func run() -> void:
 	await left_click()
 	check(is_instance_valid(game.ui.modal) and paused,"Real HUD button no longer receives pointer input")
 	check(target.health_component.hp==hp and actor.actor_context.actions._attack_sequence==sequence,"Clicking the HUD also attacked a world target")
+	# Input.parse_input_event updates the global Input state as an OS event would.
+	# Exercise the new nonmodal controls through that path too (not only GUI dispatch).
+	game.ui.close_modal(); await frames(15)
+	var bench: ExplorationInteractable
+	for node in game.region_root.get_children():
+		if node is ExplorationInteractable and node.callback==game.workshop.show_crafts: bench=node; break
+	check(bench!=null,"Town workbench missing")
+	if bench:
+		actor.position=bench.position+Vector2(0,35); actor.get_node("Camera2D").reset_smoothing(); await frames(15)
+		sequence=actor.actor_context.actions._attack_sequence
+		await pointer(game.frontier_hud.interact.get_global_rect().get_center()); await left_click()
+		check(paused and is_instance_valid(game.ui.modal),"Global mouse input did not activate nearby interaction")
+		check(actor.actor_context.actions._attack_sequence==sequence,"Nearby interaction mouse click leaked a weapon attack")
+		game.ui.close_modal(); await frames(15)
+	game.survival.supplies.grant({"ration":1})
+	await frames(15)
+	sequence=actor.actor_context.actions._attack_sequence
+	await pointer(game.frontier_hud.belt[0].get_global_rect().get_center()); await left_click()
+	check(actor.field_work.is_busy(),"Global mouse input did not activate supply belt")
+	check(actor.actor_context.actions._attack_sequence==sequence,"Supply belt mouse click leaked a weapon attack")
+	actor.field_work.cancel("test"); actor.field_work.close_panel()
 	check(game.player.quest_manager==null and game.get_node_or_null("RunManager")==null,"Campaign still instantiates unused legacy quest/run owners")
 	await fixture.close()
-	if failures.is_empty(): print("PASS world pointer input: passive HUD passes melee, real controls receive clicks, campaigns keep one quest/run owner")
+	if failures.is_empty(): print("PASS world pointer input: passive HUD passes melee, nearby and belt controls receive global mouse input without melee, campaigns keep one quest/run owner")
 	quit(0 if failures.is_empty() else 1)

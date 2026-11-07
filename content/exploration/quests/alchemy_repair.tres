@@ -4,6 +4,6 @@
 script = ExtResource("1")
 id = "alchemy_repair"
 title = "重启调和台"
-description = "在营地东北调和台接下委托；档案室读图纸，排水回廊取泵芯，蓄水机房取调压器，回营地组装。支持属性、法术与材料路线。解封后需现场E取件，修复永久开放材料回收。"
+description = "在营地东北调和台接下委托；档案室读图纸，排水回廊取泵芯，蓄水机房取调压器，回营地组装。支持属性、法术与材料路线。解封后需现场F取件，修复永久开放材料回收。"
 required_claims = PackedStringArray("alchemy.repaired")
 attribute_points = 1

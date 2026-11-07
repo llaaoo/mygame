@@ -45,7 +45,7 @@ func poll_universal_actions() -> Array[Action]:
 		hit.direction=player.get_mouse_direction()
 		actions.append(hit)
 
-	# 数字键与Q/R施法，格挡时不提出新的施法。
+	# 数字键与Q/E/R施法，格挡时不提出新的施法。
 	if not Input.is_action_pressed("guard"):
 		for pair in [["left", "cast_left"], ["right", "skill"]]:
 			_poll_universal_cast(actions, pair[0], pair[1])
@@ -111,7 +111,7 @@ func execute_action(action: Action) -> void:
 			player.state_machine.transition_to("dodge")
 
 		Action.ActionType.INTERACT:
-			_try_interact()
+			_try_interact(action.target,bool(action.params.get("targeted",false)))
 
 		Action.ActionType.CAST:
 			if action.params.get("release", false):
@@ -195,7 +195,15 @@ func _cast_source(source: String, context: CastContext = null) -> void:
 		casting._cancel_charge()
 	player.skill_manager.use_source(source, player, context)
 
-func _try_interact() -> void:
+func request_interaction(target: Node2D) -> bool:
+	if player.ui_blocked or player.health_component.is_dead or not is_instance_valid(target) or interaction_target(true)!=target: return false
+	var action:=Action.interact(player); action.target=target; action.params["targeted"]=true
+	if player.actor_context and player.actor_context.actions.active(): return player.actor_context.actions.try_action(action).accepted
+	execute_action(action)
+	return true
+
+func _try_interact(expected: Node2D = null, targeted := false) -> void:
+	if targeted and (not is_instance_valid(expected) or interaction_target(true)!=expected): return
 	var balloon := DialogueBalloon.active
 	if balloon != null and is_instance_valid(balloon) and balloon.has_method("advance"):
 		balloon.advance()

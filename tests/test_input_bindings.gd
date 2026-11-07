@@ -3,6 +3,11 @@ var failures: Array[String]=[]
 func _init() -> void: call_deferred("run")
 func check(ok: bool,message: String) -> void:
 	if not ok: failures.append(message); push_error(message)
+func event(code: Key) -> InputEventKey:
+	var key:=InputEventKey.new(); key.keycode=code; key.physical_keycode=code
+	return key
+func has_key(action: String,code: Key) -> bool:
+	return InputMap.action_has_event(action,event(code))
 func run() -> void:
 	# Preferences must load even before any Player has registered its extra slots.
 	var config:=ConfigFile.new()
@@ -16,17 +21,37 @@ func run() -> void:
 	for action in InputBindings.KEYS:
 		check(InputMap.has_action(action) and not InputMap.action_get_events(action).is_empty(),"Missing default input: "+action)
 	for pair in [["skill_5",KEY_H],["skill_6",KEY_Y]]:
-		var event:=InputEventKey.new(); event.keycode=pair[1]; event.physical_keycode=pair[1]; event.pressed=true
-		Input.parse_input_event(event); Input.flush_buffered_events(); await process_frame
+		var key:=event(pair[1]); key.pressed=true
+		Input.parse_input_event(key); Input.flush_buffered_events(); await process_frame
 		check(Input.is_action_pressed(pair[0]),"First boot skipped saved input for "+pair[0])
-		event=event.duplicate(); event.pressed=false; Input.parse_input_event(event)
-		await process_frame
-	check(InputMap.action_get_events("skill")[0] is InputEventKey and InputMap.action_get_events("guard")[0] is InputEventMouseButton,"Old saved mouse casting / V guard defeated the new layout")
-	check(InputMap.action_get_events("interact")[0].physical_keycode==KEY_F,"Legacy E interaction defeated F default")
+		key=key.duplicate(); key.pressed=false; Input.parse_input_event(key); await process_frame
+	check(InputMap.action_get_events("skill")[0] is InputEventKey and InputMap.action_get_events("guard")[0] is InputEventMouseButton,"Old mouse casting / V guard defeated layout")
+	check(has_key("interact",KEY_F),"Legacy E interaction defeated F default")
 	var reserved:=InputEventMouseButton.new(); reserved.button_index=MOUSE_BUTTON_LEFT
 	check(not InputBindings.assign("skill_1",reserved).accepted,"Rebinding allowed a skill to steal left mouse")
+	check(not InputBindings.assign("skill_1",event(KEY_K)).accepted,"Remap stole a global menu shortcut")
+	check(not InputBindings.assign("skill_1",event(KEY_F)).accepted,"Remap duplicated world interaction")
 	var before:=InputMap.action_get_events("skill_5").size()
 	InputBindings.install()
-	check(InputMap.action_get_events("skill_5").size()==before,"Multiple scene entries duplicated input events")
-	if failures.is_empty(): print("PASS input bindings: defaults precede preference restoration and extra slots work on first boot")
+	check(InputMap.action_get_events("skill_5").size()==before,"Repeated scene entries duplicated input events")
+	# v2 saved defaults migrate; valid customized E and swapped keys survive together.
+	config=ConfigFile.new(); config.set_value("layout","version",2)
+	config.set_value("bindings","loot_all",{"key":KEY_E})
+	config.set_value("bindings","skill_1",{"key":KEY_1})
+	config.set_value("bindings","skill_5",{"key":KEY_E})
+	config.set_value("bindings","skill_2",{"key":KEY_3})
+	config.set_value("bindings","skill_3",{"key":KEY_2})
+	config.save(InputBindings.PATH); InputBindings.loaded=false; InputBindings.install()
+	check(has_key("loot_all",KEY_T) and has_key("skill_1",KEY_1) and not has_key("skill_1",KEY_E) and has_key("skill_5",KEY_E),"Migration lost custom E or retained a conflicting default")
+	check(has_key("skill_2",KEY_3) and has_key("skill_3",KEY_2),"Saved key swap depends on config entry order")
+	check(InputBindings.assign("loot_all",event(KEY_E)).accepted,"World and loot contexts cannot intentionally share a key")
+	check(InputBindings.reset_defaults().accepted,"Reset could not persist defaults")
+	InputBindings.loaded=false; InputBindings.install()
+	check(has_key("skill_1",KEY_E) and has_key("skill_1",KEY_1) and has_key("loot_all",KEY_T),"Reset/restart lost E/1 aliases or retained custom loot key")
+	check(has_key("quick_item_1",KEY_Z) and has_key("quick_item_1",KEY_7) and has_key("quick_item_2",KEY_X) and has_key("quick_item_2",KEY_8),"Survival aliases missing after reset/restart")
+	# A failed preference write must leave the usable runtime map intact.
+	DirAccess.make_dir_absolute(InputBindings.PATH+".tmp")
+	check(not InputBindings.assign("skill_5",event(KEY_H)).accepted and has_key("skill_5",KEY_5),"Failed disk write changed runtime binding")
+	DirAccess.remove_absolute(InputBindings.PATH+".tmp")
+	if failures.is_empty(): print("PASS input bindings: migration, E/1 and survival aliases, key swaps, context conflicts, reset and failed-write consistency")
 	quit(0 if failures.is_empty() else 1)

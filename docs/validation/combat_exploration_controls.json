@@ -1,0 +1,84 @@
+{
+  "source_baseline": "25e68ee73d69a035433844b3507709eed2923684",
+  "date_utc": "2026-11-07",
+  "native": {
+    "platform": "Linux, Godot 4.6.3, Xorg dummy :97, OpenGL compatibility, Mesa llvmpipe",
+    "test": "tests/test_controls_workflow.gd",
+    "window_requested": [
+      960,
+      600
+    ],
+    "captured_viewport": [
+      960,
+      540
+    ],
+    "method": "Isolated fresh user directory; actual InputEvent keyboard and Viewport-local mouse events. Normal AI and GameRuntime simulation restored after fixture boot. Controlled town placement, equipped ignite slot, learned recipe and inventory material grants; fixture freezes player HP/MP regeneration for exact consumption assertions.",
+    "exit_code": 0,
+    "pass": "E/1 exactly once, mouse menus/loadout/workbench/belt, remap/reset, text ownership, material payment and stale range rejection",
+    "asserted_results": {
+      "E_and_1": "One ignite committed per key, two total",
+      "mana_before": 60,
+      "mana_after": 52,
+      "fire_stone_produced": 1,
+      "craft_inputs_consumed": {
+        "charcoal": 2,
+        "crystal": 1
+      },
+      "ration_before": 3,
+      "ration_after": 2,
+      "alias_cancel_extra_consumption": 0,
+      "mouse_attack_leaks": 0,
+      "E_menu_casts": 0,
+      "rebind_and_reset": "Mouse selected skill_5, real H key saved; mouse reset restored 5 and E/1, inventory and world claims identical",
+      "out_of_range_interaction": "Original workbench rejected after actor moved 250 units away"
+    },
+    "warnings": [
+      "Xorg dummy/llvmpipe cannot change VSync; no script errors or other warnings"
+    ],
+    "screenshots": [
+      "docs/playtests/controls/preparation-menu.png",
+      "docs/playtests/controls/mouse-workbench.png",
+      "docs/playtests/controls/world-controls.png"
+    ],
+    "log": "docs/validation/controls_native.txt",
+    "source_equivalent_commit": "93e6cb53aa42d3001b04e1981b7fc103edcb98bb"
+  },
+  "focused": {
+    "input_bindings_and_controls_workflow": "2/2 passed",
+    "other_passed_checks": [
+      "keyboard_casting",
+      "world_pointer_input",
+      "frontier_expedition",
+      "content"
+    ]
+  },
+  "cold_archive": {
+    "status": "passed",
+    "source_commit": "a079cedc4547974c102675e86822f14feef423c3",
+    "path": "/tmp/grayriver-controls-final-a079ced",
+    "export": "git archive HEAD; no .godot cache before first import",
+    "command": "python3 tools/run_tests.py --suite all --jobs 4",
+    "initial_import": "passed",
+    "checks_passed": 72,
+    "checks_total": 72,
+    "exit_code": 0,
+    "diagnostics": "Strict runner rejects errors and warnings; all checks passed",
+    "log": "docs/validation/controls_regression.txt"
+  },
+  "limits": [
+    "Controlled input/UI regression, not a new natural first-play route or combat balance comparison",
+    "Software-rendered Xorg display; no physical keyboard, GPU performance or human ergonomics acceptance",
+    "No controller or radial-menu implementation"
+  ],
+  "github_actions": "Kept disabled",
+  "additional_global_pointer_verification": {
+    "test": "tests/test_world_pointer_input.gd",
+    "headless": "1/1 passed",
+    "native_exit_code": 0,
+    "native_pass": "Passive HUD passes melee; nearby and belt buttons receive Input.parse_input_event/global mouse state without weapon attack",
+    "fixture": "Controlled enemy and station placement; enemy AI frozen to isolate input dispatch, separate from the normal-AI controls workflow",
+    "log": "docs/validation/controls_pointer_native.txt",
+    "source_equivalent_commit": "9c69014"
+  },
+  "hint_audit": "Corrected remaining E pickup prompts to F in expedition alchemy facilities, service, journal and quest; camp sign now lists Q/E/R."
+}

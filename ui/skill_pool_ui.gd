@@ -435,7 +435,8 @@ func _refresh_equip_slots() -> void:
 		var vbox := hbox.get_child(1) as VBoxContainer
 		var name_lbl := vbox.get_node("Name") as Label
 		var sub_lbl := vbox.get_node("Sub") as Label
-		var display_label := str(panel.get_meta("display_label", ""))
+		var action: String="cast_left" if src=="left" else "skill" if src=="right" else "skill_%d"%(int(src.trim_prefix("slot_"))+1)
+		var display_label := "施法 "+InputBindings.labels(action)
 
 		if skill:
 			var skill_icon := SkillIconCatalog.get_icon(skill)

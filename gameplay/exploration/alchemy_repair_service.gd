@@ -18,8 +18,8 @@ func claim_title(id: String) -> String:
 	match id:
 		"alchemy.started": return "营地接下检修委托"
 		"alchemy.schematic": return "档案室调和台图纸"
-		"alchemy.pump_taken": return "回廊泵芯（解封后靠近E取件）"
-		"alchemy.regulator_taken": return "机房调压器（解封后靠近E取件）"
+		"alchemy.pump_taken": return "回廊泵芯（解封后靠近F取件）"
+		"alchemy.regulator_taken": return "机房调压器（解封后靠近F取件）"
 	return id
 
 func status_text() -> String:

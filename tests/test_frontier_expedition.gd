@@ -53,13 +53,21 @@ func run() -> void:
  check(game.progress.claims.has("river.mine_settled"),"Combat path did not settle quest")
  game.loot.inspect("river.enemy.river_mine.quartermaster")
  await frames()
+ var cast_count: Array[int]=[0]
+ game.player.skill_manager.equip_slot(0,game.player.skill_manager.pool.get_skill("ignite"))
+ game.player.skill_manager.cast_committed.connect(func(_plan): cast_count[0]+=1)
  var key:=InputEventKey.new()
- key.keycode=KEY_E
- key.physical_keycode=KEY_E
+ key.keycode=KEY_E; key.physical_keycode=KEY_E; key.pressed=true
+ Input.parse_input_event(key); await frames()
+ check(cast_count[0]==0 and game.equipment_service.count("river_survey_spear")==0,"E cast or took loot through modal ownership")
+ key=key.duplicate(); key.pressed=false; Input.parse_input_event(key); await frames()
+ key=InputEventKey.new()
+ key.keycode=KEY_T
+ key.physical_keycode=KEY_T
  key.pressed=true
  Input.parse_input_event(key)
  await frames()
- check(game.equipment_service.count("river_survey_spear")==1,"F failed to retrieve loot while modal paused the world")
+ check(game.equipment_service.count("river_survey_spear")==1,"T failed to retrieve loot while modal paused the world")
  key.pressed=false
  Input.parse_input_event(key)
  game.ui.close_modal()

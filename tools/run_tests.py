@@ -13,7 +13,7 @@ import time
 ROOT = Path(__file__).resolve().parents[1]
 QUICK = ["save_system", "save_recovery", "skill_catalog", "skill_upgrades", "room_generation"]
 INTEGRATION = [
-    "keyboard_casting", "legacy_operation_coverage", "input_bindings", "world_pointer_input", "enemy_retaliation", "item_actions", "spray_channel", "reaction_sources", "spell_operations", "foundation_inventory", "foundation_combat", "foundation_systems",
+    "keyboard_casting", "controls_workflow", "legacy_operation_coverage", "input_bindings", "world_pointer_input", "enemy_retaliation", "item_actions", "spray_channel", "reaction_sources", "spell_operations", "foundation_inventory", "foundation_combat", "foundation_systems",
     "frontier_expedition", "frontier_projects",
     "grayriver_loot",
     "grayriver_salvage",

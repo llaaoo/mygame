@@ -156,7 +156,8 @@ func _process(_delta: float) -> void:
 			if not previews.has(comparison_key):
 				var alternate := controller.preview(instance.data, _skill_manager.get_parent(), not empower)
 				previews[comparison_key] = instance.data.display_name + "\n\n普通 · " + _brief_plan(alternate if empower else preview) + "\n\nShift · " + _brief_plan(preview if empower else alternate) + "\n\n数字为本次MP费用 · M查看完整材料与条件"
-			_panels[i].tooltip_text = previews[comparison_key]
+			var binding: String="cast_left" if _sources[i]=="left" else "skill" if _sources[i]=="right" else "skill_%d"%(int(_sources[i].trim_prefix("slot_"))+1)
+			_panels[i].tooltip_text = "按键："+InputBindings.labels(binding)+"\n"+previews[comparison_key]
 		if preview:
 			var icon_key: Variant = instance.data.icon if instance.data.icon else instance.data.icon_atlas_index
 			if _icon_keys[i] != icon_key:
