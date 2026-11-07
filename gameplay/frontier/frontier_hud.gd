@@ -74,8 +74,11 @@ func _process(delta: float) -> void:
 		var definition:=game.session.inventory.definitions.get(id) as ItemData
 		belt[i].tooltip_text=(definition.description if definition else "")+("\n按住瞄准，松开投掷；右键或Esc取消" if binding.method=="throw" else "")
 	var goal:=game.guidance.tracked()
-	tracker.text="Tab 远征面板\n选择一个委托开始追踪" if goal.is_empty() else "正在追踪\n"+goal.title
+	var orienting := goal.is_empty()
+	if orienting: goal = game.guidance.town_orientation()
+	tracker.text="Tab 远征面板\n选择一个委托开始追踪"
 	if not goal.is_empty():
+		tracker.text=("镇中整备 · 靠近按 E\n" if orienting else "正在追踪\n")+goal.title
 		var point:=game.guidance.route_target(goal)
 		if point.is_finite():
 			var delta_pos:=point-game.player.position

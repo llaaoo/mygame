@@ -29,6 +29,13 @@ func tracked() -> Dictionary:
 	for quest in game.quests:
 		if quest.id == game.progress.tracked_quest: return next_step(quest)
 	return {}
+
+func town_orientation() -> Dictionary:
+	if not game.is_at_base(): return {}
+	for id in ["river.handbook", "river.pack"]:
+		if not game.progress.claims.has(id): return objective(id)
+	return {}
+
 func route_target(goal: Dictionary) -> Vector2:
 	if goal.is_empty() or not goal.known: return Vector2.INF
 	if game.region_id == goal.region: return goal.position
