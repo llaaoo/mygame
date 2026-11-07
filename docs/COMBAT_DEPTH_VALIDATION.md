@@ -43,6 +43,6 @@ Xorg dummy、Mesa llvmpipe、GL compatibility，1152×648。`/tmp/grayriver-firs
 
 ## 交付检查
 
-代码稳定后从提交的`git archive`导出无`.godot`副本，完成首次导入与全量回归；最终代码提交、日志、PR及main同步结果在交付记录中报告。Actions保持停用。
+代码提交`182e6e442b2ecc97ad885cbc245559708ff33ce1`以`git archive`导出到`/tmp/mygame-tactics-clean`，无`.godot`缓存。执行`python3 tools/run_tests.py --suite all --jobs 3 --timeout 120`：首次导入9.9秒通过，83/83检查全部通过，无runner诊断。总日志`/tmp/tactics-cold-all.log`，分项日志与隔离存档`/tmp/mygame-tests-dengsnq4/`。同一归档的原生输入`/tmp/grayriver-first30/tactics-archive-input/runtime.log`通过，截图`/tmp/tactics-archive-captures/`。随后只补充本验证文档，不改变已验收代码；Actions保持停用。
 
 本轮证明列出的物理对策、资源约束与远征循环；多人混合遭遇、不同装备长期收益和20—30分钟自然首玩的节奏，仍需更多样本。剧情、地图、武技数量和完整成长树没有在本轮扩充。
