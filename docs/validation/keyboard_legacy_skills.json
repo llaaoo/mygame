@@ -631,5 +631,15 @@
       "project": true,
       "water_call": true
     }
+  },
+  "native_controlled_input": {
+    "passed": true,
+    "window": [
+      960,
+      600
+    ],
+    "script": "tests/test_keyboard_casting.gd",
+    "method": "Controlled fixture; real key/mouse events and native pointer warp; GUI events use Viewport local coordinates. Not a natural combat/budget run.",
+    "warning": "Changing VSync unsupported by llvmpipe driver; no script errors."
   }
 }

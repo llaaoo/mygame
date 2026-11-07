@@ -12,8 +12,9 @@ static func build() -> ExplorationChapterData:
 	var chapter := ExplorationChapterData.new()
 	chapter.actions.assign(source.chapter.actions)
 	chapter.spell_rules.assign(source.chapter.spell_rules)
+	# Content assembly references definitions, not the runtime payload/effect registry.
 	for id in ["project","shape","step","sustain"]:
-		chapter.actions.append(SpellOperationCatalog.default_catalog().operation(id).action)
+		chapter.actions.append(load("res://content/spell_operations/%s.tres"%id) as SkillData)
 	chapter.equipment.assign(ItemCatalog.default_catalog().equipment())
 	var definition := data()
 	for entry in definition.regions:

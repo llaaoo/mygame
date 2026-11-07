@@ -13,6 +13,7 @@ func key(code: Key,held: bool) -> void:
 	var event:=InputEventKey.new(); event.keycode=code; event.physical_keycode=code; event.pressed=held
 	Input.parse_input_event(event); Input.flush_buffered_events(); await frames()
 func mouse(button: MouseButton,held: bool) -> void:
+	if DisplayServer.get_name()!="headless": Input.warp_mouse(Vector2(621,324))
 	var event:=InputEventMouseButton.new(); event.position=Vector2(621,324); event.global_position=event.position; event.button_index=button; event.pressed=held
 	Input.parse_input_event(event); Input.flush_buffered_events(); await frames()
 func point_click(point: Vector2) -> void:
@@ -39,6 +40,7 @@ func run() -> void:
 	target.process_mode=Node.PROCESS_MODE_INHERIT; target.set_physics_process(false)
 	target.state_chart.process_mode=Node.PROCESS_MODE_DISABLED; target.actor_context.actions.set_physics_process(false)
 	var motion:=InputEventMouseMotion.new(); motion.position=Vector2(621,324); motion.global_position=motion.position
+	if DisplayServer.get_name()!="headless": Input.warp_mouse(motion.position)
 	Input.parse_input_event(motion); Input.flush_buffered_events(); await frames()
 	var mp:=actor.mana_component.mp
 	await mouse(MOUSE_BUTTON_RIGHT,true)

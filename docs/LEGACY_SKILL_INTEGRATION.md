@@ -95,3 +95,9 @@
 ![明确材料与来源](playtests/keyboard-legacy/explicit-source.png)
 ![真实蓄力投射](playtests/keyboard-legacy/charged-projectile.png)
 ![右键格挡](playtests/keyboard-legacy/right-guard.png)
+
+原生图形受控回归还验证了960×600窗口中滚动到第6槽、鼠标选图标编入Q、返回世界施法及右键取消。UI事件按Viewport局部坐标投递，键盘与战斗鼠标经Input事件和原生指针；它与上述原预算路线分别记录。
+
+纯内容构建曾过早加载完整操作/效果目录，两个检查退出时报资源泄漏；章节改为直接引用四个基础动作定义，操作目录继续在角色装配时加载。修后内容、路线、战役和输入专项4/4通过，完整冷归档需在此修正上复验。
+
+![小窗口可滚动到最后技能槽](playtests/keyboard-legacy/keyboard-small-window.png)
