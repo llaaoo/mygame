@@ -104,6 +104,13 @@ func run() -> void:
 	supplies.selected[action.get_id()]="invalid_source"
 	actor.casting.tick(.4)
 	check(store.count("player","frost_salt")==1 and actor.mana_component.mp==55 and actor.casting._channeling_source.is_empty(),"Channel changed its accepted payload or paid an invalid next pulse")
+
+	# The preview shows a real per-pulse ceiling; the fifth pulse may cost only 4MP.
+	supplies.select_payload(action,"ice_storm",sm)
+	store.receive("player","frost_salt",5); actor.mana_component.mp=24
+	check(controller.preview(action,actor).cost==5,"Channel preview advertises free mana instead of its per-pulse ceiling")
+	actor.casting._begin_channel("slot_0",action); actor.casting.tick(2.41)
+	check(actor.mana_component.mp==0 and store.count("player","frost_salt")==1 and actor.casting._channeling_source.is_empty(),"Rounded preview rejected an affordable fifth 4MP pulse or charged a sixth pulse")
 	# Newly materialized movement still obeys physical walls.
 	controller.clear_field(); controller.cooldowns.clear(); controller._recovery=0
 	var step:=catalog.operation("step").action; sm.equip_slot(0,step)

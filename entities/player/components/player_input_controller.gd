@@ -158,7 +158,7 @@ func execute_action(action: Action) -> void:
 						casting._begin_charge(action.skill_source, skill)
 					# 引导技能：进入引导状态
 					elif skill.cast_type == "channel":
-						casting._begin_channel(action.skill_source, skill)
+						casting._begin_channel(action.skill_source, skill, action.cast_context.empower if action.cast_context else false)
 					else:
 						casting.show_aim(action.skill_source, skill)
 

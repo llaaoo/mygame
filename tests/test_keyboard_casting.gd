@@ -98,6 +98,9 @@ func run() -> void:
 	check(actor.casting._charging_source.is_empty() and actor.actor_context.actions.guarding,"Right guard did not cancel keyboard charge")
 	await key(KEY_Q,false); await mouse(MOUSE_BUTTON_RIGHT,false); await frames(25)
 	check(casts==1 and actor.mana_component.mp==mp and store.count("player","fire_stone")==2 and rune.charges==2,"Cancelled charge leaked a release or spent a source")
+	manager.equip_slot(5,manager.pool.get_skill("sustain")); await frames(12)
+	var bar: SkillBar=game.get_node("HUDLayer").skill_bar
+	check(bar._cost_labels[7].text=="5/次","Channel HUD still advertises zero MP instead of per-pulse mana")
 	await fixture.close()
 	if failures.is_empty(): print("PASS keyboard casting: fixed mouse attack/guard, real R spell, Q charge, guard cancel without release or payment")
 	quit(0 if failures.is_empty() else 1)

@@ -256,7 +256,16 @@ func remaining_cooldown(plan: CastPlan, action_id: String) -> float:
 	return cooldown_state(plan, action_id).remaining
 
 func preview(skill: SkillData, actor: Node2D, empower: bool = false) -> CastPlan:
+	return _preview_costed(skill,actor,empower,-1)
+
+func preview_pulse(skill: SkillData, actor: Node2D, empower: bool, pulse_cost: int) -> CastPlan:
+	return _preview_costed(skill,actor,empower,pulse_cost)
+
+func _preview_costed(skill: SkillData, actor: Node2D, empower: bool, pulse_cost: int) -> CastPlan:
 	var result := build_plan(skill, actor, empower)
+	if skill.cast_type=="channel" and not skill.operation_id.is_empty():
+		var pulse:=pulse_cost if pulse_cost>=0 else ceili(skill.channel_mp_per_sec*skill.channel_tick_interval*CastCostPolicy.mana_multiplier(skill,actor)-.000001)
+		result.cost+=pulse
 	var key: String = result.rule_id if not result.rule_id.is_empty() else skill.get_id()
 	result.cooldown_key = key
 	result.reason = ""
