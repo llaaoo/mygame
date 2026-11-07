@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ItemUseDefinition" load_steps=3 format=3]
+[ext_resource type="Script" path="res://gameplay/items/item_use_definition.gd" id="1"]
+[ext_resource type="Resource" path="res://content/spell_operations/payloads/paralytic.tres" id="payload"]
+[resource]
+script = ExtResource("1")
+id = "paralytic_sprayer"
+kind = 2
+payload = ExtResource("payload")
+duration = 1.2
+stamina = 0.0

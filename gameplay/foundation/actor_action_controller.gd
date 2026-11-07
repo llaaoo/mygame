@@ -23,7 +23,9 @@ var _move_age := 0.0
 var _buffer: Action
 var _buffer_time := 0.0
 var needs:=SurvivalNeeds.new()
+var input_suppressed := 0.0
 var operation_id := 0
+var attack_weapon_uid := ""
 func active() -> bool:
 	return context and context.rules and context.rules.tactical_combat
 func busy() -> bool: return mode!="idle"
@@ -33,7 +35,8 @@ func _physics_process(delta: float) -> void:
 	if "ui_blocked" in context.actor and context.actor.ui_blocked:
 		clear_input()
 		return
-	if input_provider.is_valid():
+	input_suppressed=maxf(0,input_suppressed-delta)
+	if input_provider.is_valid() and input_suppressed==0:
 		movement=Vector2.ZERO
 		for action: Action in input_provider.call(): try_action(action)
 	advance(delta)
@@ -44,6 +47,11 @@ func try_action(action: Action) -> OperationResult:
 	var buffs:=actor.get_node_or_null("BuffManager") as BuffManager
 	if buffs and buffs.prevents_actions(): return OperationResult.reject("controlled")
 	if "ui_blocked" in actor and actor.ui_blocked: return OperationResult.reject("interface")
+	# Keep the input adapter lossless. Only execution discards an unmatched UI release.
+	if action.action_type==Action.ActionType.CAST and action.params.get("release",false) and "casting" in actor:
+		var casting: PlayerCastingController=actor.casting
+		if not casting.aiming_sources.has(action.skill_source) and casting._channeling_source!=action.skill_source and not casting._charge_source_matches(action.skill_source): return OperationResult.reject("unpaired_release")
+	if mode=="spray" and action.action_type in [Action.ActionType.DODGE,Action.ActionType.MELEE,Action.ActionType.HEAVY_ATTACK]: context.spray.stop()
 	if mode=="item" and (action.action_type in [Action.ActionType.MELEE,Action.ActionType.HEAVY_ATTACK,Action.ActionType.DODGE,Action.ActionType.CAST] or action.action_type==Action.ActionType.MOVE and action.direction.length_squared()>.01): cancel("other_action")
 	match action.action_type:
 		Action.ActionType.MOVE:
@@ -76,13 +84,15 @@ func try_action(action: Action) -> OperationResult:
 		Action.ActionType.USE_ITEM:
 			if busy() or not item_request.is_valid(): return OperationResult.reject("busy")
 			if not item_request.call(action.skill_id): return OperationResult.reject("unavailable")
-			mode="item"; elapsed=0; remaining=SurvivalCatalog.FOODS[action.skill_id].seconds; movement=Vector2.ZERO
+			if not context.item_actions.busy() and SurvivalCatalog.FOODS.has(action.skill_id):
+				mode="item"; elapsed=0; remaining=SurvivalCatalog.FOODS[action.skill_id].seconds; movement=Vector2.ZERO
 			return OperationResult.success()
 		Action.ActionType.MELEE,Action.ActionType.HEAVY_ATTACK:
 			if busy(): return _queue(action)
 			var equipment:=actor.get_node_or_null("EquipmentManager") as EquipmentManager
 			var weapon:=equipment.get_equipment(EquipmentData.SlotType.RIGHT_HAND) if equipment else null
 			profile=weapon.attack_profile if weapon and weapon.attack_profile else AttackProfile.new()
+			attack_weapon_uid=str(context.items.equipped(context.id).get(str(EquipmentData.SlotType.RIGHT_HAND),""))
 			if action.action_type==Action.ActionType.HEAVY_ATTACK: profile=profile.heavy()
 			if not stamina.spend(profile.stamina_cost*burden_cost()*activity_efficiency(SkillMastery.School.MELEE)): return OperationResult.reject("stamina")
 			_cancel_work(); _cancel_cast()
@@ -141,7 +151,7 @@ func advance(delta: float) -> void:
 			elapsed=minf(elapsed,profile.windup+profile.active)
 			_scan_contacts()
 			elapsed=after
-		if remaining==0:
+		if remaining==0 and mode not in ["aim_item","spray"] and not (mode=="item" and context.item_actions.busy()):
 			if mode=="stagger": stability.recovered()
 			mode="idle"
 			if _buffer and _buffer_time>0:
@@ -152,6 +162,7 @@ func advance(delta: float) -> void:
 	var factor:=burden_speed()
 	if guarding: factor*=.4
 	if mode=="attack": factor*=profile.movement_multiplier
+	if mode=="spray": factor*=.45
 	if mode in ["stagger","item"]: factor=0
 	var direction:=movement
 	if mode=="dodge": direction=facing; speed=600; factor=burden_speed()
@@ -197,6 +208,12 @@ func contact(target: Node2D) -> HitResult:
 		if not imbued.is_empty(): ActorCombatModel.apply_melee_surface(target,tags)
 	var skill:=SkillData.new()
 	skill.id="weapon_contact"
+	var weapon_uid: String=context.items.equipped(context.id).get(str(EquipmentData.SlotType.RIGHT_HAND),"")
+	var coating:=context.items.coating(weapon_uid) if weapon_uid==attack_weapon_uid else null
+	if coating:
+		tags.append_array(coating.payload.tags)
+		skill.contact_statuses=coating.payload.statuses.duplicate()
+		ActorCombatModel.apply_melee_surface(target,tags)
 	skill.tags=tags
 	var damage:=roundi(float(context.actor.get("attack_damage") if "attack_damage" in context.actor else context.actor.combat_component.attack_damage)*profile.damage_multiplier)
 	var result:=CombatExecutor.report_hit(context.actor,target,damage,target.global_position,skill,tags,_family,profile.impact)
@@ -229,6 +246,8 @@ func defend(hit: HitContext,result: HitResult,impact: float) -> void:
 		var duration:=stability.receive(impact)
 		if duration>0: interrupt(duration)
 func interrupt(seconds: float) -> void:
+	if context.item_actions: context.item_actions.cancel()
+	if context.spray: context.spray.stop()
 	_cancel_work(); _cancel_cast()
 	clear_input()
 	var duration:=maxf(seconds,remaining if mode=="stagger" else 0.0)

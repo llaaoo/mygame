@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="SpellPayloadData" load_steps=3 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/operations/spell_payload_data.gd" id="data"]
+[ext_resource type="Resource" path="res://content/spell_operations/energy/ward.tres" id="effect"]
+[resource]
+script = ExtResource("data")
+id = "extract_ward"
+title = "守护阵充能"
+effect = ExtResource("effect")
+source_kind = "field"
+source_field = "ward"

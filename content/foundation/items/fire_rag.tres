@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/item_data.gd" id="1"]
+[ext_resource type="Resource" path="res://content/item_uses/fire_rag.tres" id="use"]
+[resource]
+script = ExtResource("1")
+id = "fire_rag"
+display_name = "火焰抹布"
+description = "使用后涂附当前武器60秒；移动、攻击或受伤打断。"
+use_profile = ExtResource("use")
+weight = 0.3
+stackable = true
+max_stack = 20

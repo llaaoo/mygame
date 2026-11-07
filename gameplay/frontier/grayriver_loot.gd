@@ -85,9 +85,9 @@ func _take_and_show(id: String, kind: String, item: String) -> void:
 	inspect(id)
 	game.ui.notify("已收好战利品；容量不足的物品留在原地。" if taken > 0 else "未取走物品：背包或水囊已满，或已不在遗骸附近。")
 
-func take(id: String, kind := "", item_id := "") -> int:
+func take(id: String, kind := "", item_id := "",uid := "") -> int:
 	if not _available(id) or kind not in ["","equipment","materials"]: return 0
-	if game.rules.physical_inventory: return _take_instances(id,kind,item_id)
+	if game.rules.physical_inventory: return _take_instances(id,kind,item_id,uid)
 	var record: Dictionary = game.progress.loot_records[id]
 	var taken := 0
 	var supplies := game.survival.supplies
@@ -152,7 +152,7 @@ func _refresh_record(id: String) -> void:
 		for entry in store.entries(source):
 			var kind: String="equipment" if store.definitions.get(entry.definition) is EquipmentData else "materials"
 			record[kind][entry.definition]=int(record[kind].get(entry.definition,0))+entry.quantity
-func _take_instances(id: String,kind: String,key: String) -> int:
+func _take_instances(id: String,kind: String,key: String,selected_uid := "") -> int:
 	_ensure_source(id)
 	var store:=game.session.inventory
 	var taken:=0
@@ -161,6 +161,7 @@ func _take_instances(id: String,kind: String,key: String) -> int:
 	sources.append(id+".gear")
 	for source in sources:
 		for entry in store.entries(source):
+			if not selected_uid.is_empty() and entry.uid!=selected_uid: continue
 			var category: String="equipment" if store.definitions.get(entry.definition) is EquipmentData else "materials"
 			if not kind.is_empty() and kind!=category or not key.is_empty() and key!=entry.definition: continue
 			var destinations: Array[String]=[]
@@ -181,3 +182,15 @@ func _take_instances(id: String,kind: String,key: String) -> int:
 		game.survival.supplies.changed.emit()
 		game._save_progress()
 	return taken
+
+func instance_entries(id: String) -> Array[Dictionary]:
+	_ensure_source(id)
+	var result: Array[Dictionary]=[]
+	var store:=game.session.inventory
+	var sources:=store.actor_containers(id); sources.append(id+".gear")
+	for source in sources:
+		for row in store.entries(source):
+			var definition:=store.definitions.get(row.definition) as ItemData
+			if not definition: continue
+			result.append({"id":"uid:"+row.uid,"uid":row.uid,"kind":"equipment" if definition is EquipmentData else "materials","item":row.definition,"title":definition.display_name,"text":definition.description,"subtitle":"×%d · %s"%[row.quantity,store.state_text(row.uid)],"icon":definition.get_icon_texture() if definition is EquipmentData else definition.icon})
+	return result

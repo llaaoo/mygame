@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="SpellPayloadData" load_steps=3 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/operations/spell_payload_data.gd" id="data"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/focus_data.tres" id="effect"]
+[resource]
+script = ExtResource("data")
+id = "basic"
+title = "纯粹凝神"
+effect = ExtResource("effect")

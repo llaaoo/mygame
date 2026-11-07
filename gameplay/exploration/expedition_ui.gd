@@ -245,8 +245,10 @@ func show_panel(title: String, text: String, buttons: Array[Dictionary], locked:
 	body.add_theme_color_override("default_color", GameUIStyle.TEXT_MAIN)
 	body.add_theme_constant_override("line_separation", 5)
 	scroll.add_child(body)
+	var body_ref: WeakRef=weakref(body)
 	scroll.resized.connect(func():
-		if is_instance_valid(body): body.custom_minimum_size.x = maxf(1, scroll.size.x - 20))
+		var current:=body_ref.get_ref() as RichTextLabel
+		if current: current.custom_minimum_size.x = maxf(1, scroll.size.x - 20))
 	var button_host: Container = box
 	if buttons.size() > 3:
 		var grid := GridContainer.new()
@@ -255,6 +257,7 @@ func show_panel(title: String, text: String, buttons: Array[Dictionary], locked:
 		grid.add_theme_constant_override("v_separation", 8)
 		if buttons.size() > 6:
 			var button_scroll := ScrollContainer.new()
+			button_scroll.follow_focus=true
 			button_scroll.custom_minimum_size.y = 176
 			box.add_child(button_scroll)
 			grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL

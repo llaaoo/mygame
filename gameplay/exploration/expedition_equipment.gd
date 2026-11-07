@@ -46,10 +46,17 @@ func sync() -> void:
 		if game.catalog.equipment.has(item.id) and game.progress.equipment_owned.get(item.id, false):
 			game.progress.equipment_loadout[str(item.slot_type)] = item.id
 
-func equip(id: String) -> bool:
+func equip(id: String,uid := "") -> bool:
 	if not change_reason().is_empty() or count(id) <= 0 or not game.catalog.equipment.has(id):
 		return false
 	if not _fits_loadout(game.catalog.equipment[id].slot_type,game.catalog.equipment[id]): return false
+	if not uid.is_empty() and game.player.inventory.store:
+		var store:=game.player.inventory.store
+		var item:=store.item(uid)
+		if not item or item.definition_id!=id or not store.locate(uid).begins_with("player."): return false
+		if not store.equip("player",uid).accepted: return false
+		game._save_progress()
+		return true
 	if not _manager().equip(game.catalog.equipment[id]):
 		return false
 	_reconcile_inventory()

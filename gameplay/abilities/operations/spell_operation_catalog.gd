@@ -29,8 +29,10 @@ func validation_errors() -> Array[String]:
 			if not medium or medium.id.is_empty() or payload_ids.has(medium.id):
 				errors.append("Duplicate/invalid payload"); continue
 			payload_ids[medium.id]=true
+			if medium.source_kind not in ["","field","soul"]: errors.append("Unknown source kind")
+			if medium.source_kind=="field" and medium.source_field not in ["arcane","fire","frost","storm","ward"]: errors.append("Unknown rune source")
 			if not entry.action.field_type.is_empty() and medium.field_type.is_empty(): errors.append("Inscription payload needs a field type")
-			if entry.action.field_type.is_empty() and medium.material_id.is_empty(): errors.append("Dispersal cannot invent a substance")
+			if entry.action.operation_id=="disperse" and medium.material_id.is_empty(): errors.append("Dispersal cannot invent a substance")
 			if not medium.surface.is_empty() and medium.surface not in SurfaceCatalog.STATE_IDS: errors.append("Unknown payload surface")
 			for status in medium.statuses:
 				if not status is Buff or status.status_id.is_empty() or not is_finite(status.duration) or status.duration<=0 or status.tick_damage<0: errors.append("Invalid payload status")

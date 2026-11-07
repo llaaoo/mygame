@@ -33,5 +33,6 @@ func _process(_delta: float) -> void:
 	stability_bar.value=context.actions.stability.current
 	var weight:=context.items.weight(context.id) if context.items else 0.0
 	var pack: bool=context.items and context.items.containers.has(context.id+".pack") and context.items.containers[context.id+".pack"].attached
-	var state: String={"idle":"就绪","attack":"攻击中","dodge":"闪避中","stagger":"失衡","item":"使用物品"}.get(context.actions.mode,"")
+	var state: String={"idle":"就绪","attack":"攻击中","dodge":"闪避中","stagger":"失衡","item":"使用物品","aim_item":"瞄准 · 松开出手","spray":"喷洒中 · 松开即停","recovery":"动作恢复"}.get(context.actions.mode,"")
+	if context.spray and context.spray.active: state+=" · "+context.items.state_text(context.spray.uid)
 	detail.text="%.1f / %.0fkg · %s · %s"%[weight,context.rules.carry_limit,"背包随身" if pack else "背包已放下",state]

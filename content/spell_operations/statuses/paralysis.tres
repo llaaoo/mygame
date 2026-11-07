@@ -9,4 +9,5 @@ category = 3
 tick_interval = 1.0
 tick_damage = 0
 prevents_actions = true
+control_recovery = 2.0
 speed_multiplier = 0.0

@@ -17,6 +17,9 @@ extends Resource
 @export var field_duration := 15.0
 @export var extra_mana := 0
 @export var color := Color.WHITE
+@export var effect: SkillData
+@export var source_field := ""
+@export var source_kind := ""
 func describe() -> String:
 	var text:=description
 	if damage>0: text+="\n直接伤害 %d"%damage

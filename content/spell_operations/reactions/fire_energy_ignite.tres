@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="SpellCombinationRule" load_steps=3 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/combinations/spell_combination_rule.gd" id="rule"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/fireball_data.tres" id="result"]
+[resource]
+script = ExtResource("rule")
+id = "fire_energy_ignite"
+trigger_action_id = "ignite"
+result_skill = ExtResource("result")
+required_caster_status = "stored_fire"
+consume_caster_status = true
+consume_stacks = 1
+requires_empower = true
+priority = 25
+mana_cost = 10
+cooldown = 2.0

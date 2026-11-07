@@ -4,6 +4,7 @@ extends Node
 signal buffs_changed
 enum RemovalReason { EXPIRED, CONSUMED, DISPELLED, REPLACED, REGION_CLEANUP, RESTORED }
 
+var _control_immunity: Dictionary={}
 var _instances: Array[StatusInstance] = []
 var _status_versions: Dictionary = {}
 var _serial := 0
@@ -25,6 +26,9 @@ func _register_with_simulation() -> void:
 
 
 func tick(delta: float) -> void:
+	for key in _control_immunity.keys():
+		_control_immunity[key]=maxf(0,float(_control_immunity[key])-delta)
+		if _control_immunity[key]==0: _control_immunity.erase(key)
 	for instance: StatusInstance in _instances.duplicate():
 		if instance not in _instances:
 			continue
@@ -41,19 +45,20 @@ func tick(delta: float) -> void:
 				_remove(instance, RemovalReason.EXPIRED)
 
 func apply_buff(buff: Buff, source: Node2D = null, skill: SkillData = null) -> bool:
-	if not buff or is_immune(buff.status_id):
+	if not buff or is_immune(buff.status_id) or buff.prevents_actions and has_buff(buff.status_id):
 		return false
 	for status in buff.cleanse_statuses:
 		remove_status(status, RemovalReason.DISPELLED)
 	_touch_status(buff.status_id)
 	if not buff.exclusive_group.is_empty():
 		for instance: StatusInstance in _instances.duplicate():
-			if instance.definition.exclusive_group == buff.exclusive_group:
+			if instance.definition.exclusive_group == buff.exclusive_group and instance.definition.get_runtime_id()!=buff.get_runtime_id():
 				_remove(instance, RemovalReason.REPLACED)
 	var existing := _find(buff.get_runtime_id())
 	if not buff.status_id.is_empty():
 		existing = _find(buff.status_id)
 	if existing and buff.stack_behavior != Buff.StackBehavior.INDEPENDENT:
+		existing.definition=buff
 		if buff.stack_behavior == Buff.StackBehavior.INTENSITY:
 			existing.stacks = mini(stack_limit(existing.definition), existing.stacks + 1)
 		existing.remaining = buff.duration
@@ -85,6 +90,7 @@ func remove_buff(buff: Buff, reason: RemovalReason = RemovalReason.DISPELLED) ->
 func _remove(instance: StatusInstance, reason: RemovalReason) -> void:
 	if instance not in _instances:
 		return
+	if instance.definition.control_recovery>0 and reason not in [RemovalReason.REPLACED,RemovalReason.RESTORED,RemovalReason.REGION_CLEANUP]: _control_immunity[instance.definition.status_id]=instance.definition.control_recovery
 	_instances.erase(instance)
 	_touch_status(instance.definition.status_id)
 	_rebuild_attributes()
@@ -129,7 +135,7 @@ func restore_status_snapshot(snapshot: Dictionary) -> void:
 
 func begin_transaction() -> void:
 	assert(not _in_transaction)
-	_transaction_snapshot = {"instances": _instances.map(_snapshot), "versions": _status_versions.duplicate()}
+	_transaction_snapshot = {"control_immunity":_control_immunity.duplicate(),"instances": _instances.map(_snapshot), "versions": _status_versions.duplicate()}
 	_in_transaction = true
 	_events.clear()
 	_changed = false
@@ -147,6 +153,7 @@ func finish_transaction(commit: bool) -> Callable:
 			instance.stacks = snapshot.stacks
 			instance.elapsed = snapshot.elapsed
 			_instances.append(instance)
+		_control_immunity=_transaction_snapshot.get("control_immunity",{}).duplicate()
 		_status_versions = _transaction_snapshot.versions
 		_rebuild_attributes()
 		_health_dirty = false
@@ -314,6 +321,7 @@ func clear_all(reason: RemovalReason = RemovalReason.DISPELLED) -> void:
 		_remove(instance, reason)
 
 func clear_temporary() -> void:
+	_control_immunity.clear()
 	for instance: StatusInstance in _instances.duplicate():
 		if not instance.definition.persistent:
 			_remove(instance, RemovalReason.REGION_CLEANUP)
@@ -335,6 +343,7 @@ func stack_limit(buff: Buff) -> int:
 	return maxi(1, buff.max_stacks + extra)
 
 func is_immune(status: String) -> bool:
+	if _control_immunity.has(status): return true
 	if status.is_empty():
 		return false
 	if status == "burning" and get_parent().is_in_group("fire_immune"):

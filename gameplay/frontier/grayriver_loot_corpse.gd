@@ -19,6 +19,11 @@ func refresh() -> void:
 	var empty: bool = record.equipment.is_empty() and record.materials.is_empty()
 	set_title(record.title + (" · 已搜空" if empty else " · 搜刮"))
 	gear.items.clear()
+	gear.inventory_store=service.game.session.inventory
+	gear.display_uids.clear()
+	var sources:=gear.inventory_store.actor_containers(loot_id); sources.append(loot_id+".gear")
+	for source in sources:
+		for row in gear.inventory_store.entries(source): gear.display_uids.append(row.uid)
 	for id in record.equipment:
 		if service.game.catalog.equipment.has(id): gear.items.append(service.game.catalog.equipment[id])
 	gear.queue_redraw()

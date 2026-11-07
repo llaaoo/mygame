@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/item_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "cloth"
+display_name = "布料"
+description = "制作涂附抹布；来自真实补给和行囊。"
+stackable = true
+max_stack = 99
+weight = 0.1

@@ -24,6 +24,7 @@ enum StackBehavior { REFRESH, INTENSITY, INDEPENDENT }
 @export var tick_heal: int = 0
 @export var tick_damage: int = 0
 @export var tick_damage_scaling: float = 0.0
+@export var control_recovery := 0.0
 @export var prevents_actions := false
 @export var speed_multiplier: float = 1.0
 @export var damage_taken_multiplier: float = 1.0

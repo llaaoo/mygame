@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/item_data.gd" id="1"]
+[ext_resource type="Resource" path="res://content/item_uses/resin_sprayer.tres" id="use"]
+[resource]
+script = ExtResource("1")
+id = "resin_sprayer"
+display_name = "树脂喷剂"
+description = "每瓶3剂；按住喷洒技能持续喷射，余量跟随此瓶保存。"
+use_profile = ExtResource("use")
+weight = 0.3
+stackable = false
+max_stack = 1

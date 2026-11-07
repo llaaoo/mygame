@@ -66,9 +66,13 @@ func _process(delta: float) -> void:
 	_belt_grid.visible=not game.player.field_work.panel.visible
 	interact.get_parent().visible=false
 	for i in range(4):
-		var count:=game.survival.supplies.count(FOODS[i])
-		belt[i].text="%s %s\n×%d"%[["7","8","9","0"][i],["食","水","茶","汤"][i],count]
+		var binding: Dictionary=game.session.belt[i]
+		var id: String=binding.id
+		var count:=game.survival.supplies.count(id)
+		belt[i].text="%s %s\n×%d"%[["7","8","9","0"][i],game.survival.supplies.title(id),count]
 		belt[i].disabled=count==0 or game.player.health_component.is_dead
+		var definition:=game.session.inventory.definitions.get(id) as ItemData
+		belt[i].tooltip_text=(definition.description if definition else "")+("\n按住瞄准，松开投掷；右键或Esc取消" if binding.method=="throw" else "")
 	var goal:=game.guidance.tracked()
 	tracker.text="Tab 远征面板\n选择一个委托开始追踪" if goal.is_empty() else "正在追踪\n"+goal.title
 	if not goal.is_empty():
@@ -85,13 +89,22 @@ func _process(delta: float) -> void:
 		var title: String=target.title if "title" in target else target.enemy_name if target is Enemy else target.spec.title if target is SpellWorldObject else "调查"
 		interact.text="E  "+title
 func _unhandled_input(event: InputEvent) -> void:
-	if not event is InputEventKey or not event.pressed or event.echo or game.ui.modal_locked: return
-	if event.keycode==KEY_F and is_instance_valid(game.ui.modal) and game.ui.modal.get_meta("frontier_page","")=="loot":
-		game.hub.take_all()
-		get_viewport().set_input_as_handled()
+	if not event is InputEventKey or event.echo or game.ui.modal_locked: return
+	if event.pressed and event.keycode==KEY_F and is_instance_valid(game.ui.modal) and game.ui.modal.get_meta("frontier_page","")=="loot":
+		game.hub.take_all(); get_viewport().set_input_as_handled()
 	elif not get_tree().paused and event.keycode in KEYS:
-		use(KEYS.find(event.keycode))
+		var index:=KEYS.find(event.keycode)
+		var binding: Dictionary=game.session.belt[index]
+		if binding.method=="throw":
+			if event.pressed: game.player.actor_context.item_actions.begin(binding.id,true,game.player.get_mouse_direction())
+			else: game.player.actor_context.item_actions.confirm()
+		elif event.pressed: use(index)
 		get_viewport().set_input_as_handled()
 func use(index: int) -> void:
 	if index<0 or index>=4 or get_tree().paused or game.player.health_component.is_dead or game.player.ui_blocked or game.player.field_work.is_busy(): return
-	if game.survival.supplies.count(FOODS[index])>0: game.survival.begin_eating(FOODS[index])
+	var binding: Dictionary=game.session.belt[index]
+	var definition:=game.session.inventory.definitions.get(binding.id) as ItemData
+	if definition and definition.use_profile:
+		if binding.method=="throw": game.player.actor_context.item_actions.begin(binding.id,true,game.player.get_mouse_direction())
+		else: game.session.begin_item("player",binding.id)
+	elif game.survival.supplies.count(binding.id)>0: game.survival.begin_eating(binding.id)

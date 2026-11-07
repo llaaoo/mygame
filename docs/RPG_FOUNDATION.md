@@ -96,3 +96,5 @@ V 格挡要求实际持有武器或盾、检查正面方向、消耗体力；盾
 - 方向锁定修正提交 `8c449b53aabbad094d5df28fdddcd590aaaeb388`：再次从提交归档、空缓存导入，inventory/combat/systems/startup **4/4** 通过，覆盖未按格挡轮询不改变攻击/翻滚方向；日志 `/tmp/mygame-tests-jega5t2p`。
 - 同一修正提交的归档源码在正常模拟与 AI 开启的图形环境运行 `capture_rpg_foundation.gd` 通过：实际移动/重击输入、体力扣除和敌人响应均通过断言。界面检查包括小窗口装备与设置、真实鼠标启动作业；已修复体力标签挤压。
 - `git diff --check` 通过。云端验证完成；仓库未加入或启用 GitHub Actions 工作流。未生成新的桌面发布包。
+
+2026-11-07：新增 [物品动作、喷洒与真实来源](./ITEM_ACTIONS_AND_REACTIONS.md)，描述共用物品执行器、逐瓶余量、武器涂层、明确来源与临时能量的职责和验证。

@@ -11,9 +11,23 @@ func payload(id: String) -> SpellPayloadData:
 		if entry.id==id: return entry
 	return null
 func compose(entry: SpellPayloadData) -> SkillData:
-	var result:=action.create_runtime_variant()
+	var result: SkillData=(entry.effect if entry.effect else action).create_runtime_variant()
 	result.id=action.get_id()+"."+entry.id
 	result.display_name=action.display_name+" · "+entry.title
+	result.required_material=""
+	result.mp_cost=action.mp_cost
+	result.preparation=action.preparation
+	result.cooldown=action.cooldown
+	result.requires_soul_remnant=entry.source_kind=="soul"
+	if entry.effect:
+		if action.operation_id=="extract" and result.buff_resource:
+			result.buff_resource=result.buff_resource.duplicate() as Buff
+			result.buff_resource.set_meta("definition_path",entry.effect.buff_resource.resource_path)
+			result.buff_resource.exclusive_group="stored_energy"
+			if entry.source_kind!="soul": result.buff_resource.capacity_key=""
+			result.buff_resource.max_stacks=3
+		result.operation_id=""
+		return result
 	result.tags=entry.tags.duplicate()
 	result.damage=entry.damage
 	result.damage_scaling=entry.damage_scaling

@@ -115,15 +115,27 @@ func show_payloads(skill: SkillData) -> void:
 	for payload in operation.payloads:
 		var unlocked:=manager.knows_action(skill)
 		var cost:="无需材料" if payload.material_id.is_empty() else supplies.describe_cost({payload.material_id:payload.quantity})
+		if payload.source_kind=="field": cost="消耗脚下"+FireSigil.title_for(payload.source_field)+"的1次实际充能"
+		if payload.source_kind=="soul": cost="消耗附近的1个真实残魂"
+		if skill.operation_id=="disperse": cost="每0.5秒：2 MP＋该瓶1剂；每瓶3剂"
 		if supplies.inventory_store and not payload.material_id.is_empty(): cost+=" · 口袋%d"%supplies.inventory_store.count(supplies.actor_id,payload.material_id,false,true)
 		text+="\n"+payload.title+("（尚未学会）" if not unlocked else "")+"\n"+cost+(" · 额外%d MP"%payload.extra_mana if payload.extra_mana>0 else "")+"\n"+payload.describe()+"\n"
 		var current:=str(supplies.selected.get(skill.get_id(),operation.default_payload))==payload.id
 		buttons.append({"title":("✓ 当前：" if current else "选择：")+payload.title,"disabled":not unlocked,"focused":current,"callback":_select_payload.bind(skill,payload.id)})
-	text+="\n每次手动施放成功才消耗口袋实物；选定介质会保留，方便连续施放。离区/死亡/读档清除选择。物资不足不会自动换成别的介质。N可在安全时整理物资。喷洒清水会减少饮水库存；毒地可以被清洗或点燃。"
+	for material: CastingMaterialData in supplies.catalog.values():
+		if not material.supports(skill.get_id(),plan.skill.get_id(),plan.skill): continue
+		var current:=str(supplies.modifiers.get(skill.get_id(),""))==material.id
+		buttons.append({"title":("✓ 本次修饰：" if current else "本次修饰：")+material.title,"callback":_select_modifier.bind(skill,material.id)})
+	if supplies.modifiers.has(skill.get_id()): buttons.append({"title":"清除本次修饰","callback":_select_modifier.bind(skill,"")})
+	text+="\n每次手动施放成功才消耗口袋实物；选定介质会保留，方便连续施放。离区/死亡/读档清除选择。物资不足不会自动换成别的介质。N可在安全时整理物资。喷剂需先制造：清水喷剂使用制造时装入的水，不会直接吸走水囊；按住技能键喷洒，松开即停。毒地可以被清洗或点燃。"
 	buttons.append({"title":"返回材料总览","callback":show_materials})
 	game.ui.show_panel("释放介质："+skill.display_name,text,buttons)
 
 func _select_payload(skill: SkillData,id: String) -> void:
 	var manager: SkillManager=game.player.skill_manager
 	manager.combinations.supplies.select_payload(skill,id,manager)
+	show_payloads(skill)
+
+func _select_modifier(skill: SkillData,id: String) -> void:
+	game.player.skill_manager.combinations.supplies.configure_modifier(skill,id)
 	show_payloads(skill)

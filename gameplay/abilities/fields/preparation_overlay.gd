@@ -35,6 +35,8 @@ func _process(delta: float) -> void:
 	_guard = buffs.has_buff("resonant_guard")
 	_label.text = ""
 	for entry in buffs.get_active_buff_entries():
+		if entry.status_id.begins_with("stored_"):
+			_label.text += "%s %d/3 %.0fs " % [entry.name,entry.stacks,entry.remaining]
 		if entry.status_id in ["echo_ready", "resonant_guard"]:
 			_label.text += "%s %.0fs " % ["回响" if entry.status_id == "echo_ready" else "护盾", entry.remaining]
 	if _souls > 0:
