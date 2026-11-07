@@ -81,3 +81,9 @@ SkillManager：Action / 旧ID编组适配
 ![统一铭刻的介质选择](playtests/material_inscription.png)
 ![960×600喷洒介质选择](playtests/material_spray_small.png)
 ![实际快捷键喷洒与库存消费](playtests/material_spray_release.png)
+
+## 2026-11-07 验证结果
+
+- 实现提交 `095374c925b01aa873a436f276e1890810d22198` 以 `git archive` 导出到新目录，不带 `.godot` 缓存；首次导入通过，完整回归 **63/63** 通过。云日志目录：`/tmp/mygame-tests-af3obatv`。
+- 同一归档提交运行图形探针通过：真实鼠标选材不扣物品，键盘焦点跟随当前选择，960×600布局可操作；关闭菜单后实际 `skill_5` 输入完成麻痹喷洒，消耗一份真实药剂和6 MP。图形日志：`/tmp/material-ops-cold-graphics.log`。
+- 回归包含纯内容/地理入口退出清理，没有残留资源诊断。`git diff --check` 通过；GitHub Actions 未启用，未生成桌面发布包。
