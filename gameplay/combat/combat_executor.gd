@@ -2,6 +2,7 @@ class_name CombatExecutor
 extends Node
 signal damage_applied(source: Node2D, target: Node2D, amount: int)
 signal harmful_contact_applied(source: Node2D,target: Node2D)
+signal defense_resolved(target: Node2D,outcome: Dictionary)
 ## 战斗执行器 — 唯一控制流入口
 ##
 ## 原则（Single Authority Rule）：
@@ -87,7 +88,7 @@ static func report_hit(caster: Node2D, target: Node2D, damage: int, position: Ve
 	var capabilities:=target.get("actor_context") as ActorContext if "actor_context" in target else null
 	if capabilities and capabilities.actions and result.damage_accepted:
 		capabilities.actions.defend(context,result,impact if impact>0 else skill.impact_power if skill and skill.impact_power>0 else 35.0 if "impact" in context.tags else 0.0)
-		if not result.accepted: return result
+		if not result.accepted: return _complete_defense(target,result)
 	var before := health.hp if health else 0
 	if health:
 		health.begin_hit_group(family_id, context.periodic)
@@ -118,6 +119,15 @@ static func report_hit(caster: Node2D, target: Node2D, damage: int, position: Ve
 	if instance:
 		instance._current_family = previous_family
 		instance._current_hit = previous_hit
+	return _complete_defense(target,result)
+
+
+static func _complete_defense(target: Node2D,result: HitResult) -> HitResult:
+	# Presentation observes final outcomes after hit-group/resource settlement.
+	if instance and (result.blocked or result.guard_broken or result.rejection=="dodge"):
+		var outcome: Dictionary={"blocked":result.blocked,"guard_broken":result.guard_broken,"dodged":result.rejection=="dodge","damage":result.damage_dealt}
+		outcome.make_read_only()
+		instance.defense_resolved.emit(target,outcome)
 	return result
 
 

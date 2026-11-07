@@ -11,6 +11,10 @@ func run() -> void:
 	var game:=await fixture.boot()
 	var player:=game.player
 	var controls:=player.actor_context.actions
+	var outcomes: Array[Dictionary]=[]
+	CombatExecutor.instance.defense_resolved.connect(func(_target: Node2D,outcome: Dictionary):
+		check(outcome.is_read_only(),"Defense outcome exposes mutable presentation facts")
+		outcomes.append({"fact":outcome,"hp":player.health_component.hp,"stamina":controls.stamina.current}))
 	player.get_node("ActorComponents").process_mode=Node.PROCESS_MODE_DISABLED
 	var target:=game.active_enemies[0]
 	player.position=Vector2(-3500,2000); target.position=player.position+Vector2(40,0)
@@ -40,6 +44,8 @@ func run() -> void:
 	controls.elapsed=.12
 	var avoided:=CombatExecutor.report_hit(target,player,10,player.position,null,["melee"],"dodge-test",20)
 	check(not avoided.accepted and avoided.rejection=="dodge","Dodge window did not reject direct contact")
+	check(outcomes.size()==1 and outcomes.back().fact.dodged,"Physical dodge produced no final feedback fact")
+	check(game.region_root.find_children("*","Label",true,false).any(func(label): return label.text=="闪避"),"Dodge feedback never reached the current world")
 	controls.cancel()
 	# Grant a real shield, then equip its instance through the normal service.
 	game.session.inventory.receive("player","river_shield",1)
@@ -53,6 +59,7 @@ func run() -> void:
 	var before:=player.health_component.hp
 	hit=CombatExecutor.report_hit(target,player,15,player.position,null,["melee"],"guard-test",20)
 	check(hit.blocked and hit.damage_dealt==0 and player.health_component.hp==before and controls.stamina.current==92,"Frontal shield block did not trade impact for stamina")
+	check(outcomes.back().fact.blocked and outcomes.back().fact.damage==0 and outcomes.back().stamina==92 and outcomes.back().hp==before,"Block feedback published before final cost/health")
 	target.position=player.position+Vector2(-40,0)
 	player.health_component.invincible=false
 	hit=CombatExecutor.report_hit(target,player,15,player.position,null,["melee"],"rear-test",20)
@@ -62,6 +69,10 @@ func run() -> void:
 	controls.cancel(); controls.stamina.current=1; controls.try_action(guard)
 	hit=CombatExecutor.report_hit(target,player,10,player.position,null,["melee"],"break-test",40)
 	check(hit.guard_broken and controls.mode=="stagger" and controls.stamina.current==0,"Insufficient stamina did not break guard")
+	check(outcomes.back().fact.guard_broken and outcomes.back().hp==player.health_component.hp and outcomes.back().fact.damage==hit.damage_dealt,"Guard break feedback is not the final damage outcome")
+	var view: ActorStatusView=game.get_node("HUDLayer")._actor_status
+	view._process(.01)
+	check(view.detail.visible and "失衡" in view.detail.text,"Compact HUD hid the control lock after a guard break")
 	controls.cancel(); controls.stability.current=10; controls.stability.grace=0
 	player.health_component.invincible=false
 	hit=CombatExecutor.report_hit(target,player,1,player.position,null,["melee"],"knockdown",20)
@@ -73,6 +84,11 @@ func run() -> void:
 	controls.stamina.current=100
 	check(controls.try_action(heavy).accepted and controls.profile.damage_multiplier==1.5 and controls.stamina.current==76,"Heavy attack did not use profile costs")
 	controls.cancel()
+	seed(927)
+	var expected_random:=randf()
+	seed(927)
+	DamageNumber.spawn_reaction(game.region_root,"格挡",player.global_position)
+	check(randf()==expected_random,"Cosmetic combat text advanced gameplay RNG")
 	await fixture.close()
 	if failures.is_empty(): print("PASS foundation combat: acceptance costs, windup, one-hit family, dodge, facing guard, guard break and impact recovery")
 	quit(0 if failures.is_empty() else 1)

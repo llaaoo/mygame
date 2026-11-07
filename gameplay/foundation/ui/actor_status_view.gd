@@ -40,4 +40,9 @@ func _process(_delta: float) -> void:
 	if context.spray and context.spray.active: state+=" · "+context.items.state_text(context.spray.uid)
 	detail.text="%.1f / %.0fkg · %s · %s"%[weight,context.rules.carry_limit,"背包随身" if pack else "背包已放下",state]
 	tooltip_text=detail.text
-	if compact: detail.visible=not pack or weight>context.rules.carry_limit
+	if compact:
+		var constrained:=context.actions.mode in ["stagger","recovery","item","aim_item","spray"]
+		detail.visible=constrained or not pack or weight>context.rules.carry_limit
+		if constrained:
+			detail.text=state
+			if context.actions.mode in ["stagger","recovery"]: detail.text+=" · %.1f秒"%context.actions.remaining

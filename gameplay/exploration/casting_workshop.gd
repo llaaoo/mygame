@@ -46,7 +46,7 @@ func _source_detail(screen: ExpeditionScreen,skill: SkillData) -> void:
 	var configure:=FoundationWidgets.button("配置："+skill.display_name,show_action.bind(skill))
 	configure.icon=GameUIStyle.icon("chevron-right"); configure.expand_icon=true; configure.add_theme_constant_override("icon_max_width",18)
 	screen.detail.add_child(configure)
-	FoundationWidgets.disclosure(screen.detail,"来源与消耗规则","选择不扣物资。成功释放才结算真实来源；耗尽或失效会拒绝，不自动换料。K可将来源固定到单个快捷槽，M只设置未固定槽位的本次选择。组合条件需亲手准备，额外修饰只作用于一次施法。")
+	FoundationWidgets.disclosure(screen.detail,"来源与消耗规则","选择不扣物资。成功释放才结算真实来源；耗尽或失效会拒绝，不自动换料。K和M共用按槽来源；轮盘确认后再按快捷键施放，改料不会重置冷却。组合条件需亲手准备，额外修饰只作用于一次施法。")
 
 func show_action(skill: SkillData) -> void:
 	if game.rules.material_operations and is_instance_valid(game.player.material_wheel):

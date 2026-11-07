@@ -48,6 +48,14 @@ func open(focus := "all",ground := "") -> void:
  _dirty=true; show(); GameUIStyle.begin_modal(self); _refresh()
 func close() -> void:
  _popup.hide(); hide(); GameUIStyle.end_modal(self)
+func _input(event: InputEvent) -> void:
+ if not visible or not event is InputEventKey or not event.pressed or event.echo or event.keycode!=KEY_ESCAPE: return
+ # Escape dismisses a picker first; otherwise it always returns to combat,
+ # including while a quantity/search field owns keyboard focus.
+ if _popup.visible: return
+ for picker in _details.find_children("*","OptionButton",true,false):
+  if picker.get_popup().visible: return
+ close(); get_viewport().set_input_as_handled()
 func _unhandled_input(event: InputEvent) -> void:
  if not visible or not event is InputEventKey or not event.pressed or event.echo: return
  if event.keycode==KEY_ESCAPE: close(); get_viewport().set_input_as_handled()

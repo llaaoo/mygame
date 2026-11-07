@@ -62,6 +62,10 @@
     "op": "key"
   },
   {
+    "op": "click",
+    "label": "火石"
+  },
+  {
     "label": "加工：火石",
     "op": "click"
   },
@@ -128,30 +132,75 @@
     "op": "click"
   },
   {
-    "key": "M",
-    "op": "key"
+    "op": "wheel",
+    "key": "5",
+    "payload": "ember",
+    "capture": "08-select-firestone-final"
   },
   {
-    "label": "铭刻法阵 · 凝能阵",
-    "op": "click"
-  },
-  {
-    "capture": "08-select-firestone-final",
-    "label": "选择：火石阵",
-    "op": "click"
-  },
-  {
-    "label": "返回材料总览",
-    "op": "click"
-  },
-  {
-    "label": "继续探索",
-    "op": "click"
-  },
-  {
-    "capture": "09-fireball-result-final",
     "op": "duel",
-    "style": "combo"
+    "style": "combo",
+    "capture": "09-fireball-result-final"
+  },
+  {
+    "op": "key",
+    "key": "Escape"
+  },
+  {
+    "op": "walk_loot"
+  },
+  {
+    "op": "key",
+    "key": "F",
+    "capture": "10-real-loot"
+  },
+  {
+    "op": "key",
+    "key": "T"
+  },
+  {
+    "op": "key",
+    "key": "Escape"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3072,
+      -1200
+    ]
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3260,
+      -780
+    ]
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3500,
+      0
+    ]
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3500,
+      900
+    ]
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3500,
+      2100
+    ]
+  },
+  {
+    "op": "save",
+    "label": "returned-final",
+    "capture": "11-returned-town"
   },
   {
     "op": "quit"

@@ -52,6 +52,24 @@ func run() -> void:
  check(actions.drop(bottle,1).accepted,"Partly-used bottle failed to drop")
  var bottle_ground:=store.locate(bottle)
  check(not QuickslotView.item_state(actor,actor.skill_manager.shortcuts.binding("quick_e")).ready,"Dropped bound bottle remained usable")
+ # Repeated empty pickup retires caches, preserves the bottle, and never reuses
+ # an old container identity (stale transfer plans must remain stale).
+ check(actions.take(bottle_ground,bottle,1).accepted,"Could not pick up stress bottle fixture")
+ var saved_position:=actor.position
+ actor.position+=Vector2(400,400)
+ var container_count: int=store.snapshot().containers.size()
+ var retired: Dictionary={}
+ for cycle in range(128):
+  check(actions.drop(bottle,1).accepted,"Stress drop rejected")
+  var cache:=store.locate(bottle)
+  check(not retired.has(cache),"Ground identity was reused after retirement")
+  retired[cache]=true
+  check(actions.take(cache,bottle,1).accepted,"Stress pickup rejected")
+  check(not store.has_container(cache) and store.snapshot().containers.size()==container_count,"Empty ground caches accumulate in the save")
+  check(store.item(bottle).properties.doses==2,"Stress cycle refilled or replaced the bottle")
+ actor.position=saved_position
+ check(actions.drop(bottle,1).accepted,"Could not restore saved ground fixture")
+ bottle_ground=store.locate(bottle)
  var original_clock:=store.clock_seconds
  check(actions.equip(second).accepted,"Coated weapon could not be re-equipped")
  check(actions.drop(second,1).accepted,"Coated weapon could not be dropped again")

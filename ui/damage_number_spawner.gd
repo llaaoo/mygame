@@ -3,13 +3,16 @@ extends Node
 ## Shows combat feedback in the target's world so it leaves with the region.
 
 var _bus: CombatEventBus
+var _executor: CombatExecutor
 
 
-func _init(bus: CombatEventBus) -> void:
+func _init(bus: CombatEventBus,executor: CombatExecutor = null) -> void:
 	_bus = bus
+	_executor=executor
 
 
 func _ready() -> void:
+	if _executor: _executor.defense_resolved.connect(_on_defense)
 	_bus.subscribe(CombatEvent.Type.ON_DAMAGE, _on_damage)
 	_bus.subscribe(CombatEvent.Type.ON_HEAL, _on_heal)
 	_bus.subscribe(CombatEvent.Type.ON_DODGE, _on_dodge)
@@ -17,6 +20,7 @@ func _ready() -> void:
 
 
 func _exit_tree() -> void:
+	if is_instance_valid(_executor) and _executor.defense_resolved.is_connected(_on_defense): _executor.defense_resolved.disconnect(_on_defense)
 	if not is_instance_valid(_bus):
 		return
 	_bus.unsubscribe(CombatEvent.Type.ON_DAMAGE, _on_damage)
@@ -60,3 +64,10 @@ func _target_world(target: Node2D) -> Node:
 	if is_instance_valid(world) and world.is_inside_tree() and not world.is_queued_for_deletion():
 		return world
 	return null
+
+
+func _on_defense(target: Node2D,outcome: Dictionary) -> void:
+	var world:=_target_world(target)
+	if not world: return
+	var title: String="闪避" if outcome.dodged else "破防" if outcome.guard_broken else "格挡·减伤" if outcome.damage>0 else "格挡"
+	DamageNumber.spawn_reaction(world,title,target.global_position)

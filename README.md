@@ -273,3 +273,5 @@ godot --headless --path . --script res://tools/validate_mvp_content.gd
 直接运行Godot测试脚本会写入当前 `user://`，请使用独立 `XDG_DATA_HOME`；统一runner会自动隔离。完整命令、实现边界和验证限制见 [MVP 实现说明](docs/MVP_RELEASE.md)，架构改造见 [重构进展](docs/REFACTOR_PROGRESS.md)。
 
 旧 `main.tscn` 保留为房间模式/底层回归场景，不再是默认入口。整体设计见 [文档索引](docs/INDEX.md)。
+
+当前首玩闭环、同档战术对照、输入与反馈修复见[灰河谷游玩循环审查](docs/GRAYRIVER_LOOP_REVIEW.md)。

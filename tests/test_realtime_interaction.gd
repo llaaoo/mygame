@@ -65,9 +65,11 @@ func run() -> void:
  check(game.inventory_actions.equip(blade).accepted,"Guard fixture could not equip an actual blade")
  # M click mode changes one source only, without casts, costs or instance recreation.
  var stock:=store.snapshot(); var mp:=actor.mana_component.mp
+ var attack_sequence:=actor.actor_context.actions._attack_sequence
  await key(KEY_M,true); await key(KEY_M,false); await key(KEY_Q,true); await key(KEY_Q,false)
  check(actor.material_wheel.visible and not paused and not actor.ui_blocked,"Wheel blocked world or took full-menu input ownership")
  await choose("ember")
+ check(actor.actor_context.actions._attack_sequence==attack_sequence and actor.actor_context.actions.stamina.current==100,"Confirming the wheel leaked a physical attack or stamina cost")
  check(not actor.material_wheel.visible and sm.shortcuts.selection("left").payload=="ember","Mouse wheel selection did not configure Q")
  check(commits.is_empty() and store.snapshot()==stock and actor.mana_component.mp==mp and sm.get_instance("left")==instance,"Selecting material cast/paid or replaced its skill instance")
  await key(KEY_Q,true); await key(KEY_Q,false); await create_timer(1.0).timeout
@@ -138,6 +140,11 @@ func run() -> void:
  await drag_item(shield,screen._portrait.slots[EquipmentData.SlotType.LEFT_HAND])
  check(shield in store.equipped("player").values(),"Real drag did not equip the matching paper-doll slot")
  var coal:=store.ready_uid("player","charcoal")
+ await item_click(coal); await set_quantity(2)
+ await point_click(screen._quantity.get_line_edit().get_global_rect().get_center())
+ await key(KEY_ESCAPE,true); await key(KEY_ESCAPE,false)
+ check(not screen.visible and not actor.ui_blocked,"Focused quantity field trapped Escape instead of returning to combat")
+ await key(KEY_I,true); await key(KEY_I,false)
  await item_click(coal); await set_quantity(2); await click("移至背包"); await frames(10)
  check(store.count_in("player.pocket","charcoal")==4 and store.count_in("player.pack","charcoal")==2,"Bulk quantity input did not move exactly two materials")
  var tile:=screen._grid.get_node("Item_"+coal.replace(".","_")) as Control
