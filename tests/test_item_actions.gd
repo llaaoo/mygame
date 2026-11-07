@@ -8,7 +8,7 @@ func frames(n:=4) -> void:
 	for i in range(n): await physics_frame
 func run() -> void:
 	var fixture:=Fixture.new(self)
-	var game: GrayriverGame=await fixture.boot()
+	var game: GrayriverGame=await fixture.boot(true)
 	var actor:=game.player
 	actor.position=Vector2(-3500,2000)
 	var ctx:=actor.actor_context
@@ -107,6 +107,18 @@ func run() -> void:
 	check(game.session.bind_belt(0,"venom_bottle","throw") and game.session.snapshot().belt[0].method=="throw","Item binding did not persist")
 	var repo:=SaveRepository.new()
 	for version in range(1,6): check(repo.migrate({"version":version,"player":{}}).version==6,"Old save did not migrate")
+	check(use.begin("poison_rag"),"Save test coating refused"); use.advance(1.2)
+	var saved_coating:=store.item(weapon).properties.duplicate(true)
+	var saved_clock:=store.clock_seconds
+	check(use.begin("venom_bottle",true,Vector2.RIGHT),"Save test aim refused")
+	game._save_progress()
+	await fixture.close()
+	game=await fixture.boot(true)
+	store=game.session.inventory
+	check(store.item(weapon)!=null and store.item(weapon).properties==saved_coating,"Actual game reload lost or renewed the coated weapon")
+	check(store.item(partial)!=null and store.item(partial).properties.doses==1,"Actual game reload replaced or refilled the chosen partial bottle")
+	check(store.clock_seconds>=saved_clock and game.session.belt[0].id=="venom_bottle" and game.session.belt[0].method=="throw","Actual game reload lost the lifetime clock or item binding")
+	check(not game.player.actor_context.item_actions.busy() and not game.player.actor_context.spray.active and game.player.skill_manager.combinations.supplies.selected.is_empty(),"Actual game reload resumed a transient action or prepared source")
 	await fixture.close()
 	if failures.is_empty(): print("PASS item actions: interruptible UID coatings, clocks, snapshots, aimed physical throws, rollback, actual partial loot and saved bindings")
 	quit(0 if failures.is_empty() else 1)

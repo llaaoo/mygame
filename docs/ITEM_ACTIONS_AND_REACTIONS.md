@@ -53,3 +53,16 @@ godot --path . --rendering-method gl_compatibility --audio-driver Dummy --script
 ```
 
 新增专项覆盖真实UID涂层/余量、暂停时钟、取消与失败回滚、投掷飞行、锥形与墙体、中断、控制免疫、具体半瓶拾取、来源失效、灰烬修饰、临时能量容量与兑现。图形探针向Godot输入真实鼠标/键盘事件，使用预置物资和正常世界模拟检查界面；它不是自然资源预算或游戏平衡通关结论。
+
+## 本轮交付验证
+
+- 游戏代码提交 `996fe2a` 使用 `git archive` 导出到 `/tmp/item-actions-verified-i9c0epw0`，不带 `.godot`。Godot 4.6.3首次导入通过；完整 **66/66** 回归通过，日志 `/tmp/mygame-tests-czvbye1r`。
+- 同一代码归档的图形探针通过：鼠标使用抹布、菜单暂停涂层时钟、键盘瞄准/取消/投掷、精确选择半瓶喷剂、按住锥形喷洒/松开停止，以及960×600来源选择。日志 `/tmp/item-actions-visual/runtime.log`。使用软件渲染，不作性能结论。
+- 追加的真实存盘/重新启动场景回归通过（`/tmp/mygame-tests-ro9ttiv4`）：保持同一武器涂层到期时间、同瓶1剂余量、时钟和物品绑定；不恢复瞄准/引导/选材。
+- 旧松键输入适配回归已修复：适配器保留完整输入快照，实际动作执行层拒绝没有对应按下的菜单松键。既有魂类装备容量修正继续有效。
+- `git diff --check`通过。Actions保持停用，未生成发布包。
+
+![涂层跟随具体武器](playtests/item_coated_weapon.png)
+![小窗口区分不同余量的同类喷剂](playtests/item_partial_bottle_small.png)
+![持续喷洒与实时余量](playtests/item_spray_cone.png)
+![小窗口明确选择调谐来源](playtests/item_attunement_small.png)
