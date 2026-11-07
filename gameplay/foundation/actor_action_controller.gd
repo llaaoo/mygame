@@ -47,6 +47,10 @@ func try_action(action: Action) -> OperationResult:
 	var buffs:=actor.get_node_or_null("BuffManager") as BuffManager
 	if buffs and buffs.prevents_actions(): return OperationResult.reject("controlled")
 	if "ui_blocked" in actor and actor.ui_blocked: return OperationResult.reject("interface")
+	# Keep the input adapter lossless. Only execution discards an unmatched UI release.
+	if action.action_type==Action.ActionType.CAST and action.params.get("release",false) and "casting" in actor:
+		var casting: PlayerCastingController=actor.casting
+		if not casting.aiming_sources.has(action.skill_source) and casting._channeling_source!=action.skill_source and not casting._charge_source_matches(action.skill_source): return OperationResult.reject("unpaired_release")
 	if mode=="spray" and action.action_type in [Action.ActionType.DODGE,Action.ActionType.MELEE,Action.ActionType.HEAVY_ATTACK]: context.spray.stop()
 	if mode=="item" and (action.action_type in [Action.ActionType.MELEE,Action.ActionType.HEAVY_ATTACK,Action.ActionType.DODGE,Action.ActionType.CAST] or action.action_type==Action.ActionType.MOVE and action.direction.length_squared()>.01): cancel("other_action")
 	match action.action_type:

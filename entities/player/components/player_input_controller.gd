@@ -66,8 +66,6 @@ func _poll_universal_cast(actions: Array[Action], source: String, input_action: 
 	var released := Input.is_action_just_released(input_action)
 	if not pressed and not released:
 		return
-	# A UI click has no matching cast press; its release must not cancel an item action.
-	if released and not casting.aiming_sources.has(source) and casting._channeling_source!=source and not casting._charge_source_matches(source): return
 	var action := Action.cast(source, player.get_mouse_direction(), player)
 	action.params["release"] = released
 	var skill := _get_skill_for_source(source)
