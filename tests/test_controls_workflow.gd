@@ -1,43 +1,7 @@
-extends SceneTree
+extends "res://tests/support/input_scene_probe.gd"
 ## Controlled UI fixture, real keyboard/mouse events, normal AI and simulation.
 const Fixture=preload("res://tests/support/grayriver_fixture.gd")
-var failures: Array[String]=[]
 var casts:=0
-var game: GrayriverGame
-func _init() -> void: call_deferred("run")
-func check(ok: bool,message: String) -> void:
-	if not ok: failures.append(message); push_error(message)
-func frames(n:=4) -> void:
-	for i in range(n):
-		await physics_frame
-		await process_frame
-func key(code: Key,held: bool,unicode_value:=0) -> void:
-	var event:=InputEventKey.new(); event.keycode=code; event.physical_keycode=code; event.pressed=held; event.unicode=unicode_value
-	Input.parse_input_event(event); Input.flush_buffered_events(); await frames()
-func point_click(point: Vector2) -> void:
-	var motion:=InputEventMouseMotion.new(); motion.position=point; motion.global_position=point
-	root.push_input(motion,true); Input.flush_buffered_events(); await frames()
-	var event:=InputEventMouseButton.new(); event.position=point; event.global_position=point; event.button_index=MOUSE_BUTTON_LEFT; event.pressed=true
-	root.push_input(event,true); Input.flush_buffered_events(); await frames()
-	event=event.duplicate(); event.pressed=false; root.push_input(event,true); await frames()
-func click(text: String) -> void:
-	var found: Button
-	for node in root.find_children("*","Button",true,false):
-		if node.is_visible_in_tree() and (node.text==text or node.text.begins_with(text+"\n")): found=node; break
-	check(found!=null,"Missing visible button: "+text)
-	if not found: return
-	var ancestor:=found.get_parent()
-	while ancestor:
-		if ancestor is ScrollContainer: ancestor.ensure_control_visible(found)
-		ancestor=ancestor.get_parent()
-	await frames()
-	await point_click(found.get_global_rect().get_center())
-func capture(name: String) -> void:
-	var output:=OS.get_environment("CONTROLS_VISUAL_OUTPUT")
-	if output.is_empty() or DisplayServer.get_name()=="headless": return
-	DirAccess.make_dir_recursive_absolute(output)
-	await RenderingServer.frame_post_draw
-	root.get_texture().get_image().save_png(output.path_join(name+".png"))
 func run() -> void:
 	root.size=Vector2i(960,600)
 	var fixture:=Fixture.new(self)
@@ -47,13 +11,14 @@ func run() -> void:
 	var actor:=game.player
 	var manager:=actor.skill_manager
 	var supplies:=game.survival.supplies
+	manager.equip_source("quick_e",manager.pool.get_skill("ignite"))
 	manager.equip_slot(0,manager.pool.get_skill("ignite"))
 	manager.cast_committed.connect(func(_plan): casts+=1)
 	var mana:=actor.mana_component.mp
 	await key(KEY_E,true); await key(KEY_E,false); await frames(90)
-	check(casts==1 and actor.mana_component.mp==mana-4,"E did not cast once from slot 1")
+	check(casts==1 and actor.mana_component.mp==mana-4,"E did not cast its independent shortcut")
 	await key(KEY_1,true); await key(KEY_1,false); await frames(90)
-	check(casts==2 and actor.mana_component.mp==mana-8,"1 alias did not cast the same slot once")
+	check(casts==2 and actor.mana_component.mp==mana-8,"1 did not cast its independent shortcut")
 	var sequence:=actor.actor_context.actions._attack_sequence
 	await click("Tab  远征菜单")
 	check(paused and game.hub.page=="actions","Mouse footer did not open preparation menu")
@@ -63,7 +28,7 @@ func run() -> void:
 	check(casts==2 and game.hub._search.text=="e","Typing E in a menu cast a spell or failed text entry")
 	await key(KEY_ESCAPE,true); await key(KEY_ESCAPE,false)
 	await click("Tab  远征菜单")
-	await click("技能编组"); await click("打开技能编组")
+	await click("快捷栏编组"); await click("打开快捷栏编组")
 	check(actor.skill_pool_ui.visible and paused,"Mouse preparation menu failed to open K loadout")
 	await key(KEY_ESCAPE,true); await key(KEY_ESCAPE,false)
 	check(not paused and not actor.ui_blocked,"Loadout close did not return to gameplay")
@@ -93,14 +58,14 @@ func run() -> void:
 		check(not actor.input_controller.request_interaction(bench) and not paused,"Stale mouse target opened a distant station")
 	supplies.grant({"ration":3})
 	var food:=supplies.count("ration")
-	await key(KEY_Z,true); await key(KEY_Z,false)
-	check(actor.field_work.is_busy(),"Z did not begin interruptible belt use")
-	await create_timer(SurvivalCatalog.FOODS.ration.seconds+.25).timeout
-	check(supplies.count("ration")==food-1,"Z did not consume exactly one meal")
 	await key(KEY_7,true); await key(KEY_7,false)
-	check(actor.field_work.is_busy(),"7 alias did not use same belt slot")
+	check(actor.field_work.is_busy(),"7 did not begin interruptible belt use")
+	await create_timer(SurvivalCatalog.FOODS.ration.seconds+.25).timeout
+	check(supplies.count("ration")==food-1,"7 did not consume exactly one meal")
+	await key(KEY_7,true); await key(KEY_7,false)
+	check(actor.field_work.is_busy(),"Second 7 input did not use same belt slot")
 	actor.field_work.cancel("test"); actor.field_work.close_panel()
-	check(supplies.count("ration")==food-1,"Cancelling alias use consumed food")
+	check(supplies.count("ration")==food-1,"Cancelling food use consumed food")
 	await frames(14)
 	await point_click(game.frontier_hud.belt[0].get_global_rect().get_center())
 	check(actor.field_work.is_busy(),"Mouse belt did not begin same survival action")
@@ -111,12 +76,12 @@ func run() -> void:
 	var claims:=game.progress.claims.duplicate(true)
 	var inventory:=game.session.inventory.snapshot()
 	await click("Tab  远征菜单"); await click("操作设置")
-	await click("基础动作 5：5"); await key(KEY_H,true); await key(KEY_H,false)
+	await click("快捷槽 5：5"); await key(KEY_H,true); await key(KEY_H,false)
 	check(InputMap.action_has_event("skill_5",InputBindings.decode({"key":KEY_H})),"Real binding editor did not save new key: "+InputBindings.labels("skill_5"))
 	await click("恢复默认键位")
-	check(InputMap.action_has_event("skill_5",InputBindings.decode({"key":KEY_5})) and InputMap.action_has_event("skill_1",InputBindings.decode({"key":KEY_E})),"Mouse reset did not restore gameplay defaults")
+	check(InputMap.action_has_event("skill_5",InputBindings.decode({"key":KEY_5})) and InputMap.action_has_event("cast_e",InputBindings.decode({"key":KEY_E})),"Mouse reset did not restore gameplay defaults")
 	check(game.progress.claims==claims and game.session.inventory.snapshot()==inventory,"Reset controls changed world progress or inventory")
 	await key(KEY_ESCAPE,true); await key(KEY_ESCAPE,false)
 	await fixture.close()
-	if failures.is_empty(): print("PASS controls workflow: E/1 exactly once, mouse menus/loadout/workbench/belt, remap/reset, text ownership, material payment and stale range rejection; normal AI")
+	if failures.is_empty(): print("PASS controls workflow: independent E/1 exactly once, mouse menus/loadout/workbench/belt, remap/reset, text ownership, material payment and stale range rejection; normal AI")
 	quit(0 if failures.is_empty() else 1)

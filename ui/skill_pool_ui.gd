@@ -5,6 +5,9 @@ extends CanvasLayer
 var _skill_pool: SkillPool = null
 var _skill_manager: SkillManager = null
 var _selected_skill: SkillData = null
+var _selected_item: Dictionary={}
+var _selected_choice: Dictionary={}
+var _show_items := false
 
 var _background: ColorRect = null
 var _panel: Panel = null
@@ -39,8 +42,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func setup(pool: SkillPool, sm: SkillManager) -> void:
 	_skill_pool = pool
 	_skill_manager = sm
-	sm.hand_changed.connect(_on_hand_changed)
-	sm.slot_changed.connect(_on_slot_changed)
+	sm.binding_changed.connect(_on_binding_changed)
 	sm.skill_upgraded.connect(_on_skill_upgraded)
 
 
@@ -96,7 +98,7 @@ func _build_ui() -> void:
 	header.add_theme_constant_override("separation", 8)
 	left_vbox.add_child(header)
 	var title := Label.new()
-	title.text = "技能编组"
+	title.text = "快捷栏编组"
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	GameUIStyle.apply_title(title, 22)
 	header.add_child(title)
@@ -108,6 +110,12 @@ func _build_ui() -> void:
 	close_button.pressed.connect(close)
 	header.add_child(close_button)
 
+	var tabs:=HBoxContainer.new()
+	left_vbox.add_child(tabs)
+	for pair in [["基础动作",false],["可用物品",true]]:
+		var button:=Button.new(); button.text=pair[0]; GameUIStyle.apply_button(button)
+		button.pressed.connect(func(): _show_items=pair[1]; _selected_skill=null; _selected_item.clear(); _selected_choice.clear(); _refresh_all())
+		tabs.add_child(button)
 	var scroll := ScrollContainer.new()
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -120,7 +128,7 @@ func _build_ui() -> void:
 	scroll.add_child(_skill_grid)
 
 	_hint_label = Label.new()
-	_hint_label.text = "法术库与当前战斗编组"
+	_hint_label.text = "动作与物品共用快捷槽 · E和1独立 · 右键清空"
 	GameUIStyle.apply_label(_hint_label, 11, GameUIStyle.TEXT_MUTED)
 	left_vbox.add_child(_hint_label)
 
@@ -150,13 +158,10 @@ func _build_ui() -> void:
 	_detail_box.add_theme_constant_override("separation", 4)
 	detail_margin.add_child(_detail_box)
 
-	right_vbox.add_child(_make_section_label("独立施法键（不占鼠标）"))
-	_add_equip_slot(right_vbox, "left", "施法 "+InputBindings.label("cast_left"))
-	_add_equip_slot(right_vbox, "right", "施法 "+InputBindings.label("skill"))
-
-	right_vbox.add_child(_make_section_label("快捷法术"))
-	for i in range(6):
-		_add_equip_slot(right_vbox, "slot_%d" % i, "键 %d" % (i + 1))
+	right_vbox.add_child(_make_section_label("独立快捷键 · 动作或物品"))
+	for source in QuickslotLoadout.COMBAT_SOURCES: _add_equip_slot(right_vbox,source,InputBindings.label(InputBindings.action_for_source(source)))
+	right_vbox.add_child(_make_section_label("数字7—0 · 动作或物品"))
+	for source in QuickslotLoadout.ITEM_SOURCES: _add_equip_slot(right_vbox,source,InputBindings.label(InputBindings.action_for_source(source)))
 
 
 func _make_section_label(text: String) -> Label:
@@ -210,7 +215,10 @@ func _on_slot_clicked(event: InputEvent, source: String) -> void:
 	if not event is InputEventMouseButton:
 		return
 	if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-		if _selected_skill and _skill_manager:
+		if not _selected_item.is_empty() and _skill_manager:
+			_skill_manager.shortcuts.bind_item(source,_selected_item.item_id,str(_selected_item.get("uid","")))
+			_selected_item.clear(); _refresh_all()
+		elif _selected_skill and _skill_manager:
 			_equip(source, _selected_skill)
 			_selected_skill = null
 			_refresh_all()
@@ -230,25 +238,13 @@ func _equip(source: String, skill: SkillData) -> void:
 	if not _is_skill_unlocked(skill):
 		_hint_label.text = "%s 需要 %s Lv.%d" % [skill.display_name, _school_name(skill.school), _unlock_level(skill)]
 		return
-	match source:
-		"left":  _skill_manager.equip_hand("left", skill)
-		"right": _skill_manager.equip_hand("right", skill)
-		_:       _skill_manager.equip_slot(source.trim_prefix("slot_").to_int(), skill)
-
+	_skill_manager.equip_source(source,skill,_selected_choice)
 
 func _unequip(source: String) -> void:
-	match source:
-		"left":  _skill_manager.unequip_hand("left")
-		"right": _skill_manager.unequip_hand("right")
-		_:       _skill_manager.unequip_slot(source.trim_prefix("slot_").to_int())
+	_skill_manager.shortcuts.clear(source)
 
-
-func _on_hand_changed(_hand: String) -> void:
-	if visible: _refresh_all()
-
-
-func _on_slot_changed(_idx: int) -> void:
-	if visible: _refresh_all()
+func _on_binding_changed(_source: String) -> void:
+	_refresh_equip_slots()
 
 
 func _on_skill_upgraded(_source: String, _skill: SkillData, _upgrade_id: String, _rank: int) -> void:
@@ -269,15 +265,45 @@ func _refresh_detail() -> void:
 	for child in _detail_box.get_children():
 		child.queue_free()
 	var heading := Label.new()
-	heading.text = _selected_skill.display_name if _selected_skill else "法术详情"
+	heading.text = _selected_skill.display_name if _selected_skill else "快捷项详情"
 	GameUIStyle.apply_label(heading, 16, GameUIStyle.GOLD)
 	_detail_box.add_child(heading)
+	if not _selected_item.is_empty():
+		var view:=QuickslotView.item_state(_skill_manager.get_parent(),_selected_item)
+		heading.text=view.title
+		_detail_box.add_child(FoundationWidgets.label(view.detail+"\n点击右侧任一快捷槽绑定；右键清空。",11,true))
+		return
 	if not _selected_skill:
 		var empty := Label.new()
-		empty.text = "选择一个法术查看完整数值。"
+		empty.text = "选择基础动作或物品，再点右侧快捷槽。E和1相互独立；右键清空。"
 		GameUIStyle.apply_label(empty, 10, GameUIStyle.TEXT_MUTED)
 		_detail_box.add_child(empty)
 		return
+	if not _selected_skill.operation_id.is_empty():
+		var operation:=SpellOperationCatalog.default_catalog().operation(_selected_skill.operation_id)
+		var choices:=OptionButton.new(); choices.fit_to_longest_item=false; choices.clip_text=true
+		choices.add_item("跟随M本次选择")
+		for payload in operation.payloads:
+			choices.add_item(payload.title)
+			if _selected_choice.get("payload","")==payload.id: choices.select(choices.item_count-1)
+		choices.item_selected.connect(func(index: int):
+			_selected_choice={} if index==0 else {"payload":operation.payloads[index-1].id,"modifier":"","uid":""}
+			_refresh_detail())
+		_detail_box.add_child(choices)
+		if not _selected_choice.is_empty():
+			var payload:=operation.payload(str(_selected_choice.payload))
+			var modifiers:=OptionButton.new(); modifiers.fit_to_longest_item=false; modifiers.clip_text=true
+			modifiers.add_item("修饰：不额外加材料")
+			var modifier_ids: Array[String]=[""]
+			var composed:=operation.compose(payload)
+			for material: CastingMaterialData in _skill_manager.combinations.supplies.catalog.values():
+				if material.supports(_selected_skill.get_id(),composed.get_id(),composed):
+					modifier_ids.append(material.id); modifiers.add_item("修饰："+material.title+" ×1")
+					if _selected_choice.get("modifier","")==material.id: modifiers.select(modifiers.item_count-1)
+			modifiers.item_selected.connect(func(index: int): _selected_choice["modifier"]=modifier_ids[index])
+			_detail_box.add_child(modifiers)
+			var source_hint: String="脚下"+FireSigil.title_for(payload.source_field) if payload.source_kind=="field" else "附近真实残魂" if payload.source_kind=="soul" else ""
+			_detail_box.add_child(FoundationWidgets.label(payload.describe()+"\n必需来源："+(source_hint if not source_hint.is_empty() else "无额外场地来源")+"\n实物："+(_skill_manager.combinations.supplies.title(payload.material_id)+" ×"+str(payload.quantity) if not payload.material_id.is_empty() else "不消耗材料")+"\n绑定后固定此来源；不自动准备条件或串联动作。",11,true))
 	if not _is_skill_unlocked(_selected_skill):
 		var locked := Label.new()
 		locked.text = "未解锁 · %s Lv.%d" % [_school_name(_selected_skill.school), _unlock_level(_selected_skill)]
@@ -345,10 +371,13 @@ func _format_skill_stats(skill: SkillData) -> String:
 func _refresh_grid() -> void:
 	for child in _skill_grid.get_children():
 		child.queue_free()
-	if not _skill_pool:
-		return
+	_skill_grid.columns=2 if _show_items else 4
+	if _show_items:
+		_refresh_items(); return
+	if not _skill_pool: return
 	for skill in _skill_pool.skills:
 		if not skill: continue
+		if _skill_manager.material_operations and (skill.combination_only or _skill_manager.canonical_action(skill)!=skill): continue
 		if _skill_manager.restrict_actions and not _skill_manager.knows_action(skill):
 			var visible_result := false
 			for rule in _skill_manager.combinations.rules:
@@ -409,6 +438,7 @@ func _make_skill_card(skill: SkillData) -> PanelContainer:
 func _on_card_clicked(event: InputEvent, skill: SkillData) -> void:
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 		_selected_skill = skill
+		_selected_item.clear(); _selected_choice.clear()
 		_refresh_all()
 
 
@@ -418,15 +448,7 @@ func _refresh_equip_slots() -> void:
 		var panel := _equip_slots[i]
 		var skill: SkillData = null
 		var inst: SkillInstance = null
-		match src:
-			"left":
-				if _skill_manager.left_hand:
-					inst = _skill_manager.left_hand
-			"right":
-				if _skill_manager.right_hand:
-					inst = _skill_manager.right_hand
-			_:
-				inst = _skill_manager.get_slot(src.trim_prefix("slot_").to_int())
+		inst = _skill_manager.get_instance(src)
 		if inst:
 			skill = inst.data
 
@@ -435,8 +457,8 @@ func _refresh_equip_slots() -> void:
 		var vbox := hbox.get_child(1) as VBoxContainer
 		var name_lbl := vbox.get_node("Name") as Label
 		var sub_lbl := vbox.get_node("Sub") as Label
-		var action: String="cast_left" if src=="left" else "skill" if src=="right" else "skill_%d"%(int(src.trim_prefix("slot_"))+1)
-		var display_label := "施法 "+InputBindings.labels(action)
+		var action:=InputBindings.action_for_source(src)
+		var display_label := "快捷键 "+InputBindings.labels(action)
 
 		if skill:
 			var skill_icon := SkillIconCatalog.get_icon(skill)
@@ -446,7 +468,16 @@ func _refresh_equip_slots() -> void:
 			var total_ranks := 0
 			for rank in inst.upgrade_ranks.values():
 				total_ranks += int(rank)
-			sub_lbl.text = "%s | 强化 %d" % [display_label, total_ranks]
+			var choice:=_skill_manager.shortcuts.selection(src)
+			var operation:=SpellOperationCatalog.default_catalog().operation(skill.operation_id)
+			var payload:=operation.payload(str(choice.get("payload",""))) if operation else null
+			sub_lbl.text=display_label+(" · 固定"+payload.title if payload else " · 跟随M" if operation else " · 动作")+(" · 强化%d"%total_ranks if total_ranks>0 else "")
+		elif _skill_manager.shortcuts.binding(src).get("kind","")=="item":
+			var view:=QuickslotView.item_state(_skill_manager.get_parent(),_skill_manager.shortcuts.binding(src))
+			tex.texture=view.icon; tex.modulate=Color.WHITE
+			name_lbl.text=view.title+" ×%d"%view.count
+			sub_lbl.text=display_label+" · 物品"
+			panel.tooltip_text=view.detail
 		else:
 			tex.texture = null; tex.modulate = Color(1,1,1,0.1)
 			name_lbl.text = "空"
@@ -525,3 +556,24 @@ func _type_color(t: int) -> Color:
 		SkillData.SkillType.DASH:       return Color(0.3, 1.0, 0.5)
 		SkillData.SkillType.SUMMON:     return Color(0.7, 0.4, 1.0)
 	return Color.GRAY
+
+func _refresh_items() -> void:
+	var actor:=_skill_manager.get_parent() as Player
+	if not actor or not actor.actor_context: return
+	var store:=actor.actor_context.items
+	for source in store.actor_containers(actor.actor_context.id)+[actor.actor_context.id+".gear"]:
+		for row in store.entries(source):
+			var definition:=store.definitions.get(row.definition) as ItemData
+			if not definition or not (definition is EquipmentData or definition.use_profile or SurvivalCatalog.FOODS.has(definition.id)): continue
+			var uid: String=row.uid if definition is EquipmentData or definition.use_profile and definition.use_profile.kind==ItemUseDefinition.Kind.SPRAY else ""
+			var binding: Dictionary={"kind":"item","item_id":definition.id,"uid":uid}
+			var card:=PanelContainer.new(); card.custom_minimum_size=Vector2(132,92)
+			card.add_theme_stylebox_override("panel",_make_slot_bg())
+			var box:=VBoxContainer.new(); card.add_child(box)
+			box.add_child(FoundationWidgets.label(definition.display_name,13))
+			box.add_child(FoundationWidgets.label(("口袋" if source.ends_with(".pocket") else "装备" if source.ends_with(".gear") else "背包")+" · ×%d"%row.quantity+" "+store.state_text(row.uid),11,true))
+			for child in card.find_children("*","Control",true,false): child.mouse_filter=Control.MOUSE_FILTER_IGNORE
+			card.gui_input.connect(func(event: InputEvent):
+				if event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_LEFT and event.pressed:
+					_selected_item=binding; _selected_skill=null; _selected_choice.clear(); _refresh_detail())
+			_skill_grid.add_child(card)

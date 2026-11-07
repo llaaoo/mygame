@@ -112,8 +112,8 @@ func _build_skill_bar(root: Control) -> void:
 	var panel := PanelContainer.new()
 	panel.name = "SkillBarPanel"
 	panel.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-	panel.offset_left = -248
-	panel.offset_right = 248
+	panel.offset_left = -256
+	panel.offset_right = 256
 	panel.offset_top = -82
 	panel.offset_bottom = -12
 	panel.add_theme_stylebox_override("panel", GameUIStyle.panel_style(0.90, 6))

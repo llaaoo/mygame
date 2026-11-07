@@ -1,6 +1,6 @@
 class_name SurvivalCatalog
 extends RefCounted
-## Provisions share the expedition inventory; they are never spell materials.
+## Provisions share inventory; their needs/timers stay separate from spell payloads.
 const TITLES := {"grain": "谷粮", "herb": "苦叶", "ration": "烤饼", "broth": "苦叶炖汤", "tea": "醒神茶", "clean_water": "饮用水", "dirty_water": "未净化水"}
 const WATER_CAPACITY := 4
 const FOODS := {

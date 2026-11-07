@@ -2,7 +2,7 @@ class_name SaveRepository
 extends RefCounted
 ## Owns file validation, migration and replacement. Never restores gameplay state.
 
-const VERSION := 6
+const VERSION := 7
 enum Status { MISSING, VALID, RECOVERED, INVALID, UNSUPPORTED_VERSION, IO_ERROR }
 var section_validators: Dictionary = {}
 
@@ -70,6 +70,9 @@ func migrate(raw: Dictionary) -> Dictionary:
 				data["extensions"]=data.get("extensions",{})
 			5:
 				# Stateful consumable instances and item actions require the v6 reader.
+				data["extensions"]=data.get("extensions",{})
+			6:
+				# v7 stores mixed quickslot bindings; legacy belt import happens at actor binding.
 				data["extensions"]=data.get("extensions",{})
 		version += 1
 		data["version"] = version

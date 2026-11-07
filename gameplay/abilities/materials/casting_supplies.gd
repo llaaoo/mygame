@@ -121,8 +121,8 @@ func recycle(id: String) -> bool:
 	if notify.is_valid(): notify.call()
 	return true
 
-func plan(action: SkillData, base: SkillData, include_required: bool = true, preparation_material: String = "", manager: SkillManager = null) -> Dictionary:
-	if not action.operation_id.is_empty(): return operation_plan(action,manager,base)
+func plan(action: SkillData, base: SkillData, include_required: bool = true, preparation_material: String = "", manager: SkillManager = null,selection: Dictionary={}) -> Dictionary:
+	if not action.operation_id.is_empty(): return operation_plan(action,manager,base,true,selection)
 	var costs: Dictionary = {}
 	var material_id := str(selected.get(action.get_id(), ""))
 	var optional: CastingMaterialData = catalog.get(material_id)
@@ -218,9 +218,9 @@ func select_payload(action: SkillData,payload_id: String,manager: SkillManager,u
 	_notify_changed()
 	return true
 
-func operation_plan(action: SkillData,manager: SkillManager,resolved: SkillData = null,apply_modifier := true) -> Dictionary:
+func operation_plan(action: SkillData,manager: SkillManager,resolved: SkillData = null,apply_modifier := true,selection: Dictionary={}) -> Dictionary:
 	var entry:=SpellOperationCatalog.default_catalog().operation(action.operation_id)
-	var choice:=str(selected.get(action.get_id(),entry.default_payload if entry else ""))
+	var choice:=str(selection.get("payload",selected.get(action.get_id(),entry.default_payload if entry else "")))
 	var medium:=entry.payload(choice) if entry else null
 	var result: Dictionary={"skill":action,"costs":{},"material_id":"","extra_mana":0,"field_bonus":0.0,"reason":"请选择释放介质","payload":medium}
 	if not medium: return result
@@ -230,8 +230,9 @@ func operation_plan(action: SkillData,manager: SkillManager,resolved: SkillData 
 	if action.operation_id=="disperse":
 		result.extra_mana=0
 		var uid:=inventory_store.ready_uid(actor_id,medium.material_id) if inventory_store else ""
-		if prepared_uids.has(action.get_id()):
-			uid=str(prepared_uids[action.get_id()])
+		var fixed_uid:=str(selection.get("uid",prepared_uids.get(action.get_id(),"")))
+		if not fixed_uid.is_empty():
+			uid=fixed_uid
 			var instance:=inventory_store.item(uid) if inventory_store else null
 			if not instance or instance.definition_id!=medium.material_id or inventory_store.locate(uid)!=actor_id+".pocket" or int(instance.properties.get("doses",0))<1: uid=""
 		result.instance_costs=[]
@@ -241,7 +242,7 @@ func operation_plan(action: SkillData,manager: SkillManager,resolved: SkillData 
 	elif not medium.material_id.is_empty():
 		result.material_id=medium.material_id
 		result.costs={medium.material_id:medium.quantity}
-	var modifier:=catalog.get(str(modifiers.get(action.get_id(),""))) as CastingMaterialData
+	var modifier:=catalog.get(str(selection.get("modifier",modifiers.get(action.get_id(),"")))) as CastingMaterialData
 	if apply_modifier and modifier and modifier.supports(action.get_id(),result.skill.get_id(),result.skill):
 		result.skill=modifier.modify(result.skill)
 		result.costs[modifier.id]=int(result.costs.get(modifier.id,0))+1

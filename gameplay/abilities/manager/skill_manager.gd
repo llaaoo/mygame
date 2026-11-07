@@ -1,10 +1,11 @@
 class_name SkillManager
 extends Node
 ## 技能管理器 — 纯运行态，描述"怎么装备"
-## 左手/右手 + 6 快捷键槽位
+## Knowledge/cooldowns/execution; QuickslotLoadout owns mixed shortcuts.
 ## 执行逻辑委托给 SkillExecutor
 
 ## ── 信号 ──
+signal binding_changed(source: String)
 signal hand_changed(hand: String)          ## "left" / "right"
 signal slot_changed(slot_index: int)
 signal cooldown_changed(source: String, remaining: float, total: float)
@@ -21,10 +22,11 @@ var combinations: ConditionalCastController
 var material_operations := false
 var restrict_actions := false
 var known_actions: Dictionary = {}
-var left_hand: SkillInstance = null
-var right_hand: SkillInstance = null
-
-var _slots: Array[SkillInstance] = []
+var shortcuts:=QuickslotLoadout.new()
+var left_hand: SkillInstance:
+	get: return shortcuts.instance("left")
+var right_hand: SkillInstance:
+	get: return shortcuts.instance("right")
 var _cooldowns: Dictionary = {}
 var _executing := false
 
@@ -78,13 +80,12 @@ func enable_material_operations() -> void:
 		equip_hand("right", right_hand.data)
 	var seen: Dictionary = {}
 	for i in range(MAX_SLOTS):
-		if not _slots[i]:
+		if not get_slot(i):
 			continue
-		var next := canonical_action(_slots[i].data)
+		var next := canonical_action(get_slot(i).data)
 		var id := next.get_id()
 		if not next.operation_id.is_empty() and seen.has(id):
-			_slots[i] = null
-			slot_changed.emit(i)
+			shortcuts.clear("slot_%d"%i)
 		else:
 			seen[id] = true
 			equip_slot(i, next)
@@ -96,9 +97,7 @@ func enable_material_operations() -> void:
 
 
 func _ready() -> void:
-	_slots.resize(MAX_SLOTS)
-	for i in range(MAX_SLOTS):
-		_slots[i] = null
+	shortcuts.changed.connect(_binding_changed)
 	# 自动创建 executor（如果未从外部注入）
 	if not executor:
 		executor = SkillExecutor.new()
@@ -121,10 +120,7 @@ func _register_with_simulation() -> void:
 ## 统一 tick 入口（由 SimulationRuntime 驱动，替代独立 _process）
 func tick(delta: float) -> void:
 	# 更新所有 SkillInstance 冷却
-	_tick_instance(left_hand, delta)
-	_tick_instance(right_hand, delta)
-	for i in range(MAX_SLOTS):
-		_tick_instance(_slots[i], delta)
+	for source in QuickslotLoadout.SOURCES: _tick_instance(shortcuts.instance(source),delta)
 
 	# 更新 _cooldowns 并发射信号通知 UI
 	for key in _cooldowns:
@@ -157,59 +153,36 @@ func apply_loadout(loadout: SkillLoadout) -> void:
 
 ## ── 装备管理 ──
 
-func equip_hand(hand: String, skill: SkillData) -> void:
+func _binding_changed(source: String) -> void:
+	if combinations and not combinations.pending.is_empty() and combinations.pending.source==source: combinations.cancel("快捷槽已更换")
+	binding_changed.emit(source)
+	if source in ["left","right"]: hand_changed.emit(source)
+	elif source.begins_with("slot_"): slot_changed.emit(source.trim_prefix("slot_").to_int())
+
+func equip_source(source: String,skill: SkillData,selection: Dictionary={}) -> bool:
 	skill=canonical_action(skill)
-	if skill and not knows_action(skill):
-		return
-	if skill and skill.combination_only:
-		return
-	var inst := SkillInstance.new(skill) if skill else null
-	match hand:
-		"left":  left_hand = inst
-		"right": right_hand = inst
-	hand_changed.emit(hand)
+	if skill and (not knows_action(skill) or skill.combination_only): return false
+	return shortcuts.equip_skill(source,skill,selection)
 
-
+func equip_hand(hand: String,skill: SkillData) -> void:
+	if hand in ["left","right"]: equip_source(hand,skill)
 func unequip_hand(hand: String) -> SkillData:
-	var old: SkillData = null
-	match hand:
-		"left":
-			if left_hand: old = left_hand.data
-			left_hand = null
-		"right":
-			if right_hand: old = right_hand.data
-			right_hand = null
-	hand_changed.emit(hand)
-	return old
-
-
-func equip_slot(idx: int, skill: SkillData) -> void:
-	skill=canonical_action(skill)
-	if skill and not knows_action(skill):
-		return
-	if skill and skill.combination_only:
-		return
-	if idx < 0 or idx >= MAX_SLOTS:
-		return
-	_slots[idx] = SkillInstance.new(skill) if skill else null
-	slot_changed.emit(idx)
-
-
+	var old:=get_instance(hand)
+	if hand in ["left","right"]: shortcuts.clear(hand)
+	return old.data if old else null
+func equip_slot(idx: int,skill: SkillData) -> void:
+	if idx>=0 and idx<MAX_SLOTS: equip_source("slot_%d"%idx,skill)
 func unequip_slot(idx: int) -> SkillData:
-	if idx < 0 or idx >= MAX_SLOTS:
-		return null
-	var old: SkillData = _slots[idx].data if _slots[idx] else null
-	_slots[idx] = null
-	slot_changed.emit(idx)
-	return old
-
+	var old:=get_slot(idx)
+	if idx>=0 and idx<MAX_SLOTS: shortcuts.clear("slot_%d"%idx)
+	return old.data if old else null
 
 ## ── 查询 ──
 
 func get_slot(idx: int) -> SkillInstance:
 	if idx < 0 or idx >= MAX_SLOTS:
 		return null
-	return _slots[idx]
+	return shortcuts.instance("slot_%d"%idx)
 
 
 func get_instance(source: String) -> SkillInstance:
@@ -231,31 +204,21 @@ func upgrade_source(source: String, upgrade_id: String) -> bool:
 
 
 func serialize_skill_state() -> Dictionary:
-	var result := {}
-	for source in _all_sources():
-		var inst := _find_instance(source)
-		if inst:
-			result[source] = inst.serialize_state()
-	return result
-
+	return shortcuts.snapshot()
 
 func restore_skill_state(saved_state: Dictionary) -> void:
-	if not pool:
-		return
+	if not pool: return
 	for source in saved_state:
-		var entry: Dictionary = saved_state[source] if saved_state[source] is Dictionary else {}
-		var skill := pool.get_skill(str(entry.get("skill_id", "")))
-		if not skill:
-			continue
-		if source == "left" or source == "right":
-			equip_hand(source, skill)
-		elif source.begins_with("slot_"):
-			equip_slot(source.trim_prefix("slot_").to_int(), skill)
-		var inst := _find_instance(source)
-		if inst:
-			inst.restore_upgrades(entry.get("upgrades", {}))
-
-	if material_operations: normalize_operation_loadout()
+		if source not in QuickslotLoadout.SOURCES: continue
+		var entry: Variant=saved_state[source]
+		if not QuickslotLoadout.valid_entry(entry): continue
+		if entry.get("kind","")=="item":
+			shortcuts.bind_item(source,entry.item_id,str(entry.get("uid",""))); continue
+		var skill:=pool.get_skill(str(entry.get("skill_id","")))
+		if not skill or not equip_source(source,skill,entry.get("selection",{})): continue
+		var inst:=get_instance(source)
+		if inst: inst.restore_upgrades(entry.get("upgrades",{}))
+	if material_operations: normalize_operation_loadout(saved_state)
 
 
 func has_left_spell() -> bool:
@@ -273,11 +236,15 @@ func can_use(source: String) -> bool:
 	return _cooldowns.get(source, 0.0) <= 0.0
 
 
+func preview_source(source: String,empower := false) -> CastPlan:
+	var inst:=get_instance(source)
+	return combinations.preview(inst.data,get_parent(),empower,shortcuts.selection(source)) if inst else CastPlan.new()
+
 func get_cooldown_state(source: String, plan: CastPlan = null) -> Dictionary:
 	var inst := _find_instance(source)
 	if combinations and inst and combinations.handles(inst.data):
 		if not plan:
-			plan = combinations.preview(inst.data, get_parent())
+			plan = preview_source(source)
 		return combinations.cooldown_state(plan, inst.data.get_id())
 	return {"remaining": float(_cooldowns.get(source, 0.0)), "duration": inst.total_cooldown if inst else 1.0}
 
@@ -291,14 +258,16 @@ func get_cooldown_total(source: String) -> float:
 func can_start(source: String, caster: Node2D, context: CastContext) -> bool:
 	if not can_act(caster): return false
 	var inst := _find_instance(source)
+	if context and context.binding_revision>=0 and shortcuts.revision(source)!=context.binding_revision: return false
+	var selection: Dictionary=context.selection if context and not context.selection.is_empty() else shortcuts.selection(source)
 	if not context or not context.has_valid_target() or _executing or not inst or not knows_action(inst.data) or inst.data.combination_only:
 		return false
 	if combinations and combinations.handles(inst.data):
-		return combinations.preview(inst.data, caster, context.empower).ready
+		return combinations.preview(inst.data, caster, context.empower,selection).ready
 	if combinations and combinations.is_busy():
 		return false
 	var mana := caster.get_node_or_null("ManaComponent") as ManaComponent
-	var plan := combinations.build_plan(inst.data, caster, context.empower) if combinations else null
+	var plan := combinations.build_plan(inst.data, caster, context.empower,selection) if combinations else null
 	var cost := plan.cost if plan else _get_effective_mana_cost(inst.data, caster)
 	return inst.is_ready() and (not mana or mana.mp >= cost) and (not plan or combinations.supplies.can_pay_combat(plan.material_costs))
 
@@ -326,7 +295,7 @@ func use_hand(hand: String, caster: Node2D, direction: Vector2) -> bool:
 func use_slot(idx: int, caster: Node2D, direction: Vector2) -> bool:
 	if idx < 0 or idx >= MAX_SLOTS:
 		return false
-	var inst := _slots[idx]
+	var inst := get_slot(idx)
 	if not inst or not inst.data:
 		return false
 	return _execute(inst.data, "slot_%d" % idx, caster, direction)
@@ -343,7 +312,7 @@ func use_hand_with_context(hand: String, caster: Node2D, ctx: CastContext) -> bo
 func use_slot_with_context(idx: int, caster: Node2D, ctx: CastContext) -> bool:
 	if idx < 0 or idx >= MAX_SLOTS:
 		return false
-	var inst := _slots[idx]
+	var inst := get_slot(idx)
 	if not inst or not inst.data:
 		return false
 	return _execute_with_context(inst.data, "slot_%d" % idx, caster, ctx)
@@ -362,10 +331,12 @@ func _execute_with_context(skill: SkillData, source: String, caster: Node2D, ctx
 	if not can_act(caster): return false
 	if not ctx or not ctx.has_valid_target() or _executing or not knows_action(skill):
 		return false
+	if ctx.binding_revision>=0 and shortcuts.revision(source)!=ctx.binding_revision: return false
+	if ctx.selection.is_empty(): ctx.selection=shortcuts.selection(source)
 	if skill.combination_only:
 		return false
 	if skill.operation_id=="disperse" and "actor_context" in caster and caster.actor_context and caster.actor_context.spray:
-		return caster.actor_context.spray.start(skill,source,ctx.direction)
+		return caster.actor_context.spray.start(skill,source,ctx.direction,ctx.selection)
 	if combinations and combinations.handles(skill):
 		return combinations.start(skill, caster, ctx, source)
 	if combinations and combinations.is_busy():
@@ -380,9 +351,9 @@ func _execute_with_context(skill: SkillData, source: String, caster: Node2D, ctx
 			exec_inst.enter_phase(CombatPhase.Phase.IDLE)
 		return false
 
-	var plan := combinations.build_plan(skill, caster, ctx.empower) if combinations else CastPlan.new()
+	var plan := combinations.build_plan(skill, caster, ctx.empower,ctx.selection) if combinations else CastPlan.new()
 	if not skill.operation_id.is_empty() and combinations:
-		plan=combinations.preview_pulse(skill,caster,ctx.empower,channel_cost) if channel_cost>=0 else combinations.preview(skill,caster,ctx.empower)
+		plan=combinations.preview_pulse(skill,caster,ctx.empower,channel_cost,ctx.selection) if channel_cost>=0 else combinations.preview(skill,caster,ctx.empower,ctx.selection)
 		if not plan.ready:
 			if exec_inst: exec_inst.enter_phase(CombatPhase.Phase.IDLE)
 			return false
@@ -430,21 +401,11 @@ func _execute_with_context(skill: SkillData, source: String, caster: Node2D, ctx
 
 
 func _find_instance(source: String) -> SkillInstance:
-	match source:
-		"left":  return left_hand
-		"right": return right_hand
-	if not source.begins_with("slot_"):
-		return null
-	var idx := source.trim_prefix("slot_").to_int()
-	if idx >= 0 and idx < MAX_SLOTS:
-		return _slots[idx]
-	return null
-
+	return shortcuts.instance(source)
 
 func _all_sources() -> Array[String]:
-	var sources: Array[String] = ["left", "right"]
-	for i in range(MAX_SLOTS):
-		sources.append("slot_%d" % i)
+	var sources: Array[String]=[]
+	sources.assign(QuickslotLoadout.SOURCES)
 	return sources
 
 
@@ -472,19 +433,20 @@ func initialize(pool_res: SkillPool) -> void:
 	pool = pool_res
 	pool.build()
 	for i in range(MAX_SLOTS):
-		_slots[i] = null
+		shortcuts.clear("slot_%d"%i)
 		if pool_res and i < pool_res.skills.size():
-			_slots[i] = SkillInstance.new(pool_res.skills[i])
-			slot_changed.emit(i)
+			equip_slot(i,pool_res.skills[i])
 
 func can_act(actor: Node2D) -> bool:
 	var buffs:=actor.get_node_or_null("BuffManager") as BuffManager
 	return not buffs or not buffs.prevents_actions()
 
-func normalize_operation_loadout() -> void:
+func normalize_operation_loadout(saved: Dictionary={}) -> void:
 	var seen: Dictionary={}
-	for i in range(MAX_SLOTS):
-		var inst:=get_slot(i)
-		if not inst or inst.data.operation_id.is_empty(): continue
-		if seen.has(inst.data.get_id()): unequip_slot(i)
-		else: seen[inst.data.get_id()]=true
+	for source in saved:
+		var entry: Dictionary=saved[source]
+		var original:=str(entry.get("skill_id",""))
+		var inst:=get_instance(source)
+		if not inst or original==inst.base_data.get_id(): continue
+		if seen.has(inst.base_data.get_id()): shortcuts.clear(source)
+		else: seen[inst.base_data.get_id()]=true

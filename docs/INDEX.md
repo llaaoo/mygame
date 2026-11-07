@@ -4,7 +4,7 @@
 
 ---
 
-当前阅读入口：[战斗、探索与鼠标整备](CONTROL_SCHEME.md)、[技能能力迁移与新键位](LEGACY_SKILL_INTEGRATION.md)、[项目使用审计](PROJECT_USAGE_AUDIT.md)、[灰河谷首玩验证](GRAYRIVER_FIRST30.md)、[架构边界](ARCHITECTURE.md)。下方早期分析与各轮交付记录含历史范围，不能当作当前接入清单。
+当前阅读入口：[施法体系审查与统一快捷槽](SPELL_SYSTEM_REVIEW.md)、[战斗、探索与鼠标整备](CONTROL_SCHEME.md)、[技能能力迁移与新键位](LEGACY_SKILL_INTEGRATION.md)、[项目使用审计](PROJECT_USAGE_AUDIT.md)、[灰河谷首玩验证](GRAYRIVER_FIRST30.md)、[架构边界](ARCHITECTURE.md)。下方早期分析与各轮交付记录含历史范围，不能当作当前接入清单。
 
 ## 文档层级
 

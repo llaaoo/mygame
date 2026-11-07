@@ -17,7 +17,7 @@ UI可以调用领域服务请求训练、制造、交付或施法，由服务验
 | `PlayerInputController` | 将输入转换为 `Action`；只在输入边界采样强化意图 |
 | `PlayerCastingController` | 瞄准、蓄力、引导及取消；持续计时注册到模拟服务 |
 | `PlayerCombatBindings` | 角色事件、熟练度、触发器与辅助UI装配；退出时取消订阅 |
-| `SkillManager` | 动作知识、编组、冷却及公开施法请求 |
+| `SkillManager` | 动作知识、冷却及施法请求，旧编组API委托QuickslotLoadout |
 | `ConditionalCastController` | 条件规划、准备、重校验与提交；按能力字段管理任意元素动作 |
 | `BuffManager` | 状态实例、版本、事务通知和属性重算 |
 | `CampaignGame` | 战役装配与探索流程，创建 Session、World、Interface；MVPGame 为旧入口适配 |
@@ -69,4 +69,4 @@ UI可以调用领域服务请求训练、制造、交付或施法，由服务验
 
 2026-11-07：当前接入与历史内容区分见[项目使用审计](PROJECT_USAGE_AUDIT.md)。输入默认项与用户改键统一由`InputBindings.install()`在Player入树时装配；场景不另行注册。探索战役使用`ExplorationProgressService`，不创建旧`QuestManager/QuestTracker`或禁用的`RunManager`；旧main入口仍保留房间与NPC任务验证。
 
-技能输入与历史能力迁移见[LEGACY_SKILL_INTEGRATION](LEGACY_SKILL_INTEGRATION.md)。旧left/right存储键保留兼容，输入解释为Q/R独立槽；新操作继续经过SpellOperationData、CastPlan和同一事务，不另建技能或材料执行链。
+技能输入与历史能力迁移见[LEGACY_SKILL_INTEGRATION](LEGACY_SKILL_INTEGRATION.md)。统一快捷槽与来源快照见[SPELL_SYSTEM_REVIEW](SPELL_SYSTEM_REVIEW.md)。QuickslotLoadout持有13槽的动作/物品绑定；旧left/right存储键保留兼容，解释为Q/R独立槽，E单独保存；新操作继续经过SpellOperationData、CastPlan和同一事务，不另建技能或材料执行链。

@@ -63,7 +63,7 @@ func run() -> void:
 	player.casting.cancel_all()
 	sm.unequip_hand("right")
 	hud.skill_bar._process(.2)
-	check(hud.skill_bar._combination_hint.text.begins_with("水引 →") and not hud.skill_bar._cost_labels[5].text.is_empty(), "Empty right hand disabled hotbar previews")
+	check(hud.skill_bar._combination_hint.text.begins_with("水引 →") and not hud.skill_bar._cost_labels[hud.skill_bar._sources.find("slot_3")].text.is_empty(), "Empty right hand disabled hotbar previews")
 	sm.equip_hand("right", sm.pool.get_skill("ignite"))
 	# Exhaustion feedback is emitted only after a successful, irreversible commit.
 	player.global_position = Vector2.ZERO

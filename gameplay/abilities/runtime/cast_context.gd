@@ -3,6 +3,9 @@ extends RefCounted
 ## 施法上下文 — 纯数据类，SkillExecutor 的输入参数
 ## 每次施法创建一个实例，不持有任何逻辑
 
+var selection: Dictionary={}
+var binding_revision := -1
+
 var caster: Node2D = null
 var target: Node2D = null
 var direction: Vector2 = Vector2.ZERO

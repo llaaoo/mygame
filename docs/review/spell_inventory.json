@@ -1,0 +1,5273 @@
+{
+  "actions": [
+    {
+      "base_mana": 4,
+      "cast_type": "",
+      "channel_interval": 0.3,
+      "channel_rate": 10.0,
+      "cooldown": 0.6,
+      "id": "ignite",
+      "preparation": 0.25,
+      "title": "火花",
+      "type": "AOE"
+    },
+    {
+      "base_mana": 3,
+      "cast_type": "",
+      "channel_interval": 0.3,
+      "channel_rate": 10.0,
+      "cooldown": 0.8,
+      "id": "pulse",
+      "preparation": 0.25,
+      "title": "震荡",
+      "type": "AOE"
+    },
+    {
+      "base_mana": 4,
+      "cast_type": "",
+      "channel_interval": 0.3,
+      "channel_rate": 10.0,
+      "cooldown": 4.0,
+      "id": "focus",
+      "preparation": 0.25,
+      "title": "调谐",
+      "type": "BUFF"
+    },
+    {
+      "base_mana": 5,
+      "cast_type": "",
+      "channel_interval": 0.3,
+      "channel_rate": 10.0,
+      "cooldown": 1.5,
+      "id": "water_call",
+      "preparation": 0.25,
+      "title": "水引",
+      "type": "AOE"
+    },
+    {
+      "base_mana": 4,
+      "cast_type": "",
+      "channel_interval": 0.3,
+      "channel_rate": 10.0,
+      "cooldown": 0.8,
+      "id": "soul_harvest",
+      "preparation": 0.55,
+      "title": "汲取",
+      "type": "BUFF"
+    },
+    {
+      "base_mana": 18,
+      "cast_type": "charge",
+      "channel_interval": 0.3,
+      "channel_rate": 10.0,
+      "cooldown": 5.0,
+      "id": "project",
+      "preparation": 0.25,
+      "title": "聚能投射",
+      "type": "PROJECTILE"
+    },
+    {
+      "base_mana": 24,
+      "cast_type": "",
+      "channel_interval": 0.3,
+      "channel_rate": 10.0,
+      "cooldown": 8.0,
+      "id": "shape",
+      "preparation": 0.8,
+      "title": "塑形",
+      "type": "PROJECTILE"
+    },
+    {
+      "base_mana": 18,
+      "cast_type": "",
+      "channel_interval": 0.3,
+      "channel_rate": 10.0,
+      "cooldown": 6.0,
+      "id": "step",
+      "preparation": 0.15,
+      "title": "移形",
+      "type": "PROJECTILE"
+    },
+    {
+      "base_mana": 0,
+      "cast_type": "channel",
+      "channel_interval": 0.4,
+      "channel_rate": 12.0,
+      "cooldown": 0.1,
+      "id": "sustain",
+      "preparation": 0.0,
+      "title": "引导介质",
+      "type": "PROJECTILE"
+    },
+    {
+      "base_mana": 8,
+      "cast_type": "",
+      "channel_interval": 0.3,
+      "channel_rate": 10.0,
+      "cooldown": 8.0,
+      "id": "inscribe",
+      "preparation": 0.8,
+      "title": "铭刻法阵",
+      "type": "BUFF"
+    },
+    {
+      "base_mana": 2,
+      "cast_type": "",
+      "channel_interval": 0.3,
+      "channel_rate": 10.0,
+      "cooldown": 0.5,
+      "id": "disperse",
+      "preparation": 0.25,
+      "title": "喷洒介质",
+      "type": "AOE"
+    }
+  ],
+  "counts": {
+    "actions": 11,
+    "effect_definitions": 82,
+    "food_effects": 5,
+    "hit_reactions": 9,
+    "manufacturing_recipes": 20,
+    "material_item_ids": 26,
+    "modifier_materials": 7,
+    "operations": 8,
+    "payloads": 49,
+    "rules": 37,
+    "status_ids": 28,
+    "surface_reactions": 16,
+    "surfaces": 8,
+    "survival_recipes": 4,
+    "usable_item_definitions": 10
+  },
+  "effects": {
+    "ancestral_ward": {
+      "base_mana": 8,
+      "cast_type": "",
+      "cooldown": 2.0,
+      "damage": 25,
+      "field": "",
+      "origin": "combination_rule:soul_focus → soul_focus.tres",
+      "path": "res://gameplay/abilities/data/ancestral_ward_result.tres",
+      "surface": "",
+      "tags": [
+        "soul",
+        "buff"
+      ],
+      "title": "先祖护佑",
+      "type": "BUFF"
+    },
+    "arcane_burst": {
+      "base_mana": 3,
+      "cast_type": "",
+      "cooldown": 0.8,
+      "damage": 6,
+      "field": "",
+      "origin": "combination_rule:arcane_pulse → arcane_pulse.tres",
+      "path": "res://content/spell_operations/arcane_burst.tres",
+      "surface": "",
+      "tags": [
+        "arcane",
+        "aoe",
+        "impact"
+      ],
+      "title": "凝能震荡",
+      "type": "AOE"
+    },
+    "disperse": {
+      "base_mana": 2,
+      "cast_type": "",
+      "cooldown": 0.5,
+      "damage": 0,
+      "field": "",
+      "origin": "current_action",
+      "path": "res://content/spell_operations/disperse.tres",
+      "surface": "",
+      "tags": [],
+      "title": "喷洒介质",
+      "type": "AOE"
+    },
+    "disperse.paralytic": {
+      "base_mana": 2,
+      "cast_type": "",
+      "cooldown": 0.5,
+      "damage": 0,
+      "field": "",
+      "origin": "composed_payload:disperse/paralytic",
+      "path": "",
+      "surface": "",
+      "tags": [
+        "control",
+        "spray"
+      ],
+      "title": "喷洒介质 · 麻痹喷洒",
+      "type": "AOE"
+    },
+    "disperse.potent": {
+      "base_mana": 2,
+      "cast_type": "",
+      "cooldown": 0.5,
+      "damage": 0,
+      "field": "",
+      "origin": "composed_payload:disperse/potent",
+      "path": "",
+      "surface": "",
+      "tags": [
+        "poison",
+        "spray"
+      ],
+      "title": "喷洒介质 · 浓毒喷洒",
+      "type": "AOE"
+    },
+    "disperse.resin": {
+      "base_mana": 2,
+      "cast_type": "",
+      "cooldown": 0.5,
+      "damage": 0,
+      "field": "",
+      "origin": "composed_payload:disperse/resin",
+      "path": "",
+      "surface": "oiled",
+      "tags": [
+        "oil",
+        "spray"
+      ],
+      "title": "喷洒介质 · 树脂喷洒",
+      "type": "AOE"
+    },
+    "disperse.venom": {
+      "base_mana": 2,
+      "cast_type": "",
+      "cooldown": 0.5,
+      "damage": 0,
+      "field": "",
+      "origin": "composed_payload:disperse/venom",
+      "path": "",
+      "surface": "poisoned",
+      "tags": [
+        "poison",
+        "spray"
+      ],
+      "title": "喷洒介质 · 毒性喷洒",
+      "type": "AOE"
+    },
+    "disperse.water": {
+      "base_mana": 2,
+      "cast_type": "",
+      "cooldown": 0.5,
+      "damage": 0,
+      "field": "",
+      "origin": "composed_payload:disperse/water",
+      "path": "",
+      "surface": "wet",
+      "tags": [
+        "water",
+        "spray"
+      ],
+      "title": "喷洒介质 · 清水喷洒",
+      "type": "AOE"
+    },
+    "echo_barrage": {
+      "base_mana": 12,
+      "cast_type": "",
+      "cooldown": 2.0,
+      "damage": 15,
+      "field": "",
+      "origin": "combination_rule:echo_spark → echo_spark.tres",
+      "path": "res://gameplay/abilities/data/echo_barrage_result.tres",
+      "surface": "",
+      "tags": [
+        "arcane",
+        "echo",
+        "projectile"
+      ],
+      "title": "回响三重矢",
+      "type": "PROJECTILE"
+    },
+    "echo_wave": {
+      "base_mana": 14,
+      "cast_type": "",
+      "cooldown": 2.0,
+      "damage": 9,
+      "field": "",
+      "origin": "combination_rule:echo_pulse → echo_pulse.tres",
+      "path": "res://gameplay/abilities/data/echo_wave_result.tres",
+      "surface": "",
+      "tags": [
+        "arcane",
+        "echo",
+        "aoe",
+        "impact"
+      ],
+      "title": "回响脉冲",
+      "type": "AOE"
+    },
+    "ember_focus": {
+      "base_mana": 10,
+      "cast_type": "",
+      "cooldown": 4.0,
+      "damage": 25,
+      "field": "",
+      "origin": "combination_rule:fire_sigil_focus → fire_sigil_focus.tres",
+      "path": "res://gameplay/abilities/data/ember_focus_result.tres",
+      "surface": "",
+      "tags": [
+        "buff",
+        "combination"
+      ],
+      "title": "余烬战意",
+      "type": "BUFF"
+    },
+    "fire_sigil_burst": {
+      "base_mana": 14,
+      "cast_type": "",
+      "cooldown": 3.0,
+      "damage": 32,
+      "field": "",
+      "origin": "combination_rule:fire_sigil_pulse → fire_sigil_pulse.tres",
+      "path": "res://gameplay/abilities/data/fire_sigil_burst_data.tres",
+      "surface": "",
+      "tags": [
+        "fire",
+        "aoe",
+        "combination"
+      ],
+      "title": "火阵喷发",
+      "type": "AOE"
+    },
+    "fireball": {
+      "base_mana": 12,
+      "cast_type": "",
+      "cooldown": 2.0,
+      "damage": 25,
+      "field": "",
+      "origin": "combination_rule:fire_sigil_fireball → fire_sigil_fireball.tres",
+      "path": "res://gameplay/abilities/data/fireball_data.tres",
+      "surface": "",
+      "tags": [
+        "fire",
+        "projectile"
+      ],
+      "title": "火球术",
+      "type": "PROJECTILE"
+    },
+    "flow_attunement": {
+      "base_mana": 8,
+      "cast_type": "",
+      "cooldown": 4.0,
+      "damage": 25,
+      "field": "",
+      "origin": "combination_rule:terrain_water_focus → terrain_water_focus.tres",
+      "path": "res://gameplay/abilities/data/flow_attunement_result.tres",
+      "surface": "",
+      "tags": [
+        "buff",
+        "combination"
+      ],
+      "title": "流息",
+      "type": "BUFF"
+    },
+    "focus": {
+      "base_mana": 4,
+      "cast_type": "",
+      "cooldown": 4.0,
+      "damage": 25,
+      "field": "",
+      "origin": "current_action",
+      "path": "res://content/spell_operations/attune.tres",
+      "surface": "",
+      "tags": [
+        "buff",
+        "combination"
+      ],
+      "title": "调谐",
+      "type": "BUFF"
+    },
+    "focus.attune_arcane": {
+      "base_mana": 4,
+      "cast_type": "",
+      "cooldown": 4.0,
+      "damage": 25,
+      "field": "",
+      "origin": "composed_payload:focus/attune_arcane",
+      "path": "",
+      "surface": "",
+      "tags": [
+        "buff",
+        "combination"
+      ],
+      "title": "调谐 · 凝能阵调谐",
+      "type": "BUFF"
+    },
+    "focus.attune_fire": {
+      "base_mana": 4,
+      "cast_type": "",
+      "cooldown": 4.0,
+      "damage": 25,
+      "field": "",
+      "origin": "composed_payload:focus/attune_fire",
+      "path": "",
+      "surface": "",
+      "tags": [
+        "buff",
+        "combination"
+      ],
+      "title": "调谐 · 火阵调谐",
+      "type": "BUFF"
+    },
+    "focus.attune_frost": {
+      "base_mana": 4,
+      "cast_type": "",
+      "cooldown": 4.0,
+      "damage": 25,
+      "field": "",
+      "origin": "composed_payload:focus/attune_frost",
+      "path": "",
+      "surface": "",
+      "tags": [
+        "buff",
+        "combination"
+      ],
+      "title": "调谐 · 霜阵调谐",
+      "type": "BUFF"
+    },
+    "focus.attune_storm": {
+      "base_mana": 4,
+      "cast_type": "",
+      "cooldown": 4.0,
+      "damage": 25,
+      "field": "",
+      "origin": "composed_payload:focus/attune_storm",
+      "path": "",
+      "surface": "",
+      "tags": [
+        "buff",
+        "lightning",
+        "combination"
+      ],
+      "title": "调谐 · 雷阵调谐",
+      "type": "BUFF"
+    },
+    "focus.attune_ward": {
+      "base_mana": 4,
+      "cast_type": "",
+      "cooldown": 4.0,
+      "damage": 25,
+      "field": "",
+      "origin": "composed_payload:focus/attune_ward",
+      "path": "",
+      "surface": "",
+      "tags": [
+        "arcane",
+        "buff"
+      ],
+      "title": "调谐 · 守护阵调谐",
+      "type": "BUFF"
+    },
+    "focus.basic": {
+      "base_mana": 4,
+      "cast_type": "",
+      "cooldown": 4.0,
+      "damage": 25,
+      "field": "",
+      "origin": "composed_payload:focus/basic",
+      "path": "",
+      "surface": "",
+      "tags": [
+        "buff",
+        "combination"
+      ],
+      "title": "调谐 · 纯粹凝神",
+      "type": "BUFF"
+    },
+    "focus.echo": {
+      "base_mana": 4,
+      "cast_type": "",
+      "cooldown": 4.0,
+      "damage": 25,
+      "field": "",
+      "origin": "composed_payload:focus/echo",
+      "path": "",
+      "surface": "",
+      "tags": [
+        "arcane",
+        "buff"
+      ],
+      "title": "调谐 · 回响铭印",
+      "type": "BUFF"
+    },
+    "focus.ice_armor": {
+      "base_mana": 4,
+      "cast_type": "",
+      "cooldown": 4.0,
+      "damage": 0,
+      "field": "",
+      "origin": "composed_payload:focus/ice_armor",
+      "path": "",
+      "surface": "",
+      "tags": [
+        "ice",
+        "buff"
+      ],
+      "title": "调谐 · 霜盐护甲",
+      "type": "BUFF"
+    },
+    "focus.ward": {
+      "base_mana": 4,
+      "cast_type": "",
+      "cooldown": 4.0,
+      "damage": 25,
+      "field": "",
+      "origin": "composed_payload:focus/ward",
+      "path": "",
+      "surface": "",
+      "tags": [
+        "arcane",
+        "buff"
+      ],
+      "title": "调谐 · 守护调谐",
+      "type": "BUFF"
+    },
+    "frost_bolt": {
+      "base_mana": 10,
+      "cast_type": "",
+      "cooldown": 2.2,
+      "damage": 22,
+      "field": "",
+      "origin": "combination_rule:frost_sigil_spark → frost_sigil_spark.tres",
+      "path": "res://gameplay/abilities/data/frost_bolt_result.tres",
+      "surface": "",
+      "tags": [
+        "ice",
+        "projectile",
+        "combination"
+      ],
+      "title": "寒霜弹",
+      "type": "PROJECTILE"
+    },
+    "frost_ring": {
+      "base_mana": 12,
+      "cast_type": "",
+      "cooldown": 3.0,
+      "damage": 18,
+      "field": "",
+      "origin": "combination_rule:frost_sigil_pulse → frost_sigil_pulse.tres",
+      "path": "res://gameplay/abilities/data/frost_ring_result.tres",
+      "surface": "",
+      "tags": [
+        "ice",
+        "aoe",
+        "combination"
+      ],
+      "title": "寒霜新星",
+      "type": "AOE"
+    },
+    "frost_stride": {
+      "base_mana": 10,
+      "cast_type": "",
+      "cooldown": 4.0,
+      "damage": 25,
+      "field": "",
+      "origin": "combination_rule:frost_sigil_focus → frost_sigil_focus.tres",
+      "path": "res://gameplay/abilities/data/frost_stride_result.tres",
+      "surface": "",
+      "tags": [
+        "buff",
+        "combination"
+      ],
+      "title": "霜行",
+      "type": "BUFF"
+    },
+    "guard_release": {
+      "base_mana": 8,
+      "cast_type": "",
+      "cooldown": 2.0,
+      "damage": 24,
+      "field": "",
+      "origin": "combination_rule:guard_pulse → guard_pulse.tres",
+      "path": "res://gameplay/abilities/data/guard_release_result.tres",
+      "surface": "",
+      "tags": [
+        "arcane",
+        "echo",
+        "ward_release",
+        "aoe"
+      ],
+      "title": "守护爆破",
+      "type": "AOE"
+    },
+    "ignite": {
+      "base_mana": 4,
+      "cast_type": "",
+      "cooldown": 0.6,
+      "damage": 12,
+      "field": "",
+      "origin": "current_action",
+      "path": "res://gameplay/abilities/data/ignite_data.tres",
+      "surface": "",
+      "tags": [
+        "fire",
+        "spark",
+        "aoe"
+      ],
+      "title": "火花",
+      "type": "AOE"
+    },
+    "inscribe": {
+      "base_mana": 8,
+      "cast_type": "",
+      "cooldown": 8.0,
+      "damage": 0,
+      "field": "arcane",
+      "origin": "current_action",
+      "path": "res://content/spell_operations/inscribe.tres",
+      "surface": "",
+      "tags": [],
+      "title": "铭刻法阵",
+      "type": "BUFF"
+    },
+    "inscribe.arcane": {
+      "base_mana": 8,
+      "cast_type": "",
+      "cooldown": 8.0,
+      "damage": 0,
+      "field": "arcane",
+      "origin": "composed_payload:inscribe/arcane",
+      "path": "",
+      "surface": "",
+      "tags": [
+        "arcane",
+        "field"
+      ],
+      "title": "铭刻法阵 · 凝能阵",
+      "type": "BUFF"
+    },
+    "inscribe.ember": {
+      "base_mana": 8,
+      "cast_type": "",
+      "cooldown": 8.0,
+      "damage": 0,
+      "field": "fire",
+      "origin": "composed_payload:inscribe/ember",
+      "path": "",
+      "surface": "",
+      "tags": [
+        "fire",
+        "field"
+      ],
+      "title": "铭刻法阵 · 火石阵",
+      "type": "BUFF"
+    },
+    "inscribe.frost": {
+      "base_mana": 8,
+      "cast_type": "",
+      "cooldown": 8.0,
+      "damage": 0,
+      "field": "frost",
+      "origin": "composed_payload:inscribe/frost",
+      "path": "",
+      "surface": "",
+      "tags": [
+        "ice",
+        "field"
+      ],
+      "title": "铭刻法阵 · 霜盐阵",
+      "type": "BUFF"
+    },
+    "inscribe.storm": {
+      "base_mana": 8,
+      "cast_type": "",
+      "cooldown": 8.0,
+      "damage": 0,
+      "field": "storm",
+      "origin": "composed_payload:inscribe/storm",
+      "path": "",
+      "surface": "",
+      "tags": [
+        "lightning",
+        "field"
+      ],
+      "title": "铭刻法阵 · 雷晶阵",
+      "type": "BUFF"
+    },
+    "inscribe.ward_rune": {
+      "base_mana": 8,
+      "cast_type": "",
+      "cooldown": 8.0,
+      "damage": 0,
+      "field": "ward",
+      "origin": "composed_payload:inscribe/ward_rune",
+      "path": "",
+      "surface": "",
+      "tags": [],
+      "title": "铭刻法阵 · 守护法阵",
+      "type": "BUFF"
+    },
+    "project": {
+      "base_mana": 18,
+      "cast_type": "charge",
+      "cooldown": 5.0,
+      "damage": 0,
+      "field": "",
+      "origin": "current_action",
+      "path": "res://content/spell_operations/project.tres",
+      "surface": "",
+      "tags": [],
+      "title": "聚能投射",
+      "type": "PROJECTILE"
+    },
+    "project.charged_fireball": {
+      "base_mana": 18,
+      "cast_type": "charge",
+      "cooldown": 5.0,
+      "damage": 40,
+      "field": "",
+      "origin": "composed_payload:project/charged_fireball",
+      "path": "",
+      "surface": "",
+      "tags": [
+        "fire",
+        "projectile",
+        "charge"
+      ],
+      "title": "聚能投射 · 火石核心",
+      "type": "PROJECTILE"
+    },
+    "project.cinder_volley": {
+      "base_mana": 18,
+      "cast_type": "",
+      "cooldown": 5.0,
+      "damage": 13,
+      "field": "",
+      "origin": "composed_payload:project/cinder_volley",
+      "path": "",
+      "surface": "",
+      "tags": [
+        "fire",
+        "projectile",
+        "volley"
+      ],
+      "title": "聚能投射 · 树脂散射",
+      "type": "PROJECTILE"
+    },
+    "project.ember_orb": {
+      "base_mana": 18,
+      "cast_type": "",
+      "cooldown": 5.0,
+      "damage": 58,
+      "field": "",
+      "origin": "composed_payload:project/ember_orb",
+      "path": "",
+      "surface": "",
+      "tags": [
+        "fire",
+        "projectile",
+        "heavy"
+      ],
+      "title": "聚能投射 · 炭屑重核",
+      "type": "PROJECTILE"
+    },
+    "project.glacial_orb": {
+      "base_mana": 18,
+      "cast_type": "",
+      "cooldown": 5.0,
+      "damage": 32,
+      "field": "",
+      "origin": "composed_payload:project/glacial_orb",
+      "path": "",
+      "surface": "",
+      "tags": [
+        "ice",
+        "projectile",
+        "homing"
+      ],
+      "title": "聚能投射 · 霜盐追踪核",
+      "type": "PROJECTILE"
+    },
+    "project.plague_bolt": {
+      "base_mana": 18,
+      "cast_type": "",
+      "cooldown": 5.0,
+      "damage": 18,
+      "field": "",
+      "origin": "composed_payload:project/plague_bolt",
+      "path": "",
+      "surface": "",
+      "tags": [
+        "poison",
+        "projectile",
+        "piercing"
+      ],
+      "title": "聚能投射 · 毒萃穿刺",
+      "type": "PROJECTILE"
+    },
+    "project.shadow_bolt": {
+      "base_mana": 18,
+      "cast_type": "",
+      "cooldown": 5.0,
+      "damage": 14,
+      "field": "",
+      "origin": "composed_payload:project/shadow_bolt",
+      "path": "",
+      "surface": "",
+      "tags": [
+        "shadow",
+        "projectile"
+      ],
+      "title": "聚能投射 · 回响暗蚀",
+      "type": "PROJECTILE"
+    },
+    "project.solar_spear": {
+      "base_mana": 18,
+      "cast_type": "",
+      "cooldown": 5.0,
+      "damage": 70,
+      "field": "",
+      "origin": "composed_payload:project/solar_spear",
+      "path": "",
+      "surface": "",
+      "tags": [
+        "fire",
+        "holy",
+        "projectile",
+        "piercing"
+      ],
+      "title": "聚能投射 · 守护粉贯穿",
+      "type": "PROJECTILE"
+    },
+    "project.thunder_orb": {
+      "base_mana": 18,
+      "cast_type": "",
+      "cooldown": 5.0,
+      "damage": 38,
+      "field": "",
+      "origin": "composed_payload:project/thunder_orb",
+      "path": "",
+      "surface": "",
+      "tags": [
+        "lightning",
+        "projectile",
+        "homing"
+      ],
+      "title": "聚能投射 · 雷晶追踪核",
+      "type": "PROJECTILE"
+    },
+    "project.tidal_orb": {
+      "base_mana": 18,
+      "cast_type": "",
+      "cooldown": 5.0,
+      "damage": 15,
+      "field": "",
+      "origin": "composed_payload:project/tidal_orb",
+      "path": "",
+      "surface": "",
+      "tags": [
+        "water",
+        "projectile",
+        "homing"
+      ],
+      "title": "聚能投射 · 清水追踪核",
+      "type": "PROJECTILE"
+    },
+    "pulse": {
+      "base_mana": 3,
+      "cast_type": "",
+      "cooldown": 0.8,
+      "damage": 6,
+      "field": "",
+      "origin": "current_action",
+      "path": "res://gameplay/abilities/data/pulse_data.tres",
+      "surface": "",
+      "tags": [
+        "arcane",
+        "aoe",
+        "impact"
+      ],
+      "title": "震荡",
+      "type": "AOE"
+    },
+    "resonant_guard": {
+      "base_mana": 10,
+      "cast_type": "",
+      "cooldown": 1.5,
+      "damage": 25,
+      "field": "",
+      "origin": "combination_rule:echo_focus → echo_focus.tres",
+      "path": "res://gameplay/abilities/data/resonant_guard_result.tres",
+      "surface": "",
+      "tags": [
+        "arcane",
+        "buff"
+      ],
+      "title": "共鸣护盾",
+      "type": "BUFF"
+    },
+    "restoring_echo": {
+      "base_mana": 9,
+      "cast_type": "",
+      "cooldown": 1.5,
+      "damage": 25,
+      "field": "",
+      "origin": "combination_rule:echo_water → echo_water.tres",
+      "path": "res://gameplay/abilities/data/restoring_echo_result.tres",
+      "surface": "",
+      "tags": [
+        "arcane",
+        "buff"
+      ],
+      "title": "回响复苏",
+      "type": "BUFF"
+    },
+    "shape": {
+      "base_mana": 24,
+      "cast_type": "",
+      "cooldown": 8.0,
+      "damage": 0,
+      "field": "",
+      "origin": "current_action",
+      "path": "res://content/spell_operations/shape.tres",
+      "surface": "",
+      "tags": [],
+      "title": "塑形",
+      "type": "PROJECTILE"
+    },
+    "shape.blizzard": {
+      "base_mana": 24,
+      "cast_type": "",
+      "cooldown": 8.0,
+      "damage": 11,
+      "field": "",
+      "origin": "composed_payload:shape/blizzard",
+      "path": "",
+      "surface": "",
+      "tags": [
+        "ice",
+        "aoe",
+        "storm"
+      ],
+      "title": "塑形 · 霜盐暴雪",
+      "type": "AOE"
+    },
+    "shape.flame_storm": {
+      "base_mana": 24,
+      "cast_type": "",
+      "cooldown": 8.0,
+      "damage": 30,
+      "field": "",
+      "origin": "composed_payload:shape/flame_storm",
+      "path": "",
+      "surface": "",
+      "tags": [
+        "fire",
+        "aoe"
+      ],
+      "title": "塑形 · 火石爆区",
+      "type": "AOE"
+    },
+    "shape.magma_pool": {
+      "base_mana": 24,
+      "cast_type": "",
+      "cooldown": 8.0,
+      "damage": 14,
+      "field": "",
+      "origin": "composed_payload:shape/magma_pool",
+      "path": "",
+      "surface": "",
+      "tags": [
+        "fire",
+        "aoe",
+        "ground"
+      ],
+      "title": "塑形 · 树脂焚区",
+      "type": "AOE"
+    },
+    "shape.miasma_ring": {
+      "base_mana": 24,
+      "cast_type": "",
+      "cooldown": 8.0,
+      "damage": 10,
+      "field": "",
+      "origin": "composed_payload:shape/miasma_ring",
+      "path": "",
+      "surface": "",
+      "tags": [
+        "poison",
+        "aoe",
+        "aura"
+      ],
+      "title": "塑形 · 毒萃瘴环",
+      "type": "AOE"
+    },
+    "shape.radiant_aegis": {
+      "base_mana": 24,
+      "cast_type": "",
+      "cooldown": 8.0,
+      "damage": 0,
+      "field": "",
+      "origin": "composed_payload:shape/radiant_aegis",
+      "path": "",
+      "surface": "",
+      "tags": [
+        "holy",
+        "heal",
+        "buff"
+      ],
+      "title": "塑形 · 守护再生",
+      "type": "BUFF"
+    },
+    "shape.static_nova": {
+      "base_mana": 24,
+      "cast_type": "",
+      "cooldown": 8.0,
+      "damage": 16,
+      "field": "",
+      "origin": "composed_payload:shape/static_nova",
+      "path": "",
+      "surface": "",
+      "tags": [
+        "lightning",
+        "aoe",
+        "nova"
+      ],
+      "title": "塑形 · 雷晶近身三脉冲",
+      "type": "AOE"
+    },
+    "shape.storm_field": {
+      "base_mana": 24,
+      "cast_type": "",
+      "cooldown": 8.0,
+      "damage": 22,
+      "field": "",
+      "origin": "composed_payload:shape/storm_field",
+      "path": "",
+      "surface": "",
+      "tags": [
+        "lightning",
+        "aoe"
+      ],
+      "title": "塑形 · 雷晶雷场",
+      "type": "AOE"
+    },
+    "shape.summon_golem": {
+      "base_mana": 24,
+      "cast_type": "",
+      "cooldown": 8.0,
+      "damage": 0,
+      "field": "",
+      "origin": "composed_payload:shape/summon_golem",
+      "path": "",
+      "surface": "",
+      "tags": [
+        "summon",
+        "earth",
+        "tank"
+      ],
+      "title": "塑形 · 晶砂构体",
+      "type": "SUMMON"
+    },
+    "shape.summon_skeleton": {
+      "base_mana": 24,
+      "cast_type": "",
+      "cooldown": 8.0,
+      "damage": 0,
+      "field": "",
+      "origin": "composed_payload:shape/summon_skeleton",
+      "path": "",
+      "surface": "",
+      "tags": [
+        "summon",
+        "shadow"
+      ],
+      "title": "塑形 · 铭刻灰与真实残魂",
+      "type": "SUMMON"
+    },
+    "shape.summon_wisp": {
+      "base_mana": 24,
+      "cast_type": "",
+      "cooldown": 8.0,
+      "damage": 0,
+      "field": "",
+      "origin": "composed_payload:shape/summon_wisp",
+      "path": "",
+      "surface": "",
+      "tags": [
+        "summon",
+        "fire"
+      ],
+      "title": "塑形 · 炭屑火灵",
+      "type": "SUMMON"
+    },
+    "shape.venom_burst": {
+      "base_mana": 24,
+      "cast_type": "",
+      "cooldown": 8.0,
+      "damage": 36,
+      "field": "",
+      "origin": "composed_payload:shape/venom_burst",
+      "path": "",
+      "surface": "",
+      "tags": [
+        "poison",
+        "aoe",
+        "burst"
+      ],
+      "title": "塑形 · 浓毒爆区",
+      "type": "AOE"
+    },
+    "soul_cleanse": {
+      "base_mana": 7,
+      "cast_type": "",
+      "cooldown": 3.0,
+      "damage": 25,
+      "field": "",
+      "origin": "combination_rule:soul_water → soul_water.tres",
+      "path": "res://gameplay/abilities/data/soul_cleanse_result.tres",
+      "surface": "",
+      "tags": [
+        "soul",
+        "water",
+        "buff"
+      ],
+      "title": "净魂",
+      "type": "BUFF"
+    },
+    "soul_harvest": {
+      "base_mana": 4,
+      "cast_type": "",
+      "cooldown": 0.8,
+      "damage": 25,
+      "field": "",
+      "origin": "current_action",
+      "path": "res://content/spell_operations/extract.tres",
+      "surface": "",
+      "tags": [
+        "soul",
+        "buff"
+      ],
+      "title": "汲取",
+      "type": "BUFF"
+    },
+    "soul_harvest.extract_arcane": {
+      "base_mana": 4,
+      "cast_type": "",
+      "cooldown": 0.8,
+      "damage": 25,
+      "field": "",
+      "origin": "composed_payload:soul_harvest/extract_arcane",
+      "path": "",
+      "surface": "",
+      "tags": [
+        "arcane",
+        "buff"
+      ],
+      "title": "汲取 · 凝能阵充能",
+      "type": "BUFF"
+    },
+    "soul_harvest.extract_fire": {
+      "base_mana": 4,
+      "cast_type": "",
+      "cooldown": 0.8,
+      "damage": 25,
+      "field": "",
+      "origin": "composed_payload:soul_harvest/extract_fire",
+      "path": "",
+      "surface": "",
+      "tags": [
+        "arcane",
+        "buff"
+      ],
+      "title": "汲取 · 火阵充能",
+      "type": "BUFF"
+    },
+    "soul_harvest.extract_frost": {
+      "base_mana": 4,
+      "cast_type": "",
+      "cooldown": 0.8,
+      "damage": 25,
+      "field": "",
+      "origin": "composed_payload:soul_harvest/extract_frost",
+      "path": "",
+      "surface": "",
+      "tags": [
+        "arcane",
+        "buff"
+      ],
+      "title": "汲取 · 霜阵充能",
+      "type": "BUFF"
+    },
+    "soul_harvest.extract_storm": {
+      "base_mana": 4,
+      "cast_type": "",
+      "cooldown": 0.8,
+      "damage": 25,
+      "field": "",
+      "origin": "composed_payload:soul_harvest/extract_storm",
+      "path": "",
+      "surface": "",
+      "tags": [
+        "arcane",
+        "buff"
+      ],
+      "title": "汲取 · 雷阵充能",
+      "type": "BUFF"
+    },
+    "soul_harvest.extract_ward": {
+      "base_mana": 4,
+      "cast_type": "",
+      "cooldown": 0.8,
+      "damage": 25,
+      "field": "",
+      "origin": "composed_payload:soul_harvest/extract_ward",
+      "path": "",
+      "surface": "",
+      "tags": [
+        "arcane",
+        "buff"
+      ],
+      "title": "汲取 · 守护阵充能",
+      "type": "BUFF"
+    },
+    "soul_harvest.soul_source": {
+      "base_mana": 4,
+      "cast_type": "",
+      "cooldown": 0.8,
+      "damage": 25,
+      "field": "",
+      "origin": "composed_payload:soul_harvest/soul_source",
+      "path": "",
+      "surface": "",
+      "tags": [
+        "soul",
+        "buff"
+      ],
+      "title": "汲取 · 真实残魂",
+      "type": "BUFF"
+    },
+    "soul_lance": {
+      "base_mana": 9,
+      "cast_type": "",
+      "cooldown": 1.8,
+      "damage": 24,
+      "field": "",
+      "origin": "combination_rule:soul_spark → soul_spark.tres",
+      "path": "res://gameplay/abilities/data/soul_lance_result.tres",
+      "surface": "",
+      "tags": [
+        "soul",
+        "fire",
+        "projectile"
+      ],
+      "title": "魂焰矢",
+      "type": "PROJECTILE"
+    },
+    "soul_nova": {
+      "base_mana": 10,
+      "cast_type": "",
+      "cooldown": 2.2,
+      "damage": 20,
+      "field": "",
+      "origin": "combination_rule:soul_pulse → soul_pulse.tres",
+      "path": "res://gameplay/abilities/data/soul_nova_result.tres",
+      "surface": "",
+      "tags": [
+        "soul",
+        "ice",
+        "aoe"
+      ],
+      "title": "魂霜震荡",
+      "type": "AOE"
+    },
+    "spore_bolt": {
+      "base_mana": 12,
+      "cast_type": "",
+      "cooldown": 2.0,
+      "damage": 19,
+      "field": "",
+      "origin": "combination_rule:echo_venom → echo_venom.tres",
+      "path": "res://gameplay/abilities/data/spore_bolt_result.tres",
+      "surface": "",
+      "tags": [
+        "poison",
+        "echo",
+        "projectile"
+      ],
+      "title": "腐蚀孢子",
+      "type": "PROJECTILE"
+    },
+    "static_focus": {
+      "base_mana": 10,
+      "cast_type": "",
+      "cooldown": 4.0,
+      "damage": 25,
+      "field": "",
+      "origin": "combination_rule:storm_sigil_focus → storm_sigil_focus.tres",
+      "path": "res://gameplay/abilities/data/static_focus_result.tres",
+      "surface": "",
+      "tags": [
+        "buff",
+        "lightning",
+        "combination"
+      ],
+      "title": "雷息",
+      "type": "BUFF"
+    },
+    "step": {
+      "base_mana": 18,
+      "cast_type": "",
+      "cooldown": 6.0,
+      "damage": 0,
+      "field": "",
+      "origin": "current_action",
+      "path": "res://content/spell_operations/step.tres",
+      "surface": "",
+      "tags": [],
+      "title": "移形",
+      "type": "PROJECTILE"
+    },
+    "step.arcane_dash": {
+      "base_mana": 18,
+      "cast_type": "",
+      "cooldown": 6.0,
+      "damage": 0,
+      "field": "",
+      "origin": "composed_payload:step/arcane_dash",
+      "path": "",
+      "surface": "",
+      "tags": [
+        "arcane",
+        "dash"
+      ],
+      "title": "移形 · 晶砂短移",
+      "type": "DASH"
+    },
+    "step.phase_blink": {
+      "base_mana": 18,
+      "cast_type": "",
+      "cooldown": 6.0,
+      "damage": 0,
+      "field": "",
+      "origin": "composed_payload:step/phase_blink",
+      "path": "",
+      "surface": "",
+      "tags": [
+        "shadow",
+        "arcane",
+        "dash"
+      ],
+      "title": "移形 · 铭刻灰长移",
+      "type": "DASH"
+    },
+    "step.shadow_step": {
+      "base_mana": 18,
+      "cast_type": "",
+      "cooldown": 6.0,
+      "damage": 0,
+      "field": "",
+      "origin": "composed_payload:step/shadow_step",
+      "path": "",
+      "surface": "",
+      "tags": [
+        "shadow",
+        "dash",
+        "buff"
+      ],
+      "title": "移形 · 墨印突袭",
+      "type": "DASH"
+    },
+    "storm_bolt": {
+      "base_mana": 11,
+      "cast_type": "",
+      "cooldown": 2.2,
+      "damage": 20,
+      "field": "",
+      "origin": "combination_rule:storm_sigil_spark → storm_sigil_spark.tres",
+      "path": "res://gameplay/abilities/data/storm_bolt_result.tres",
+      "surface": "",
+      "tags": [
+        "lightning",
+        "projectile",
+        "combination"
+      ],
+      "title": "雷矢",
+      "type": "PROJECTILE"
+    },
+    "storm_ring": {
+      "base_mana": 13,
+      "cast_type": "",
+      "cooldown": 3.0,
+      "damage": 19,
+      "field": "",
+      "origin": "combination_rule:storm_sigil_pulse → storm_sigil_pulse.tres",
+      "path": "res://gameplay/abilities/data/storm_ring_result.tres",
+      "surface": "",
+      "tags": [
+        "lightning",
+        "aoe",
+        "combination"
+      ],
+      "title": "雷环",
+      "type": "AOE"
+    },
+    "sustain": {
+      "base_mana": 0,
+      "cast_type": "channel",
+      "cooldown": 0.1,
+      "damage": 0,
+      "field": "",
+      "origin": "current_action",
+      "path": "res://content/spell_operations/sustain.tres",
+      "surface": "",
+      "tags": [],
+      "title": "引导介质",
+      "type": "PROJECTILE"
+    },
+    "sustain.ice_storm": {
+      "base_mana": 0,
+      "cast_type": "channel",
+      "cooldown": 0.1,
+      "damage": 12,
+      "field": "",
+      "origin": "composed_payload:sustain/ice_storm",
+      "path": "",
+      "surface": "",
+      "tags": [
+        "ice",
+        "aoe",
+        "channel"
+      ],
+      "title": "引导介质 · 霜盐冰风暴",
+      "type": "AOE"
+    },
+    "venom_accord": {
+      "base_mana": 8,
+      "cast_type": "",
+      "cooldown": 4.0,
+      "damage": 25,
+      "field": "",
+      "origin": "combination_rule:terrain_poison_focus → terrain_poison_focus.tres",
+      "path": "res://gameplay/abilities/data/venom_accord_result.tres",
+      "surface": "",
+      "tags": [
+        "buff",
+        "combination"
+      ],
+      "title": "毒契",
+      "type": "BUFF"
+    },
+    "water_call": {
+      "base_mana": 5,
+      "cast_type": "",
+      "cooldown": 1.5,
+      "damage": 0,
+      "field": "",
+      "origin": "current_action",
+      "path": "res://gameplay/abilities/data/water_call_data.tres",
+      "surface": "wet",
+      "tags": [
+        "water",
+        "aoe"
+      ],
+      "title": "水引",
+      "type": "AOE"
+    }
+  },
+  "food_effects": {
+    "broth": {
+      "duration": 240.0,
+      "fatigue": -8.0,
+      "hydration": 20.0,
+      "nutrition": 35.0,
+      "seconds": 1.5,
+      "text": "饱食+35、饮水+20、疲劳-8；240秒生命回复+0.4/秒、法力回复+0.5/秒，替换原食物。"
+    },
+    "clean_water": {
+      "duration": 120.0,
+      "fatigue": 0.0,
+      "hydration": 40.0,
+      "nutrition": 0.0,
+      "seconds": 1.0,
+      "text": "饮水+40，120秒法力回复+0.5/秒；同类饮水刷新，不叠加。"
+    },
+    "dirty_water": {
+      "duration": 0.0,
+      "fatigue": 0.0,
+      "hydration": 25.0,
+      "nutrition": 0.0,
+      "seconds": 1.0,
+      "text": "应急饮水+25，但会施加中毒；不获得饮水恢复增益。可先过滤煮沸。"
+    },
+    "ration": {
+      "duration": 180.0,
+      "fatigue": 0.0,
+      "hydration": 0.0,
+      "nutrition": 45.0,
+      "seconds": 1.5,
+      "text": "饱食+45；180秒食物恢复：生命回复+0.6/秒。同类食物替换，不叠加。"
+    },
+    "tea": {
+      "duration": 150.0,
+      "fatigue": -15.0,
+      "hydration": 25.0,
+      "nutrition": 0.0,
+      "seconds": 0.5,
+      "text": "0.5秒饮用；饮水+25、疲劳-15；解除当前中毒，150秒法力回复+1/秒；不提供持续毒免疫。"
+    }
+  },
+  "hit_reactions": [
+    {
+      "bonus_damage_ratio": 0.6,
+      "caster_status": "",
+      "consume_target_status": true,
+      "description": "火焰命中冻结目标时造成 60% 额外伤害并移除冻结。",
+      "id": "melt",
+      "tags": [
+        "fire"
+      ],
+      "target_status": "frozen",
+      "title": "融化",
+      "triggered_skill": ""
+    },
+    {
+      "bonus_damage_ratio": 0.3,
+      "caster_status": "",
+      "consume_target_status": true,
+      "description": "火球命中潮湿目标时额外造成30%伤害，并消耗潮湿。",
+      "id": "vaporize",
+      "tags": [
+        "fire"
+      ],
+      "target_status": "wet",
+      "title": "蒸发",
+      "triggered_skill": ""
+    },
+    {
+      "bonus_damage_ratio": 0.75,
+      "caster_status": "",
+      "consume_target_status": true,
+      "description": "火焰命中中毒目标时造成 75% 额外伤害并消耗中毒。",
+      "id": "toxic_ignition",
+      "tags": [
+        "fire"
+      ],
+      "target_status": "poison",
+      "title": "毒焰引爆",
+      "triggered_skill": ""
+    },
+    {
+      "bonus_damage_ratio": 0.3,
+      "caster_status": "",
+      "consume_target_status": true,
+      "description": "寒霜弹或寒霜新星命中潮湿目标时额外造成30%伤害，消耗潮湿并保留冻结。",
+      "id": "deep_freeze",
+      "tags": [
+        "ice"
+      ],
+      "target_status": "wet",
+      "title": "凝冻",
+      "triggered_skill": ""
+    },
+    {
+      "bonus_damage_ratio": 0.45,
+      "caster_status": "",
+      "consume_target_status": false,
+      "description": "闪电命中潮湿目标时造成 45% 额外伤害。",
+      "id": "conduction",
+      "tags": [
+        "lightning"
+      ],
+      "target_status": "wet",
+      "title": "导电",
+      "triggered_skill": ""
+    },
+    {
+      "bonus_damage_ratio": 0.35,
+      "caster_status": "static_focus",
+      "consume_target_status": false,
+      "description": "雷息期间，雷矢或雷环命中额外造成35%伤害。",
+      "id": "static_overload",
+      "tags": [
+        "lightning"
+      ],
+      "target_status": "",
+      "title": "雷息共鸣",
+      "triggered_skill": ""
+    },
+    {
+      "bonus_damage_ratio": 0.5,
+      "caster_status": "",
+      "consume_target_status": true,
+      "description": "冰或水命中燃烧目标时造成 50% 额外伤害并扑灭燃烧。",
+      "id": "steam_burst",
+      "tags": [
+        "ice",
+        "water"
+      ],
+      "target_status": "burning",
+      "title": "蒸汽爆裂",
+      "triggered_skill": ""
+    },
+    {
+      "bonus_damage_ratio": 0.4,
+      "caster_status": "",
+      "consume_target_status": false,
+      "description": "暗影命中中毒目标时造成 40% 额外伤害，不消耗中毒。",
+      "id": "shadow_decay",
+      "tags": [
+        "shadow"
+      ],
+      "target_status": "poison",
+      "title": "腐影",
+      "triggered_skill": ""
+    },
+    {
+      "bonus_damage_ratio": 0.5,
+      "caster_status": "",
+      "consume_target_status": true,
+      "description": "震荡或回响脉冲命中已冻结目标时额外造成50%伤害并打碎冻结；消耗控制时间换取爆发。",
+      "id": "shatter",
+      "tags": [
+        "impact"
+      ],
+      "target_status": "frozen",
+      "title": "碎冰",
+      "triggered_skill": ""
+    }
+  ],
+  "items": [
+    {
+      "capacity": 3,
+      "id": "poison_rag",
+      "kind": "COATING",
+      "reach": 360.0,
+      "seconds": 1.2,
+      "stamina": 0.0,
+      "title": "毒抹布"
+    },
+    {
+      "capacity": 3,
+      "id": "fire_rag",
+      "kind": "COATING",
+      "reach": 360.0,
+      "seconds": 1.2,
+      "stamina": 0.0,
+      "title": "火焰抹布"
+    },
+    {
+      "capacity": 3,
+      "id": "oil_bottle",
+      "kind": "THROWABLE",
+      "reach": 360.0,
+      "seconds": 0.5,
+      "stamina": 8.0,
+      "title": "火油瓶"
+    },
+    {
+      "capacity": 3,
+      "id": "venom_bottle",
+      "kind": "THROWABLE",
+      "reach": 360.0,
+      "seconds": 0.5,
+      "stamina": 8.0,
+      "title": "毒瓶"
+    },
+    {
+      "capacity": 3,
+      "id": "paralytic_bottle",
+      "kind": "THROWABLE",
+      "reach": 360.0,
+      "seconds": 0.5,
+      "stamina": 8.0,
+      "title": "麻痹瓶"
+    },
+    {
+      "capacity": 3,
+      "id": "water_sprayer",
+      "kind": "SPRAY",
+      "reach": 360.0,
+      "seconds": 1.2,
+      "stamina": 0.0,
+      "title": "清水喷剂"
+    },
+    {
+      "capacity": 3,
+      "id": "resin_sprayer",
+      "kind": "SPRAY",
+      "reach": 360.0,
+      "seconds": 1.2,
+      "stamina": 0.0,
+      "title": "树脂喷剂"
+    },
+    {
+      "capacity": 3,
+      "id": "venom_sprayer",
+      "kind": "SPRAY",
+      "reach": 360.0,
+      "seconds": 1.2,
+      "stamina": 0.0,
+      "title": "毒性喷剂"
+    },
+    {
+      "capacity": 3,
+      "id": "potent_sprayer",
+      "kind": "SPRAY",
+      "reach": 360.0,
+      "seconds": 1.2,
+      "stamina": 0.0,
+      "title": "浓毒喷剂"
+    },
+    {
+      "capacity": 3,
+      "id": "paralytic_sprayer",
+      "kind": "SPRAY",
+      "reach": 360.0,
+      "seconds": 1.2,
+      "stamina": 0.0,
+      "title": "麻痹喷剂"
+    }
+  ],
+  "material_roles": [
+    {
+      "id": "ash",
+      "made_by": [
+        "ash"
+      ],
+      "modifier": true,
+      "primary_for": [
+        "塑形/铭刻灰与真实残魂",
+        "移形/铭刻灰长移"
+      ],
+      "recipe_inputs": [
+        "ward_powder"
+      ],
+      "title": "铭刻灰"
+    },
+    {
+      "id": "resin",
+      "made_by": [
+        "resin"
+      ],
+      "modifier": true,
+      "primary_for": [
+        "聚能投射/树脂散射",
+        "塑形/树脂焚区"
+      ],
+      "recipe_inputs": [
+        "fire_rag",
+        "oil_bottle",
+        "resin_sprayer"
+      ],
+      "title": "树脂制剂"
+    },
+    {
+      "id": "frost_salt",
+      "made_by": [
+        "frost_salt"
+      ],
+      "modifier": true,
+      "primary_for": [
+        "铭刻法阵/霜盐阵",
+        "调谐/霜盐护甲",
+        "聚能投射/霜盐追踪核",
+        "塑形/霜盐暴雪",
+        "引导介质/霜盐冰风暴"
+      ],
+      "recipe_inputs": [],
+      "title": "霜盐"
+    },
+    {
+      "id": "storm_dust",
+      "made_by": [
+        "storm_dust"
+      ],
+      "modifier": true,
+      "primary_for": [
+        "铭刻法阵/雷晶阵",
+        "聚能投射/雷晶追踪核",
+        "塑形/雷晶雷场",
+        "塑形/雷晶近身三脉冲"
+      ],
+      "recipe_inputs": [],
+      "title": "雷晶粉"
+    },
+    {
+      "id": "echo_ink",
+      "made_by": [
+        "echo_ink"
+      ],
+      "modifier": true,
+      "primary_for": [
+        "调谐/回响铭印",
+        "聚能投射/回响暗蚀",
+        "移形/墨印突袭"
+      ],
+      "recipe_inputs": [],
+      "title": "回响墨"
+    },
+    {
+      "id": "venom_extract",
+      "made_by": [
+        "venom_extract"
+      ],
+      "modifier": true,
+      "primary_for": [
+        "聚能投射/毒萃穿刺",
+        "塑形/毒萃瘴环"
+      ],
+      "recipe_inputs": [
+        "potent_venom",
+        "poison_rag",
+        "venom_bottle",
+        "venom_sprayer"
+      ],
+      "title": "毒性萃取"
+    },
+    {
+      "id": "ward_powder",
+      "made_by": [
+        "ward_powder"
+      ],
+      "modifier": true,
+      "primary_for": [
+        "铭刻法阵/守护法阵",
+        "调谐/守护调谐",
+        "聚能投射/守护粉贯穿",
+        "塑形/守护再生"
+      ],
+      "recipe_inputs": [],
+      "title": "守护粉"
+    },
+    {
+      "id": "fire_stone",
+      "made_by": [
+        "fire_stone"
+      ],
+      "modifier": false,
+      "primary_for": [
+        "铭刻法阵/火石阵",
+        "聚能投射/火石核心",
+        "塑形/火石爆区"
+      ],
+      "recipe_inputs": [],
+      "title": "火石"
+    },
+    {
+      "id": "water_sprayer",
+      "made_by": [
+        "water_sprayer"
+      ],
+      "modifier": false,
+      "primary_for": [
+        "喷洒介质/清水喷洒"
+      ],
+      "recipe_inputs": [],
+      "title": "清水喷剂"
+    },
+    {
+      "id": "venom_sprayer",
+      "made_by": [
+        "venom_sprayer"
+      ],
+      "modifier": false,
+      "primary_for": [
+        "喷洒介质/毒性喷洒"
+      ],
+      "recipe_inputs": [],
+      "title": "毒性喷剂"
+    },
+    {
+      "id": "potent_sprayer",
+      "made_by": [
+        "potent_sprayer"
+      ],
+      "modifier": false,
+      "primary_for": [
+        "喷洒介质/浓毒喷洒"
+      ],
+      "recipe_inputs": [],
+      "title": "浓毒喷剂"
+    },
+    {
+      "id": "paralytic_sprayer",
+      "made_by": [
+        "paralytic_sprayer"
+      ],
+      "modifier": false,
+      "primary_for": [
+        "喷洒介质/麻痹喷洒"
+      ],
+      "recipe_inputs": [],
+      "title": "麻痹喷剂"
+    },
+    {
+      "id": "resin_sprayer",
+      "made_by": [
+        "resin_sprayer"
+      ],
+      "modifier": false,
+      "primary_for": [
+        "喷洒介质/树脂喷洒"
+      ],
+      "recipe_inputs": [],
+      "title": "树脂喷剂"
+    },
+    {
+      "id": "charcoal",
+      "made_by": [],
+      "modifier": false,
+      "primary_for": [
+        "聚能投射/炭屑重核",
+        "塑形/炭屑火灵"
+      ],
+      "recipe_inputs": [
+        "ash",
+        "storm_dust",
+        "venom_extract",
+        "fire_stone",
+        "fire_rag"
+      ],
+      "title": "炭屑"
+    },
+    {
+      "id": "clean_water",
+      "made_by": [],
+      "modifier": false,
+      "primary_for": [
+        "聚能投射/清水追踪核"
+      ],
+      "recipe_inputs": [
+        "water_sprayer",
+        "resin_sprayer",
+        "venom_sprayer",
+        "potent_sprayer",
+        "paralytic_sprayer"
+      ],
+      "title": "饮用水"
+    },
+    {
+      "id": "potent_venom",
+      "made_by": [
+        "potent_venom"
+      ],
+      "modifier": false,
+      "primary_for": [
+        "塑形/浓毒爆区"
+      ],
+      "recipe_inputs": [
+        "potent_sprayer"
+      ],
+      "title": "浓缩毒剂"
+    },
+    {
+      "id": "crystal",
+      "made_by": [],
+      "modifier": false,
+      "primary_for": [
+        "塑形/晶砂构体",
+        "移形/晶砂短移"
+      ],
+      "recipe_inputs": [
+        "frost_salt",
+        "storm_dust",
+        "echo_ink",
+        "ward_powder",
+        "fire_stone",
+        "paralytic_extract"
+      ],
+      "title": "晶砂"
+    },
+    {
+      "id": "sap",
+      "made_by": [],
+      "modifier": false,
+      "primary_for": [],
+      "recipe_inputs": [
+        "resin",
+        "echo_ink",
+        "venom_extract"
+      ],
+      "title": "树液"
+    },
+    {
+      "id": "herb",
+      "made_by": [],
+      "modifier": false,
+      "primary_for": [],
+      "recipe_inputs": [
+        "paralytic_extract",
+        "potent_venom"
+      ],
+      "title": "苦叶"
+    },
+    {
+      "id": "paralytic_extract",
+      "made_by": [
+        "paralytic_extract"
+      ],
+      "modifier": false,
+      "primary_for": [],
+      "recipe_inputs": [
+        "paralytic_bottle",
+        "paralytic_sprayer"
+      ],
+      "title": "麻痹萃取"
+    },
+    {
+      "id": "cloth",
+      "made_by": [],
+      "modifier": false,
+      "primary_for": [],
+      "recipe_inputs": [
+        "poison_rag",
+        "fire_rag"
+      ],
+      "title": "布料"
+    },
+    {
+      "id": "poison_rag",
+      "made_by": [
+        "poison_rag"
+      ],
+      "modifier": false,
+      "primary_for": [],
+      "recipe_inputs": [],
+      "title": "毒抹布"
+    },
+    {
+      "id": "fire_rag",
+      "made_by": [
+        "fire_rag"
+      ],
+      "modifier": false,
+      "primary_for": [],
+      "recipe_inputs": [],
+      "title": "火焰抹布"
+    },
+    {
+      "id": "oil_bottle",
+      "made_by": [
+        "oil_bottle"
+      ],
+      "modifier": false,
+      "primary_for": [],
+      "recipe_inputs": [],
+      "title": "火油瓶"
+    },
+    {
+      "id": "venom_bottle",
+      "made_by": [
+        "venom_bottle"
+      ],
+      "modifier": false,
+      "primary_for": [],
+      "recipe_inputs": [],
+      "title": "毒瓶"
+    },
+    {
+      "id": "paralytic_bottle",
+      "made_by": [
+        "paralytic_bottle"
+      ],
+      "modifier": false,
+      "primary_for": [],
+      "recipe_inputs": [],
+      "title": "麻痹瓶"
+    }
+  ],
+  "materials": [
+    {
+      "description": "火/霜法阵持续时间+10秒，额外2 MP；不增加触发次数。",
+      "extra_mana": 2,
+      "id": "ash",
+      "title": "铭刻灰"
+    },
+    {
+      "description": "强化火球或魂焰矢：飞行减慢20%，命中留下半径80的6秒燃烧区，额外4 MP。",
+      "extra_mana": 4,
+      "id": "resin",
+      "title": "树脂制剂"
+    },
+    {
+      "description": "冰/水投射物或范围法术适配：寒霜弹穿透+1、范围半径+30；造水先凝成冰面，额外2 MP。",
+      "extra_mana": 2,
+      "id": "frost_salt",
+      "title": "霜盐"
+    },
+    {
+      "description": "铭刻雷阵的必需媒介；雷矢或水系投射物变三发散射，每发伤害70%；造水同时导电，可能波及自己与相连水域，额外4 MP。",
+      "extra_mana": 4,
+      "id": "storm_dust",
+      "title": "雷晶粉"
+    },
+    {
+      "description": "回响铭印的必需媒介；也可让回响三重矢每发或魂焰矢额外穿透1个目标，额外3 MP。",
+      "extra_mana": 3,
+      "id": "echo_ink",
+      "title": "回响墨"
+    },
+    {
+      "description": "毒雾的必需媒介；冰/水投射物或范围法术附毒，造水形成毒地、失去洗毒用途，额外3 MP。",
+      "extra_mana": 3,
+      "id": "venom_extract",
+      "title": "毒性萃取"
+    },
+    {
+      "description": "延长凝神恩赐、共鸣护盾、先祖护佑或净魂保护4秒，额外2 MP；不延长蕴魂或回响印记。",
+      "extra_mana": 2,
+      "id": "ward_powder",
+      "title": "守护粉"
+    }
+  ],
+  "operations": [
+    {
+      "aliases": [
+        "fire_sigil",
+        "frost_sigil",
+        "storm_sigil"
+      ],
+      "id": "inscribe",
+      "operation": "inscribe",
+      "payloads": [
+        {
+          "base_mana": 8,
+          "channel_interval": 0.3,
+          "channel_rate": 10.0,
+          "damage": 0,
+          "description": "不耗材料；只有一次充能，需以震荡手动触发。\n1次充能 · 10秒",
+          "effect": "",
+          "field": "arcane",
+          "id": "arcane",
+          "material": "",
+          "quantity": 0,
+          "source_field": "",
+          "source_kind": "",
+          "surface": "",
+          "title": "凝能阵"
+        },
+        {
+          "base_mana": 8,
+          "channel_interval": 0.3,
+          "channel_rate": 10.0,
+          "damage": 0,
+          "description": "火石提供火阵介质；由之后亲手执行的火花、震荡或凝神按已知关系触发。\n2次充能 · 15秒",
+          "effect": "",
+          "field": "fire",
+          "id": "ember",
+          "material": "fire_stone",
+          "quantity": 1,
+          "source_field": "",
+          "source_kind": "",
+          "surface": "",
+          "title": "火石阵"
+        },
+        {
+          "base_mana": 8,
+          "channel_interval": 0.3,
+          "channel_rate": 10.0,
+          "damage": 0,
+          "description": "霜盐提供霜阵介质；由后续基础动作与已知反应决定释放结果。\n2次充能 · 15秒",
+          "effect": "",
+          "field": "frost",
+          "id": "frost",
+          "material": "frost_salt",
+          "quantity": 1,
+          "source_field": "",
+          "source_kind": "",
+          "surface": "",
+          "title": "霜盐阵"
+        },
+        {
+          "base_mana": 9,
+          "channel_interval": 0.3,
+          "channel_rate": 10.0,
+          "damage": 0,
+          "description": "雷晶粉提供雷阵介质；由后续基础动作与已知反应决定释放结果。\n2次充能 · 15秒",
+          "effect": "",
+          "field": "storm",
+          "id": "storm",
+          "material": "storm_dust",
+          "quantity": 1,
+          "source_field": "",
+          "source_kind": "",
+          "surface": "",
+          "title": "雷晶阵"
+        },
+        {
+          "base_mana": 8,
+          "channel_interval": 0.3,
+          "channel_rate": 10.0,
+          "damage": 0,
+          "description": "守护粉铭刻的真实法阵；调谐获得护盾，震荡可释放能量。\n2次充能 · 15秒",
+          "effect": "",
+          "field": "ward",
+          "id": "ward_rune",
+          "material": "ward_powder",
+          "quantity": 1,
+          "source_field": "",
+          "source_kind": "",
+          "surface": "",
+          "title": "守护法阵"
+        }
+      ],
+      "title": "铭刻法阵"
+    },
+    {
+      "aliases": [
+        "venom_mist",
+        "poison_cloud",
+        "oil_flask"
+      ],
+      "id": "disperse",
+      "operation": "disperse",
+      "payloads": [
+        {
+          "base_mana": 2,
+          "channel_interval": 0.3,
+          "channel_rate": 10.0,
+          "damage": 0,
+          "description": "消耗饮用水，洗除燃烧、中毒与麻痹；喷出后不能再饮用。残水仍可导电或受污染。\n冲洗: 净化：中毒、麻痹、燃烧 0.1s\n地面：水域 · 8秒",
+          "effect": "",
+          "field": "",
+          "id": "water",
+          "material": "water_sprayer",
+          "quantity": 1,
+          "source_field": "",
+          "source_kind": "",
+          "surface": "wet",
+          "title": "清水喷洒"
+        },
+        {
+          "base_mana": 4,
+          "channel_interval": 0.3,
+          "channel_rate": 10.0,
+          "damage": 0,
+          "description": "在目标身上施加萃取毒素，并留下普通毒地。可被清水冲洗；已有毒素可被火引爆。\n萃取毒素: DOT 3/1.0s 5.0s\n地面：毒地 · 10秒",
+          "effect": "",
+          "field": "",
+          "id": "venom",
+          "material": "venom_sprayer",
+          "quantity": 1,
+          "source_field": "",
+          "source_kind": "",
+          "surface": "poisoned",
+          "title": "毒性喷洒"
+        },
+        {
+          "base_mana": 5,
+          "channel_interval": 0.3,
+          "channel_rate": 10.0,
+          "damage": 0,
+          "description": "浓缩毒素更强、更持久，直接附着目标；不铺设普通毒地。\n浓缩毒素: DOT 6/1.0s 8.0s",
+          "effect": "",
+          "field": "",
+          "id": "potent",
+          "material": "potent_sprayer",
+          "quantity": 1,
+          "source_field": "",
+          "source_kind": "",
+          "surface": "",
+          "title": "浓毒喷洒"
+        },
+        {
+          "base_mana": 4,
+          "channel_interval": 0.3,
+          "channel_rate": 10.0,
+          "damage": 0,
+          "description": "短暂限制移动与发起动作，不造成毒伤，也不生成毒地。清水可洗除。\n麻痹: 移速 ×0.00 1.5s",
+          "effect": "",
+          "field": "",
+          "id": "paralytic",
+          "material": "paralytic_sprayer",
+          "quantity": 1,
+          "source_field": "",
+          "source_kind": "",
+          "surface": "",
+          "title": "麻痹喷洒"
+        },
+        {
+          "base_mana": 2,
+          "channel_interval": 0.3,
+          "channel_rate": 10.0,
+          "damage": 0,
+          "description": "将树脂铺到前方地面，遇火燃烧，也可为现场准备提供燃料。\n地面：油地 · 8秒",
+          "effect": "",
+          "field": "",
+          "id": "resin",
+          "material": "resin_sprayer",
+          "quantity": 1,
+          "source_field": "",
+          "source_kind": "",
+          "surface": "oiled",
+          "title": "树脂喷洒"
+        }
+      ],
+      "title": "喷洒介质"
+    },
+    {
+      "aliases": [
+        "echo_mark",
+        "ice_armor"
+      ],
+      "id": "focus",
+      "operation": "attune",
+      "payloads": [
+        {
+          "base_mana": 4,
+          "channel_interval": 0.3,
+          "channel_rate": 10.0,
+          "damage": 0,
+          "description": "\n效果：凝神\n短暂稳定呼吸，移动速度提高8%；在法阵中会转化为更强的增益。",
+          "effect": "focus",
+          "field": "",
+          "id": "basic",
+          "material": "",
+          "quantity": 0,
+          "source_field": "",
+          "source_kind": "",
+          "surface": "",
+          "title": "纯粹凝神"
+        },
+        {
+          "base_mana": 6,
+          "channel_interval": 0.3,
+          "channel_rate": 10.0,
+          "damage": 0,
+          "description": "\n效果：回响铭印\n消耗回响墨1，获得持续12秒的一次性印记。接下来火花/震荡/凝神/水引/毒雾会转化为回响法术；用K编组。",
+          "effect": "echo_mark",
+          "field": "",
+          "id": "echo",
+          "material": "echo_ink",
+          "quantity": 1,
+          "source_field": "",
+          "source_kind": "",
+          "surface": "",
+          "title": "回响铭印"
+        },
+        {
+          "base_mana": 10,
+          "channel_interval": 0.3,
+          "channel_rate": 10.0,
+          "damage": 0,
+          "description": "\n效果：共鸣护盾\n回响印记＋凝神：8秒内承受伤害降低40%。与其他凝神增益互斥；普通震荡保留护盾，按住Shift使用震荡才消耗护盾释放守护爆破。",
+          "effect": "resonant_guard",
+          "field": "",
+          "id": "ward",
+          "material": "ward_powder",
+          "quantity": 1,
+          "source_field": "",
+          "source_kind": "",
+          "surface": "",
+          "title": "守护调谐"
+        },
+        {
+          "base_mana": 4,
+          "channel_interval": 0.3,
+          "channel_rate": 10.0,
+          "damage": 0,
+          "description": "\n效果：余烬战意\n火阵内凝神：10秒内近战攻击力+8并附带火焰命中，普通火焰施法伤害+20%且保留恩赐。按住Shift施放火焰动作会消耗余烬：本次伤害+60%，火球留下燃烧区，火花/喷发扩大并铺火，额外3 MP。失去持续增益，地面火焰也会伤害自己。",
+          "effect": "ember_focus",
+          "field": "",
+          "id": "attune_fire",
+          "material": "",
+          "quantity": 0,
+          "source_field": "fire",
+          "source_kind": "field",
+          "surface": "",
+          "title": "火阵调谐"
+        },
+        {
+          "base_mana": 4,
+          "channel_interval": 0.3,
+          "channel_rate": 10.0,
+          "damage": 0,
+          "description": "\n效果：霜行\n霜阵内凝神：8秒内移速+30%，普通冰霜施法伤害+20%且保留恩赐。按住Shift施放冰霜动作消耗霜行：本次伤害+60%，寒霜弹额外穿透两次、新星半径+36，额外3 MP；随后失去移速增益。",
+          "effect": "frost_stride",
+          "field": "",
+          "id": "attune_frost",
+          "material": "",
+          "quantity": 0,
+          "source_field": "frost",
+          "source_kind": "field",
+          "surface": "",
+          "title": "霜阵调谐"
+        },
+        {
+          "base_mana": 4,
+          "channel_interval": 0.3,
+          "channel_rate": 10.0,
+          "damage": 0,
+          "description": "\n效果：雷息\n雷阵内凝神：9秒内移速+15%，恩赐存在时雷矢/雷环命中额外35%伤害。按住Shift施放雷电动作会消耗雷息：本次伤害+90%，雷矢变为三发散射、雷环半径+48，额外3 MP；之后失去持续收益。",
+          "effect": "static_focus",
+          "field": "",
+          "id": "attune_storm",
+          "material": "",
+          "quantity": 0,
+          "source_field": "storm",
+          "source_kind": "field",
+          "surface": "",
+          "title": "雷阵调谐"
+        },
+        {
+          "base_mana": 4,
+          "channel_interval": 0.3,
+          "channel_rate": 10.0,
+          "damage": 0,
+          "description": "\n效果：凝神\n短暂稳定呼吸，移动速度提高8%；在法阵中会转化为更强的增益。",
+          "effect": "focus",
+          "field": "",
+          "id": "attune_arcane",
+          "material": "",
+          "quantity": 0,
+          "source_field": "arcane",
+          "source_kind": "field",
+          "surface": "",
+          "title": "凝能阵调谐"
+        },
+        {
+          "base_mana": 4,
+          "channel_interval": 0.3,
+          "channel_rate": 10.0,
+          "damage": 0,
+          "description": "\n效果：共鸣护盾\n回响印记＋凝神：8秒内承受伤害降低40%。与其他凝神增益互斥；普通震荡保留护盾，按住Shift使用震荡才消耗护盾释放守护爆破。",
+          "effect": "resonant_guard",
+          "field": "",
+          "id": "attune_ward",
+          "material": "",
+          "quantity": 0,
+          "source_field": "ward",
+          "source_kind": "field",
+          "surface": "",
+          "title": "守护阵调谐"
+        },
+        {
+          "base_mana": 25,
+          "channel_interval": 0.3,
+          "channel_rate": 10.0,
+          "damage": 0,
+          "description": "霜盐护甲；消耗真实材料，所选来源失效时拒绝，不自动换源。\n效果：冰霜护盾\n凝聚寒冰护盾，临时提高生命值上限。",
+          "effect": "ice_armor",
+          "field": "",
+          "id": "ice_armor",
+          "material": "frost_salt",
+          "quantity": 1,
+          "source_field": "frost",
+          "source_kind": "field",
+          "surface": "",
+          "title": "霜盐护甲"
+        }
+      ],
+      "title": "调谐"
+    },
+    {
+      "aliases": [],
+      "id": "soul_harvest",
+      "operation": "extract",
+      "payloads": [
+        {
+          "base_mana": 4,
+          "channel_interval": 0.3,
+          "channel_rate": 10.0,
+          "damage": 0,
+          "description": "\n效果：汲魂\n靠近战死守卫遗留的残魂，汲取1层蕴魂。魂量满时不会消耗残魂。用K编组，Shift配合火花/震荡/凝神/水引兑现。",
+          "effect": "soul_harvest",
+          "field": "",
+          "id": "soul_source",
+          "material": "",
+          "quantity": 0,
+          "source_field": "",
+          "source_kind": "soul",
+          "surface": "",
+          "title": "真实残魂"
+        },
+        {
+          "base_mana": 4,
+          "channel_interval": 0.3,
+          "channel_rate": 10.0,
+          "damage": 0,
+          "description": "\n效果：汲取 · 火\n",
+          "effect": "extract_fire",
+          "field": "",
+          "id": "extract_fire",
+          "material": "",
+          "quantity": 0,
+          "source_field": "fire",
+          "source_kind": "field",
+          "surface": "",
+          "title": "火阵充能"
+        },
+        {
+          "base_mana": 4,
+          "channel_interval": 0.3,
+          "channel_rate": 10.0,
+          "damage": 0,
+          "description": "\n效果：汲取 · 霜\n",
+          "effect": "extract_frost",
+          "field": "",
+          "id": "extract_frost",
+          "material": "",
+          "quantity": 0,
+          "source_field": "frost",
+          "source_kind": "field",
+          "surface": "",
+          "title": "霜阵充能"
+        },
+        {
+          "base_mana": 4,
+          "channel_interval": 0.3,
+          "channel_rate": 10.0,
+          "damage": 0,
+          "description": "\n效果：汲取 · 雷\n",
+          "effect": "extract_storm",
+          "field": "",
+          "id": "extract_storm",
+          "material": "",
+          "quantity": 0,
+          "source_field": "storm",
+          "source_kind": "field",
+          "surface": "",
+          "title": "雷阵充能"
+        },
+        {
+          "base_mana": 4,
+          "channel_interval": 0.3,
+          "channel_rate": 10.0,
+          "damage": 0,
+          "description": "\n效果：汲取 · 凝能\n",
+          "effect": "extract_arcane",
+          "field": "",
+          "id": "extract_arcane",
+          "material": "",
+          "quantity": 0,
+          "source_field": "arcane",
+          "source_kind": "field",
+          "surface": "",
+          "title": "凝能阵充能"
+        },
+        {
+          "base_mana": 4,
+          "channel_interval": 0.3,
+          "channel_rate": 10.0,
+          "damage": 0,
+          "description": "\n效果：汲取 · 守护\n",
+          "effect": "extract_ward",
+          "field": "",
+          "id": "extract_ward",
+          "material": "",
+          "quantity": 0,
+          "source_field": "ward",
+          "source_kind": "field",
+          "surface": "",
+          "title": "守护阵充能"
+        }
+      ],
+      "title": "汲取"
+    },
+    {
+      "aliases": [
+        "charged_fireball",
+        "cinder_volley",
+        "ember_orb",
+        "glacial_orb",
+        "thunder_orb",
+        "tidal_orb",
+        "plague_bolt",
+        "shadow_bolt",
+        "solar_spear"
+      ],
+      "id": "project",
+      "operation": "project",
+      "payloads": [
+        {
+          "base_mana": 20,
+          "channel_interval": 0.3,
+          "channel_rate": 10.0,
+          "damage": 0,
+          "description": "火石核心；消耗真实材料，所选来源失效时拒绝，不自动换源。\n效果：蓄力火球\n蓄力后释放高威力火球；提前释放会降低伤害和体积。",
+          "effect": "charged_fireball",
+          "field": "",
+          "id": "charged_fireball",
+          "material": "fire_stone",
+          "quantity": 1,
+          "source_field": "fire",
+          "source_kind": "field",
+          "surface": "",
+          "title": "火石核心"
+        },
+        {
+          "base_mana": 20,
+          "channel_interval": 0.3,
+          "channel_rate": 10.0,
+          "damage": 0,
+          "description": "树脂散射；消耗真实材料，所选来源失效时拒绝，不自动换源。\n效果：余烬齐射\n同时扇形发射四枚低伤火弹，近距离可集中命中。",
+          "effect": "cinder_volley",
+          "field": "",
+          "id": "cinder_volley",
+          "material": "resin",
+          "quantity": 1,
+          "source_field": "fire",
+          "source_kind": "field",
+          "surface": "",
+          "title": "树脂散射"
+        },
+        {
+          "base_mana": 24,
+          "channel_interval": 0.3,
+          "channel_rate": 10.0,
+          "damage": 0,
+          "description": "炭屑重核；消耗真实材料，所选来源失效时拒绝，不自动换源。\n效果：余烬球\n发射缓慢但沉重的火焰核心，适合封锁狭窄通道。",
+          "effect": "ember_orb",
+          "field": "",
+          "id": "ember_orb",
+          "material": "charcoal",
+          "quantity": 1,
+          "source_field": "fire",
+          "source_kind": "field",
+          "surface": "",
+          "title": "炭屑重核"
+        },
+        {
+          "base_mana": 18,
+          "channel_interval": 0.3,
+          "channel_rate": 10.0,
+          "damage": 0,
+          "description": "霜盐追踪核；消耗真实材料，所选来源失效时拒绝，不自动换源。\n效果：冰河之眼\n缓慢追踪敌人的冰霜核心，可贯穿一个目标。",
+          "effect": "glacial_orb",
+          "field": "",
+          "id": "glacial_orb",
+          "material": "frost_salt",
+          "quantity": 1,
+          "source_field": "frost",
+          "source_kind": "field",
+          "surface": "",
+          "title": "霜盐追踪核"
+        },
+        {
+          "base_mana": 23,
+          "channel_interval": 0.3,
+          "channel_rate": 10.0,
+          "damage": 0,
+          "description": "雷晶追踪核；消耗真实材料，所选来源失效时拒绝，不自动换源。\n效果：雷鸣球\n自动追猎附近敌人的雷电核心。",
+          "effect": "thunder_orb",
+          "field": "",
+          "id": "thunder_orb",
+          "material": "storm_dust",
+          "quantity": 1,
+          "source_field": "storm",
+          "source_kind": "field",
+          "surface": "",
+          "title": "雷晶追踪核"
+        },
+        {
+          "base_mana": 18,
+          "channel_interval": 0.3,
+          "channel_rate": 10.0,
+          "damage": 0,
+          "description": "清水追踪核；消耗真实材料，所选来源失效时拒绝，不自动换源。\n效果：潮汐灵球\n追踪敌人的水元素球，命中后施加潮湿。",
+          "effect": "tidal_orb",
+          "field": "",
+          "id": "tidal_orb",
+          "material": "clean_water",
+          "quantity": 1,
+          "source_field": "arcane",
+          "source_kind": "field",
+          "surface": "",
+          "title": "清水追踪核"
+        },
+        {
+          "base_mana": 18,
+          "channel_interval": 0.3,
+          "channel_rate": 10.0,
+          "damage": 0,
+          "description": "毒萃穿刺；消耗真实材料，所选来源失效时拒绝，不自动换源。\n效果：疫病穿刺\n发射可穿透多个目标的浓缩疫病箭。",
+          "effect": "plague_bolt",
+          "field": "",
+          "id": "plague_bolt",
+          "material": "venom_extract",
+          "quantity": 1,
+          "source_field": "arcane",
+          "source_kind": "field",
+          "surface": "",
+          "title": "毒萃穿刺"
+        },
+        {
+          "base_mana": 18,
+          "channel_interval": 0.3,
+          "channel_rate": 10.0,
+          "damage": 0,
+          "description": "回响暗蚀；消耗真实材料，所选来源失效时拒绝，不自动换源。\n效果：暗影弹\n低消耗地发射暗影能量，适合持续压制。",
+          "effect": "shadow_bolt",
+          "field": "",
+          "id": "shadow_bolt",
+          "material": "echo_ink",
+          "quantity": 1,
+          "source_field": "arcane",
+          "source_kind": "field",
+          "surface": "",
+          "title": "回响暗蚀"
+        },
+        {
+          "base_mana": 32,
+          "channel_interval": 0.3,
+          "channel_rate": 10.0,
+          "damage": 0,
+          "description": "守护粉贯穿；消耗真实材料，所选来源失效时拒绝，不自动换源。\n效果：日耀长枪\n投出高速圣火长枪，天然贯穿多个敌人。",
+          "effect": "solar_spear",
+          "field": "",
+          "id": "solar_spear",
+          "material": "ward_powder",
+          "quantity": 1,
+          "source_field": "fire",
+          "source_kind": "field",
+          "surface": "",
+          "title": "守护粉贯穿"
+        }
+      ],
+      "title": "聚能投射"
+    },
+    {
+      "aliases": [
+        "magma_pool",
+        "flame_storm",
+        "blizzard",
+        "storm_field",
+        "static_nova",
+        "miasma_ring",
+        "venom_burst",
+        "radiant_aegis",
+        "summon_golem",
+        "summon_skeleton",
+        "summon_wisp"
+      ],
+      "id": "shape",
+      "operation": "shape",
+      "payloads": [
+        {
+          "base_mana": 30,
+          "channel_interval": 0.3,
+          "channel_rate": 10.0,
+          "damage": 0,
+          "description": "树脂焚区；消耗真实材料，所选来源失效时拒绝，不自动换源。\n效果：熔岩池\n在前方制造持续喷涌的熔岩区域。",
+          "effect": "magma_pool",
+          "field": "",
+          "id": "magma_pool",
+          "material": "resin",
+          "quantity": 1,
+          "source_field": "fire",
+          "source_kind": "field",
+          "surface": "",
+          "title": "树脂焚区"
+        },
+        {
+          "base_mana": 35,
+          "channel_interval": 0.3,
+          "channel_rate": 10.0,
+          "damage": 0,
+          "description": "火石爆区；消耗真实材料，所选来源失效时拒绝，不自动换源。\n效果：烈焰风暴\n在前方召唤烈焰风暴，灼烧范围内敌人并点燃表面。",
+          "effect": "flame_storm",
+          "field": "",
+          "id": "flame_storm",
+          "material": "fire_stone",
+          "quantity": 1,
+          "source_field": "fire",
+          "source_kind": "field",
+          "surface": "",
+          "title": "火石爆区"
+        },
+        {
+          "base_mana": 42,
+          "channel_interval": 0.3,
+          "channel_rate": 10.0,
+          "damage": 0,
+          "description": "霜盐暴雪；消耗真实材料，所选来源失效时拒绝，不自动换源。\n效果：白灾暴雪\n在大范围内持续降下冰刃。",
+          "effect": "blizzard",
+          "field": "",
+          "id": "blizzard",
+          "material": "frost_salt",
+          "quantity": 1,
+          "source_field": "frost",
+          "source_kind": "field",
+          "surface": "",
+          "title": "霜盐暴雪"
+        },
+        {
+          "base_mana": 32,
+          "channel_interval": 0.3,
+          "channel_rate": 10.0,
+          "damage": 0,
+          "description": "雷晶雷场；消耗真实材料，所选来源失效时拒绝，不自动换源。\n效果：雷暴领域\n在前方生成持续雷场，强化潮湿区域中的闪电反应。",
+          "effect": "storm_field",
+          "field": "",
+          "id": "storm_field",
+          "material": "storm_dust",
+          "quantity": 1,
+          "source_field": "storm",
+          "source_kind": "field",
+          "surface": "",
+          "title": "雷晶雷场"
+        },
+        {
+          "base_mana": 24,
+          "channel_interval": 0.3,
+          "channel_rate": 10.0,
+          "damage": 0,
+          "description": "雷晶近身三脉冲；消耗真实材料，所选来源失效时拒绝，不自动换源。\n效果：静电新星\n从自身释放三次快速扩散的电弧脉冲。",
+          "effect": "static_nova",
+          "field": "",
+          "id": "static_nova",
+          "material": "storm_dust",
+          "quantity": 1,
+          "source_field": "storm",
+          "source_kind": "field",
+          "surface": "",
+          "title": "雷晶近身三脉冲"
+        },
+        {
+          "base_mana": 36,
+          "channel_interval": 0.3,
+          "channel_rate": 10.0,
+          "damage": 0,
+          "description": "毒萃瘴环；消耗真实材料，所选来源失效时拒绝，不自动换源。\n效果：瘴气环\n在自身周围维持一圈跟随施法位置的致命瘴气。",
+          "effect": "miasma_ring",
+          "field": "",
+          "id": "miasma_ring",
+          "material": "venom_extract",
+          "quantity": 1,
+          "source_field": "arcane",
+          "source_kind": "field",
+          "surface": "",
+          "title": "毒萃瘴环"
+        },
+        {
+          "base_mana": 24,
+          "channel_interval": 0.3,
+          "channel_rate": 10.0,
+          "damage": 0,
+          "description": "浓毒爆区；消耗真实材料，所选来源失效时拒绝，不自动换源。\n效果：剧毒爆发\n引爆短暂的大范围毒雾，以持续时间换取爆发覆盖。",
+          "effect": "venom_burst",
+          "field": "",
+          "id": "venom_burst",
+          "material": "potent_venom",
+          "quantity": 1,
+          "source_field": "arcane",
+          "source_kind": "field",
+          "surface": "",
+          "title": "浓毒爆区"
+        },
+        {
+          "base_mana": 28,
+          "channel_interval": 0.3,
+          "channel_rate": 10.0,
+          "damage": 0,
+          "description": "守护再生；消耗真实材料，所选来源失效时拒绝，不自动换源。\n效果：辉光圣盾\n提高生命上限并持续恢复生命。",
+          "effect": "radiant_aegis",
+          "field": "",
+          "id": "radiant_aegis",
+          "material": "ward_powder",
+          "quantity": 1,
+          "source_field": "ward",
+          "source_kind": "field",
+          "surface": "",
+          "title": "守护再生"
+        },
+        {
+          "base_mana": 44,
+          "channel_interval": 0.3,
+          "channel_rate": 10.0,
+          "damage": 0,
+          "description": "晶砂构体；消耗真实材料，所选来源失效时拒绝，不自动换源。\n效果：召唤苔岩魔像\n召唤坚固的苔岩魔像阻挡敌人。",
+          "effect": "summon_golem",
+          "field": "",
+          "id": "summon_golem",
+          "material": "crystal",
+          "quantity": 1,
+          "source_field": "arcane",
+          "source_kind": "field",
+          "surface": "",
+          "title": "晶砂构体"
+        },
+        {
+          "base_mana": 30,
+          "channel_interval": 0.3,
+          "channel_rate": 10.0,
+          "damage": 0,
+          "description": "铭刻灰与真实残魂；消耗真实材料，所选来源失效时拒绝，不自动换源。\n效果：召唤骷髅\n召唤一名骷髅战士追随并攻击附近敌人。",
+          "effect": "summon_skeleton",
+          "field": "",
+          "id": "summon_skeleton",
+          "material": "ash",
+          "quantity": 1,
+          "source_field": "",
+          "source_kind": "soul",
+          "surface": "",
+          "title": "铭刻灰与真实残魂"
+        },
+        {
+          "base_mana": 24,
+          "channel_interval": 0.3,
+          "channel_rate": 10.0,
+          "damage": 0,
+          "description": "炭屑火灵；消耗真实材料，所选来源失效时拒绝，不自动换源。\n效果：召唤余烬精灵\n召唤高速远程余烬精灵，频繁骚扰敌人。",
+          "effect": "summon_wisp",
+          "field": "",
+          "id": "summon_wisp",
+          "material": "charcoal",
+          "quantity": 1,
+          "source_field": "fire",
+          "source_kind": "field",
+          "surface": "",
+          "title": "炭屑火灵"
+        }
+      ],
+      "title": "塑形"
+    },
+    {
+      "aliases": [
+        "arcane_dash",
+        "shadow_step",
+        "phase_blink"
+      ],
+      "id": "step",
+      "operation": "step",
+      "payloads": [
+        {
+          "base_mana": 18,
+          "channel_interval": 0.3,
+          "channel_rate": 10.0,
+          "damage": 0,
+          "description": "晶砂短移；消耗真实材料，所选来源失效时拒绝，不自动换源。\n效果：奥术突进\n以纯粹奥术完成快速位移，不依赖目标或增益效果。",
+          "effect": "arcane_dash",
+          "field": "",
+          "id": "arcane_dash",
+          "material": "crystal",
+          "quantity": 1,
+          "source_field": "arcane",
+          "source_kind": "field",
+          "surface": "",
+          "title": "晶砂短移"
+        },
+        {
+          "base_mana": 20,
+          "channel_interval": 0.3,
+          "channel_rate": 10.0,
+          "damage": 0,
+          "description": "墨印突袭；消耗真实材料，所选来源失效时拒绝，不自动换源。\n效果：暗影步\n穿向目标方向，并在短时间内提高近战伤害。",
+          "effect": "shadow_step",
+          "field": "",
+          "id": "shadow_step",
+          "material": "echo_ink",
+          "quantity": 1,
+          "source_field": "arcane",
+          "source_kind": "field",
+          "surface": "",
+          "title": "墨印突袭"
+        },
+        {
+          "base_mana": 22,
+          "channel_interval": 0.3,
+          "channel_rate": 10.0,
+          "damage": 0,
+          "description": "铭刻灰长移；消耗真实材料，所选来源失效时拒绝，不自动换源。\n效果：相位闪现\n瞬间穿过长距离，以较高冷却换取脱离包围。",
+          "effect": "phase_blink",
+          "field": "",
+          "id": "phase_blink",
+          "material": "ash",
+          "quantity": 1,
+          "source_field": "arcane",
+          "source_kind": "field",
+          "surface": "",
+          "title": "铭刻灰长移"
+        }
+      ],
+      "title": "移形"
+    },
+    {
+      "aliases": [
+        "ice_storm"
+      ],
+      "id": "sustain",
+      "operation": "sustain",
+      "payloads": [
+        {
+          "base_mana": 0,
+          "channel_interval": 0.4,
+          "channel_rate": 12.0,
+          "damage": 0,
+          "description": "霜盐冰风暴；消耗真实材料，所选来源失效时拒绝，不自动换源。\n效果：冰风暴\n持续引导冰风暴，快速生成短暂的寒冰区域。",
+          "effect": "ice_storm",
+          "field": "",
+          "id": "ice_storm",
+          "material": "frost_salt",
+          "quantity": 1,
+          "source_field": "",
+          "source_kind": "",
+          "surface": "",
+          "title": "霜盐冰风暴"
+        }
+      ],
+      "title": "引导介质"
+    }
+  ],
+  "recipes": [
+    {
+      "id": "ash",
+      "inputs": {
+        "charcoal": 1
+      },
+      "output": "ash",
+      "quantity": 1
+    },
+    {
+      "id": "resin",
+      "inputs": {
+        "sap": 2
+      },
+      "output": "resin",
+      "quantity": 1
+    },
+    {
+      "id": "frost_salt",
+      "inputs": {
+        "crystal": 2
+      },
+      "output": "frost_salt",
+      "quantity": 1
+    },
+    {
+      "id": "storm_dust",
+      "inputs": {
+        "charcoal": 1,
+        "crystal": 1
+      },
+      "output": "storm_dust",
+      "quantity": 1
+    },
+    {
+      "id": "echo_ink",
+      "inputs": {
+        "crystal": 1,
+        "sap": 1
+      },
+      "output": "echo_ink",
+      "quantity": 1
+    },
+    {
+      "id": "venom_extract",
+      "inputs": {
+        "charcoal": 1,
+        "sap": 2
+      },
+      "output": "venom_extract",
+      "quantity": 1
+    },
+    {
+      "id": "ward_powder",
+      "inputs": {
+        "ash": 1,
+        "crystal": 1
+      },
+      "output": "ward_powder",
+      "quantity": 1
+    },
+    {
+      "id": "fire_stone",
+      "inputs": {
+        "charcoal": 2,
+        "crystal": 1
+      },
+      "output": "fire_stone",
+      "quantity": 1
+    },
+    {
+      "id": "paralytic_extract",
+      "inputs": {
+        "crystal": 1,
+        "herb": 2
+      },
+      "output": "paralytic_extract",
+      "quantity": 1
+    },
+    {
+      "id": "potent_venom",
+      "inputs": {
+        "herb": 1,
+        "venom_extract": 2
+      },
+      "output": "potent_venom",
+      "quantity": 1
+    },
+    {
+      "id": "poison_rag",
+      "inputs": {
+        "cloth": 1,
+        "venom_extract": 1
+      },
+      "output": "poison_rag",
+      "quantity": 1
+    },
+    {
+      "id": "fire_rag",
+      "inputs": {
+        "charcoal": 1,
+        "cloth": 1,
+        "resin": 1
+      },
+      "output": "fire_rag",
+      "quantity": 1
+    },
+    {
+      "id": "oil_bottle",
+      "inputs": {
+        "resin": 2
+      },
+      "output": "oil_bottle",
+      "quantity": 1
+    },
+    {
+      "id": "venom_bottle",
+      "inputs": {
+        "venom_extract": 2
+      },
+      "output": "venom_bottle",
+      "quantity": 1
+    },
+    {
+      "id": "paralytic_bottle",
+      "inputs": {
+        "paralytic_extract": 2
+      },
+      "output": "paralytic_bottle",
+      "quantity": 1
+    },
+    {
+      "id": "water_sprayer",
+      "inputs": {
+        "clean_water": 1
+      },
+      "output": "water_sprayer",
+      "quantity": 1
+    },
+    {
+      "id": "resin_sprayer",
+      "inputs": {
+        "clean_water": 1,
+        "resin": 1
+      },
+      "output": "resin_sprayer",
+      "quantity": 1
+    },
+    {
+      "id": "venom_sprayer",
+      "inputs": {
+        "clean_water": 1,
+        "venom_extract": 1
+      },
+      "output": "venom_sprayer",
+      "quantity": 1
+    },
+    {
+      "id": "potent_sprayer",
+      "inputs": {
+        "clean_water": 1,
+        "potent_venom": 1
+      },
+      "output": "potent_sprayer",
+      "quantity": 1
+    },
+    {
+      "id": "paralytic_sprayer",
+      "inputs": {
+        "clean_water": 1,
+        "paralytic_extract": 1
+      },
+      "output": "paralytic_sprayer",
+      "quantity": 1
+    }
+  ],
+  "rules": [
+    {
+      "action": "ignite",
+      "condition": "火阵",
+      "consume_status": false,
+      "empower": false,
+      "field": "fire",
+      "id": "fire_sigil_fireball",
+      "mana": 12,
+      "priority": 0,
+      "result": "fireball",
+      "result_title": "火球术",
+      "stacks": 0,
+      "status": "",
+      "surface": ""
+    },
+    {
+      "action": "pulse",
+      "condition": "火阵",
+      "consume_status": false,
+      "empower": false,
+      "field": "fire",
+      "id": "fire_sigil_pulse",
+      "mana": 14,
+      "priority": 0,
+      "result": "fire_sigil_burst",
+      "result_title": "火阵喷发",
+      "stacks": 0,
+      "status": "",
+      "surface": ""
+    },
+    {
+      "action": "ignite",
+      "condition": "霜阵",
+      "consume_status": false,
+      "empower": false,
+      "field": "frost",
+      "id": "frost_sigil_spark",
+      "mana": 10,
+      "priority": 0,
+      "result": "frost_bolt",
+      "result_title": "寒霜弹",
+      "stacks": 0,
+      "status": "",
+      "surface": ""
+    },
+    {
+      "action": "pulse",
+      "condition": "霜阵",
+      "consume_status": false,
+      "empower": false,
+      "field": "frost",
+      "id": "frost_sigil_pulse",
+      "mana": 12,
+      "priority": 0,
+      "result": "frost_ring",
+      "result_title": "寒霜新星",
+      "stacks": 0,
+      "status": "",
+      "surface": ""
+    },
+    {
+      "action": "focus",
+      "condition": "火阵",
+      "consume_status": false,
+      "empower": false,
+      "field": "fire",
+      "id": "fire_sigil_focus",
+      "mana": 10,
+      "priority": 0,
+      "result": "ember_focus",
+      "result_title": "余烬战意",
+      "stacks": 0,
+      "status": "",
+      "surface": ""
+    },
+    {
+      "action": "focus",
+      "condition": "霜阵",
+      "consume_status": false,
+      "empower": false,
+      "field": "frost",
+      "id": "frost_sigil_focus",
+      "mana": 10,
+      "priority": 0,
+      "result": "frost_stride",
+      "result_title": "霜行",
+      "stacks": 0,
+      "status": "",
+      "surface": ""
+    },
+    {
+      "action": "ignite",
+      "condition": "雷阵",
+      "consume_status": false,
+      "empower": false,
+      "field": "storm",
+      "id": "storm_sigil_spark",
+      "mana": 11,
+      "priority": 0,
+      "result": "storm_bolt",
+      "result_title": "雷矢",
+      "stacks": 0,
+      "status": "",
+      "surface": ""
+    },
+    {
+      "action": "pulse",
+      "condition": "雷阵",
+      "consume_status": false,
+      "empower": false,
+      "field": "storm",
+      "id": "storm_sigil_pulse",
+      "mana": 13,
+      "priority": 0,
+      "result": "storm_ring",
+      "result_title": "雷环",
+      "stacks": 0,
+      "status": "",
+      "surface": ""
+    },
+    {
+      "action": "focus",
+      "condition": "雷阵",
+      "consume_status": false,
+      "empower": false,
+      "field": "storm",
+      "id": "storm_sigil_focus",
+      "mana": 10,
+      "priority": 0,
+      "result": "static_focus",
+      "result_title": "雷息",
+      "stacks": 0,
+      "status": "",
+      "surface": ""
+    },
+    {
+      "action": "ignite",
+      "condition": "回响印记",
+      "consume_status": true,
+      "empower": false,
+      "field": "",
+      "id": "echo_spark",
+      "mana": 12,
+      "priority": 30,
+      "result": "echo_barrage",
+      "result_title": "回响三重矢",
+      "stacks": 0,
+      "status": "echo_ready",
+      "surface": ""
+    },
+    {
+      "action": "pulse",
+      "condition": "回响印记",
+      "consume_status": true,
+      "empower": false,
+      "field": "",
+      "id": "echo_pulse",
+      "mana": 14,
+      "priority": 30,
+      "result": "echo_wave",
+      "result_title": "回响脉冲",
+      "stacks": 0,
+      "status": "echo_ready",
+      "surface": ""
+    },
+    {
+      "action": "focus",
+      "condition": "回响印记",
+      "consume_status": true,
+      "empower": false,
+      "field": "",
+      "id": "echo_focus",
+      "mana": 10,
+      "priority": 30,
+      "result": "resonant_guard",
+      "result_title": "共鸣护盾",
+      "stacks": 0,
+      "status": "echo_ready",
+      "surface": ""
+    },
+    {
+      "action": "water_call",
+      "condition": "回响印记",
+      "consume_status": true,
+      "empower": false,
+      "field": "",
+      "id": "echo_water",
+      "mana": 9,
+      "priority": 30,
+      "result": "restoring_echo",
+      "result_title": "回响复苏",
+      "stacks": 0,
+      "status": "echo_ready",
+      "surface": ""
+    },
+    {
+      "action": "venom_mist",
+      "condition": "回响印记",
+      "consume_status": true,
+      "empower": false,
+      "field": "",
+      "id": "echo_venom",
+      "mana": 12,
+      "priority": 30,
+      "result": "spore_bolt",
+      "result_title": "腐蚀孢子",
+      "stacks": 0,
+      "status": "echo_ready",
+      "surface": ""
+    },
+    {
+      "action": "pulse",
+      "condition": "共鸣护盾 + Shift",
+      "consume_status": true,
+      "empower": true,
+      "field": "",
+      "id": "guard_pulse",
+      "mana": 8,
+      "priority": 40,
+      "result": "guard_release",
+      "result_title": "守护爆破",
+      "stacks": 0,
+      "status": "resonant_guard",
+      "surface": ""
+    },
+    {
+      "action": "ignite",
+      "condition": "蕴魂 + Shift",
+      "consume_status": true,
+      "empower": true,
+      "field": "",
+      "id": "soul_spark",
+      "mana": 9,
+      "priority": 20,
+      "result": "soul_lance",
+      "result_title": "魂焰矢",
+      "stacks": 1,
+      "status": "soul_charge",
+      "surface": ""
+    },
+    {
+      "action": "pulse",
+      "condition": "蕴魂 + Shift",
+      "consume_status": true,
+      "empower": true,
+      "field": "",
+      "id": "soul_pulse",
+      "mana": 10,
+      "priority": 20,
+      "result": "soul_nova",
+      "result_title": "魂霜震荡",
+      "stacks": 1,
+      "status": "soul_charge",
+      "surface": ""
+    },
+    {
+      "action": "focus",
+      "condition": "蕴魂 + Shift",
+      "consume_status": true,
+      "empower": true,
+      "field": "",
+      "id": "soul_focus",
+      "mana": 8,
+      "priority": 20,
+      "result": "ancestral_ward",
+      "result_title": "先祖护佑",
+      "stacks": 1,
+      "status": "soul_charge",
+      "surface": ""
+    },
+    {
+      "action": "water_call",
+      "condition": "蕴魂 + Shift",
+      "consume_status": true,
+      "empower": true,
+      "field": "",
+      "id": "soul_water",
+      "mana": 7,
+      "priority": 20,
+      "result": "soul_cleanse",
+      "result_title": "净魂",
+      "stacks": 1,
+      "status": "soul_charge",
+      "surface": ""
+    },
+    {
+      "action": "focus",
+      "condition": "脚下燃烧地面（消耗1格）或树脂制剂×1 + Shift",
+      "consume_status": false,
+      "empower": true,
+      "field": "",
+      "id": "terrain_fire_focus",
+      "mana": 10,
+      "priority": -10,
+      "result": "ember_focus",
+      "result_title": "余烬战意",
+      "stacks": 0,
+      "status": "",
+      "surface": "burning"
+    },
+    {
+      "action": "focus",
+      "condition": "脚下水域（消耗1格） + Shift",
+      "consume_status": false,
+      "empower": true,
+      "field": "",
+      "id": "terrain_water_focus",
+      "mana": 8,
+      "priority": -10,
+      "result": "flow_attunement",
+      "result_title": "流息",
+      "stacks": 0,
+      "status": "",
+      "surface": "wet"
+    },
+    {
+      "action": "focus",
+      "condition": "脚下冰面（消耗1格）或霜盐×1 + Shift",
+      "consume_status": false,
+      "empower": true,
+      "field": "",
+      "id": "terrain_frost_focus",
+      "mana": 10,
+      "priority": -10,
+      "result": "frost_stride",
+      "result_title": "霜行",
+      "stacks": 0,
+      "status": "",
+      "surface": "frozen"
+    },
+    {
+      "action": "focus",
+      "condition": "脚下导电水域（消耗1格）或雷晶粉×1 + Shift",
+      "consume_status": false,
+      "empower": true,
+      "field": "",
+      "id": "terrain_lightning_focus",
+      "mana": 10,
+      "priority": -10,
+      "result": "static_focus",
+      "result_title": "雷息",
+      "stacks": 0,
+      "status": "",
+      "surface": "electrified"
+    },
+    {
+      "action": "focus",
+      "condition": "脚下毒地（消耗1格）或毒性萃取×1 + Shift",
+      "consume_status": false,
+      "empower": true,
+      "field": "",
+      "id": "terrain_poison_focus",
+      "mana": 8,
+      "priority": -10,
+      "result": "venom_accord",
+      "result_title": "毒契",
+      "stacks": 0,
+      "status": "",
+      "surface": "poisoned"
+    },
+    {
+      "action": "pulse",
+      "condition": "凝能阵",
+      "consume_status": false,
+      "empower": false,
+      "field": "arcane",
+      "id": "arcane_pulse",
+      "mana": 8,
+      "priority": 0,
+      "result": "arcane_burst",
+      "result_title": "凝能震荡",
+      "stacks": 0,
+      "status": "",
+      "surface": ""
+    },
+    {
+      "action": "focus",
+      "condition": "守护阵",
+      "consume_status": false,
+      "empower": false,
+      "field": "ward",
+      "id": "ward_focus",
+      "mana": 10,
+      "priority": 0,
+      "result": "resonant_guard",
+      "result_title": "共鸣护盾",
+      "stacks": 0,
+      "status": "",
+      "surface": ""
+    },
+    {
+      "action": "pulse",
+      "condition": "守护阵",
+      "consume_status": false,
+      "empower": false,
+      "field": "ward",
+      "id": "ward_pulse",
+      "mana": 10,
+      "priority": 0,
+      "result": "guard_release",
+      "result_title": "守护爆破",
+      "stacks": 0,
+      "status": "",
+      "surface": ""
+    },
+    {
+      "action": "ignite",
+      "condition": "stored_fire + Shift",
+      "consume_status": true,
+      "empower": true,
+      "field": "",
+      "id": "fire_energy_ignite",
+      "mana": 10,
+      "priority": 25,
+      "result": "fireball",
+      "result_title": "火球术",
+      "stacks": 1,
+      "status": "stored_fire",
+      "surface": ""
+    },
+    {
+      "action": "pulse",
+      "condition": "stored_fire + Shift",
+      "consume_status": true,
+      "empower": true,
+      "field": "",
+      "id": "fire_energy_pulse",
+      "mana": 10,
+      "priority": 25,
+      "result": "fire_sigil_burst",
+      "result_title": "火阵喷发",
+      "stacks": 1,
+      "status": "stored_fire",
+      "surface": ""
+    },
+    {
+      "action": "ignite",
+      "condition": "stored_frost + Shift",
+      "consume_status": true,
+      "empower": true,
+      "field": "",
+      "id": "frost_energy_ignite",
+      "mana": 10,
+      "priority": 25,
+      "result": "frost_bolt",
+      "result_title": "寒霜弹",
+      "stacks": 1,
+      "status": "stored_frost",
+      "surface": ""
+    },
+    {
+      "action": "pulse",
+      "condition": "stored_frost + Shift",
+      "consume_status": true,
+      "empower": true,
+      "field": "",
+      "id": "frost_energy_pulse",
+      "mana": 10,
+      "priority": 25,
+      "result": "frost_ring",
+      "result_title": "寒霜新星",
+      "stacks": 1,
+      "status": "stored_frost",
+      "surface": ""
+    },
+    {
+      "action": "ignite",
+      "condition": "stored_storm + Shift",
+      "consume_status": true,
+      "empower": true,
+      "field": "",
+      "id": "storm_energy_ignite",
+      "mana": 10,
+      "priority": 25,
+      "result": "storm_bolt",
+      "result_title": "雷矢",
+      "stacks": 1,
+      "status": "stored_storm",
+      "surface": ""
+    },
+    {
+      "action": "pulse",
+      "condition": "stored_storm + Shift",
+      "consume_status": true,
+      "empower": true,
+      "field": "",
+      "id": "storm_energy_pulse",
+      "mana": 10,
+      "priority": 25,
+      "result": "storm_ring",
+      "result_title": "雷环",
+      "stacks": 1,
+      "status": "stored_storm",
+      "surface": ""
+    },
+    {
+      "action": "ignite",
+      "condition": "stored_arcane + Shift",
+      "consume_status": true,
+      "empower": true,
+      "field": "",
+      "id": "arcane_energy_ignite",
+      "mana": 10,
+      "priority": 25,
+      "result": "arcane_burst",
+      "result_title": "凝能震荡",
+      "stacks": 1,
+      "status": "stored_arcane",
+      "surface": ""
+    },
+    {
+      "action": "pulse",
+      "condition": "stored_arcane + Shift",
+      "consume_status": true,
+      "empower": true,
+      "field": "",
+      "id": "arcane_energy_pulse",
+      "mana": 10,
+      "priority": 25,
+      "result": "arcane_burst",
+      "result_title": "凝能震荡",
+      "stacks": 1,
+      "status": "stored_arcane",
+      "surface": ""
+    },
+    {
+      "action": "ignite",
+      "condition": "stored_ward + Shift",
+      "consume_status": true,
+      "empower": true,
+      "field": "",
+      "id": "ward_energy_ignite",
+      "mana": 10,
+      "priority": 25,
+      "result": "guard_release",
+      "result_title": "守护爆破",
+      "stacks": 1,
+      "status": "stored_ward",
+      "surface": ""
+    },
+    {
+      "action": "pulse",
+      "condition": "stored_ward + Shift",
+      "consume_status": true,
+      "empower": true,
+      "field": "",
+      "id": "ward_energy_pulse",
+      "mana": 10,
+      "priority": 25,
+      "result": "guard_release",
+      "result_title": "守护爆破",
+      "stacks": 1,
+      "status": "stored_ward",
+      "surface": ""
+    }
+  ],
+  "statuses": {
+    "ancestral_ward": [
+      {
+        "cleanse": [],
+        "damage_taken_multiplier": 0.75,
+        "description": "先祖护佑: 受到伤害 x0.75, 火焰/凝霜/雷电/arcane法术伤害 x1.15（保留）, Shift消耗：先祖回声（额外2 MP）, 保留减伤与15%法术增益；Shift伤害施法消费护佑，增加伤害和穿透，额外2 MP。 8.0s",
+        "duration": 8.0,
+        "empower": true,
+        "empower_damage_multiplier": 1.45,
+        "empower_mana_cost": 2,
+        "exclusive_group": "ancestral_boon",
+        "hint": "保留减伤与15%法术增益；Shift伤害施法消费护佑，增加伤害和穿透，额外2 MP。",
+        "immunities": [],
+        "max_stacks": 1,
+        "origin": "combination_rule:soul_focus → soul_focus.tres → ancestral_ward_result.tres",
+        "path": "res://gameplay/abilities/data/ancestral_ward_result.tres::Buff",
+        "prevents_actions": false,
+        "projectile_damage_multiplier": 1.0,
+        "speed_multiplier": 1.0,
+        "spell_damage_multiplier": 1.15,
+        "stat_modifiers": {
+
+        },
+        "stat_multipliers": {
+
+        },
+        "tick_damage": 0,
+        "tick_heal": 0,
+        "title": "先祖护佑"
+      }
+    ],
+    "burning": [
+      {
+        "cleanse": [],
+        "damage_taken_multiplier": 1.0,
+        "description": "燃烧: DOT 5/1.0s 4.0s",
+        "duration": 4.0,
+        "empower": false,
+        "empower_damage_multiplier": 1.0,
+        "empower_mana_cost": 0,
+        "exclusive_group": "",
+        "hint": "",
+        "immunities": [],
+        "max_stacks": 3,
+        "origin": "item_use:fire_rag → fire_rag.tres → flame.tres",
+        "path": "res://gameplay/abilities/data/burning.tres",
+        "prevents_actions": false,
+        "projectile_damage_multiplier": 1.0,
+        "speed_multiplier": 1.0,
+        "spell_damage_multiplier": 1.0,
+        "stat_modifiers": {
+
+        },
+        "stat_multipliers": {
+
+        },
+        "tick_damage": 5,
+        "tick_heal": 0,
+        "title": "燃烧"
+      }
+    ],
+    "clear_mind": [
+      {
+        "cleanse": [
+          "burning",
+          "poison",
+          "shocked"
+        ],
+        "damage_taken_multiplier": 1.0,
+        "description": "清明: 净化：燃烧、中毒、感电, 保护：燃烧、中毒、感电, 净化并阻止燃烧、中毒、感电；不能阻挡直接伤害或冻结。 6.0s",
+        "duration": 6.0,
+        "empower": false,
+        "empower_damage_multiplier": 1.0,
+        "empower_mana_cost": 0,
+        "exclusive_group": "",
+        "hint": "净化并阻止燃烧、中毒、感电；不能阻挡直接伤害或冻结。",
+        "immunities": [
+          "burning",
+          "poison",
+          "shocked"
+        ],
+        "max_stacks": 1,
+        "origin": "combination_rule:soul_water → soul_water.tres → soul_cleanse_result.tres",
+        "path": "res://gameplay/abilities/data/soul_cleanse_result.tres::Buff",
+        "prevents_actions": false,
+        "projectile_damage_multiplier": 1.0,
+        "speed_multiplier": 1.0,
+        "spell_damage_multiplier": 1.0,
+        "stat_modifiers": {
+
+        },
+        "stat_multipliers": {
+
+        },
+        "tick_damage": 0,
+        "tick_heal": 0,
+        "title": "清明"
+      }
+    ],
+    "echo_ready": [
+      {
+        "cleanse": [],
+        "damage_taken_multiplier": 1.0,
+        "description": "回响印记: no modifiers 12.0s",
+        "duration": 12.0,
+        "empower": false,
+        "empower_damage_multiplier": 1.0,
+        "empower_mana_cost": 0,
+        "exclusive_group": "echo_preparation",
+        "hint": "",
+        "immunities": [],
+        "max_stacks": 1,
+        "origin": "composed_payload:focus/echo → ",
+        "path": "",
+        "prevents_actions": false,
+        "projectile_damage_multiplier": 1.0,
+        "speed_multiplier": 1.0,
+        "spell_damage_multiplier": 1.0,
+        "stat_modifiers": {
+
+        },
+        "stat_multipliers": {
+
+        },
+        "tick_damage": 0,
+        "tick_heal": 0,
+        "title": "回响印记"
+      }
+    ],
+    "ember_focus": [
+      {
+        "cleanse": [],
+        "damage_taken_multiplier": 1.0,
+        "description": "余烬战意: 近战攻击+8, 近战附加火焰, 火焰法术伤害 x1.20（保留）, Shift消耗：燃尽余烬（额外3 MP） 10.0s",
+        "duration": 10.0,
+        "empower": true,
+        "empower_damage_multiplier": 1.6,
+        "empower_mana_cost": 3,
+        "exclusive_group": "sigil_attunement",
+        "hint": "",
+        "immunities": [],
+        "max_stacks": 1,
+        "origin": "composed_payload:focus/attune_fire → ",
+        "path": "",
+        "prevents_actions": false,
+        "projectile_damage_multiplier": 1.0,
+        "speed_multiplier": 1.0,
+        "spell_damage_multiplier": 1.2,
+        "stat_modifiers": {
+          "attack_damage": 8
+        },
+        "stat_multipliers": {
+
+        },
+        "tick_damage": 0,
+        "tick_heal": 0,
+        "title": "余烬战意"
+      },
+      {
+        "cleanse": [],
+        "damage_taken_multiplier": 1.0,
+        "description": "余烬战意: 近战攻击+8, 近战附加火焰, 火焰法术伤害 x1.20（保留）, Shift消耗：燃尽余烬（额外3 MP） 10.0s",
+        "duration": 10.0,
+        "empower": true,
+        "empower_damage_multiplier": 1.6,
+        "empower_mana_cost": 3,
+        "exclusive_group": "sigil_attunement",
+        "hint": "",
+        "immunities": [],
+        "max_stacks": 1,
+        "origin": "combination_rule:fire_sigil_focus → fire_sigil_focus.tres → ember_focus_result.tres",
+        "path": "res://gameplay/abilities/data/ember_focus_result.tres::Buff",
+        "prevents_actions": false,
+        "projectile_damage_multiplier": 1.0,
+        "speed_multiplier": 1.0,
+        "spell_damage_multiplier": 1.2,
+        "stat_modifiers": {
+          "attack_damage": 8
+        },
+        "stat_multipliers": {
+
+        },
+        "tick_damage": 0,
+        "tick_heal": 0,
+        "title": "余烬战意"
+      }
+    ],
+    "flow_attunement": [
+      {
+        "cleanse": [
+          "burning"
+        ],
+        "damage_taken_multiplier": 0.9,
+        "description": "流息: 受到伤害 x0.90, 水系法术伤害 x1.10（保留）, Shift消耗：涌流（额外3 MP）, 净化：燃烧 8.0s",
+        "duration": 8.0,
+        "empower": true,
+        "empower_damage_multiplier": 1.4,
+        "empower_mana_cost": 3,
+        "exclusive_group": "sigil_attunement",
+        "hint": "",
+        "immunities": [],
+        "max_stacks": 1,
+        "origin": "combination_rule:terrain_water_focus → terrain_water_focus.tres → flow_attunement_result.tres",
+        "path": "res://gameplay/abilities/data/flow_attunement_result.tres::Buff",
+        "prevents_actions": false,
+        "projectile_damage_multiplier": 1.0,
+        "speed_multiplier": 1.0,
+        "spell_damage_multiplier": 1.1,
+        "stat_modifiers": {
+
+        },
+        "stat_multipliers": {
+
+        },
+        "tick_damage": 0,
+        "tick_heal": 0,
+        "title": "流息"
+      }
+    ],
+    "focus": [
+      {
+        "cleanse": [],
+        "damage_taken_multiplier": 1.0,
+        "description": "凝神: 移速 ×1.08 5.0s",
+        "duration": 5.0,
+        "empower": false,
+        "empower_damage_multiplier": 1.0,
+        "empower_mana_cost": 0,
+        "exclusive_group": "sigil_attunement",
+        "hint": "",
+        "immunities": [],
+        "max_stacks": 1,
+        "origin": "current_action → attune.tres",
+        "path": "res://content/spell_operations/attune.tres::Buff",
+        "prevents_actions": false,
+        "projectile_damage_multiplier": 1.0,
+        "speed_multiplier": 1.08,
+        "spell_damage_multiplier": 1.0,
+        "stat_modifiers": {
+
+        },
+        "stat_multipliers": {
+
+        },
+        "tick_damage": 0,
+        "tick_heal": 0,
+        "title": "凝神"
+      },
+      {
+        "cleanse": [],
+        "damage_taken_multiplier": 1.0,
+        "description": "凝神: 移速 ×1.08 5.0s",
+        "duration": 5.0,
+        "empower": false,
+        "empower_damage_multiplier": 1.0,
+        "empower_mana_cost": 0,
+        "exclusive_group": "sigil_attunement",
+        "hint": "",
+        "immunities": [],
+        "max_stacks": 1,
+        "origin": "composed_payload:focus/basic → ",
+        "path": "",
+        "prevents_actions": false,
+        "projectile_damage_multiplier": 1.0,
+        "speed_multiplier": 1.08,
+        "spell_damage_multiplier": 1.0,
+        "stat_modifiers": {
+
+        },
+        "stat_multipliers": {
+
+        },
+        "tick_damage": 0,
+        "tick_heal": 0,
+        "title": "凝神"
+      },
+      {
+        "cleanse": [],
+        "damage_taken_multiplier": 1.0,
+        "description": "凝神: 移速 ×1.08 5.0s",
+        "duration": 5.0,
+        "empower": false,
+        "empower_damage_multiplier": 1.0,
+        "empower_mana_cost": 0,
+        "exclusive_group": "sigil_attunement",
+        "hint": "",
+        "immunities": [],
+        "max_stacks": 1,
+        "origin": "composed_payload:focus/attune_arcane → ",
+        "path": "",
+        "prevents_actions": false,
+        "projectile_damage_multiplier": 1.0,
+        "speed_multiplier": 1.08,
+        "spell_damage_multiplier": 1.0,
+        "stat_modifiers": {
+
+        },
+        "stat_multipliers": {
+
+        },
+        "tick_damage": 0,
+        "tick_heal": 0,
+        "title": "凝神"
+      }
+    ],
+    "frost_stride": [
+      {
+        "cleanse": [],
+        "damage_taken_multiplier": 1.0,
+        "description": "霜行: 移速 ×1.30, 凝霜法术伤害 x1.20（保留）, Shift消耗：碎霜（额外3 MP） 8.0s",
+        "duration": 8.0,
+        "empower": true,
+        "empower_damage_multiplier": 1.6,
+        "empower_mana_cost": 3,
+        "exclusive_group": "sigil_attunement",
+        "hint": "",
+        "immunities": [],
+        "max_stacks": 1,
+        "origin": "composed_payload:focus/attune_frost → ",
+        "path": "",
+        "prevents_actions": false,
+        "projectile_damage_multiplier": 1.0,
+        "speed_multiplier": 1.3,
+        "spell_damage_multiplier": 1.2,
+        "stat_modifiers": {
+
+        },
+        "stat_multipliers": {
+
+        },
+        "tick_damage": 0,
+        "tick_heal": 0,
+        "title": "霜行"
+      },
+      {
+        "cleanse": [],
+        "damage_taken_multiplier": 1.0,
+        "description": "霜行: 移速 ×1.30, 凝霜法术伤害 x1.20（保留）, Shift消耗：碎霜（额外3 MP） 8.0s",
+        "duration": 8.0,
+        "empower": true,
+        "empower_damage_multiplier": 1.6,
+        "empower_mana_cost": 3,
+        "exclusive_group": "sigil_attunement",
+        "hint": "",
+        "immunities": [],
+        "max_stacks": 1,
+        "origin": "combination_rule:frost_sigil_focus → frost_sigil_focus.tres → frost_stride_result.tres",
+        "path": "res://gameplay/abilities/data/frost_stride_result.tres::Buff",
+        "prevents_actions": false,
+        "projectile_damage_multiplier": 1.0,
+        "speed_multiplier": 1.3,
+        "spell_damage_multiplier": 1.2,
+        "stat_modifiers": {
+
+        },
+        "stat_multipliers": {
+
+        },
+        "tick_damage": 0,
+        "tick_heal": 0,
+        "title": "霜行"
+      }
+    ],
+    "frozen": [
+      {
+        "cleanse": [],
+        "damage_taken_multiplier": 1.0,
+        "description": "冻结: 移速 ×0.30 3.0s",
+        "duration": 3.0,
+        "empower": false,
+        "empower_damage_multiplier": 1.0,
+        "empower_mana_cost": 0,
+        "exclusive_group": "",
+        "hint": "",
+        "immunities": [],
+        "max_stacks": 1,
+        "origin": "element:ice → ice.tres",
+        "path": "res://gameplay/abilities/data/frozen.tres",
+        "prevents_actions": false,
+        "projectile_damage_multiplier": 1.0,
+        "speed_multiplier": 0.3,
+        "spell_damage_multiplier": 1.0,
+        "stat_modifiers": {
+
+        },
+        "stat_multipliers": {
+
+        },
+        "tick_damage": 0,
+        "tick_heal": 0,
+        "title": "冻结"
+      },
+      {
+        "cleanse": [],
+        "damage_taken_multiplier": 1.0,
+        "description": "冻结: 移速 ×0.30 3.0s",
+        "duration": 3.0,
+        "empower": false,
+        "empower_damage_multiplier": 1.0,
+        "empower_mana_cost": 0,
+        "exclusive_group": "",
+        "hint": "",
+        "immunities": [],
+        "max_stacks": 1,
+        "origin": "surface:frozen → frozen.tres",
+        "path": "res://gameplay/abilities/data/frozen.tres",
+        "prevents_actions": false,
+        "projectile_damage_multiplier": 1.0,
+        "speed_multiplier": 0.3,
+        "spell_damage_multiplier": 1.0,
+        "stat_modifiers": {
+
+        },
+        "stat_multipliers": {
+
+        },
+        "tick_damage": 0,
+        "tick_heal": 0,
+        "title": "冻结"
+      }
+    ],
+    "ice_armor": [
+      {
+        "cleanse": [],
+        "damage_taken_multiplier": 1.0,
+        "description": "冰霜护盾: 生命上限+40 8.0s",
+        "duration": 8.0,
+        "empower": false,
+        "empower_damage_multiplier": 1.0,
+        "empower_mana_cost": 0,
+        "exclusive_group": "",
+        "hint": "",
+        "immunities": [],
+        "max_stacks": 1,
+        "origin": "composed_payload:focus/ice_armor → ",
+        "path": "res://gameplay/abilities/data/ice_armor_buff.tres",
+        "prevents_actions": false,
+        "projectile_damage_multiplier": 1.0,
+        "speed_multiplier": 1.0,
+        "spell_damage_multiplier": 1.0,
+        "stat_modifiers": {
+          "max_hp": 40.0
+        },
+        "stat_multipliers": {
+
+        },
+        "tick_damage": 0,
+        "tick_heal": 0,
+        "title": "冰霜护盾"
+      }
+    ],
+    "paralysis": [
+      {
+        "cleanse": [],
+        "damage_taken_multiplier": 1.0,
+        "description": "麻痹: 移速 ×0.00 1.5s",
+        "duration": 1.5,
+        "empower": false,
+        "empower_damage_multiplier": 1.0,
+        "empower_mana_cost": 0,
+        "exclusive_group": "",
+        "hint": "",
+        "immunities": [],
+        "max_stacks": 1,
+        "origin": "composed_payload:disperse/paralytic → ",
+        "path": "res://content/spell_operations/statuses/paralysis.tres",
+        "prevents_actions": true,
+        "projectile_damage_multiplier": 1.0,
+        "speed_multiplier": 0.0,
+        "spell_damage_multiplier": 1.0,
+        "stat_modifiers": {
+
+        },
+        "stat_multipliers": {
+
+        },
+        "tick_damage": 0,
+        "tick_heal": 0,
+        "title": "麻痹"
+      }
+    ],
+    "poison": [
+      {
+        "cleanse": [],
+        "damage_taken_multiplier": 1.0,
+        "description": "萃取毒素: DOT 3/1.0s 5.0s",
+        "duration": 5.0,
+        "empower": false,
+        "empower_damage_multiplier": 1.0,
+        "empower_mana_cost": 0,
+        "exclusive_group": "",
+        "hint": "",
+        "immunities": [],
+        "max_stacks": 1,
+        "origin": "composed_payload:disperse/venom → ",
+        "path": "res://content/spell_operations/statuses/toxin.tres",
+        "prevents_actions": false,
+        "projectile_damage_multiplier": 1.0,
+        "speed_multiplier": 1.0,
+        "spell_damage_multiplier": 1.0,
+        "stat_modifiers": {
+
+        },
+        "stat_multipliers": {
+
+        },
+        "tick_damage": 3,
+        "tick_heal": 0,
+        "title": "萃取毒素"
+      },
+      {
+        "cleanse": [],
+        "damage_taken_multiplier": 1.0,
+        "description": "浓缩毒素: DOT 6/1.0s 8.0s",
+        "duration": 8.0,
+        "empower": false,
+        "empower_damage_multiplier": 1.0,
+        "empower_mana_cost": 0,
+        "exclusive_group": "",
+        "hint": "",
+        "immunities": [],
+        "max_stacks": 1,
+        "origin": "composed_payload:disperse/potent → ",
+        "path": "res://content/spell_operations/statuses/potent_toxin.tres",
+        "prevents_actions": false,
+        "projectile_damage_multiplier": 1.0,
+        "speed_multiplier": 1.0,
+        "spell_damage_multiplier": 1.0,
+        "stat_modifiers": {
+
+        },
+        "stat_multipliers": {
+
+        },
+        "tick_damage": 6,
+        "tick_heal": 0,
+        "title": "浓缩毒素"
+      },
+      {
+        "cleanse": [],
+        "damage_taken_multiplier": 1.0,
+        "description": "中毒: DOT 3/1.0s 5.0s",
+        "duration": 5.0,
+        "empower": false,
+        "empower_damage_multiplier": 1.0,
+        "empower_mana_cost": 0,
+        "exclusive_group": "",
+        "hint": "",
+        "immunities": [],
+        "max_stacks": 5,
+        "origin": "element:poison → poison.tres",
+        "path": "res://gameplay/abilities/data/poison.tres",
+        "prevents_actions": false,
+        "projectile_damage_multiplier": 1.0,
+        "speed_multiplier": 1.0,
+        "spell_damage_multiplier": 1.0,
+        "stat_modifiers": {
+
+        },
+        "stat_multipliers": {
+
+        },
+        "tick_damage": 3,
+        "tick_heal": 0,
+        "title": "中毒"
+      },
+      {
+        "cleanse": [],
+        "damage_taken_multiplier": 1.0,
+        "description": "中毒: DOT 3/1.0s 5.0s",
+        "duration": 5.0,
+        "empower": false,
+        "empower_damage_multiplier": 1.0,
+        "empower_mana_cost": 0,
+        "exclusive_group": "",
+        "hint": "",
+        "immunities": [],
+        "max_stacks": 5,
+        "origin": "surface:poisoned → poisoned.tres",
+        "path": "res://gameplay/abilities/data/poison.tres",
+        "prevents_actions": false,
+        "projectile_damage_multiplier": 1.0,
+        "speed_multiplier": 1.0,
+        "spell_damage_multiplier": 1.0,
+        "stat_modifiers": {
+
+        },
+        "stat_multipliers": {
+
+        },
+        "tick_damage": 3,
+        "tick_heal": 0,
+        "title": "中毒"
+      }
+    ],
+    "radiant_aegis": [
+      {
+        "cleanse": [],
+        "damage_taken_multiplier": 1.0,
+        "description": "辉光圣盾: 生命上限+20, HOT 6/1.5s 8.0s",
+        "duration": 8.0,
+        "empower": false,
+        "empower_damage_multiplier": 1.0,
+        "empower_mana_cost": 0,
+        "exclusive_group": "",
+        "hint": "",
+        "immunities": [],
+        "max_stacks": 1,
+        "origin": "composed_payload:shape/radiant_aegis → ",
+        "path": "res://gameplay/abilities/data/radiant_aegis_buff.tres",
+        "prevents_actions": false,
+        "projectile_damage_multiplier": 1.0,
+        "speed_multiplier": 1.0,
+        "spell_damage_multiplier": 1.0,
+        "stat_modifiers": {
+          "max_hp": 20.0
+        },
+        "stat_multipliers": {
+
+        },
+        "tick_damage": 0,
+        "tick_heal": 6,
+        "title": "辉光圣盾"
+      }
+    ],
+    "resonant_guard": [
+      {
+        "cleanse": [],
+        "damage_taken_multiplier": 0.6,
+        "description": "共鸣护盾: 受到伤害 x0.60 8.0s",
+        "duration": 8.0,
+        "empower": false,
+        "empower_damage_multiplier": 1.0,
+        "empower_mana_cost": 0,
+        "exclusive_group": "sigil_attunement",
+        "hint": "",
+        "immunities": [],
+        "max_stacks": 1,
+        "origin": "composed_payload:focus/ward → ",
+        "path": "",
+        "prevents_actions": false,
+        "projectile_damage_multiplier": 1.0,
+        "speed_multiplier": 1.0,
+        "spell_damage_multiplier": 1.0,
+        "stat_modifiers": {
+
+        },
+        "stat_multipliers": {
+
+        },
+        "tick_damage": 0,
+        "tick_heal": 0,
+        "title": "共鸣护盾"
+      },
+      {
+        "cleanse": [],
+        "damage_taken_multiplier": 0.6,
+        "description": "共鸣护盾: 受到伤害 x0.60 8.0s",
+        "duration": 8.0,
+        "empower": false,
+        "empower_damage_multiplier": 1.0,
+        "empower_mana_cost": 0,
+        "exclusive_group": "sigil_attunement",
+        "hint": "",
+        "immunities": [],
+        "max_stacks": 1,
+        "origin": "composed_payload:focus/attune_ward → ",
+        "path": "",
+        "prevents_actions": false,
+        "projectile_damage_multiplier": 1.0,
+        "speed_multiplier": 1.0,
+        "spell_damage_multiplier": 1.0,
+        "stat_modifiers": {
+
+        },
+        "stat_multipliers": {
+
+        },
+        "tick_damage": 0,
+        "tick_heal": 0,
+        "title": "共鸣护盾"
+      },
+      {
+        "cleanse": [],
+        "damage_taken_multiplier": 0.6,
+        "description": "共鸣护盾: 受到伤害 x0.60 8.0s",
+        "duration": 8.0,
+        "empower": false,
+        "empower_damage_multiplier": 1.0,
+        "empower_mana_cost": 0,
+        "exclusive_group": "sigil_attunement",
+        "hint": "",
+        "immunities": [],
+        "max_stacks": 1,
+        "origin": "combination_rule:echo_focus → echo_focus.tres → resonant_guard_result.tres",
+        "path": "res://gameplay/abilities/data/resonant_guard_result.tres::Buff",
+        "prevents_actions": false,
+        "projectile_damage_multiplier": 1.0,
+        "speed_multiplier": 1.0,
+        "spell_damage_multiplier": 1.0,
+        "stat_modifiers": {
+
+        },
+        "stat_multipliers": {
+
+        },
+        "tick_damage": 0,
+        "tick_heal": 0,
+        "title": "共鸣护盾"
+      }
+    ],
+    "restoring_echo": [
+      {
+        "cleanse": [],
+        "damage_taken_multiplier": 1.0,
+        "description": "回响复苏: HOT 6/1.0s 4.3s",
+        "duration": 4.3,
+        "empower": false,
+        "empower_damage_multiplier": 1.0,
+        "empower_mana_cost": 0,
+        "exclusive_group": "echo_restoration",
+        "hint": "",
+        "immunities": [],
+        "max_stacks": 1,
+        "origin": "combination_rule:echo_water → echo_water.tres → restoring_echo_result.tres",
+        "path": "res://gameplay/abilities/data/restoring_echo_result.tres::Buff",
+        "prevents_actions": false,
+        "projectile_damage_multiplier": 1.0,
+        "speed_multiplier": 1.0,
+        "spell_damage_multiplier": 1.0,
+        "stat_modifiers": {
+
+        },
+        "stat_multipliers": {
+
+        },
+        "tick_damage": 0,
+        "tick_heal": 6,
+        "title": "回响复苏"
+      }
+    ],
+    "shadow_step": [
+      {
+        "cleanse": [],
+        "damage_taken_multiplier": 1.0,
+        "description": "暗影步: 近战攻击+25 3.0s",
+        "duration": 3.0,
+        "empower": false,
+        "empower_damage_multiplier": 1.0,
+        "empower_mana_cost": 0,
+        "exclusive_group": "",
+        "hint": "",
+        "immunities": [],
+        "max_stacks": 1,
+        "origin": "composed_payload:step/shadow_step → ",
+        "path": "res://gameplay/abilities/data/shadow_step_buff.tres",
+        "prevents_actions": false,
+        "projectile_damage_multiplier": 1.0,
+        "speed_multiplier": 1.0,
+        "spell_damage_multiplier": 1.0,
+        "stat_modifiers": {
+          "attack_damage": 25.0
+        },
+        "stat_multipliers": {
+
+        },
+        "tick_damage": 0,
+        "tick_heal": 0,
+        "title": "暗影步"
+      }
+    ],
+    "shocked": [
+      {
+        "cleanse": [],
+        "damage_taken_multiplier": 1.0,
+        "description": "感电: DOT 4/1.0s, 移速 ×0.85 2.0s",
+        "duration": 2.0,
+        "empower": false,
+        "empower_damage_multiplier": 1.0,
+        "empower_mana_cost": 0,
+        "exclusive_group": "",
+        "hint": "",
+        "immunities": [],
+        "max_stacks": 1,
+        "origin": "surface:electrified → electrified.tres",
+        "path": "res://gameplay/abilities/data/shocked.tres",
+        "prevents_actions": false,
+        "projectile_damage_multiplier": 1.0,
+        "speed_multiplier": 0.85,
+        "spell_damage_multiplier": 1.0,
+        "stat_modifiers": {
+
+        },
+        "stat_multipliers": {
+
+        },
+        "tick_damage": 4,
+        "tick_heal": 0,
+        "title": "感电"
+      }
+    ],
+    "soul_charge": [
+      {
+        "cleanse": [],
+        "damage_taken_multiplier": 1.0,
+        "description": "蕴魂: 普通施法保留；Shift＋火花/震荡/凝神/水引各兑现1层。汲魂刷新持续时间，不超容量；跨区域清理。 45.0s",
+        "duration": 45.0,
+        "empower": false,
+        "empower_damage_multiplier": 1.0,
+        "empower_mana_cost": 0,
+        "exclusive_group": "",
+        "hint": "普通施法保留；Shift＋火花/震荡/凝神/水引各兑现1层。汲魂刷新持续时间，不超容量；跨区域清理。",
+        "immunities": [],
+        "max_stacks": 3,
+        "origin": "current_action → extract.tres",
+        "path": "res://content/spell_operations/extract.tres::Buff",
+        "prevents_actions": false,
+        "projectile_damage_multiplier": 1.0,
+        "speed_multiplier": 1.0,
+        "spell_damage_multiplier": 1.0,
+        "stat_modifiers": {
+
+        },
+        "stat_multipliers": {
+
+        },
+        "tick_damage": 0,
+        "tick_heal": 0,
+        "title": "蕴魂"
+      },
+      {
+        "cleanse": [],
+        "damage_taken_multiplier": 1.0,
+        "description": "蕴魂: 普通施法保留；Shift＋火花/震荡/凝神/水引各兑现1层。汲魂刷新持续时间，不超容量；跨区域清理。 45.0s",
+        "duration": 45.0,
+        "empower": false,
+        "empower_damage_multiplier": 1.0,
+        "empower_mana_cost": 0,
+        "exclusive_group": "stored_energy",
+        "hint": "普通施法保留；Shift＋火花/震荡/凝神/水引各兑现1层。汲魂刷新持续时间，不超容量；跨区域清理。",
+        "immunities": [],
+        "max_stacks": 3,
+        "origin": "composed_payload:soul_harvest/soul_source → ",
+        "path": "",
+        "prevents_actions": false,
+        "projectile_damage_multiplier": 1.0,
+        "speed_multiplier": 1.0,
+        "spell_damage_multiplier": 1.0,
+        "stat_modifiers": {
+
+        },
+        "stat_multipliers": {
+
+        },
+        "tick_damage": 0,
+        "tick_heal": 0,
+        "title": "蕴魂"
+      }
+    ],
+    "static_focus": [
+      {
+        "cleanse": [],
+        "damage_taken_multiplier": 1.0,
+        "description": "雷息: 移速 ×1.15, Shift消耗：雷息过载（额外3 MP） 9.0s",
+        "duration": 9.0,
+        "empower": true,
+        "empower_damage_multiplier": 1.9,
+        "empower_mana_cost": 3,
+        "exclusive_group": "sigil_attunement",
+        "hint": "",
+        "immunities": [],
+        "max_stacks": 1,
+        "origin": "composed_payload:focus/attune_storm → ",
+        "path": "",
+        "prevents_actions": false,
+        "projectile_damage_multiplier": 1.0,
+        "speed_multiplier": 1.15,
+        "spell_damage_multiplier": 1.0,
+        "stat_modifiers": {
+
+        },
+        "stat_multipliers": {
+
+        },
+        "tick_damage": 0,
+        "tick_heal": 0,
+        "title": "雷息"
+      },
+      {
+        "cleanse": [],
+        "damage_taken_multiplier": 1.0,
+        "description": "雷息: 移速 ×1.15, Shift消耗：雷息过载（额外3 MP） 9.0s",
+        "duration": 9.0,
+        "empower": true,
+        "empower_damage_multiplier": 1.9,
+        "empower_mana_cost": 3,
+        "exclusive_group": "sigil_attunement",
+        "hint": "",
+        "immunities": [],
+        "max_stacks": 1,
+        "origin": "combination_rule:storm_sigil_focus → storm_sigil_focus.tres → static_focus_result.tres",
+        "path": "res://gameplay/abilities/data/static_focus_result.tres::Buff",
+        "prevents_actions": false,
+        "projectile_damage_multiplier": 1.0,
+        "speed_multiplier": 1.15,
+        "spell_damage_multiplier": 1.0,
+        "stat_modifiers": {
+
+        },
+        "stat_multipliers": {
+
+        },
+        "tick_damage": 0,
+        "tick_heal": 0,
+        "title": "雷息"
+      }
+    ],
+    "steam_veil": [
+      {
+        "cleanse": [],
+        "damage_taken_multiplier": 1.0,
+        "description": "蒸汽迟滞: 移速 ×0.85, 投射物直接伤害 x0.75, 投射物直接伤害降低25%；近战、范围与持续伤害不变。接触蒸汽刷新2秒，离开后自然消退。 2.0s",
+        "duration": 2.0,
+        "empower": false,
+        "empower_damage_multiplier": 1.0,
+        "empower_mana_cost": 0,
+        "exclusive_group": "",
+        "hint": "投射物直接伤害降低25%；近战、范围与持续伤害不变。接触蒸汽刷新2秒，离开后自然消退。",
+        "immunities": [],
+        "max_stacks": 1,
+        "origin": "surface:steam → steam.tres",
+        "path": "res://gameplay/abilities/data/steam_veil.tres",
+        "prevents_actions": false,
+        "projectile_damage_multiplier": 0.75,
+        "speed_multiplier": 0.85,
+        "spell_damage_multiplier": 1.0,
+        "stat_modifiers": {
+
+        },
+        "stat_multipliers": {
+
+        },
+        "tick_damage": 0,
+        "tick_heal": 0,
+        "title": "蒸汽迟滞"
+      }
+    ],
+    "stored_arcane": [
+      {
+        "cleanse": [],
+        "damage_taken_multiplier": 1.0,
+        "description": "蕴能 · 凝能: Shift＋火花/震荡手动兑现1层；更换能量类型替换原有能量，跨区域清理。 45.0s",
+        "duration": 45.0,
+        "empower": false,
+        "empower_damage_multiplier": 1.0,
+        "empower_mana_cost": 0,
+        "exclusive_group": "stored_energy",
+        "hint": "Shift＋火花/震荡手动兑现1层；更换能量类型替换原有能量，跨区域清理。",
+        "immunities": [],
+        "max_stacks": 3,
+        "origin": "composed_payload:soul_harvest/extract_arcane → ",
+        "path": "",
+        "prevents_actions": false,
+        "projectile_damage_multiplier": 1.0,
+        "speed_multiplier": 1.0,
+        "spell_damage_multiplier": 1.0,
+        "stat_modifiers": {
+
+        },
+        "stat_multipliers": {
+
+        },
+        "tick_damage": 0,
+        "tick_heal": 0,
+        "title": "蕴能 · 凝能"
+      }
+    ],
+    "stored_fire": [
+      {
+        "cleanse": [],
+        "damage_taken_multiplier": 1.0,
+        "description": "蕴能 · 火: Shift＋火花/震荡手动兑现1层；更换能量类型替换原有能量，跨区域清理。 45.0s",
+        "duration": 45.0,
+        "empower": false,
+        "empower_damage_multiplier": 1.0,
+        "empower_mana_cost": 0,
+        "exclusive_group": "stored_energy",
+        "hint": "Shift＋火花/震荡手动兑现1层；更换能量类型替换原有能量，跨区域清理。",
+        "immunities": [],
+        "max_stacks": 3,
+        "origin": "composed_payload:soul_harvest/extract_fire → ",
+        "path": "",
+        "prevents_actions": false,
+        "projectile_damage_multiplier": 1.0,
+        "speed_multiplier": 1.0,
+        "spell_damage_multiplier": 1.0,
+        "stat_modifiers": {
+
+        },
+        "stat_multipliers": {
+
+        },
+        "tick_damage": 0,
+        "tick_heal": 0,
+        "title": "蕴能 · 火"
+      }
+    ],
+    "stored_frost": [
+      {
+        "cleanse": [],
+        "damage_taken_multiplier": 1.0,
+        "description": "蕴能 · 霜: Shift＋火花/震荡手动兑现1层；更换能量类型替换原有能量，跨区域清理。 45.0s",
+        "duration": 45.0,
+        "empower": false,
+        "empower_damage_multiplier": 1.0,
+        "empower_mana_cost": 0,
+        "exclusive_group": "stored_energy",
+        "hint": "Shift＋火花/震荡手动兑现1层；更换能量类型替换原有能量，跨区域清理。",
+        "immunities": [],
+        "max_stacks": 3,
+        "origin": "composed_payload:soul_harvest/extract_frost → ",
+        "path": "",
+        "prevents_actions": false,
+        "projectile_damage_multiplier": 1.0,
+        "speed_multiplier": 1.0,
+        "spell_damage_multiplier": 1.0,
+        "stat_modifiers": {
+
+        },
+        "stat_multipliers": {
+
+        },
+        "tick_damage": 0,
+        "tick_heal": 0,
+        "title": "蕴能 · 霜"
+      }
+    ],
+    "stored_storm": [
+      {
+        "cleanse": [],
+        "damage_taken_multiplier": 1.0,
+        "description": "蕴能 · 雷: Shift＋火花/震荡手动兑现1层；更换能量类型替换原有能量，跨区域清理。 45.0s",
+        "duration": 45.0,
+        "empower": false,
+        "empower_damage_multiplier": 1.0,
+        "empower_mana_cost": 0,
+        "exclusive_group": "stored_energy",
+        "hint": "Shift＋火花/震荡手动兑现1层；更换能量类型替换原有能量，跨区域清理。",
+        "immunities": [],
+        "max_stacks": 3,
+        "origin": "composed_payload:soul_harvest/extract_storm → ",
+        "path": "",
+        "prevents_actions": false,
+        "projectile_damage_multiplier": 1.0,
+        "speed_multiplier": 1.0,
+        "spell_damage_multiplier": 1.0,
+        "stat_modifiers": {
+
+        },
+        "stat_multipliers": {
+
+        },
+        "tick_damage": 0,
+        "tick_heal": 0,
+        "title": "蕴能 · 雷"
+      }
+    ],
+    "stored_ward": [
+      {
+        "cleanse": [],
+        "damage_taken_multiplier": 1.0,
+        "description": "蕴能 · 守护: Shift＋火花/震荡手动兑现1层；更换能量类型替换原有能量，跨区域清理。 45.0s",
+        "duration": 45.0,
+        "empower": false,
+        "empower_damage_multiplier": 1.0,
+        "empower_mana_cost": 0,
+        "exclusive_group": "stored_energy",
+        "hint": "Shift＋火花/震荡手动兑现1层；更换能量类型替换原有能量，跨区域清理。",
+        "immunities": [],
+        "max_stacks": 3,
+        "origin": "composed_payload:soul_harvest/extract_ward → ",
+        "path": "",
+        "prevents_actions": false,
+        "projectile_damage_multiplier": 1.0,
+        "speed_multiplier": 1.0,
+        "spell_damage_multiplier": 1.0,
+        "stat_modifiers": {
+
+        },
+        "stat_multipliers": {
+
+        },
+        "tick_damage": 0,
+        "tick_heal": 0,
+        "title": "蕴能 · 守护"
+      }
+    ],
+    "venom_accord": [
+      {
+        "cleanse": [
+          "poison"
+        ],
+        "damage_taken_multiplier": 1.0,
+        "description": "毒契: 毒法术伤害 x1.15（保留）, Shift消耗：蚀散（额外3 MP）, 净化：中毒, 保护：中毒 8.0s",
+        "duration": 8.0,
+        "empower": true,
+        "empower_damage_multiplier": 1.5,
+        "empower_mana_cost": 3,
+        "exclusive_group": "sigil_attunement",
+        "hint": "",
+        "immunities": [
+          "poison"
+        ],
+        "max_stacks": 1,
+        "origin": "combination_rule:terrain_poison_focus → terrain_poison_focus.tres → venom_accord_result.tres",
+        "path": "res://gameplay/abilities/data/venom_accord_result.tres::Buff",
+        "prevents_actions": false,
+        "projectile_damage_multiplier": 1.0,
+        "speed_multiplier": 1.0,
+        "spell_damage_multiplier": 1.15,
+        "stat_modifiers": {
+
+        },
+        "stat_multipliers": {
+
+        },
+        "tick_damage": 0,
+        "tick_heal": 0,
+        "title": "毒契"
+      }
+    ],
+    "washing": [
+      {
+        "cleanse": [
+          "poison",
+          "paralysis",
+          "burning"
+        ],
+        "damage_taken_multiplier": 1.0,
+        "description": "冲洗: 净化：中毒、麻痹、燃烧 0.1s",
+        "duration": 0.1,
+        "empower": false,
+        "empower_damage_multiplier": 1.0,
+        "empower_mana_cost": 0,
+        "exclusive_group": "",
+        "hint": "",
+        "immunities": [],
+        "max_stacks": 1,
+        "origin": "composed_payload:disperse/water → ",
+        "path": "res://content/spell_operations/statuses/washing.tres",
+        "prevents_actions": false,
+        "projectile_damage_multiplier": 1.0,
+        "speed_multiplier": 1.0,
+        "spell_damage_multiplier": 1.0,
+        "stat_modifiers": {
+
+        },
+        "stat_multipliers": {
+
+        },
+        "tick_damage": 0,
+        "tick_heal": 0,
+        "title": "冲洗"
+      }
+    ],
+    "wet": [
+      {
+        "cleanse": [],
+        "damage_taken_multiplier": 1.0,
+        "description": "潮湿: no modifiers 6.0s",
+        "duration": 6.0,
+        "empower": false,
+        "empower_damage_multiplier": 1.0,
+        "empower_mana_cost": 0,
+        "exclusive_group": "",
+        "hint": "",
+        "immunities": [],
+        "max_stacks": 1,
+        "origin": "element:water → water.tres",
+        "path": "res://gameplay/abilities/data/wet.tres",
+        "prevents_actions": false,
+        "projectile_damage_multiplier": 1.0,
+        "speed_multiplier": 1.0,
+        "spell_damage_multiplier": 1.0,
+        "stat_modifiers": {
+
+        },
+        "stat_multipliers": {
+
+        },
+        "tick_damage": 0,
+        "tick_heal": 0,
+        "title": "潮湿"
+      },
+      {
+        "cleanse": [],
+        "damage_taken_multiplier": 1.0,
+        "description": "潮湿: no modifiers 6.0s",
+        "duration": 6.0,
+        "empower": false,
+        "empower_damage_multiplier": 1.0,
+        "empower_mana_cost": 0,
+        "exclusive_group": "",
+        "hint": "",
+        "immunities": [],
+        "max_stacks": 1,
+        "origin": "surface:wet → wet.tres",
+        "path": "res://gameplay/abilities/data/wet.tres",
+        "prevents_actions": false,
+        "projectile_damage_multiplier": 1.0,
+        "speed_multiplier": 1.0,
+        "spell_damage_multiplier": 1.0,
+        "stat_modifiers": {
+
+        },
+        "stat_multipliers": {
+
+        },
+        "tick_damage": 0,
+        "tick_heal": 0,
+        "title": "潮湿"
+      },
+      {
+        "cleanse": [],
+        "damage_taken_multiplier": 1.0,
+        "description": "潮湿: no modifiers 6.0s",
+        "duration": 6.0,
+        "empower": false,
+        "empower_damage_multiplier": 1.0,
+        "empower_mana_cost": 0,
+        "exclusive_group": "",
+        "hint": "",
+        "immunities": [],
+        "max_stacks": 1,
+        "origin": "surface:electrified → electrified.tres",
+        "path": "res://gameplay/abilities/data/wet.tres",
+        "prevents_actions": false,
+        "projectile_damage_multiplier": 1.0,
+        "speed_multiplier": 1.0,
+        "spell_damage_multiplier": 1.0,
+        "stat_modifiers": {
+
+        },
+        "stat_multipliers": {
+
+        },
+        "tick_damage": 0,
+        "tick_heal": 0,
+        "title": "潮湿"
+      }
+    ]
+  },
+  "surface_reactions": [
+    {
+      "entity_status_path": "",
+      "required_state": "oiled",
+      "required_tags": [
+        "fire"
+      ],
+      "result_duration": 8.0,
+      "result_state": "burning",
+      "rule_id": "oil_fire",
+      "spread_damage": 1.0,
+      "spread_tags": [
+        "fire"
+      ],
+      "spread_to_neighbors": true
+    },
+    {
+      "entity_status_path": "res://gameplay/abilities/data/frozen.tres",
+      "required_state": "wet",
+      "required_tags": [
+        "ice"
+      ],
+      "result_duration": 5.0,
+      "result_state": "frozen",
+      "rule_id": "wet_ice",
+      "spread_damage": 0.0,
+      "spread_tags": [],
+      "spread_to_neighbors": false
+    },
+    {
+      "entity_status_path": "",
+      "required_state": "wet",
+      "required_tags": [
+        "fire"
+      ],
+      "result_duration": 3.0,
+      "result_state": "steam",
+      "rule_id": "wet_fire",
+      "spread_damage": 0.0,
+      "spread_tags": [],
+      "spread_to_neighbors": false
+    },
+    {
+      "entity_status_path": "",
+      "required_state": "burning",
+      "required_tags": [
+        "ice"
+      ],
+      "result_duration": 0.0,
+      "result_state": "dry",
+      "rule_id": "burn_ice",
+      "spread_damage": 0.0,
+      "spread_tags": [],
+      "spread_to_neighbors": false
+    },
+    {
+      "entity_status_path": "",
+      "required_state": "burning",
+      "required_tags": [
+        "water"
+      ],
+      "result_duration": 0.0,
+      "result_state": "dry",
+      "rule_id": "burn_wet",
+      "spread_damage": 0.0,
+      "spread_tags": [],
+      "spread_to_neighbors": false
+    },
+    {
+      "entity_status_path": "res://gameplay/abilities/data/burning.tres",
+      "required_state": "dry",
+      "required_tags": [
+        "fire"
+      ],
+      "result_duration": 5.0,
+      "result_state": "burning",
+      "rule_id": "dry_fire",
+      "spread_damage": 0.0,
+      "spread_tags": [],
+      "spread_to_neighbors": false
+    },
+    {
+      "entity_status_path": "res://gameplay/abilities/data/frozen.tres",
+      "required_state": "dry",
+      "required_tags": [
+        "ice"
+      ],
+      "result_duration": 4.0,
+      "result_state": "frozen",
+      "rule_id": "dry_ice",
+      "spread_damage": 0.0,
+      "spread_tags": [],
+      "spread_to_neighbors": false
+    },
+    {
+      "entity_status_path": "",
+      "required_state": "frozen",
+      "required_tags": [
+        "impact"
+      ],
+      "result_duration": 4.0,
+      "result_state": "wet",
+      "rule_id": "frozen_impact",
+      "spread_damage": 0.0,
+      "spread_tags": [],
+      "spread_to_neighbors": false
+    },
+    {
+      "entity_status_path": "",
+      "required_state": "wet",
+      "required_tags": [
+        "lightning"
+      ],
+      "result_duration": 5.0,
+      "result_state": "electrified",
+      "rule_id": "wet_lightning",
+      "spread_damage": 0.0,
+      "spread_tags": [],
+      "spread_to_neighbors": false
+    },
+    {
+      "entity_status_path": "",
+      "required_state": "frozen",
+      "required_tags": [
+        "fire"
+      ],
+      "result_duration": 5.0,
+      "result_state": "wet",
+      "rule_id": "frozen_fire",
+      "spread_damage": 0.0,
+      "spread_tags": [],
+      "spread_to_neighbors": false
+    },
+    {
+      "entity_status_path": "",
+      "required_state": "dry",
+      "required_tags": [
+        "water"
+      ],
+      "result_duration": 12.0,
+      "result_state": "wet",
+      "rule_id": "dry_water",
+      "spread_damage": 0.0,
+      "spread_tags": [],
+      "spread_to_neighbors": false
+    },
+    {
+      "entity_status_path": "",
+      "required_state": "electrified",
+      "required_tags": [
+        "ice"
+      ],
+      "result_duration": 4.0,
+      "result_state": "frozen",
+      "rule_id": "electrified_ice",
+      "spread_damage": 0.0,
+      "spread_tags": [],
+      "spread_to_neighbors": false
+    },
+    {
+      "entity_status_path": "",
+      "required_state": "poisoned",
+      "required_tags": [
+        "fire"
+      ],
+      "result_duration": 6.0,
+      "result_state": "burning",
+      "rule_id": "poisoned_fire",
+      "spread_damage": 0.0,
+      "spread_tags": [],
+      "spread_to_neighbors": false
+    },
+    {
+      "entity_status_path": "",
+      "required_state": "poisoned",
+      "required_tags": [
+        "water"
+      ],
+      "result_duration": 8.0,
+      "result_state": "wet",
+      "rule_id": "poisoned_water",
+      "spread_damage": 0.0,
+      "spread_tags": [],
+      "spread_to_neighbors": false
+    },
+    {
+      "entity_status_path": "",
+      "required_state": "poisoned",
+      "required_tags": [
+        "ice"
+      ],
+      "result_duration": 4.0,
+      "result_state": "frozen",
+      "rule_id": "poisoned_ice",
+      "spread_damage": 0.0,
+      "spread_tags": [],
+      "spread_to_neighbors": false
+    },
+    {
+      "entity_status_path": "",
+      "required_state": "wet",
+      "required_tags": [
+        "poison"
+      ],
+      "result_duration": 8.0,
+      "result_state": "poisoned",
+      "rule_id": "wet_poison",
+      "spread_damage": 0.0,
+      "spread_tags": [],
+      "spread_to_neighbors": false
+    }
+  ],
+  "surfaces": [
+    {
+      "id": "dry",
+      "title": "干地"
+    },
+    {
+      "id": "wet",
+      "title": "水域"
+    },
+    {
+      "id": "frozen",
+      "title": "冰面"
+    },
+    {
+      "id": "oiled",
+      "title": "油地"
+    },
+    {
+      "id": "burning",
+      "title": "燃烧地面"
+    },
+    {
+      "id": "electrified",
+      "title": "导电水域"
+    },
+    {
+      "id": "steam",
+      "title": "蒸汽"
+    },
+    {
+      "id": "poisoned",
+      "title": "毒地"
+    }
+  ],
+  "survival_recipes": {
+    "broth": {
+      "inputs": {
+        "clean_water": 1,
+        "herb": 1,
+        "ration": 1
+      },
+      "output": "broth",
+      "unlock": "survival.drain_recipe"
+    },
+    "purify": {
+      "inputs": {
+        "charcoal": 1,
+        "dirty_water": 1
+      },
+      "output": "clean_water",
+      "unlock": ""
+    },
+    "ration": {
+      "inputs": {
+        "grain": 1
+      },
+      "output": "ration",
+      "unlock": ""
+    },
+    "tea": {
+      "inputs": {
+        "clean_water": 1,
+        "herb": 1
+      },
+      "output": "tea",
+      "unlock": "survival.archive_recipe"
+    }
+  }
+}

@@ -3,6 +3,8 @@ extends Node
 
 var player: Player
 var casting: PlayerCastingController
+var _mouse_shortcuts: Dictionary={}
+var _ui_click_pending := false
 var _focus: Node2D
 var _focus_frame := -1
 var _focus_origin := Vector2.INF
@@ -45,34 +47,65 @@ func poll_universal_actions() -> Array[Action]:
 		hit.direction=player.get_mouse_direction()
 		actions.append(hit)
 
-	# 数字键与Q/E/R施法，格挡时不提出新的施法。
-	if not Input.is_action_pressed("guard"):
-		for pair in [["left", "cast_left"], ["right", "skill"]]:
-			_poll_universal_cast(actions, pair[0], pair[1])
-		for i in range(SkillManager.MAX_SLOTS):
-			_poll_universal_cast(actions, "slot_%d" % i, "skill_%d" % (i + 1))
+	# Every shortcut can carry a skill or an item. Input only proposes requests.
+	for source in QuickslotLoadout.SOURCES:
+		var input_action:=action_for_source(source)
+		_poll_shortcut_edges(actions,source,input_action)
 	# 交互
 	if Input.is_action_just_pressed("interact"):
 		actions.append(Action.interact(player))
 
+	_ui_click_pending=false
 	return actions
 
-func _poll_universal_cast(actions: Array[Action], source: String, input_action: String) -> void:
+func _ready() -> void:
+	process_mode=Node.PROCESS_MODE_ALWAYS
+	get_window().focus_exited.connect(_focus_lost)
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_LEFT and not event.pressed:
+		for source in _mouse_shortcuts.keys(): request_shortcut(source,false,true)
+
+func source_held(source: String) -> bool:
+	return not player.ui_blocked and not get_tree().paused and (bool(_mouse_shortcuts.get(source,false)) or Input.is_action_pressed(action_for_source(source)))
+
+func request_shortcut(source: String,pressed: bool,mouse := false) -> void:
+	if mouse:
+		if not pressed and not _mouse_shortcuts.has(source): return
+		if pressed: _mouse_shortcuts[source]=true; _ui_click_pending=true
+		else: _mouse_shortcuts.erase(source)
+	if player.ui_blocked or get_tree().paused or player.health_component.is_dead: return
+	var actions: Array[Action]=[]
+	_poll_shortcut(actions,source,pressed)
+	for action in actions: resolve_action(action)
+
+func _poll_shortcut(actions: Array[Action],source: String,pressed: bool) -> void:
+	var entry:=player.skill_manager.shortcuts.binding(source)
+	if entry.get("kind","")=="item":
+		var definition:=ItemCatalog.default_catalog().definition(str(entry.item_id))
+		if not definition: return
+		if not pressed and not (definition.use_profile and definition.use_profile.kind==ItemUseDefinition.Kind.THROWABLE): return
+		var request:=Action.new(); request.action_type=Action.ActionType.USE_ITEM; request.source=player
+		request.skill_source=source; request.skill_id=str(entry.item_id); request.direction=player.get_mouse_direction()
+		request.params={"binding":entry,"release":not pressed}
+		actions.append(request); return
+	if Input.is_action_pressed("guard"): return
+	_poll_cast_edge(actions,source,pressed)
+
+func _poll_cast_edge(actions: Array[Action], source: String, pressed: bool) -> void:
 	if not _can_cast_source(source):
 		return
-	var pressed := Input.is_action_just_pressed(input_action)
-	var released := Input.is_action_just_released(input_action)
-	if not pressed and not released:
-		return
+	var released := not pressed
 	var action := Action.cast(source, player.get_mouse_direction(), player)
 	action.params["release"] = released
 	var skill := _get_skill_for_source(source)
-	var quick := player.actor_context and player.actor_context.rules.modern_controls and ControlPreferences.quick_cast and skill.cast_type not in ["charge","channel"]
-	if skill.operation_id=="disperse": quick=true
+	var quick:=_quick_skill(skill)
 	if quick and released: return
 	action.params["quick_cast"] = quick
 	action.cast_context = CastContext.at_position(player, CastContext.ground_point(player, player.get_global_mouse_position(), skill.cast_distance), skill) if skill.ground_targeted else CastContext.simple(player, action.direction, skill)
 	action.cast_context.empower = Input.is_key_pressed(KEY_SHIFT)
+	action.cast_context.selection=player.skill_manager.shortcuts.selection(source)
+	action.cast_context.binding_revision=player.skill_manager.shortcuts.revision(source)
 	actions.append(action)
 
 func resolve_action(action: Action) -> void:
@@ -163,22 +196,11 @@ func execute_action(action: Action) -> void:
 						casting.show_aim(action.skill_source, skill)
 
 func _can_cast_source(source: String) -> bool:
-	match source:
-		"left":  return player.skill_manager.has_left_spell()
-		"right": return player.skill_manager.has_right_spell()
-		_:
-			var idx := source.trim_prefix("slot_").to_int()
-			var inst: SkillInstance = player.skill_manager.get_slot(idx)
-			return inst != null and inst.data != null
+	return player.skill_manager.get_instance(source)!=null
 
 func _get_skill_for_source(source: String) -> SkillData:
-	var sm = player.skill_manager
-	match source:
-		"left":  return sm.left_hand.data if sm.left_hand else null
-		"right": return sm.right_hand.data if sm.right_hand else null
-		_:
-			var inst: SkillInstance = sm.get_slot(source.trim_prefix("slot_").to_int())
-			return inst.data if inst else null
+	var inst:=player.skill_manager.get_instance(source)
+	return inst.data if inst else null
 
 func _cast_source(source: String, context: CastContext = null) -> void:
 	var skill := _get_skill_for_source(source)
@@ -188,7 +210,7 @@ func _cast_source(source: String, context: CastContext = null) -> void:
 	if not context:
 		context = CastContext.simple(player, player.get_mouse_direction(), skill)
 	if casting._charge_skill and casting._charge_source_matches(source):
-		if casting._charge_skill != skill:
+		if casting._charge_skill != skill or casting._charge_revision!=player.skill_manager.shortcuts.revision(source):
 			casting.cancel_source(source)
 			return
 		context.charge_power = casting._charge_power
@@ -255,9 +277,44 @@ func interaction_target(refresh := false) -> Node2D:
 	return _focus
 
 func _pointer_over_interface() -> bool:
-	return get_viewport().gui_get_hovered_control()!=null
+	return _ui_click_pending or not _mouse_shortcuts.is_empty() or get_viewport().gui_get_hovered_control()!=null
 
 func action_for_source(source: String) -> String:
-	if source=="left": return "cast_left"
-	if source=="right": return "skill"
-	return "skill_%d"%(int(source.trim_prefix("slot_"))+1)
+	return InputBindings.action_for_source(source)
+
+func _poll_universal_cast(actions: Array[Action],source: String,input_action: String) -> void:
+	_poll_shortcut_edges(actions,source,input_action)
+
+func shortcut_changed(source: String) -> void:
+	_mouse_shortcuts.erase(source)
+	casting.cancel_source(source)
+	if not player.actor_context: return
+	if player.actor_context.spray.source==source: player.actor_context.spray.stop()
+	if player.actor_context.item_actions.input_source==source: player.actor_context.item_actions.cancel()
+
+func _focus_lost() -> void:
+	# Lost pointer releases cancel, never confirm a prepared throw or charged spell.
+	for source in _mouse_shortcuts.keys(): shortcut_changed(source)
+	casting.cancel_all()
+	if player.actor_context:
+		player.actor_context.item_actions.cancel()
+		player.actor_context.spray.stop()
+
+func _quick_skill(skill: SkillData) -> bool:
+	return skill.operation_id=="disperse" or player.actor_context and player.actor_context.rules.modern_controls and ControlPreferences.quick_cast and skill.cast_type not in ["charge","channel"]
+
+func _poll_shortcut_edges(actions: Array[Action],source: String,input_action: String) -> void:
+	var pressed:=Input.is_action_just_pressed(input_action)
+	var released:=Input.is_action_just_released(input_action)
+	if pressed and released:
+		# One physics frame may contain a complete tap. Preserve the chosen input
+		# mode without duplicating casts or swallowing an ordinary item use.
+		var inst:=player.skill_manager.get_instance(source)
+		var entry:=player.skill_manager.shortcuts.binding(source)
+		if entry.get("kind","")=="item":
+			_poll_shortcut(actions,source,true)
+			var definition:=ItemCatalog.default_catalog().definition(str(entry.item_id))
+			if definition and definition.use_profile and definition.use_profile.kind==ItemUseDefinition.Kind.THROWABLE: _poll_shortcut(actions,source,false)
+		else: _poll_shortcut(actions,source,inst!=null and _quick_skill(inst.data))
+	elif pressed: _poll_shortcut(actions,source,true)
+	elif released: _poll_shortcut(actions,source,false)

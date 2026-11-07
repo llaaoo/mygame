@@ -55,7 +55,9 @@ func _ready() -> void:
 	row.offset_bottom=-76
 	root.add_child(row)
 	for i in range(4):
-		var button:=FrontierWidgets.button("",use.bind(i))
+		var button:=Button.new()
+		GameUIStyle.apply_button(button)
+		button.gui_input.connect(_shortcut_mouse.bind(i))
 		button.custom_minimum_size.x=60
 		button.tooltip_text=SurvivalCatalog.FOODS[FOODS[i]].text
 		row.add_child(button)
@@ -67,13 +69,22 @@ func _process(delta: float) -> void:
 	tracker.disabled=is_instance_valid(game.ui.modal)
 	_belt_grid.visible=not game.player.field_work.panel.visible
 	for i in range(4):
-		var binding: Dictionary=game.session.belt[i]
-		var id: String=binding.id
-		var count:=game.survival.supplies.count(id)
-		belt[i].text="%s %s\n×%d"%[InputBindings.label(BELT_ACTIONS[i]),game.survival.supplies.title(id),count]
-		belt[i].disabled=count==0 or game.player.health_component.is_dead
-		var definition:=game.session.inventory.definitions.get(id) as ItemData
-		belt[i].tooltip_text="按键："+InputBindings.labels(BELT_ACTIONS[i])+"\n"+(definition.description if definition else "")+("\n按住瞄准，松开投掷；右键或Esc取消" if binding.method=="throw" else "")
+		var source: String=QuickslotLoadout.ITEM_SOURCES[i]
+		var binding:=game.player.skill_manager.shortcuts.binding(source)
+		var inst:=game.player.skill_manager.get_instance(source)
+		var title: String=inst.data.display_name if inst else "空槽"
+		var detail: String="K编组动作或物品"
+		var amount: String=""
+		var ready:=inst!=null
+		if binding.get("kind","")=="item":
+			var view:=QuickslotView.item_state(game.player,binding)
+			title=view.title; detail=view.detail; ready=view.ready; amount="×%d"%view.count
+		elif inst:
+			var plan:=game.player.skill_manager.preview_source(source)
+			detail=inst.data.description+"\n"+plan.reason; amount="%d MP"%plan.cost
+		belt[i].text="%s %s\n%s"%[InputBindings.label(BELT_ACTIONS[i]),title,amount]
+		belt[i].disabled=not ready or game.player.health_component.is_dead
+		belt[i].tooltip_text="按键："+InputBindings.labels(BELT_ACTIONS[i])+"\n"+detail
 	var goal:=game.guidance.tracked()
 	var orienting := goal.is_empty()
 	if orienting: goal = game.guidance.town_orientation()
@@ -102,23 +113,9 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not event is InputEventKey and not event is InputEventMouseButton or event is InputEventKey and event.echo or game.ui.modal_locked: return
 	if event.is_action_pressed("loot_all") and is_instance_valid(game.ui.modal) and game.ui.modal.get_meta("frontier_page","")=="loot":
 		game.hub.take_all(); get_viewport().set_input_as_handled(); return
-	if get_tree().paused: return
-	for index in range(BELT_ACTIONS.size()):
-		var input_action: String=BELT_ACTIONS[index]
-		if not event.is_action(input_action): continue
-		var binding: Dictionary=game.session.belt[index]
-		if binding.method=="throw":
-			if event.is_action_pressed(input_action): game.player.actor_context.item_actions.begin(binding.id,true,game.player.get_mouse_direction())
-			else: game.player.actor_context.item_actions.confirm()
-		elif event.is_action_pressed(input_action): use(index)
-		get_viewport().set_input_as_handled()
-		return
 
+func _shortcut_mouse(event: InputEvent,index: int) -> void:
+	if event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_LEFT:
+		game.player.input_controller.request_shortcut(QuickslotLoadout.ITEM_SOURCES[index],event.pressed,true)
 func use(index: int) -> void:
-	if index<0 or index>=4 or get_tree().paused or game.player.health_component.is_dead or game.player.ui_blocked or game.player.field_work.is_busy(): return
-	var binding: Dictionary=game.session.belt[index]
-	var definition:=game.session.inventory.definitions.get(binding.id) as ItemData
-	if definition and definition.use_profile:
-		if binding.method=="throw": game.player.actor_context.item_actions.begin(binding.id,true,game.player.get_mouse_direction())
-		else: game.session.begin_item("player",binding.id)
-	elif game.survival.supplies.count(binding.id)>0: game.survival.begin_eating(binding.id)
+	if index>=0 and index<4: game.player.input_controller.request_shortcut(QuickslotLoadout.ITEM_SOURCES[index],true)

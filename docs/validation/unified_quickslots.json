@@ -1,0 +1,146 @@
+{
+  "baseline": "09f963c84eec7c1fae13cea8892e50ccb875cfe6",
+  "input_layout_version": 4,
+  "save_version": 7,
+  "shortcuts": {
+    "keys": [
+      "Q",
+      "E",
+      "R",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8",
+      "9",
+      "0"
+    ],
+    "default_aliases": false,
+    "binding_owner": "QuickslotLoadout",
+    "old_session_belt": "legacy import/read projection only; not written to new saves"
+  },
+  "inventory_counts": {
+    "actions": 11,
+    "effect_definitions": 82,
+    "food_effects": 5,
+    "hit_reactions": 9,
+    "manufacturing_recipes": 20,
+    "material_item_ids": 26,
+    "modifier_materials": 7,
+    "operations": 8,
+    "payloads": 49,
+    "rules": 37,
+    "status_ids": 28,
+    "surface_reactions": 16,
+    "surfaces": 8,
+    "survival_recipes": 4,
+    "usable_item_definitions": 10
+  },
+  "focused": {
+    "status": "passed",
+    "checks": [
+      "input_bindings",
+      "cast_refactor",
+      "controls_workflow",
+      "unified_quickslots",
+      "world_pointer_input",
+      "shared_characters",
+      "enemy_preparation",
+      "ui_system",
+      "playtest_iteration",
+      "skill_upgrades",
+      "item_actions",
+      "spray_channel",
+      "save_system",
+      "save_recovery",
+      "field_work",
+      "frontier_projects",
+      "content"
+    ]
+  },
+  "native": {
+    "status": "passed",
+    "source_commit": "76e1fb99172268e1a09826b7973bfe698f9569ac",
+    "platform": "Linux Godot 4.6.3, Xorg dummy :97, llvmpipe OpenGL compatibility",
+    "window_requested": [
+      960,
+      600
+    ],
+    "captured_viewport": [
+      960,
+      540
+    ],
+    "tests": [
+      "test_unified_quickslots.gd",
+      "test_world_pointer_input.gd"
+    ],
+    "exit_codes": [
+      0,
+      0
+    ],
+    "input": "Actual InputEvent keyboard, Viewport-local GUI pointer events; separate global Input.parse_input_event pointer test at 1152x648",
+    "checked": [
+      "E casts its skill while 1 uses food, and a single-frame quick tap commits once",
+      "Mouse K binding; learning a skill preserves an occupied item shortcut",
+      "Specific equipment UID equips and obeys nearby-hostile restriction",
+      "Q fire rune/E frost rune use separate media without changing M, share cooldown, reject invalid source",
+      "Throw release pays one bottle; focus loss or rebinding cancels and old release cannot use replacement",
+      "Bound one-dose spray bottle stops on exhaustion; full spare remains at three doses",
+      "Coating applies to the equipped real weapon; 7 can carry a skill",
+      "Actual save/restart keeps mixed bindings, item UIDs and properties; clears transient fields/held actions",
+      "Actual v6 file imports old belt once, keeps numeric skills, leaves new E empty; clearing a migrated slot survives restart",
+      "Global mouse clicking interaction/supply UI causes no melee attack"
+    ],
+    "asserted_item_deltas": {
+      "ration": "2 → 1",
+      "fire_stone": "1 → 0",
+      "frost_salt": "1 → 0",
+      "oil_bottle": "2 → 1 after valid throw; cancelled attempts cost 0",
+      "fire_rag": "1 → 0",
+      "selected_sprayer": "one remaining dose → empty/removed UID",
+      "spare_sprayer": "three doses → three doses"
+    },
+    "warnings": [
+      "Software display cannot change VSync; no script errors or other warnings"
+    ],
+    "logs": [
+      "docs/validation/unified_quickslots_native.txt",
+      "docs/validation/unified_quickslots_pointer_native.txt"
+    ],
+    "screenshots": [
+      "docs/playtests/unified-quickslots/mixed-shortcut-binder.png",
+      "docs/playtests/unified-quickslots/mixed-shortcut-world.png"
+    ]
+  },
+  "cold_archive": {
+    "status": "passed",
+    "source_commit": "76e1fb99172268e1a09826b7973bfe698f9569ac",
+    "path": "/tmp/grayriver-quickslots-76e1fb9",
+    "cache_before_import": false,
+    "first_import": "passed",
+    "command": "python3 tools/run_tests.py --suite all --jobs 4",
+    "passed": 73,
+    "total": 73,
+    "exit_code": 0,
+    "diagnostics": "Strict runner rejects errors and warnings; all checks passed",
+    "log": "docs/validation/unified_quickslots_regression.txt"
+  },
+  "limits": [
+    "Controlled knowledge, material grants and placement; no natural route or balance acceptance",
+    "Normal AI restored for the input phase; restart comparisons freeze enemies in the fixture",
+    "Player regeneration fixed for exact MP/item assertions",
+    "No controller or radial menu; software Xorg/llvmpipe display is not target hardware performance"
+  ],
+  "review": "docs/SPELL_SYSTEM_REVIEW.md",
+  "inventory": "docs/review/spell_inventory.json",
+  "github_actions": "kept disabled",
+  "inventory_reproducibility": {
+    "status": "passed",
+    "source_commit": "76e1fb99172268e1a09826b7973bfe698f9569ac",
+    "command": "SPELL_REVIEW_OUTPUT=<isolated-output> godot --headless --path <archive> --script res://tools/audit_spell_system.gd",
+    "result": "Archived generator exactly reproduces committed JSON and Markdown"
+  }
+}

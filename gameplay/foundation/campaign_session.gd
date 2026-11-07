@@ -16,11 +16,22 @@ var inspect_actor: Callable
 var hostility_changed: Callable
 var equipment_page: Callable
 var supply_page: Callable
+var equip_item: Callable
 var sync_extra: Callable
 var death_handler: Callable
 var hour_query: Callable
 var state: Dictionary={}
-var belt: Array[Dictionary]=[{"id":"ration","method":"use"},{"id":"clean_water","method":"use"},{"id":"tea","method":"use"},{"id":"broth","method":"use"}]
+# Compatibility projection for old callers; QuickslotLoadout is authoritative.
+var belt: Array[Dictionary]:
+	get:
+		var result: Array[Dictionary]=[]
+		var actor:=actor_for_id("player")
+		for source in QuickslotLoadout.ITEM_SOURCES:
+			var entry: Dictionary=actor.get_node("SkillManager").shortcuts.binding(source) if actor else {}
+			var id:=str(entry.get("item_id",""))
+			var definition:=ItemCatalog.default_catalog().definition(id)
+			result.append({"id":id,"method":"throw" if definition and definition.use_profile and definition.use_profile.kind==ItemUseDefinition.Kind.THROWABLE else "use"})
+		return result
 var _pack_nodes: Dictionary={}
 var _activity_families: Dictionary={}
 func configure(content: ExplorationContentCatalog,profile: RulesetDefinition) -> void:
@@ -39,7 +50,6 @@ func restore(data: Dictionary) -> bool:
 	if data.has("inventory") and not inventory.valid_definitions(data.inventory): return false
 	state=data.duplicate(true)
 	inventory.clock_seconds=float(data.get("clock_seconds",0))
-	if data.has("belt"): belt.assign(data.belt)
 	if data.has("inventory"): inventory.restore(data.inventory)
 	actor_records=data.get("actors",{}).duplicate(true)
 	proficiency=data.get("proficiency",{}).duplicate(true)
@@ -98,12 +108,15 @@ func bind_actor(actor: CharacterBody2D,id: String,legacy_counts: Dictionary = {}
 		context.actions.input_provider=actor.input_controller.poll_universal_actions
 		context.item_actions.aim_query=actor.get_mouse_direction
 		context.spray.aim_query=actor.get_mouse_direction
-		context.spray.held_query=func(source: String): return Input.is_action_pressed(actor.input_controller.action_for_source(source))
+		context.spray.held_query=actor.input_controller.source_held
 		context.actions.legacy_request=actor.input_controller.execute_action
 		context.actions.pack_request=drop_pack.bind(id)
 	if rules.tactical_combat:
-		context.actions.item_request=func(item_id: String): return begin_item(id,item_id)
+		context.actions.item_request=func(request: Action): return execute_item_request(id,request)
 	relations.memberships[id]="traveler" if id=="player" else "guards"
+	if actor is Player:
+		restore_shortcuts(actor)
+		if not actor.skill_manager.binding_changed.is_connected(actor.input_controller.shortcut_changed): actor.skill_manager.binding_changed.connect(actor.input_controller.shortcut_changed)
 	return context
 func _restore_actor(actor: CharacterBody2D,record: Dictionary) -> void:
 	var health:=actor.get_node("HealthComponent") as HealthComponent
@@ -126,7 +139,7 @@ func capture_actors() -> void:
 func snapshot() -> Dictionary:
 	capture_actors()
 	if sync_extra.is_valid(): sync_extra.call()
-	return {"schema":1,"clock_seconds":inventory.clock_seconds,"belt":belt.duplicate(true),"inventory":persistent_inventory(),"actors":actor_records.duplicate(true),"relations":relations.snapshot(),"proficiency":proficiency.duplicate(true)}
+	return {"schema":1,"clock_seconds":inventory.clock_seconds,"shortcut_schema":1,"inventory":persistent_inventory(),"actors":actor_records.duplicate(true),"relations":relations.snapshot(),"proficiency":proficiency.duplicate(true)}
 func leave_region() -> void:
 	capture_actors()
 	for id in actors.keys():
@@ -230,6 +243,7 @@ static func valid_snapshot(data: Variant) -> bool:
 	if not data is Dictionary: return false
 	if data.is_empty(): return true
 	if typeof(data.get("clock_seconds",0)) not in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(data.get("clock_seconds",0))) or data.get("clock_seconds",0)<0: return false
+	if data.has("shortcut_schema") and (not data.shortcut_schema is int or data.shortcut_schema!=1): return false
 	if data.has("belt"):
 		if not data.belt is Array or data.belt.size()!=4: return false
 		for binding in data.belt:
@@ -311,13 +325,51 @@ func mount_actor(scene: PackedScene,id: String,position: Vector2,configure_actor
 
 func _process(delta: float) -> void:
 	if rules and rules.physical_inventory and region.available(): inventory.clock_seconds+=delta
+func restore_shortcuts(actor: Player) -> void:
+	if int(state.get("shortcut_schema",0))==1: return
+	var previous: Array=state.get("belt",[{"id":"ration"},{"id":"clean_water"},{"id":"tea"},{"id":"broth"}])
+	for i in range(4):
+		var id:=str(previous[i].id)
+		var definition:=inventory.definitions.get(id) as ItemData
+		var uid:=inventory.ready_uid("player",id) if definition and definition.use_profile and definition.use_profile.kind==ItemUseDefinition.Kind.SPRAY else ""
+		actor.skill_manager.shortcuts.bind_item("item_%d"%i,id,uid)
+	state["shortcut_schema"]=1
+
 func bind_belt(index: int,id: String,method := "use") -> bool:
-	if index<0 or index>=4 or not valid_belt_item(id,method): return false
-	belt[index]={"id":id,"method":method}
-	if save_requested.is_valid(): save_requested.call()
-	return true
+	var actor:=actor_for_id("player")
+	if not actor or index<0 or index>=4 or not valid_belt_item(id,method): return false
+	var definition:=inventory.definitions.get(id) as ItemData
+	var uid:=inventory.ready_uid("player",id) if definition and definition.use_profile and definition.use_profile.kind==ItemUseDefinition.Kind.SPRAY else ""
+	return actor.get_node("SkillManager").shortcuts.bind_item("item_%d"%index,id,uid)
 static func valid_belt_item(id: String,method: String) -> bool:
 	var definition:=ItemCatalog.default_catalog().definition(id)
 	if not definition: return false
 	if method=="throw": return definition.use_profile!=null and definition.use_profile.kind==ItemUseDefinition.Kind.THROWABLE
 	return method=="use" and (SurvivalCatalog.FOODS.has(id) or definition.use_profile!=null)
+
+func execute_item_request(actor_id: String,request: Action) -> bool:
+	var actor:=actor_for_id(actor_id)
+	if not actor: return false
+	if not request.params.has("binding"): return begin_item(actor_id,request.skill_id)
+	var manager:=actor.get_node("SkillManager") as SkillManager
+	var binding:=manager.shortcuts.binding(request.skill_source)
+	if binding!=request.params.binding or binding.get("kind","")!="item": return false
+	var controller: ItemActionController=actor.actor_context.item_actions
+	if request.params.get("release",false):
+		return controller.input_source==request.skill_source and controller.confirm()
+	var id:=str(binding.item_id)
+	var uid:=str(binding.get("uid",""))
+	var definition:=inventory.definitions.get(id) as ItemData
+	if not definition: return false
+	if not uid.is_empty():
+		var instance:=inventory.item(uid)
+		if not instance or instance.definition_id!=id or inventory.locate(uid) not in inventory.actor_containers(actor_id)+[actor_id+".gear"]: return false
+	if definition is EquipmentData: return equip_item.is_valid() and equip_item.call(id,uid)
+	if definition.use_profile:
+		if definition.use_profile.kind==ItemUseDefinition.Kind.SPRAY:
+			var operation:=SpellOperationCatalog.default_catalog().operation("disperse")
+			for payload in operation.payloads:
+				if payload.material_id==id: return actor.actor_context.spray.start(operation.action,request.skill_source,request.direction,{"payload":payload.id,"uid":uid,"modifier":""})
+			return false
+		return controller.begin(uid if not uid.is_empty() else id,definition.use_profile.kind==ItemUseDefinition.Kind.THROWABLE,request.direction,request.skill_source)
+	return begin_item(actor_id,id)

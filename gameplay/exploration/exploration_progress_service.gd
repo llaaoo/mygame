@@ -50,17 +50,17 @@ func _apply_knowledge() -> void:
 					if sm.get_slot(i) and sm.get_slot(i).data.get_id()==canonical: equipped=true
 				if equipped: continue
 			var slot: int = pair[1]
-			if sm.get_slot(slot) != null:
+			if not sm.shortcuts.binding("slot_%d"%slot).is_empty():
 				slot = -1
 				for i in range(SkillManager.MAX_SLOTS):
-					if sm.get_slot(i) == null:
+					if sm.shortcuts.binding("slot_%d"%i).is_empty():
 						slot = i
 						break
 			if slot >= 0:
 				sm.equip_slot(slot, sm.pool.get_skill(pair[0]))
 	if sm.material_operations and game.progress.actions.has("water_call") and not previous.has("water_call"):
 		for i in range(SkillManager.MAX_SLOTS):
-			if sm.get_slot(i)==null:
+			if sm.shortcuts.binding("slot_%d"%i).is_empty():
 				sm.equip_slot(i,sm.pool.get_skill("disperse"))
 				break
 	if previous.is_empty():
@@ -126,8 +126,7 @@ func _restore_loadout() -> void:
 	var sm := game.player.skill_manager
 	sm.unequip_hand("left")
 	sm.unequip_hand("right")
-	for i in range(SkillManager.MAX_SLOTS):
-		sm.unequip_slot(i)
+	for source in QuickslotLoadout.SOURCES: sm.shortcuts.clear(source)
 	sm.restore_skill_state(game.progress.loadout)
 
 func replay_encounters() -> void:

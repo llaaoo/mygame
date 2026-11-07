@@ -56,9 +56,9 @@ func live_fields() -> Array[FireSigil]:
 		result.append(field)
 	return result
 
-func build_plan(skill: SkillData, actor: Node2D, empower: bool = false) -> CastPlan:
+func build_plan(skill: SkillData, actor: Node2D, empower: bool = false,selection: Dictionary={}) -> CastPlan:
 	var operation:=not skill.operation_id.is_empty()
-	var primary := supplies.operation_plan(skill, _manager, null, false) if operation else {}
+	var primary := supplies.operation_plan(skill, _manager, null, false,selection) if operation else {}
 	var basis: SkillData=primary.skill if operation else skill
 	if operation:
 		basis=basis.create_runtime_variant()
@@ -81,6 +81,7 @@ func build_plan(skill: SkillData, actor: Node2D, empower: bool = false) -> CastP
 		components[0].field=source_fields[0]
 		components[0].version=source_fields[0].revision
 	var result := CastPlan.new()
+	result.selection=selection.duplicate(true)
 	result.rule_id = components[0].rule_id
 	result.field = components[0].field
 	result.components = components
@@ -93,7 +94,7 @@ func build_plan(skill: SkillData, actor: Node2D, empower: bool = false) -> CastP
 	result.action_cooldown = _manager.effective_cooldown(skill, actor, skill.cooldown)
 	result.signature = [["action_cooldown", result.action_cooldown]]
 	if operation:
-		result.signature.append(["payload",medium.id if medium else "",supplies.prepared_uids.get(skill.get_id(),"")])
+		result.signature.append(["payload",medium.id if medium else "",selection.get("uid",supplies.prepared_uids.get(skill.get_id(),""))])
 	if skill.operation_id=="extract" and basis.buff_resource:
 		var buffs:=actor.get_node("BuffManager") as BuffManager
 		result.signature.append(["energy",buffs.status_version(basis.buff_resource.status_id)])
@@ -135,7 +136,7 @@ func build_plan(skill: SkillData, actor: Node2D, empower: bool = false) -> CastP
 			elif not component.substitute_material.is_empty():
 				condition = supplies.title(component.substitute_material) + "×1替代地面（不附加投射物改造）"
 			result.explanation.append(CastExplanationStep.new("combination", component.rule_id, condition + " → " + component.skill.display_name))
-		var material := supplies.plan(skill, component.skill, i == 0, component.substitute_material, _manager)
+		var material := supplies.plan(skill, component.skill, i == 0, component.substitute_material, _manager,selection)
 		if not skill.operation_id.is_empty():
 			result.operation_reason=str(material.get("reason",""))
 			result.modifier_id=str(material.get("modifier_id",""))
@@ -255,14 +256,14 @@ func cooldown_state(plan: CastPlan, action_id: String) -> Dictionary:
 func remaining_cooldown(plan: CastPlan, action_id: String) -> float:
 	return cooldown_state(plan, action_id).remaining
 
-func preview(skill: SkillData, actor: Node2D, empower: bool = false) -> CastPlan:
-	return _preview_costed(skill,actor,empower,-1)
+func preview(skill: SkillData, actor: Node2D, empower: bool = false,selection: Dictionary={}) -> CastPlan:
+	return _preview_costed(skill,actor,empower,-1,selection)
 
-func preview_pulse(skill: SkillData, actor: Node2D, empower: bool, pulse_cost: int) -> CastPlan:
-	return _preview_costed(skill,actor,empower,pulse_cost)
+func preview_pulse(skill: SkillData, actor: Node2D, empower: bool, pulse_cost: int,selection: Dictionary={}) -> CastPlan:
+	return _preview_costed(skill,actor,empower,pulse_cost,selection)
 
-func _preview_costed(skill: SkillData, actor: Node2D, empower: bool, pulse_cost: int) -> CastPlan:
-	var result := build_plan(skill, actor, empower)
+func _preview_costed(skill: SkillData, actor: Node2D, empower: bool, pulse_cost: int,selection: Dictionary={}) -> CastPlan:
+	var result := build_plan(skill, actor, empower,selection)
 	if skill.cast_type=="channel" and not skill.operation_id.is_empty():
 		var pulse:=pulse_cost if pulse_cost>=0 else ceili(skill.channel_mp_per_sec*skill.channel_tick_interval*CastCostPolicy.mana_multiplier(skill,actor)-.000001)
 		result.cost+=pulse
@@ -302,7 +303,7 @@ func start(skill: SkillData, actor: Node2D, context: CastContext, source: String
 		return false
 	if get_tree().paused or _dead(actor) or ("ui_blocked" in actor and actor.ui_blocked):
 		return false
-	var plan := preview(skill, actor, context.empower)
+	var plan := preview(skill, actor, context.empower,context.selection)
 	if not plan.ready:
 		_message(plan.reason)
 		return false
@@ -316,6 +317,7 @@ func start(skill: SkillData, actor: Node2D, context: CastContext, source: String
 	plan.live_target=context.target
 	plan.action = skill
 	plan.source = source
+	plan.binding_revision=context.binding_revision
 	plan.actor = actor
 	plan.scope = scope
 	plan.position = actor.global_position
@@ -412,7 +414,9 @@ func tick(delta: float) -> void:
 func _commit() -> void:
 	var plan := pending
 	var actor: Node2D = plan.actor
-	var selected := build_plan(plan.action, actor, plan.empower)
+	var selected := build_plan(plan.action, actor, plan.empower,plan.selection)
+	if plan.binding_revision>=0 and _manager.shortcuts.revision(plan.source)!=plan.binding_revision:
+		cancel("快捷槽已更换，未扣费"); return
 	if selected.signature != plan.signature or not selected.operation_reason.is_empty():
 		cancel("组合条件或素材已改变，未扣费")
 		return
@@ -484,7 +488,7 @@ func _commit() -> void:
 				var title := FireSigil.title_for(component.field.field_type)
 				if title not in exhausted: exhausted.append(title)
 		if not exhausted.is_empty():
-			var next := build_plan(plan.action, actor, plan.empower)
+			var next := build_plan(plan.action, actor, plan.empower,plan.selection)
 			var notice := "、".join(exhausted) + "充能耗尽：" + plan.action.display_name + "下次为" + next.effect_label + " · " + effect_scope(next.skill)
 			_message(last_message + "\n" + notice)
 			feedback_requested.emit(notice)
