@@ -169,17 +169,25 @@ func run() -> void:
   if candidate.get_meta("frontier_claim","")=="river.enemy.camp.forest.3": enemy=candidate; break
  check(enemy!=null,"Normal-AI menu exposure guard missing")
  var base:=actor.position
+ # Check the short dodge at acceptance, away from AI interruption; the enemy
+ # exposure sample below remains normal AI. Four rendered frames may outlast .35s.
+ var origin:=actor.position
+ var world_clock:=store.clock_seconds
+ var before_selection:=commits.size()
+ await key(KEY_M,true); await key(KEY_M,false); await key(KEY_Q,true); await key(KEY_Q,false)
+ await key(KEY_A,true); await choose("ember"); await key(KEY_A,false)
+ check(actor.position.distance_to(origin)>8 and store.clock_seconds>world_clock and commits.size()==before_selection,"Combat wheel froze movement/time or cast while selecting")
+ await key(KEY_M,true); await key(KEY_M,false)
+ var dodge:=InputEventKey.new(); dodge.keycode=KEY_SPACE; dodge.physical_keycode=KEY_SPACE; dodge.pressed=true
+ var stamina_before:=actor.actor_context.actions.stamina.current
+ Input.parse_input_event(dodge); Input.flush_buffered_events(); await frames(1)
+ check(not actor.material_wheel.visible and actor.actor_context.actions.mode=="dodge" and actor.actor_context.actions.stamina.current<stamina_before,"Live wheel did not yield to a paid dodge at acceptance")
+ await key(KEY_SPACE,false)
+ await create_timer(.45).timeout
  if enemy:
-  actor.position=enemy.position-Vector2(170,0); actor.get_node("Camera2D").reset_smoothing(); await frames(4)
-  var origin:=actor.position
-  var world_clock:=store.clock_seconds
-  var before_selection:=commits.size()
-  await key(KEY_M,true); await key(KEY_M,false); await key(KEY_Q,true); await key(KEY_Q,false)
-  await key(KEY_A,true); await choose("ember"); await key(KEY_A,false)
-  check(actor.position.distance_to(origin)>8 and store.clock_seconds>world_clock and commits.size()==before_selection,"Combat wheel froze movement/time or cast while selecting")
-  await key(KEY_M,true); await key(KEY_M,false); await key(KEY_SPACE,true); await key(KEY_SPACE,false)
-  check(not actor.material_wheel.visible and actor.actor_context.actions.mode=="dodge","Live wheel did not yield to actual dodge input")
-  actor.position=enemy.position-Vector2(100,0); actor.get_node("Camera2D").reset_smoothing(); await frames(4)
+  # A close-range exposure fixture avoids measuring approach/coating preparation
+  # or carrying an in-flight dodge into a different location. AI remains unchanged.
+  actor.position=enemy.position-Vector2(45,0); actor.get_node("Camera2D").reset_smoothing(); await frames(4)
   var health:=actor.health_component.hp
   await key(KEY_I,true); await key(KEY_I,false)
   await create_timer(2.8).timeout
