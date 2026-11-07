@@ -1,16 +1,34 @@
 class_name EnemyCharacterBrain
 extends RefCounted
 ## Chooses one base action at a time. No stored combo, free setup or resource grant.
-const INTERVAL := 0.25
+const INTERVAL := 0.1
 var actor: Enemy
 var _clock := 0.0
 var _reposition := 0.0
 var _defense_cooldown := 0.0
-func _init(owner_actor: Enemy) -> void: actor = owner_actor
+var _guard_remaining := 0.0
+var _offense_cooldown := 0.0
+var _observed_target := 0
+var _observed_serial := -1
+var _observation_age := 0.0
+var _own_serial := -1
+var _tempo:=CombatTemperament.new()
+func _init(owner_actor: Enemy) -> void:
+	actor = owner_actor
+	if actor.character_definition and actor.character_definition.temperament: _tempo=actor.character_definition.temperament
 func tick(delta: float) -> void:
 	_clock = maxf(0,_clock-delta)
 	_reposition = maxf(0,_reposition-delta)
 	_defense_cooldown=maxf(0,_defense_cooldown-delta)
+	_guard_remaining=maxf(0,_guard_remaining-delta)
+	_offense_cooldown=maxf(0,_offense_cooldown-delta)
+	_observation_age+=delta
+	if actor.actor_context:
+		var observation:=actor.actor_context.actions.attack_observation()
+		if not observation.is_empty() and int(observation.serial)!=_own_serial:
+			_own_serial=int(observation.serial)
+			var strike:=actor.actor_context.actions.profile
+			_offense_cooldown=strike.windup+strike.active+strike.recovery+_tempo.attack_pause
 func refused() -> void: _reposition = 1.0
 func choose(target: Node2D) -> Array[Action]:
 	var result: Array[Action] = []
@@ -34,21 +52,37 @@ func choose(target: Node2D) -> Array[Action]:
 			actions.guarding=false
 			if actor.actor_context.region.navigation: return [Action.move(actor.actor_context.region.navigation.direction(actor.position,actor._last_seen_position if actor._last_seen_position.is_finite() else actor.position),actor)]
 			return result
-		if target_context and _defense_cooldown<=0 and target_context.actions.mode=="attack" and target_context.actions.elapsed<target_context.actions.profile.windup and dist<target_context.actions.profile.reach+24 and actions.stamina.current>28:
-			_defense_cooldown=1.3
-			if target_context.actions.profile.impact>=38 or target_context.actions.profile.windup>=.35:
+		var observation:=target_context.actions.attack_observation() if target_context else {}
+		if observation.is_empty(): _observed_serial=-1
+		elif target.get_instance_id()!=_observed_target or int(observation.serial)!=_observed_serial:
+			_observed_target=target.get_instance_id(); _observed_serial=int(observation.serial); _observation_age=0
+		if not observation.is_empty() and float(observation.windup)>0 and _observation_age<_tempo.reaction_delay and dist<float(observation.reach)+24:
+			actions.movement=Vector2.ZERO
+			return result
+		if _guard_remaining>0 and actions.can_guard() and actions.stamina.current>20:
+			return [_guard(target)]
+		if not observation.is_empty() and _observation_age>=_tempo.reaction_delay and _defense_cooldown<=0 and float(observation.windup)>0 and dist<float(observation.reach)+24 and actions.stamina.current>28:
+			_defense_cooldown=_tempo.defense_interval
+			if observation.heavy:
 				var evade:=Action.new(); evade.action_type=Action.ActionType.DODGE; evade.direction=actor.get_target_direction().orthogonal()
 				return [evade]
 			if actions.can_guard():
-				var defend:=Action.new(); defend.action_type=Action.ActionType.GUARD; defend.params["held"]=true; defend.direction=actor.get_target_direction()
-				return [defend]
+				_guard_remaining=_tempo.guard_duration
+				return [_guard(target)]
 		actions.guarding=false
+		if actions.stamina.current<actions.stamina.maximum*_tempo.retreat_fraction:
+			if dist>actor.attack_range*2 and actions.needs.water_remaining<=0 and store.can_pay(owner_id,{"clean_water":1},true):
+				var drink:=Action.new(); drink.action_type=Action.ActionType.USE_ITEM; drink.skill_id="clean_water"; return [drink]
+			return [Action.move(-actor.get_target_direction()*.65,actor)]
 		var weapon:=store.equipment_definition(weapon_uid)
 		var reach:=weapon.moveset.attacks[0].reach if weapon and weapon.moveset and not weapon.moveset.attacks.is_empty() else actor.attack_range
 		if weapon and weapon.moveset and weapon.moveset.weapon_type=="bow" and store.can_pay(owner_id,{"arrow":1},true):
 			if dist<140: return [Action.move(-actor.get_target_direction(),actor)]
-			if dist<=reach:
+			if dist<=reach and _offense_cooldown<=0:
 				var shot:=Action.melee(actor); shot.direction=actor.get_target_direction(); return [shot]
+		if dist<=reach and (_offense_cooldown>0 or _ally_striking(target)):
+			var backstep:=clampf((reach*_tempo.preferred_reach-dist)/maxf(1,reach),.2,.7)
+			return [Action.move(actor.get_target_direction().orthogonal()*.35-actor.get_target_direction()*backstep,actor)]
 		if dist<=reach and weapon and weapon.world_shape in ["blade","spear","staff"]:
 			if target_context and target_context.actions.guarding and actions.stamina.current>40:
 				var heavy:=Action.new(); heavy.action_type=Action.ActionType.HEAVY_ATTACK; heavy.direction=actor.get_target_direction(); return [heavy]
@@ -64,12 +98,9 @@ func choose(target: Node2D) -> Array[Action]:
 		if dist<115 and not find_source("disperse").is_empty() and store.can_pay(owner_id,{"venom_sprayer":1},true):
 			var spray:=cast("venom_mist",target)
 			if spray: return [spray]
-		if actions.stamina.current<24:
-			if dist>actor.attack_range*2 and actions.item_request.is_valid() and actor.actor_context.items.can_pay(actor.actor_context.id,{"clean_water":1},true):
-				var use:=Action.new(); use.action_type=Action.ActionType.USE_ITEM; use.skill_id="clean_water"; return [use]
-			var guard:=Action.new(); guard.action_type=Action.ActionType.GUARD; guard.params["held"]=false; guard.direction=actor.get_target_direction()
-			return [guard,Action.move(-actor.get_target_direction()*.5,actor)]
-		if dist>actor.attack_range and actor.actor_context.region.navigation:
+		if actor.ai_role==Enemy.AIRole.RANGED and dist<actor.ranged_preferred_range*.45:
+			return [Action.move(-actor.get_target_direction()*.65,actor)]
+		if dist>reach and actor.actor_context.region.navigation:
 			var route:=actor.actor_context.region.navigation.direction(actor.position,target.position)
 			if route.length_squared()>.01 and not actor.surface_awareness.should_evade and actor.ai_role==Enemy.AIRole.MELEE: return [Action.move(route,actor)]
 	if actor.surface_awareness.should_evade:
@@ -142,3 +173,17 @@ func cast(id: String,target: Node2D,empower:=false,at_self:=false) -> Action:
 	action.target=target
 	action.cast_context=context
 	return action
+
+func _guard(_target: Node2D) -> Action:
+	var defend:=Action.new(); defend.action_type=Action.ActionType.GUARD; defend.params["held"]=true; defend.direction=actor.get_target_direction()
+	return defend
+func _ally_striking(target: Node2D) -> bool:
+	var context:=actor.actor_context
+	if not context.nearby_allies.is_valid(): return false
+	for ally: Node2D in context.nearby_allies.call(180.0):
+		if not actor.can_see(ally): continue
+		var other:=ally.get("actor_context") as ActorContext
+		if not other or not other.actions.active() or other.actions.mode!="attack" or other.actions.profile.projectile_speed>0: continue
+		var toward:=target.global_position-ally.global_position
+		if toward.length()<=other.actions.profile.reach+24 and (toward.is_zero_approx() or other.actions.facing.dot(toward.normalized())>.5): return true
+	return false

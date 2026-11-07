@@ -12,6 +12,9 @@ var item_actions: Node
 var spray: Node
 var actions: ActorActionController
 var martial:=MartialArts.new()
+var preparation_query: Callable
+var cancel_preparation: Callable
+var nearby_allies: Callable
 var inspect_requested: Callable
 var hostile_requested: Callable
 var panel_requested: Callable
@@ -22,9 +25,12 @@ var loot_eligible := false
 func world() -> Node:
 	return region.root if region and region.available() else null
 func dispose() -> void:
+	if cancel_preparation.is_valid(): cancel_preparation.call()
 	if actions: actions.cancel("scope_left")
 	if item_actions: item_actions.cancel()
 	if spray: spray.stop()
+	preparation_query=Callable(); cancel_preparation=Callable()
+	nearby_allies=Callable()
 	inspect_requested=Callable()
 	hostile_requested=Callable()
 	panel_requested=Callable()

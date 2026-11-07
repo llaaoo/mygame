@@ -3,6 +3,8 @@
 [ext_resource type="Script" path="res://gameplay/foundation/data/attack_profile.gd" id="attack"]
 [sub_resource type="Resource" id="Attack"]
 script = ExtResource("attack")
+interrupts_preparation = true
+motion = "shot"
 windup = 0.85
 active = 0.08
 recovery = 0.55
@@ -18,5 +20,5 @@ script = ExtResource("tech")
 id = "bow_aim"
 title = "蓄力穿射"
 weapon_type = "bow"
-description = "站定蓄力，较远射程与高冲击；消耗24体力及1支实物箭，不花MP。"
+description = "站定蓄力，命中未格挡的准备动作可打断，射程更远；消耗24体力及1支实物箭，不花MP。"
 profile = SubResource("Attack")

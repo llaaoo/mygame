@@ -33,7 +33,7 @@ static func clear(node: Node) -> void:
 		node.remove_child(child)
 		child.queue_free()
 static func comparison(current: EquipmentData, candidate: EquipmentData) -> String:
-	var labels := {"attack_damage":"近战攻击","strength":"力量","intelligence":"智力","endurance":"耐力","agility":"敏捷","move_speed":"移动速度","damage_reduction":"受伤减免","damage.fire":"火焰伤害","mana_cost.all":"法力费用","preparation_bonus":"准备时间","partial_boon_mana_cost":"部分消费额外MP","field_radius_bonus":"法阵半径","field_duration_bonus":"法阵持续秒数","soul_capacity_bonus":"残魂容量","soul_range_bonus":"汲魂范围","boon_duration_bonus":"恩赐持续时间","empower_damage_bonus":"释放伤害倍率","empower_mana_bonus":"释放额外法力","medium_infusion_cost":"介质灌注法力","partial_boon_damage_multiplier":"保留伤害倍率","medium_infusion_enabled":"介质灌注","partial_boon_enabled":"部分消费","hp_regen":"生命回复","max_hp":"生命上限","mp_regen":"法力回复","attack_speed":"攻击速度"}
+	var labels := {"impact_resistance":"冲击抵抗","stamina_recovery":"体力每秒回复","dodge_cost":"闪避体力费用","attack_damage":"近战攻击","strength":"力量","intelligence":"智力","endurance":"耐力","agility":"敏捷","move_speed":"移动速度","damage_reduction":"受伤减免","damage.fire":"火焰伤害","mana_cost.all":"法力费用","preparation_bonus":"准备时间","partial_boon_mana_cost":"部分消费额外MP","field_radius_bonus":"法阵半径","field_duration_bonus":"法阵持续秒数","soul_capacity_bonus":"残魂容量","soul_range_bonus":"汲魂范围","boon_duration_bonus":"恩赐持续时间","empower_damage_bonus":"释放伤害倍率","empower_mana_bonus":"释放额外法力","medium_infusion_cost":"介质灌注法力","partial_boon_damage_multiplier":"保留伤害倍率","medium_infusion_enabled":"介质灌注","partial_boon_enabled":"部分消费","hp_regen":"生命回复","max_hp":"生命上限","mp_regen":"法力回复","attack_speed":"攻击速度"}
 	var before := {}
 	var after := {}
 	for pair in [[current,before],[candidate,after]]:
@@ -61,7 +61,7 @@ static func comparison(current: EquipmentData, candidate: EquipmentData) -> Stri
 			continue
 		var a := float(before.get(key,0))
 		var b := float(after.get(key,0))
-		var percentage: bool = "." in key or key in ["damage_reduction","attack_speed","preparation_bonus","boon_duration_bonus","empower_damage_bonus"]
+		var percentage: bool = "." in key or key in ["impact_resistance","dodge_cost","damage_reduction","attack_speed","preparation_bonus","boon_duration_bonus","empower_damage_bonus"]
 		var factor := 100.0 if percentage else 1.0
 		var suffix := "%" if percentage else ""
 		text += "%s   %.0f%s → %.0f%s  (%+.0f%s)\n" % [labels.get(key,key),a*factor,suffix,b*factor,suffix,(b-a)*factor,suffix]

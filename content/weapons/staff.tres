@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://gameplay/foundation/data/attack_profile.gd" id="attack"]
 [sub_resource type="Resource" id="stroke0"]
 script = ExtResource("attack")
+motion = "sweep"
 windup = 0.3
 active = 0.18
 recovery = 0.4
@@ -13,6 +14,7 @@ impact = 32
 damage_multiplier = 0.9
 [sub_resource type="Resource" id="stroke1"]
 script = ExtResource("attack")
+motion = "sweep"
 windup = 0.4
 active = 0.2
 recovery = 0.52

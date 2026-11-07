@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="ActorCharacterData" load_steps=11 format=3]
+[gd_resource type="Resource" script_class="ActorCharacterData" load_steps=12 format=3]
 [ext_resource type="Script" path="res://gameplay/characters/actor_character_data.gd" id="data"]
 [ext_resource type="Script" path="res://gameplay/abilities/loadout/skill_loadout.gd" id="loadout"]
 [ext_resource type="Resource" path="res://gameplay/abilities/data/fire_sigil_data.tres" id="fire_sigil"]
@@ -8,12 +8,14 @@
 [ext_resource type="Resource" path="res://content/exploration/equipment/cadence_gloves.tres" id="gloves"]
 [ext_resource type="Resource" path="res://content/frontier/equipment/river_staff.tres" id="river_staff"]
 [ext_resource type="Resource" path="res://gameplay/abilities/data/venom_mist_data.tres" id="spray"]
+[ext_resource type="Resource" path="res://content/tactics/pressure.tres" id="temperament"]
 [sub_resource type="Resource" id="Loadout"]
 script = ExtResource("loadout")
 right_hand = "ignite"
 slots = Array[String](["fire_sigil", "focus", "water_call", "venom_mist"])
 [resource]
 script = ExtResource("data")
+temperament = ExtResource("temperament")
 id = "river_caster"
 title = "刻阵术士"
 strength = 2

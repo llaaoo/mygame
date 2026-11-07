@@ -73,6 +73,9 @@ func _draw() -> void:
 		draw_rect(Rect2(-4,-21,2,2),Color("26282b"))
 		draw_rect(Rect2(3,-21,2,2),Color("26282b"))
 	for item in items:
+		if manager and item.slot_type==EquipmentData.SlotType.RIGHT_HAND:
+			var actor_context:=get_parent().get("actor_context") as ActorContext
+			if actor_context and actor_context.actions.active() and actor_context.actions.mode=="attack": continue
 		var c := item.world_color
 		var store:=manager.inventory_store if manager else inventory_store
 		if store and item.slot_type==EquipmentData.SlotType.RIGHT_HAND:

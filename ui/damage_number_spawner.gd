@@ -69,5 +69,5 @@ func _target_world(target: Node2D) -> Node:
 func _on_defense(target: Node2D,outcome: Dictionary) -> void:
 	var world:=_target_world(target)
 	if not world: return
-	var title: String="闪避" if outcome.dodged else "破防" if outcome.guard_broken else "格挡·减伤" if outcome.damage>0 else "格挡"
+	var title: String="精准格挡" if outcome.get("parried",false) else "打断" if outcome.get("interrupted",false) else "击退" if outcome.get("pushed",false) else "闪避" if outcome.dodged else "破防" if outcome.guard_broken else "格挡·减伤" if outcome.damage>0 else "格挡"
 	DamageNumber.spawn_reaction(world,title,target.global_position)

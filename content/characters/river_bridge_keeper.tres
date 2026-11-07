@@ -5,11 +5,13 @@
 [ext_resource type="Resource" path="res://content/frontier/equipment/river_sabre.tres" id="river_sabre"]
 [ext_resource type="Resource" path="res://content/frontier/equipment/river_coat.tres" id="river_coat"]
 [ext_resource type="Resource" path="res://content/frontier/equipment/river_shield.tres" id="river_shield"]
+[ext_resource type="Resource" path="res://content/tactics/sentinel.tres" id="temperament"]
 [sub_resource type="Resource" id="Loadout"]
 script = ExtResource("loadout")
 slots = Array[String](["focus"])
 [resource]
 script = ExtResource("data")
+temperament = ExtResource("temperament")
 id = "river_bridge_keeper"
 title = "断桥守望者·洛恩"
 strength = 4

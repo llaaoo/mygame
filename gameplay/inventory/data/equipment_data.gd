@@ -71,8 +71,9 @@ func get_effective_power_score() -> int:
 		score += int(absf(float(value)))
 	for value in get_combined_stat_multipliers().values():
 		score += int(absf(float(value)) * 100.0)
-	for value in get_combined_combat_modifiers().values():
-		score += int(absf(float(value)) * 100.0)
+	var combat:=get_combined_combat_modifiers()
+	for key in combat:
+		score += int(absf(float(combat[key])) * (3.0 if key=="stamina_recovery" else 100.0))
 	return maxi(1, score)
 
 

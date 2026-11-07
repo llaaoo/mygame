@@ -65,6 +65,10 @@ func bind_actor(actor: CharacterBody2D,id: String,legacy_counts: Dictionary = {}
 	context.reward_eligible=bool(actor.get("rewards_enabled")) if "rewards_enabled" in actor else true
 	context.persistent=persistent
 	context.loot_eligible=rules.physical_inventory and persistent and id!="player"
+	if actor is Enemy and actor.attack_preparation:
+		context.preparation_query=actor.attack_preparation.is_preparing
+		context.cancel_preparation=actor.attack_preparation.cancel
+	context.nearby_allies=nearby_allies.bind(id)
 	context.inspect_requested=inspect_actor
 	context.hostile_requested=hostility_changed
 	actor.actor_context=context
@@ -415,3 +419,13 @@ func advance_rest_time(seconds: float) -> void:
 	facts.publish("time_advanced","player",{"seconds":seconds})
 
 func elapsed_seconds() -> float: return inventory.clock_seconds
+
+func nearby_allies(radius: float,id: String) -> Array[Node2D]:
+	var result: Array[Node2D]=[]
+	var actor:=actor_for_id(id)
+	if not is_instance_valid(actor) or not region.available(): return result
+	for other_id in actors:
+		if other_id==id or relations.memberships.get(id,"")=="" or relations.memberships.get(other_id,"")!=relations.memberships.get(id,""): continue
+		var other:=actor_for_id(other_id)
+		if is_instance_valid(other) and other.global_position.distance_to(actor.global_position)<=radius and not other.get_node("HealthComponent").is_dead: result.append(other)
+	return result

@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="CombatTemperament" format=3]
+[ext_resource type="Script" path="res://gameplay/characters/combat_temperament.gd" id="data"]
+[resource]
+script = ExtResource("data")
+reaction_delay = 0.2
+defense_interval = 2.0
+guard_duration = 0.36
+attack_pause = 0.45
+retreat_fraction = 0.35
+preferred_reach = 0.95

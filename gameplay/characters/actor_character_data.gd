@@ -1,6 +1,7 @@
 class_name ActorCharacterData
 extends Resource
 ## Shared by human actors; input, AI, rewards and persistence belong to controllers.
+@export var temperament: CombatTemperament
 @export var id: String
 @export var title: String
 @export var level := 1
@@ -20,6 +21,7 @@ extends Resource
 
 func validation_errors(available_rules: Variant = null) -> Array[String]:
 	var errors: Array[String] = []
+	if temperament and not temperament.valid(): errors.append("Invalid combat temperament")
 	if level<1 or level>100: errors.append("Invalid character level")
 	if id.is_empty() or title.is_empty(): errors.append("Missing character id/title")
 	for key in Buff.PRIMARY_STATS:

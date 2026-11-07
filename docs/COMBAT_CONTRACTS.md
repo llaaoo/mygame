@@ -13,6 +13,8 @@
 
 物理动作新增共用 ActorActionController：体力在接受攻击/闪避时消费，前摇后命中，格挡/闪避资格在直接命中的 ON_HIT 前判定；稳定性和重击仍走同一 CombatExecutor。详见 [RPG 基座](./RPG_FOUNDATION.md)。
 
+2026-11-07 UTC：物理动作可在HitContext携带不可变AttackProfile；精准格挡、格挡压力、打断和位移规则见[武器纵深](COMBAT_DEPTH.md)。命中前采样准备状态，资格拒绝不产生额外物理效果；伤害成立后结算打断/击退，反馈读取最终HitResult。
+
 本文从属于[ARCHITECTURE](./ARCHITECTURE.md)。以下契约约束领域职责，已实现的公开同步请求/查询允许跨服务调用；延迟世界工作才使用带区域scope的CommandBus。
 
 - CastContext保留输入意图，CastPlan/组件/状态条件表达确定计划；预览不消费资源，准备提交重读真实版本。

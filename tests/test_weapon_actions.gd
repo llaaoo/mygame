@@ -85,7 +85,11 @@ func run() -> void:
 	actions.advance(.6)
 	arrows=game.region_root.get_children().filter(func(node): return node is WeaponArrow and not node.is_queued_for_deletion())
 	if not arrows.is_empty():
-		var arrow:=arrows[0] as WeaponArrow; arrow.set_physics_process(false); arrow._physics_process(.5)
+		var arrow:=arrows[0] as WeaponArrow; arrow.set_physics_process(false)
+		var committed_damage:=arrow.damage
+		store.equip("player",store.find_owned("player","river_staff"))
+		check(arrow.damage==committed_damage and arrow.damage!=actor.combat_component.attack_damage,"Changing equipment rewrote an in-flight arrow")
+		arrow._physics_process(.5)
 	await frames()
 	check(target.health_component.hp<hp and actor.mana_component.mp==mp and store.count("player","arrow")==1,"Arrow has no real physical damage or used mana")
 	# Normal brain reacts to visible physical telegraphs, routes dodge through executor.
@@ -98,6 +102,9 @@ func run() -> void:
 	check(actions.try_action(request).accepted,"Could not start visible light telegraph")
 	target.character_brain._clock=0; target.character_brain._defense_cooldown=0
 	var chosen:=target.character_brain.choose(actor)
+	check(chosen.is_empty(),"Enemy defended before observing the windup")
+	target.character_brain.tick(.3)
+	chosen=target.character_brain.choose(actor)
 	check(chosen.size()==1 and chosen[0].action_type==Action.ActionType.GUARD,"Enemy did not respond to a visible light windup")
 	if chosen.size()==1: target.resolve_action(chosen[0])
 	check(target.actor_context.actions.guarding,"Enemy guard intent never reached shared physical executor")
@@ -105,7 +112,10 @@ func run() -> void:
 	var heavy:=Action.melee(actor); heavy.action_type=Action.ActionType.HEAVY_ATTACK; heavy.direction=Vector2.RIGHT
 	check(actions.try_action(heavy).accepted,"Could not start heavy telegraph")
 	target.actor_context.actions.cancel(); target.actor_context.actions.stamina.current=100
-	target.character_brain._clock=0; target.character_brain._defense_cooldown=0
+	target.character_brain._clock=0; target.character_brain._defense_cooldown=0; target.character_brain._guard_remaining=0
+	chosen=target.character_brain.choose(actor)
+	check(chosen.is_empty(),"Enemy dodged a new attack without reaction time")
+	target.character_brain.tick(.3)
 	chosen=target.character_brain.choose(actor)
 	check(chosen.size()==1 and chosen[0].action_type==Action.ActionType.DODGE,"Enemy did not distinguish heavy and light windups")
 	if chosen.size()==1: target.resolve_action(chosen[0])
