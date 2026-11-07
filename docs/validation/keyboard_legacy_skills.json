@@ -640,6 +640,18 @@
     ],
     "script": "tests/test_keyboard_casting.gd",
     "method": "Controlled fixture; real key/mouse events and native pointer warp; GUI events use Viewport local coordinates. Not a natural combat/budget run.",
-    "warning": "Changing VSync unsupported by llvmpipe driver; no script errors."
+    "warning": "Changing VSync unsupported by llvmpipe driver; no script errors.",
+    "archive_revision": "fc391b0e411ee4e7186b6969ec4c2ac884b4c21e",
+    "exit_code": 0
+  },
+  "clean_archive_regression": {
+    "revision": "fc391b0e411ee4e7186b6969ec4c2ac884b4c21e",
+    "command": "python3 tools/run_tests.py --suite all --jobs 4",
+    "cold_import": true,
+    "passed": 71,
+    "total": 71,
+    "exit_code": 0,
+    "log": "keyboard_legacy_regression.txt",
+    "log_sha256": "253cd68b3f77f69bc894b172ec0b1516a6af482f0a69caebc35f2b370ebb650d"
   }
 }
