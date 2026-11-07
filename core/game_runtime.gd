@@ -128,7 +128,7 @@ func _setup_runtimes() -> void:
 
 	# === 伤害数字生成器（监听 CombatEventBus → 浮动数字） ===
 	if not has_node("DamageNumberSpawner"):
-		var dns := DamageNumberSpawner.new(combat_event_bus)
+		var dns := DamageNumberSpawner.new(combat_event_bus,combat_executor)
 		dns.name = "DamageNumberSpawner"
 		add_child(dns)
 

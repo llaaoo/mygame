@@ -101,9 +101,10 @@ func drop_item(actor: String,uid: String,quantity: int,region: String,position: 
 	var created:=destination.is_empty()
 	if created:
 		if _containers.size()>=4096: return OperationResult.reject("world_capacity")
-		var serial:=_containers.size()
+		var serial:=next_uid
+		while _containers.has("ground.%d"%serial): serial+=1
+		next_uid=serial+1
 		destination="ground.%d"%serial
-		while _containers.has(destination): serial+=1; destination="ground.%d"%serial
 		ensure_container(destination,"world","cache",256)
 		_containers[destination].region=region
 		_containers[destination].position=[position.x,position.y]
@@ -290,6 +291,7 @@ func commit(plan: TransferPlan) -> OperationResult:
 		accepted=mini(accepted,maxi(0,(rules.maximum_water if rules else 4)-count(owner,"clean_water")-count(owner,"dirty_water")))
 	if accepted<=0 or not plan.partial and accepted!=plan.quantity: return OperationResult.reject("capacity")
 	var key:=entry.definition_id
+	var source_owner: String=_containers[plan.source].owner
 	var properties:=entry.properties.duplicate(true)
 	var uid:=entry.uid if accepted==entry.quantity else ""
 	begin_batch()
@@ -302,8 +304,9 @@ func commit(plan: TransferPlan) -> OperationResult:
 	_touch(plan.source)
 	var result:=OperationResult.success(accepted)
 	result.item_uids=_insert(plan.destination,key,accepted,uid,properties)
+	if plan.source.begins_with("ground.") and _containers[plan.source].kind=="cache" and _containers[plan.source].items.is_empty(): _containers.erase(plan.source)
 	end_batch()
-	_publish("item_transferred",_containers[plan.source].owner,{"from":plan.source,"to":plan.destination,"definition":key,"quantity":accepted,"uids":result.item_uids})
+	_publish("item_transferred",source_owner,{"from":plan.source,"to":plan.destination,"definition":key,"quantity":accepted,"uids":result.item_uids})
 	return result
 func exchange(a: String,b: String,costs: Dictionary,returns: Dictionary) -> OperationResult:
 	if a==b or not can_pay(a,costs) or not can_pay(b,returns): return OperationResult.reject("insufficient_items")
@@ -423,6 +426,7 @@ func restore(data: Dictionary) -> void:
 	next_uid=int(data.get("next_uid",1))
 	for id in data.get("containers",{}):
 		var record: Dictionary=data.containers[id].duplicate(true)
+		if id.begins_with("ground.") and record.kind=="cache" and record.items.is_empty(): continue
 		var instances: Array=[]
 		for raw in record.items:
 			var entry:=ItemInstance.from_snapshot(raw)

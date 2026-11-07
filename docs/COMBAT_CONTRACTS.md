@@ -554,3 +554,7 @@ HitContext在命中前固定投射物条件减伤倍率；命中事件仍以未�
 ## 材料接触状态（2026-11-07）
 
 释放介质在运行时 SkillData.contact_statuses 携带具体药效。CombatExecutor 在先前状态快照和 ON_HIT 之后、主体伤害之前，按 status_accepted 施加；元素默认挂状态不覆盖同 ID 的材料定义。由此新挂毒不能冒充命中前已有的毒。控制效果通过 Buff.prevents_actions 同时限制共用物理动作和施法入口；有害接触即使零直接伤害也通知战役关系服务。详见 [基础动作与释放介质](./MATERIAL_SPELL_OPERATIONS.md)。
+
+## 防御结果展示
+
+`CombatExecutor.defense_resolved(target, outcome)`只广播物理闪避、格挡和破防的最终只读投影。格挡/破防在命中组结束、伤害与资源写回、执行器上下文恢复后广播；物理闪避在拒绝命中后广播。它不替代ON_HIT、ON_DAMAGE或概率闪避事件，不发出伤害/奖励请求。表现节点按区域所有权挂载和卸载；浮字偏移不读取玩法随机数。

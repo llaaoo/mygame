@@ -9,6 +9,7 @@ const DURATION: float = 0.7
 const FADE_START: float = 0.55
 
 var _label: Label = null
+static var _offset_sequence := 0
 
 
 func _ready() -> void:
@@ -81,8 +82,9 @@ static func spawn_miss(parent: Node, world_pos: Vector2) -> void:
 static func _spawn(parent: Node, text: String, color: Color, world_pos: Vector2, scale: float) -> void:
 	var dn := DamageNumber.new()
 	dn.name = "DamageNumber"
-	# 随机偏移避免重叠
-	var point := world_pos + Vector2(randf_range(-12, 12), randf_range(-8, 8))
+	# Cosmetic staggering never advances gameplay randomness.
+	_offset_sequence+=1
+	var point := world_pos + Vector2((_offset_sequence*7)%25-12,(_offset_sequence*5)%17-8)
 	dn.position = parent.to_local(point) if parent is Node2D else point
 	parent.add_child(dn)
 	dn.configure(text, color, scale)

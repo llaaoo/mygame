@@ -5,6 +5,7 @@ var player: Player
 var casting: PlayerCastingController
 var _mouse_shortcuts: Dictionary={}
 var _ui_click_pending := false
+var _attack_suppressed := false
 var _suppressed_sources: Dictionary={}
 var _fresh_after_ui: Dictionary={}
 var _focus: Node2D
@@ -23,7 +24,7 @@ func poll_universal_actions() -> Array[Action]:
 	var actions: Array[Action] = []
 	var selecting:=is_instance_valid(player.material_wheel) and player.material_wheel.visible
 	var tactical:=player.actor_context and player.actor_context.rules.tactical_combat
-	var heavy:=tactical and Input.is_action_just_pressed("heavy_attack") and not selecting and not _pointer_over_interface()
+	var heavy:=tactical and not _attack_suppressed and Input.is_action_just_pressed("heavy_attack") and not selecting and not _pointer_over_interface()
 	if tactical:
 		for pair in [[Action.ActionType.GUARD,"guard"],[Action.ActionType.SPRINT,"sprint"]]:
 			var state:=Action.new()
@@ -46,7 +47,7 @@ func poll_universal_actions() -> Array[Action]:
 		actions.append(Action.dodge(input_dir if input_dir.length() > 0.1 else player.facing_direction, player))
 
 	# 左键始终提出武器攻击，法术使用独立键位。
-	if not selecting and Input.is_action_just_pressed("attack") and not _pointer_over_interface() and not heavy:
+	if not selecting and not _attack_suppressed and Input.is_action_just_pressed("attack") and not _pointer_over_interface() and not heavy:
 		var hit:=Action.melee(player)
 		hit.direction=player.get_mouse_direction()
 		actions.append(hit)
@@ -68,6 +69,8 @@ func _ready() -> void:
 	get_window().focus_exited.connect(_focus_lost)
 
 func _input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_LEFT and event.pressed:
+		if not player.ui_blocked and not get_tree().paused and not (is_instance_valid(player.material_wheel) and player.material_wheel.visible): _attack_suppressed=false
 	# Global Input edges survive handled UI events. Preserve a genuinely new press
 	# after closing a selector, without replaying its earlier selection/release.
 	if event is InputEventKey or event is InputEventMouseButton:
@@ -88,7 +91,7 @@ func source_held(source: String) -> bool:
 func request_shortcut(source: String,pressed: bool,mouse := false) -> void:
 	if mouse:
 		if not pressed and not _mouse_shortcuts.has(source): return
-		if pressed: _mouse_shortcuts[source]=true; _ui_click_pending=true
+		if pressed: _mouse_shortcuts[source]=true; pointer_consumed()
 		else: _mouse_shortcuts.erase(source)
 	if player.ui_blocked or get_tree().paused or player.health_component.is_dead or is_instance_valid(player.material_wheel) and player.material_wheel.visible: return
 	var actions: Array[Action]=[]
@@ -355,3 +358,6 @@ func suppress_held_shortcuts() -> void:
 		if Input.is_action_pressed(action_for_source(source)): suppress_source(source)
 func pointer_consumed() -> void:
 	_ui_click_pending=true
+	# Handled GUI presses remain in global Input across physics frames. Keep
+	# this press suppressed until a genuinely new gameplay press arrives.
+	_attack_suppressed=true
