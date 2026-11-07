@@ -40,7 +40,7 @@ func _run() -> void:
 	await _travel("camp")
 	points = game.player.stats_component.attribute_points
 	await _interact("测绘员艾妲")
-	_check(paused, "Rescued NPC did not appear in camp")
+	_check(not paused and game.player.ui_blocked, "Rescued NPC did not appear in camp")
 	game._claim_quest(game.quests[0])
 	_check(game.player.stats_component.attribute_points == points + 1, "Rescue reward missing")
 	game._claim_quest(game.quests[0])
@@ -131,7 +131,7 @@ func _run() -> void:
 	await _travel("cistern")
 	var event: ExplorationWorldEventData = game.current_data.events[0]
 	await _interact("旧水路控制阀")
-	_check(paused, "Cleared valve did not open choice panel")
+	_check(not paused and game.player.ui_blocked, "Cleared valve did not open choice panel")
 	game._choose_world_event(event, event.choices[0])
 	_check(game.progress.choices.get("waterworks_choice") == "cooling" and game.region_root.has_node("WaterworksShortcut"), "Cooling choice/shortcut missing")
 	await _travel("boss")

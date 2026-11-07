@@ -36,7 +36,8 @@ func _source_rows(screen: ExpeditionScreen,query: String) -> void:
 func _source_detail(screen: ExpeditionScreen,skill: SkillData) -> void:
 	FoundationWidgets.clear(screen.detail)
 	var controller: ConditionalCastController=game.player.skill_manager.combinations
-	var plan:=controller.preview(skill,game.player)
+	var source:=QuickslotMaterials.source_for(game.player.skill_manager,skill)
+	var plan: CastPlan=game.player.skill_manager.preview_source(source) if not source.is_empty() else controller.preview(skill,game.player)
 	var card:=FoundationWidgets.card(screen.detail,skill.display_name,skill.description)
 	card.add_child(FoundationWidgets.label("本次 → "+plan.effect_label,18))
 	card.add_child(FoundationWidgets.label("%d MP · 准备 %.2f秒"%[plan.cost,plan.preparation],14,true))
@@ -48,6 +49,16 @@ func _source_detail(screen: ExpeditionScreen,skill: SkillData) -> void:
 	FoundationWidgets.disclosure(screen.detail,"来源与消耗规则","选择不扣物资。成功释放才结算真实来源；耗尽或失效会拒绝，不自动换料。K可将来源固定到单个快捷槽，M只设置未固定槽位的本次选择。组合条件需亲手准备，额外修饰只作用于一次施法。")
 
 func show_action(skill: SkillData) -> void:
+	if game.rules.material_operations and is_instance_valid(game.player.material_wheel):
+		var source:=QuickslotMaterials.source_for(game.player.skill_manager,skill,game.player.material_wheel.last_source)
+		game.ui.close_modal()
+		if source.is_empty():
+			game.player.skill_pool_ui.open_for(skill)
+			game.ui.notify("先将这个动作绑定快捷槽，再用M选材。")
+		else:
+			game.player.material_wheel.remember_source(source)
+			game.player.material_wheel.open()
+		return
 	if not skill.operation_id.is_empty():
 		show_payloads(skill)
 		return

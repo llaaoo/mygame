@@ -5,6 +5,8 @@ var player: Player
 var casting: PlayerCastingController
 var _mouse_shortcuts: Dictionary={}
 var _ui_click_pending := false
+var _suppressed_sources: Dictionary={}
+var _fresh_after_ui: Dictionary={}
 var _focus: Node2D
 var _focus_frame := -1
 var _focus_origin := Vector2.INF
@@ -19,13 +21,14 @@ func poll_universal_actions() -> Array[Action]:
 		return []
 
 	var actions: Array[Action] = []
+	var selecting:=is_instance_valid(player.material_wheel) and player.material_wheel.visible
 	var tactical:=player.actor_context and player.actor_context.rules.tactical_combat
-	var heavy:=tactical and Input.is_action_just_pressed("heavy_attack") and not _pointer_over_interface()
+	var heavy:=tactical and Input.is_action_just_pressed("heavy_attack") and not selecting and not _pointer_over_interface()
 	if tactical:
 		for pair in [[Action.ActionType.GUARD,"guard"],[Action.ActionType.SPRINT,"sprint"]]:
 			var state:=Action.new()
 			state.action_type=pair[0]; state.source=player; state.direction=player.get_mouse_direction()
-			state.params["held"]=Input.is_action_pressed(pair[1]) and not (pair[1]=="guard" and _pointer_over_interface())
+			state.params["held"]=Input.is_action_pressed(pair[1]) and not (pair[1]=="guard" and _pointer_over_interface() and not selecting)
 			actions.append(state)
 		if Input.is_action_just_pressed("drop_pack"):
 			var drop:=Action.new(); drop.action_type=Action.ActionType.DROP_PACK; drop.source=player; actions.append(drop)
@@ -39,20 +42,22 @@ func poll_universal_actions() -> Array[Action]:
 
 	# 闪避
 	if Input.is_action_just_pressed("dodge"):
+		if selecting: player.material_wheel.close()
 		actions.append(Action.dodge(input_dir if input_dir.length() > 0.1 else player.facing_direction, player))
 
 	# 左键始终提出武器攻击，法术使用独立键位。
-	if Input.is_action_just_pressed("attack") and not _pointer_over_interface() and not heavy:
+	if not selecting and Input.is_action_just_pressed("attack") and not _pointer_over_interface() and not heavy:
 		var hit:=Action.melee(player)
 		hit.direction=player.get_mouse_direction()
 		actions.append(hit)
 
 	# Every shortcut can carry a skill or an item. Input only proposes requests.
 	for source in QuickslotLoadout.SOURCES:
+		if selecting: continue
 		var input_action:=action_for_source(source)
 		_poll_shortcut_edges(actions,source,input_action)
 	# 交互
-	if Input.is_action_just_pressed("interact"):
+	if not selecting and Input.is_action_just_pressed("interact"):
 		actions.append(Action.interact(player))
 
 	_ui_click_pending=false
@@ -63,6 +68,17 @@ func _ready() -> void:
 	get_window().focus_exited.connect(_focus_lost)
 
 func _input(event: InputEvent) -> void:
+	# Global Input edges survive handled UI events. Preserve a genuinely new press
+	# after closing a selector, without replaying its earlier selection/release.
+	if event is InputEventKey or event is InputEventMouseButton:
+		for source in QuickslotLoadout.SOURCES:
+			var action:=action_for_source(source)
+			if event.is_action_pressed(action) and not (event is InputEventKey and event.echo):
+				if player.ui_blocked or get_tree().paused or is_instance_valid(player.material_wheel) and player.material_wheel.visible:
+					_suppressed_sources[source]=true
+				elif _suppressed_sources.has(source):
+					_suppressed_sources.erase(source); _fresh_after_ui[source]=false
+			elif event.is_action_released(action) and _fresh_after_ui.has(source): _fresh_after_ui[source]=true
 	if event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_LEFT and not event.pressed:
 		for source in _mouse_shortcuts.keys(): request_shortcut(source,false,true)
 
@@ -74,12 +90,13 @@ func request_shortcut(source: String,pressed: bool,mouse := false) -> void:
 		if not pressed and not _mouse_shortcuts.has(source): return
 		if pressed: _mouse_shortcuts[source]=true; _ui_click_pending=true
 		else: _mouse_shortcuts.erase(source)
-	if player.ui_blocked or get_tree().paused or player.health_component.is_dead: return
+	if player.ui_blocked or get_tree().paused or player.health_component.is_dead or is_instance_valid(player.material_wheel) and player.material_wheel.visible: return
 	var actions: Array[Action]=[]
 	_poll_shortcut(actions,source,pressed)
 	for action in actions: resolve_action(action)
 
 func _poll_shortcut(actions: Array[Action],source: String,pressed: bool) -> void:
+	if is_instance_valid(player.material_wheel): player.material_wheel.remember_source(source)
 	var entry:=player.skill_manager.shortcuts.binding(source)
 	if entry.get("kind","")=="item":
 		var definition:=ItemCatalog.default_catalog().definition(str(entry.item_id))
@@ -293,6 +310,8 @@ func shortcut_changed(source: String) -> void:
 	if player.actor_context.item_actions.input_source==source: player.actor_context.item_actions.cancel()
 
 func _focus_lost() -> void:
+	_fresh_after_ui.clear()
+	for source in QuickslotLoadout.SOURCES: suppress_source(source)
 	# Lost pointer releases cancel, never confirm a prepared throw or charged spell.
 	for source in _mouse_shortcuts.keys(): shortcut_changed(source)
 	casting.cancel_all()
@@ -304,6 +323,15 @@ func _quick_skill(skill: SkillData) -> bool:
 	return skill.operation_id=="disperse" or player.actor_context and player.actor_context.rules.modern_controls and ControlPreferences.quick_cast and skill.cast_type not in ["charge","channel"]
 
 func _poll_shortcut_edges(actions: Array[Action],source: String,input_action: String) -> void:
+	if _fresh_after_ui.has(source):
+		var released: bool=_fresh_after_ui[source]
+		_fresh_after_ui.erase(source)
+		_poll_shortcut(actions,source,true)
+		if released: _poll_shortcut(actions,source,false)
+		return
+	if _suppressed_sources.has(source):
+		if not Input.is_action_pressed(input_action): _suppressed_sources.erase(source)
+		return
 	var pressed:=Input.is_action_just_pressed(input_action)
 	var released:=Input.is_action_just_released(input_action)
 	if pressed and released:
@@ -318,3 +346,12 @@ func _poll_shortcut_edges(actions: Array[Action],source: String,input_action: St
 		else: _poll_shortcut(actions,source,inst!=null and _quick_skill(inst.data))
 	elif pressed: _poll_shortcut(actions,source,true)
 	elif released: _poll_shortcut(actions,source,false)
+
+func suppress_source(source: String) -> void:
+	_suppressed_sources[source]=true
+func suppress_held_shortcuts() -> void:
+	_fresh_after_ui.clear()
+	for source in QuickslotLoadout.SOURCES:
+		if Input.is_action_pressed(action_for_source(source)): suppress_source(source)
+func pointer_consumed() -> void:
+	_ui_click_pending=true

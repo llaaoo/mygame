@@ -31,6 +31,8 @@ var persistence_enabled := true
 var ready_for_play := false
 var quests: Array[ExplorationQuestData] = []
 var equipment_service: ExpeditionEquipment
+var inventory_actions: InventoryActions
+var inventory_screen: ActorInventoryScreen
 var knowledge: ElementKnowledge
 var trial_recorder: ElementTrialRecorder
 var workshop: CastingWorkshop
@@ -98,6 +100,9 @@ func _bootstrap() -> void:
 	ui.progress = progress
 	ui.journal_provider = journal_text
 	interface_root.add_child(ui)
+	ui.material_action=func():
+		if is_instance_valid(player.material_wheel): player.material_wheel.open()
+	if is_instance_valid(player.material_wheel): player.material_wheel.save_request=_queue_save
 	session.notify=ui.notify
 	progress_service.save_failed.connect(ui.notify)
 	progress_service.changed.connect(presenter._update_objective)
@@ -143,6 +148,19 @@ func _bootstrap() -> void:
 	equipment_service.restore()
 	session.equip_item=equipment_service.equip
 	session.bind_actor(player,"player",progress.equipment_counts,progress.equipment_loadout)
+	if rules.physical_inventory:
+		inventory_actions=InventoryActions.new(player,session)
+		inventory_actions.equip_request=equipment_service.equip
+		inventory_actions.unequip_request=equipment_service.unequip
+		inventory_actions.management_reason=equipment_service.change_reason
+		inventory_actions.removal_reason=equipment_service.removal_reason
+		inventory_actions.save_request=_queue_save
+		inventory_screen=ActorInventoryScreen.new()
+		inventory_screen.actor=player; inventory_screen.session=session; inventory_screen.actions=inventory_actions
+		inventory_screen.use_request=use_inventory_item
+		inventory_screen.notify=ui.notify
+		interface_root.add_child(inventory_screen)
+		session.ground_page=func(id: String): inventory_screen.open("all",id)
 	var start := start_location()
 	_change_region(start.region, start.position)
 	ready_for_play = true
@@ -152,12 +170,34 @@ func _bootstrap() -> void:
 	(player.get_node("EquipmentManager") as EquipmentManager).loadout_changed.connect(_queue_save)
 	presenter.show_arrival()
 	if player.skill_manager.combinations.supplies.discarded_legacy_selection:
-		ui.notify("材料已改为本次选择：旧自动绑定已清除，库存保留。M选择素材，实际使用成功后清除选择。")
+		ui.notify("材料已改为本次选择：旧自动绑定已清除，库存保留。M轮盘按快捷槽选择来源，K完整编组。")
 
 	if load_status == SaveRepository.Status.RECOVERED:
 		ui.notify("主存档不可用，已从有效备份恢复进度。")
 	elif load_status not in [SaveRepository.Status.VALID, SaveRepository.Status.MISSING]:
 		ui.notify("存档无法读取，原文件已保留。当前旅程不会覆盖它；请先恢复存档。")
+
+func use_inventory_item(uid: String) -> void:
+	var item:=session.inventory.item(uid)
+	if not item: return
+	var definition:=session.inventory.definitions.get(item.definition_id) as ItemData
+	if not definition: return
+	if definition.use_profile:
+		if definition.use_profile.kind==ItemUseDefinition.Kind.SPRAY:
+			var operation:=SpellOperationCatalog.default_catalog().operation("disperse")
+			var source:=QuickslotMaterials.source_for(player.skill_manager,operation.action,player.material_wheel.last_source)
+			if source.is_empty():
+				ui.notify("先在K编组喷洒动作，或把这瓶绑定任意快捷键。")
+				player.skill_pool_ui.open_for(operation.action)
+				return
+			for payload in operation.payloads:
+				if payload.material_id==definition.id and QuickslotMaterials.select(player,source,{"payload":payload.id,"modifier":"","uid":uid}):
+					ui.notify("已为"+InputBindings.label(InputBindings.action_for_source(source))+"选择这瓶喷剂。")
+					_queue_save()
+					return
+			ui.notify("这瓶喷剂不在可用口袋中。")
+		elif not player.actor_context.item_actions.begin(uid,definition.use_profile.kind==ItemUseDefinition.Kind.THROWABLE,player.get_mouse_direction()): ui.notify("无法使用：检查口袋、武器和当前动作。")
+	elif SurvivalCatalog.FOODS.has(definition.id): survival.begin_eating(definition.id)
 
 func get_active_region() -> Node2D:
 	return region_root
@@ -169,6 +209,8 @@ func request_travel(destination: String, arrival: Vector2 = Vector2.INF) -> void
 	call_deferred("_change_region", destination, arrival)
 
 func _clear_temporary() -> void:
+	GameUIStyle.close_gameplay_views(player)
+	if is_instance_valid(player.material_wheel): player.material_wheel.close()
 	if session: session.leave_region()
 	GameRuntime.instance.get_region_session().leave(region_root, player)
 	region_root = null

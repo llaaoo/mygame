@@ -16,6 +16,7 @@ var inspect_actor: Callable
 var hostility_changed: Callable
 var equipment_page: Callable
 var supply_page: Callable
+var ground_page: Callable
 var equip_item: Callable
 var sync_extra: Callable
 var death_handler: Callable
@@ -33,6 +34,7 @@ var belt: Array[Dictionary]:
 			result.append({"id":id,"method":"throw" if definition and definition.use_profile and definition.use_profile.kind==ItemUseDefinition.Kind.THROWABLE else "use"})
 		return result
 var _pack_nodes: Dictionary={}
+var _ground_nodes: Dictionary={}
 var _activity_families: Dictionary={}
 func configure(content: ExplorationContentCatalog,profile: RulesetDefinition) -> void:
 	catalog=content
@@ -155,13 +157,31 @@ func leave_region() -> void:
 	for key in relations.personal.keys():
 		if key.begins_with("trial.") or "|trial." in key: relations.personal.erase(key)
 	_pack_nodes.clear()
+	_ground_nodes.clear()
 	region.leave()
 func mount_region(id: String,root: Node2D,layout: RunRoomLayout) -> void:
 	region.id=id; region.root=root
 	region.navigation=RegionNavigation.new()
 	region.navigation.configure(layout)
+	refresh_ground()
 	for container_id in inventory.dropped_pack_ids(id):
 		_mount_pack(container_id)
+func refresh_ground() -> void:
+	if not region.available(): return
+	var current:=inventory.ground_ids(region.id)
+	for id in _ground_nodes.keys():
+		if id not in current:
+			if is_instance_valid(_ground_nodes[id]): _ground_nodes[id].queue_free()
+			_ground_nodes.erase(id)
+	for id in current:
+		if _ground_nodes.has(id) and is_instance_valid(_ground_nodes[id]): continue
+		var node:=GroundItems.new()
+		node.service=self; node.container_id=id; node.position=inventory.ground_position(id)
+		region.root.add_child(node); _ground_nodes[id]=node
+func inspect_ground(actor: Node2D,id: String) -> void:
+	if ground_available(actor,id) and ground_page.is_valid(): ground_page.call(id)
+func ground_available(actor: Node2D,id: String) -> bool:
+	return is_instance_valid(actor) and region.available() and id in inventory.ground_ids(region.id) and actor.global_position.distance_to(inventory.ground_position(id))<80
 func mark_dead(actor: CharacterBody2D) -> void:
 	if not actor.actor_context.persistent: return
 	var id: String=actor.actor_context.id

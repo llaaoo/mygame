@@ -21,7 +21,7 @@ func run() -> void:
 	check(casts==2 and actor.mana_component.mp==mana-8,"1 did not cast its independent shortcut")
 	var sequence:=actor.actor_context.actions._attack_sequence
 	await click("Tab  远征菜单")
-	check(paused and game.hub.page=="actions","Mouse footer did not open preparation menu")
+	check(not paused and game.player.ui_blocked and game.hub.page=="actions","Mouse footer did not open preparation menu")
 	await capture("preparation-menu")
 	await point_click(game.hub._search.get_global_rect().get_center())
 	await key(KEY_E,true,101); await key(KEY_E,false)
@@ -29,7 +29,7 @@ func run() -> void:
 	await key(KEY_ESCAPE,true); await key(KEY_ESCAPE,false)
 	await click("Tab  远征菜单")
 	await click("快捷栏编组"); await click("打开快捷栏编组")
-	check(actor.skill_pool_ui.visible and paused,"Mouse preparation menu failed to open K loadout")
+	check(actor.skill_pool_ui.visible and not paused and game.player.ui_blocked,"Mouse preparation menu failed to open K loadout")
 	await key(KEY_ESCAPE,true); await key(KEY_ESCAPE,false)
 	check(not paused and not actor.ui_blocked,"Loadout close did not return to gameplay")
 	# Real nearby station, no new remote crafting authority. Fixture supplies are explicit.
@@ -41,7 +41,7 @@ func run() -> void:
 		actor.position=bench.position+Vector2(0,35); actor.get_node("Camera2D").reset_smoothing(); await frames(18)
 		check(game.frontier_hud.interact.is_visible_in_tree(),"Nearby mouse interaction hidden")
 		await point_click(game.frontier_hud.interact.get_global_rect().get_center())
-		check(paused and is_instance_valid(game.ui.modal),"Clicking nearby station failed to open crafting")
+		check(not paused and game.player.ui_blocked and is_instance_valid(game.ui.modal),"Clicking nearby station failed to open crafting")
 		game.ui.close_modal()
 		var recipe:=supplies.crafting_recipes["fire_stone"] as CraftingRecipe
 		supplies.known_recipes["fire_stone"]=true; supplies.grant(recipe.inputs)

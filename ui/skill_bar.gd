@@ -31,6 +31,7 @@ var _combination_hint: Label
 var _hint_panel: PanelContainer
 var _preparation_bar: ProgressBar
 var _cost_labels: Array[Label] = []
+var _variant_labels: Array[Label] = []
 var _affinity_strips: Array[ColorRect] = []
 var _icon_keys: Array = []
 var _hover_source := ""
@@ -55,7 +56,7 @@ func setup(sm: SkillManager) -> void:
 func _build() -> void:
 	for child in get_children():
 		child.queue_free()
-	_cost_labels.clear(); _affinity_strips.clear(); _icon_keys.clear()
+	_cost_labels.clear(); _variant_labels.clear(); _affinity_strips.clear(); _icon_keys.clear()
 	_panels.clear(); _icons.clear(); _masks.clear(); _bind_labels.clear(); _cd_labels.clear(); _sources.clear()
 
 	for source in QuickslotLoadout.COMBAT_SOURCES:
@@ -117,7 +118,7 @@ func _process(_delta: float) -> void:
 		_hint_panel.hide()
 		return
 	_combination_hint.show()
-	_hint_panel.visible=not source.is_empty() or not controller.pending.is_empty() or _feedback_time>0
+	_hint_panel.visible=(not source.is_empty() or not controller.pending.is_empty() or _feedback_time>0) and not (actor and is_instance_valid(actor.material_wheel) and actor.material_wheel.visible)
 	var previews: Dictionary = {}
 	var hint_source:=source if not source.is_empty() and _skill_manager.get_instance(source) else "right"
 	if not _skill_manager.get_instance(hint_source):
@@ -153,6 +154,15 @@ func _process(_delta: float) -> void:
 	for i in range(_sources.size()):
 		_bind_labels[i].text=InputBindings.label(InputBindings.action_for_source(_sources[i]))
 		var instance := _skill_manager.get_instance(_sources[i])
+		_variant_labels[i].text=""
+		if instance and not instance.data.operation_id.is_empty():
+			var operation:=SpellOperationCatalog.default_catalog().operation(instance.data.operation_id)
+			var choice:=_skill_manager.shortcuts.selection(_sources[i])
+			var payload:=operation.payload(str(choice.get("payload",controller.supplies.selected.get(instance.data.get_id(),operation.default_payload)))) if operation else null
+			if payload: _variant_labels[i].text=payload.title.left(2)
+		elif instance:
+			var modifier:=str(_skill_manager.shortcuts.selection(_sources[i]).get("modifier",""))
+			if not modifier.is_empty(): _variant_labels[i].text=controller.supplies.title(modifier).left(2)
 		var preview: CastPlan
 		if instance and (controller.handles(instance.data) or not instance.data.operation_id.is_empty()):
 			var key := hash([instance.base_data, instance.upgrade_ranks,_skill_manager.shortcuts.selection(_sources[i])])
@@ -206,7 +216,7 @@ func _add_item(source: String, label: String, size: Vector2) -> void:
 	panel.add_child(inner)
 
 	var icon := TextureRect.new()
-	icon.size = size-Vector2(16,14)
+	icon.size = size-Vector2(16,20)
 	icon.position=Vector2(8,5)
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
@@ -228,6 +238,15 @@ func _add_item(source: String, label: String, size: Vector2) -> void:
 	cost.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	inner.add_child(cost)
 	_cost_labels.append(cost)
+	var variant:=Label.new()
+	variant.position=Vector2(3,size.y-17); variant.size=Vector2(30,15)
+	variant.add_theme_font_size_override("font_size",11)
+	variant.add_theme_color_override("font_color",GameUIStyle.TEXT_MAIN)
+	variant.add_theme_color_override("font_shadow_color",Color.BLACK)
+	variant.add_theme_constant_override("shadow_offset_x",1); variant.add_theme_constant_override("shadow_offset_y",1)
+	variant.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	inner.add_child(variant); _variant_labels.append(variant)
+
 
 	var mask := ColorRect.new()
 	mask.size = Vector2(size.x, 0)
@@ -326,6 +345,7 @@ func _refresh_items() -> void:
 		_bind_labels[i].text=InputBindings.label(InputBindings.action_for_source(_sources[i]))
 		var binding:=_skill_manager.shortcuts.binding(_sources[i])
 		if binding.get("kind","")!="item": continue
+		_variant_labels[i].text=""
 		var view:=QuickslotView.item_state(_skill_manager.get_parent(),binding)
 		var definition:=ItemCatalog.default_catalog().definition(str(binding.item_id))
 		_icons[i].texture=InterfaceIcons.item(definition); _icons[i].modulate=Color.WHITE if view.ready else GameUIStyle.TEXT_DISABLED

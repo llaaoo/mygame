@@ -124,7 +124,7 @@ func recycle(id: String) -> bool:
 func plan(action: SkillData, base: SkillData, include_required: bool = true, preparation_material: String = "", manager: SkillManager = null,selection: Dictionary={}) -> Dictionary:
 	if not action.operation_id.is_empty(): return operation_plan(action,manager,base,true,selection)
 	var costs: Dictionary = {}
-	var material_id := str(selected.get(action.get_id(), ""))
+	var material_id := str(selection.get("modifier",selected.get(action.get_id(), "")))
 	var optional: CastingMaterialData = catalog.get(material_id)
 	var is_preparation := optional != null and material_id == preparation_material
 	if optional and not is_preparation and not optional.supports(action.get_id(), base.get_id(), base):

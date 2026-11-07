@@ -141,7 +141,7 @@ func run() -> void:
 	check(SaveManager.instance.save_game(2), "Survival state could not save")
 	await fixture.close()
 	fixture = Fixture.new(self)
-	game = await fixture.boot(true)
+	game = await fixture.boot(true,true)
 	GameRuntime.instance.set_process(false)
 	check(game.survival.needs.serialize() == _without_vitals(snapshot) and game.player.health_component.hp == 31 and game.player.mana_component.mp == 7, "Cold load refilled vitals or lost needs/timers")
 	await fixture.close()

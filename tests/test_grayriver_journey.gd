@@ -34,7 +34,7 @@ func run() -> void:
 	check(game.player.position.distance_to(Vector2(-1800,1000))<2 and game.player.health_component.hp==67 and game.player.mana_component.mp==29,"Bootstrap teleported or refilled saved traveler")
 	check(game.active_enemies.size()==11 and game.progress.claims.has(id),"Defeated outdoor actor respawned on load")
 	game.show_map()
-	check(paused,"Map failed pause lifecycle")
+	check(not paused and game.player.ui_blocked,"Map failed pause lifecycle")
 	var key:=InputEventKey.new();key.keycode=KEY_G;key.pressed=true
 	game.ui._unhandled_input(key)
 	check(not paused and not is_instance_valid(game.ui.modal),"G cannot close paused map")

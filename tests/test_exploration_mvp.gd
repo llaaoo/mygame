@@ -5,7 +5,7 @@ func _run() -> void:
 	root.add_child(game)
 	current_scene = game
 	await _frames(10)
-	_check(game.ready_for_play and paused and game.region_id == "camp", "MVP did not start at camp with instructions")
+	_check(game.ready_for_play and not paused and game.player.ui_blocked and game.region_id == "camp", "MVP did not start at camp with instructions")
 	game.ui.close_modal()
 	_check(not game.player.skill_manager.known_actions.has("fire_sigil"), "New game already knows fire sigil")
 	var sm := game.player.skill_manager
@@ -24,7 +24,7 @@ func _run() -> void:
 	await _interact("前往火药库")
 	_check(game.region_id == "yard", "Locked forward exit was usable")
 	await _interact("火阵铭刻记录")
-	_check(paused and game.progress.spell_rules.has("fire_sigil_fireball") and sm.get_slot(4) != null, "Discovery did not teach and equip fire sigil")
+	_check(not paused and game.player.ui_blocked and game.progress.spell_rules.has("fire_sigil_fireball") and sm.get_slot(4) != null, "Discovery did not teach and equip fire sigil")
 	game.ui.close_modal()
 	var count := game.progress.journal.size()
 	await _interact("火阵铭刻记录")
@@ -88,11 +88,11 @@ func _run() -> void:
 	await _clear_encounter()
 	_check(game.progress.completed, "Boss death did not complete MVP")
 	await _interact("完成探索，返回营地")
-	_check(paused and is_instance_valid(game.ui.modal), "Completion screen missing")
+	_check(not paused and game.player.ui_blocked and is_instance_valid(game.ui.modal), "Completion screen missing")
 	game.ui.close_modal()
 	await _travel("camp")
 	game.ui.show_journal()
-	_check(paused and game.progress.journal.size() >= 3, "Journal missing discoveries")
+	_check(not paused and game.player.ui_blocked and game.progress.journal.size() >= 3, "Journal missing discoveries")
 	game.ui.close_modal()
 	var original_intelligence := game.player.stats_component.intelligence
 	game.player.stats_component.attribute_points = maxi(1, game.player.stats_component.attribute_points)
@@ -110,7 +110,7 @@ func _run() -> void:
 	game.player.health_component.invincible = false
 	CombatExecutor.instance.reset_chain()
 	CombatExecutor.report_hit(null, game.player, 5000, game.player.global_position)
-	_check(game.player.health_component.is_dead and paused, "Death/recovery modal missing")
+	_check(game.player.health_component.is_dead and not paused and game.player.ui_blocked, "Death/recovery modal missing")
 	_check(not game.get_node("HUDLayer")._death_active, "Legacy death screen hijacked MVP")
 	game.ui.close_modal()
 	await _travel("camp")

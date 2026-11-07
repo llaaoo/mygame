@@ -42,7 +42,7 @@ func _run() -> void:
 	controller.tick(1)
 	_check(controller.field.radius == 120 and controller.field.remaining == 21, "Actual field disagreed with equipment preview")
 	service.show_detail("keeper_ring")
-	_check(is_instance_valid(game.ui.modal) and paused, "Equipment comparison panel did not open")
+	_check(is_instance_valid(game.ui.modal) and not paused and game.player.ui_blocked, "Equipment comparison panel did not open")
 	game.ui.close_modal()
 
 	# Test authored loadout choices and cap reduction using real profile resources.

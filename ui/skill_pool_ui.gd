@@ -52,10 +52,16 @@ func toggle() -> void:
 
 
 func open() -> void:
+	if not GameUIStyle.can_open(self): return
 	_refresh_all()
 	show()
 	GameUIStyle.begin_modal(self)
 
+
+func open_for(skill: SkillData) -> void:
+	_selected_skill=skill; _selected_item.clear(); _selected_choice.clear(); _show_items=false
+	open()
+	_hint_label.text="选择来源后点击目标快捷槽；也可先绑定默认动作，再用M切换。"
 
 func close() -> void:
 	_selected_skill = null
@@ -171,8 +177,7 @@ func _on_slot_clicked(event: InputEvent, source: String) -> void:
 			_skill_manager.shortcuts.bind_item(source,_selected_item.item_id,str(_selected_item.get("uid","")))
 			_selected_item.clear(); _refresh_all()
 		elif _selected_skill and _skill_manager:
-			_equip(source, _selected_skill)
-			_selected_skill = null
+			if _equip(source, _selected_skill): _selected_skill = null
 			_refresh_all()
 	elif event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
 		if _skill_manager:
@@ -180,17 +185,26 @@ func _on_slot_clicked(event: InputEvent, source: String) -> void:
 			_refresh_all()
 
 
-func _equip(source: String, skill: SkillData) -> void:
+func _equip(source: String, skill: SkillData) -> bool:
+	if skill.operation_id=="disperse" and not _selected_choice.is_empty() and _selected_choice.get("uid","").is_empty():
+		_hint_label.text="先选择口袋中的具体喷剂。"
+		return false
 	if skill.combination_only:
 		_hint_label.text = _combination_description(skill)
-		return
+		return false
 	if not _skill_manager.knows_action(skill):
 		_hint_label.text = "尚未掌握：%s。探索遗迹寻找记录。" % skill.display_name
-		return
+		return false
 	if not _is_skill_unlocked(skill):
 		_hint_label.text = "%s 需要 %s Lv.%d" % [skill.display_name, _school_name(skill.school), _unlock_level(skill)]
-		return
-	_skill_manager.equip_source(source,skill,_selected_choice)
+		return false
+	var choice:=_selected_choice.duplicate(true)
+	if _skill_manager.material_operations and choice.is_empty():
+		if skill.get_id() in ["ignite","pulse","water_call"]: choice={"payload":"","modifier":"","uid":""}
+		else:
+			var operation:=SpellOperationCatalog.default_catalog().operation(skill.operation_id)
+			if operation and not operation.default_payload.is_empty(): choice={"payload":operation.default_payload,"modifier":"","uid":""}
+	return _skill_manager.equip_source(source,skill,choice)
 
 func _unequip(source: String) -> void:
 	_skill_manager.shortcuts.clear(source)
@@ -231,10 +245,18 @@ func _refresh_detail() -> void:
 		GameUIStyle.apply_label(empty, 10, GameUIStyle.TEXT_MUTED)
 		_detail_box.add_child(empty)
 		return
+	if _skill_manager.material_operations and _selected_skill.get_id() in ["ignite","pulse","water_call"]:
+		var modifiers:=OptionButton.new(); modifiers.fit_to_longest_item=false
+		var ids:=QuickslotMaterials.modifier_ids(_skill_manager,_selected_skill)
+		for id in ids:
+			modifiers.add_item("不加额外材料" if id.is_empty() else "修饰："+_skill_manager.combinations.supplies.title(id))
+			if _selected_choice.get("modifier","")==id: modifiers.select(modifiers.item_count-1)
+		modifiers.item_selected.connect(func(index: int): _selected_choice={"payload":"","modifier":ids[index],"uid":""})
+		_detail_box.add_child(modifiers)
 	if not _selected_skill.operation_id.is_empty():
 		var operation:=SpellOperationCatalog.default_catalog().operation(_selected_skill.operation_id)
 		var choices:=OptionButton.new(); choices.fit_to_longest_item=false; choices.clip_text=true
-		choices.add_item("跟随M本次选择")
+		choices.add_item("动作默认来源（M按槽切换）")
 		for payload in operation.payloads:
 			choices.add_item(payload.title)
 			if _selected_choice.get("payload","")==payload.id: choices.select(choices.item_count-1)
@@ -244,6 +266,18 @@ func _refresh_detail() -> void:
 		_detail_box.add_child(choices)
 		if not _selected_choice.is_empty():
 			var payload:=operation.payload(str(_selected_choice.payload))
+			if operation.action.operation_id=="disperse":
+				var bottles:=OptionButton.new(); bottles.fit_to_longest_item=false
+				bottles.add_item("选择具体喷剂（需在口袋）")
+				var bottle_uids: Array[String]=[""]
+				var store: InventoryService=_skill_manager.combinations.supplies.inventory_store
+				if store:
+					for row in store.entries(_skill_manager.combinations.supplies.actor_id+".pocket"):
+						if row.definition!=payload.material_id: continue
+						bottle_uids.append(row.uid); bottles.add_item("瓶 "+str(row.uid).trim_prefix("item.")+" · "+store.state_text(row.uid))
+						if _selected_choice.get("uid","")==row.uid: bottles.select(bottles.item_count-1)
+				bottles.item_selected.connect(func(index: int): _selected_choice["uid"]=bottle_uids[index])
+				_detail_box.add_child(bottles)
 			var modifiers:=OptionButton.new(); modifiers.fit_to_longest_item=false; modifiers.clip_text=true
 			modifiers.add_item("修饰：不额外加材料")
 			var modifier_ids: Array[String]=[""]
@@ -298,7 +332,7 @@ func _refresh_detail() -> void:
 
 func _format_skill_stats(skill: SkillData) -> String:
 	if not skill.operation_id.is_empty():
-		return "M选择实物与来源，查看本次费用、范围和效果。\n蓄力/引导按住所编组键，其余按设置按下或松开施放。"
+		return "M轮盘按快捷槽选择来源，查看实际费用与条件。\n蓄力/引导按住所编组键，其余按设置按下或松开施放。"
 	var lines: Array[String] = [
 		"%s · T%d · %s" % [_type_name(skill.skill_type), skill.tier, skill.role],
 		"伤害 %d  |  法力 %d  |  冷却 %.1fs" % [skill.damage, skill.mp_cost, skill.cooldown],

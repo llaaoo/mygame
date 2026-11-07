@@ -64,6 +64,8 @@ func _process(delta: float) -> void:
 	if _clock>0 or not game.ready_for_play: return
 	_clock=.15
 	tracker.disabled=is_instance_valid(game.ui.modal)
+	var selecting:=is_instance_valid(game.player.material_wheel) and game.player.material_wheel.visible
+	tracker.visible=not selecting
 	_belt_grid.visible=not game.player.field_work.panel.visible
 	for i in range(4):
 		var source: String=QuickslotLoadout.ITEM_SOURCES[i]
@@ -100,7 +102,7 @@ func _process(delta: float) -> void:
 		else: tracker.text+="\n先探索相关地点；地图不揭示未发现目标"
 	var target:=game.player.input_controller.interaction_target()
 	_focus=weakref(target) if is_instance_valid(target) else null
-	interact.get_parent().visible=is_instance_valid(target) and not game.player.health_component.is_dead and not get_tree().paused and game.player.casting.aimed_source().is_empty() and not game.player.skill_manager.combinations.is_busy()
+	interact.get_parent().visible=is_instance_valid(target) and not game.player.health_component.is_dead and not get_tree().paused and not selecting and game.player.casting.aimed_source().is_empty() and not game.player.skill_manager.combinations.is_busy()
 	if is_instance_valid(target):
 		var title: String=target.title if "title" in target else target.enemy_name if target is Enemy else target.spec.title if target is SpellWorldObject else "调查"
 		interact.text=InputBindings.label("interact")+"  "+title

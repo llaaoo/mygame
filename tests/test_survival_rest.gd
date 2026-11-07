@@ -49,11 +49,16 @@ func run() -> void:
 	check(work.start_selected(), "Empty inventory prevented emergency food")
 	work.tick(2)
 	check(service.needs.nutrition == 60 and service.needs.hydration == 60 and service.supplies.serialize() == inventory and service.needs.meal_remaining == 0, "Emergency food generated goods or meal buffs")
-	# Pause and offline time do not advance needs or regeneration effects.
+	# Live menus advance needs; explicit engine pause still freezes simulation.
 	game.ui.show_pause()
 	var snapshot := service.needs.serialize()
 	service.tick(600)
-	check(snapshot == service.needs.serialize(), "Paused menu drained needs")
+	check(not paused and player.ui_blocked and snapshot != service.needs.serialize(), "Live menu froze needs")
+	snapshot=service.needs.serialize()
+	paused=true
+	service.tick(600)
+	check(snapshot==service.needs.serialize(),"Explicit engine pause advanced needs")
+	paused=false
 	game.ui.close_modal()
 	service.needs.nutrition = 10
 	service.needs.hydration = 10
@@ -88,5 +93,5 @@ func run() -> void:
 	game._change_region("camp")
 	check(not player.health_component.is_dead and player.health_component.hp == 50 and player.mana_component.mp == 30 and service.needs.nutrition == 35 and service.needs.hydration == 35 and service.needs.fatigue == 60 and service.supplies.serialize() == inventory, "Death recovery created supplies, refilled fully or trapped exhausted character")
 	await fixture.close()
-	if errors.is_empty(): print("Survival rest passed: explicit short/full rest, hunger/thirst costs, emergency fallback, no travel/load refill, paused clocks, existing regen, preview rollback and bounded death recovery")
+	if errors.is_empty(): print("Survival rest passed: explicit short/full rest, hunger/thirst costs, emergency fallback, no travel/load refill, live menus / explicit paused clocks, existing regen, preview rollback and bounded death recovery")
 	quit(0 if errors.is_empty() else 1)

@@ -49,7 +49,7 @@ func sync() -> void:
 func equip(id: String,uid := "") -> bool:
 	if not change_reason().is_empty() or count(id) <= 0 or not game.catalog.equipment.has(id):
 		return false
-	if not _fits_loadout(game.catalog.equipment[id].slot_type,game.catalog.equipment[id]): return false
+	if not game.player.inventory.store and not _fits_loadout(game.catalog.equipment[id].slot_type,game.catalog.equipment[id]): return false
 	if not uid.is_empty() and game.player.inventory.store:
 		var store:=game.player.inventory.store
 		var item:=store.item(uid)
@@ -64,7 +64,7 @@ func equip(id: String,uid := "") -> bool:
 	return true
 
 func unequip(slot: int) -> bool:
-	if not change_reason().is_empty() or not _fits_loadout(slot) or not _manager().unequip(slot):
+	if not change_reason().is_empty() or not game.player.inventory.store and not _fits_loadout(slot) or not _manager().unequip(slot):
 		return false
 	_reconcile_inventory()
 	game._save_progress()
@@ -184,3 +184,6 @@ func change_reason() -> String:
 		if game.player.health_component.is_dead or game.player.field_work.is_busy() or (game.player.actor_context and game.player.actor_context.actions.busy()) or game.player.skill_manager.combinations.is_busy() or not game.player.casting.aiming_sources.is_empty(): return "先结束当前动作，再手动换装。"
 		return "附近有敌人，先脱离战斗再换装。" if game.has_hostiles_near(game.player.position) else ""
 	return "返回营地整备。" if not game.is_at_base() else ""
+
+func removal_reason(_slot: int) -> String:
+	return change_reason()

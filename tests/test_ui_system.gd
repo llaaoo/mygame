@@ -95,7 +95,11 @@ func _test_expedition_layout() -> void:
 	game.ui.show_panel("不可中断的提示", "测试", choices, true)
 	_tap(KEY_ESCAPE)
 	await process_frame
-	_check(is_instance_valid(game.ui.modal) and paused, "Escape bypassed locked modal")
+	_check(is_instance_valid(game.ui.modal) and not paused and game.player.ui_blocked, "Escape bypassed locked modal")
+	var locked:=game.ui.modal
+	_tap(KEY_I); await process_frame
+	_tap(KEY_K); await process_frame
+	_check(game.ui.modal==locked and not game.player.skill_pool_ui.visible and game.player.ui_blocked,"Inventory/loadout bypassed locked live modal")
 	game.ui.close_modal()
 	await _test_cast_interruption(game)
 	await fixture.close()
@@ -114,7 +118,7 @@ func _test_cast_interruption(game: MVPGame) -> void:
 	_check(casting._charging_source == "slot_0", "Physical skill key did not start charging")
 	_tap(KEY_J)
 	await process_frame
-	_check(is_instance_valid(game.ui.modal) and paused and player.ui_blocked, "Journal shortcut did not block gameplay")
+	_check(is_instance_valid(game.ui.modal) and not paused and game.player.ui_blocked and player.ui_blocked, "Journal shortcut did not block gameplay")
 	_check(casting._charging_source.is_empty() and casting.aiming_sources.is_empty(), "Opening a modal kept a held charge")
 	_key(KEY_1, false)
 	_tap(KEY_ESCAPE)

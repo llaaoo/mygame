@@ -55,6 +55,7 @@ func toggle() -> void:
 
 
 func open() -> void:
+	if not GameUIStyle.can_open(self): return
 	if not _mastery_manager:
 		return
 	_refresh()
