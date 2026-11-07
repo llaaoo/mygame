@@ -38,6 +38,9 @@ var _current_target: Node2D = null
 const BODY_SHAPE := preload("res://entities/enemy/enemy_body_shape.tres")
 
 
+func get_combat_owner() -> Node2D:
+	return _player
+
 func _ready() -> void:
 	# 在 setup() 调用之前，节点已经就位但数据未注入
 	pass

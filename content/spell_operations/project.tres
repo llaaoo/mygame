@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="data"]
+[resource]
+script = ExtResource("data")
+id = "project"
+operation_id = "project"
+display_name = "聚能投射"
+description = "按住键蓄力，松开投射；M选择实物与脚下对应法阵，每次付材料和一次充能。"
+conditional_cast = true
+mp_cost = 18
+cooldown = 5.0
+preparation = 0.25
+damage = 0
+damage_scaling = 0.0
+icon_atlas_index = 2
+cast_type = "charge"
+charge_duration = 1.0
+school = 0

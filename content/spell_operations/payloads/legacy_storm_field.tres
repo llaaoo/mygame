@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="SpellPayloadData" load_steps=3 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/operations/spell_payload_data.gd" id="data"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/storm_field_data.tres" id="effect"]
+[resource]
+script = ExtResource("data")
+id = "storm_field"
+title = "雷晶雷场"
+description = "雷晶雷场；消耗真实材料，所选来源失效时拒绝，不自动换源。"
+effect = ExtResource("effect")
+material_id = "storm_dust"
+source_kind = "field"
+source_field = "storm"
+extra_mana = 8

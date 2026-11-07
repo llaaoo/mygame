@@ -12,6 +12,8 @@ static func build() -> ExplorationChapterData:
 	var chapter := ExplorationChapterData.new()
 	chapter.actions.assign(source.chapter.actions)
 	chapter.spell_rules.assign(source.chapter.spell_rules)
+	for id in ["project","shape","step","sustain"]:
+		chapter.actions.append(SpellOperationCatalog.default_catalog().operation(id).action)
 	chapter.equipment.assign(ItemCatalog.default_catalog().equipment())
 	var definition := data()
 	for entry in definition.regions:
@@ -43,6 +45,8 @@ static func build() -> ExplorationChapterData:
 			note.heal = raw.get("heal", false)
 			note.kind = raw.get("kind",note.kind)
 			if raw.has("materials"): note.materials = amounts(raw.materials)
+			for id in raw.get("actions",[]):
+				if id not in note.actions: note.actions.append(id)
 			if raw.has("equipment"): note.equipment.assign(raw.equipment)
 			note.set_meta("crafting_recipes", raw.get("crafts", []))
 			region.discoveries.append(note)

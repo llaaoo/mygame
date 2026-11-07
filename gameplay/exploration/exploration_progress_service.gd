@@ -25,6 +25,10 @@ func _apply_knowledge() -> void:
 	for region: ExplorationRegionData in game.catalog.regions.values():
 		for note in region.discoveries:
 			if game.progress.claims.has(note.id):
+				for id in note.actions:
+					if game.catalog.actions.has(id) and not game.progress.actions.has(id):
+						game.progress.actions[id]=true
+						backfilled=true
 				for id in note.spell_rules:
 					if game.catalog.spell_rules.has(id) and not game.progress.spell_rules.has(id):
 						game.progress.spell_rules[id] = true

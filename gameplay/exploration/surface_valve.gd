@@ -48,7 +48,7 @@ func refill() -> void:
 
 func _refresh() -> void:
 	var title := "关闭" if mode == "off" else spec.paths[0 if mode == "a" else 1].title
-	_label.text = "[E] " + spec.title + " · " + title + "\n关闭→路线A→路线B；旧水自然消退"
+	_label.text = "[F] " + spec.title + " · " + title + "\n关闭→路线A→路线B；旧水自然消退"
 	queue_redraw()
 
 func _draw() -> void:

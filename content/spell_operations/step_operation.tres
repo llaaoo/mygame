@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="SpellOperationData" load_steps=6 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/operations/spell_operation_data.gd" id="data"]
+[ext_resource type="Resource" path="res://content/spell_operations/step.tres" id="action"]
+[ext_resource type="Resource" path="res://content/spell_operations/payloads/legacy_arcane_dash.tres" id="arcane_dash"]
+[ext_resource type="Resource" path="res://content/spell_operations/payloads/legacy_shadow_step.tres" id="shadow_step"]
+[ext_resource type="Resource" path="res://content/spell_operations/payloads/legacy_phase_blink.tres" id="phase_blink"]
+[resource]
+script = ExtResource("data")
+action = ExtResource("action")
+aliases = PackedStringArray("arcane_dash", "shadow_step", "phase_blink")
+payloads = [ExtResource("arcane_dash"), ExtResource("shadow_step"), ExtResource("phase_blink")]

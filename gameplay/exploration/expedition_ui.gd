@@ -130,6 +130,9 @@ func set_survival_status(text: String) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed or event.echo:
 		return
+	# An external loadout/inventory window owns its shortcuts and Escape.
+	for owner in get_tree().get_nodes_in_group("modal_ui"):
+		if owner!=modal and owner is CanvasLayer and owner.visible: return
 	if not modal_locked and shortcut_action.is_valid() and shortcut_action.call(event.keycode):
 		get_viewport().set_input_as_handled()
 		return

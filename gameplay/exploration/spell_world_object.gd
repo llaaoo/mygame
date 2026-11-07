@@ -106,7 +106,7 @@ func _refresh() -> void:
 	for step in _steps:
 		count = maxi(count, step)
 	var result := " · 已解开" if spec.pickup_claim.is_empty() else " · 已取件" if part_taken else " · 可取件"
-	_label.text = "[E] " + str(spec.title) + (result if completed else (" · 共鸣%d" % count if count > 0 else ""))
+	_label.text = "[F] " + str(spec.title) + (result if completed else (" · 共鸣%d" % count if count > 0 else ""))
 	if not completed:
 		for i in range(spec.routes.size()):
 			var route := spec.routes[i]

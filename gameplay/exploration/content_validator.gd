@@ -76,7 +76,7 @@ func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 			_fail(action, "Invalid soul harvesting contract")
 		if not action.field_type.is_empty():
 			fields[action.field_type] = true
-		if not action.conditional_cast:
+		if not action.conditional_cast and not (action.cast_type=="channel" and not action.operation_id.is_empty()):
 			_fail(action, "Exploration action must declare conditional_cast")
 		if not action.required_material.is_empty() and (not supplies.catalog.has(action.required_material) or action.material_amount <= 0):
 			_fail(action, "Invalid required material")

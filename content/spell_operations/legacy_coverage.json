@@ -1,0 +1,264 @@
+{
+  "scope": "All 30 legacy room rewards; baseline 28 gaps plus the already connected fireball and poison cloud. Equivalence describes capability, not identical numbers.",
+  "entries": [
+    {
+      "legacy": "arcane_dash",
+      "status": "implemented_as_payload",
+      "action": "step",
+      "payload": "arcane_dash",
+      "material": "crystal",
+      "source": "arcane",
+      "effect": "arcane_dash"
+    },
+    {
+      "legacy": "blizzard",
+      "status": "implemented_as_payload",
+      "action": "shape",
+      "payload": "blizzard",
+      "material": "frost_salt",
+      "source": "frost",
+      "effect": "blizzard"
+    },
+    {
+      "legacy": "charged_fireball",
+      "status": "implemented_as_payload",
+      "action": "project",
+      "payload": "charged_fireball",
+      "material": "fire_stone",
+      "source": "fire",
+      "effect": "charged_fireball"
+    },
+    {
+      "legacy": "cinder_volley",
+      "status": "implemented_as_payload",
+      "action": "project",
+      "payload": "cinder_volley",
+      "material": "resin",
+      "source": "fire",
+      "effect": "cinder_volley"
+    },
+    {
+      "legacy": "ember_orb",
+      "status": "implemented_as_payload",
+      "action": "project",
+      "payload": "ember_orb",
+      "material": "charcoal",
+      "source": "fire",
+      "effect": "ember_orb"
+    },
+    {
+      "legacy": "fireball",
+      "status": "replaced_by_existing_combination",
+      "rule": "fire_sigil_fireball",
+      "effect": "fireball",
+      "reason": "火阵＋火花已有远程火球，旧直接编组迁移为火花，不自动提供法阵或材料"
+    },
+    {
+      "legacy": "flame_storm",
+      "status": "implemented_as_payload",
+      "action": "shape",
+      "payload": "flame_storm",
+      "material": "fire_stone",
+      "source": "fire",
+      "effect": "flame_storm"
+    },
+    {
+      "legacy": "frost_lance",
+      "status": "replaced_by_existing_combination",
+      "rule": "frost_sigil_spark",
+      "effect": "frost_bolt",
+      "reason": "霜阵＋火花已覆盖直线冰霜投射；数值与旧独立技能不同"
+    },
+    {
+      "legacy": "glacial_orb",
+      "status": "implemented_as_payload",
+      "action": "project",
+      "payload": "glacial_orb",
+      "material": "frost_salt",
+      "source": "frost",
+      "effect": "glacial_orb"
+    },
+    {
+      "legacy": "ice_armor",
+      "status": "implemented_as_payload",
+      "action": "focus",
+      "payload": "ice_armor",
+      "material": "frost_salt",
+      "source": "frost",
+      "effect": "ice_armor"
+    },
+    {
+      "legacy": "ice_explosion",
+      "status": "replaced_by_existing_combination",
+      "rule": "frost_sigil_pulse",
+      "effect": "frost_ring",
+      "reason": "霜阵＋震荡已覆盖近身冰霜爆发；不承诺旧技能树的自动到期冰爆"
+    },
+    {
+      "legacy": "ice_storm",
+      "status": "implemented_as_payload",
+      "action": "sustain",
+      "payload": "ice_storm",
+      "material": "frost_salt",
+      "source": "material",
+      "effect": "ice_storm"
+    },
+    {
+      "legacy": "lightning_bolt",
+      "status": "replaced_by_existing_combination",
+      "rule": "storm_sigil_spark",
+      "effect": "storm_bolt",
+      "reason": "雷阵＋火花已覆盖直线雷电与潮湿反应"
+    },
+    {
+      "legacy": "magma_pool",
+      "status": "implemented_as_payload",
+      "action": "shape",
+      "payload": "magma_pool",
+      "material": "resin",
+      "source": "fire",
+      "effect": "magma_pool"
+    },
+    {
+      "legacy": "miasma_ring",
+      "status": "implemented_as_payload",
+      "action": "shape",
+      "payload": "miasma_ring",
+      "material": "venom_extract",
+      "source": "arcane",
+      "effect": "miasma_ring"
+    },
+    {
+      "legacy": "phase_blink",
+      "status": "implemented_as_payload",
+      "action": "step",
+      "payload": "phase_blink",
+      "material": "ash",
+      "source": "arcane",
+      "effect": "phase_blink"
+    },
+    {
+      "legacy": "plague_bolt",
+      "status": "implemented_as_payload",
+      "action": "project",
+      "payload": "plague_bolt",
+      "material": "venom_extract",
+      "source": "arcane",
+      "effect": "plague_bolt"
+    },
+    {
+      "legacy": "poison_cloud",
+      "status": "replaced_by_existing_operation",
+      "action": "disperse",
+      "reason": "喷洒＋真实毒喷剂已有中毒与残留；不恢复无材料造毒"
+    },
+    {
+      "legacy": "radiant_aegis",
+      "status": "implemented_as_payload",
+      "action": "shape",
+      "payload": "radiant_aegis",
+      "material": "ward_powder",
+      "source": "ward",
+      "effect": "radiant_aegis"
+    },
+    {
+      "legacy": "shadow_bolt",
+      "status": "implemented_as_payload",
+      "action": "project",
+      "payload": "shadow_bolt",
+      "material": "echo_ink",
+      "source": "arcane",
+      "effect": "shadow_bolt"
+    },
+    {
+      "legacy": "shadow_step",
+      "status": "implemented_as_payload",
+      "action": "step",
+      "payload": "shadow_step",
+      "material": "echo_ink",
+      "source": "arcane",
+      "effect": "shadow_step"
+    },
+    {
+      "legacy": "solar_spear",
+      "status": "implemented_as_payload",
+      "action": "project",
+      "payload": "solar_spear",
+      "material": "ward_powder",
+      "source": "fire",
+      "effect": "solar_spear"
+    },
+    {
+      "legacy": "static_nova",
+      "status": "implemented_as_payload",
+      "action": "shape",
+      "payload": "static_nova",
+      "material": "storm_dust",
+      "source": "storm",
+      "effect": "static_nova"
+    },
+    {
+      "legacy": "storm_field",
+      "status": "implemented_as_payload",
+      "action": "shape",
+      "payload": "storm_field",
+      "material": "storm_dust",
+      "source": "storm",
+      "effect": "storm_field"
+    },
+    {
+      "legacy": "summon_golem",
+      "status": "implemented_as_payload",
+      "action": "shape",
+      "payload": "summon_golem",
+      "material": "crystal",
+      "source": "arcane",
+      "effect": "summon_golem"
+    },
+    {
+      "legacy": "summon_skeleton",
+      "status": "implemented_as_payload",
+      "action": "shape",
+      "payload": "summon_skeleton",
+      "material": "ash",
+      "source": "soul",
+      "effect": "summon_skeleton"
+    },
+    {
+      "legacy": "summon_wisp",
+      "status": "implemented_as_payload",
+      "action": "shape",
+      "payload": "summon_wisp",
+      "material": "charcoal",
+      "source": "fire",
+      "effect": "summon_wisp"
+    },
+    {
+      "legacy": "thunder_orb",
+      "status": "implemented_as_payload",
+      "action": "project",
+      "payload": "thunder_orb",
+      "material": "storm_dust",
+      "source": "storm",
+      "effect": "thunder_orb"
+    },
+    {
+      "legacy": "tidal_orb",
+      "status": "implemented_as_payload",
+      "action": "project",
+      "payload": "tidal_orb",
+      "material": "clean_water",
+      "source": "arcane",
+      "effect": "tidal_orb"
+    },
+    {
+      "legacy": "venom_burst",
+      "status": "implemented_as_payload",
+      "action": "shape",
+      "payload": "venom_burst",
+      "material": "potent_venom",
+      "source": "arcane",
+      "effect": "venom_burst"
+    }
+  ]
+}

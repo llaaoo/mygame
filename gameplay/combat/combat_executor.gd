@@ -58,12 +58,21 @@ func _exit_tree() -> void:
 
 ## 报告命中 — 唯一伤害入口（事件 + 扣血）
 ## 所有命中源（Projectile/AoE/近战/陷阱/DOT）只能通过此方法造成伤害
+static func same_combat_owner(source: Node2D, target: Node2D) -> bool:
+	if not is_instance_valid(source) or not is_instance_valid(target): return false
+	var source_owner: Node2D=source.get_combat_owner() if source.has_method("get_combat_owner") else source
+	var target_owner: Node2D=target.get_combat_owner() if target.has_method("get_combat_owner") else target
+	return is_instance_valid(source_owner) and source_owner==target_owner and (source_owner!=source or target_owner!=target)
+
 static func report_hit(caster: Node2D, target: Node2D, damage: int, position: Vector2, skill: SkillData = null, tags: Array = [], family_id: String = "", impact: float = 0.0) -> HitResult:
 	var context := HitContext.new(caster, target, damage, position, skill, tags, family_id)
 	var result := HitResult.new()
 	result.attempted_damage = context.damage
 	if not is_instance_valid(target) or not target.has_method("take_damage"):
 		result.rejection = "invalid_target"
+		return result
+	if same_combat_owner(caster,target):
+		result.rejection="same_owner"
 		return result
 	var health := target.get_node_or_null("HealthComponent") as HealthComponent
 	if health and health.is_dead:

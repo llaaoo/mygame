@@ -109,7 +109,7 @@ func show_page() -> void:
 	for id in ["water_call", "pulse", "frost_sigil", "storm_sigil", "venom_mist"]:
 		var skill := game.player.skill_manager.pool.get_skill(id)
 		if game.player.skill_manager.knows_action(skill): text += skill.display_name + "：已学，K可编组\n"
-	text += "\n已经发现并解锁的检修通路可直接返场。已清理区域按Esc可重试本区，耗材照常消耗，击杀没有经验、掉落或残魂；探索进度保留。\n\n记录包含实际施法、近战与作业次数、已提交MP与材料消耗、造成伤害、自身受伤、游戏内用时和起止配置。菜单暂停时间不计入；由环境造成且无法归因玩家的伤害不计入造成伤害。初始属性/装备/补给保存在记录中，比较时应使用相近预算。最多保留10次；开始按钮只给记录命名，不修改动作、库存、装备、恩赐或世界。\n"
+	text += "\n已经发现并解锁的检修通路可直接返场。已清理区域按Fsc可重试本区，耗材照常消耗，击杀没有经验、掉落或残魂；探索进度保留。\n\n记录包含实际施法、近战与作业次数、已提交MP与材料消耗、造成伤害、自身受伤、游戏内用时和起止配置。菜单暂停时间不计入；由环境造成且无法归因玩家的伤害不计入造成伤害。初始属性/装备/补给保存在记录中，比较时应使用相近预算。最多保留10次；开始按钮只给记录命名，不修改动作、库存、装备、恩赐或世界。\n"
 	if active:
 		text += "\n正在记录：%s · %.1f秒 · 施法/近战合计%d次\n" % [run.label, GameRuntime.instance.get_simulation_runtime().elapsed_time - _started, int(run.casts) + int(run.melee)]
 	for entry in game.progress.trial_runs:

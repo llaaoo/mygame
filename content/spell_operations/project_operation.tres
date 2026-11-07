@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="SpellOperationData" load_steps=12 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/operations/spell_operation_data.gd" id="data"]
+[ext_resource type="Resource" path="res://content/spell_operations/project.tres" id="action"]
+[ext_resource type="Resource" path="res://content/spell_operations/payloads/legacy_charged_fireball.tres" id="charged_fireball"]
+[ext_resource type="Resource" path="res://content/spell_operations/payloads/legacy_cinder_volley.tres" id="cinder_volley"]
+[ext_resource type="Resource" path="res://content/spell_operations/payloads/legacy_ember_orb.tres" id="ember_orb"]
+[ext_resource type="Resource" path="res://content/spell_operations/payloads/legacy_glacial_orb.tres" id="glacial_orb"]
+[ext_resource type="Resource" path="res://content/spell_operations/payloads/legacy_thunder_orb.tres" id="thunder_orb"]
+[ext_resource type="Resource" path="res://content/spell_operations/payloads/legacy_tidal_orb.tres" id="tidal_orb"]
+[ext_resource type="Resource" path="res://content/spell_operations/payloads/legacy_plague_bolt.tres" id="plague_bolt"]
+[ext_resource type="Resource" path="res://content/spell_operations/payloads/legacy_shadow_bolt.tres" id="shadow_bolt"]
+[ext_resource type="Resource" path="res://content/spell_operations/payloads/legacy_solar_spear.tres" id="solar_spear"]
+[resource]
+script = ExtResource("data")
+action = ExtResource("action")
+aliases = PackedStringArray("charged_fireball", "cinder_volley", "ember_orb", "glacial_orb", "thunder_orb", "tidal_orb", "plague_bolt", "shadow_bolt", "solar_spear")
+payloads = [ExtResource("charged_fireball"), ExtResource("cinder_volley"), ExtResource("ember_orb"), ExtResource("glacial_orb"), ExtResource("thunder_orb"), ExtResource("tidal_orb"), ExtResource("plague_bolt"), ExtResource("shadow_bolt"), ExtResource("solar_spear")]

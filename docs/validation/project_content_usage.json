@@ -1,35 +1,6 @@
 {
-  "all_authored_skill_definition_count": 69,
-  "authored_skills_without_direct_current_source": [
-    "arcane_dash",
-    "blizzard",
-    "charged_fireball",
-    "cinder_volley",
-    "ember_orb",
-    "flame_storm",
-    "frost_lance",
-    "glacial_orb",
-    "ice_armor",
-    "ice_explosion",
-    "ice_storm",
-    "lightning_bolt",
-    "magma_pool",
-    "miasma_ring",
-    "phase_blink",
-    "plague_bolt",
-    "radiant_aegis",
-    "shadow_bolt",
-    "shadow_step",
-    "solar_spear",
-    "static_nova",
-    "storm_field",
-    "summon_golem",
-    "summon_skeleton",
-    "summon_wisp",
-    "thunder_orb",
-    "tidal_orb",
-    "venom_burst"
-  ],
+  "all_authored_skill_definition_count": 73,
+  "authored_skills_without_direct_current_source": [],
   "conditional_results_with_sources": {
     "ancestral_ward": "soul_focus",
     "arcane_burst": "arcane_energy_pulse",
@@ -180,7 +151,271 @@
     ]
   },
   "kind": "authored_resource_sources",
-  "known_pool_definition_count": 11,
+  "known_pool_definition_count": 15,
+  "legacy_coverage": {
+    "entries": [
+      {
+        "action": "step",
+        "effect": "arcane_dash",
+        "legacy": "arcane_dash",
+        "material": "crystal",
+        "payload": "arcane_dash",
+        "source": "arcane",
+        "status": "implemented_as_payload"
+      },
+      {
+        "action": "shape",
+        "effect": "blizzard",
+        "legacy": "blizzard",
+        "material": "frost_salt",
+        "payload": "blizzard",
+        "source": "frost",
+        "status": "implemented_as_payload"
+      },
+      {
+        "action": "project",
+        "effect": "charged_fireball",
+        "legacy": "charged_fireball",
+        "material": "fire_stone",
+        "payload": "charged_fireball",
+        "source": "fire",
+        "status": "implemented_as_payload"
+      },
+      {
+        "action": "project",
+        "effect": "cinder_volley",
+        "legacy": "cinder_volley",
+        "material": "resin",
+        "payload": "cinder_volley",
+        "source": "fire",
+        "status": "implemented_as_payload"
+      },
+      {
+        "action": "project",
+        "effect": "ember_orb",
+        "legacy": "ember_orb",
+        "material": "charcoal",
+        "payload": "ember_orb",
+        "source": "fire",
+        "status": "implemented_as_payload"
+      },
+      {
+        "effect": "fireball",
+        "legacy": "fireball",
+        "reason": "火阵＋火花已有远程火球，旧直接编组迁移为火花，不自动提供法阵或材料",
+        "rule": "fire_sigil_fireball",
+        "status": "replaced_by_existing_combination"
+      },
+      {
+        "action": "shape",
+        "effect": "flame_storm",
+        "legacy": "flame_storm",
+        "material": "fire_stone",
+        "payload": "flame_storm",
+        "source": "fire",
+        "status": "implemented_as_payload"
+      },
+      {
+        "effect": "frost_bolt",
+        "legacy": "frost_lance",
+        "reason": "霜阵＋火花已覆盖直线冰霜投射；数值与旧独立技能不同",
+        "rule": "frost_sigil_spark",
+        "status": "replaced_by_existing_combination"
+      },
+      {
+        "action": "project",
+        "effect": "glacial_orb",
+        "legacy": "glacial_orb",
+        "material": "frost_salt",
+        "payload": "glacial_orb",
+        "source": "frost",
+        "status": "implemented_as_payload"
+      },
+      {
+        "action": "focus",
+        "effect": "ice_armor",
+        "legacy": "ice_armor",
+        "material": "frost_salt",
+        "payload": "ice_armor",
+        "source": "frost",
+        "status": "implemented_as_payload"
+      },
+      {
+        "effect": "frost_ring",
+        "legacy": "ice_explosion",
+        "reason": "霜阵＋震荡已覆盖近身冰霜爆发；不承诺旧技能树的自动到期冰爆",
+        "rule": "frost_sigil_pulse",
+        "status": "replaced_by_existing_combination"
+      },
+      {
+        "action": "sustain",
+        "effect": "ice_storm",
+        "legacy": "ice_storm",
+        "material": "frost_salt",
+        "payload": "ice_storm",
+        "source": "material",
+        "status": "implemented_as_payload"
+      },
+      {
+        "effect": "storm_bolt",
+        "legacy": "lightning_bolt",
+        "reason": "雷阵＋火花已覆盖直线雷电与潮湿反应",
+        "rule": "storm_sigil_spark",
+        "status": "replaced_by_existing_combination"
+      },
+      {
+        "action": "shape",
+        "effect": "magma_pool",
+        "legacy": "magma_pool",
+        "material": "resin",
+        "payload": "magma_pool",
+        "source": "fire",
+        "status": "implemented_as_payload"
+      },
+      {
+        "action": "shape",
+        "effect": "miasma_ring",
+        "legacy": "miasma_ring",
+        "material": "venom_extract",
+        "payload": "miasma_ring",
+        "source": "arcane",
+        "status": "implemented_as_payload"
+      },
+      {
+        "action": "step",
+        "effect": "phase_blink",
+        "legacy": "phase_blink",
+        "material": "ash",
+        "payload": "phase_blink",
+        "source": "arcane",
+        "status": "implemented_as_payload"
+      },
+      {
+        "action": "project",
+        "effect": "plague_bolt",
+        "legacy": "plague_bolt",
+        "material": "venom_extract",
+        "payload": "plague_bolt",
+        "source": "arcane",
+        "status": "implemented_as_payload"
+      },
+      {
+        "action": "disperse",
+        "legacy": "poison_cloud",
+        "reason": "喷洒＋真实毒喷剂已有中毒与残留；不恢复无材料造毒",
+        "status": "replaced_by_existing_operation"
+      },
+      {
+        "action": "shape",
+        "effect": "radiant_aegis",
+        "legacy": "radiant_aegis",
+        "material": "ward_powder",
+        "payload": "radiant_aegis",
+        "source": "ward",
+        "status": "implemented_as_payload"
+      },
+      {
+        "action": "project",
+        "effect": "shadow_bolt",
+        "legacy": "shadow_bolt",
+        "material": "echo_ink",
+        "payload": "shadow_bolt",
+        "source": "arcane",
+        "status": "implemented_as_payload"
+      },
+      {
+        "action": "step",
+        "effect": "shadow_step",
+        "legacy": "shadow_step",
+        "material": "echo_ink",
+        "payload": "shadow_step",
+        "source": "arcane",
+        "status": "implemented_as_payload"
+      },
+      {
+        "action": "project",
+        "effect": "solar_spear",
+        "legacy": "solar_spear",
+        "material": "ward_powder",
+        "payload": "solar_spear",
+        "source": "fire",
+        "status": "implemented_as_payload"
+      },
+      {
+        "action": "shape",
+        "effect": "static_nova",
+        "legacy": "static_nova",
+        "material": "storm_dust",
+        "payload": "static_nova",
+        "source": "storm",
+        "status": "implemented_as_payload"
+      },
+      {
+        "action": "shape",
+        "effect": "storm_field",
+        "legacy": "storm_field",
+        "material": "storm_dust",
+        "payload": "storm_field",
+        "source": "storm",
+        "status": "implemented_as_payload"
+      },
+      {
+        "action": "shape",
+        "effect": "summon_golem",
+        "legacy": "summon_golem",
+        "material": "crystal",
+        "payload": "summon_golem",
+        "source": "arcane",
+        "status": "implemented_as_payload"
+      },
+      {
+        "action": "shape",
+        "effect": "summon_skeleton",
+        "legacy": "summon_skeleton",
+        "material": "ash",
+        "payload": "summon_skeleton",
+        "source": "soul",
+        "status": "implemented_as_payload"
+      },
+      {
+        "action": "shape",
+        "effect": "summon_wisp",
+        "legacy": "summon_wisp",
+        "material": "charcoal",
+        "payload": "summon_wisp",
+        "source": "fire",
+        "status": "implemented_as_payload"
+      },
+      {
+        "action": "project",
+        "effect": "thunder_orb",
+        "legacy": "thunder_orb",
+        "material": "storm_dust",
+        "payload": "thunder_orb",
+        "source": "storm",
+        "status": "implemented_as_payload"
+      },
+      {
+        "action": "project",
+        "effect": "tidal_orb",
+        "legacy": "tidal_orb",
+        "material": "clean_water",
+        "payload": "tidal_orb",
+        "source": "arcane",
+        "status": "implemented_as_payload"
+      },
+      {
+        "action": "shape",
+        "effect": "venom_burst",
+        "legacy": "venom_burst",
+        "material": "potent_venom",
+        "payload": "venom_burst",
+        "source": "arcane",
+        "status": "implemented_as_payload"
+      }
+    ],
+    "scope": "All 30 legacy room rewards; baseline 28 gaps plus the already connected fireball and poison cloud. Equivalence describes capability, not identical numbers."
+  },
   "legacy_equipment": [
     "chronoglass",
     "cinder_amulet",
@@ -268,6 +503,121 @@
       "river_caster"
     ]
   },
+  "operation_payload_effects_with_sources": {
+    "arcane_dash": [
+      "step.arcane_dash"
+    ],
+    "blizzard": [
+      "shape.blizzard"
+    ],
+    "charged_fireball": [
+      "project.charged_fireball"
+    ],
+    "cinder_volley": [
+      "project.cinder_volley"
+    ],
+    "echo_mark": [
+      "focus.echo"
+    ],
+    "ember_focus": [
+      "focus.attune_fire"
+    ],
+    "ember_orb": [
+      "project.ember_orb"
+    ],
+    "extract_arcane": [
+      "soul_harvest.extract_arcane"
+    ],
+    "extract_fire": [
+      "soul_harvest.extract_fire"
+    ],
+    "extract_frost": [
+      "soul_harvest.extract_frost"
+    ],
+    "extract_storm": [
+      "soul_harvest.extract_storm"
+    ],
+    "extract_ward": [
+      "soul_harvest.extract_ward"
+    ],
+    "flame_storm": [
+      "shape.flame_storm"
+    ],
+    "focus": [
+      "focus.basic",
+      "focus.attune_arcane"
+    ],
+    "frost_stride": [
+      "focus.attune_frost"
+    ],
+    "glacial_orb": [
+      "project.glacial_orb"
+    ],
+    "ice_armor": [
+      "focus.ice_armor"
+    ],
+    "ice_storm": [
+      "sustain.ice_storm"
+    ],
+    "magma_pool": [
+      "shape.magma_pool"
+    ],
+    "miasma_ring": [
+      "shape.miasma_ring"
+    ],
+    "phase_blink": [
+      "step.phase_blink"
+    ],
+    "plague_bolt": [
+      "project.plague_bolt"
+    ],
+    "radiant_aegis": [
+      "shape.radiant_aegis"
+    ],
+    "resonant_guard": [
+      "focus.ward",
+      "focus.attune_ward"
+    ],
+    "shadow_bolt": [
+      "project.shadow_bolt"
+    ],
+    "shadow_step": [
+      "step.shadow_step"
+    ],
+    "solar_spear": [
+      "project.solar_spear"
+    ],
+    "soul_harvest": [
+      "soul_harvest.soul_source"
+    ],
+    "static_focus": [
+      "focus.attune_storm"
+    ],
+    "static_nova": [
+      "shape.static_nova"
+    ],
+    "storm_field": [
+      "shape.storm_field"
+    ],
+    "summon_golem": [
+      "shape.summon_golem"
+    ],
+    "summon_skeleton": [
+      "shape.summon_skeleton"
+    ],
+    "summon_wisp": [
+      "shape.summon_wisp"
+    ],
+    "thunder_orb": [
+      "project.thunder_orb"
+    ],
+    "tidal_orb": [
+      "project.tidal_orb"
+    ],
+    "venom_burst": [
+      "shape.venom_burst"
+    ]
+  },
   "player_actions_with_world_sources": {
     "disperse": [
       "river.handbook",
@@ -285,11 +635,23 @@
       "river.frost",
       "river.storm"
     ],
+    "project": [
+      "river.fire"
+    ],
     "pulse": [
       "river.pulse"
     ],
+    "shape": [
+      "river.focus"
+    ],
     "soul_harvest": [
       "river.soul"
+    ],
+    "step": [
+      "river.storm"
+    ],
+    "sustain": [
+      "river.frost"
     ],
     "water_call": [
       "river.handbook"

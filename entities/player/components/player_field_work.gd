@@ -55,7 +55,7 @@ func _input(event: InputEvent) -> void:
 		cancel("已取消作业")
 		close_panel()
 		get_viewport().set_input_as_handled()
-	elif event.keycode == KEY_Q:
+	elif event.is_action_pressed("field_method"):
 		if not is_busy() and not methods.is_empty():
 			selected = (selected + 1) % methods.size()
 			_refresh_panel()
@@ -183,7 +183,7 @@ func _refresh_panel() -> void:
 			text += "\n" + (reason if not reason.is_empty() else "可操作")
 			if not method.material_costs.is_empty(): text += " · " + player.skill_manager.combinations.supplies.describe_cost(method.material_costs)
 		text += "\n"
-	panel.display(text + _guide + "\nQ切换 · E开始 · Esc收起\n战斗继续进行")
+	panel.display(text + _guide + "\n"+InputBindings.label("field_method")+"切换 · "+InputBindings.label("interact")+"开始 · Esc收起\n战斗继续进行")
 
 func _efficiency() -> float:
 	return player.mastery_manager.activity_efficiency(SkillMastery.School.CRAFTING) if player.mastery_manager else 1.0

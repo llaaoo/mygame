@@ -146,7 +146,7 @@ func _on_area_entered(area: Area2D) -> void:
 
 
 func _try_hit(target: Node, from_tick: bool = false) -> void:
-	if not target or target == caster or not target.has_method("take_damage"):
+	if not target or target == caster or not target.has_method("take_damage") or CombatExecutor.same_combat_owner(caster,target as Node2D):
 		return
 	if _skill and "spray" in _skill.tags and is_instance_valid(caster):
 		var origin: Vector2=get_meta("delivery_origin",caster.global_position)

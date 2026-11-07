@@ -8,7 +8,7 @@ func _init(owner_game: CampaignGame) -> void:
 func show_arrival() -> void:
 	var first_visit := game.progress.claims.is_empty() and game.progress.cleared.is_empty()
 	var title := "余烬监狱 · 初次远征" if first_visit else "余烬监狱 · 继续旅程"
-	var text := "先读营地材料手册，取得水引，再去外院寻找火阵记录。\n\n这次先试一条规律：火花在火阵内变为火球，阵外仍是近身火花。按住动作键观察范围，松开施放。\n\n左键近战，右键火花，空格闪避，E调查；J日志，M材料，K编组，O装备。"
+	var text := "先读营地材料手册，取得水引，再去外院寻找火阵记录。\n\n这次先试一条规律：火花在火阵内变为火球，阵外仍是近身火花。按住动作键观察范围，松开施放。\n\n左键近战，右键格挡，R键火花，空格闪避，F调查；J日志，M材料，K编组，O装备。"
 	if not first_visit:
 		text = "监狱封锁已解除，可以回访遗漏支路或尝试不同操作。" if game.progress.completed else "已恢复你的知识、装备、材料与探索进度。"
 		var reports: Array[String] = []
@@ -126,7 +126,7 @@ func _choose_world_event(entry: ExplorationWorldEventData, choice: ExplorationWo
 		shortcut.name = "WaterworksShortcut"
 
 func journal_text() -> String:
-	var text := "行动提示\n左键近战；右键/6火花；1震荡、2凝神、3霜阵、4水引、5火阵需探索学习。雷阵与泼洒树脂用K编组；M选择本次材料，营地工作台加工。J关闭日志。\n\n法术联动\n已有动作可以通过元素、材料、恩赐、法阵和装备改变用途。点击“元素关系”查看已读线索与实际验证；未验证的高级关系不会提前列出。\n\n路线与清理进度\n仅列出已经到达的地点；现场调查可发现新支路。\n"
+	var text := "行动提示\n左键近战、右键格挡；R/6火花；1震荡、2凝神、3霜阵、4水引、5火阵需探索学习。雷阵与泼洒树脂用K编组；M选择本次材料，营地工作台加工。J关闭日志。\n\n法术联动\n已有动作可以通过元素、材料、恩赐、法阵和装备改变用途。点击“元素关系”查看已读线索与实际验证；未验证的高级关系不会提前列出。\n\n路线与清理进度\n仅列出已经到达的地点；现场调查可发现新支路。\n"
 	for id in game.catalog.regions:
 		if not game.progress.visited.has(id): continue
 		var data: ExplorationRegionData = game.catalog.regions[id]
@@ -151,7 +151,7 @@ func journal_text() -> String:
 		if game.progress.claims.has(pair[0]) and not game.progress.claims.has(pair[1]): text += "□ " + pair[2] + "：已解封，靠近设备E取件\n"
 	if game.progress.claims.has("alchemy.started") or game.progress.claims.has("alchemy.schematic"): text += "\n" + game.alchemy.status_text() + "\n"
 	text += "\n远征生存（N补给）\n" + game.survival.description() + "\n"
-	text += "\n本区试战\n在已清理区域按Esc，可单独重试当地敌人。耗材照常消耗，击杀无经验、掉落或残魂；知识、机关、委托和其他区域进度保持。\n"
+	text += "\n本区试战\n在已清理区域按Fsc，可单独重试当地敌人。耗材照常消耗，击杀无经验、掉落或残魂；知识、机关、委托和其他区域进度保持。\n"
 	text += "\n保留与兑现\n普通施法保留恩赐；Shift请求消费适配恩赐，形态与总成本见技能槽预览。节律护手可改为部分消费：保留当前剩余时长50%，较弱伤害倍率，每份另加3 MP。蕴魂、回响和护盾不受部分消费影响。\n"
 	text += "\n营地委托（回营地交付）\n"
 	for quest in game.quests:

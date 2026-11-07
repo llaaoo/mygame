@@ -7,6 +7,7 @@ var _charging_source: String = ""       ## 正在蓄力的槽位
 var _charge_power: float = 0.0          ## 当前蓄力倍率
 var _charge_skill: SkillData = null     ## 正在蓄力的技能数据
 var _channeling_source: String = ""     ## 正在引导的槽位
+var _channel_payload_signature := 0
 var _channel_skill: SkillData = null    ## 正在引导的技能
 var _channel_mana_total := 0.0
 var _channel_timer: float = 0.0         ## tick 累加器
@@ -76,6 +77,7 @@ func _cancel_charge() -> void:
 func _begin_channel(source: String, skill: SkillData) -> void:
 	_channeling_source = source
 	_channel_skill = skill
+	_channel_payload_signature = _payload_signature(skill)
 	_channel_timer = 0.0
 	_channel_mana_total = 0.0
 	show_aim(source, skill)
@@ -89,9 +91,14 @@ func _cancel_channel() -> void:
 	_channel_timer = 0.0
 	_channel_mana_total = 0.0
 
+func _payload_signature(skill: SkillData) -> int:
+	var supplies:=player.skill_manager.combinations.supplies
+	return hash([supplies.selected.get(skill.get_id(),""),supplies.prepared_uids.get(skill.get_id(),"")])
+
 func _channel_tick(mana_cost: int) -> bool:
 	if not _channel_skill or not _is_equipped(_channeling_source, _channel_skill):
 		return false
+	if not _channel_skill.operation_id.is_empty() and _payload_signature(_channel_skill)!=_channel_payload_signature: return false
 	var ctx := CastContext.simple(player, player.get_mouse_direction(), _channel_skill)
 	return player.skill_manager.use_channel_tick(_channeling_source, player, ctx, mana_cost)
 

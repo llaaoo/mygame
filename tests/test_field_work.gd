@@ -60,7 +60,8 @@ func run() -> void:
 	game.progress.claims["test.blueprint"] = true
 	check(not work.start_selected(), "Insufficient strength accepted")
 	var key := InputEventKey.new()
-	key.keycode = KEY_Q
+	key.keycode = KEY_C
+	key.physical_keycode = KEY_C
 	key.pressed = true
 	work._input(key)
 	check(work.selected == 1 and not paused, "Q did not switch live work methods")

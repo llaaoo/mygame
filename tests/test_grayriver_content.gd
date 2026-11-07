@@ -12,8 +12,8 @@ func read(id:String) -> void:
 func interact_at(point: Vector2) -> void:
 	game.player.position = point
 	var key := InputEventKey.new()
-	key.keycode = KEY_E
-	key.physical_keycode = KEY_E
+	key.keycode = KEY_F
+	key.physical_keycode = KEY_F
 	key.pressed = true
 	Input.parse_input_event(key)
 	Input.flush_buffered_events()

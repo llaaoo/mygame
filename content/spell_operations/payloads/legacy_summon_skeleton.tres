@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="SpellPayloadData" load_steps=3 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/operations/spell_payload_data.gd" id="data"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/summon_skeleton_data.tres" id="effect"]
+[resource]
+script = ExtResource("data")
+id = "summon_skeleton"
+title = "铭刻灰与真实残魂"
+description = "铭刻灰与真实残魂；消耗真实材料，所选来源失效时拒绝，不自动换源。"
+effect = ExtResource("effect")
+material_id = "ash"
+source_kind = "soul"
+extra_mana = 6

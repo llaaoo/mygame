@@ -59,7 +59,7 @@ func _build() -> void:
 	_panels.clear(); _icons.clear(); _masks.clear(); _bind_labels.clear(); _cd_labels.clear(); _sources.clear()
 
 	# 左手
-	_add_item("left", "L", HAND_SIZE)
+	_add_item("left", "Q", HAND_SIZE)
 	# 右手
 	_add_item("right", "R", HAND_SIZE)
 	# 快捷键 1-6
@@ -143,6 +143,7 @@ func _process(_delta: float) -> void:
 	_hint_panel.size = Vector2(466, 0)
 	_hint_panel.global_position = global_position + Vector2(0, -_hint_panel.size.y - 12)
 	for i in range(_sources.size()):
+		_bind_labels[i].text=InputBindings.label("cast_left" if _sources[i]=="left" else "skill" if _sources[i]=="right" else "skill_%d"%(int(_sources[i].trim_prefix("slot_"))+1))
 		var instance := _skill_manager.get_instance(_sources[i])
 		var preview: CastPlan
 		if instance and controller.handles(instance.data):
@@ -266,6 +267,7 @@ func _refresh_idx(idx: int) -> void:
 	_cost_labels[idx].text = str(skill.mp_cost) if skill else ""
 	_cost_labels[idx].tooltip_text = "本次法力费用"
 	_bind_labels[idx].visible = true
+	_bind_labels[idx].text=InputBindings.label("cast_left" if src=="left" else "skill" if src=="right" else "skill_%d"%(int(src.trim_prefix("slot_"))+1))
 	_panels[idx].tooltip_text = "%s\n%s" % [skill.display_name, skill.description] if skill else "空槽"
 	_update_cooldown(idx)
 

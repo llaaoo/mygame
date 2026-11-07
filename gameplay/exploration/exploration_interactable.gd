@@ -52,7 +52,7 @@ func _ready() -> void:
 func set_title(value: String) -> void:
 	title = value
 	if _label:
-		_label.text = ("[E] " if _near else "") + title
+		_label.text = ("[F] " if _near else "") + title
 
 func _process(delta: float) -> void:
 	_label_time += delta

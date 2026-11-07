@@ -3,10 +3,10 @@ extends RefCounted
 const PATH := "user://actor_bindings.cfg"
 const KEYS := {
 	"move_left":KEY_A,"move_right":KEY_D,"move_up":KEY_W,"move_down":KEY_S,
-	"dodge":KEY_SPACE,"interact":KEY_E,
+	"dodge":KEY_SPACE,"interact":KEY_F,"loot_all":KEY_E,"field_method":KEY_C,
 	"skill_1":KEY_1,"skill_2":KEY_2,"skill_3":KEY_3,
 	"skill_4":KEY_4,"skill_5":KEY_5,"skill_6":KEY_6,
-	"guard":KEY_V,"sprint":KEY_ALT,"drop_pack":KEY_B,
+	"cast_left":KEY_Q,"skill":KEY_R,"sprint":KEY_ALT,"drop_pack":KEY_B,
 }
 static var loaded := false
 static func install() -> void:
@@ -16,7 +16,7 @@ static func install() -> void:
 			var event:=InputEventKey.new()
 			event.physical_keycode=KEYS[action]
 			InputMap.action_add_event(action,event)
-	for action in {"attack":MOUSE_BUTTON_LEFT,"skill":MOUSE_BUTTON_RIGHT}:
+	for action in ["attack","guard"]:
 		if InputMap.has_action(action): continue
 		InputMap.add_action(action)
 		var event:=InputEventMouseButton.new()
@@ -36,9 +36,13 @@ static func install() -> void:
 		var raw: Variant=config.get_value("bindings",action)
 		if not raw is Dictionary: continue
 		var event:=decode(raw)
-		if event: assign(action,event,false)
+		if action=="interact" and int(config.get_value("layout","version",0))<2 and event is InputEventKey and (event.physical_keycode==KEY_E or event.keycode==KEY_E): continue
+		if event and action not in ["attack","guard"]: assign(action,event,false)
 static func assign(action: String,event: InputEvent,save := true) -> OperationResult:
 	if not InputMap.has_action(action) or not event is InputEventKey and not event is InputEventMouseButton: return OperationResult.reject("invalid_binding")
+	if action in ["attack","guard"]: return OperationResult.reject("reserved_mouse_action")
+	if event is InputEventMouseButton and event.button_index in [MOUSE_BUTTON_LEFT,MOUSE_BUTTON_RIGHT]:
+		if action!="heavy_attack" or event.button_index!=MOUSE_BUTTON_LEFT or not event.ctrl_pressed: return OperationResult.reject("reserved_mouse_action")
 	for other in InputMap.get_actions():
 		if other==action: continue
 		for binding in InputMap.action_get_events(other):
@@ -48,6 +52,7 @@ static func assign(action: String,event: InputEvent,save := true) -> OperationRe
 	if save:
 		var config:=ConfigFile.new()
 		config.load(PATH)
+		config.set_value("layout","version",2)
 		config.set_value("bindings",action,encode(event))
 		if config.save(PATH)!=OK: return OperationResult.reject("save_failed")
 	return OperationResult.success()
@@ -62,3 +67,7 @@ static func decode(raw: Dictionary) -> InputEvent:
 	else: return null
 	event.ctrl_pressed=bool(raw.get("ctrl",false)); event.alt_pressed=bool(raw.get("alt",false)); event.shift_pressed=bool(raw.get("shift",false))
 	return event
+
+static func label(action: String) -> String:
+	var bindings:=InputMap.action_get_events(action)
+	return bindings[0].as_text().replace(" (Physical)","").replace(" - Physical","") if not bindings.is_empty() else "—"

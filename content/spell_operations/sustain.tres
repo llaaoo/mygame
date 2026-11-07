@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="data"]
+[resource]
+script = ExtResource("data")
+id = "sustain"
+operation_id = "sustain"
+display_name = "引导介质"
+description = "按住技能键逐次引导，松开即停；每次脉冲消耗一份所选介质与法力，耗尽停止，不自动换源。"
+conditional_cast = false
+mp_cost = 0
+cooldown = 0.1
+preparation = 0
+damage = 0
+damage_scaling = 0.0
+icon_atlas_index = 9
+cast_type = "channel"
+channel_mp_per_sec = 12.0
+channel_tick_interval = 0.4
+school = 3

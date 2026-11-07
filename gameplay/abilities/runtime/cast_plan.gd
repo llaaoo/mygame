@@ -21,6 +21,7 @@ var preparation := 0.0
 var field_bonus := 0.0
 var signature: Array = []
 var empower := false
+var charge_power := 1.0
 var status_conditions: Array[CastStatusRequirement] = []
 var retained_boons: Array[String] = []
 var consumed_boons: Array[String] = []

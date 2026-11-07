@@ -160,7 +160,7 @@ func _on_body_entered(body: Node2D) -> void:
 		target = body.owner
 	if not target and body.get_parent() is MapObject:
 		target = body.get_parent()
-	if target == caster:
+	if target == caster or CombatExecutor.same_combat_owner(caster,target):
 		return
 	if target and caster.is_in_group("enemy") and target.is_in_group("enemy"):
 		return
@@ -189,7 +189,7 @@ func _on_area_entered(area: Area2D) -> void:
 		return
 	# 检查 area 自身或 owner（如 MapObject 的 HitArea → MapObject 有 take_damage）
 	var target: Node2D = area if area.has_method("take_damage") else (area.owner if area.owner and area.owner.has_method("take_damage") else null)
-	if target:
+	if target and not CombatExecutor.same_combat_owner(caster,target):
 		if _hit_targets.has(target.get_instance_id()):
 			return
 		_hit_targets[target.get_instance_id()] = true

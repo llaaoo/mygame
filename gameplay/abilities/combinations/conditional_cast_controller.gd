@@ -65,7 +65,7 @@ func build_plan(skill: SkillData, actor: Node2D, empower: bool = false) -> CastP
 		basis.id=skill.get_id()
 	var medium:=primary.get("payload") as SpellPayloadData
 	var source_fields:=SpellSourceResolver.fields_for(medium,live_fields(),actor)
-	var explicit_source:=skill.operation_id in ["attune","extract"]
+	var explicit_source:=skill.operation_id in ["attune","extract"] or (medium!=null and medium.source_kind=="field")
 	var candidate_fields:=source_fields if explicit_source else live_fields()
 	var components: Array[CastComponent] = []
 	if not skill.conditional_cast or skill.operation_id=="extract":
@@ -74,7 +74,7 @@ func build_plan(skill: SkillData, actor: Node2D, empower: bool = false) -> CastP
 		components = SpellCombinationResolver.resolve_components(basis, candidate_fields, actor, rules, learned_rules, empower, rule_index, supplies)
 	else:
 		components.append(SpellCombinationResolver.resolve_rules(basis, candidate_fields.back() if not candidate_fields.is_empty() else null, actor, rule_index.for_action(skill.get_id()), learned_rules, empower, true, supplies))
-	if skill.operation_id=="extract" and not source_fields.is_empty():
+	if medium and medium.source_kind=="field" and not source_fields.is_empty():
 		components[0].field=source_fields[0]
 		components[0].version=source_fields[0].revision
 	if skill.operation_id=="attune" and not source_fields.is_empty() and not components.any(func(component: CastComponent): return component.field!=null):
@@ -273,14 +273,14 @@ func preview(skill: SkillData, actor: Node2D, empower: bool = false) -> CastPlan
 		var buffs := actor.get_node("BuffManager") as BuffManager
 		if not result.soul_remnant:
 			result.reason = "附近没有残魂：击败守卫后靠近残魂，再使用汲魂"
-		elif buffs.get_stack_count("soul_charge") >= buffs.stack_limit(skill.buff_resource):
+		elif result.skill.buff_resource and buffs.get_stack_count("soul_charge") >= buffs.stack_limit(result.skill.buff_resource):
 			result.reason = "蕴魂已满：先以Shift组合兑现，再汲取残魂"
 	if skill.operation_id=="extract" and result.skill.buff_resource:
 		var buffs:=actor.get_node("BuffManager") as BuffManager
 		var capacity:=buffs.stack_limit(result.skill.buff_resource)
 		if buffs.get_stack_count(result.skill.buff_resource.status_id)>=capacity: result.reason="同类蕴能已满（%d层），先手动兑现"%capacity
 	if not supplies.can_pay_combat(result.material_costs):
-		result.reason = "施法材料不足：" + supplies.describe_cost(result.material_costs)
+		result.reason = ("材料在背包中，先整理到随身口袋：" if supplies.can_pay(result.material_costs) else "施法材料不足：") + supplies.describe_cost(result.material_costs)
 	if not result.operation_reason.is_empty(): result.reason=result.operation_reason
 	if not _manager.can_act(actor):
 		result.reason = "麻痹中，无法施法"
@@ -311,6 +311,7 @@ func start(skill: SkillData, actor: Node2D, context: CastContext, source: String
 	plan.scope = scope
 	plan.position = actor.global_position
 	plan.direction = context.direction
+	plan.charge_power = context.charge_power
 	plan.has_target_position = skill.ground_targeted and context.has_target_position
 	if plan.has_target_position:
 		plan.target_position = CastContext.ground_point(actor, context.target_position, skill.cast_distance)
@@ -447,6 +448,7 @@ func _commit() -> void:
 			var context := CastContext.simple(actor, plan.direction, component.skill)
 			context.world = plan.scope
 			context.batch = batch
+			context.charge_power = plan.charge_power
 			context.family_id = "%s:%s" % [get_instance_id(), plan.execution_id]
 			if plan.has_target_position:
 				context.target_position = plan.target_position

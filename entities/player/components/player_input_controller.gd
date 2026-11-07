@@ -23,7 +23,7 @@ func poll_universal_actions() -> Array[Action]:
 		for pair in [[Action.ActionType.GUARD,"guard"],[Action.ActionType.SPRINT,"sprint"]]:
 			var state:=Action.new()
 			state.action_type=pair[0]; state.source=player; state.direction=player.get_mouse_direction()
-			state.params["held"]=Input.is_action_pressed(pair[1])
+			state.params["held"]=Input.is_action_pressed(pair[1]) and not (pair[1]=="guard" and _pointer_over_interface())
 			actions.append(state)
 		if Input.is_action_just_pressed("drop_pack"):
 			var drop:=Action.new(); drop.action_type=Action.ActionType.DROP_PACK; drop.source=player; actions.append(drop)
@@ -39,19 +39,18 @@ func poll_universal_actions() -> Array[Action]:
 	if Input.is_action_just_pressed("dodge"):
 		actions.append(Action.dodge(input_dir if input_dir.length() > 0.1 else player.facing_direction, player))
 
-	# 近战（左键 = 无左手技能时直接近战）
-	if Input.is_action_just_pressed("attack") and not player.skill_manager.has_left_spell() and not _pointer_over_interface() and not heavy:
+	# 左键始终提出武器攻击，法术使用独立键位。
+	if Input.is_action_just_pressed("attack") and not _pointer_over_interface() and not heavy:
 		var hit:=Action.melee(player)
 		hit.direction=player.get_mouse_direction()
 		actions.append(hit)
 
-	# 技能（左手/右手/快捷键1-6）
-	for pair in [["left", "attack"], ["right", "skill"]]:
-		if heavy and pair[0]=="left": continue
-		_poll_universal_cast(actions, pair[0], pair[1])
-	for i in range(SkillManager.MAX_SLOTS):
-		_poll_universal_cast(actions, "slot_%d" % i, "skill_%d" % (i + 1))
-
+	# 数字键与Q/R施法，格挡时不提出新的施法。
+	if not Input.is_action_pressed("guard"):
+		for pair in [["left", "cast_left"], ["right", "skill"]]:
+			_poll_universal_cast(actions, pair[0], pair[1])
+		for i in range(SkillManager.MAX_SLOTS):
+			_poll_universal_cast(actions, "slot_%d" % i, "skill_%d" % (i + 1))
 	# 交互
 	if Input.is_action_just_pressed("interact"):
 		actions.append(Action.interact(player))
@@ -59,7 +58,6 @@ func poll_universal_actions() -> Array[Action]:
 	return actions
 
 func _poll_universal_cast(actions: Array[Action], source: String, input_action: String) -> void:
-	if source in ["left","right"] and _pointer_over_interface() and not Input.is_action_just_released(input_action): return
 	if not _can_cast_source(source):
 		return
 	var pressed := Input.is_action_just_pressed(input_action)
@@ -252,6 +250,6 @@ func _pointer_over_interface() -> bool:
 	return get_viewport().gui_get_hovered_control()!=null
 
 func action_for_source(source: String) -> String:
-	if source=="left": return "attack"
+	if source=="left": return "cast_left"
 	if source=="right": return "skill"
 	return "skill_%d"%(int(source.trim_prefix("slot_"))+1)

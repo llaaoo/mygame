@@ -22,6 +22,8 @@ extends Resource
 @export var source_kind := ""
 func describe() -> String:
 	var text:=description
+	if effect:
+		text+="\n效果："+effect.display_name+"\n"+effect.description
 	if damage>0: text+="\n直接伤害 %d"%damage
 	for status in statuses: text+="\n"+status.describe()
 	if not field_type.is_empty(): text+="\n%d次充能 · %.0f秒"%[field_charges,field_duration]
