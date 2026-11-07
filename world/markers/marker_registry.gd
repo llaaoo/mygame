@@ -1,27 +1,16 @@
 class_name MarkerRegistry
 extends RefCounted
-## 全局 Marker 注册表 — marker_id → global_position (Vector2)
+## Finds an authored marker within one map, even before that map enters the tree.
 
 
-static var _positions: Dictionary = {}
-
-
-static func register(marker: WorldMarker) -> void:
-	if marker.marker_id.is_empty():
-		return
-	_positions[marker.marker_id] = marker.global_position
-
-
-static func get_position(marker_id: String) -> Vector2:
-	if _positions.has(marker_id):
-		return _positions[marker_id]
-	push_warning("MarkerRegistry: 未找到 '%s'" % marker_id)
-	return Vector2.ZERO
-
-
-static func has(marker_id: String) -> bool:
-	return _positions.has(marker_id)
-
-
-static func clear() -> void:
-	_positions.clear()
+static func find_marker(marker_id: String, scope: Node) -> WorldMarker:
+	if marker_id.is_empty() or not is_instance_valid(scope) or scope.is_queued_for_deletion():
+		return null
+	var candidate := scope as WorldMarker
+	if candidate and candidate.marker_id == marker_id:
+		return candidate
+	for child in scope.get_children():
+		var marker := find_marker(marker_id, child)
+		if marker:
+			return marker
+	return null

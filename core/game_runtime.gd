@@ -21,6 +21,9 @@ signal runtimes_ready
 static var instance: GameRuntime = null
 
 ## ── 子 Runtime 引用 ──
+@export var legacy_player: Player
+@export var legacy_region: Node2D
+
 var world_runtime: WorldRuntime = null
 var simulation_runtime: SimulationRuntime = null
 var command_bus: CommandBus = null
@@ -32,19 +35,17 @@ var combat_executor: CombatExecutor = null
 var combat_event_bus: CombatEventBus = null
 
 
-func _init() -> void:
-	# _init 在 autoload 时最早执行，确保 instance 立即可用
-	if instance == null:
+func _enter_tree() -> void:
+	if not is_instance_valid(instance):
 		instance = self
 
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	if instance == null:
-		instance = self
 	_setup_runtimes()
 	RuntimeRegistration.runtime_ready(self)
 	runtimes_ready.emit()
+
 
 func _exit_tree() -> void:
 	if instance == self:
@@ -80,7 +81,7 @@ func _setup_runtimes() -> void:
 	_setup_combat_runtime()
 
 	if not has_node("ElementHitBindings"):
-		var elements := preload("res://gameplay/combat/on_hit/element_hit_bindings.gd").new()
+		var elements := preload("res://gameplay/combat/on_hit/element_hit_bindings.gd").new(combat_event_bus)
 		elements.name="ElementHitBindings"
 		add_child(elements)
 
@@ -91,6 +92,7 @@ func _setup_runtimes() -> void:
 		world_runtime = WorldRuntime.new()
 		world_runtime.name = "WorldRuntime"
 		add_child(world_runtime)
+	world_runtime.bind_command_bus(command_bus)
 
 	# === SimulationRuntime（如果场景中已有则复用，否则创建） ===
 	if has_node("SimulationRuntime"):
@@ -101,8 +103,11 @@ func _setup_runtimes() -> void:
 		add_child(simulation_runtime)
 
 	# === 连接 Simulation → World 依赖 ===
-	if simulation_runtime and world_runtime and simulation_runtime.has_method("setup_dependencies"):
-		simulation_runtime.setup_dependencies(world_runtime.spatial_index, world_runtime.state_manager)
+	simulation_runtime.setup_dependencies(
+			world_runtime.spatial_index,
+			world_runtime.state_manager,
+			command_bus,
+	)
 
 	# === WorldTime 也归 GameRuntime 管理 ===
 	_setup_world_time()
@@ -119,10 +124,11 @@ func _setup_runtimes() -> void:
 		region_runtime = RegionRuntime.new()
 		region_runtime.name = "RegionRuntime"
 		add_child(region_runtime)
+	region_runtime.setup(region_session, get_parent(), legacy_player, legacy_region)
 
 	# === 伤害数字生成器（监听 CombatEventBus → 浮动数字） ===
 	if not has_node("DamageNumberSpawner"):
-		var dns := DamageNumberSpawner.new()
+		var dns := DamageNumberSpawner.new(combat_event_bus)
 		dns.name = "DamageNumberSpawner"
 		add_child(dns)
 
@@ -144,35 +150,23 @@ func _setup_runtimes() -> void:
 ## ── Combat Runtime 初始化 ──
 
 func _setup_combat_runtime() -> void:
-	# CombatExecutor — 唯一控制流入口
-	if not CombatExecutor.instance:
-		combat_executor = CombatExecutor.new()
-		combat_executor.name = "CombatExecutor"
-		CombatExecutor.instance = combat_executor
-	else:
-		combat_executor = CombatExecutor.instance
-	if not combat_executor.is_inside_tree():
-		add_child(combat_executor)
-
-	# CombatEventBus — 全局事件广播
-	if not CombatEventBus.instance:
-		combat_event_bus = CombatEventBus.new()
-		combat_event_bus.name = "CombatEventBus"
+	combat_event_bus = CombatEventBus.new()
+	combat_event_bus.name = "CombatEventBus"
+	combat_executor = CombatExecutor.new(combat_event_bus)
+	combat_executor.name = "CombatExecutor"
+	if instance == self:
 		CombatEventBus.instance = combat_event_bus
-	else:
-		combat_event_bus = CombatEventBus.instance
-	if not combat_event_bus.is_inside_tree():
-		add_child(combat_event_bus)
+		CombatExecutor.instance = combat_executor
+	add_child(combat_event_bus)
+	add_child(combat_executor)
 
-
-## ── WorldTime 初始化 ──
 
 func _setup_world_time() -> void:
-	if WorldTime.instance:
-		return
-	var wt := WorldTime.new()
-	wt.name = "WorldTime"
-	add_child(wt)
+	var clock := WorldTime.new()
+	clock.name = "WorldTime"
+	if instance == self:
+		WorldTime.instance = clock
+	add_child(clock)
 
 
 ## ── 公开访问器（禁止硬编码路径查找） ──

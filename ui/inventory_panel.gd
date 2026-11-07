@@ -46,7 +46,7 @@ func _ready() -> void:
 	_add_close_button()
 
 
-func _input(event: InputEvent) -> void:
+func _unhandled_input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed or event.echo:
 		return
 	if visible and event.keycode == KEY_ESCAPE:

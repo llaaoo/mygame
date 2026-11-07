@@ -300,7 +300,7 @@ func restore_state(entries: Array[Dictionary]) -> void:
 	clear_all(RemovalReason.RESTORED)
 	for entry in entries:
 		var path := str(entry.get("resource_path", ""))
-		if path.is_empty():
+		if path.is_empty() or not ResourceLoader.exists(path):
 			continue
 		var definition := load(path) as Buff
 		if not definition:
@@ -310,6 +310,8 @@ func restore_state(entries: Array[Dictionary]) -> void:
 		buff.set_meta("definition_path", path)
 		apply_buff(buff)
 		var instance := _find(buff.get_runtime_id())
+		if not instance:
+			continue
 		instance.remaining = maxf(0, float(entry.get("remaining", buff.duration)))
 		instance.stacks = clampi(int(entry.get("stacks", 1)), 1, stack_limit(buff))
 		instance.elapsed = maxf(0, float(entry.get("tick_elapsed", 0)))

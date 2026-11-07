@@ -1,5 +1,5 @@
-extends State
 class_name PlayerDodgeState
+extends State
 
 @export var dodge_duration: float = 0.35
 @export var dodge_speed: float = 600.0

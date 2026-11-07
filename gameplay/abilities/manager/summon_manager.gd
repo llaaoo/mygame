@@ -15,6 +15,7 @@ var active_summons: Array[SummonEntity] = []
 var attack_target: Node2D = null       ## 玩家攻击的目标 → 召唤物集火
 var revenge_target: Node2D = null      ## 伤害了玩家的敌人 → 召唤物复仇
 var player: Player = null
+var _bus: CombatEventBus
 
 ## ── 信号 ──
 signal summon_added(entity: SummonEntity)
@@ -33,18 +34,21 @@ func _ready() -> void:
 
 
 func _subscribe_events() -> void:
-	var bus := CombatEventBus.instance
-	if not bus:
-		await get_tree().process_frame
-		_subscribe_events()
+	if not is_inside_tree() or is_queued_for_deletion():
 		return
+	_bus = RuntimeRegistration.combat_bus_for(self)
+	if not is_instance_valid(_bus):
+		return
+	_bus.subscribe(CombatEvent.Type.ON_HIT, _on_combat_event)
+	_bus.subscribe(CombatEvent.Type.ON_KILL, _on_combat_event)
 
-	bus.subscribe(CombatEvent.Type.ON_HIT, _on_combat_event)
-	bus.subscribe(CombatEvent.Type.ON_KILL, _on_combat_event)
-	print("📡 [SummonManager] 已订阅 CombatEventBus (ON_HIT + ON_KILL)")
 
+func _exit_tree() -> void:
+	if is_instance_valid(_bus):
+		_bus.unsubscribe(CombatEvent.Type.ON_HIT, _on_combat_event)
+		_bus.unsubscribe(CombatEvent.Type.ON_KILL, _on_combat_event)
+	_bus = null
 
-## ── 公共接口 ──
 
 func can_summon() -> bool:
 	return active_summons.size() < get_max_summons()

@@ -92,7 +92,7 @@ func entries() -> Array[Dictionary]:
 				if filter_index == 1 and not food or filter_index == 2 and food: continue
 				result.append({"id":id,"title":game.survival.supplies.title(id),"text":"补给" if food else "施法与制造材料","subtitle":"×%d · %s"%[count,"可使用" if food else "材料"]})
 			for source in ["player.pocket","player.pack"]:
-				if source=="player.pack" and not game.session.inventory.containers[source].attached: continue
+				if source=="player.pack" and not game.session.inventory.is_attached(source): continue
 				for row in game.session.inventory.entries(source):
 					var definition:=game.session.inventory.definitions.get(row.definition) as ItemData
 					if not definition or not definition.use_profile or definition.use_profile.kind!=ItemUseDefinition.Kind.SPRAY: continue
@@ -258,7 +258,7 @@ func take_all() -> void:
 func _repack(id: String,to_pocket: bool,uid := "") -> void:
 	if not game.equipment_service.change_reason().is_empty(): return
 	var store:=game.session.inventory
-	if not store.containers["player.pack"].attached:
+	if not store.is_attached("player.pack"):
 		game.ui.notify("先拾回背包再整理物品。")
 		return
 	var source:="player.pack" if to_pocket else "player.pocket"

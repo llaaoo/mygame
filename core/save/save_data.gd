@@ -101,15 +101,15 @@ class PlayerData:
 		player.intelligence = data.get("intelligence", 10)
 		player.agility = data.get("agility", 10)
 		player.endurance = data.get("endurance", 10)
-		player.inventory_items = data.get("inventory_items", []) as Array[Dictionary]
-		player.equipment_items = data.get("equipment_items", []) as Array[Dictionary]
+		player.inventory_items.assign(data.get("inventory_items", []).duplicate(true))
+		player.equipment_items.assign(data.get("equipment_items", []).duplicate(true))
 		player.skill_left = data.get("skill_left", "")
 		player.skill_right = data.get("skill_right", "")
 		player.skill_slots = SaveData._string_array(data.get("skill_slots", []))
-		player.skill_cooldowns = data.get("skill_cooldowns", {})
-		player.skill_upgrade_state = data.get("skill_upgrade_state", {})
-		player.mastery_state = data.get("mastery_state", {})
-		player.buff_state = data.get("buff_state", []) as Array[Dictionary]
+		player.skill_cooldowns = data.get("skill_cooldowns", {}).duplicate(true)
+		player.skill_upgrade_state = data.get("skill_upgrade_state", {}).duplicate(true)
+		player.mastery_state = data.get("mastery_state", {}).duplicate(true)
+		player.buff_state.assign(data.get("buff_state", []).duplicate(true))
 		return player
 
 
@@ -125,7 +125,7 @@ class WorldData:
 
 	static func deserialize(data: Dictionary) -> WorldData:
 		var world := WorldData.new()
-		world.object_states = data.get("object_states", {})
+		world.object_states = data.get("object_states", {}).duplicate(true)
 		world.world_time_hour = data.get("world_time_hour", 8.0)
 		return world
 
@@ -143,7 +143,7 @@ class QuestSave:
 	static func deserialize(data: Dictionary) -> QuestSave:
 		var quest := QuestSave.new()
 		quest.completed = SaveData._string_array(data.get("completed", []))
-		quest.active = data.get("active", []) as Array[Dictionary]
+		quest.active.assign(data.get("active", []).duplicate(true))
 		return quest
 
 
@@ -170,5 +170,5 @@ class Root:
 		root.player = PlayerData.deserialize(data.get("player", {}))
 		root.world = WorldData.deserialize(data.get("world", {}))
 		root.quest = QuestSave.deserialize(data.get("quest", {}))
-		root.extensions = data.get("extensions", {}) as Dictionary
+		root.extensions = data.get("extensions", {}).duplicate(true)
 		return root

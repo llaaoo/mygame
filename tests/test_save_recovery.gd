@@ -86,12 +86,35 @@ func _run() -> void:
 	malformed.extensions[MVPGame.SECTION].character_state = {"stats": {"strength": {"wrong": "type"}}}
 	_raw(path, malformed)
 	_check(repo.read(path).status == SaveRepository.Status.RECOVERED, "Malformed character numbers were accepted")
+	for invalid_fields: Dictionary in [
+		{"section": "player", "key": "position", "value": {"x": INF, "y": 0.0}},
+		{"section": "player", "key": "hp", "value": "many"},
+		{"section": "player", "key": "inventory_items", "value": ["broken entry"]},
+		{"section": "player", "key": "buff_state", "value": [{"remaining": NAN}]},
+		{"section": "world", "key": "object_states", "value": {"gate": {"hp": []}}},
+		{"section": "quest", "key": "active", "value": [{"progress": {}}]},
+	]:
+		malformed = a.duplicate(true)
+		malformed[invalid_fields.section][invalid_fields.key] = invalid_fields.value
+		_raw(path, malformed)
+		_check(repo.read(path).status == SaveRepository.Status.RECOVERED, "Malformed %s was treated as usable" % invalid_fields.key)
+		_check(not repo.write("user://invalid-payload.sav", malformed), "Writer accepted malformed %s" % invalid_fields.key)
+
 	var v1 := a.duplicate(true)
 	v1.version = 1
 	v1.erase("extensions")
 	v1.player.erase("equipment_items")
+	v1.player.inventory_items = [{"path": "res://legacy/item.tres", "slot": 2, "quantity": 3}]
+	v1.quest.active = [{"quest_id": "legacy.quest", "stage": 0, "progress": [1]}]
 	_raw(path, v1)
-	_check(repo.read(path).data.version == SaveRepository.VERSION and repo.read(path).data.player.has("equipment_items"), "Legacy migration changed")
+	var migrated := repo.read(path)
+	_check(migrated.status == SaveRepository.Status.VALID and migrated.data.version == SaveRepository.VERSION, "Legacy migration changed")
+	var legacy := SaveData.Root.deserialize(migrated.data)
+	_check(legacy.player.equipment_items.is_empty() and legacy.player.inventory_items == v1.player.inventory_items, "Legacy untyped inventory array did not restore")
+	_check(legacy.quest.active == v1.quest.active, "Legacy untyped quest array did not restore")
+	if not legacy.quest.active.is_empty():
+		legacy.quest.active[0].progress[0] = 99
+		_check(migrated.data.quest.active[0].progress[0] == 1, "Restored quest aliases its source payload")
 
 	for failure in ["write", "copy", "backup", "replace"]:
 		var fault := FaultRepository.new()

@@ -12,6 +12,7 @@ var completion_handler: Callable
 var _steps: Array[int] = []
 var _held: Array[float] = []
 var _label: Label
+var _bus: CombatEventBus
 
 func _ready() -> void:
 	collision_layer = 0 if completed else 8
@@ -34,7 +35,9 @@ func _ready() -> void:
 	_label.add_theme_font_size_override("font_size", 13)
 	add_child(_label)
 	_refresh()
-	CombatEventBus.instance.subscribe(CombatEvent.Type.ON_HIT, _on_hit)
+	_bus = RuntimeRegistration.combat_bus_for(self)
+	if is_instance_valid(_bus):
+		_bus.subscribe(CombatEvent.Type.ON_HIT, _on_hit)
 	add_to_group("interactable")
 	var interaction := Interactable.new()
 	interaction.name = "Interactable"
@@ -42,8 +45,9 @@ func _ready() -> void:
 	add_child(interaction)
 
 func _exit_tree() -> void:
-	if CombatEventBus.instance:
-		CombatEventBus.instance.unsubscribe(CombatEvent.Type.ON_HIT, _on_hit)
+	if is_instance_valid(_bus):
+		_bus.unsubscribe(CombatEvent.Type.ON_HIT, _on_hit)
+	_bus = null
 
 func take_damage(_amount: int) -> void:
 	pass # This object responds to elements rather than health depletion.

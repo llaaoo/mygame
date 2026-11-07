@@ -1,13 +1,20 @@
 extends Node
 ## Elemental contact rules belong to the combat world, independent of controllers.
 var _effects: Array[TriggeredEffect] = []
+var _bus: CombatEventBus
+
+
+func _init(bus: CombatEventBus) -> void:
+	_bus = bus
+
+
 func _ready() -> void:
 	for tag in ["fire","ice","poison","water"]:
 		var effect := OnHitApplyStatus.create(tag,ElementCatalog.definition(tag).hit_status_paths[0])
 		_effects.append(effect)
-		effect.register()
+		effect.register(_bus)
 	var chain := OnHitChain.create("lightning",120.0,3,.6)
 	_effects.append(chain)
-	chain.register()
+	chain.register(_bus)
 func _exit_tree() -> void:
 	for effect in _effects: effect.unregister()

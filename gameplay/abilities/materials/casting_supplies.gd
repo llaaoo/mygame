@@ -236,7 +236,7 @@ func operation_plan(action: SkillData,manager: SkillManager,resolved: SkillData 
 			if not instance or instance.definition_id!=medium.material_id or inventory_store.locate(uid)!=actor_id+".pocket" or int(instance.properties.get("doses",0))<1: uid=""
 		result.instance_costs=[]
 		if uid.is_empty(): result.reason="口袋中没有可用喷剂"
-		else: result.instance_costs=[{"uid":uid,"property":"doses","amount":1,"revision":inventory_store.containers[actor_id+".pocket"].revision}]
+		else: result.instance_costs=[{"uid":uid,"property":"doses","amount":1,"revision":inventory_store.container_revision(actor_id + ".pocket")}]
 		result.material_id=medium.material_id
 	elif not medium.material_id.is_empty():
 		result.material_id=medium.material_id

@@ -9,19 +9,36 @@ var _active_quests: Array[QuestRuntime] = []
 var _completed_quests: Array[String] = []
 var _quest_catalog: Dictionary = {}
 var _quest_resource_paths: Dictionary = {}
+var _bus: CombatEventBus
+var _recipient: Player
+
+
+func _init(recipient: Player = null) -> void:
+	_recipient = recipient
 
 
 func _ready() -> void:
-	_subscribe_to_events()
+	if RuntimeRegistration.combat_bus_for(self):
+		_subscribe_to_events()
+	else:
+		_subscribe_to_events.call_deferred()
 
 
 func _subscribe_to_events() -> void:
-	if not CombatEventBus.instance:
-		await get_tree().process_frame
-	if not CombatEventBus.instance:
+	if not is_inside_tree() or is_queued_for_deletion():
 		return
-	CombatEventBus.instance.subscribe(CombatEvent.Type.ON_KILL, _on_event)
-	CombatEventBus.instance.subscribe(CombatEvent.Type.ON_INTERACT, _on_event)
+	_bus = RuntimeRegistration.combat_bus_for(self)
+	if not is_instance_valid(_bus):
+		return
+	_bus.subscribe(CombatEvent.Type.ON_KILL, _on_event)
+	_bus.subscribe(CombatEvent.Type.ON_INTERACT, _on_event)
+
+
+func _exit_tree() -> void:
+	if is_instance_valid(_bus):
+		_bus.unsubscribe(CombatEvent.Type.ON_KILL, _on_event)
+		_bus.unsubscribe(CombatEvent.Type.ON_INTERACT, _on_event)
+	_bus = null
 
 
 func start_quest(data: QuestData) -> bool:
@@ -117,7 +134,7 @@ func _register_quest_data(data: QuestData) -> void:
 
 func _load_quest_data(entry: Dictionary) -> QuestData:
 	var path: String = entry.get("resource_path", "")
-	if not path.is_empty():
+	if not path.is_empty() and ResourceLoader.exists(path):
 		var loaded := load(path) as QuestData
 		if loaded != null:
 			_register_quest_data(loaded)
@@ -129,6 +146,5 @@ func _load_quest_data(entry: Dictionary) -> QuestData:
 func _apply_rewards(data: QuestData) -> void:
 	if data.reward_experience <= 0:
 		return
-	var player := get_tree().get_first_node_in_group("player")
-	if player:
-		CombatExecutor.report_exp_bonus(player, data.reward_experience)
+	if is_instance_valid(_recipient) and _recipient.is_inside_tree():
+		CombatExecutor.report_exp_bonus(_recipient, data.reward_experience)

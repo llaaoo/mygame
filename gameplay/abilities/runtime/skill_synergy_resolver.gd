@@ -5,18 +5,26 @@ signal reaction_observed(id: String, position: Vector2)
 signal reaction_recorded(details: Dictionary)
 
 var _owner_entity: Node2D = null
+var _bus: CombatEventBus
 var _cooldowns: Dictionary = {}
 
 
-func setup(owner_entity: Node2D) -> void:
+func setup(owner_entity: Node2D, bus: CombatEventBus = null) -> void:
 	_owner_entity = owner_entity
-	if CombatEventBus.instance:
-		CombatEventBus.instance.subscribe(CombatEvent.Type.ON_HIT, _on_hit)
+	_disconnect_bus()
+	_bus = bus if is_instance_valid(bus) else RuntimeRegistration.combat_bus_for(self)
+	if is_instance_valid(_bus):
+		_bus.subscribe(CombatEvent.Type.ON_HIT, _on_hit)
 
 
 func _exit_tree() -> void:
-	if CombatEventBus.instance:
-		CombatEventBus.instance.unsubscribe(CombatEvent.Type.ON_HIT, _on_hit)
+	_disconnect_bus()
+
+
+func _disconnect_bus() -> void:
+	if is_instance_valid(_bus):
+		_bus.unsubscribe(CombatEvent.Type.ON_HIT, _on_hit)
+	_bus = null
 
 
 func _ready() -> void:

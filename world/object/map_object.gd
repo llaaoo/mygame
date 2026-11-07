@@ -13,6 +13,7 @@ var _object_id: String
 var _current_hp: int
 var _state: String = "INTACT"  ## INTACT / DAMAGED / DESTROYED / RESPAWNING
 var _respawn_timer: float = 0.0
+var _registered_world: WorldRuntime
 
 
 func _ready() -> void:
@@ -22,11 +23,19 @@ func _ready() -> void:
 	_object_id = _build_object_id()
 	_current_hp = object_data.max_hp
 	_apply_visual()
-	_register_with_world_runtime()
+	var runtime := RuntimeRegistration.runtime_for(self)
+	if not runtime:
+		_register_with_world_runtime.call_deferred()
+	elif runtime.get_world_runtime():
+		_register_with_world_runtime()
+	else:
+		runtime.runtimes_ready.connect(_register_with_world_runtime, CONNECT_ONE_SHOT)
 
 
-	
-
+func _exit_tree() -> void:
+	if is_instance_valid(_registered_world):
+		_registered_world.unregister_object(self)
+		_registered_world = null
 
 
 ## 公开 object_id
@@ -135,7 +144,7 @@ func _on_destroyed() -> void:
 
 ## 通过 CommandBus 发送 world/destroyed 命令（替代直接调用 SimulationRuntime）
 func _emit_destroyed_command() -> void:
-	var gr := GameRuntime.instance
+	var gr := RuntimeRegistration.runtime_for(self)
 	if not gr:
 		return
 	var bus := gr.get_command_bus()
@@ -195,20 +204,16 @@ func _build_object_id() -> String:
 
 
 func _register_with_world_runtime() -> void:
-	var wr: WorldRuntime = _get_world_runtime()
-	if wr:
-		wr.register_object(self)
-	else:
-		# GameRuntime._ready() 尚未完成，延迟重试
-		call_deferred("_register_with_world_runtime")
+	var runtime := _get_world_runtime()
+	if runtime and is_inside_tree() and not is_queued_for_deletion():
+		_registered_world = runtime
+		runtime.register_object(self)
 
 
 ## 通过 GameRuntime.instance 获取 WorldRuntime（不再硬编码路径）
 func _get_world_runtime() -> WorldRuntime:
-	var gr := GameRuntime.instance
-	if gr:
-		return gr.get_world_runtime()
-	return null
+	var runtime := RuntimeRegistration.runtime_for(self)
+	return runtime.get_world_runtime() if runtime else null
 
 
 func _restore_collision() -> void:

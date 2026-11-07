@@ -180,10 +180,16 @@ func _get_skill_for_source(source: String) -> SkillData:
 			return inst.data if inst else null
 
 func _cast_source(source: String, context: CastContext = null) -> void:
+	var skill := _get_skill_for_source(source)
+	if not skill or (context and context.skill and context.skill != skill):
+		casting.cancel_source(source)
+		return
 	if not context:
-		context = CastContext.simple(player, player.get_mouse_direction(), _get_skill_for_source(source))
-		context.empower = Input.is_key_pressed(KEY_SHIFT)
+		context = CastContext.simple(player, player.get_mouse_direction(), skill)
 	if casting._charge_skill and casting._charge_source_matches(source):
+		if casting._charge_skill != skill:
+			casting.cancel_source(source)
+			return
 		context.charge_power = casting._charge_power
 		casting._cancel_charge()
 	player.skill_manager.use_source(source, player, context)
@@ -209,11 +215,20 @@ func _try_interact() -> void:
 				var ev := CombatEvent.create(CombatEvent.Type.ON_INTERACT, player, nearest)
 				CombatEventBus.instance.emit(ev)
 
-func _input(event: InputEvent) -> void:
-	if event is InputEventMouseButton:
-		if (event.button_index == MOUSE_BUTTON_WHEEL_UP or event.button_index == MOUSE_BUTTON_WHEEL_DOWN) and event.pressed:
-			if casting.aiming_sources.size() > 0:
-				casting.cancel_aim = true
+func _unhandled_input(event: InputEvent) -> void:
+	if player.ui_blocked or casting.aiming_sources.is_empty():
+		return
+	if not event is InputEventMouseButton or not event.pressed:
+		return
+	if event.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
+		casting.cancel_all()
+		get_viewport().set_input_as_handled()
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_WINDOW_FOCUS_OUT and is_instance_valid(player) and player.is_node_ready():
+		player.cancel_active_input("窗口失焦：动作取消")
+
 
 func interaction_target(refresh := false) -> Node2D:
 	var frame := Engine.get_physics_frames()

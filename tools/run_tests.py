@@ -68,11 +68,15 @@ def main():
         workspace = logs / name
         workspace.mkdir()
         env = os.environ.copy()
-        for kind in ["DATA", "CONFIG", "CACHE"]:
-            env[f"XDG_{kind}_HOME"] = str(workspace / kind.lower())
+        if os.name == "nt":
+            env["APPDATA"] = str(workspace / "roaming")
+            env["LOCALAPPDATA"] = str(workspace / "local")
+        else:
+            for kind in ["DATA", "CONFIG", "CACHE"]:
+                env[f"XDG_{kind}_HOME"] = str(workspace / kind.lower())
         started = time.monotonic()
         path = logs / f"{name}.log"
-        with path.open("w") as output_file:
+        with path.open("w", encoding="utf-8") as output_file:
             try:
                 result = subprocess.run(
                     [godot, "--headless", "--path", str(ROOT), *options],
@@ -83,7 +87,7 @@ def main():
             except subprocess.TimeoutExpired:
                 output_file.write(f"\nERROR: timeout after {args.timeout} seconds\n")
                 code = -1
-        output = path.read_text()
+        output = path.read_text(encoding="utf-8", errors="replace")
         good = code == 0 and not DIAGNOSTIC.search(output)
         print(f"{'PASS' if good else 'FAIL'} {name} ({time.monotonic() - started:.1f}s)" +
               (f" — {path}" if not good else ""), flush=True)

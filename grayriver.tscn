@@ -69,7 +69,8 @@ script = ExtResource("6_efxa6")
 [node name="InputSetup" type="Node" parent="." unique_id=2019032865]
 script = SubResource("GDScript_272bh")
 
-[node name="HUDLayer" parent="." unique_id=1720897277 instance=ExtResource("5_7mycd")]
+[node name="HUDLayer" parent="." unique_id=1720897277 node_paths=PackedStringArray("player") instance=ExtResource("5_7mycd")]
+player = NodePath("../Player")
 
 [node name="GameRuntime" type="Node" parent="." unique_id=2108780999]
 script = ExtResource("8_dg77c")

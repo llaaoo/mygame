@@ -87,7 +87,7 @@ func get_slot(index: int) -> Dictionary:
 		if index>=0 and index<rows.size(): return {"item":store.definitions.get(rows[index].definition),"quantity":rows[index].quantity,"uid":rows[index].uid}
 		return {"item":null,"quantity":0}
 	if index >= 0 and index < capacity:
-		return _slots[index]
+		return _slots[index].duplicate()
 	return {"item": null, "quantity": 0}
 
 
@@ -104,10 +104,7 @@ func get_item_count(item: ItemData) -> int:
 ## 设置指定槽位（用于拖拽交换）
 func set_slot(index: int, item: ItemData, quantity: int) -> void:
 	if store:
-		var existing:=get_slot(index)
-		if existing.item: store.remove_from(container_id,existing.item.id,existing.quantity)
-		if item: add_item(item,quantity)
-		return
+		return # Physical inventories change by UID through InventoryService.
 	if index >= 0 and index < capacity:
 		_slots[index] = {"item": item, "quantity": quantity}
 
@@ -139,9 +136,7 @@ func bind_container(service: InventoryService, id: String) -> void:
 
 func swap_slots(a: int,b: int) -> void:
 	if store:
-		var items: Array=store.containers[container_id].items
-		if a>=0 and b>=0 and a<items.size() and b<items.size():
-			var old=items[a]; items[a]=items[b]; items[b]=old
+		store.swap_slots(container_id, a, b)
 		return
 	if a>=0 and b>=0 and a<_slots.size() and b<_slots.size():
 		var old=_slots[a]; _slots[a]=_slots[b]; _slots[b]=old

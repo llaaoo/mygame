@@ -23,6 +23,14 @@ var last_message := ""
 var _message_remaining := 0.0
 var _recovery := 0.0
 var _committing := false
+var _manager: SkillManager
+var _owner_actor: Node2D
+
+
+func setup(manager: SkillManager, actor: Node2D) -> void:
+	_manager = manager
+	_owner_actor = actor
+
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_PAUSABLE
@@ -50,7 +58,7 @@ func live_fields() -> Array[FireSigil]:
 
 func build_plan(skill: SkillData, actor: Node2D, empower: bool = false) -> CastPlan:
 	var operation:=not skill.operation_id.is_empty()
-	var primary: Dictionary=supplies.operation_plan(skill,get_parent(),null,false) if operation else {}
+	var primary := supplies.operation_plan(skill, _manager, null, false) if operation else {}
 	var basis: SkillData=primary.skill if operation else skill
 	if operation:
 		basis=basis.create_runtime_variant()
@@ -82,7 +90,7 @@ func build_plan(skill: SkillData, actor: Node2D, empower: bool = false) -> CastP
 	result.cooldown = 0.0
 	result.preparation = 0.0
 	result.field_bonus = 0.0
-	result.action_cooldown = get_parent().effective_cooldown(skill, actor, skill.cooldown)
+	result.action_cooldown = _manager.effective_cooldown(skill, actor, skill.cooldown)
 	result.signature = [["action_cooldown", result.action_cooldown]]
 	if operation:
 		result.signature.append(["payload",medium.id if medium else "",supplies.prepared_uids.get(skill.get_id(),"")])
@@ -127,7 +135,7 @@ func build_plan(skill: SkillData, actor: Node2D, empower: bool = false) -> CastP
 			elif not component.substitute_material.is_empty():
 				condition = supplies.title(component.substitute_material) + "×1替代地面（不附加投射物改造）"
 			result.explanation.append(CastExplanationStep.new("combination", component.rule_id, condition + " → " + component.skill.display_name))
-		var material := supplies.plan(skill, component.skill, i == 0, component.substitute_material,get_parent())
+		var material := supplies.plan(skill, component.skill, i == 0, component.substitute_material, _manager)
 		if not skill.operation_id.is_empty():
 			result.operation_reason=str(material.get("reason",""))
 			result.modifier_id=str(material.get("modifier_id",""))
@@ -175,8 +183,8 @@ func build_plan(skill: SkillData, actor: Node2D, empower: bool = false) -> CastP
 				var title: String = {"echo_ready": "回响印记", "resonant_guard": "共鸣护盾", "soul_charge": "蕴魂1层"}.get(component.status_id, component.status_id)
 				if title not in result.consumed_boons:
 					result.consumed_boons.append(title)
-		component.cost = get_parent().effective_mana_cost(component.skill, actor, int(component.cost) + int(material.extra_mana) + boon_cost + infusion_cost)
-		component.cooldown = get_parent().effective_cooldown(component.skill, actor, component.cooldown)
+		component.cost = _manager.effective_mana_cost(component.skill, actor, int(component.cost) + int(material.extra_mana) + boon_cost + infusion_cost)
+		component.cooldown = _manager.effective_cooldown(component.skill, actor, component.cooldown)
 		component.material_costs = material.costs
 		component.material_id = material.material_id
 		component.field_bonus = material.field_bonus
@@ -274,13 +282,15 @@ func preview(skill: SkillData, actor: Node2D, empower: bool = false) -> CastPlan
 	if not supplies.can_pay_combat(result.material_costs):
 		result.reason = "施法材料不足：" + supplies.describe_cost(result.material_costs)
 	if not result.operation_reason.is_empty(): result.reason=result.operation_reason
-	if not get_parent().can_act(actor): result.reason="麻痹中，无法施法"
+	if not _manager.can_act(actor):
+		result.reason = "麻痹中，无法施法"
 	if skill.combination_only: result.reason = "组合结果须通过基础动作与现场条件触发"
 	result.ready = result.reason.is_empty()
 	return result
 
 func start(skill: SkillData, actor: Node2D, context: CastContext, source: String) -> bool:
-	if not skill or not context or not context.has_valid_target() or skill.combination_only or not get_parent().knows_action(skill): return false
+	if not skill or not context or not context.has_valid_target() or skill.combination_only or not _manager.knows_action(skill):
+		return false
 	if get_tree().paused or _dead(actor) or ("ui_blocked" in actor and actor.ui_blocked):
 		return false
 	var plan := preview(skill, actor, context.empower)
@@ -354,8 +364,7 @@ func tick(delta: float) -> void:
 	_message_remaining -= delta
 	if _message_remaining <= 0:
 		last_message = ""
-	var owner_actor := get_parent().get_parent() as Node2D
-	if owner_actor and _dead(owner_actor):
+	if is_instance_valid(_owner_actor) and _dead(_owner_actor):
 		clear_field()
 	if pending.is_empty():
 		return
@@ -363,7 +372,7 @@ func tick(delta: float) -> void:
 		cancel("目标失效：准备取消")
 		return
 	var actor: Node2D = pending.actor
-	var inst: SkillInstance = get_parent().get_instance(pending.source)
+	var inst: SkillInstance = _manager.get_instance(pending.source)
 	if not inst or inst.data != pending.action:
 		cancel("装备已改变")
 		return
@@ -374,8 +383,9 @@ func tick(delta: float) -> void:
 	if not is_instance_valid(pending.scope) or pending.scope != _scope(actor):
 		cancel("区域已改变")
 		return
-	if not get_parent().can_act(actor):
-		cancel("受控：准备取消"); return
+	if not _manager.can_act(actor):
+		cancel("受控：准备取消")
+		return
 	if _health(actor) < pending.health:
 		cancel("受到伤害：准备取消")
 		return
@@ -408,7 +418,7 @@ func _commit() -> void:
 		cancel("铭刻位置被阻挡")
 		return
 	for component in plan.components:
-		if not placement and not _can_execute(component.skill):
+		if not placement and not _manager.executor.can_execute(component.skill, actor):
 			cancel("组合效果不可用，未扣费")
 			return
 	_committing = true
@@ -444,11 +454,11 @@ func _commit() -> void:
 			if component.field != null and component.anchor_to_field:
 				context.target_position = component.field.global_position
 				context.has_target_position = true
-			if not get_parent().executor.execute(component.skill, context):
+			if not _manager.executor.execute(component.skill, context):
 				ok = false
 				break
 		if ok:
-			get_parent().executor.commit_batch(batch, transaction.commit)
+			_manager.executor.commit_batch(batch, transaction.commit)
 	if ok:
 		var action_cooldown: float = plan.action_cooldown
 		cooldowns[plan.action.get_id()] = action_cooldown
@@ -468,20 +478,17 @@ func _commit() -> void:
 			_message(last_message + "\n" + notice)
 			feedback_requested.emit(notice)
 		for component in plan.components:
-			get_parent().skill_used.emit(plan.source, component.skill)
+			_manager.skill_used.emit(plan.source, component.skill)
 	else:
 		transaction.rollback()
 		_message("组合未接受，资源与准备状态已恢复")
 	_committing = false
 	if ok:
-		get_parent().cast_committed.emit(plan)
+		_manager.cast_committed.emit(plan)
 		for component in plan.components:
 			action_committed.emit(component.skill.get_id())
 	else:
 		action_cancelled.emit(last_message)
-
-func _can_execute(skill: SkillData) -> bool:
-	return get_parent().executor.can_execute(skill, get_parent().get_parent())
 
 func _scope(actor: Node2D) -> Node:
 	return CastContext.default_world(actor)

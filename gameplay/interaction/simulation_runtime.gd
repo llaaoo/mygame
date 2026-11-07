@@ -11,6 +11,7 @@ var _surface_manager: SurfaceManager = null
 var _propagation_scheduler: PropagationScheduler = null
 var _respawn_scheduler: RespawnScheduler = null
 var _spatial_index: WorldSpatialIndex = null
+var _command_bus: CommandBus
 
 ## 实体 Tick 注册表 — 所有需要持续 tick 的实体组件在此注册
 ## 实体实现 tick(delta) 方法，SimulationRuntime 统一驱动
@@ -35,13 +36,21 @@ func _ready() -> void:
 	_respawn_scheduler.name = "RespawnScheduler"
 	add_child(_respawn_scheduler)
 
-	# 订阅 CommandBus 命令
-	call_deferred("_subscribe_to_bus")
+
+func _exit_tree() -> void:
+	if not is_instance_valid(_command_bus):
+		return
+	_command_bus.unsubscribe(RuntimeCommand.TYPE_SURFACE_CHANGE, _on_surface_change_command)
+	_command_bus.unsubscribe(RuntimeCommand.TYPE_RESPAWN_REQUEST, _on_respawn_request_command)
+	_command_bus = null
 
 
 ## 注入外部依赖（由 GameRuntime 在初始化时调用）
-func setup_dependencies(spatial_index: WorldSpatialIndex, state_manager: WorldStateManager) -> void:
+func setup_dependencies(spatial_index: WorldSpatialIndex, state_manager: WorldStateManager, bus: CommandBus) -> void:
 	_spatial_index = spatial_index
+	_command_bus = bus
+	bus.subscribe_for_target(RuntimeCommand.TYPE_SURFACE_CHANGE, RuntimeCommand.Target.SIMULATION, _on_surface_change_command)
+	bus.subscribe_for_target(RuntimeCommand.TYPE_RESPAWN_REQUEST, RuntimeCommand.Target.SIMULATION, _on_respawn_request_command)
 
 	# SurfaceManager 作为外观层
 	_surface_manager = SurfaceManager.new()
@@ -131,17 +140,6 @@ func get_surface_manager() -> SurfaceManager:
 
 
 ## ── CommandBus 订阅 ──
-
-func _subscribe_to_bus() -> void:
-	var gr := GameRuntime.instance
-	if not gr:
-		call_deferred("_subscribe_to_bus")
-		return
-	var bus := gr.get_command_bus()
-	if bus:
-		bus.subscribe_for_target(RuntimeCommand.TYPE_SURFACE_CHANGE, RuntimeCommand.Target.SIMULATION, _on_surface_change_command)
-		bus.subscribe_for_target(RuntimeCommand.TYPE_RESPAWN_REQUEST, RuntimeCommand.Target.SIMULATION, _on_respawn_request_command)
-
 
 func _on_respawn_request_command(cmd: RuntimeCommand) -> void:
 	if not _respawn_scheduler:

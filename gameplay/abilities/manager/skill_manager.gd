@@ -4,8 +4,6 @@ extends Node
 ## 左手/右手 + 6 快捷键槽位
 ## 执行逻辑委托给 SkillExecutor
 
-const MAX_SLOTS := 6
-
 ## ── 信号 ──
 signal hand_changed(hand: String)          ## "left" / "right"
 signal slot_changed(slot_index: int)
@@ -14,6 +12,8 @@ signal skill_used(source: String, skill: SkillData)
 signal cast_committed(plan: CastPlan)
 signal skill_upgraded(source: String, skill: SkillData, upgrade_id: String, rank: int)
 
+const MAX_SLOTS := 6
+
 ## ── 核心依赖 ──
 var pool: SkillPool = null                 ## 技能池（ID索引）
 var executor: SkillExecutor = null         ## 执行器（计算+执行）
@@ -21,59 +21,76 @@ var combinations: ConditionalCastController
 var material_operations := false
 var restrict_actions := false
 var known_actions: Dictionary = {}
-
-func knows_action(skill: SkillData) -> bool:
-	if not skill: return false
-	if material_operations:
-		var registry:=SpellOperationCatalog.default_catalog()
-		if registry.canonical(skill.get_id())!=skill.get_id(): return false
-		var operation:=registry.operation(skill.operation_id)
-		if operation:
-			if not restrict_actions or known_actions.has(skill.get_id()): return true
-			for alias in operation.aliases+operation.knowledge_actions:
-				if known_actions.has(alias): return true
-			return false
-	return not restrict_actions or known_actions.has(skill.get_id())
-
-func canonical_action(skill: SkillData) -> SkillData:
-	if not material_operations or not skill: return skill
-	var id:=SpellOperationCatalog.default_catalog().canonical(skill.get_id())
-	return pool.get_skill(id) if pool and pool.get_skill(id) and (id!=skill.get_id() or not pool.get_skill(id).operation_id.is_empty()) else skill
-
-func enable_material_operations() -> void:
-	if material_operations: return
-	material_operations=true
-	if not pool: pool=SkillPool.new()
-	# Skill pools are per actor. Definitions remain shared and immutable.
-	for operation in SpellOperationCatalog.default_catalog().operations:
-		pool.remove_skill(operation.action.get_id())
-		pool.add_skill(operation.action)
-	if left_hand: equip_hand("left",left_hand.data)
-	if right_hand: equip_hand("right",right_hand.data)
-	var seen: Dictionary={}
-	for i in range(MAX_SLOTS):
-		if not _slots[i]: continue
-		var next:=canonical_action(_slots[i].data)
-		if not next.operation_id.is_empty() and seen.has(next.get_id()): _slots[i]=null; slot_changed.emit(i)
-		else:
-			seen[next.get_id()]=true
-			equip_slot(i,next)
-	# A material-free rune still needs an explicit triggering action.
-	for rule in SpellOperationCatalog.default_catalog().rules:
-		combinations.rules.append(rule)
-		combinations.learned_rules[rule.id]=true
-	combinations.rule_index.rebuild(combinations.rules)
-
-## ── 左右手（SkillInstance 包装） ──
 var left_hand: SkillInstance = null
 var right_hand: SkillInstance = null
 
-## ── 快捷键槽位 ──
 var _slots: Array[SkillInstance] = []
-
-## ── 冷却（统一字典，source → remaining） ──
 var _cooldowns: Dictionary = {}
 var _executing := false
+
+
+func knows_action(skill: SkillData) -> bool:
+	if not skill:
+		return false
+	var id := skill.get_id()
+	if material_operations:
+		var registry := SpellOperationCatalog.default_catalog()
+		if registry.canonical(id) != id:
+			return false
+		var operation := registry.operation(skill.operation_id)
+		if operation:
+			if not restrict_actions or known_actions.has(id):
+				return true
+			for alias in operation.aliases + operation.knowledge_actions:
+				if known_actions.has(alias):
+					return true
+			return false
+	return not restrict_actions or known_actions.has(id)
+
+
+func canonical_action(skill: SkillData) -> SkillData:
+	if not material_operations or not skill or not pool:
+		return skill
+	var original_id := skill.get_id()
+	var id := SpellOperationCatalog.default_catalog().canonical(original_id)
+	var candidate := pool.get_skill(id)
+	if candidate and (id != original_id or not candidate.operation_id.is_empty()):
+		return candidate
+	return skill
+
+
+func enable_material_operations() -> void:
+	if material_operations:
+		return
+	material_operations = true
+	if not pool:
+		pool = SkillPool.new()
+	# Skill pools are per actor. Definitions remain shared and immutable.
+	var catalog := SpellOperationCatalog.default_catalog()
+	for operation in catalog.operations:
+		pool.remove_skill(operation.action.get_id())
+		pool.add_skill(operation.action)
+	if left_hand:
+		equip_hand("left", left_hand.data)
+	if right_hand:
+		equip_hand("right", right_hand.data)
+	var seen: Dictionary = {}
+	for i in range(MAX_SLOTS):
+		if not _slots[i]:
+			continue
+		var next := canonical_action(_slots[i].data)
+		var id := next.get_id()
+		if not next.operation_id.is_empty() and seen.has(id):
+			_slots[i] = null
+			slot_changed.emit(i)
+		else:
+			seen[id] = true
+			equip_slot(i, next)
+	# A material-free rune still needs an explicit triggering action.
+	for rule in catalog.rules:
+		combinations.rules.append(rule)
+		combinations.learned_rules[rule.id] = true
+	combinations.rule_index.rebuild(combinations.rules)
 
 
 func _ready() -> void:
@@ -87,6 +104,7 @@ func _ready() -> void:
 		add_child(executor)
 	combinations = ConditionalCastController.new()
 	combinations.name = "ConditionalCasting"
+	combinations.setup(self, get_parent() as Node2D)
 	add_child(combinations)
 	# 禁用独立 _process，改为 SimulationRuntime 统一驱动
 	process_mode = Node.PROCESS_MODE_DISABLED

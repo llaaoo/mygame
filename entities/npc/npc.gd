@@ -1,5 +1,5 @@
-extends CharacterBody2D
 class_name NPC
+extends CharacterBody2D
 ## NPC 基类 — 挂载 StatsComponent 即可拥有属性
 ## 子类化用于商人/任务NPC/训练师等
 

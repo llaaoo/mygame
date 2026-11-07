@@ -1,69 +1,62 @@
 class_name DamageNumberSpawner
 extends Node
-## 伤害数字生成器 — 监听 CombatEventBus，在命中位置生成浮动数字
-##
-## 挂载到场景根节点（get_tree().current_scene）
-## 订阅: ON_DAMAGE → 红色伤害数字, ON_HEAL → 绿色治疗数字
+## Shows combat feedback in the target's world so it leaves with the region.
 
-var _world: Node = null
+var _bus: CombatEventBus
+
+
+func _init(bus: CombatEventBus) -> void:
+	_bus = bus
 
 
 func _ready() -> void:
-	# 伤害数字必须渲染在 CanvasItem 下（Node2D 不能直接挂在纯 Node 下）
-	_world = get_tree().current_scene
-	if not _world:
-		_world = get_parent()
-	call_deferred("_subscribe")
+	_bus.subscribe(CombatEvent.Type.ON_DAMAGE, _on_damage)
+	_bus.subscribe(CombatEvent.Type.ON_HEAL, _on_heal)
+	_bus.subscribe(CombatEvent.Type.ON_DODGE, _on_dodge)
+	_bus.subscribe(CombatEvent.Type.ON_CRIT, _on_crit)
 
 
-func _subscribe() -> void:
-	var bus := CombatEventBus.instance
-	if not bus:
-		await get_tree().process_frame
-		_subscribe()
+func _exit_tree() -> void:
+	if not is_instance_valid(_bus):
 		return
-	bus.subscribe(CombatEvent.Type.ON_DAMAGE, _on_damage)
-	bus.subscribe(CombatEvent.Type.ON_HEAL, _on_heal)
-	# 预留给未来实现
-	bus.subscribe(CombatEvent.Type.ON_DODGE, _on_dodge)
-	bus.subscribe(CombatEvent.Type.ON_CRIT, _on_crit)
-	print("📊 [DamageNumberSpawner] 已订阅 CombatEventBus")
+	_bus.unsubscribe(CombatEvent.Type.ON_DAMAGE, _on_damage)
+	_bus.unsubscribe(CombatEvent.Type.ON_HEAL, _on_heal)
+	_bus.unsubscribe(CombatEvent.Type.ON_DODGE, _on_dodge)
+	_bus.unsubscribe(CombatEvent.Type.ON_CRIT, _on_crit)
 
 
-## ── 事件处理 ──
-
-func _on_damage(ev: CombatEvent) -> void:
-	if not _world or not ev.target or not is_instance_valid(ev.target):
-		return
-	var amount: int = ev.data.get("damage", 0)
-	if amount <= 0:
-		return
-	var pos: Vector2 = ev.target.global_position if "global_position" in ev.target else Vector2.ZERO
-	DamageNumber.spawn_damage(_world, amount, pos, false)
+func _on_damage(event: CombatEvent) -> void:
+	_show_damage(event, false)
 
 
-func _on_heal(ev: CombatEvent) -> void:
-	if not _world or not ev.target or not is_instance_valid(ev.target):
-		return
-	var amount: int = ev.data.get("amount", 0)
-	if amount <= 0:
-		return
-	var pos: Vector2 = ev.target.global_position if "global_position" in ev.target else Vector2.ZERO
-	DamageNumber.spawn_heal(_world, amount, pos)
+func _on_crit(event: CombatEvent) -> void:
+	_show_damage(event, true)
 
 
-func _on_dodge(ev: CombatEvent) -> void:
-	if not _world or not ev.target or not is_instance_valid(ev.target):
-		return
-	var pos: Vector2 = ev.target.global_position if "global_position" in ev.target else Vector2.ZERO
-	DamageNumber.spawn_miss(_world, pos)
+func _show_damage(event: CombatEvent, critical: bool) -> void:
+	var amount: int = event.data.get("damage", 0)
+	var world := _target_world(event.target)
+	if amount > 0 and world:
+		DamageNumber.spawn_damage(world, amount, event.target.global_position, critical)
 
 
-func _on_crit(ev: CombatEvent) -> void:
-	if not _world or not ev.target or not is_instance_valid(ev.target):
-		return
-	var amount: int = ev.data.get("damage", 0)
-	if amount <= 0:
-		return
-	var pos: Vector2 = ev.target.global_position if "global_position" in ev.target else Vector2.ZERO
-	DamageNumber.spawn_damage(_world, amount, pos, true)
+func _on_heal(event: CombatEvent) -> void:
+	var amount: int = event.data.get("amount", 0)
+	var world := _target_world(event.target)
+	if amount > 0 and world:
+		DamageNumber.spawn_heal(world, amount, event.target.global_position)
+
+
+func _on_dodge(event: CombatEvent) -> void:
+	var world := _target_world(event.target)
+	if world:
+		DamageNumber.spawn_miss(world, event.target.global_position)
+
+
+func _target_world(target: Node2D) -> Node:
+	if not is_instance_valid(target) or not target.is_inside_tree():
+		return null
+	var world := WorldScope.resolve(target)
+	if is_instance_valid(world) and world.is_inside_tree() and not world.is_queued_for_deletion():
+		return world
+	return null

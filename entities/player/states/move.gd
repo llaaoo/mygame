@@ -1,15 +1,10 @@
-extends State
 class_name PlayerMoveState
+extends State
 
 
 func physics_update(_delta: float) -> void:
 	if entity.get("ui_blocked"):
 		return
-
-	if entity.cancel_aim:
-		entity.cancel_aim = false
-		entity.aiming_sources.clear()
-		entity.hide_aim()
 
 	var actions: Array = entity.poll_universal_actions()
 

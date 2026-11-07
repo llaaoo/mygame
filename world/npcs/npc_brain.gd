@@ -33,7 +33,9 @@ func make_action(entry: ScheduleEntry) -> Action:
 		return Action.idle()
 	match entry.action_type:
 		"move":
-			return Action.move(MarkerRegistry.get_position(entry.target_marker) - _npc.global_position, _npc)
+			var marker := MarkerRegistry.find_marker(entry.target_marker, WorldScope.resolve(_npc))
+			if marker:
+				return Action.move(marker.global_position - _npc.global_position, _npc)
 		"idle":
 			return Action.idle()
 		"wander":
@@ -56,7 +58,8 @@ func _execute_entry(entry: ScheduleEntry) -> void:
 
 
 func _start_move(marker_id: String) -> void:
-	if marker_id.is_empty():
+	var marker := MarkerRegistry.find_marker(marker_id, WorldScope.resolve(_npc))
+	if not marker:
 		return
 	var agent := _npc.get_node_or_null("NavigationAgent2D") as NavigationAgent2D
 	if not agent:
@@ -65,12 +68,10 @@ func _start_move(marker_id: String) -> void:
 	# 复用已有 MoveToTask，避免重名冲突
 	var task := _npc.get_node_or_null("MoveToTask") as MoveToTask
 	if task:
-		task.target_marker = marker_id
-		task._target_pos = MarkerRegistry.get_position(marker_id)
-		task._started = false
+		task.setup(_npc, agent, marker)
 	else:
 		task = MoveToTask.new()
 		task.name = "MoveToTask"
-		task.setup(_npc, agent, marker_id)
+		task.setup(_npc, agent, marker)
 		_npc.add_child(task)
 	print("🚶 %s → %s" % [_npc.name, marker_id])

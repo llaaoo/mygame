@@ -11,7 +11,6 @@ extends Node2D
 @export var quest_completed_lines: Array[String] = []
 
 var _tick_count: int = 0
-var _dm_cache: Node = null
 
 
 func _ready() -> void:
@@ -24,19 +23,7 @@ func _ready() -> void:
 
 	process_mode = Node.PROCESS_MODE_DISABLED
 	call_deferred("_setup_npc_schedule")
-	call_deferred("_register_with_simulation")
-
-
-func _register_with_simulation() -> void:
-	var gr := GameRuntime.instance
-	if not gr:
-		call_deferred("_register_with_simulation")
-		return
-	var sim := gr.get_simulation_runtime()
-	if not sim:
-		call_deferred("_register_with_simulation")
-		return
-	sim.register_ticker(self)
+	RuntimeRegistration.register_ticker(self)
 
 
 func tick(delta: float) -> void:
@@ -102,27 +89,16 @@ func _npc_display_name() -> String:
 func _show_balloon(lines: Array[String], npc_name: String) -> void:
 	var balloon := DialogueBalloon.new()
 	balloon.name = "DialogueBalloon"
-	get_tree().current_scene.add_child(balloon)
+	balloon.process_mode = Node.PROCESS_MODE_PAUSABLE
+	add_child(balloon)
 	balloon.show_text(lines, npc_name)
 
 
 func _show_from_dialogue_resource() -> void:
-	var dm := _get_dialogue_manager()
-	if not dm or not dialogue_resource:
-		return
-	dm.show_example_dialogue_balloon(dialogue_resource)
-
-
-func _get_dialogue_manager() -> Node:
-	if _dm_cache:
-		return _dm_cache
-	if Engine.has_singleton("DialogueManager"):
-		_dm_cache = Engine.get_singleton("DialogueManager")
-		return _dm_cache
-	_dm_cache = load("res://addons/dialogue_manager/dialogue_manager.gd").new()
-	_dm_cache.name = "DialogueManager"
-	get_tree().current_scene.add_child(_dm_cache)
-	return _dm_cache
+	var resource := dialogue_resource as DialogueResource
+	var manager := Engine.get_singleton("DialogueManager") if Engine.has_singleton("DialogueManager") else null
+	if manager and resource:
+		manager.show_example_dialogue_balloon(resource)
 
 
 func _setup_npc_schedule() -> void:
@@ -174,25 +150,22 @@ func _create_default_schedule() -> NPCSchedule:
 
 
 func _create_test_markers() -> void:
-	if MarkerRegistry.has("forge") and MarkerRegistry.has("bed"):
-		return
+	var scope := WorldScope.resolve(self)
 	var parent := get_parent()
-	if not parent:
+	if not scope or not parent:
 		return
-
-	var forge := WorldMarker.new()
-	forge.name = "ForgeMarker"
-	forge.marker_id = "forge"
-	parent.add_child(forge)
-	forge.position = Vector2(400, -419)
-	MarkerRegistry.register(forge)
-
-	var bed := WorldMarker.new()
-	bed.name = "BedMarker"
-	bed.marker_id = "bed"
-	parent.add_child(bed)
-	bed.position = Vector2(-550, -400)
-	MarkerRegistry.register(bed)
+	if not MarkerRegistry.find_marker("forge", scope):
+		var forge := WorldMarker.new()
+		forge.name = "ForgeMarker"
+		forge.marker_id = "forge"
+		forge.position = Vector2(400, -419)
+		parent.add_child(forge)
+	if not MarkerRegistry.find_marker("bed", scope):
+		var bed := WorldMarker.new()
+		bed.name = "BedMarker"
+		bed.marker_id = "bed"
+		bed.position = Vector2(-550, -400)
+		parent.add_child(bed)
 
 
 func _resolve_dialogue_resource() -> Resource:

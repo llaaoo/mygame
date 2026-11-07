@@ -8,9 +8,13 @@ var active_root: Node2D
 func _init(owner_runtime: GameRuntime) -> void:
 	runtime = owner_runtime
 
-func mount(root: Node2D, parent: Node) -> void:
+func adopt(root: Node2D) -> void:
 	active_root = root
 	root.set_meta("region_generation", generation)
+
+
+func mount(root: Node2D, parent: Node) -> void:
+	adopt(root)
 	parent.add_child(root)
 
 func leave(root: Node, actor: Node = null) -> void:
@@ -27,7 +31,6 @@ func leave(root: Node, actor: Node = null) -> void:
 			root.get_parent().remove_child(root)
 		root.queue_free()
 	active_root = null
-	MarkerRegistry.clear()
 
 func is_current(token: int) -> bool:
 	return token == generation
