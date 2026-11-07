@@ -135,7 +135,8 @@
   "limitations": [
     "No working shared desktop/computer-use tool; native GUI rendered with software OpenGL and PNG review.",
     "One pair of policy-driven trials; no dodge/guard, no equipment.",
-    "Runtime Node script census does not enumerate RefCounted services or unvisited content."
+    "Runtime Node script census does not enumerate RefCounted services or unvisited content.",
+    "Native software GUI logs contain the driver warning: changing V-Sync is unsupported; no script errors. Headless regression diagnostics are checked separately."
   ],
   "return_reload": {
     "same": {
@@ -318,7 +319,8 @@
         2087.8583984375
       ],
       "stamina": 100.0
-    }
+    },
+    "dead_guard_absent": true
   },
   "default_arcane_rune": {
     "casts": [
@@ -435,5 +437,221 @@
       "sap": 9,
       "storm_dust": 3
     }
+  },
+  "clean_archive_graphical_repeats": {
+    "revision": "35726ba895768f926d11bec5dc6c02199e3cc2fa",
+    "seed_sha256": "19729bca0f244f3c19847e6e22fe07d409cfe36382b3928c9623bd7c42261a91",
+    "duels": {
+      "basic": {
+        "seconds": 3.74066636363636,
+        "killed": true,
+        "damage_taken": 13,
+        "player": {
+          "base": false,
+          "damage_taken": 13,
+          "dead": false,
+          "hp": 87,
+          "mode": "attack",
+          "mp": 60,
+          "position": [
+            -2645.3369140625,
+            -1112.65649414062
+          ],
+          "stamina": 52.0
+        },
+        "cast_cost_total": 0,
+        "casts": [],
+        "melee_hit_count": 4,
+        "materials": {
+          "ash": 2,
+          "charcoal": 5,
+          "clean_water": 4,
+          "crystal": 8,
+          "fire_stone": 1,
+          "frost_salt": 2,
+          "grain": 3,
+          "herb": 2,
+          "ration": 2,
+          "resin": 2,
+          "sap": 9,
+          "storm_dust": 3
+        }
+      },
+      "combo": {
+        "seconds": 4.25245633333334,
+        "killed": true,
+        "damage_taken": 0,
+        "player": {
+          "base": false,
+          "damage_taken": 0,
+          "dead": false,
+          "hp": 100,
+          "mode": "idle",
+          "mp": 28,
+          "position": [
+            -2887.39697265625,
+            -1209.88256835938
+          ],
+          "stamina": 100.0
+        },
+        "cast_cost_total": 32,
+        "casts": [
+          {
+            "action": "inscribe",
+            "materials": {
+              "fire_stone": 1
+            },
+            "mp_after": 52,
+            "mp_cost": 8,
+            "position": [
+              -3074.39697265625,
+              -1209.88256835938
+            ],
+            "result": "inscribe",
+            "rule": "",
+            "t": 1.04841555555556
+          },
+          {
+            "action": "ignite",
+            "materials": {},
+            "mp_after": 40,
+            "mp_cost": 12,
+            "position": [
+              -3074.39697265625,
+              -1209.88256835938
+            ],
+            "result": "fireball",
+            "rule": "fire_sigil_fireball",
+            "t": 1.59919033333333
+          },
+          {
+            "action": "ignite",
+            "materials": {},
+            "mp_after": 28,
+            "mp_cost": 12,
+            "position": [
+              -3074.39697265625,
+              -1209.88256835938
+            ],
+            "result": "fireball",
+            "rule": "fire_sigil_fireball",
+            "t": 3.89875033333333
+          }
+        ],
+        "melee_hit_count": 0,
+        "materials": {
+          "ash": 2,
+          "charcoal": 5,
+          "clean_water": 4,
+          "crystal": 8,
+          "frost_salt": 2,
+          "grain": 3,
+          "herb": 2,
+          "ration": 2,
+          "resin": 2,
+          "sap": 9,
+          "storm_dust": 3
+        }
+      }
+    }
+  },
+  "runtime_node_scripts_observed": [
+    "",
+    "res://core/command/command_bus.gd",
+    "res://core/debug/combat_debug_ui.gd",
+    "res://core/event/combat_event_bus.gd",
+    "res://core/game_runtime.gd",
+    "res://core/region_runtime.gd",
+    "res://core/save_manager.gd",
+    "res://core/state/state_machine.gd",
+    "res://entities/components/combat_component.gd",
+    "res://entities/components/health_component.gd",
+    "res://entities/components/mana_component.gd",
+    "res://entities/components/stats_component.gd",
+    "res://entities/enemy/enemy.gd",
+    "res://entities/enemy/enemy_attack_preparation.gd",
+    "res://entities/enemy/enemy_character_status.gd",
+    "res://entities/enemy/enemy_surface_awareness.gd",
+    "res://entities/player/components/player_casting_controller.gd",
+    "res://entities/player/components/player_combat_bindings.gd",
+    "res://entities/player/components/player_field_work.gd",
+    "res://entities/player/components/player_input_controller.gd",
+    "res://entities/player/player.gd",
+    "res://entities/player/states/attack.gd",
+    "res://entities/player/states/dodge.gd",
+    "res://entities/player/states/idle.gd",
+    "res://entities/player/states/move.gd",
+    "res://entities/player/states/skill.gd",
+    "res://entities/player/states/work.gd",
+    "res://gameplay/abilities/combinations/conditional_cast_controller.gd",
+    "res://gameplay/abilities/fields/field_placement_preview.gd",
+    "res://gameplay/abilities/fields/preparation_overlay.gd",
+    "res://gameplay/abilities/fields/soul_remnant.gd",
+    "res://gameplay/abilities/manager/skill_manager.gd",
+    "res://gameplay/abilities/manager/skill_mastery_manager.gd",
+    "res://gameplay/abilities/manager/summon_manager.gd",
+    "res://gameplay/abilities/runtime/projectile.gd",
+    "res://gameplay/abilities/runtime/skill_executor.gd",
+    "res://gameplay/abilities/runtime/skill_synergy_resolver.gd",
+    "res://gameplay/characters/actor_equipment_visual.gd",
+    "res://gameplay/combat/combat_executor.gd",
+    "res://gameplay/combat/on_hit/element_hit_bindings.gd",
+    "res://gameplay/exploration/element_knowledge.gd",
+    "res://gameplay/exploration/element_trial_recorder.gd",
+    "res://gameplay/exploration/expedition_ui.gd",
+    "res://gameplay/exploration/exploration_interactable.gd",
+    "res://gameplay/exploration/spell_world_object.gd",
+    "res://gameplay/exploration/surface_overlay.gd",
+    "res://gameplay/exploration/surface_valve.gd",
+    "res://gameplay/exploration/survival/survival_service.gd",
+    "res://gameplay/foundation/actor_action_controller.gd",
+    "res://gameplay/foundation/actor_components.gd",
+    "res://gameplay/foundation/campaign_session.gd",
+    "res://gameplay/foundation/interaction_provider.gd",
+    "res://gameplay/foundation/service_npc.gd",
+    "res://gameplay/foundation/stability_component.gd",
+    "res://gameplay/foundation/stamina_component.gd",
+    "res://gameplay/foundation/ui/actor_status_view.gd",
+    "res://gameplay/frontier/frontier_hud.gd",
+    "res://gameplay/frontier/frontier_scenery.gd",
+    "res://gameplay/frontier/grayriver_game.gd",
+    "res://gameplay/frontier/grayriver_loot_corpse.gd",
+    "res://gameplay/frontier/grayriver_terrain.gd",
+    "res://gameplay/interaction/propagation_scheduler.gd",
+    "res://gameplay/interaction/respawn_scheduler.gd",
+    "res://gameplay/interaction/simulation_runtime.gd",
+    "res://gameplay/interaction/surface_manager.gd",
+    "res://gameplay/interaction/surface_scheduler.gd",
+    "res://gameplay/inventory/equipment_manager.gd",
+    "res://gameplay/items/item_action_controller.gd",
+    "res://gameplay/items/spray_channel.gd",
+    "res://gameplay/presentation/spell_visual.gd",
+    "res://gameplay/status/buff_manager.gd",
+    "res://ui/boss_hp_bar.gd",
+    "res://ui/buff_status_ui.gd",
+    "res://ui/damage_number.gd",
+    "res://ui/damage_number_spawner.gd",
+    "res://ui/field_work_panel.gd",
+    "res://ui/hud.gd",
+    "res://ui/inventory_panel.gd",
+    "res://ui/skill_bar.gd",
+    "res://ui/skill_pool_ui.gd",
+    "res://ui/slot_button.gd",
+    "res://ui/summon_status_ui.gd",
+    "res://world/object/interactable.gd",
+    "res://world/object/map_object.gd",
+    "res://world/state/world_state_manager.gd",
+    "res://world/time/world_time.gd",
+    "res://world/world_runtime.gd"
+  ],
+  "clean_archive_regression": {
+    "revision": "35726ba895768f926d11bec5dc6c02199e3cc2fa",
+    "command": "python3 tools/run_tests.py --suite all",
+    "cold_import": true,
+    "passed": 69,
+    "total": 69,
+    "exit_code": 0,
+    "log_sha256": "32ddf21c0b5424264af0f2efc9d164cb2387aff005e9cc0d2ae091cfe29ec883",
+    "log": "grayriver_first30_regression.txt"
   }
 }

@@ -9,7 +9,7 @@
 ## 文档层级
 
 ```
-PROJECT_ANALYSIS.md (完整项目分析 — 架构评估 + 文件功能清单 + 迭代建议)
+PROJECT_ANALYSIS.md (历史项目分析 — 当前使用情况见PROJECT_USAGE_AUDIT.md)
     │
     ├── PROJECT_IMPROVEMENTS.md (当前改进点 — 已完成链路 + 剩余工作)
     ├── CODE_REVIEW_2026_11_04.md (当前代码审查 — 已复现边界问题、重构顺序与验收)
@@ -53,7 +53,7 @@ PROJECT_ANALYSIS.md (完整项目分析 — 架构评估 + 文件功能清单 + 
 
 > 当前设计重点：探索获得知识、法术组合规则、技能与装备；自由搭配；世界反馈；优先完善条件组合。后续玩法规划先阅读 `EXPLORATION_COMBINATION_DESIGN.md`。该文档包含已落地的MVP方向与后续产品规划；实现范围见MVP_RELEASE，当前架构以ARCHITECTURE和REFACTOR_PROGRESS为准。旧房间制roguelite保留作战斗试验场。
 
-> 当前开发顺序：技能用途与世界条件 → Buff层数、防护与兑现 → 装备构筑。魂术、层数消费、净化/保护、4件固定装备已接通，详见`SPELL_BUFF_EQUIPMENT_ITERATION.md`；生存指标与完整装备经济仍属后续产品范围。
+> 历史阶段顺序：技能用途与世界条件 → Buff层数、防护与兑现 → 装备构筑。魂术、层数消费、净化/保护、4件固定装备已接通，详见`SPELL_BUFF_EQUIPMENT_ITERATION.md`；该阶段之后生存与真实库存已继续接入，当前范围见RPG_FOUNDATION、ITEM_ACTIONS_AND_REACTIONS及PROJECT_USAGE_AUDIT。
 
 > 默认入口已更新为 `grayriver.tscn`（灰河谷），原 `mvp.tscn` 保留为监狱验证场；灰河谷交付与验证边界见 `GRAYRIVER_FRONTIER.md`、`GRAYRIVER_PLAYTEST.md`，原验证场见 `MVP_RELEASE.md`；旧 `main.tscn` 保留为回归场景。启动与操作见根目录 README。
 
