@@ -279,7 +279,7 @@ func _use_item(id: String,aim: bool) -> void:
 	if not game.player.actor_context.item_actions.begin(id,aim,game.player.get_mouse_direction()): game.ui.notify("无法使用：检查口袋、武器和当前动作。")
 func _bind_item(index: int,id: String,method: String) -> void:
 	game.session.bind_belt(index,id,method)
-	game.ui.notify("快捷物品已绑定。投掷时按住瞄准，松开出手；右键取消。")
+	game.ui.notify("已绑定到"+["7","8","9","0"][index]+"："+game.survival.supplies.title(id)+("。按住瞄准，松开出手；右键取消。" if method=="throw" else "。"))
 
 func _prepare_sprayer(id: String,uid: String) -> void:
 	if game.session.prepare_sprayer("player",id,uid): game.ui.notify("已选择这瓶喷剂；编组喷洒动作后按住对应技能键使用。")

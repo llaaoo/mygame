@@ -23,7 +23,7 @@ func start(action: SkillData,binding: String,aim: Vector2) -> bool:
 	uid=preview.instance_costs[0].uid
 	skill=action; source=binding; payload_id=str(manager.combinations.supplies.selected.get(action.get_id(),""))
 	direction=aim.normalized() if aim.length_squared()>.01 else context.actions.facing
-	timer=.25; hp=context.actor.get_node("HealthComponent").hp; generation=context.region.generation; operation_id=context.actions.operation_id
+	timer=preview.preparation; hp=context.actor.get_node("HealthComponent").hp; generation=context.region.generation; operation_id=context.actions.operation_id
 	active=true; context.actions.mode="spray"; context.actions.remaining=100000
 	context.actions.guarding=false
 	queue_redraw(); return true

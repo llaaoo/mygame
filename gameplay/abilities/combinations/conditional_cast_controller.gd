@@ -202,7 +202,9 @@ func build_plan(skill: SkillData, actor: Node2D, empower: bool = false) -> CastP
 			shape = "；" + component.skill.buff_resource.describe()
 			if component.skill.buff_duration > 0: shape += "；本次持续%.1f秒" % component.skill.buff_duration
 		var affinity := ElementCatalog.affinity_label(component.skill.tags)
-		if component.skill.skill_type == SkillData.SkillType.AOE:
+		if "spray" in component.skill.tags:
+			shape="，前方120、60°锥形；按住持续，松开即停"
+		elif component.skill.skill_type == SkillData.SkillType.AOE:
 			shape = "，半径%.0f" % (component.skill.aoe_visual.radius if component.skill.aoe_visual else component.skill.aoe_radius)
 		elif component.skill.skill_type == SkillData.SkillType.PROJECTILE:
 			shape = "，%d发、额外穿透%d" % [component.skill.projectile_count, component.skill.projectile_pierce]
@@ -211,7 +213,10 @@ func build_plan(skill: SkillData, actor: Node2D, empower: bool = false) -> CastP
 		result.explanation.append(CastExplanationStep.new("survival", "fatigue", "疲劳：准备时间×%.2f，休整或醒神茶可缓解" % fatigue_factor))
 	if stats and stats.preparation_multiplier < 1.0:
 		result.explanation.append(CastExplanationStep.new("attributes", "agility", "敏捷%d：准备时间×%.2f，另与装备准备修正相乘" % [stats.effective_stat("agility"), stats.preparation_multiplier]))
-	result.explanation.append(CastExplanationStep.new("cost", "total", "总计%d MP；准备%.2f秒；%s" % [result.cost, result.preparation, supplies.describe_cost(result.material_costs) if not result.material_costs.is_empty() else "无材料消耗"]))
+	var material_label:=supplies.describe_cost(result.material_costs) if not result.material_costs.is_empty() else "无材料消耗"
+	if not result.instance_costs.is_empty():
+		material_label="每次脉冲消费所选瓶内1剂"
+	result.explanation.append(CastExplanationStep.new("cost", "total", "总计%d MP；准备%.2f秒；%s" % [result.cost, result.preparation, material_label]))
 	return result
 
 func boon_hint(plan: CastPlan) -> String:
@@ -503,6 +508,7 @@ func _message(message: String) -> void:
 
 func effect_scope(skill: SkillData) -> String:
 	if not skill.field_type.is_empty(): return "脚下布阵"
+	if "spray" in skill.tags: return "前方120、60°锥形 · 按住持续"
 	match skill.skill_type:
 		SkillData.SkillType.PROJECTILE: return "远程投射物"
 		SkillData.SkillType.AOE:
