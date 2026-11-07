@@ -43,7 +43,10 @@
             "fire_rag",
             "oil_bottle",
             "water_sprayer",
-            "resin_sprayer"
+            "resin_sprayer",
+            "arrows",
+            "guard_tonic",
+            "clear_tonic"
           ]
         },
         {
@@ -287,10 +290,11 @@
             -3800,
             2200
           ],
-          "text": "布料可以加工涂附抹布；完成使用后才消耗。",
+          "text": "布料可以加工涂附抹布；完成使用后才消耗。 包裹里还有一本贯步刺武技书；放进口袋后使用，学会后可在K武技页绑定快捷键。",
           "requires_clear": false,
           "materials": {
-            "cloth": 4
+            "cloth": 4,
+            "book_spear_thrust": 1
           }
         }
       ],
@@ -414,6 +418,47 @@
           "required_claims": [
             "river.north_beacon"
           ]
+        },
+        {
+          "id": "resource.fallen_wood",
+          "title": "林缘倒木：炭材与树液",
+          "pos": [
+            -3450,
+            600
+          ],
+          "kind": "forage",
+          "harvest": {
+            "charcoal": 2,
+            "sap": 2
+          },
+          "regeneration_hours": 6
+        },
+        {
+          "id": "resource.crystal_outcrop",
+          "title": "矿道外露晶脉",
+          "pos": [
+            -1800,
+            -2400
+          ],
+          "kind": "forage",
+          "harvest": {
+            "crystal": 2,
+            "metal_scrap": 2
+          },
+          "regeneration_hours": 8
+        },
+        {
+          "id": "resource.frost_deposit",
+          "title": "湖岸霜盐结晶",
+          "pos": [
+            600,
+            -2300
+          ],
+          "kind": "forage",
+          "harvest": {
+            "frost_salt": 2
+          },
+          "regeneration_hours": 8
         }
       ],
       "patches": [

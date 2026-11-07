@@ -5,6 +5,7 @@ var hub: FrontierHub
 var guidance: FrontierGuidance
 var stories: GrayriverStories
 var frontier_hud: FrontierHUD
+var town_services: TownServices
 var loot: GrayriverLoot
 var definition: Dictionary
 var terrain: GrayriverTerrain
@@ -18,6 +19,7 @@ func _ready() -> void:
 	guidance=FrontierGuidance.new(self)
 	stories=GrayriverStories.new(self)
 	loot = GrayriverLoot.new(self)
+	town_services=TownServices.new(self)
 	definition = GrayriverDefinition.data()
 	catalog = ExplorationContentCatalog.new(GrayriverDefinition.build())
 	save_slot = 3
@@ -36,8 +38,10 @@ func _build_camp() -> void:
 	_add_interaction("镇中篝火：休整与粗食",Vector2(-3500,2100),Callable(),"mechanism")
 	var rest := region_root.get_child(region_root.get_child_count()-1) as ExplorationInteractable
 	survival.mount_rest(rest)
-	_mount_trainer(Vector2(-3300,2350),_show_training)
-	_add_interaction("施法工作台：加工已学配方",Vector2(-3100,1800),workshop.show_crafts,"mechanism")
+	_mount_trainer(Vector2(-3300,2350),town_services.show_training)
+	town_services.ensure_stock()
+	_add_interaction("整修铺：交易、拆解与强化",TownServices.POINT,town_services.show,"mechanism")
+	_add_interaction("镇中工作台：制造与炼制",Vector2(-3100,1800),workshop.show_crafts,"mechanism")
 	_add_interaction("艾妲的委托板",Vector2(-2900,2200),_show_quests,"person")
 	_add_interaction("手动整备装备",Vector2(-3300,2100),equipment_service.show_equipment,"mechanism")
 	var layout := current_data.make_layout()

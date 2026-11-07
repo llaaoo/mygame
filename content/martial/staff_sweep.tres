@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="MartialTechnique" format=3]
+[ext_resource type="Script" path="res://gameplay/martial/martial_technique.gd" id="tech"]
+[ext_resource type="Script" path="res://gameplay/foundation/data/attack_profile.gd" id="attack"]
+[sub_resource type="Resource" id="Attack"]
+script = ExtResource("attack")
+windup = 0.55
+active = 0.22
+recovery = 0.6
+reach = 92
+angle_degrees = 175
+stamina_cost = 30
+impact = 65
+damage_multiplier = 1.1
+[resource]
+script = ExtResource("tech")
+id = "staff_sweep"
+title = "压阵横扫"
+weapon_type = "staff"
+description = "宽扇面击退压制，起手慢，适合惩罚近身围堵；消耗30体力。"
+profile = SubResource("Attack")

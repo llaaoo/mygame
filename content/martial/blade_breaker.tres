@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="MartialTechnique" format=3]
+[ext_resource type="Script" path="res://gameplay/martial/martial_technique.gd" id="tech"]
+[ext_resource type="Script" path="res://gameplay/foundation/data/attack_profile.gd" id="attack"]
+[sub_resource type="Resource" id="Attack"]
+script = ExtResource("attack")
+windup = 0.46
+active = 0.15
+recovery = 0.6
+reach = 66
+angle_degrees = 90
+stamina_cost = 26
+impact = 70
+damage_multiplier = 1.35
+[resource]
+script = ExtResource("tech")
+id = "blade_breaker"
+title = "破势斩"
+weapon_type = "blade"
+description = "较长起手，稳定性打击高，适合抓格挡和敌人收招；消耗26体力，不花MP。"
+profile = SubResource("Attack")

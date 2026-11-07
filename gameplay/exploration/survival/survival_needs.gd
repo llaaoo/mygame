@@ -59,7 +59,7 @@ static func valid(data: Variant) -> bool:
 	if data.get("meal", "") not in ["", "ration", "broth"] or not data.get("harvests", {}) is Dictionary: return false
 	for id in data.get("harvests", {}):
 		var value: Variant = data.harvests[id]
-		if not id is String or typeof(value) not in [TYPE_FLOAT, TYPE_INT] or not is_finite(float(value)) or float(value) < 0 or float(value) > 240: return false
+		if not id is String or typeof(value) not in [TYPE_FLOAT, TYPE_INT] or not is_finite(float(value)) or float(value) < 0 or float(value) > 86400: return false
 	for key in ["hp", "mp"]:
 		if data.has(key) and (not data[key] is int or int(data[key]) < 0): return false
 	return true

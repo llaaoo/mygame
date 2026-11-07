@@ -47,7 +47,7 @@ func run() -> void:
 	buffs.clear_all(); supplies.select_payload(focus,"attune_fire",manager)
 	check(cast(manager,1,actor) and field.charges==charges-1 and buffs.has_buff("ember_focus"),"Explicit fire attunement did not consume its actual rune charge")
 	buffs.clear_all(); supplies.select_payload(extract,"extract_fire",manager)
-	check(cast(manager,2,actor) and field.charges==0 and buffs.get_stack_count("stored_fire")==1,"Rune extraction did not exchange one actual charge for temporary energy")
+	check(cast(manager,2,actor) and field.charges==charges-2 and buffs.get_stack_count("stored_fire")==1,"Rune extraction did not exchange one actual charge for temporary energy")
 	check(store.count("player","fire_stone")==3,"Extracting rune energy manufactured a permanent material")
 	controller.clear_field(); controller.cooldowns.clear()
 	var ordinary:=controller.preview(manager.get_slot(3).data,actor)

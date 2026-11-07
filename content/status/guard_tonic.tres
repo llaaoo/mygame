@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="Buff" format=3]
+[ext_resource type="Script" path="res://gameplay/status/buff.gd" id="buff"]
+[resource]
+script = ExtResource("buff")
+buff_id = "guard_tonic"
+status_id = "guard_tonic"
+display_name = "石肤药效"
+exclusive_group = "tonic"
+persistent = true
+duration = 90.0
+stat_modifiers = {}
+damage_taken_multiplier = 0.85

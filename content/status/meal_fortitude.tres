@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="Buff" format=3]
+[ext_resource type="Script" path="res://gameplay/status/buff.gd" id="buff"]
+[resource]
+script = ExtResource("buff")
+buff_id = "meal_fortitude"
+status_id = "meal_fortitude"
+display_name = "饱食耐力"
+exclusive_group = "meal_fortitude"
+persistent = true
+duration = 180.0
+stat_modifiers = {"endurance":2}

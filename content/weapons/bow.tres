@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="WeaponMoveset" format=3]
+[ext_resource type="Script" path="res://gameplay/foundation/data/weapon_moveset.gd" id="moves"]
+[ext_resource type="Script" path="res://gameplay/foundation/data/attack_profile.gd" id="attack"]
+[sub_resource type="Resource" id="stroke0"]
+script = ExtResource("attack")
+windup = 0.48
+active = 0.08
+recovery = 0.42
+reach = 520
+angle_degrees = 12
+stamina_cost = 13
+impact = 12
+damage_multiplier = 1.0
+ammo_id = "arrow"
+projectile_speed = 640.0
+[resource]
+script = ExtResource("moves")
+weapon_type = "bow"
+attacks = [SubResource("stroke0")]

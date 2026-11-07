@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="CraftingRecipe" format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/materials/crafting_recipe.gd" id="recipe"]
+[resource]
+script = ExtResource("recipe")
+id = "arrows"
+inputs = {"charcoal": 1, "metal_scrap": 1}
+output_id = "arrow"
+output_count = 6

@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/item_data.gd" id="item"]
+[ext_resource type="Script" path="res://gameplay/items/item_use_definition.gd" id="use"]
+[ext_resource type="Script" path="res://gameplay/abilities/operations/spell_payload_data.gd" id="payload"]
+[ext_resource type="Resource" path="res://content/status/guard_tonic.tres" id="buff"]
+[sub_resource type="Resource" id="Payload"]
+script = ExtResource("payload")
+id = "guard_tonic"
+title = "石肤药剂"
+statuses = [ExtResource("buff")]
+[sub_resource type="Resource" id="Use"]
+script = ExtResource("use")
+id = "guard_tonic"
+kind = 3
+payload = SubResource("Payload")
+duration = 1.0
+[resource]
+script = ExtResource("item")
+id = "guard_tonic"
+display_name = "石肤药剂"
+description = "1秒饮用，90秒受到伤害×0.85。同类药剂互相替换；不能叠加减伤。"
+weight = 0.3
+stackable = true
+max_stack = 99
+sell_price = 4
+use_profile = SubResource("Use")

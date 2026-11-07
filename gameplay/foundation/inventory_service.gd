@@ -354,6 +354,7 @@ func exchange(a: String,b: String,costs: Dictionary,returns: Dictionary) -> Oper
 		if remaining>0: return OperationResult.reject("capacity")
 	var committed:=scratch.snapshot()
 	begin_batch()
+	discard_actor_containers(a); discard_actor_containers(b)
 	restore_actor(a,committed); restore_actor(b,committed)
 	for id in committed.containers: _touch(id)
 	for row in outgoing: _publish("item_transferred",_containers[row.source].owner,{"from":row.source,"to_actor":row.actor,"definition":row.key,"quantity":row.quantity,"uid":row.uid})
@@ -485,6 +486,8 @@ static func valid_snapshot(data: Variant) -> bool:
 				if typeof(n) not in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(n)) or absf(float(n))>100000: return false
 		for raw in c.items:
 			if not raw is Dictionary or not raw.get("uid") is String or not raw.uid.begins_with("item.") or not raw.uid.trim_prefix("item.").is_valid_int() or seen.has(raw.uid) or not raw.get("definition") is String or raw.definition.is_empty() or not raw.get("quantity") is int or raw.quantity<1 or raw.quantity>1000000 or not raw.get("properties",{}) is Dictionary: return false
+			var instance_properties: Dictionary=raw.get("properties",{})
+			if instance_properties.has("upgrade_level") and (not instance_properties.upgrade_level is int or instance_properties.upgrade_level<0 or instance_properties.upgrade_level>3): return false
 			var number:=int(raw.uid.trim_prefix("item."))
 			if number<1: return false
 			highest=maxi(highest,number)
@@ -536,6 +539,7 @@ func valid_definitions(data: Dictionary) -> bool:
 			var definition:=definitions.get(row.definition) as ItemData
 			if not definition or row.quantity>_stack_limit(row.definition): return false
 			var props: Dictionary=row.get("properties",{})
+			if props.has("upgrade_level") and not definition is EquipmentData: return false
 			if definition.use_profile and definition.use_profile.kind==ItemUseDefinition.Kind.SPRAY:
 				if not props.get("doses") is int or props.doses<1 or props.doses>definition.use_profile.capacity: return false
 			if props.has("coating"):
@@ -587,8 +591,78 @@ func state_text(uid: String) -> String:
 	var entry:=_instance(uid)
 	if not entry: return ""
 	if entry.properties.has("doses"): return "剩余%d剂"%int(entry.properties.doses)
+	var upgrade:="强化 +%d"%int(entry.properties.upgrade_level) if entry.properties.has("upgrade_level") else ""
 	var active:=coating(uid)
 	if active:
 		var definition:=definitions.get(active.id) as ItemData
-		return "%s · 剩余%.0f秒"%[definition.display_name if definition else "涂层",float(entry.properties.coating.expires_at)-clock_seconds]
-	return ""
+		return upgrade+(" · " if not upgrade.is_empty() else "")+"%s · 剩余%.0f秒"%[definition.display_name if definition else "涂层",float(entry.properties.coating.expires_at)-clock_seconds]
+	return upgrade
+
+## A specific instance changes owner, including its coating, doses and upgrade level.
+## Work on a private inventory first; observers see only the final atomic state.
+func trade_instance(buyer: String,seller: String,uid: String,quantity: int,price: int) -> OperationResult:
+	var entry:=item(uid)
+	if buyer==seller or not entry or quantity<=0 or quantity>entry.quantity or price<0 or locate(uid) not in actor_containers(seller): return OperationResult.reject("not_owned")
+	var scratch:=_scratch([buyer,seller])
+	if price>0 and not scratch.exchange(buyer,seller,{"coin":price},{}).accepted: return OperationResult.reject("payment_or_capacity")
+	var moved:=false
+	for destination in scratch.actor_containers(buyer):
+		if definitions[entry.definition_id] is EquipmentData and destination!=buyer+".pack": continue
+		if scratch.commit(scratch.preview(scratch.locate(uid),destination,uid,quantity)).accepted:
+			moved=true; break
+	if not moved: return OperationResult.reject("capacity")
+	_adopt(scratch,[buyer,seller])
+	_publish("trade_committed",buyer,{"partner":seller,"uid":uid,"quantity":quantity,"price":price})
+	return OperationResult.success(quantity)
+
+func dismantle_instance(actor: String,uid: String) -> OperationResult:
+	var entry:=item(uid)
+	if not entry or not definitions.get(entry.definition_id) is EquipmentData or locate(uid) not in actor_containers(actor): return OperationResult.reject("unequip_first")
+	var scratch:=_scratch([actor])
+	var source:=scratch.locate(uid)
+	var actual:=scratch._instance(uid)
+	scratch._containers[source].items.erase(actual); scratch._unindex(actual); scratch._touch(source)
+	var amount:=2+clampi(int(entry.properties.get("upgrade_level",0)),0,3)
+	if scratch.receive(actor,"metal_scrap",amount)!=amount: return OperationResult.reject("capacity")
+	_adopt(scratch,[actor])
+	_publish("equipment_dismantled",actor,{"uid":uid,"scrap":amount})
+	return OperationResult.success(amount)
+
+func upgrade_instance(actor: String,uid: String) -> OperationResult:
+	var entry:=item(uid)
+	if not entry or not definitions.get(entry.definition_id) is EquipmentData or locate(uid) not in actor_containers(actor): return OperationResult.reject("unequip_first")
+	var level:=clampi(int(entry.properties.get("upgrade_level",0)),0,3)
+	if level>=3: return OperationResult.reject("maximum_level")
+	var scratch:=_scratch([actor])
+	if not scratch.pay(actor,{"coin":5*(level+1),"metal_scrap":2*(level+1)}): return OperationResult.reject("materials")
+	var properties:=entry.properties.duplicate(true); properties.upgrade_level=level+1
+	scratch.set_properties(uid,properties)
+	_adopt(scratch,[actor])
+	_publish("equipment_upgraded",actor,{"uid":uid,"level":level+1})
+	return OperationResult.success(level+1)
+
+func equipment_definition(uid: String) -> EquipmentData:
+	var entry:=item(uid)
+	var definition:=definitions.get(entry.definition_id) as EquipmentData if entry else null
+	if not definition: return null
+	var level:=clampi(int(entry.properties.get("upgrade_level",0)),0,3)
+	if level==0: return definition
+	var copy:=definition.duplicate(true) as EquipmentData
+	copy.display_name+=" +%d"%level
+	var key:="attack_damage" if copy.slot_type==EquipmentData.SlotType.RIGHT_HAND else "max_hp"
+	copy.stat_modifiers[key]=float(copy.stat_modifiers.get(key,0))+level*(1 if key=="attack_damage" else 4)
+	return copy
+
+func _scratch(owners: Array) -> InventoryService:
+	var scratch:=InventoryService.new()
+	scratch.rules=rules; scratch.definitions=definitions
+	scratch.restore(snapshot_owners(owners))
+	return scratch
+
+func _adopt(scratch: InventoryService,owners: Array) -> void:
+	var committed:=scratch.snapshot()
+	begin_batch()
+	for owner_id: String in owners: discard_actor_containers(owner_id)
+	for owner_id: String in owners: restore_actor(owner_id,committed)
+	for container_id in committed.containers: _touch(container_id)
+	end_batch()

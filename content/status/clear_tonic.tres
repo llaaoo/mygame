@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Buff" format=3]
+[ext_resource type="Script" path="res://gameplay/status/buff.gd" id="buff"]
+[resource]
+script = ExtResource("buff")
+buff_id = "clear_tonic"
+status_id = "clear_tonic"
+display_name = "醒神药效"
+exclusive_group = "tonic"
+persistent = true
+duration = 90.0
+stat_modifiers = {}
+status_immunities = Array[String](["poison"])
+cleanse_statuses = Array[String](["poison"])

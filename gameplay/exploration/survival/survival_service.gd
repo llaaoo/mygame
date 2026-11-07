@@ -6,6 +6,7 @@ var needs := SurvivalNeeds.new()
 var _loaded_vitals: Dictionary = {}
 var _awaiting_vitals := false
 var _notice_tier := ""
+var _advancing_rest := false
 var _ui_time := 0.0
 var _save_time := 0.0
 var supplies: CastingSupplies:
@@ -42,7 +43,7 @@ func tick(delta: float) -> void:
 		if tier != _notice_tier:
 			if not _notice_tier.is_empty(): game.ui.notify(status_line() + "\nN查看补给、恢复变化和休整。")
 			_notice_tier = tier
-	if _save_time >= 30:
+	if _save_time >= 30 and not _advancing_rest:
 		_save_time = 0
 		game._queue_save()
 
@@ -153,6 +154,7 @@ func begin_discard() -> void:
 func mount(spec: SurvivalStationData) -> void:
 	var node := game.builder._add_interaction(spec.title, spec.pos, Callable(), "mechanism" if spec.kind in ["cook", "water"] else "note")
 	node.set_meta("survival_station", spec)
+	if spec.kind=="forage": node.harvest_ready_query=harvest_ready.bind(spec.id)
 	node.callback = inspect.bind(node, spec)
 	if spec.kind == "cook":
 		var marker := Label.new()
@@ -170,6 +172,9 @@ func mount_rest(node: ExplorationInteractable) -> void:
 	node.callback = inspect_rest.bind(node)
 
 func inspect_field_rest(node: ExplorationInteractable) -> void:
+	if game.rules.physical_inventory:
+		_open(node,[method("sleep:1","前哨休息1小时 · 烤饼1 / 清水1",2.4,{"ration":1,"clean_water":1})],"野外仅可短休1小时；附近敌人或有害状态会阻止休息。")
+		return
 	_open(node, [method("rest:short", "野外短休3秒：生命+40/法力+30/疲劳-25", 3)], "短休消耗饱食5、饮水10；敌人、移动和其他动作仍会打断。不提供粗食或充分休整。旁边锅位仍需燃料或实际火源。")
 
 func field_rest_available(node: Node2D) -> bool:
@@ -179,7 +184,15 @@ func field_rest_available(node: Node2D) -> bool:
 	return false
 
 func inspect_rest(node: ExplorationInteractable) -> void:
-	_open(node, [method("rest:short", "短休3秒：生命+40/法力+30/疲劳-25", 3), method("rest:full", "充分休整6秒：恢复生命法力/疲劳归零", 6), method("basic", "营地粗食2秒：饱食与饮水至少60", 2)], "短休消耗饱食5、饮水10；充分休整消耗饱食20、饮水25。粗食不产生物品或额外恢复Buff，补给耗尽时仍可整备。")
+	if not game.rules.physical_inventory:
+		_open(node, [method("rest:short", "短休3秒：生命+40/法力+30/疲劳-25", 3), method("rest:full", "充分休整6秒：恢复生命法力/疲劳归零", 6), method("basic", "营地粗食2秒：饱食与饮水至少60", 2)], "旧验证场休整。")
+		return
+	var options: Array[FieldWorkMethod]=[]
+	for hours in [1,3,6]:
+		var portions:=ceili(hours/3.0)
+		options.append(method("sleep:%d"%hours,"休息%d小时 · 烤饼%d / 清水%d"%[hours,portions,portions],2.0+hours*.4,{"ration":portions,"clean_water":portions}))
+	options.append(method("basic","营地粗食：饱食、饮水至少60（不恢复生命法力）",2))
+	_open(node,options,WorldTime.instance.stamp()+"。选项按游戏小时推进；准备可中断，成功才扣补给。自然恢复继续推进，另每小时恢复20%生命、25%法力、降低15疲劳；补给维持饱食饮水；食物药效、涂层、采集与服务时段同时推进。敌人附近、燃烧或中毒时不能睡眠。")
 
 func inspect(node: ExplorationInteractable, spec: SurvivalStationData) -> void:
 	if not _available(node, spec): return
@@ -200,7 +213,7 @@ func inspect(node: ExplorationInteractable, spec: SurvivalStationData) -> void:
 			guide = "冰面需先融化，导电需先消退或断路。污染会产生未净化水。水袋满时可在N饮用或倒掉浑水。"
 		"forage":
 			options.append(method("harvest", "采集：" + supplies.describe_cost(spec.harvest), 2))
-			guide = "采后需要240秒实际游戏时间再生；休整、切区、读档、重置遭遇均不立即补货。暂停与离线不推进。"
+			guide = "采后需要%.0f个游戏小时再生；休息会推进再生，切区、读档不立即补货。暂停与离线不推进。"%spec.regeneration_hours
 	_open(node, options, guide, spec)
 
 func _open(node: Node2D, options: Array[FieldWorkMethod], guide: String, spec: SurvivalStationData = null) -> void:
@@ -248,6 +261,15 @@ func _reason(option: FieldWorkMethod, node: Node2D, spec: SurvivalStationData) -
 		"harvest":
 			if not spec or spec.kind != "forage": return "采集点已失效"
 			if needs.harvests.has(spec.id): return "尚在再生：%.0f秒" % needs.harvests[spec.id]
+		"sleep":
+			if not game.rules.physical_inventory or not (game.is_at_base() and node.get_meta("survival_rest",false)) and not field_rest_available(node): return "需要安全篝火或前哨"
+			if parts.size()!=2 or parts[1] not in ["1","3","6"]: return "未知休息时长"
+			if field_rest_available(node) and parts[1]!="1": return "野外前哨只能休息1小时"
+			if game.has_hostiles_near(node.global_position): return "附近仍有敌人，不能休息"
+			for status in game.player.get_node("BuffManager").get_active_buff_entries():
+				if status.category in [Buff.Category.DEBUFF,Buff.Category.DOT,Buff.Category.CONTROL]: return "先处理有害状态，再休息"
+			var portions:=ceili(int(parts[1])/3.0)
+			if option.material_costs!={"ration":portions,"clean_water":portions}: return "休息补给已变化"
 		"rest", "basic":
 			if not game.is_at_base() or not node.get_meta("survival_rest", false):
 				if not field_rest_available(node) or option.id != "rest:short": return "需要营地篝火；前哨仅可短休"
@@ -280,13 +302,31 @@ func _complete(option: FieldWorkMethod, node: Node2D, spec: SurvivalStationData)
 		"eat":
 			needs.consume(parts[1])
 			var buffs := game.player.get_node("BuffManager") as BuffManager
+			if parts[1] in ["ration","broth"]: buffs.apply_buff(load("res://content/status/%s.tres"%("meal_fortitude" if parts[1]=="ration" else "broth_fortitude")))
 			if parts[1] == "tea": buffs.remove_status("poison")
 			if parts[1] == "dirty_water": buffs.apply_buff(load("res://gameplay/abilities/data/poison.tres"))
 		"harvest":
-			needs.harvests[spec.id] = 240.0
+			needs.harvests[spec.id] = spec.regeneration_hours*3600.0/WorldTime.instance.time_scale
 		"basic":
 			needs.nutrition = maxf(needs.nutrition, 60)
 			needs.hydration = maxf(needs.hydration, 60)
+		"sleep":
+			var hours:=int(parts[1])
+			var elapsed:=hours*3600.0/WorldTime.instance.time_scale
+			_advancing_rest=true
+			game.session.advance_rest_time(elapsed)
+			var left:=elapsed
+			while left>0:
+				var step:=minf(1,left)
+				GameRuntime.instance.get_simulation_runtime().tick(step)
+				left-=step
+			_advancing_rest=false
+			needs.nutrition=clampf(needs.nutrition+float(option.material_costs.get("ration",0))*30,0,100)
+			needs.hydration=clampf(needs.hydration+float(option.material_costs.get("clean_water",0))*30,0,100)
+			needs.fatigue=maxf(0,needs.fatigue-hours*15)
+			game.player.heal(roundi(game.player.health_component.max_hp*.2*hours),"rest")
+			game.player.restore_mp(roundi(game.player.mana_component.max_mp*.25*hours),"rest")
+			game.ui.notify("休息结束 · "+WorldTime.instance.stamp())
 		"rest":
 			var full := parts[1] == "full"
 			needs.nutrition = maxf(0, needs.nutrition - (20 if full else 5))
@@ -306,5 +346,7 @@ func _complete(option: FieldWorkMethod, node: Node2D, spec: SurvivalStationData)
 	if notify.is_valid(): notify.call()
 	game._save_progress()
 	game.ui.set_survival_status(status_line() + ("\n" + timers_line() if not timers_line().is_empty() else ""))
-	game.ui.notify("完成：" + option.title + "\n" + status_line())
+	game.ui.notify("完成：" + option.title + (" · "+WorldTime.instance.stamp() if parts[0]=="sleep" else "") + "\n" + status_line())
 	return true
+
+func harvest_ready(id: String) -> bool: return not needs.harvests.has(id)

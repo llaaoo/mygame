@@ -110,7 +110,7 @@ func show_crafts() -> void:
 	screen.status.text="%d项配方 · 选择一项查看产出和原料"%supplies.crafting_recipes.size()
 	screen.footer.add_child(FoundationWidgets.button("材料与配置",show_materials))
 	screen.footer.add_child(FoundationWidgets.button("继续探索",game.ui.close_modal))
-	game.ui.show_view("营地施法工作台",screen)
+	game.ui.show_view("营地工作台",screen)
 	_craft_rows(screen,selection,query)
 
 func _craft_rows(screen: ExpeditionScreen, selected: String, query: String) -> void:
@@ -218,7 +218,7 @@ func show_payloads(skill: SkillData) -> void:
 	var card:=FoundationWidgets.card(screen.detail,payload.title if payload else "未装填",skill.description)
 	card.add_child(FoundationWidgets.label("%d MP · 准备 %.2f秒"%[plan.cost,plan.preparation],16))
 	if payload:
-		card.add_child(FoundationWidgets.label(payload.describe(),14))
+		card.add_child(FoundationWidgets.label(payload.describe(game.rules.timed_fields),14))
 		var cost:="无需材料" if payload.material_id.is_empty() else supplies.describe_cost({payload.material_id:payload.quantity})
 		if payload.source_kind=="field": cost="脚下"+FireSigil.title_for(payload.source_field)+" · 消耗1次实际充能"
 		if payload.source_kind=="soul": cost="附近真实残魂 · 消耗1个"

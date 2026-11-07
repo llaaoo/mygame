@@ -107,6 +107,7 @@ func bind_actor(actor: CharacterBody2D,id: String,legacy_counts: Dictionary = {}
 	if rules.material_operations: actor.get_node("SkillManager").enable_material_operations()
 	if rules.tactical_combat and actor is Player:
 		actor.state_machine.process_mode=Node.PROCESS_MODE_DISABLED
+		if notify.is_valid(): context.actions.action_refused.connect(notify)
 		context.actions.input_provider=actor.input_controller.poll_universal_actions
 		context.item_actions.aim_query=actor.get_mouse_direction
 		context.spray.aim_query=actor.get_mouse_direction
@@ -121,14 +122,21 @@ func bind_actor(actor: CharacterBody2D,id: String,legacy_counts: Dictionary = {}
 		if not actor.skill_manager.binding_changed.is_connected(actor.input_controller.shortcut_changed): actor.skill_manager.binding_changed.connect(actor.input_controller.shortcut_changed)
 	return context
 func _restore_actor(actor: CharacterBody2D,record: Dictionary) -> void:
-	var health:=actor.get_node("HealthComponent") as HealthComponent
-	health.hp=clampi(int(record.get("hp",health.hp)),1,health.max_hp)
-	var mana:=actor.get_node_or_null("ManaComponent") as ManaComponent
-	if mana: mana.mp=clampi(int(record.get("mp",mana.mp)),0,mana.max_mp)
 	if record.get("position") is Array: actor.position=Vector2(float(record.position[0]),float(record.position[1]))
 	if "story_truce" in actor: actor.story_truce=bool(record.get("truce",actor.story_truce))
 	actor.actor_context.actions.stamina.restore(record.get("stamina",{}))
 	actor.actor_context.actions.needs.restore(record.get("needs",{}))
+	var away:=maxf(0,inventory.clock_seconds-float(record.get("updated_at",inventory.clock_seconds)))
+	if away>0: actor.actor_context.actions.needs.tick(away,actor.get_node("StatsComponent").effective_stat("endurance"),rules.is_base(record.region,actor.position))
+	actor.actor_context.martial.restore(record.get("martial",{}))
+	var provisions: Array=record.get("provisions",[]).duplicate(true)
+	for entry in provisions: entry.remaining=maxf(0,float(entry.remaining)-away)
+	provisions=provisions.filter(func(entry): return entry.remaining>0)
+	(actor.get_node("BuffManager") as BuffManager).restore_provisions(provisions)
+	var health:=actor.get_node("HealthComponent") as HealthComponent
+	health.hp=clampi(int(record.get("hp",health.hp)),1,health.max_hp)
+	var mana:=actor.get_node_or_null("ManaComponent") as ManaComponent
+	if mana: mana.mp=clampi(int(record.get("mp",mana.mp)),0,mana.max_mp)
 func capture_actors() -> void:
 	if not rules.physical_inventory: return
 	for id in actors:
@@ -137,7 +145,7 @@ func capture_actors() -> void:
 		var health:=actor.get_node("HealthComponent") as HealthComponent
 		if health.is_dead: continue
 		var mana:=actor.get_node_or_null("ManaComponent") as ManaComponent
-		actor_records[id]={"hp":health.hp,"mp":mana.mp if mana else 0,"position":[actor.position.x,actor.position.y],"region":region.id,"stamina":actor.actor_context.actions.stamina.snapshot(),"needs":actor.actor_context.actions.needs.serialize(),"truce":bool(actor.story_truce) if "story_truce" in actor else false,"dead":false}
+		actor_records[id]={"updated_at":inventory.clock_seconds,"hp":health.hp,"mp":mana.mp if mana else 0,"position":[actor.position.x,actor.position.y],"region":region.id,"stamina":actor.actor_context.actions.stamina.snapshot(),"needs":actor.actor_context.actions.needs.serialize(),"martial":actor.actor_context.martial.snapshot(),"provisions":(actor.get_node("BuffManager") as BuffManager).provision_state(),"truce":bool(actor.story_truce) if "story_truce" in actor else false,"dead":false}
 func snapshot() -> Dictionary:
 	capture_actors()
 	if sync_extra.is_valid(): sync_extra.call()
@@ -262,7 +270,7 @@ func _on_fact(fact: Dictionary) -> void:
 static func valid_snapshot(data: Variant) -> bool:
 	if not data is Dictionary: return false
 	if data.is_empty(): return true
-	if typeof(data.get("clock_seconds",0)) not in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(data.get("clock_seconds",0))) or data.get("clock_seconds",0)<0: return false
+	if typeof(data.get("clock_seconds",0)) not in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(data.get("clock_seconds",0))) or data.get("clock_seconds",0)<0 or data.get("clock_seconds",0)>1000000000: return false
 	if data.has("shortcut_schema") and (not data.shortcut_schema is int or data.shortcut_schema!=1): return false
 	if data.has("belt"):
 		if not data.belt is Array or data.belt.size()!=4: return false
@@ -273,7 +281,8 @@ static func valid_snapshot(data: Variant) -> bool:
 	for id in data.actors:
 		var record=data.actors[id]
 		if not id is String or not record is Dictionary or not record.get("hp") is int or record.hp<0 or record.hp>100000 or not record.get("dead") is bool or not record.get("region") is String: return false
-		if not SurvivalNeeds.valid(record.get("needs",{})): return false
+		if not SurvivalNeeds.valid(record.get("needs",{})) or not MartialArts.valid(record.get("martial",{})) or not BuffManager.valid_provisions(record.get("provisions",[])): return false
+		if typeof(record.get("updated_at",0)) not in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(record.get("updated_at",0))) or record.get("updated_at",0)<0 or record.get("updated_at",0)>data.get("clock_seconds",0): return false
 		var stamina=record.get("stamina",{})
 		if not stamina is Dictionary: return false
 		for key in stamina:
@@ -393,3 +402,16 @@ func execute_item_request(actor_id: String,request: Action) -> bool:
 			return false
 		return controller.begin(uid if not uid.is_empty() else id,definition.use_profile.kind==ItemUseDefinition.Kind.THROWABLE,request.direction,request.skill_source)
 	return begin_item(actor_id,id)
+
+func advance_rest_time(seconds: float) -> void:
+	if not is_finite(seconds) or seconds<=0: return
+	inventory.clock_seconds+=seconds
+	for id in actors:
+		var actor:=actor_for_id(id)
+		if not is_instance_valid(actor) or id=="player": continue
+		actor.actor_context.actions.needs.tick(seconds,actor.get_node("StatsComponent").effective_stat("endurance"),rules.is_base(region.id,actor.position))
+		actor.actor_context.actions.rest_elapsed(seconds)
+		if actor is ServiceNPC: actor.resume_schedule()
+	facts.publish("time_advanced","player",{"seconds":seconds})
+
+func elapsed_seconds() -> float: return inventory.clock_seconds

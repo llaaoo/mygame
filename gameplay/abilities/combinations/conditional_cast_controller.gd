@@ -130,7 +130,7 @@ func build_plan(skill: SkillData, actor: Node2D, empower: bool = false,selection
 	for i in range(components.size()):
 		var component := components[i]
 		if not component.rule_id.is_empty():
-			var condition := FireSigil.title_for(component.field.field_type) + "，1次充能" if component.field else Buff.status_title(component.status_id)
+			var condition := FireSigil.title_for(component.field.field_type) + "，"+component.field.consumption_text() if component.field else Buff.status_title(component.status_id)
 			if not component.surface_state.is_empty():
 				condition = "脚下" + SurfaceManager.surface_title(component.surface_state) + "：完成后消耗所在1格，保留周围介质"
 			elif not component.substitute_material.is_empty():
@@ -142,7 +142,7 @@ func build_plan(skill: SkillData, actor: Node2D, empower: bool = false,selection
 			result.modifier_id=str(material.get("modifier_id",""))
 			result.instance_costs.assign(material.get("instance_costs",[]))
 			var payload:=material.get("payload") as SpellPayloadData
-			if payload: result.explanation.append(CastExplanationStep.new("payload",payload.id,payload.title+"："+payload.describe()))
+			if payload: result.explanation.append(CastExplanationStep.new("payload",payload.id,payload.title+"："+payload.describe(actor.get("actor_context")!=null and actor.actor_context.rules.timed_fields)))
 		elif not material.material_id.is_empty():
 			var entry: CastingMaterialData = supplies.catalog[material.material_id]
 			var purpose := "替代地面准备恩赐，不附加投射物改造；额外%d MP（修正前）" % entry.extra_mana if not component.substitute_material.is_empty() else entry.description
@@ -447,6 +447,8 @@ func _commit() -> void:
 		next.charges=plan.skill.field_charges
 		next.radius = plan.placement_radius
 		next.remaining = (clampf(plan.skill.field_duration+plan.placement_duration-15,5,40) if not plan.action.operation_id.is_empty() else plan.placement_duration) + float(plan.field_bonus)
+		if "actor_context" in actor and actor.actor_context and actor.actor_context.rules.timed_fields:
+			next.configure_budget((120.0 if next.field_type=="arcane" else 180.0)+maxf(0,plan.placement_duration-15.0)+plan.field_bonus,40.0 if next.field_type=="arcane" else 30.0)
 		if allow_layered_fields:
 			clear_field_type(next.field_type)
 		else:

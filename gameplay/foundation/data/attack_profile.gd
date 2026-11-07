@@ -1,5 +1,7 @@
 class_name AttackProfile
 extends Resource
+@export var ammo_id := ""
+@export var projectile_speed := 0.0
 @export var windup := 0.18
 @export var active := 0.12
 @export var recovery := 0.30
@@ -19,6 +21,8 @@ func heavy() -> AttackProfile:
 	return value
 
 func valid() -> bool:
-	for key in ["windup","active","recovery","reach","angle_degrees","stamina_cost","impact","damage_multiplier","movement_multiplier"]:
+	for key in ["projectile_speed","windup","active","recovery","reach","angle_degrees","stamina_cost","impact","damage_multiplier","movement_multiplier"]:
 		if not is_finite(float(get(key))) or float(get(key))<0: return false
+	if not ammo_id.is_empty() and (projectile_speed<=0 or not ItemCatalog.default_catalog().definition(ammo_id)): return false
+	if projectile_speed>0 and ammo_id.is_empty(): return false
 	return active>0 and reach>0 and angle_degrees>0 and angle_degrees<=360 and movement_multiplier<=1

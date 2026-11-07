@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/item_data.gd" id="item"]
+[resource]
+script = ExtResource("item")
+id = "metal_scrap"
+display_name = "金属碎料"
+description = "矿脉采集或拆解装备获得，可整修武器和护具。"
+weight = 0.15
+stackable = true
+max_stack = 999
+sell_price = 1

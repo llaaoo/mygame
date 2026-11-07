@@ -38,6 +38,10 @@ func bind_item(source: String,id: String,uid := "") -> bool:
 	if (definition is EquipmentData or definition.use_profile and definition.use_profile.kind==ItemUseDefinition.Kind.SPRAY) and uid.is_empty(): return false
 	_bindings[source]={"kind":"item","item_id":id,"uid":uid}
 	_touch(source); return true
+func bind_technique(source: String,id: String) -> bool:
+	if source not in SOURCES or not MartialArts.definition(id): return false
+	_bindings[source]={"kind":"technique","technique_id":id}
+	_touch(source); return true
 func clear(source: String) -> bool:
 	if source not in SOURCES: return false
 	_bindings.erase(source); _touch(source); return true
@@ -57,7 +61,8 @@ func snapshot() -> Dictionary:
 	return result
 static func valid_entry(entry: Variant) -> bool:
 	if not entry is Dictionary: return false
-	if entry.get("kind","skill") not in ["skill","item"]: return false
+	if entry.get("kind","skill") not in ["skill","item","technique"]: return false
+	if entry.get("kind","")=="technique": return entry.get("technique_id","") is String and MartialArts.definition(entry.get("technique_id",""))!=null
 	if entry.get("kind","")=="item":
 		if not entry.get("item_id") is String or not entry.get("uid","") is String: return false
 		var definition:=ItemCatalog.default_catalog().definition(entry.item_id)

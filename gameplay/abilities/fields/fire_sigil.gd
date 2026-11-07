@@ -8,6 +8,13 @@ var radius := 96.0
 var remaining := 15.0
 var charges := 2
 var revision := 0
+var use_seconds := 0.0
+var initial_duration := 15.0
+func configure_budget(duration: float,per_use: float) -> void:
+	remaining=duration; initial_duration=duration; use_seconds=per_use
+	charges=ceili(remaining/use_seconds) if use_seconds>0 else charges
+func consumption_text() -> String:
+	return "剩余存续-%.0f秒"%use_seconds if use_seconds>0 else "1次充能"
 var _label: Label
 var _consumed: Dictionary = {}
 
@@ -28,6 +35,7 @@ func _ready() -> void:
 
 func tick(delta: float) -> void:
 	remaining = maxf(0.0, remaining - delta)
+	if use_seconds>0: charges=ceili(remaining/use_seconds)
 	if remaining <= 0.0 or charges <= 0 or not is_instance_valid(caster):
 		expire()
 		return
@@ -39,15 +47,23 @@ func is_available_to(actor: Node2D) -> bool:
 func consume(actor: Node2D, expected_revision: int, execution_id: int) -> bool:
 	if not is_available_to(actor) or revision != expected_revision or _consumed.has(execution_id):
 		return false
-	_consumed[execution_id] = true
-	charges -= 1
+	_consumed[execution_id] = minf(use_seconds,remaining) if use_seconds>0 else 0.0
+	if use_seconds>0:
+		remaining=maxf(0,remaining-use_seconds)
+		charges=ceili(remaining/use_seconds)
+	else: charges -= 1
 	revision += 1
 	_update_label()
 	return true
 
 func refund_consumption(execution_id: int) -> void:
-	if _consumed.erase(execution_id) and not is_queued_for_deletion():
-		charges += 1
+	if _consumed.has(execution_id) and not is_queued_for_deletion():
+		var restored: float=_consumed[execution_id]
+		_consumed.erase(execution_id)
+		if use_seconds>0:
+			remaining+=restored
+			charges=ceili(remaining/use_seconds)
+		else: charges += 1
 		revision += 1
 		_update_label()
 
@@ -57,7 +73,8 @@ func expire() -> void:
 	queue_free()
 
 func _update_label() -> void:
-	_label.text = "%s · %d 次 · %.0fs" % [title_for(field_type), charges, remaining]
+	if not is_instance_valid(_label): return
+	_label.text = ("%s · %.0f秒 · 每次-%.0f秒"%[title_for(field_type),remaining,use_seconds]) if use_seconds>0 else "%s · %d 次 · %.0fs" % [title_for(field_type), charges, remaining]
 
 static func title_for(type: String) -> String:
 	return {"arcane": "凝能阵", "fire": "火阵", "frost": "霜阵", "storm": "雷阵", "ward":"守护阵"}.get(type, type)
@@ -77,7 +94,7 @@ func _draw() -> void:
 	for i in range(6):
 		var angle := i * TAU / 6 - PI / 2
 		draw_line(Vector2.from_angle(angle) * radius * .53, Vector2.from_angle(angle + TAU / 3) * radius * .53, Color(tint, .55), 1, true)
-	for i in range(charges):
+	for i in range(mini(charges,8)):
 		var angle := -PI / 2 + (i - (charges - 1) * .5) * .22
 		draw_circle(Vector2.from_angle(angle) * (ring_radius - 15), 3, tint.lightened(.3))
-	draw_arc(Vector2.ZERO, ring_radius - 3, -PI / 2, -PI / 2 + TAU * clampf(remaining / 15, 0, 1), 64, Color(tint, .32), 2, true)
+	draw_arc(Vector2.ZERO, ring_radius - 3, -PI / 2, -PI / 2 + TAU * clampf(remaining / initial_duration, 0, 1), 64, Color(tint, .32), 2, true)

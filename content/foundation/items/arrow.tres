@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/item_data.gd" id="item"]
+[resource]
+script = ExtResource("item")
+id = "arrow"
+display_name = "木杆箭"
+description = "弓攻击与弓武技每次消耗一支口袋中的箭。工作台用炭材、金属碎料制造。"
+weight = 0.05
+stackable = true
+max_stack = 99
+sell_price = 1

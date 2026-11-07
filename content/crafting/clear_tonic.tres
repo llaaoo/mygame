@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="CraftingRecipe" format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/materials/crafting_recipe.gd" id="recipe"]
+[resource]
+script = ExtResource("recipe")
+id = "clear_tonic"
+inputs = {"herb": 2, "crystal": 1, "clean_water": 1}
+output_id = "clear_tonic"
+output_count = 1

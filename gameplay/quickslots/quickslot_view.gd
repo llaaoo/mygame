@@ -25,5 +25,15 @@ static func item_state(actor: Node2D,binding: Dictionary) -> Dictionary:
 		match definition.use_profile.kind:
 			ItemUseDefinition.Kind.SPRAY: result.detail+="\n按住喷洒、松开停止；逐剂支付物品与法力，空瓶停止。"
 			ItemUseDefinition.Kind.THROWABLE: result.detail+="\n按住瞄准、松开投掷；右键或Esc取消。"
+			ItemUseDefinition.Kind.CONSUMABLE: result.detail+="\n站定饮用，完成才消费；药效按类别互斥，剩余时长保存。"
+			ItemUseDefinition.Kind.BOOK: result.detail+="\n站定阅读，学会才消费；已学会不会浪费。"
 			ItemUseDefinition.Kind.COATING: result.detail+="\n使用抹布涂附当前武器，完成才消费。"
 	return result
+
+static func technique_state(actor: Node2D,binding: Dictionary) -> Dictionary:
+	var id:=str(binding.get("technique_id",""))
+	var data:=MartialArts.definition(id)
+	var context:=actor.get("actor_context") as ActorContext
+	if not data or not context: return {"title":"未学习武技","ready":false,"detail":"","remaining":0.0,"cost":0.0}
+	var reason:=context.martial.reason(id,context)
+	return {"title":data.title,"ready":reason.is_empty(),"detail":data.description+"\n"+reason,"remaining":maxf(0,float(context.martial.ready_at.get(id,0))-context.items.clock_seconds),"cost":data.profile.stamina_cost}

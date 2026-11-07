@@ -308,7 +308,7 @@ func _refresh_idx(idx: int) -> void:
 
 
 func _update_cooldown(idx: int, plan: CastPlan = null) -> void:
-	if _skill_manager.shortcuts.binding(_sources[idx]).get("kind","")=="item": return
+	if _skill_manager.shortcuts.binding(_sources[idx]).get("kind","") in ["item","technique"]: return
 	var state := _skill_manager.get_cooldown_state(_sources[idx], plan)
 	var remaining: float = state.remaining
 	var total: float = state.duration
@@ -344,6 +344,15 @@ func _refresh_items() -> void:
 	for i in range(_sources.size()):
 		_bind_labels[i].text=InputBindings.label(InputBindings.action_for_source(_sources[i]))
 		var binding:=_skill_manager.shortcuts.binding(_sources[i])
+		if binding.get("kind","")=="technique":
+			var view:=QuickslotView.technique_state(_skill_manager.get_parent(),binding)
+			_variant_labels[i].text="武技"
+			_icons[i].texture=GameUIStyle.icon("swords"); _icons[i].modulate=Color.WHITE if view.ready else GameUIStyle.TEXT_DISABLED
+			_cost_labels[i].text="%.0f体"%view.cost; _cost_labels[i].visible=true
+			_cd_labels[i].text="%.1f"%view.remaining; _cd_labels[i].visible=view.remaining>0
+			_panels[i].tooltip_text=view.title+"\n"+view.detail
+			_masks[i].visible=false; _affinity_strips[i].color=GameUIStyle.GOLD
+			continue
 		if binding.get("kind","")!="item": continue
 		_variant_labels[i].text=""
 		var view:=QuickslotView.item_state(_skill_manager.get_parent(),binding)

@@ -275,3 +275,5 @@ godot --headless --path . --script res://tools/validate_mvp_content.gd
 旧 `main.tscn` 保留为房间模式/底层回归场景，不再是默认入口。整体设计见 [文档索引](docs/INDEX.md)。
 
 当前首玩闭环、同档战术对照、输入与反馈修复见[灰河谷游玩循环审查](docs/GRAYRIVER_LOOP_REVIEW.md)。
+
+当前系统深化与游玩入口：[时间、采集、整修、武器武技与增益](docs/SYSTEM_DEPTH.md)，[实测与覆盖边界](docs/SYSTEM_DEPTH_VALIDATION.md)。

@@ -101,6 +101,13 @@ func request_shortcut(source: String,pressed: bool,mouse := false) -> void:
 func _poll_shortcut(actions: Array[Action],source: String,pressed: bool) -> void:
 	if is_instance_valid(player.material_wheel): player.material_wheel.remember_source(source)
 	var entry:=player.skill_manager.shortcuts.binding(source)
+	if entry.get("kind","")=="technique":
+		if pressed:
+			var request:=Action.new(); request.action_type=Action.ActionType.TECHNIQUE; request.source=player
+			request.skill_id=entry.technique_id; request.skill_source=source; request.direction=player.get_mouse_direction()
+			request.params={"binding_revision":player.skill_manager.shortcuts.revision(source)}
+			actions.append(request)
+		return
 	if entry.get("kind","")=="item":
 		var definition:=ItemCatalog.default_catalog().definition(str(entry.item_id))
 		if not definition: return
@@ -342,9 +349,9 @@ func _poll_shortcut_edges(actions: Array[Action],source: String,input_action: St
 		# mode without duplicating casts or swallowing an ordinary item use.
 		var inst:=player.skill_manager.get_instance(source)
 		var entry:=player.skill_manager.shortcuts.binding(source)
-		if entry.get("kind","")=="item":
+		if entry.get("kind","") in ["item","technique"]:
 			_poll_shortcut(actions,source,true)
-			var definition:=ItemCatalog.default_catalog().definition(str(entry.item_id))
+			var definition:=ItemCatalog.default_catalog().definition(str(entry.get("item_id","")))
 			if definition and definition.use_profile and definition.use_profile.kind==ItemUseDefinition.Kind.THROWABLE: _poll_shortcut(actions,source,false)
 		else: _poll_shortcut(actions,source,inst!=null and _quick_skill(inst.data))
 	elif pressed: _poll_shortcut(actions,source,true)

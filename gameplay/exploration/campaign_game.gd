@@ -93,6 +93,7 @@ func _bootstrap() -> void:
 	saves.before_save.connect(_sync_progress)
 	progress.deserialize_save_data(saves.read_extension(save_slot, save_section))
 	session.restore(progress.foundation)
+	if rules.physical_inventory: WorldTime.instance.bind_elapsed(session.elapsed_seconds)
 	var load_status := saves.last_read.status
 	player.skill_manager.combinations.supplies.restore(progress.casting_supplies)
 	GameRuntime.instance.get_world_runtime().state_manager.set_all_states(progress.world_states)
