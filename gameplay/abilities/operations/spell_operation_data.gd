@@ -24,7 +24,7 @@ func compose(entry: SpellPayloadData) -> SkillData:
 			result.buff_resource=result.buff_resource.duplicate() as Buff
 			result.buff_resource.set_meta("definition_path",entry.effect.buff_resource.resource_path)
 			result.buff_resource.exclusive_group="stored_energy"
-			result.buff_resource.capacity_key=""
+			if entry.source_kind!="soul": result.buff_resource.capacity_key=""
 			result.buff_resource.max_stacks=3
 		result.operation_id=""
 		return result

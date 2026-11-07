@@ -269,7 +269,8 @@ func preview(skill: SkillData, actor: Node2D, empower: bool = false) -> CastPlan
 			result.reason = "蕴魂已满：先以Shift组合兑现，再汲取残魂"
 	if skill.operation_id=="extract" and result.skill.buff_resource:
 		var buffs:=actor.get_node("BuffManager") as BuffManager
-		if buffs.get_stack_count(result.skill.buff_resource.status_id)>=3: result.reason="同类蕴能已满（3层），先手动兑现"
+		var capacity:=buffs.stack_limit(result.skill.buff_resource)
+		if buffs.get_stack_count(result.skill.buff_resource.status_id)>=capacity: result.reason="同类蕴能已满（%d层），先手动兑现"%capacity
 	if not supplies.can_pay_combat(result.material_costs):
 		result.reason = "施法材料不足：" + supplies.describe_cost(result.material_costs)
 	if not result.operation_reason.is_empty(): result.reason=result.operation_reason
