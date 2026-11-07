@@ -74,7 +74,6 @@ func try_action(action: Action) -> OperationResult:
 		Action.ActionType.CAST:
 			if busy(): return _queue(action)
 			guarding=false
-			action.params["authorized"]=true
 			if legacy_request.is_valid(): legacy_request.call(action)
 			return OperationResult.success()
 		Action.ActionType.INTERACT:

@@ -9,6 +9,20 @@ func read(id:String) -> void:
 	for note in game.current_data.discoveries:
 		if note.id==id:check(game.progress_service.discover(note),"Could not learn "+id);return
 	check(false,"Missing note "+id)
+func interact_at(point: Vector2) -> void:
+	game.player.position = point
+	var key := InputEventKey.new()
+	key.keycode = KEY_E
+	key.physical_keycode = KEY_E
+	key.pressed = true
+	Input.parse_input_event(key)
+	Input.flush_buffered_events()
+	await physics_frame
+	await physics_frame
+	var release := key.duplicate() as InputEventKey
+	release.pressed = false
+	Input.parse_input_event(release)
+	Input.flush_buffered_events()
 func site(id:String) -> SpellWorldObject:
 	for node in game.region_root.get_children():
 		if node is SpellWorldObject and node.spec.id==id:return node
@@ -42,6 +56,10 @@ func run() -> void:
 	var supplies:=p.skill_manager.combinations.supplies
 	check(p.health_component.max_hp==100 and p.mana_component.max_mp==60,"Functional test changed normal caps")
 	read("river.handbook");read("river.pack")
+	var stove := station("river.stove")
+	await interact_at(stove.position)
+	check(p.field_work.panel.visible and p.field_work.methods.any(func(option: FieldWorkMethod): return option.id == "cook:ration"), "E at the town stove did not open the cooking options")
+	p.field_work.close_panel()
 	var before:=supplies.serialize()
 	check(supplies.knows_recipe("resin") and not supplies.knows_recipe("storm_dust") and not supplies.craft("storm_dust") and supplies.serialize()==before,"Recipe discovery gate leaked inventory")
 	check(station("river.relief_garden")==null,"Garden opened without delivery")

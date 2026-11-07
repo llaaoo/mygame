@@ -99,7 +99,7 @@ func bind_actor(actor: CharacterBody2D,id: String,legacy_counts: Dictionary = {}
 		context.item_actions.aim_query=actor.get_mouse_direction
 		context.spray.aim_query=actor.get_mouse_direction
 		context.spray.held_query=func(source: String): return Input.is_action_pressed(actor.input_controller.action_for_source(source))
-		context.actions.legacy_request=actor.input_controller.resolve_action
+		context.actions.legacy_request=actor.input_controller.execute_action
 		context.actions.pack_request=drop_pack.bind(id)
 	if rules.tactical_combat:
 		context.actions.item_request=func(item_id: String): return begin_item(id,item_id)

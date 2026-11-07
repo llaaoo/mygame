@@ -78,9 +78,12 @@ func _poll_universal_cast(actions: Array[Action], source: String, input_action: 
 	actions.append(action)
 
 func resolve_action(action: Action) -> void:
-	if player.actor_context and player.actor_context.actions.active() and not action.params.get("authorized",false):
+	if player.actor_context and player.actor_context.actions.active():
 		player.actor_context.actions.try_action(action)
 		return
+	execute_action(action)
+
+func execute_action(action: Action) -> void:
 	if player.field_work:
 		if action.action_type == Action.ActionType.INTERACT and player.field_work.interact(): return
 		if action.action_type in [Action.ActionType.MOVE, Action.ActionType.DODGE, Action.ActionType.MELEE, Action.ActionType.CAST]:
