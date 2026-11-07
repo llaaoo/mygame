@@ -293,6 +293,11 @@ func resolve_action(action: Action) -> void:
 	if not skill_manager.can_act(self): return
 	if actor_context and actor_context.actions.active() and action.action_type in [Action.ActionType.MOVE,Action.ActionType.MELEE,Action.ActionType.HEAVY_ATTACK,Action.ActionType.DODGE,Action.ActionType.TECHNIQUE,Action.ActionType.GUARD,Action.ActionType.USE_ITEM]:
 		if action.action_type==Action.ActionType.MELEE: action.direction=get_target_direction()
+		if action.action_type==Action.ActionType.MOVE and surface_awareness:
+			# Tactical actors must use the same bounded hazard/collision steering.
+			var steered:=Action.move(surface_awareness.steer(action.direction)*action.direction.length(),self)
+			actor_context.actions.try_action(steered)
+			return
 		actor_context.actions.try_action(action)
 		return
 	if actor_context and actor_context.actions.active() and actor_context.actions.busy(): return

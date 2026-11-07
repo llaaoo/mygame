@@ -11,4 +11,5 @@ func describe() -> String:
 	for i in range(attacks.size()):
 		var stroke:=attacks[i]
 		text+="\n第%d段 · 起手%.2f / 恢复%.2f秒 · 距离%.0f · 扇面%.0f° · 体力%.0f · 冲击%.0f"%[i+1,stroke.windup,stroke.recovery,stroke.reach,stroke.angle_degrees,stroke.stamina_cost,stroke.impact]
+		text+=" · 前踏%.0f · 移速%.0f%%"%[stroke.step_distance,stroke.movement_multiplier*100]
 	return text

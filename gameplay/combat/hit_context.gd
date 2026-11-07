@@ -1,6 +1,7 @@
 class_name HitContext
 extends RefCounted
 var was_preparing := false
+var control_protected := false
 var strike: AttackProfile
 var source: Node2D
 var target: Node2D

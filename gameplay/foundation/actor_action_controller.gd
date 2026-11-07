@@ -26,6 +26,7 @@ var counter_strike := false
 var _parry_spent := true
 var _push_remaining := 0.0
 var _push_velocity:=Vector2.ZERO
+var push_recovery := 0.0
 var profile: AttackProfile
 var _hit_targets: Dictionary={}
 var _family := ""
@@ -184,6 +185,7 @@ func advance(delta: float) -> void:
 	guard_age=guard_age+delta if guarding else 99.0
 	parry_retry=maxf(0,parry_retry-delta)
 	counter_remaining=maxf(0,counter_remaining-delta)
+	push_recovery=maxf(0,push_recovery-delta)
 	combo_remaining=maxf(0,combo_remaining-delta)
 	_move_age+=delta
 	if _move_age>.3 and not input_provider.is_valid(): movement=Vector2.ZERO
@@ -212,6 +214,8 @@ func advance(delta: float) -> void:
 		elapsed+=delta
 		remaining=maxf(0,remaining-delta)
 		if mode=="attack" and elapsed>=profile.windup and old_elapsed<profile.windup+profile.active:
+			var active_delta:=maxf(0,minf(elapsed,profile.windup+profile.active)-maxf(old_elapsed,profile.windup))
+			if profile.step_distance>0: actor.move_and_collide(facing*profile.step_distance*active_delta/profile.active)
 			var after:=elapsed
 			elapsed=minf(elapsed,profile.windup+profile.active)
 			if profile.projectile_speed>0:
@@ -260,7 +264,7 @@ func equipment_value(key: String) -> float:
 	return equipment.get_modifier_value(key) if equipment else 0.0
 func attack_observation() -> Dictionary:
 	if mode!="attack" or not profile: return {}
-	return {"serial":_attack_sequence,"windup":maxf(0,profile.windup-elapsed),"reach":profile.reach,"heavy":profile.guard_pressure>1 or profile.windup>=.35}
+	return {"serial":_attack_sequence,"windup":maxf(0,profile.windup-elapsed),"reach":profile.reach+profile.step_distance,"direction":facing,"angle":profile.angle_degrees,"heavy":profile.guard_pressure>1 or profile.windup>=.35}
 func is_preparing() -> bool:
 	var manager:=context.actor.get_node("SkillManager") as SkillManager
 	var preparing:=manager.combinations.is_busy() or mode in ["item","aim_item","spray"] or mode=="attack" and profile and profile.projectile_speed>0 and elapsed<profile.windup
@@ -270,12 +274,13 @@ func is_preparing() -> bool:
 	return preparing or context.preparation_query.is_valid() and bool(context.preparation_query.call())
 func resolve_strike(hit: HitContext,result: HitResult) -> void:
 	if not hit.strike or result.blocked or not result.damage_accepted or result.damage_dealt<=0: return
-	if hit.strike.interrupts_preparation and hit.was_preparing:
+	if hit.strike.interrupts_preparation and hit.was_preparing and not hit.control_protected:
 		interrupt(.35); result.interrupted=true
-	if hit.strike.push_distance>0 and is_instance_valid(hit.source):
+	if hit.strike.push_distance>0 and push_recovery<=0 and is_instance_valid(hit.source):
 		var direction: Vector2=context.actor.global_position-hit.source.global_position
 		if direction.is_zero_approx(): direction=-facing
 		_push_remaining=.18; _push_velocity=direction.normalized()*hit.strike.push_distance/.18
+		push_recovery=.9
 		result.pushed=true
 func _scan_contacts() -> void:
 	var actor:=context.actor
@@ -308,7 +313,6 @@ func contact(target: Node2D) -> HitResult:
 	if buffs:
 		var imbued:=buffs.get_attack_tags()
 		tags.append_array(imbued)
-		if not imbued.is_empty(): ActorCombatModel.apply_melee_surface(target,tags)
 	var skill:=SkillData.new()
 	skill.id="weapon_contact"
 	var weapon_uid: String=context.items.equipped(context.id).get(str(EquipmentData.SlotType.RIGHT_HAND),"")
@@ -316,10 +320,10 @@ func contact(target: Node2D) -> HitResult:
 	if coating:
 		tags.append_array(coating.payload.tags)
 		skill.contact_statuses=coating.payload.statuses.duplicate()
-		ActorCombatModel.apply_melee_surface(target,tags)
 	skill.tags=tags
 	var damage:=roundi(float(context.actor.get("attack_damage") if "attack_damage" in context.actor else context.actor.combat_component.attack_damage)*profile.damage_multiplier)
 	var result:=CombatExecutor.report_hit(context.actor,target,damage,target.global_position,skill,tags,_family,profile.impact,profile)
+	if result.damage_dealt>0 and not result.blocked: ActorCombatModel.apply_melee_surface(target,tags)
 	if result.damage_dealt>0 and context.reward_eligible and context.facts and (not "rewards_enabled" in target or target.rewards_enabled): context.facts.publish("melee_hit",context.id,{"target":str(id),"damage":result.damage_dealt,"family":_family})
 	return result
 func defend(hit: HitContext,result: HitResult,impact: float) -> void:
@@ -353,15 +357,17 @@ func defend(hit: HitContext,result: HitResult,impact: float) -> void:
 		var duration:=stability.receive(impact)
 		if duration>0: interrupt(duration)
 func interrupt(seconds: float) -> void:
+	# Repeated impact may drain stability, but cannot renew a committed stagger.
+	if mode=="stagger": return
 	combo_remaining=0; combo_index=0; _ammo_uid=""
 	counter_remaining=0; counter_strike=false; _push_remaining=0
 	if context.item_actions: context.item_actions.cancel()
 	if context.spray: context.spray.stop()
 	_cancel_work(); _cancel_cast()
 	clear_input()
-	var duration:=maxf(seconds,remaining if mode=="stagger" else 0.0)
-	mode="stagger"; elapsed=0; remaining=duration
+	mode="stagger"; elapsed=0; remaining=seconds
 func cancel(_reason := "cancelled") -> void:
+	if _reason in ["dead","scope_left","rest_time"]: push_recovery=0
 	combo_remaining=0; combo_index=0; _ammo_uid=""
 	counter_remaining=0; counter_strike=false; _push_remaining=0
 	operation_id+=1
@@ -389,6 +395,14 @@ func _draw() -> void:
 	if mode=="attack" and elapsed<profile.windup:
 		var angle:=facing.angle()
 		draw_arc(Vector2.ZERO,profile.reach,angle-deg_to_rad(profile.angle_degrees*.5),angle+deg_to_rad(profile.angle_degrees*.5),20,Color(1,.35,.18,.65) if profile.guard_pressure>1 or profile.windup>=.35 else Color(1,.7,.3,.6),2,true)
+		if profile.guard_pressure>1:
+			var marker:=facing*32
+			draw_polyline(PackedVector2Array([marker+Vector2(0,-6),marker+Vector2(6,0),marker+Vector2(0,6),marker+Vector2(-6,0),marker+Vector2(0,-6)]),Color("ff7855"),2,true)
+		if profile.projectile_speed>0: draw_dashed_line(facing*28,facing*minf(profile.reach,180),Color(1,.7,.3,.5),1,8)
+		if profile.step_distance>0: draw_line(Vector2.ZERO,facing*profile.step_distance,Color("dacb93"),3,true)
+	if mode=="attack" and elapsed>=profile.windup+profile.active:
+		var fraction:=clampf(remaining/maxf(.001,profile.recovery),0,1)
+		draw_arc(Vector2.ZERO,26,-PI/2,-PI/2+TAU*fraction,20,Color(.75,.8,.9,.45),1.5,true)
 	if mode=="attack": _draw_weapon_motion()
 	if counter_remaining>0: draw_arc(Vector2.ZERO,34,0,TAU*counter_remaining/.85,24,Color("e0bf70"),2,true)
 	if guarding: draw_arc(Vector2.ZERO,30,facing.angle()-PI/3,facing.angle()+PI/3,16,Color(.5,.8,1),3,true)

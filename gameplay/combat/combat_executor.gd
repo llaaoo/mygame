@@ -89,6 +89,7 @@ static func report_hit(caster: Node2D, target: Node2D, damage: int, position: Ve
 	var capabilities:=target.get("actor_context") as ActorContext if "actor_context" in target else null
 	if capabilities and capabilities.actions and result.damage_accepted:
 		context.was_preparing=capabilities.actions.is_preparing()
+		context.control_protected=capabilities.actions.mode=="stagger" or capabilities.actions.stability.grace>0
 		capabilities.actions.defend(context,result,impact if impact>0 else skill.impact_power if skill and skill.impact_power>0 else 35.0 if "impact" in context.tags else 0.0)
 		if not result.accepted: return _complete_defense(target,result)
 	var before := health.hp if health else 0

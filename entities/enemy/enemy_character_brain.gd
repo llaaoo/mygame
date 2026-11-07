@@ -56,16 +56,17 @@ func choose(target: Node2D) -> Array[Action]:
 		if observation.is_empty(): _observed_serial=-1
 		elif target.get_instance_id()!=_observed_target or int(observation.serial)!=_observed_serial:
 			_observed_target=target.get_instance_id(); _observed_serial=int(observation.serial); _observation_age=0
-		if not observation.is_empty() and float(observation.windup)>0 and _observation_age<_tempo.reaction_delay and dist<float(observation.reach)+24:
+		var threatened:=_threatens(observation,target)
+		if threatened and float(observation.windup)>0 and _observation_age<_tempo.reaction_delay:
 			actions.movement=Vector2.ZERO
 			return result
 		if _guard_remaining>0 and actions.can_guard() and actions.stamina.current>20:
 			return [_guard(target)]
-		if not observation.is_empty() and _observation_age>=_tempo.reaction_delay and _defense_cooldown<=0 and float(observation.windup)>0 and dist<float(observation.reach)+24 and actions.stamina.current>28:
+		if threatened and _observation_age>=_tempo.reaction_delay and _defense_cooldown<=0 and float(observation.windup)>0 and actions.stamina.current>28:
 			_defense_cooldown=_tempo.defense_interval
 			if observation.heavy:
-				var evade:=Action.new(); evade.action_type=Action.ActionType.DODGE; evade.direction=actor.get_target_direction().orthogonal()
-				return [evade]
+				var side:=_safe_side(target)
+				if not side.is_zero_approx(): return [Action.dodge(side,actor)]
 			if actions.can_guard():
 				_guard_remaining=_tempo.guard_duration
 				return [_guard(target)]
@@ -79,11 +80,13 @@ func choose(target: Node2D) -> Array[Action]:
 		if weapon and weapon.moveset and weapon.moveset.weapon_type=="bow" and store.can_pay(owner_id,{"arrow":1},true):
 			if dist<140: return [Action.move(-actor.get_target_direction(),actor)]
 			if dist<=reach and _offense_cooldown<=0:
+				if not shot_lane_clear(target): return _reposition_for_shot(target)
 				var shot:=Action.melee(actor); shot.direction=actor.get_target_direction(); return [shot]
 		if dist<=reach and (_offense_cooldown>0 or _ally_striking(target)):
 			var backstep:=clampf((reach*_tempo.preferred_reach-dist)/maxf(1,reach),.2,.7)
 			return [Action.move(actor.get_target_direction().orthogonal()*.35-actor.get_target_direction()*backstep,actor)]
 		if dist<=reach and weapon and weapon.world_shape in ["blade","spear","staff"]:
+			if _crowded(target): return _reposition_for_shot(target)
 			if target_context and target_context.actions.guarding and actions.stamina.current>40:
 				var heavy:=Action.new(); heavy.action_type=Action.ActionType.HEAVY_ATTACK; heavy.direction=actor.get_target_direction(); return [heavy]
 			if actions.stamina.current>=16: return [Action.melee(actor)]
@@ -129,7 +132,9 @@ func choose(target: Node2D) -> Array[Action]:
 				var release := health and health.hp<float(health.max_hp)*.4 and buffs.has_buff("ember_focus")
 				var shot := cast("ignite",target,release)
 				if not shot and release: shot=cast("ignite",target)
-				if shot: return [shot]
+				if shot:
+					if not shot_lane_clear(target): return _reposition_for_shot(target)
+					return [shot]
 				if actor.mana_component.mp<plan.cost: return [Action.move(actor.get_target_direction(),actor)]
 				return result # Wait for cooldown while keeping position inside the field.
 			var placement := cast("fire_sigil",target)
@@ -186,4 +191,54 @@ func _ally_striking(target: Node2D) -> bool:
 		if not other or not other.actions.active() or other.actions.mode!="attack" or other.actions.profile.projectile_speed>0: continue
 		var toward:=target.global_position-ally.global_position
 		if toward.length()<=other.actions.profile.reach+24 and (toward.is_zero_approx() or other.actions.facing.dot(toward.normalized())>.5): return true
+	return false
+
+func _threatens(observation: Dictionary,target: Node2D) -> bool:
+	if observation.is_empty(): return false
+	var offset:=actor.global_position-target.global_position
+	if offset.length()>float(observation.reach)+24: return false
+	var direction: Vector2=observation.direction
+	var tolerance:=atan2(18,maxf(1,offset.length()))
+	return offset.is_zero_approx() or direction.dot(offset.normalized())>=cos(minf(PI,deg_to_rad(float(observation.angle)*.5)+tolerance))
+
+## Same collision mask and owner resolution as a real arrow; queries spend nothing.
+func shot_lane_clear(target: Node2D,origin:=Vector2.INF) -> bool:
+	var start:=actor.global_position if not origin.is_finite() else origin
+	var query:=PhysicsRayQueryParameters2D.create(start,target.global_position,11,[actor.get_rid()])
+	query.collide_with_areas=true
+	var hit:=actor.get_world_2d().direct_space_state.intersect_ray(query)
+	if hit.is_empty(): return true
+	var body:=hit.collider as Node2D
+	if body and not body.has_method("take_damage"): body=body.owner as Node2D
+	return body==target
+
+func _safe_side(target: Node2D,seek_lane:=false) -> Vector2:
+	var toward:=actor.global_position.direction_to(target.global_position)
+	var surfaces:=SurfaceManager.instance
+	var best:=INF
+	var selected:=Vector2.ZERO
+	# Stable per-body preference makes allies choose different shoulders, not RNG.
+	var sign_side:=1.0 if actor.get_instance_id()%2==0 else -1.0
+	for sign_value in [sign_side,-sign_side]:
+		var side: Vector2=toward.orthogonal()*float(sign_value)
+		if actor.test_move(actor.global_transform,side*64): continue
+		var point:=actor.global_position+side*64
+		var danger:=surfaces.danger_at(point,actor) if surfaces else 0.0
+		var score:=danger*6+(0 if not seek_lane or shot_lane_clear(target,point) else 2)
+		if score<best: best=score; selected=side
+	return selected
+
+func _reposition_for_shot(target: Node2D) -> Array[Action]:
+	var side:=_safe_side(target,true)
+	var result: Array[Action]=[Action.move(side*.65,actor)]
+	return result
+
+func _crowded(target: Node2D) -> bool:
+	var context:=actor.actor_context
+	if not context.nearby_allies.is_valid(): return false
+	var toward:=target.global_position-actor.global_position
+	for ally: Node2D in context.nearby_allies.call(100.0):
+		if not actor.can_see(ally): continue
+		var offset:=ally.global_position-actor.global_position
+		if offset.length()<38 and offset.dot(toward)>0 and ally.global_position.distance_to(target.global_position)<toward.length(): return true
 	return false

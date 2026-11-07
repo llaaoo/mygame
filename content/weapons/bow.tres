@@ -3,6 +3,8 @@
 [ext_resource type="Script" path="res://gameplay/foundation/data/attack_profile.gd" id="attack"]
 [sub_resource type="Resource" id="stroke0"]
 script = ExtResource("attack")
+step_distance = 0.0
+movement_multiplier = 0.1
 motion = "shot"
 windup = 0.48
 active = 0.08

@@ -3,6 +3,8 @@
 [ext_resource type="Script" path="res://gameplay/foundation/data/attack_profile.gd" id="attack"]
 [sub_resource type="Resource" id="Attack"]
 script = ExtResource("attack")
+step_distance = 8.0
+movement_multiplier = 0.0
 guard_pressure = 2.1
 motion = "slash"
 windup = 0.46
@@ -18,5 +20,5 @@ script = ExtResource("tech")
 id = "blade_breaker"
 title = "破势斩"
 weapon_type = "blade"
-description = "较长起手，对正面格挡造成2.1倍体力压力，适合抓格挡和敌人收招；消耗26体力，不花MP。"
+description = "站定起手、挥出时小步前踏，对正面格挡造成2.1倍体力压力，适合抓格挡和敌人收招；消耗26体力，不花MP。"
 profile = SubResource("Attack")

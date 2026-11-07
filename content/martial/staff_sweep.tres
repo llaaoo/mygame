@@ -3,6 +3,8 @@
 [ext_resource type="Script" path="res://gameplay/foundation/data/attack_profile.gd" id="attack"]
 [sub_resource type="Resource" id="Attack"]
 script = ExtResource("attack")
+step_distance = 0.0
+movement_multiplier = 0.0
 push_distance = 64.0
 motion = "sweep"
 windup = 0.55
@@ -18,5 +20,5 @@ script = ExtResource("tech")
 id = "staff_sweep"
 title = "压阵横扫"
 weapon_type = "staff"
-description = "未被格挡的命中会击退64距离，碰到墙体停下，起手慢，适合惩罚近身围堵；消耗30体力。"
+description = "站定锁向横扫，未被格挡的命中会击退64距离，碰到墙体停下，同一目标0.9秒内不再被击退；起手慢，适合惩罚近身围堵；消耗30体力。"
 profile = SubResource("Attack")
