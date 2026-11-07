@@ -76,6 +76,7 @@ func toggle() -> void:
 
 
 func open() -> void:
+	if not GameUIStyle.can_open(self): return
 	_refresh_all()
 	show()
 	_background.show()

@@ -126,7 +126,7 @@ func _choose_world_event(entry: ExplorationWorldEventData, choice: ExplorationWo
 		shortcut.name = "WaterworksShortcut"
 
 func journal_text() -> String:
-	var text := "行动提示\n左键近战、右键格挡；R/6火花；1震荡、2凝神、3霜阵、4水引、5火阵需探索学习。雷阵与泼洒树脂用K编组；M选择本次材料，营地工作台加工。J关闭日志。\n\n法术联动\n已有动作可以通过元素、材料、恩赐、法阵和装备改变用途。点击“元素关系”查看已读线索与实际验证；未验证的高级关系不会提前列出。\n\n路线与清理进度\n仅列出已经到达的地点；现场调查可发现新支路。\n"
+	var text := "行动提示\n左键近战、右键格挡；R/6火花；1震荡、2凝神、3霜阵、4水引、5火阵需探索学习。雷阵与泼洒树脂用K编组；M/中键轮盘按槽选材，营地工作台加工。J关闭日志。\n\n法术联动\n已有动作可以通过元素、材料、恩赐、法阵和装备改变用途。点击“元素关系”查看已读线索与实际验证；未验证的高级关系不会提前列出。\n\n路线与清理进度\n仅列出已经到达的地点；现场调查可发现新支路。\n"
 	for id in game.catalog.regions:
 		if not game.progress.visited.has(id): continue
 		var data: ExplorationRegionData = game.catalog.regions[id]

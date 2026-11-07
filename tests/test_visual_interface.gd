@@ -32,7 +32,7 @@ func run() -> void:
  check(not hud.skill_bar._hint_panel.visible,"Idle spell summary still occupies the world HUD")
  await capture("01-world")
  await key(KEY_TAB,true); await key(KEY_TAB,false)
- check(paused and game.hub.page=="actions","Preparation navigation failed")
+ check(not paused and game.player.ui_blocked and game.hub.page=="actions","Preparation navigation failed")
  await capture("02-expedition")
  await click("快捷栏编组"); await click("打开快捷栏编组")
  var pool:=game.player.skill_pool_ui
@@ -49,14 +49,12 @@ func run() -> void:
  await capture("03-quickslots")
  await key(KEY_ESCAPE,true); await key(KEY_ESCAPE,false)
  await key(KEY_G,true); await key(KEY_G,false)
- check(paused and is_instance_valid(game.ui.modal),"Map input failed")
+ check(not paused and game.player.ui_blocked and is_instance_valid(game.ui.modal),"Map input failed")
  await capture("04-map")
  await key(KEY_ESCAPE,true); await key(KEY_ESCAPE,false)
  await key(KEY_M,true); await key(KEY_M,false)
- check(paused and is_instance_valid(game.ui.modal),"Source overview input failed")
+ check(game.player.material_wheel.visible and not paused and not game.player.ui_blocked,"Live selector input failed")
  await capture("05-source-overview")
- await click("配置：火花")
- check(paused and is_instance_valid(game.ui.modal),"Source detail mouse navigation failed")
  await key(KEY_ESCAPE,true); await key(KEY_ESCAPE,false)
  # Reach the real handbook by walking; no fixture grants or teleport.
  await walk_to(Vector2(-3500,2390))
@@ -64,16 +62,30 @@ func run() -> void:
  check(game.progress.claims.has("river.handbook"),"Natural input did not read the town handbook")
  await capture("06-handbook")
  await key(KEY_ESCAPE,true); await key(KEY_ESCAPE,false)
+ await key(KEY_K,true); await key(KEY_K,false)
+ var learned: Control
+ for label in pool._skill_grid.find_children("*","Label",true,false):
+  if label.text=="喷洒介质": learned=label
+ check(learned!=null,"Natural handbook did not expose spray in loadout")
+ if learned:
+  await point_click(learned.get_global_rect().get_center())
+  var target_slot: Control=pool._equip_slots[pool._equip_sources.find("quick_e")]
+  (target_slot.get_parent().get_parent() as ScrollContainer).ensure_control_visible(target_slot); await frames()
+  await point_click(target_slot.get_global_rect().get_center())
+ await key(KEY_ESCAPE,true); await key(KEY_ESCAPE,false)
  var before:=game.session.inventory.snapshot()
  await key(KEY_M,true); await key(KEY_M,false)
- await click("喷洒介质"); await click("配置：喷洒介质")
- check(is_instance_valid(game.ui.modal),"Operation payload view missing")
+ await key(KEY_E,true); await key(KEY_E,false)
+ var wheel:=game.player.material_wheel
+ check(wheel.visible and not wheel.entries.is_empty(),"Learned operation missing from wheel")
  await capture("07-payloads")
- # Source selection changes no physical inventory or resource budget.
- await click("选择：树脂喷洒")
- check(game.player.skill_manager.combinations.supplies.selected.get("disperse","")=="resin","Payload mouse selection was not applied")
- check(game.session.inventory.snapshot()==before,"Opening/selecting payload consumed an item")
+ var target:=-1
+ for i in range(wheel.entries.size()):
+  if wheel.entries[i].choice.payload=="resin": target=i
+ check(target>=0,"Learned resin payload missing from wheel")
+ # An unavailable bottle stays visible and cannot silently bind a future replacement.
  await key(KEY_ESCAPE,true); await key(KEY_ESCAPE,false)
+ check(game.session.inventory.snapshot()==before,"Opening/cancelling payload consumed an item")
  await key(KEY_K,true); await key(KEY_K,false)
  var inscription: Control
  for label in pool._skill_grid.find_children("*","Label",true,false):

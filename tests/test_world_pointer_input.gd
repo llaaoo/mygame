@@ -41,7 +41,7 @@ func run() -> void:
 	var sequence:=actor.actor_context.actions._attack_sequence
 	await pointer(game.frontier_hud.tracker.get_global_rect().get_center())
 	await left_click()
-	check(is_instance_valid(game.ui.modal) and paused,"Real HUD button no longer receives pointer input")
+	check(is_instance_valid(game.ui.modal) and not paused and game.player.ui_blocked,"Real HUD button no longer receives pointer input")
 	check(target.health_component.hp==hp and actor.actor_context.actions._attack_sequence==sequence,"Clicking the HUD also attacked a world target")
 	# Input.parse_input_event updates the global Input state as an OS event would.
 	# Exercise the new nonmodal controls through that path too (not only GUI dispatch).
@@ -54,7 +54,7 @@ func run() -> void:
 		actor.position=bench.position+Vector2(0,35); actor.get_node("Camera2D").reset_smoothing(); await frames(15)
 		sequence=actor.actor_context.actions._attack_sequence
 		await pointer(game.frontier_hud.interact.get_global_rect().get_center()); await left_click()
-		check(paused and is_instance_valid(game.ui.modal),"Global mouse input did not activate nearby interaction")
+		check(not paused and game.player.ui_blocked and is_instance_valid(game.ui.modal),"Global mouse input did not activate nearby interaction")
 		check(actor.actor_context.actions._attack_sequence==sequence,"Nearby interaction mouse click leaked a weapon attack")
 		game.ui.close_modal(); await frames(15)
 	game.survival.supplies.grant({"ration":1})

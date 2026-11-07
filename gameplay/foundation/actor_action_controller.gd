@@ -32,10 +32,11 @@ func busy() -> bool: return mode!="idle"
 func _physics_process(delta: float) -> void:
 	if not active() or not is_instance_valid(context.actor): return
 	if context.actor.process_mode==Node.PROCESS_MODE_DISABLED: return
+	input_suppressed=maxf(0,input_suppressed-delta)
 	if "ui_blocked" in context.actor and context.actor.ui_blocked:
 		clear_input()
+		advance(delta)
 		return
-	input_suppressed=maxf(0,input_suppressed-delta)
 	if input_provider.is_valid() and input_suppressed==0:
 		movement=Vector2.ZERO
 		for action: Action in input_provider.call(): try_action(action)

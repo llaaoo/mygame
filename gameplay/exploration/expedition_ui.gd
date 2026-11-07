@@ -22,6 +22,7 @@ var journal_provider: Callable
 var map_provider: Callable
 var pause_provider: Callable
 var practice_available: Callable
+var material_action: Callable
 var menu_action: Callable
 var journal_action: Callable
 var shortcut_action: Callable
@@ -117,6 +118,9 @@ func _label(text: String, size: int) -> Label:
 	return label
 
 func _process(delta: float) -> void:
+	var actor:=get_tree().get_first_node_in_group("player") as Player
+	var selecting:=actor and is_instance_valid(actor.material_wheel) and actor.material_wheel.visible
+	_heading_panel.visible=not selecting
 	_terrain_time += delta
 	if _terrain_time >= .2:
 		_terrain_time = 0
@@ -124,6 +128,7 @@ func _process(delta: float) -> void:
 	if not get_tree().paused:
 		_message_time -= delta
 		_notice.modulate.a=clampf(_message_time/.35,0,1)
+		_notice.visible=_message_time>0 and not selecting
 		if _message_time <= 0:
 			message.text = ""
 			_notice.hide()
@@ -170,6 +175,8 @@ func _unhandled_input(event: InputEvent) -> void:
 			return
 		if is_instance_valid(modal):
 			close_modal()
+		elif material_action.is_valid():
+			material_action.call()
 		else:
 			materials_requested.emit()
 		get_viewport().set_input_as_handled()
@@ -209,6 +216,8 @@ func show_panel(title: String, text: String, buttons: Array[Dictionary], locked:
 	modal.layer = GameUIStyle.LAYER_MODAL + 1
 	modal.process_mode = Node.PROCESS_MODE_ALWAYS
 	modal.add_to_group("modal_ui")
+	modal.set_meta("close_request",close_modal)
+	modal.set_meta("locked",locked)
 	add_child(modal)
 	var backdrop := ColorRect.new()
 	backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)

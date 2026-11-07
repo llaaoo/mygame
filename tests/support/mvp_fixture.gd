@@ -6,11 +6,12 @@ var game: MVPGame
 func _init(owner_tree: SceneTree) -> void:
 	tree = owner_tree
 
-func boot(persist: bool = false) -> MVPGame:
+func boot(persist: bool = false, freeze_simulation := false) -> MVPGame:
 	game = load("res://mvp.tscn").instantiate()
 	game.persistence_enabled = persist
 	tree.root.add_child(game)
 	tree.current_scene = game
+	if freeze_simulation: GameRuntime.instance.set_process(false)
 	for i in range(20):
 		await tree.process_frame
 	game.ui.close_modal()

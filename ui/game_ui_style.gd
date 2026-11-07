@@ -156,22 +156,26 @@ static func begin_modal(owner: CanvasLayer) -> void:
 	owner.process_mode = Node.PROCESS_MODE_ALWAYS
 	owner.add_to_group("modal_ui")
 	for other in owner.get_tree().get_nodes_in_group("modal_ui"):
-		if other != owner and other is CanvasLayer and other.visible and other.has_method("close"):
-			other.close()
-	owner.get_tree().paused = true
+		if other != owner and other is CanvasLayer and other.visible:
+			if other.has_method("close"): other.close()
+			elif other.has_meta("close_request"): other.get_meta("close_request").call()
 	var player := owner.get_tree().get_first_node_in_group("player")
 	if player:
+		if is_instance_valid(player.get("material_wheel")): player.material_wheel.close()
 		player.set("ui_blocked", true)
+		if player.get("input_controller"): player.input_controller.suppress_held_shortcuts()
 
 
 static func end_modal(owner: CanvasLayer) -> void:
 	for other in owner.get_tree().get_nodes_in_group("modal_ui"):
 		if other != owner and other is CanvasLayer and other.visible:
 			return
-	owner.get_tree().paused = false
 	var player := owner.get_tree().get_first_node_in_group("player")
 	if player:
 		player.set("ui_blocked", false)
+		if player.get("input_controller"):
+			player.input_controller.pointer_consumed()
+			player.input_controller.suppress_held_shortcuts()
 
 static func icon(id: String) -> Texture2D:
 	var path:="res://content/art/third_party/lucide/"+id+".svg"
@@ -193,6 +197,18 @@ static func keycap(text: String) -> Label:
 	return label
 
 static func install_theme(window: Window) -> void:
+	window.gui_embed_subwindows=true
 	# Project custom themes load before first-import fonts exist. Install only
 	# when a real game UI enters the tree, after imported resources are available.
 	if window.theme==null: window.theme=load("res://ui/themes/grayriver.tres") as Theme
+
+static func close_gameplay_views(actor: Node) -> void:
+	for view in actor.get_tree().get_nodes_in_group("modal_ui"):
+		if view is CanvasLayer and view.visible:
+			if view.has_method("close"): view.close()
+			elif view.has_meta("close_request"): view.get_meta("close_request").call()
+
+static func can_open(view: Node) -> bool:
+	for other in view.get_tree().get_nodes_in_group("modal_ui"):
+		if other!=view and other is CanvasLayer and other.visible and other.get_meta("locked",false): return false
+	return true

@@ -3,7 +3,7 @@ extends RefCounted
 ## Gameplay defaults and user overrides have one owner. Menu-only bindings can
 ## overlap world bindings; UI ownership prevents them firing in both contexts.
 const PATH := "user://actor_bindings.cfg"
-const LAYOUT_VERSION := 4
+const LAYOUT_VERSION := 5
 const KEYS := {
 	"move_left":KEY_A,"move_right":KEY_D,"move_up":KEY_W,"move_down":KEY_S,
 	"dodge":KEY_SPACE,"interact":KEY_F,"loot_all":KEY_T,"field_method":KEY_C,
@@ -21,9 +21,9 @@ static func defaults() -> Dictionary:
 	var result: Dictionary={}
 	for action in KEYS:
 		result[action]=[_key(KEYS[action])]
-	for action in ["attack","guard","heavy_attack"]:
+	for action in ["attack","guard","heavy_attack","material_wheel"]:
 		var event:=InputEventMouseButton.new()
-		event.button_index=MOUSE_BUTTON_RIGHT if action=="guard" else MOUSE_BUTTON_LEFT
+		event.button_index=MOUSE_BUTTON_MIDDLE if action=="material_wheel" else MOUSE_BUTTON_RIGHT if action=="guard" else MOUSE_BUTTON_LEFT
 		event.ctrl_pressed=action=="heavy_attack"
 		result[action]=[event]
 	return result

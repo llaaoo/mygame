@@ -67,7 +67,7 @@ func run() -> void:
  key.pressed=true
  Input.parse_input_event(key)
  await frames()
- check(game.equipment_service.count("river_survey_spear")==1,"T failed to retrieve loot while modal paused the world")
+ check(game.equipment_service.count("river_survey_spear")==1,"T failed to retrieve loot through live modal input ownership")
  key.pressed=false
  Input.parse_input_event(key)
  game.ui.close_modal()
@@ -82,13 +82,17 @@ func run() -> void:
  for tab in FrontierHub.TABS:
   game.hub.open(tab)
   await frames()
-  check(is_instance_valid(game.ui.modal) and game.ui.modal.get_meta("frontier_page")==tab,"Hub tab missing: "+tab)
-  check(game.hub._rows.size.x>100 and game.hub._detail.size.x>100,"Hub columns collapsed")
+  if tab in ["equipment","supplies"]:
+   check(game.inventory_screen.visible and game.inventory_screen.mode==tab and game.player.ui_blocked and not paused,"Unified inventory route missing: "+tab)
+   check(game.inventory_screen._portrait.size.x>=240 and game.inventory_screen._grid.size.x>100,"Paper doll / inventory columns collapsed")
+  else:
+   check(is_instance_valid(game.ui.modal) and game.ui.modal.get_meta("frontier_page")==tab,"Hub tab missing: "+tab)
+   check(game.hub._rows.size.x>100 and game.hub._detail.size.x>100,"Hub columns collapsed")
  game.hub.open("equipment")
- game.hub.query="不可能匹配的物品"
- game.hub._refresh_rows()
- check(game.hub.selected.is_empty(),"Search retained mismatched selection")
- game.ui.close_modal()
+ game.inventory_screen._search.text="不可能匹配的物品"
+ await frames(20)
+ check(game.inventory_screen._rows().is_empty(),"Search retained mismatched physical inventory")
+ game.inventory_screen.close()
  # Searchable UI and old modal can replace each other without stale resize callbacks.
  game.show_map()
  await frames()

@@ -70,3 +70,5 @@ UI可以调用领域服务请求训练、制造、交付或施法，由服务验
 2026-11-07：当前接入与历史内容区分见[项目使用审计](PROJECT_USAGE_AUDIT.md)。输入默认项与用户改键统一由`InputBindings.install()`在Player入树时装配；场景不另行注册。探索战役使用`ExplorationProgressService`，不创建旧`QuestManager/QuestTracker`或禁用的`RunManager`；旧main入口仍保留房间与NPC任务验证。
 
 技能输入与历史能力迁移见[LEGACY_SKILL_INTEGRATION](LEGACY_SKILL_INTEGRATION.md)。统一快捷槽与来源快照见[SPELL_SYSTEM_REVIEW](SPELL_SYSTEM_REVIEW.md)。QuickslotLoadout持有13槽的动作/物品绑定；旧left/right存储键保留兼容，解释为Q/R独立槽，E单独保存；新操作继续经过SpellOperationData、CastPlan和同一事务，不另建技能或材料执行链。
+
+2026-11-07：实时界面与物品管理见[REALTIME_INVENTORY](REALTIME_INVENTORY.md)。`QuickslotMaterials`统一按槽选材查询/请求，`InventoryActions`注入库存管理权限与保存行为，`GroundItems`只投影库存cache；UI不持有第二份绑定或战利品。菜单仅接管输入，`ActorActionController.advance`与世界保持运行。

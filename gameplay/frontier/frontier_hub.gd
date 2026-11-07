@@ -17,7 +17,8 @@ var _open := false
 
 func _init(owner_game: GrayriverGame) -> void: game=owner_game
 func handle_shortcut(key: int) -> bool:
-	var target: String = {KEY_J:"quests",KEY_O:"equipment",KEY_I:"equipment",KEY_N:"supplies",KEY_TAB:"actions"}.get(key,"")
+	if game.ui.modal_locked: return false
+	var target: String = {KEY_J:"quests",KEY_O:"equipment",KEY_I:"inventory",KEY_N:"supplies",KEY_TAB:"actions"}.get(key,"")
 	if target.is_empty(): return false
 	if key==KEY_TAB and is_instance_valid(game.ui.modal):
 		if game.ui.modal.get_meta("frontier_page","").is_empty(): return false
@@ -29,6 +30,11 @@ func handle_shortcut(key: int) -> bool:
 	return true
 
 func open(tab := "quests", source := "") -> void:
+	if game.ui.modal_locked: return
+	if tab in ["equipment","supplies","inventory"] and is_instance_valid(game.inventory_screen):
+		game.ui.close_modal()
+		game.inventory_screen.open("all" if tab=="inventory" else tab)
+		return
 	page=tab
 	loot_id=source
 	query=""
@@ -270,7 +276,7 @@ func _show_detail() -> void:
 				if not FrontierControls.set_quick_cast(value): game.ui.notify("本次设置已生效，但未保存到磁盘。"))
 			card.add_child(toggle)
 			card.add_child(preload("res://gameplay/foundation/ui/binding_editor.tscn").instantiate())
-			card.add_child(W.label("关闭时按住预览、松开施放。蓄力与引导仍需按住；Shift只表示显式消费恩赐。每次只执行一个基础动作，不自动组合。\n\nWASD 移动 · 空格闪避 · F交互\nQ/E/R与1—0 独立快捷槽 · K绑定动作或物品\nTab 远征面板 · J委托 · I/O装备 · N补给 · G地图\n右键按住格挡 · Alt冲刺 · Ctrl+左键重击 · B放下背包\n地图滚轮缩放、中键/右键拖动、左键放路标。",14))
+			card.add_child(W.label("关闭时按住预览、松开施放。蓄力与引导仍需按住；Shift只表示显式消费恩赐。每次只执行一个基础动作，不自动组合。\n\nWASD 移动 · 空格闪避 · F交互\nQ/E/R与1—0 独立快捷槽 · K绑定动作或物品\nTab 远征面板 · J委托 · I行囊 · O穿戴 · N补给 · G地图\n右键按住格挡 · Alt冲刺 · Ctrl+左键重击 · B放下背包\n地图滚轮缩放、中键/右键拖动、左键放路标。",14))
 
 func _open_loadout() -> void:
 	game.ui.close_modal()

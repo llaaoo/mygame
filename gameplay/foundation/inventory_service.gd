@@ -81,6 +81,49 @@ func recover_pack(actor: String, id: String) -> bool:
 	return true
 
 
+func ground_ids(region: String) -> Array[String]:
+	var result: Array[String]=[]
+	for id: String in _containers:
+		var record: Dictionary=_containers[id]
+		if record.kind=="cache" and id.begins_with("ground.") and record.region==region and not record.items.is_empty(): result.append(id)
+	return result
+func ground_position(id: String) -> Vector2:
+	var point: Array=_containers.get(id,{}).get("position",[])
+	return Vector2(point[0],point[1]) if point.size()==2 else Vector2.INF
+func drop_item(actor: String,uid: String,quantity: int,region: String,position: Vector2) -> OperationResult:
+	var source:=locate(uid)
+	var instance:=_instance(uid)
+	var owned:=actor_containers(actor); owned.append(actor+".gear")
+	if not instance or source not in owned or quantity<1 or quantity>instance.quantity or region.is_empty() or not position.is_finite() or absf(position.x)>100000 or absf(position.y)>100000: return OperationResult.reject("invalid_drop")
+	var destination:=""
+	for id in ground_ids(region):
+		if ground_position(id).distance_to(position)<24 and space(id,instance.definition_id,instance.properties)>=quantity: destination=id; break
+	var created:=destination.is_empty()
+	if created:
+		if _containers.size()>=4096: return OperationResult.reject("world_capacity")
+		var serial:=_containers.size()
+		destination="ground.%d"%serial
+		while _containers.has(destination): serial+=1; destination="ground.%d"%serial
+		ensure_container(destination,"world","cache",256)
+		_containers[destination].region=region
+		_containers[destination].position=[position.x,position.y]
+	var result:=commit(preview(source,destination,uid,quantity))
+	if not result.accepted and created: _containers.erase(destination)
+	return result
+func split_stack(actor: String,uid: String,quantity: int) -> OperationResult:
+	var source:=locate(uid)
+	var instance:=_instance(uid)
+	if not instance or source not in actor_containers(actor) or quantity<1 or quantity>=instance.quantity: return OperationResult.reject("invalid_quantity")
+	if _containers[source].items.size()>=int(_containers[source].capacity): return OperationResult.reject("capacity")
+	var split:=ItemInstance.from_snapshot(instance.snapshot())
+	split.uid="item.%d"%next_uid; next_uid+=1
+	split.quantity=quantity; instance.quantity-=quantity
+	_containers[source].items.append(split)
+	_index(source,split); _touch(source)
+	var result:=OperationResult.success(quantity)
+	result.item_uids=[split.uid]
+	return result
+
 func discard_actor_containers(actor: String) -> void:
 	for id: String in _containers.keys():
 		if _containers[id].owner != actor:
@@ -348,6 +391,7 @@ func equip(actor: String,uid: String) -> OperationResult:
 	_publish("equipment_changed",actor,{"uid":uid,"slot":data.slot_type})
 	return OperationResult.success(1)
 func unequip(actor: String,slot: int) -> OperationResult:
+	if not is_attached(actor+".pack"): return OperationResult.reject("背包已放下，无法远程收起装备。")
 	var gear:=actor+".gear"
 	var uid: String=_containers.get(gear,{}).get("equipped",{}).get(str(slot),"")
 	if uid.is_empty(): return OperationResult.reject("empty_slot")
@@ -430,6 +474,7 @@ static func valid_snapshot(data: Variant) -> bool:
 		if not c.get("revision") is int or c.revision<0 or not c.get("attached") is bool or not c.get("region") is String or not c.get("position") is Array: return false
 		if not c.attached and (c.kind != "pack" or c.region.is_empty() or c.position.size() != 2):
 			return false
+		if id.begins_with("ground.") and (c.kind!="cache" or c.owner!="world" or c.region.is_empty() or c.position.size()!=2): return false
 		if not c.position.is_empty():
 			if c.position.size()!=2: return false
 			for n in c.position:

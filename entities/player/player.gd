@@ -44,6 +44,7 @@ const PLAYER_SKILL_IDS: Array[String] = [
 @export var inventory: Inventory
 var inventory_panel: InventoryPanel
 var skill_pool_ui: SkillPoolUI = null
+var material_wheel: MaterialWheel
 var _skill_pool: SkillPool = null
 
 ## ── 调试 ──
@@ -261,6 +262,8 @@ func _on_health_changed(current_hp: int, max_hp: int) -> void:
 	health_changed.emit(current_hp, max_hp)
 
 func _on_died() -> void:
+	if is_instance_valid(material_wheel): material_wheel.close()
+	GameUIStyle.close_gameplay_views(self)
 	set_process(false)
 	set_physics_process(false)
 	# 清理所有召唤物
@@ -323,6 +326,9 @@ func _setup_boss_bar() -> void:
 	WorldScope.presentation(self).add_child.call_deferred(bar)
 
 func _setup_skill_pool_ui() -> void:
+	material_wheel=MaterialWheel.new()
+	material_wheel.player=self
+	WorldScope.presentation(self).add_child(material_wheel)
 	var ui := SkillPoolUI.new()
 	skill_pool_ui=ui
 	ui.name = "SkillPoolUI"
@@ -347,6 +353,7 @@ func _add_test_items() -> void:
 ## ── 公开 API ──
 
 func get_mouse_direction() -> Vector2:
+	if is_instance_valid(material_wheel) and material_wheel.visible: return material_wheel.opening_direction
 	return (get_global_mouse_position() - global_position).normalized()
 
 func perform_melee_attack() -> void:

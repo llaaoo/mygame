@@ -36,7 +36,7 @@ func _run() -> void:
 	var text := controller.describe_comparison(water, player, normal, shifted)
 	check("普通施法" in text and "Shift施法" in text and "50%" in text and "半径171" in text and "实际命中" in text, "Comparison did not explain ordinary/Shift shape, spending and uncertainty")
 	game.workshop.show_action(water)
-	check(is_instance_valid(game.ui.modal) and paused, "Material comparison panel did not open")
+	check(is_instance_valid(game.ui.modal) and not paused and game.player.ui_blocked, "Material comparison panel did not open")
 	game.ui.close_modal()
 	var surfaces := GameRuntime.instance.get_simulation_runtime().get_surface_manager()
 	surfaces.project_state("wet", ["ice"])

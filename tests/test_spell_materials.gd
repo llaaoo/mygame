@@ -20,7 +20,7 @@ func _run() -> void:
 	var previous := supplies.serialize()
 	_check(not supplies.craft("unknown") and previous == supplies.serialize(), "Invalid craft changed inventory")
 	game.workshop.show_materials()
-	_check(paused and is_instance_valid(game.ui.modal), "Material configuration UI missing")
+	_check(not paused and game.player.ui_blocked and is_instance_valid(game.ui.modal), "Material configuration UI missing")
 	game.ui.close_modal()
 	await _travel("yard")
 	await _interact("火阵铭刻记录")

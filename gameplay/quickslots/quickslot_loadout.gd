@@ -23,6 +23,14 @@ func equip_skill(source: String,skill: SkillData,choice: Dictionary={}) -> bool:
 	if not valid_entry({"skill_id":skill.get_id(),"selection":choice}): return false
 	_bindings[source]={"skill":SkillInstance.new(skill),"selection":choice.duplicate(true)}
 	_touch(source); return true
+func set_selection(source: String,choice: Dictionary) -> bool:
+	var skill:=instance(source)
+	if not skill or not valid_entry({"skill_id":skill.base_data.get_id(),"selection":choice}): return false
+	if selection(source)==choice: return true
+	# Preserve the instance, upgrades and shared cooldown. Only the source version changes.
+	_bindings[source]["selection"]=choice.duplicate(true)
+	_touch(source)
+	return true
 func bind_item(source: String,id: String,uid := "") -> bool:
 	if source not in SOURCES: return false
 	var definition:=ItemCatalog.default_catalog().definition(id)
@@ -63,7 +71,9 @@ static func valid_entry(entry: Variant) -> bool:
 		var operation: SpellOperationData
 		for candidate in SpellOperationCatalog.default_catalog().operations:
 			if candidate.action.get_id()==entry.get("skill_id",""): operation=candidate; break
-		if not operation or not operation.payload(str(choice.get("payload",""))): return false
+		if not operation:
+			if entry.get("skill_id","") not in ["ignite","pulse","water_call"] or choice.get("payload","")!="" or choice.get("uid","")!="": return false
+		elif not operation.payload(str(choice.get("payload",""))): return false
 		if choice.get("modifier","")!="" and choice.modifier not in CastingSupplies.MATERIAL_IDS: return false
 	for rank in entry.get("upgrades",{}).values():
 		if typeof(rank) not in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(rank)) or rank<0: return false

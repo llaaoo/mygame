@@ -46,7 +46,7 @@ func _run() -> void:
 		_check(supplies.craft("echo_ink"), "Echo ink crafting failed")
 	_check(supplies.craft("venom_extract") and supplies.craft("ward_powder"), "Advanced material crafting failed")
 	game.workshop.show_action(sm.pool.get_skill("ignite"))
-	_check(paused, "Advanced material configuration did not open")
+	_check(not paused and game.player.ui_blocked, "Advanced material configuration did not open")
 	game.ui.close_modal()
 
 	# Isolated status conversion rollback; joint field activation has a dedicated test.

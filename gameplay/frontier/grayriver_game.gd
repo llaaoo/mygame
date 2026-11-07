@@ -129,6 +129,7 @@ func _bootstrap() -> void:
 	await super._bootstrap()
 	session.equipment_page=hub.open.bind("equipment","")
 	session.supply_page=hub.open.bind("supplies","")
+	if inventory_screen: inventory_screen.navigation_request=_inventory_navigation
 	session.sync_extra=stories.sync
 	if player.inventory_panel: player.inventory_panel.page_request=hub.handle_shortcut.bind(KEY_I)
 	ui.pause_provider = show_valley_pause
@@ -139,8 +140,15 @@ func _bootstrap() -> void:
 	frontier_hud=FrontierHUD.new()
 	frontier_hud.game=self
 	add_child(frontier_hud)
+func _inventory_navigation(key: int) -> void:
+	match key:
+		KEY_TAB: hub.open("actions")
+		KEY_J: hub.open("quests")
+		KEY_K: player.skill_pool_ui.open()
+		KEY_G: show_map()
+		KEY_M: player.material_wheel.open()
 func show_valley_pause() -> void:
-	ui.show_panel("灰河谷 · 暂停","野外连续行走，遗迹沿实际入口往返。G只记录亲自到过的地点。\n\n撤回镇中需现场站定3秒，移动、攻击、施法或受伤打断；不治疗、不补货。F5保存当前地点与进度，F9读取。已击败敌人和永久成果保留。",[{"title":"继续旅程","callback":ui.close_modal},{"title":"查看行路图","callback":show_map},{"title":"现场撤回河谷镇","disabled":is_at_base(),"callback":retreat.begin},{"title":"重试遗迹（无击杀奖励）","disabled":not can_practice(),"callback":progress_service.practice_encounters},{"title":"重置河谷遭遇（无击杀奖励）","callback":replay_encounters},{"title":"旧监狱验证场（独立存档）","callback":open_prototype}])
+	ui.show_panel("灰河谷 · 系统菜单","世界持续运行，打开界面仍可能受伤。野外连续行走，遗迹沿实际入口往返。G只记录亲自到过的地点。\n\n撤回镇中需现场站定3秒，移动、攻击、施法或受伤打断；不治疗、不补货。F5保存当前地点与进度，F9读取。已击败敌人和永久成果保留。",[{"title":"继续旅程","callback":ui.close_modal},{"title":"查看行路图","callback":show_map},{"title":"现场撤回河谷镇","disabled":is_at_base(),"callback":retreat.begin},{"title":"重试遗迹（无击杀奖励）","disabled":not can_practice(),"callback":progress_service.practice_encounters},{"title":"重置河谷遭遇（无击杀奖励）","callback":replay_encounters},{"title":"旧监狱验证场（独立存档）","callback":open_prototype}])
 func replay_encounters() -> void:
 	if trial_recorder.active: trial_recorder.finish("重置河谷遭遇")
 	ui.close_modal()
