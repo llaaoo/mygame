@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=4 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="skill"]
+[ext_resource type="Script" path="res://gameplay/status/buff.gd" id="buff"]
+[sub_resource type="Resource" id="Buff"]
+script = ExtResource("buff")
+status_id = "soul_charge"
+buff_id = "soul_charge"
+display_name = "蕴魂"
+duration = 45.0
+stack_behavior = 1
+max_stacks = 3
+capacity_key = "soul_capacity_bonus"
+tactical_hint = "普通施法保留；Shift＋火花/震荡/凝神/水引各兑现1层。汲魂刷新持续时间，不超容量；跨区域清理。"
+[resource]
+script = ExtResource("skill")
+id = "soul_harvest"
+conditional_cast = true
+requires_soul_remnant = true
+preparation = 0.55
+display_name = "汲取"
+description = "汲取真实残魂或自己法阵的剩余充能，存为最多3层、持续45秒的临时能量；不会制造材料。"
+mechanics = "4 MP；范围150；准备0.55秒；蕴魂最多3层，持续45秒。残魂60秒后消散，随区域清理。"
+role = "世界条件与准备"
+icon_atlas_index = 17
+skill_type = 1
+tags = ["soul", "buff"]
+mp_cost = 4
+cooldown = 0.8
+buff_resource = SubResource("Buff")
+buff_duration = 45.0
+
+school = 1
+
+operation_id = "extract"

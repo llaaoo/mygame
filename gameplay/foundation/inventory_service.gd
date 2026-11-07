@@ -5,6 +5,7 @@ signal changed
 var definitions: Dictionary = {}
 var containers: Dictionary = {}
 var next_uid := 1
+var clock_seconds := 0.0
 var _instances: Dictionary={}
 var _locations: Dictionary={}
 var _pending_facts: Array[Dictionary]=[]
@@ -73,6 +74,7 @@ func set_materials(actor: String,amounts: Dictionary) -> void:
 	end_batch()
 func _stack_limit(key: String) -> int:
 	var data:=definitions.get(key) as ItemData
+	if data and data.use_profile and data.use_profile.kind==ItemUseDefinition.Kind.SPRAY: return 1
 	return 1 if data is EquipmentData else maxi(1,data.max_stack) if data and data.stackable else 99 if CastingSupplies.known_item(key) else 1
 func space(id: String,key: String,properties: Dictionary = {}) -> int:
 	if not containers.has(id): return 0
@@ -102,6 +104,9 @@ func receive(actor: String,key: String,amount: int,migration := false) -> int:
 	end_batch()
 	return added
 func _insert(id: String,key: String,amount: int,uid := "",properties: Dictionary = {}) -> Array[String]:
+	var data:=definitions.get(key) as ItemData
+	if properties.is_empty() and data and data.use_profile and data.use_profile.kind==ItemUseDefinition.Kind.SPRAY:
+		properties={"doses":data.use_profile.capacity}
 	var uids: Array[String]=[]
 	var limit:=_stack_limit(key)
 	if limit>1:
@@ -403,8 +408,59 @@ func valid_definitions(data: Dictionary) -> bool:
 		for row in container.items:
 			var definition:=definitions.get(row.definition) as ItemData
 			if not definition or row.quantity>_stack_limit(row.definition): return false
+			var props: Dictionary=row.get("properties",{})
+			if definition.use_profile and definition.use_profile.kind==ItemUseDefinition.Kind.SPRAY:
+				if not props.get("doses") is int or props.doses<1 or props.doses>definition.use_profile.capacity: return false
+			if props.has("coating"):
+				var state=props.coating
+				if not definition is EquipmentData or not state is Dictionary: return false
+				var material:=definitions.get(state.get("id","")) as ItemData
+				if not material or not material.use_profile or material.use_profile.kind!=ItemUseDefinition.Kind.COATING: return false
+				if typeof(state.get("expires_at")) not in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(state.expires_at)) or state.expires_at<0: return false
 			if container.kind=="gear":
 				if not definition is EquipmentData or container.equipped.get(str(definition.slot_type),"")!=row.uid: return false
 				slots[str(definition.slot_type)]=row.uid
 		if container.kind=="gear" and slots!=container.equipped: return false
 	return true
+
+func ready_uid(actor: String,key: String) -> String:
+	for row in entries(actor+".pocket"):
+		if row.definition==key and int(row.properties.get("doses",1))>0: return row.uid
+	return ""
+func spend_instance(actor: String,uid: String,property: String,amount: int,revision := -1) -> bool:
+	var source:=locate(uid)
+	var entry:=_instance(uid)
+	if not entry or source!=actor+".pocket" or amount<=0 or revision>=0 and containers[source].revision!=revision: return false
+	var value:=entry.quantity if property=="quantity" else int(entry.properties.get(property,0))
+	if value<amount: return false
+	if property=="quantity": entry.quantity-=amount
+	elif property=="doses": entry.properties.doses=value-amount
+	else: return false
+	if value==amount:
+		containers[source].items.erase(entry)
+		_unindex(entry)
+	_touch(source)
+	_publish("item_used",actor,{"uid":uid,"property":property,"amount":amount})
+	return true
+func set_properties(uid: String,properties: Dictionary) -> bool:
+	var entry:=_instance(uid)
+	if not entry: return false
+	entry.properties=properties.duplicate(true)
+	_touch(locate(uid))
+	return true
+func coating(uid: String) -> ItemUseDefinition:
+	var entry:=_instance(uid)
+	if not entry: return null
+	var state: Dictionary=entry.properties.get("coating",{})
+	if float(state.get("expires_at",0))<=clock_seconds: return null
+	var definition:=definitions.get(state.get("id","")) as ItemData
+	return definition.use_profile if definition else null
+func state_text(uid: String) -> String:
+	var entry:=_instance(uid)
+	if not entry: return ""
+	if entry.properties.has("doses"): return "剩余%d剂"%int(entry.properties.doses)
+	var active:=coating(uid)
+	if active:
+		var definition:=definitions.get(active.id) as ItemData
+		return "%s · 剩余%.0f秒"%[definition.display_name if definition else "涂层",float(entry.properties.coating.expires_at)-clock_seconds]
+	return ""

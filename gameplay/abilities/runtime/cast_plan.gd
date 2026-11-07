@@ -10,6 +10,8 @@ var rule_id := ""
 var field: FireSigil
 var cost := 0
 var material_costs: Dictionary = {}
+var instance_costs: Array[Dictionary]=[]
+var stamina_cost := 0.0
 var material_id := ""
 var cooldown_keys: Dictionary = {}
 var cooldown_key := ""
@@ -26,6 +28,7 @@ var partial_boons: Array[String] = []
 var infusions: Array[String] = []
 var explanation: Array[CastExplanationStep] = []
 var effect_label := ""
+var modifier_id := ""
 var operation_reason := ""
 var reason := ""
 var ready := false

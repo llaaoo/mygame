@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=4 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="1"]
+[ext_resource type="Script" path="res://gameplay/status/buff.gd" id="2"]
+[sub_resource type="Resource" id="Buff"]
+script = ExtResource("2")
+buff_id = "focus"
+display_name = "凝神"
+exclusive_group = "sigil_attunement"
+duration = 5.0
+speed_multiplier = 1.08
+stat_modifiers = {}
+[resource]
+script = ExtResource("1")
+conditional_cast = true
+id = "focus"
+display_name = "调谐"
+combination_only = false
+description = "选择纯粹凝神、回响墨、守护粉，或脚下已有法阵作为来源；不会自动布阵。"
+mechanics = "4 MP；持续 5.0 秒。"
+role = "增益触发"
+icon_atlas_index = 17
+skill_type = 1
+tags = ["buff", "combination"]
+mp_cost = 4
+cooldown = 4.0
+buff_resource = SubResource("Buff")
+buff_duration = 5.0
+
+operation_id = "attune"

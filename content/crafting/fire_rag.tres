@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="CraftingRecipe" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/materials/crafting_recipe.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "fire_rag"
+inputs = {"resin":1, "charcoal":1, "cloth":1}
+output_id = "fire_rag"
+output_count = 1

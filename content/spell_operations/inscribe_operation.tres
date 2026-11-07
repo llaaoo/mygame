@@ -1,13 +1,14 @@
-[gd_resource type="Resource" script_class="SpellOperationData" load_steps=7 format=3]
+[gd_resource type="Resource" script_class="SpellOperationData" load_steps=8 format=3]
 [ext_resource type="Script" path="res://gameplay/abilities/operations/spell_operation_data.gd" id="1"]
 [ext_resource type="Resource" path="res://content/spell_operations/inscribe.tres" id="action"]
 [ext_resource type="Resource" path="res://content/spell_operations/payloads/arcane.tres" id="arcane"]
 [ext_resource type="Resource" path="res://content/spell_operations/payloads/ember.tres" id="ember"]
 [ext_resource type="Resource" path="res://content/spell_operations/payloads/frost.tres" id="frost"]
 [ext_resource type="Resource" path="res://content/spell_operations/payloads/storm.tres" id="storm"]
+[ext_resource type="Resource" path="res://content/spell_operations/payloads/ward_rune.tres" id="ward"]
 [resource]
 script = ExtResource("1")
 action = ExtResource("action")
 aliases = PackedStringArray("fire_sigil", "frost_sigil", "storm_sigil")
 default_payload = "arcane"
-payloads = [ExtResource("arcane"), ExtResource("ember"), ExtResource("frost"), ExtResource("storm")]
+payloads = [ExtResource("arcane"), ExtResource("ember"), ExtResource("frost"), ExtResource("storm"), ExtResource("ward")]

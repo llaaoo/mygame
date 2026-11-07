@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="SpellPayloadData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/operations/spell_payload_data.gd" id="data"]
+[resource]
+script = ExtResource("data")
+id = "ward_rune"
+title = "守护法阵"
+material_id = "ward_powder"
+field_type = "ward"
+description = "守护粉铭刻的真实法阵；调谐获得护盾，震荡可释放能量。"

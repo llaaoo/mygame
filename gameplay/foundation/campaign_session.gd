@@ -20,6 +20,7 @@ var sync_extra: Callable
 var death_handler: Callable
 var hour_query: Callable
 var state: Dictionary={}
+var belt: Array[Dictionary]=[{"id":"ration","method":"use"},{"id":"clean_water","method":"use"},{"id":"tea","method":"use"},{"id":"broth","method":"use"}]
 var _pack_nodes: Dictionary={}
 var _activity_families: Dictionary={}
 func configure(content: ExplorationContentCatalog,profile: RulesetDefinition) -> void:
@@ -37,6 +38,8 @@ func restore(data: Dictionary) -> bool:
 	if not valid_snapshot(data): return false
 	if data.has("inventory") and not inventory.valid_definitions(data.inventory): return false
 	state=data.duplicate(true)
+	inventory.clock_seconds=float(data.get("clock_seconds",0))
+	if data.has("belt"): belt.assign(data.belt)
 	if data.has("inventory"): inventory.restore(data.inventory)
 	actor_records=data.get("actors",{}).duplicate(true)
 	proficiency=data.get("proficiency",{}).duplicate(true)
@@ -93,6 +96,9 @@ func bind_actor(actor: CharacterBody2D,id: String,legacy_counts: Dictionary = {}
 	if rules.tactical_combat and actor is Player:
 		actor.state_machine.process_mode=Node.PROCESS_MODE_DISABLED
 		context.actions.input_provider=actor.input_controller.poll_universal_actions
+		context.item_actions.aim_query=actor.get_mouse_direction
+		context.spray.aim_query=actor.get_mouse_direction
+		context.spray.held_query=func(source: String): return Input.is_action_pressed(actor.input_controller.action_for_source(source))
 		context.actions.legacy_request=actor.input_controller.resolve_action
 		context.actions.pack_request=drop_pack.bind(id)
 	if rules.tactical_combat:
@@ -120,7 +126,7 @@ func capture_actors() -> void:
 func snapshot() -> Dictionary:
 	capture_actors()
 	if sync_extra.is_valid(): sync_extra.call()
-	return {"schema":1,"inventory":persistent_inventory(),"actors":actor_records.duplicate(true),"relations":relations.snapshot(),"proficiency":proficiency.duplicate(true)}
+	return {"schema":1,"clock_seconds":inventory.clock_seconds,"belt":belt.duplicate(true),"inventory":persistent_inventory(),"actors":actor_records.duplicate(true),"relations":relations.snapshot(),"proficiency":proficiency.duplicate(true)}
 func leave_region() -> void:
 	capture_actors()
 	for id in actors.keys():
@@ -184,6 +190,10 @@ func recover_pack(actor_id: String,id: String) -> bool:
 	if save_requested.is_valid(): save_requested.call()
 	return true
 func begin_item(actor_id: String,id: String) -> bool:
+	var owner:=actor_for_id(actor_id)
+	var definition:=inventory.definitions.get(id) as ItemData
+	if owner and definition and definition.use_profile and definition.use_profile.kind==ItemUseDefinition.Kind.SPRAY: return prepare_sprayer(actor_id,id)
+	if owner and definition and definition.use_profile: return owner.actor_context.item_actions.begin(id)
 	if not actors.has(actor_id) or not SurvivalCatalog.FOODS.has(id): return false
 	var actor: CharacterBody2D=actors[actor_id].get_ref()
 	if not is_instance_valid(actor) or not actor.actor_context.items.can_pay(actor_id,{id:1},true): return false
@@ -194,6 +204,15 @@ func begin_item(actor_id: String,id: String) -> bool:
 	use.context=actor.actor_context; use.item_id=id
 	actor.add_child(use)
 	return true
+func prepare_sprayer(actor_id: String,id: String,uid := "") -> bool:
+	var owner:=actor_for_id(actor_id)
+	if not owner: return false
+	var manager:=owner.get_node("SkillManager") as SkillManager
+	var action:=manager.pool.get_skill("disperse")
+	if not action or not manager.knows_action(action): return false
+	for payload in SpellOperationCatalog.default_catalog().operation("disperse").payloads:
+		if payload.material_id==id: return manager.combinations.supplies.select_payload(action,payload.id,manager,uid)
+	return false
 func _on_fact(fact: Dictionary) -> void:
 	if fact.source=="player":
 		var actor:=actor_for_id("player")
@@ -214,6 +233,12 @@ func _on_fact(fact: Dictionary) -> void:
 static func valid_snapshot(data: Variant) -> bool:
 	if not data is Dictionary: return false
 	if data.is_empty(): return true
+	if typeof(data.get("clock_seconds",0)) not in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(data.get("clock_seconds",0))) or data.get("clock_seconds",0)<0: return false
+	if data.has("belt"):
+		if not data.belt is Array or data.belt.size()!=4: return false
+		for binding in data.belt:
+			if not binding is Dictionary or not binding.get("id") is String or binding.get("method","") not in ["use","throw"]: return false
+			if not valid_belt_item(binding.id,binding.method): return false
 	if data.get("schema")!=1 or not InventoryService.valid_snapshot(data.get("inventory",{})) or not data.get("actors") is Dictionary or not data.get("relations") is Dictionary or not data.get("proficiency") is Dictionary: return false
 	for id in data.actors:
 		var record=data.actors[id]
@@ -242,13 +267,19 @@ func observe_combat(executor: CombatExecutor) -> void:
 		executor.damage_applied.connect(_on_damage)
 		executor.harmful_contact_applied.connect(_on_hostile_contact)
 func _on_damage(source: Node2D,target: Node2D,amount: int) -> void:
-	if amount>0: _on_hostile_contact(source,target)
+	if amount>0:
+		var context:=target.get("actor_context") as ActorContext if "actor_context" in target else null
+		if context:
+			context.item_actions.cancel()
+			context.spray.stop()
+		_on_hostile_contact(source,target)
 func _on_hostile_contact(source: Node2D,target: Node2D) -> void:
 	if not is_instance_valid(source) or not is_instance_valid(target) or source==target: return
 	if target.is_queued_for_deletion() or target.get_node("HealthComponent").is_dead: return
 	if not "actor_context" in source or not "actor_context" in target or not source.actor_context or not target.actor_context: return
 	var a: ActorContext=source.actor_context
 	var b: ActorContext=target.actor_context
+	if a.id==b.id: return
 	relations.set_attitude(b.id,a.id,"hostile")
 	if "story_truce" in target: target.story_truce=false
 	if b.hostile_requested.is_valid(): b.hostile_requested.call(target)
@@ -281,3 +312,16 @@ func mount_actor(scene: PackedScene,id: String,position: Vector2,configure_actor
 	region.root.add_child(actor)
 	bind_actor(actor,id)
 	return actor
+
+func _process(delta: float) -> void:
+	if rules and rules.physical_inventory and region.available(): inventory.clock_seconds+=delta
+func bind_belt(index: int,id: String,method := "use") -> bool:
+	if index<0 or index>=4 or not valid_belt_item(id,method): return false
+	belt[index]={"id":id,"method":method}
+	if save_requested.is_valid(): save_requested.call()
+	return true
+static func valid_belt_item(id: String,method: String) -> bool:
+	var definition:=ItemCatalog.default_catalog().definition(id)
+	if not definition: return false
+	if method=="throw": return definition.use_profile!=null and definition.use_profile.kind==ItemUseDefinition.Kind.THROWABLE
+	return method=="use" and (SurvivalCatalog.FOODS.has(id) or definition.use_profile!=null)

@@ -38,14 +38,16 @@ func knows_action(skill: SkillData) -> bool:
 func canonical_action(skill: SkillData) -> SkillData:
 	if not material_operations or not skill: return skill
 	var id:=SpellOperationCatalog.default_catalog().canonical(skill.get_id())
-	return pool.get_skill(id) if pool and id!=skill.get_id() else skill
+	return pool.get_skill(id) if pool and pool.get_skill(id) and (id!=skill.get_id() or not pool.get_skill(id).operation_id.is_empty()) else skill
 
 func enable_material_operations() -> void:
 	if material_operations: return
 	material_operations=true
 	if not pool: pool=SkillPool.new()
 	# Skill pools are per actor. Definitions remain shared and immutable.
-	for operation in SpellOperationCatalog.default_catalog().operations: pool.add_skill(operation.action)
+	for operation in SpellOperationCatalog.default_catalog().operations:
+		pool.remove_skill(operation.action.get_id())
+		pool.add_skill(operation.action)
 	if left_hand: equip_hand("left",left_hand.data)
 	if right_hand: equip_hand("right",right_hand.data)
 	var seen: Dictionary={}
@@ -342,6 +344,8 @@ func _execute_with_context(skill: SkillData, source: String, caster: Node2D, ctx
 		return false
 	if skill.combination_only:
 		return false
+	if skill.operation_id=="disperse" and "actor_context" in caster and caster.actor_context and caster.actor_context.spray:
+		return caster.actor_context.spray.start(skill,source,ctx.direction)
 	if combinations and combinations.handles(skill):
 		return combinations.start(skill, caster, ctx, source)
 	if combinations and combinations.is_busy():

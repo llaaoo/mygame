@@ -8,6 +8,7 @@ static func allocate_id() -> int:
 
 ## A synchronous resource transaction. No facts escape before every effect accepts.
 var batch := SkillExecutionBatch.new()
+var stamina: StaminaComponent
 var mana: ManaComponent
 var buffs: BuffManager
 var supplies: CastingSupplies
@@ -20,6 +21,9 @@ var _finished := false
 var _soul: SoulRemnant
 
 func _init(actor: Node2D, inventory: CastingSupplies, id: int) -> void:
+	if "actor_context" in actor and actor.actor_context:
+		stamina=actor.actor_context.actions.stamina
+		stamina.begin_transaction()
 	mana = actor.get_node_or_null("ManaComponent") as ManaComponent
 	buffs = actor.get_node_or_null("BuffManager") as BuffManager
 	_health = actor.get_node_or_null("HealthComponent") as HealthComponent
@@ -58,7 +62,11 @@ func reserve(plan: CastPlan) -> bool:
 			if not accepted:
 				return false
 			consumed[requirement.id] = true
+	if stamina and plan.stamina_cost>0 and not stamina.spend(plan.stamina_cost): return false
+	for cost in plan.instance_costs:
+		if not supplies or not supplies.inventory_store or not supplies.inventory_store.spend_instance(supplies.actor_id,cost.uid,cost.property,cost.amount,int(cost.get("revision",-1))): return false
 	if not pay(plan.cost, plan.material_costs): return false
+	if not plan.modifier_id.is_empty(): supplies.modifiers.erase(plan.action.get_id())
 	if not plan.action.operation_id.is_empty(): return true # Prepared ammunition stays selected; every cast still pays.
 	for component in plan.components:
 		if not component.material_id.is_empty():
@@ -93,6 +101,7 @@ func _finish(commit: bool) -> void:
 	if is_instance_valid(_soul):
 		_soul.finish(commit)
 	var notifications: Array[Callable] = []
+	if stamina: notifications.append(stamina.finish_transaction(commit))
 	# Finish all mutations before invoking any subscriber.
 	if buffs:
 		notifications.append(buffs.finish_transaction(commit))

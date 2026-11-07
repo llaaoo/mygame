@@ -14,6 +14,7 @@ enum ItemType {
 
 ## 唯一标识符（推荐格式："iron_helmet"）
 @export var id: String = ""
+@export var use_profile: ItemUseDefinition
 @export_range(0,100,0.05) var weight := 0.2
 
 ## 显示名称

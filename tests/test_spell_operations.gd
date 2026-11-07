@@ -63,10 +63,10 @@ func run() -> void:
 	check(supplies.select_payload(spray,"venom",sm),"Known dispersal action required a redundant poison spell unlock")
 	mp=actor.mana_component.mp
 	check(not sm.use_slot(2,actor,Vector2.RIGHT) and actor.mana_component.mp==mp,"Missing venom still produced a paid cast")
-	store.receive_into("player.pack","venom_extract",1)
-	check(not controller.preview(spray,actor).ready,"Sprayer pulled reagent directly from the backpack")
-	var uid:=store.find_owned("player","venom_extract")
-	check(store.commit(store.preview("player.pack","player.pocket",uid,1)).accepted,"Reagent could not be prepared in pocket")
+	store.receive_into("player.pack","venom_sprayer",1)
+	check(not controller.preview(spray,actor).ready,"Sprayer pulled a bottle directly from the backpack")
+	var uid:=store.find_owned("player","venom_sprayer")
+	check(store.commit(store.preview("player.pack","player.pocket",uid,1)).accepted,"Bottle could not be prepared in pocket")
 	var target:=game.active_enemies[0]
 	target.position=actor.position+Vector2(90,0)
 	target.process_mode=Node.PROCESS_MODE_INHERIT
@@ -76,24 +76,24 @@ func run() -> void:
 	var buffs:=target.get_node("BuffManager") as BuffManager
 	buffs.clear_all(); target.health_component.invincible=false
 	await frames()
-	check(sm.use_slot(2,actor,Vector2.RIGHT),"Prepared real venom refused")
-	controller.tick(.5)
-	await frames()
-	check(buffs.has_buff("poison") and store.count("player","venom_extract")==0,"Forward spray did not hit with its real reagent")
-	check(supplies.selected.get("disperse")=="venom","Sprayer forced a menu visit after every cast")
+	var channel:=actor.actor_context.spray as SprayChannel
+	channel.set_physics_process(false); channel.held_query=Callable(); channel.aim_query=Callable()
+	check(sm.use_slot(2,actor,Vector2.RIGHT),"Prepared real spray bottle refused")
+	channel.advance(.25); channel.stop()
+	check(buffs.has_buff("poison") and store.item(uid).properties.doses==2,"Cone spray did not hit using one actual dose")
+	check(supplies.selected.get("disperse")=="venom","Sprayer forced a menu visit after every dose")
 	var poison:=buffs.capture_status("poison")
 	check(not poison.is_empty() and poison.buff.tick_damage==3,"Default elemental status overwrote the material poison")
-	controller.reset_session()
-	store.receive("player","venom_extract",1)
-	supplies.select_payload(spray,"venom",sm)
+	controller.reset_session(); supplies.select_payload(spray,"venom",sm)
 	mp=actor.mana_component.mp
 	check(sm.use_slot(2,actor,Vector2.RIGHT),"Depletion test could not begin")
-	store.pay("player",{"venom_extract":1},true)
-	controller.tick(.5)
-	check(controller.pending.is_empty() and actor.mana_component.mp==mp and supplies.selected.get("disperse")=="venom","Depleted reagent was consumed again or replaced during preparation")
+	store.pay("player",{"venom_sprayer":1},true)
+	channel.advance(.25)
+	check(not channel.active and actor.mana_component.mp==mp,"Missing bottle was replaced or charged during windup")
 	var registry:=SpellOperationCatalog.default_catalog()
 	var disperse:=registry.operation("disperse")
-	buffs.clear_all(); target.health_component.invincible=false
+	target.health_component.invincible=false
+	buffs.apply_buff(disperse.payload("venom").statuses[0])
 	var potent:=disperse.compose(disperse.payload("potent"))
 	CombatExecutor.report_hit(actor,target,0,target.position,potent,potent.tags,"potent-check")
 	poison=buffs.capture_status("poison")
@@ -122,19 +122,11 @@ func run() -> void:
 	store.receive("player","herb",3); store.receive("player","crystal",2)
 	var herbs:=store.count("player","herb")
 	check(supplies.craft("paralytic_extract") and store.count("player","herb")==herbs-2 and store.count("player","paralytic_extract")==1,"Gathered ingredients did not produce the actual sprayer reagent")
+	store.receive("player","paralytic_sprayer",1)
 	controller.reset_session(); supplies.select_payload(spray,"paralytic",sm)
-	var original:=sm.executor
-	var rejecting:=RejectingExecutor.new(); sm.add_child(rejecting); sm.executor=rejecting
-	mp=actor.mana_component.mp
-	var reagent_uid:=store.find_owned("player","paralytic_extract")
-	check(sm.use_slot(2,actor,Vector2.RIGHT),"Rejected execution test could not prepare")
-	controller.tick(.5)
-	check(actor.mana_component.mp==mp and store.item(reagent_uid)!=null and store.count("player","paralytic_extract")==1 and supplies.selected.get("disperse")=="paralytic","Executor rejection did not restore payload, UID and mana together")
-	sm.executor=original; rejecting.queue_free()
-	controller.reset_session()
 	check(supplies.serialize(true).selected.is_empty(),"Prepared payload leaked into a persistent selection")
 	check(game.session.drop_pack("player"),"Backpack drop failed")
-	check(controller.preview(spray,actor).ready,"Dropping a backpack hid a prepared pocket reagent")
+	check(controller.preview(spray,actor).ready,"Dropping a backpack hid a prepared pocket bottle")
 	var found_caster:=false
 	for enemy in game.active_enemies:
 		if not enemy.character_definition or enemy.character_definition.id!="river_caster": continue

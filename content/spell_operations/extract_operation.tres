@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="SpellOperationData" load_steps=9 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/operations/spell_operation_data.gd" id="data"]
+[ext_resource type="Resource" path="res://content/spell_operations/extract.tres" id="action"]
+[ext_resource type="Resource" path="res://content/spell_operations/payloads/soul_source.tres" id="soul_source"]
+[ext_resource type="Resource" path="res://content/spell_operations/payloads/extract_fire.tres" id="extract_fire"]
+[ext_resource type="Resource" path="res://content/spell_operations/payloads/extract_frost.tres" id="extract_frost"]
+[ext_resource type="Resource" path="res://content/spell_operations/payloads/extract_storm.tres" id="extract_storm"]
+[ext_resource type="Resource" path="res://content/spell_operations/payloads/extract_arcane.tres" id="extract_arcane"]
+[ext_resource type="Resource" path="res://content/spell_operations/payloads/extract_ward.tres" id="extract_ward"]
+[resource]
+script = ExtResource("data")
+action = ExtResource("action")
+aliases = PackedStringArray()
+knowledge_actions = PackedStringArray("soul_harvest")
+default_payload = "soul_source"
+payloads = [ExtResource("soul_source"), ExtResource("extract_fire"), ExtResource("extract_frost"), ExtResource("extract_storm"), ExtResource("extract_arcane"), ExtResource("extract_ward")]

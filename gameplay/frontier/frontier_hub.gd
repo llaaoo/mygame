@@ -72,14 +72,31 @@ func entries() -> Array[Dictionary]:
 				if filter_index == 3 and item.slot_type not in [5,6]: continue
 				if filter_index == 4 and item.slot_type > 4: continue
 				if filter_index == 5 and item.slot_type not in [7,8]: continue
-				result.append({"id":id,"title":item.display_name,"text":item.description,"subtitle":("已装备" if equipped else "持有 ×%d"%count if count>0 else "尚未发现")+" · "+EquipmentManager.slot_name(item.slot_type),"icon":item.get_icon_texture()})
+				var store:=game.session.inventory
+				var worn:=store.equipped("player")
+				var sources:=store.actor_containers("player"); sources.append("player.gear")
+				for source in sources:
+					for row in store.entries(source):
+						if row.definition!=id: continue
+						var active: bool=row.uid in worn.values()
+						if filter_index==2 and not active: continue
+						result.append({"id":"uid:"+row.uid,"item":id,"uid":row.uid,"equipped":active,"title":item.display_name,"text":item.description,"subtitle":("已装备" if active else "背包")+" · "+EquipmentManager.slot_name(item.slot_type)+" · "+store.state_text(row.uid),"icon":item.get_icon_texture()})
+				if count==0: result.append({"id":id,"title":item.display_name,"text":item.description,"subtitle":"尚未发现 · "+EquipmentManager.slot_name(item.slot_type),"icon":item.get_icon_texture()})
 		"supplies":
 			for id in game.survival.supplies.amounts:
 				var count:=game.survival.supplies.count(id)
 				if count<=0: continue
-				var food: bool=SurvivalCatalog.FOODS.has(id)
+				var definition:=game.session.inventory.definitions.get(id) as ItemData
+				if definition and definition.use_profile and definition.use_profile.kind==ItemUseDefinition.Kind.SPRAY: continue
+				var food: bool=SurvivalCatalog.FOODS.has(id) or definition!=null and definition.use_profile!=null
 				if filter_index == 1 and not food or filter_index == 2 and food: continue
 				result.append({"id":id,"title":game.survival.supplies.title(id),"text":"补给" if food else "施法与制造材料","subtitle":"×%d · %s"%[count,"可使用" if food else "材料"]})
+			for source in ["player.pocket","player.pack"]:
+				if source=="player.pack" and not game.session.inventory.containers[source].attached: continue
+				for row in game.session.inventory.entries(source):
+					var definition:=game.session.inventory.definitions.get(row.definition) as ItemData
+					if not definition or not definition.use_profile or definition.use_profile.kind!=ItemUseDefinition.Kind.SPRAY: continue
+					result.append({"id":"uid:"+row.uid,"item":row.definition,"uid":row.uid,"title":definition.display_name,"text":definition.description,"subtitle":("口袋 · " if source.ends_with("pocket") else "背包 · ")+game.session.inventory.state_text(row.uid)})
 		"quests":
 			for quest in game.quests:
 				var done:=game.progress.claims.has("quest."+quest.id)
@@ -92,11 +109,7 @@ func entries() -> Array[Dictionary]:
 		"settings":
 			result.append({"id":"controls","title":"施法与快捷操作","text":"操作设置","subtitle":"按下施法 / 松开施法"})
 		"loot":
-			var record: Dictionary=game.progress.loot_records.get(loot_id,{})
-			for kind in ["equipment","materials"]:
-				for id in record.get(kind,{}):
-					var item:=game.catalog.equipment.get(id) as EquipmentData
-					result.append({"id":kind+":"+id,"kind":kind,"item":id,"title":item.display_name if item else game.survival.supplies.title(id),"text":item.description if item else "剩余携带物","subtitle":"×%d"%record[kind][id],"icon":item.get_icon_texture() if item else null})
+			if game.progress.loot_records.has(loot_id): result=game.loot.instance_entries(loot_id)
 	return result
 
 func _refresh_rows() -> void:
@@ -155,7 +168,7 @@ func _show_detail() -> void:
 				if page=="equipment":
 					var reason:=game.equipment_service.change_reason()
 					if not reason.is_empty(): _detail.add_child(W.label(reason,13,true))
-					_detail.add_child(W.button("卸下装备" if current==item else "装备这件",_change_equipment.bind(id,current==item),not reason.is_empty() or game.equipment_service.count(id)<=0))
+					_detail.add_child(W.button("卸下装备" if entry.get("equipped",false) else "装备这件",_change_equipment.bind(id,bool(entry.get("equipped",false)),str(entry.get("uid",""))),not reason.is_empty() or game.equipment_service.count(id)<=0))
 					if game.equipment_service.count(id)==0:
 						var sources: Dictionary={}
 						for region: ExplorationRegionData in game.catalog.regions.values():
@@ -164,17 +177,17 @@ func _show_detail() -> void:
 							for discovery in region.discoveries:
 								if id in discovery.equipment: sources[region.title+" · "+discovery.title]=true
 						for source in sources: compare.add_child(W.label("线索："+source,12,true))
-			if page=="loot": _detail.add_child(W.button("取走这一项",_take_selected.bind(entry.kind,id)))
+			if page=="loot": _detail.add_child(W.button("取走这一项",_take_selected.bind(entry.kind,id,str(entry.get("uid","")))))
 		"supplies":
-			var id: String=entry.id
+			var id: String=entry.get("item",entry.id)
 			var store:=game.session.inventory
 			var pocket:=store.count_in("player.pocket",id)
 			var packed:=store.count_in("player.pack",id)
 			card.add_child(W.label("随身口袋 ×%d · 背包 ×%d\n战斗施法与进食只使用随身口袋。"%[pocket,packed],13,true))
 			var reason:=game.equipment_service.change_reason()
 			if not reason.is_empty(): card.add_child(W.label(reason,13,true))
-			_detail.add_child(W.button("移一份到随身口袋",_repack.bind(id,true),packed==0 or not reason.is_empty()))
-			_detail.add_child(W.button("移一份到背包",_repack.bind(id,false),pocket==0 or not reason.is_empty()))
+			_detail.add_child(W.button("移一份到随身口袋",_repack.bind(id,true,str(entry.get("uid",""))),packed==0 or not str(entry.get("uid","")).is_empty() and store.locate(entry.uid)!="player.pack" or not reason.is_empty()))
+			_detail.add_child(W.button("移一份到背包",_repack.bind(id,false,str(entry.get("uid",""))),pocket==0 or not str(entry.get("uid","")).is_empty() and store.locate(entry.uid)!="player.pocket" or not reason.is_empty()))
 			if SurvivalCatalog.FOODS.has(id):
 				var food: Dictionary=SurvivalCatalog.FOODS[id]
 				card.add_child(W.label("饱食 %+.0f · 饮水 %+.0f · 疲劳 %+.0f\n持续 %.0f秒"%[food.nutrition,food.hydration,food.fatigue,food.duration],14))
@@ -185,6 +198,13 @@ func _show_detail() -> void:
 					if payload.material_id!=id: continue
 					card.add_child(W.label("用于："+operation.action.display_name+"\n"+payload.describe(),13,true))
 					_detail.add_child(W.button("查看释放介质选项",game.workshop.show_action.bind(operation.action),not game.player.skill_manager.knows_action(operation.action)))
+			var definition:=store.definitions.get(id) as ItemData
+			if definition and definition.use_profile:
+				var use:=definition.use_profile
+				if use.kind==ItemUseDefinition.Kind.SPRAY: _detail.add_child(W.button("装填这瓶喷剂",_prepare_sprayer.bind(id,str(entry.get("uid","")))))
+				if use.kind!=ItemUseDefinition.Kind.SPRAY: _detail.add_child(W.button("瞄准投掷" if use.kind==ItemUseDefinition.Kind.THROWABLE else "涂附当前主手武器",_use_item.bind(str(entry.get("uid",id)),use.kind==ItemUseDefinition.Kind.THROWABLE)))
+			if SurvivalCatalog.FOODS.has(id) or definition and definition.use_profile:
+				for i in range(4): _detail.add_child(W.button("绑定到快捷物品 "+["7","8","9","0"][i],_bind_item.bind(i,id,"throw" if definition and definition.use_profile and definition.use_profile.kind==ItemUseDefinition.Kind.THROWABLE else "use")))
 			_detail.add_child(W.button("查看本次施法材料",func(): game.workshop.show_materials()))
 		"quests":
 			var quest: ExplorationQuestData
@@ -210,23 +230,23 @@ func _show_detail() -> void:
 				if not FrontierControls.set_quick_cast(value): game.ui.notify("本次设置已生效，但未保存到磁盘。"))
 			card.add_child(toggle)
 			card.add_child(preload("res://gameplay/foundation/ui/binding_editor.tscn").instantiate())
-			card.add_child(W.label("关闭时按住预览、松开施放。蓄力与引导仍需按住；Shift只表示显式消费恩赐。每次只执行一个基础动作，不自动组合。\n\nWASD 移动 · 空格闪避 · E交互\n1—6 基础动作 · 7烤饼 · 8清水 · 9茶 · 0炖汤\nTab 远征面板 · J委托 · I/O装备 · N补给 · G地图\nV按住格挡 · Alt冲刺 · Ctrl+左键重击 · B放下背包\n地图滚轮缩放、中键/右键拖动、左键放路标。",14))
+			card.add_child(W.label("关闭时按住预览、松开施放。蓄力与引导仍需按住；Shift只表示显式消费恩赐。每次只执行一个基础动作，不自动组合。\n\nWASD 移动 · 空格闪避 · E交互\n1—6 基础动作 · 7/8/9/0 可绑定物品（默认食物）\nTab 远征面板 · J委托 · I/O装备 · N补给 · G地图\nV按住格挡 · Alt冲刺 · Ctrl+左键重击 · B放下背包\n地图滚轮缩放、中键/右键拖动、左键放路标。",14))
 
 func _pin(id: String) -> void:
 	game.guidance.pin(id)
 	_refresh_rows()
 func _report(quest: ExplorationQuestData) -> void:
 	if game.progress_service.claim_quest(quest): _refresh_rows()
-func _change_equipment(id: String, active: bool) -> void:
-	var ok:=game.equipment_service.unequip(game.catalog.equipment[id].slot_type) if active else game.equipment_service.equip(id)
+func _change_equipment(id: String, active: bool,uid := "") -> void:
+	var ok:=game.equipment_service.unequip(game.catalog.equipment[id].slot_type) if active else game.equipment_service.equip(id,uid)
 	if not ok: game.ui.notify("无法换装：检查附近威胁与背包空间。")
 	_refresh_rows()
 func _use_supply(id: String) -> void:
 	game.ui.close_modal()
 	_open=false
 	game.survival.begin_eating(id)
-func _take_selected(kind: String, id: String) -> void:
-	var taken:=game.loot.take(loot_id,kind,id)
+func _take_selected(kind: String, id: String,uid := "") -> void:
+	var taken:=game.loot.take(loot_id,kind,id,uid)
 	game.ui.notify("已收好。" if taken>0 else "容量不足或已离开遗骸；物品仍在原处。")
 	_refresh_rows()
 func take_all() -> void:
@@ -235,7 +255,7 @@ func take_all() -> void:
 	game.ui.notify("收好%d件物品，未能携带的留在原处。"%taken if taken>0 else "没有取走物品，检查背包与水囊容量。")
 	_refresh_rows()
 
-func _repack(id: String,to_pocket: bool) -> void:
+func _repack(id: String,to_pocket: bool,uid := "") -> void:
 	if not game.equipment_service.change_reason().is_empty(): return
 	var store:=game.session.inventory
 	if not store.containers["player.pack"].attached:
@@ -244,7 +264,7 @@ func _repack(id: String,to_pocket: bool) -> void:
 	var source:="player.pack" if to_pocket else "player.pocket"
 	var destination:="player.pocket" if to_pocket else "player.pack"
 	for row in store.entries(source):
-		if row.definition!=id: continue
+		if row.definition!=id or not uid.is_empty() and row.uid!=uid: continue
 		var result:=store.commit(store.preview(source,destination,row.uid,1))
 		if not result.accepted: game.ui.notify("目标容器没有足够空间。")
 		else:
@@ -252,3 +272,14 @@ func _repack(id: String,to_pocket: bool) -> void:
 			game._save_progress()
 		_refresh_rows()
 		return
+
+func _use_item(id: String,aim: bool) -> void:
+	game.ui.close_modal()
+	game.player.actor_context.actions.input_suppressed=.15
+	if not game.player.actor_context.item_actions.begin(id,aim,game.player.get_mouse_direction()): game.ui.notify("无法使用：检查口袋、武器和当前动作。")
+func _bind_item(index: int,id: String,method: String) -> void:
+	game.session.bind_belt(index,id,method)
+	game.ui.notify("快捷物品已绑定。投掷时按住瞄准，松开出手；右键取消。")
+
+func _prepare_sprayer(id: String,uid: String) -> void:
+	if game.session.prepare_sprayer("player",id,uid): game.ui.notify("已选择这瓶喷剂；编组喷洒动作后按住对应技能键使用。")

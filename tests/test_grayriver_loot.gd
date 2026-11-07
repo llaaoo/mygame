@@ -72,7 +72,7 @@ func run() -> void:
 	# Used materials are absent; the gear is still present on a dead caster.
 	var mage := find_enemy(game,"river.enemy.camp.road.2")
 	var sm := mage.skill_manager
-	sm.combinations.supplies.configure("focus","ward_powder")
+	sm.combinations.supplies.select_payload(sm.pool.get_skill("focus"),"ward",sm)
 	var source := mage.character_brain.find_source("focus")
 	check(sm.use_source(source,mage,CastContext.simple(mage,Vector2.LEFT,sm.get_instance(source).data)),"Caster could not spend real carried powder")
 	sm.combinations.tick(2)

@@ -5,6 +5,6 @@ script = ExtResource("1")
 id = "ash"
 title = "铭刻灰"
 description = "火/霜法阵持续时间+10秒，额外2 MP；不增加触发次数。"
-action_ids = PackedStringArray("fire_sigil", "frost_sigil")
+action_ids = PackedStringArray("fire_sigil", "frost_sigil", "inscribe")
 extra_mana = 2
 field_lifetime_bonus = 10.0

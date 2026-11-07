@@ -3,6 +3,8 @@ extends Node2D
 ## Draw the actual equipped resources. Loot uses this same renderer.
 var items: Array[EquipmentData] = []
 var manager: EquipmentManager
+var inventory_store: InventoryService
+var display_uids: Array[String]=[]
 var _walk_phase := 0.0
 
 static func install(actor: Node2D) -> ActorEquipmentVisual:
@@ -26,7 +28,9 @@ func refresh() -> void:
 	queue_redraw()
 
 func _process(delta: float) -> void:
-	if not manager: return
+	if not manager:
+		if inventory_store: queue_redraw()
+		return
 	var actor := get_parent() as Node2D
 	var sprite := actor.get_node_or_null("Sprite2D") as Sprite2D
 	if sprite: modulate = sprite.modulate
@@ -59,6 +63,15 @@ func _draw() -> void:
 		draw_rect(Rect2(3,-21,3,2),Color("26282b"))
 	for item in items:
 		var c := item.world_color
+		var store:=manager.inventory_store if manager else inventory_store
+		if store and item.slot_type==EquipmentData.SlotType.RIGHT_HAND:
+			var uids: Array=store.equipped(manager.actor_id).values() if manager else display_uids
+			for uid in uids:
+				var instance:=store.item(uid)
+				if not instance or instance.definition_id!=item.id: continue
+				var coating:=store.coating(uid)
+				if coating: c=c.lerp(coating.payload.color,.8)
+				break
 		match item.world_shape:
 			"blade":
 				draw_line(Vector2(13, 6), Vector2(26, -17), Color("151c22"), 6)

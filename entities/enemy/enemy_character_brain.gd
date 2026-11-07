@@ -18,6 +18,16 @@ func choose(target: Node2D) -> Array[Action]:
 	var dist := actor.global_position.distance_to(target.global_position)
 	if actor.actor_context and actor.actor_context.actions.active():
 		var actions:=actor.actor_context.actions
+		var store:=actor.actor_context.items
+		var owner_id:=actor.actor_context.id
+		var weapon_uid:=str(store.equipped(owner_id).get(str(EquipmentData.SlotType.RIGHT_HAND),""))
+		if dist>90 and not weapon_uid.is_empty() and not store.coating(weapon_uid) and store.can_pay(owner_id,{"poison_rag":1},true):
+			var coat:=Action.new(); coat.action_type=Action.ActionType.USE_ITEM; coat.skill_id="poison_rag"; return [coat]
+		if dist>140 and dist<320 and store.can_pay(owner_id,{"venom_bottle":1},true):
+			if actor.actor_context.item_actions.begin("venom_bottle",false,actor.get_target_direction()): return result
+		if dist<115 and not find_source("disperse").is_empty() and store.can_pay(owner_id,{"venom_sprayer":1},true):
+			var spray:=cast("venom_mist",target)
+			if spray: return [spray]
 		if actions.stamina.current<24:
 			if dist>actor.attack_range*2 and actions.item_request.is_valid() and actor.actor_context.items.can_pay(actor.actor_context.id,{"clean_water":1},true):
 				var use:=Action.new(); use.action_type=Action.ActionType.USE_ITEM; use.skill_id="clean_water"; return [use]
@@ -81,6 +91,12 @@ func cast(id: String,target: Node2D,empower:=false,at_self:=false) -> Action:
 	if actor.skill_manager.material_operations and not skill.operation_id.is_empty():
 		var payload: String={"fire_sigil":"ember","frost_sigil":"frost","storm_sigil":"storm","venom_mist":"venom","poison_cloud":"venom","oil_flask":"resin"}.get(id,"")
 		if not payload.is_empty(): actor.skill_manager.combinations.supplies.select_payload(skill,payload,actor.skill_manager)
+		if id=="focus":
+			var sources:=actor.skill_manager.combinations.live_fields()
+			var choice: String="basic"
+			for field in sources:
+				if field.is_available_to(actor): choice="attune_"+field.field_type; break
+			actor.skill_manager.combinations.supplies.select_payload(skill,choice,actor.skill_manager)
 	var context := CastContext.at_position(actor,actor.global_position if at_self else target.global_position,skill)
 	context.target=target
 	context.requires_live_target=true

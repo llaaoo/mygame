@@ -16,6 +16,8 @@ var amounts: Dictionary:
 		else: _amounts=value
 var _inventory_snapshot: Dictionary={}
 var selected: Dictionary = {}
+var modifiers: Dictionary={}
+var prepared_uids: Dictionary={}
 var catalog: Dictionary = {}
 var crafting_recipes: Dictionary = {}
 var restrict_crafting := false
@@ -92,6 +94,8 @@ func craft(id: String) -> bool:
 	return true
 
 func recycle_preview(id: String) -> Dictionary:
+	var definition:=ItemCatalog.default_catalog().definition(id)
+	if definition and definition.use_profile: return {}
 	var recipe := crafting_recipes.get(id) as CraftingRecipe
 	if not recipe or not knows_recipe(id) or (not catalog.has(id) and not ItemCatalog.default_catalog().definition(id)) or recipe.output_id != id or recipe.output_count <= 0 or recipe.inputs.is_empty(): return {}
 	for input in recipe.inputs:
@@ -118,7 +122,7 @@ func recycle(id: String) -> bool:
 	return true
 
 func plan(action: SkillData, base: SkillData, include_required: bool = true, preparation_material: String = "", manager: SkillManager = null) -> Dictionary:
-	if not action.operation_id.is_empty(): return operation_plan(action,manager)
+	if not action.operation_id.is_empty(): return operation_plan(action,manager,base)
 	var costs: Dictionary = {}
 	var material_id := str(selected.get(action.get_id(), ""))
 	var optional: CastingMaterialData = catalog.get(material_id)
@@ -139,16 +143,16 @@ func describe_cost(costs: Dictionary) -> String:
 	return "、".join(parts)
 
 func clear_selection() -> void:
-	if selected.is_empty(): return
-	selected.clear()
+	if selected.is_empty() and modifiers.is_empty() and prepared_uids.is_empty(): return
+	selected.clear(); modifiers.clear(); prepared_uids.clear()
 	_notify_changed()
 
 func serialize(persistent := false) -> Dictionary:
-	return {"amounts": amounts.duplicate(), "selected": {} if persistent else selected.duplicate()}
+	return {"amounts": amounts.duplicate(), "selected": {} if persistent else selected.duplicate(),"modifiers":{} if persistent else modifiers.duplicate(),"prepared_uids":{} if persistent else prepared_uids.duplicate()}
 
 func restore(data: Dictionary) -> void:
 	amounts = {}
-	selected.clear()
+	selected.clear(); modifiers.clear(); prepared_uids.clear()
 	for id in data.get("amounts", {}):
 		if known_item(id):
 			var amount := maxi(0, int(data.amounts[id]))
@@ -178,6 +182,8 @@ func finish_transaction(commit: bool) -> Callable:
 		if inventory_store: inventory_store.restore_actor(actor_id,_inventory_snapshot)
 		else: amounts = _transaction.amounts
 		selected = _transaction.selected
+		modifiers=_transaction.get("modifiers",{}).duplicate()
+		prepared_uids=_transaction.get("prepared_uids",{}).duplicate()
 	_transaction.clear()
 	_inventory_snapshot.clear()
 	if inventory_store: inventory_store.end_batch(commit)
@@ -202,24 +208,49 @@ func _set_amount(id: String, amount: int) -> void:
 	if amount>current: inventory_store.receive(actor_id,id,amount-current)
 	elif amount<current: inventory_store.pay(actor_id,{id:current-amount})
 
-func select_payload(action: SkillData,payload_id: String,manager: SkillManager) -> bool:
+func select_payload(action: SkillData,payload_id: String,manager: SkillManager,uid := "") -> bool:
 	var operation:=SpellOperationCatalog.default_catalog().operation(action.operation_id)
 	var payload:=operation.payload(payload_id) if operation else null
 	if not payload or not manager.knows_action(action): return false
 	selected[action.get_id()]=payload_id
+	prepared_uids.erase(action.get_id())
+	if not uid.is_empty(): prepared_uids[action.get_id()]=uid
 	_notify_changed()
 	return true
 
-func operation_plan(action: SkillData,manager: SkillManager) -> Dictionary:
+func operation_plan(action: SkillData,manager: SkillManager,resolved: SkillData = null,apply_modifier := true) -> Dictionary:
 	var entry:=SpellOperationCatalog.default_catalog().operation(action.operation_id)
 	var choice:=str(selected.get(action.get_id(),entry.default_payload if entry else ""))
 	var medium:=entry.payload(choice) if entry else null
 	var result: Dictionary={"skill":action,"costs":{},"material_id":"","extra_mana":0,"field_bonus":0.0,"reason":"请选择释放介质","payload":medium}
 	if not medium: return result
-	result.skill=entry.compose(medium)
+	result.skill=entry.compose(medium) if not resolved else resolved
 	result.extra_mana=medium.extra_mana
 	result.reason="" if manager and manager.knows_action(action) else "尚未掌握这个基础动作"
-	if not medium.material_id.is_empty():
+	if action.operation_id=="disperse":
+		result.extra_mana=0
+		var uid:=inventory_store.ready_uid(actor_id,medium.material_id) if inventory_store else ""
+		if prepared_uids.has(action.get_id()):
+			uid=str(prepared_uids[action.get_id()])
+			var instance:=inventory_store.item(uid) if inventory_store else null
+			if not instance or instance.definition_id!=medium.material_id or inventory_store.locate(uid)!=actor_id+".pocket" or int(instance.properties.get("doses",0))<1: uid=""
+		result.instance_costs=[]
+		if uid.is_empty(): result.reason="口袋中没有可用喷剂"
+		else: result.instance_costs=[{"uid":uid,"property":"doses","amount":1,"revision":inventory_store.containers[actor_id+".pocket"].revision}]
+		result.material_id=medium.material_id
+	elif not medium.material_id.is_empty():
 		result.material_id=medium.material_id
 		result.costs={medium.material_id:medium.quantity}
+	var modifier:=catalog.get(str(modifiers.get(action.get_id(),""))) as CastingMaterialData
+	if apply_modifier and modifier and modifier.supports(action.get_id(),result.skill.get_id(),result.skill):
+		result.skill=modifier.modify(result.skill)
+		result.costs[modifier.id]=int(result.costs.get(modifier.id,0))+1
+		result.extra_mana+=modifier.extra_mana
+		result.field_bonus=modifier.field_lifetime_bonus
+		result.modifier_id=modifier.id
 	return result
+func configure_modifier(action: SkillData,id: String) -> bool:
+	if id.is_empty(): modifiers.erase(action.get_id()); _notify_changed(); return true
+	var entry:=catalog.get(id) as CastingMaterialData
+	if not entry: return false
+	modifiers[action.get_id()]=id; _notify_changed(); return true

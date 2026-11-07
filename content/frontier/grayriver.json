@@ -38,7 +38,12 @@
           "crafts": [
             "ash",
             "resin",
-            "fire_stone"
+            "fire_stone",
+            "poison_rag",
+            "fire_rag",
+            "oil_bottle",
+            "water_sprayer",
+            "resin_sprayer"
           ]
         },
         {
@@ -137,7 +142,12 @@
           "crafts": [
             "venom_extract",
             "paralytic_extract",
-            "potent_venom"
+            "potent_venom",
+            "venom_bottle",
+            "paralytic_bottle",
+            "venom_sprayer",
+            "potent_sprayer",
+            "paralytic_sprayer"
           ],
           "kind": "person"
         },
@@ -259,6 +269,19 @@
           "text": "“北风再大，也要让矿工看见这盏火。侧廊的承梁松了，要先用炭烘干，再以晶砂加固；矿里那条坡道直通湖岸。芮克带走了最后的晶石，他还欠大家一个解释。”\n炉旁留着一份没来得及吃的烤饼。",
           "materials": {
             "ration": 1
+          }
+        },
+        {
+          "id": "river.material.cloth_bundle.v1",
+          "title": "旅人留下的布料包",
+          "pos": [
+            -3800,
+            2200
+          ],
+          "text": "布料可以加工涂附抹布；完成使用后才消耗。",
+          "requires_clear": false,
+          "materials": {
+            "cloth": 4
           }
         }
       ],

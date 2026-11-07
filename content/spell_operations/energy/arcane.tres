@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=4 format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_data.gd" id="skill"]
+[ext_resource type="Script" path="res://gameplay/status/buff.gd" id="buff"]
+[sub_resource type="Resource" id="energy"]
+script = ExtResource("buff")
+buff_id = "stored_arcane"
+status_id = "stored_arcane"
+display_name = "蕴能 · 凝能"
+exclusive_group = "stored_energy"
+duration = 45.0
+stack_behavior = 1
+max_stacks = 3
+tactical_hint = "Shift＋火花/震荡手动兑现1层；更换能量类型替换原有能量，跨区域清理。"
+[resource]
+script = ExtResource("skill")
+id = "extract_arcane"
+display_name = "汲取 · 凝能"
+skill_type = 1
+tags = ["arcane", "buff"]
+buff_resource = SubResource("energy")
+buff_duration = 45.0
+mp_cost = 4
+cooldown = 0.8

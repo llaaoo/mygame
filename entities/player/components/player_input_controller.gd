@@ -66,10 +66,13 @@ func _poll_universal_cast(actions: Array[Action], source: String, input_action: 
 	var released := Input.is_action_just_released(input_action)
 	if not pressed and not released:
 		return
+	# A UI click has no matching cast press; its release must not cancel an item action.
+	if released and not casting.aiming_sources.has(source) and casting._channeling_source!=source and not casting._charge_source_matches(source): return
 	var action := Action.cast(source, player.get_mouse_direction(), player)
 	action.params["release"] = released
 	var skill := _get_skill_for_source(source)
 	var quick := player.actor_context and player.actor_context.rules.modern_controls and ControlPreferences.quick_cast and skill.cast_type not in ["charge","channel"]
+	if skill.operation_id=="disperse": quick=true
 	if quick and released: return
 	action.params["quick_cast"] = quick
 	action.cast_context = CastContext.at_position(player, CastContext.ground_point(player, player.get_global_mouse_position(), skill.cast_distance), skill) if skill.ground_targeted else CastContext.simple(player, action.direction, skill)
@@ -231,3 +234,8 @@ func interaction_target(refresh := false) -> Node2D:
 
 func _pointer_over_interface() -> bool:
 	return get_viewport().gui_get_hovered_control()!=null
+
+func action_for_source(source: String) -> String:
+	if source=="left": return "attack"
+	if source=="right": return "skill"
+	return "skill_%d"%(int(source.trim_prefix("slot_"))+1)

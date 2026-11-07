@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="ActorCharacterData" format=3]
+[gd_resource type="Resource" script_class="ActorCharacterData" load_steps=7 format=3]
 [ext_resource type="Script" path="res://gameplay/characters/actor_character_data.gd" id="data"]
 [ext_resource type="Script" path="res://gameplay/abilities/loadout/skill_loadout.gd" id="loadout"]
 [ext_resource type="Resource" path="res://gameplay/abilities/data/focus_data.tres" id="focus"]
@@ -20,4 +20,4 @@ melee_multiplier = 0.6
 skills = [ExtResource("focus")]
 loadout = SubResource("Loadout")
 equipment = [ExtResource("river_sabre"), ExtResource("river_coat")]
-materials = {"ration": 1}
+materials = {"cloth":1, "poison_rag":1, "ration": 1}

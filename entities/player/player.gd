@@ -77,7 +77,10 @@ var mana_component: ManaComponent = null
 var ui_blocked: bool = false:
 	set(value):
 		ui_blocked = value
-		if value and actor_context and actor_context.actions: actor_context.actions.clear_input()
+		if value and actor_context and actor_context.actions:
+			actor_context.actions.clear_input()
+			if actor_context.item_actions: actor_context.item_actions.cancel()
+			if actor_context.spray: actor_context.spray.stop()
 		if value and field_work:
 			field_work.cancel("打开菜单：作业取消")
 			field_work.close_panel()
@@ -398,6 +401,8 @@ func heal(amount: int, source := "skill") -> void:
 
 func cancel_region_actions() -> void:
 	if actor_context and actor_context.actions: actor_context.actions.cancel("region_left")
+	if actor_context and actor_context.item_actions: actor_context.item_actions.cancel()
+	if actor_context and actor_context.spray: actor_context.spray.stop()
 	skill_manager.combinations.supplies.clear_selection()
 	if field_work:
 		field_work.cancel("区域切换：作业取消")

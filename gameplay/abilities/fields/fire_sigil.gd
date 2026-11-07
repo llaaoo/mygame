@@ -60,7 +60,7 @@ func _update_label() -> void:
 	_label.text = "%s · %d 次 · %.0fs" % [title_for(field_type), charges, remaining]
 
 static func title_for(type: String) -> String:
-	return {"arcane": "凝能阵", "fire": "火阵", "frost": "霜阵", "storm": "雷阵"}.get(type, type)
+	return {"arcane": "凝能阵", "fire": "火阵", "frost": "霜阵", "storm": "雷阵", "ward":"守护阵"}.get(type, type)
 
 func _draw() -> void:
 	var tag: String = {"fire": "fire", "frost": "ice", "storm": "lightning"}.get(field_type, "arcane")
