@@ -10,42 +10,6 @@
 [ext_resource type="Script" uid="uid://8ghdd2c772lv" path="res://gameplay/interaction/simulation_runtime.gd" id="10_w48qg"]
 [ext_resource type="Script" uid="uid://c0v6ealvnnji1" path="res://gameplay/run/run_manager.gd" id="11_run"]
 
-[sub_resource type="GDScript" id="GDScript_272bh"]
-script/source = "extends Node
-## 自动注册输入映射（运行时 fallback，避免手动配置 Input Map）
-
-func _enter_tree() -> void:
-	_setup_key_action(\"move_left\", KEY_A)
-	_setup_key_action(\"move_right\", KEY_D)
-	_setup_key_action(\"move_up\", KEY_W)
-	_setup_key_action(\"move_down\", KEY_S)
-	_setup_key_action(\"dodge\", KEY_SPACE)
-	_setup_mouse_action(\"attack\", MOUSE_BUTTON_LEFT)
-	_setup_mouse_action(\"skill\", MOUSE_BUTTON_RIGHT)
-	_setup_key_action(\"skill_1\", KEY_1)
-	_setup_key_action(\"skill_2\", KEY_2)
-	_setup_key_action(\"skill_3\", KEY_3)
-	_setup_key_action(\"skill_4\", KEY_4)
-
-
-func _setup_key_action(action_name: String, key: Key) -> void:
-	if InputMap.has_action(action_name):
-		return
-	InputMap.add_action(action_name)
-	var event := InputEventKey.new()
-	event.keycode = key
-	InputMap.action_add_event(action_name, event)
-
-
-func _setup_mouse_action(action_name: String, button: MouseButton) -> void:
-	if InputMap.has_action(action_name):
-		return
-	InputMap.add_action(action_name)
-	var event := InputEventMouseButton.new()
-	event.button_index = button
-	InputMap.action_add_event(action_name, event)
-"
-
 [node name="Game" type="Node" unique_id=1368087060]
 
 [node name="Overworld" parent="." unique_id=1549094242 instance=ExtResource("1_ig7tw")]
@@ -59,9 +23,6 @@ script = ExtResource("5_4c57u")
 
 [node name="StatsComponent" type="Node" parent="Player" unique_id=1491100307]
 script = ExtResource("6_efxa6")
-
-[node name="InputSetup" type="Node" parent="." unique_id=2019032865]
-script = SubResource("GDScript_272bh")
 
 [node name="HUDLayer" parent="." unique_id=1720897277 node_paths=PackedStringArray("player", "run_manager") instance=ExtResource("5_7mycd")]
 player = NodePath("../Player")

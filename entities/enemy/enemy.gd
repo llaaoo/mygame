@@ -320,7 +320,11 @@ func _current_state_name() -> String:
 
 func _on_idle_physics(delta: float) -> void:
 	var target := _get_current_target()
-	if target and global_position.distance_to(target.global_position) <= detect_range:
+	var retaliating:=target!=null and target==_revenge_target
+	if retaliating and _is_out_of_leash(target):
+		_begin_return_home()
+		return
+	if target and (global_position.distance_to(target.global_position) <= detect_range or retaliating):
 		_returning_home = false
 		_suspicion_timer = suspicion_duration
 		state_chart.send_event("player_detected")

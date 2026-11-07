@@ -1,7 +1,13 @@
 class_name InputBindings
 extends RefCounted
 const PATH := "user://actor_bindings.cfg"
-const KEYS := {"guard":KEY_V,"sprint":KEY_ALT,"drop_pack":KEY_B}
+const KEYS := {
+	"move_left":KEY_A,"move_right":KEY_D,"move_up":KEY_W,"move_down":KEY_S,
+	"dodge":KEY_SPACE,"interact":KEY_E,
+	"skill_1":KEY_1,"skill_2":KEY_2,"skill_3":KEY_3,
+	"skill_4":KEY_4,"skill_5":KEY_5,"skill_6":KEY_6,
+	"guard":KEY_V,"sprint":KEY_ALT,"drop_pack":KEY_B,
+}
 static var loaded := false
 static func install() -> void:
 	for action in KEYS:
@@ -10,6 +16,12 @@ static func install() -> void:
 			var event:=InputEventKey.new()
 			event.physical_keycode=KEYS[action]
 			InputMap.action_add_event(action,event)
+	for action in {"attack":MOUSE_BUTTON_LEFT,"skill":MOUSE_BUTTON_RIGHT}:
+		if InputMap.has_action(action): continue
+		InputMap.add_action(action)
+		var event:=InputEventMouseButton.new()
+		event.button_index=MOUSE_BUTTON_LEFT if action=="attack" else MOUSE_BUTTON_RIGHT
+		InputMap.action_add_event(action,event)
 	if not InputMap.has_action("heavy_attack"):
 		InputMap.add_action("heavy_attack")
 		var event:=InputEventMouseButton.new()

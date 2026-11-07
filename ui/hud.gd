@@ -29,11 +29,13 @@ func _ready() -> void:
 
 func _build_ui() -> void:
 	var margin := $MarginContainer as MarginContainer
+	margin.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	for child in margin.get_children():
 		child.queue_free()
 
 	var root := Control.new()
 	root.name = "HUDRoot"
+	root.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	root.set_anchors_preset(Control.PRESET_FULL_RECT)
 	margin.add_child(root)
 

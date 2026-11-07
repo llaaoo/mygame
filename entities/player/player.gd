@@ -97,15 +97,6 @@ var state_machine: Node
 
 func _enter_tree() -> void:
 	InputBindings.install()
-	# 必须在 _ready 之前注册，否则第一帧 _input 可能触发 Missing action 错误
-	_register_interact_key()
-	for i in range(4, SkillManager.MAX_SLOTS):
-		var action_name := "skill_%d" % (i + 1)
-		if not InputMap.has_action(action_name):
-			InputMap.add_action(action_name)
-			var event := InputEventKey.new()
-			event.physical_keycode = KEY_5 + i - 4
-			InputMap.action_add_event(action_name, event)
 
 func _ready() -> void:
 	if inventory: inventory=inventory.duplicate(true) as Inventory
@@ -263,15 +254,6 @@ var summon_manager: SummonManager = null
 var mastery_manager: SkillMasteryManager = null
 
 ## 输入意图与施法过程委托给PlayerInputController和PlayerCastingController。
-
-## ── 交互键 ──
-
-func _register_interact_key() -> void:
-	if not InputMap.has_action("interact"):
-		InputMap.add_action("interact")
-		var event := InputEventKey.new()
-		event.keycode = KEY_E
-		InputMap.action_add_event("interact", event)
 
 ## ── 信号转发 ──
 

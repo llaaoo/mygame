@@ -250,7 +250,8 @@ res://gameplay/abilities/          ← 旧: res://skills/
   archetypes/ → 技能场景 (.tscn + 脚本)  ← 旧: scenes/
 
 res://gameplay/combat/             ← 旧: res://systems/
-  CombatEvent / CombatEventBus / CombatExecutor / CombatPhase / CombatScope
+  CombatEvent / CombatEventBus / CombatExecutor / CombatPhase
+  （未接入的CombatScope枚举已归档；区域生命周期由RegionSession/RegionContext管理）
   TriggeredEffect / conditions/ / effect_graph/ / modifiers/ / debug/
 
 res://entities/components/         ← 旧: res://components/

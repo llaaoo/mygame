@@ -1,0 +1,439 @@
+{
+  "date": "2026-11-07",
+  "starting_revision": "60aad3635b3efdd55965ff065aa1c9410247db98",
+  "platform": "Linux, Godot 4.6.3, Xorg dummy :97, llvmpipe OpenGL, 1152x648",
+  "method": "actual keyboard/pointer events, normal AI and default budgets; script-guided waypoints; not blind human usability or statistical balance validation",
+  "precombat_sha256": "19729bca0f244f3c19847e6e22fe07d409cfe36382b3928c9623bd7c42261a91",
+  "target": "river.enemy.camp.forest.3",
+  "duels": {
+    "basic": {
+      "seed_sha256": "19729bca0f244f3c19847e6e22fe07d409cfe36382b3928c9623bd7c42261a91",
+      "seconds": 3.76818181818182,
+      "killed": true,
+      "damage_taken": 13,
+      "hp_before": 100,
+      "hp_after": 87,
+      "mp_before": 60,
+      "mp_after": 60,
+      "stamina_after": 52.0,
+      "cast_cost_total": 0,
+      "casts": [],
+      "melee_hit_count": 4,
+      "materials_before": {
+        "ash": 2,
+        "charcoal": 5,
+        "clean_water": 4,
+        "crystal": 8,
+        "fire_stone": 1,
+        "frost_salt": 2,
+        "grain": 3,
+        "herb": 2,
+        "ration": 2,
+        "resin": 2,
+        "sap": 9,
+        "storm_dust": 3
+      },
+      "materials_after": {
+        "ash": 2,
+        "charcoal": 5,
+        "clean_water": 4,
+        "crystal": 8,
+        "fire_stone": 1,
+        "frost_salt": 2,
+        "grain": 3,
+        "herb": 2,
+        "ration": 2,
+        "resin": 2,
+        "sap": 9,
+        "storm_dust": 3
+      }
+    },
+    "combo": {
+      "seed_sha256": "19729bca0f244f3c19847e6e22fe07d409cfe36382b3928c9623bd7c42261a91",
+      "seconds": 4.226551,
+      "killed": true,
+      "damage_taken": 0,
+      "hp_before": 100,
+      "hp_after": 100,
+      "mp_before": 60,
+      "mp_after": 29,
+      "stamina_after": 100.0,
+      "cast_cost_total": 32,
+      "casts": [
+        {
+          "action": "inscribe",
+          "materials": {
+            "fire_stone": 1
+          },
+          "mp_after": 52,
+          "mp_cost": 8,
+          "position": [
+            -3074.39697265625,
+            -1209.88256835938
+          ],
+          "result": "inscribe",
+          "rule": "",
+          "t": 1.04969344444445
+        },
+        {
+          "action": "ignite",
+          "materials": {},
+          "mp_after": 40,
+          "mp_cost": 12,
+          "position": [
+            -3074.39697265625,
+            -1209.88256835938
+          ],
+          "result": "fireball",
+          "rule": "fire_sigil_fireball",
+          "t": 1.56990577777778
+        },
+        {
+          "action": "ignite",
+          "materials": {},
+          "mp_after": 29,
+          "mp_cost": 12,
+          "position": [
+            -3074.39697265625,
+            -1209.88256835938
+          ],
+          "result": "fireball",
+          "rule": "fire_sigil_fireball",
+          "t": 4.08139822222222
+        }
+      ],
+      "melee_hit_count": 0,
+      "materials_before": {
+        "ash": 2,
+        "charcoal": 5,
+        "clean_water": 4,
+        "crystal": 8,
+        "fire_stone": 1,
+        "frost_salt": 2,
+        "grain": 3,
+        "herb": 2,
+        "ration": 2,
+        "resin": 2,
+        "sap": 9,
+        "storm_dust": 3
+      },
+      "materials_after": {
+        "ash": 2,
+        "charcoal": 5,
+        "clean_water": 4,
+        "crystal": 8,
+        "frost_salt": 2,
+        "grain": 3,
+        "herb": 2,
+        "ration": 2,
+        "resin": 2,
+        "sap": 9,
+        "storm_dust": 3
+      }
+    }
+  },
+  "limitations": [
+    "No working shared desktop/computer-use tool; native GUI rendered with software OpenGL and PNG review.",
+    "One pair of policy-driven trials; no dodge/guard, no equipment.",
+    "Runtime Node script census does not enumerate RefCounted services or unvisited content."
+  ],
+  "return_reload": {
+    "same": {
+      "materials": true,
+      "items": true,
+      "pack": true,
+      "gear": true,
+      "claims": true,
+      "known_actions": true
+    },
+    "materials": {
+      "ash": 2,
+      "charcoal": 5,
+      "clean_water": 4,
+      "cloth": 1,
+      "crystal": 8,
+      "frost_salt": 2,
+      "grain": 3,
+      "herb": 2,
+      "poison_rag": 1,
+      "ration": 3,
+      "resin": 2,
+      "sap": 9,
+      "storm_dust": 3
+    },
+    "pocket": [
+      {
+        "definition": "ash",
+        "properties": {},
+        "quantity": 2,
+        "uid": "item.61"
+      },
+      {
+        "definition": "charcoal",
+        "properties": {},
+        "quantity": 5,
+        "uid": "item.62"
+      },
+      {
+        "definition": "crystal",
+        "properties": {},
+        "quantity": 8,
+        "uid": "item.63"
+      },
+      {
+        "definition": "frost_salt",
+        "properties": {},
+        "quantity": 2,
+        "uid": "item.64"
+      },
+      {
+        "definition": "resin",
+        "properties": {},
+        "quantity": 2,
+        "uid": "item.65"
+      },
+      {
+        "definition": "sap",
+        "properties": {},
+        "quantity": 9,
+        "uid": "item.66"
+      },
+      {
+        "definition": "storm_dust",
+        "properties": {},
+        "quantity": 3,
+        "uid": "item.67"
+      },
+      {
+        "definition": "ration",
+        "properties": {},
+        "quantity": 3,
+        "uid": "item.68"
+      },
+      {
+        "definition": "grain",
+        "properties": {},
+        "quantity": 3,
+        "uid": "item.69"
+      },
+      {
+        "definition": "herb",
+        "properties": {},
+        "quantity": 2,
+        "uid": "item.70"
+      },
+      {
+        "definition": "clean_water",
+        "properties": {},
+        "quantity": 4,
+        "uid": "item.71"
+      },
+      {
+        "definition": "cloth",
+        "properties": {},
+        "quantity": 1,
+        "uid": "item.11"
+      }
+    ],
+    "pack": [
+      {
+        "definition": "poison_rag",
+        "properties": {},
+        "quantity": 1,
+        "uid": "item.12"
+      },
+      {
+        "definition": "river_sabre",
+        "properties": {},
+        "quantity": 1,
+        "uid": "item.14"
+      },
+      {
+        "definition": "river_coat",
+        "properties": {},
+        "quantity": 1,
+        "uid": "item.15"
+      }
+    ],
+    "gear": [],
+    "claims": [
+      "equipment.sources_v1",
+      "fog.-9.3",
+      "fog.-9.4",
+      "fog.-9.5",
+      "fog.-8.3",
+      "fog.-8.4",
+      "fog.-8.5",
+      "fog.-7.3",
+      "fog.-7.4",
+      "fog.-7.5",
+      "place.town",
+      "fog.-6.3",
+      "fog.-6.4",
+      "fog.-6.5",
+      "river.handbook",
+      "river.pack",
+      "fog.-8.2",
+      "fog.-7.2",
+      "fog.-6.2",
+      "seen.river.stove",
+      "fog.-8.1",
+      "fog.-7.1",
+      "fog.-6.1",
+      "river.sign_town",
+      "fog.-8.0",
+      "fog.-7.0",
+      "fog.-6.0",
+      "fog.-8.-1",
+      "fog.-7.-1",
+      "fog.-6.-1",
+      "fog.-8.-2",
+      "fog.-7.-2",
+      "fog.-6.-2",
+      "fog.-8.-3",
+      "fog.-7.-3",
+      "fog.-6.-3",
+      "fog.-8.-4",
+      "fog.-7.-4",
+      "fog.-6.-4",
+      "river.fire",
+      "river.enemy.camp.forest.3",
+      "fog.-5.-4",
+      "fog.-5.-3",
+      "fog.-5.-2",
+      "place.forest",
+      "loot.river.enemy.camp.forest.3"
+    ],
+    "temporary_fields": [],
+    "selection": {},
+    "player": {
+      "base": true,
+      "damage_taken": 0,
+      "dead": false,
+      "hp": 100,
+      "mode": "idle",
+      "mp": 60,
+      "position": [
+        -3496.98046875,
+        2087.8583984375
+      ],
+      "stamina": 100.0
+    }
+  },
+  "default_arcane_rune": {
+    "casts": [
+      {
+        "action": "inscribe",
+        "materials": {},
+        "mp_after": 52,
+        "mp_cost": 8,
+        "position": [
+          -3074.39697265625,
+          -1209.88256835938
+        ],
+        "result": "inscribe",
+        "rule": "",
+        "t": 0.972803090909091
+      },
+      {
+        "action": "ignite",
+        "materials": {},
+        "mp_after": 48,
+        "mp_cost": 4,
+        "position": [
+          -3074.39697265625,
+          -1209.88256835938
+        ],
+        "result": "ignite",
+        "rule": "",
+        "t": 1.64787609090909
+      }
+    ],
+    "materials": {
+      "ash": 2,
+      "charcoal": 5,
+      "clean_water": 4,
+      "crystal": 8,
+      "fire_stone": 1,
+      "frost_salt": 2,
+      "grain": 3,
+      "herb": 2,
+      "ration": 2,
+      "resin": 2,
+      "sap": 9,
+      "storm_dust": 3
+    },
+    "fields": [
+      {
+        "charges": 1,
+        "position": [
+          -3074.39697265625,
+          -1209.88256835938
+        ],
+        "remaining": 8.300474,
+        "type": "arcane"
+      }
+    ],
+    "player": {
+      "base": false,
+      "damage_taken": 0,
+      "dead": false,
+      "hp": 100,
+      "mode": "idle",
+      "mp": 48,
+      "position": [
+        -3074.39697265625,
+        -1209.88256835938
+      ],
+      "stamina": 100.0
+    }
+  },
+  "fresh_safe_preparation": {
+    "player": {
+      "base": false,
+      "damage_taken": 0,
+      "dead": false,
+      "hp": 100,
+      "mode": "idle",
+      "mp": 60,
+      "position": [
+        -3076.67529296875,
+        -1206.82250976562
+      ],
+      "stamina": 100.0
+    },
+    "nearest_enemy": {
+      "detect": 440.0,
+      "distance": 488.498077392578,
+      "hp": 60,
+      "id": "river.enemy.camp.forest.3",
+      "mode": "idle",
+      "mp": 39,
+      "position": [
+        -2600.0,
+        -1100.0
+      ],
+      "processing": false,
+      "state": "Idle",
+      "title": "守备兵"
+    },
+    "text": [
+      "林间旧猎营：火阵",
+      "按 M，打开「铭刻法阵」并选择「火石阵」。读后先退到笔记西侧，确认守林兵尚未追来；找一处离守林兵有距离的空地，用快捷栏里的铭刻法阵布阵，站定直到火阵成形。然后留在阵内，朝敌人用火花（默认右键或 6）打出远程火球，每发消耗一次阵充能。凝能阵内和火阵外都只会放出近身火花。\n\n布火阵需要一枚火石。没有火石时，可回镇在施法工作台用炭屑×2和晶砂×1加工。猎营西侧的旧窖藏着档案。\n\n完整用法已记入J日志，可随时回看。"
+    ],
+    "materials": {
+      "ash": 2,
+      "charcoal": 5,
+      "clean_water": 4,
+      "crystal": 8,
+      "fire_stone": 1,
+      "frost_salt": 2,
+      "grain": 3,
+      "herb": 2,
+      "ration": 2,
+      "resin": 2,
+      "sap": 9,
+      "storm_dust": 3
+    }
+  }
+}
