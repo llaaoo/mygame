@@ -1,2222 +1,627 @@
 {
   "kind": "same game-created post-loot kit; authored encounter replay with rewards disabled; normal AI and real inputs",
+  "source_commit": "b16bbcc8e50733bb41e6a70ec8e8d278de295a89",
   "seed_sha256": "60f412397c6fedb6ac632d50f3919de66f899fa4d97f4a91a126399ea860b12a",
-  "source_commit": "pending final archive",
+  "common_initial_inventory": {
+    "items": [
+      {
+        "definition": "charcoal",
+        "properties": {},
+        "quantity": 3,
+        "uid": "item.62"
+      },
+      {
+        "definition": "crystal",
+        "properties": {},
+        "quantity": 7,
+        "uid": "item.63"
+      },
+      {
+        "definition": "frost_salt",
+        "properties": {},
+        "quantity": 2,
+        "uid": "item.64"
+      },
+      {
+        "definition": "resin",
+        "properties": {},
+        "quantity": 1,
+        "uid": "item.65"
+      },
+      {
+        "definition": "sap",
+        "properties": {},
+        "quantity": 5,
+        "uid": "item.66"
+      },
+      {
+        "definition": "storm_dust",
+        "properties": {},
+        "quantity": 3,
+        "uid": "item.67"
+      },
+      {
+        "definition": "ration",
+        "properties": {},
+        "quantity": 3,
+        "uid": "item.68"
+      },
+      {
+        "definition": "clean_water",
+        "properties": {},
+        "quantity": 3,
+        "uid": "item.71"
+      },
+      {
+        "definition": "poison_rag",
+        "properties": {},
+        "quantity": 1,
+        "uid": "item.12"
+      },
+      {
+        "definition": "oil_bottle",
+        "properties": {},
+        "quantity": 1,
+        "uid": "item.73"
+      },
+      {
+        "definition": "resin_sprayer",
+        "properties": {
+          "doses": 3
+        },
+        "quantity": 1,
+        "uid": "item.74"
+      },
+      {
+        "definition": "fire_stone",
+        "properties": {},
+        "quantity": 1,
+        "uid": "item.75"
+      }
+    ],
+    "pack": [
+      {
+        "definition": "grain",
+        "properties": {},
+        "quantity": 3,
+        "uid": "item.69"
+      },
+      {
+        "definition": "herb",
+        "properties": {},
+        "quantity": 2,
+        "uid": "item.70"
+      },
+      {
+        "definition": "ash",
+        "properties": {},
+        "quantity": 2,
+        "uid": "item.61"
+      },
+      {
+        "definition": "cloth",
+        "properties": {},
+        "quantity": 1,
+        "uid": "item.11"
+      }
+    ],
+    "gear": [
+      {
+        "definition": "river_sabre",
+        "properties": {},
+        "quantity": 1,
+        "uid": "item.14"
+      },
+      {
+        "definition": "river_coat",
+        "properties": {},
+        "quantity": 1,
+        "uid": "item.15"
+      }
+    ],
+    "shortcuts": {
+      "item_0": {
+        "item_id": "ration",
+        "kind": "item",
+        "uid": ""
+      },
+      "item_1": {
+        "item_id": "clean_water",
+        "kind": "item",
+        "uid": ""
+      },
+      "item_2": {
+        "item_id": "tea",
+        "kind": "item",
+        "uid": ""
+      },
+      "item_3": {
+        "item_id": "broth",
+        "kind": "item",
+        "uid": ""
+      },
+      "left": {
+        "item_id": "oil_bottle",
+        "kind": "item",
+        "uid": ""
+      },
+      "quick_e": {
+        "item_id": "poison_rag",
+        "kind": "item",
+        "uid": ""
+      },
+      "right": {
+        "kind": "skill",
+        "skill_id": "ignite",
+        "upgrades": {}
+      },
+      "slot_0": {
+        "kind": "skill",
+        "selection": {
+          "modifier": "",
+          "payload": "resin",
+          "uid": "item.74"
+        },
+        "skill_id": "disperse",
+        "upgrades": {}
+      },
+      "slot_3": {
+        "kind": "skill",
+        "skill_id": "water_call",
+        "upgrades": {}
+      },
+      "slot_4": {
+        "kind": "skill",
+        "selection": {
+          "modifier": "",
+          "payload": "ember",
+          "uid": ""
+        },
+        "skill_id": "inscribe",
+        "upgrades": {}
+      },
+      "slot_5": {
+        "kind": "skill",
+        "skill_id": "ignite",
+        "upgrades": {}
+      }
+    }
+  },
   "results": [
     {
       "style": "basic",
-      "seconds": 3.69276977777778,
-      "damage_taken": 12,
+      "seconds": 3.76484066666667,
+      "damage_taken": 15,
       "killed": true,
-      "before": {
-        "player": {
-          "attacks": 0,
-          "base": false,
-          "channel_source": "",
-          "charge_source": "",
-          "damage_taken": 0,
-          "dead": false,
-          "guarding": false,
-          "hp": 100,
-          "mode": "idle",
-          "mp": 60,
-          "position": [
-            -3077.734375,
-            -1200.52368164062
-          ],
-          "stamina": 100.0,
-          "ui_blocked": false
-        },
-        "items": [
-          {
-            "definition": "charcoal",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.62"
-          },
-          {
-            "definition": "crystal",
-            "properties": {},
-            "quantity": 7,
-            "uid": "item.63"
-          },
-          {
-            "definition": "frost_salt",
-            "properties": {},
-            "quantity": 2,
-            "uid": "item.64"
-          },
-          {
-            "definition": "resin",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.65"
-          },
-          {
-            "definition": "sap",
-            "properties": {},
-            "quantity": 5,
-            "uid": "item.66"
-          },
-          {
-            "definition": "storm_dust",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.67"
-          },
-          {
-            "definition": "ration",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.68"
-          },
-          {
-            "definition": "clean_water",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.71"
-          },
-          {
-            "definition": "poison_rag",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.12"
-          },
-          {
-            "definition": "oil_bottle",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.73"
-          },
-          {
-            "definition": "resin_sprayer",
-            "properties": {
-              "doses": 3
-            },
-            "quantity": 1,
-            "uid": "item.74"
-          },
-          {
-            "definition": "fire_stone",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.75"
-          }
+      "initial_resources": {
+        "attacks": 0,
+        "base": false,
+        "channel_source": "",
+        "charge_source": "",
+        "damage_taken": 0,
+        "dead": false,
+        "guarding": false,
+        "hp": 100,
+        "mode": "idle",
+        "mp": 60,
+        "position": [
+          -3077.734375,
+          -1200.52368164062
         ],
-        "pack": [
-          {
-            "definition": "grain",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.69"
-          },
-          {
-            "definition": "herb",
-            "properties": {},
-            "quantity": 2,
-            "uid": "item.70"
-          },
-          {
-            "definition": "ash",
-            "properties": {},
-            "quantity": 2,
-            "uid": "item.61"
-          },
-          {
-            "definition": "cloth",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.11"
-          }
-        ],
-        "gear": [
-          {
-            "definition": "river_sabre",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.14"
-          },
-          {
-            "definition": "river_coat",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.15"
-          }
-        ],
-        "shortcuts": {
-          "item_0": {
-            "item_id": "ration",
-            "kind": "item",
-            "uid": ""
-          },
-          "item_1": {
-            "item_id": "clean_water",
-            "kind": "item",
-            "uid": ""
-          },
-          "item_2": {
-            "item_id": "tea",
-            "kind": "item",
-            "uid": ""
-          },
-          "item_3": {
-            "item_id": "broth",
-            "kind": "item",
-            "uid": ""
-          },
-          "left": {
-            "item_id": "oil_bottle",
-            "kind": "item",
-            "uid": ""
-          },
-          "quick_e": {
-            "item_id": "poison_rag",
-            "kind": "item",
-            "uid": ""
-          },
-          "right": {
-            "kind": "skill",
-            "skill_id": "ignite",
-            "upgrades": {}
-          },
-          "slot_0": {
-            "kind": "skill",
-            "selection": {
-              "modifier": "",
-              "payload": "resin",
-              "uid": "item.74"
-            },
-            "skill_id": "disperse",
-            "upgrades": {}
-          },
-          "slot_3": {
-            "kind": "skill",
-            "skill_id": "water_call",
-            "upgrades": {}
-          },
-          "slot_4": {
-            "kind": "skill",
-            "selection": {
-              "modifier": "",
-              "payload": "ember",
-              "uid": ""
-            },
-            "skill_id": "inscribe",
-            "upgrades": {}
-          },
-          "slot_5": {
-            "kind": "skill",
-            "skill_id": "ignite",
-            "upgrades": {}
-          }
-        },
-        "casts": [],
-        "defenses": []
+        "stamina": 100.0,
+        "ui_blocked": false
       },
-      "after": {
-        "player": {
-          "attacks": 4,
-          "base": false,
-          "channel_source": "",
-          "charge_source": "",
-          "damage_taken": 12,
-          "dead": false,
-          "guarding": false,
-          "hp": 88,
-          "mode": "attack",
-          "mp": 60,
-          "position": [
-            -2649.7265625,
-            -1115.11547851562
-          ],
-          "stamina": 52.0,
-          "ui_blocked": false
+      "final_resources": {
+        "attacks": 4,
+        "base": false,
+        "channel_source": "",
+        "charge_source": "",
+        "damage_taken": 15,
+        "dead": false,
+        "guarding": false,
+        "hp": 85,
+        "mode": "attack",
+        "mp": 60,
+        "position": [
+          -2647.62622070312,
+          -1107.18676757812
+        ],
+        "stamina": 52.0,
+        "ui_blocked": false
+      },
+      "inventory_delta": {},
+      "sprays_before": {
+        "item.74": {
+          "id": "resin_sprayer",
+          "doses": 3
+        }
+      },
+      "sprays_after": {
+        "item.74": {
+          "id": "resin_sprayer",
+          "doses": 3
+        }
+      },
+      "paid_casts": [],
+      "final_equipped_instances": [
+        {
+          "definition": "river_sabre",
+          "properties": {},
+          "quantity": 1,
+          "uid": "item.14"
         },
-        "items": [
-          {
-            "definition": "charcoal",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.62"
-          },
-          {
-            "definition": "crystal",
-            "properties": {},
-            "quantity": 7,
-            "uid": "item.63"
-          },
-          {
-            "definition": "frost_salt",
-            "properties": {},
-            "quantity": 2,
-            "uid": "item.64"
-          },
-          {
-            "definition": "resin",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.65"
-          },
-          {
-            "definition": "sap",
-            "properties": {},
-            "quantity": 5,
-            "uid": "item.66"
-          },
-          {
-            "definition": "storm_dust",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.67"
-          },
-          {
-            "definition": "ration",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.68"
-          },
-          {
-            "definition": "clean_water",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.71"
-          },
-          {
-            "definition": "poison_rag",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.12"
-          },
-          {
-            "definition": "oil_bottle",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.73"
-          },
-          {
-            "definition": "resin_sprayer",
-            "properties": {
-              "doses": 3
-            },
-            "quantity": 1,
-            "uid": "item.74"
-          },
-          {
-            "definition": "fire_stone",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.75"
-          }
-        ],
-        "pack": [
-          {
-            "definition": "grain",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.69"
-          },
-          {
-            "definition": "herb",
-            "properties": {},
-            "quantity": 2,
-            "uid": "item.70"
-          },
-          {
-            "definition": "ash",
-            "properties": {},
-            "quantity": 2,
-            "uid": "item.61"
-          },
-          {
-            "definition": "cloth",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.11"
-          }
-        ],
-        "gear": [
-          {
-            "definition": "river_sabre",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.14"
-          },
-          {
-            "definition": "river_coat",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.15"
-          }
-        ],
-        "shortcuts": {
-          "item_0": {
-            "item_id": "ration",
-            "kind": "item",
-            "uid": ""
-          },
-          "item_1": {
-            "item_id": "clean_water",
-            "kind": "item",
-            "uid": ""
-          },
-          "item_2": {
-            "item_id": "tea",
-            "kind": "item",
-            "uid": ""
-          },
-          "item_3": {
-            "item_id": "broth",
-            "kind": "item",
-            "uid": ""
-          },
-          "left": {
-            "item_id": "oil_bottle",
-            "kind": "item",
-            "uid": ""
-          },
-          "quick_e": {
-            "item_id": "poison_rag",
-            "kind": "item",
-            "uid": ""
-          },
-          "right": {
-            "kind": "skill",
-            "skill_id": "ignite",
-            "upgrades": {}
-          },
-          "slot_0": {
-            "kind": "skill",
-            "selection": {
-              "modifier": "",
-              "payload": "resin",
-              "uid": "item.74"
-            },
-            "skill_id": "disperse",
-            "upgrades": {}
-          },
-          "slot_3": {
-            "kind": "skill",
-            "skill_id": "water_call",
-            "upgrades": {}
-          },
-          "slot_4": {
-            "kind": "skill",
-            "selection": {
-              "modifier": "",
-              "payload": "ember",
-              "uid": ""
-            },
-            "skill_id": "inscribe",
-            "upgrades": {}
-          },
-          "slot_5": {
-            "kind": "skill",
-            "skill_id": "ignite",
-            "upgrades": {}
-          }
-        },
-        "casts": [],
-        "defenses": []
-      }
+        {
+          "definition": "river_coat",
+          "properties": {},
+          "quantity": 1,
+          "uid": "item.15"
+        }
+      ]
     },
     {
       "style": "coat",
-      "seconds": 5.05917633333334,
+      "seconds": 4.94570433333333,
       "damage_taken": 12,
       "killed": true,
-      "before": {
-        "player": {
-          "attacks": 0,
-          "base": false,
-          "channel_source": "",
-          "charge_source": "",
-          "damage_taken": 0,
-          "dead": false,
-          "guarding": false,
-          "hp": 100,
-          "mode": "idle",
-          "mp": 60,
-          "position": [
-            -3077.734375,
-            -1200.52368164062
-          ],
-          "stamina": 100.0,
-          "ui_blocked": false
-        },
-        "items": [
-          {
-            "definition": "charcoal",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.62"
-          },
-          {
-            "definition": "crystal",
-            "properties": {},
-            "quantity": 7,
-            "uid": "item.63"
-          },
-          {
-            "definition": "frost_salt",
-            "properties": {},
-            "quantity": 2,
-            "uid": "item.64"
-          },
-          {
-            "definition": "resin",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.65"
-          },
-          {
-            "definition": "sap",
-            "properties": {},
-            "quantity": 5,
-            "uid": "item.66"
-          },
-          {
-            "definition": "storm_dust",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.67"
-          },
-          {
-            "definition": "ration",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.68"
-          },
-          {
-            "definition": "clean_water",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.71"
-          },
-          {
-            "definition": "poison_rag",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.12"
-          },
-          {
-            "definition": "oil_bottle",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.73"
-          },
-          {
-            "definition": "resin_sprayer",
-            "properties": {
-              "doses": 3
-            },
-            "quantity": 1,
-            "uid": "item.74"
-          },
-          {
-            "definition": "fire_stone",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.75"
-          }
+      "initial_resources": {
+        "attacks": 0,
+        "base": false,
+        "channel_source": "",
+        "charge_source": "",
+        "damage_taken": 0,
+        "dead": false,
+        "guarding": false,
+        "hp": 100,
+        "mode": "idle",
+        "mp": 60,
+        "position": [
+          -3077.734375,
+          -1200.52368164062
         ],
-        "pack": [
-          {
-            "definition": "grain",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.69"
-          },
-          {
-            "definition": "herb",
-            "properties": {},
-            "quantity": 2,
-            "uid": "item.70"
-          },
-          {
-            "definition": "ash",
-            "properties": {},
-            "quantity": 2,
-            "uid": "item.61"
-          },
-          {
-            "definition": "cloth",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.11"
-          }
-        ],
-        "gear": [
-          {
-            "definition": "river_sabre",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.14"
-          },
-          {
-            "definition": "river_coat",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.15"
-          }
-        ],
-        "shortcuts": {
-          "item_0": {
-            "item_id": "ration",
-            "kind": "item",
-            "uid": ""
-          },
-          "item_1": {
-            "item_id": "clean_water",
-            "kind": "item",
-            "uid": ""
-          },
-          "item_2": {
-            "item_id": "tea",
-            "kind": "item",
-            "uid": ""
-          },
-          "item_3": {
-            "item_id": "broth",
-            "kind": "item",
-            "uid": ""
-          },
-          "left": {
-            "item_id": "oil_bottle",
-            "kind": "item",
-            "uid": ""
-          },
-          "quick_e": {
-            "item_id": "poison_rag",
-            "kind": "item",
-            "uid": ""
-          },
-          "right": {
-            "kind": "skill",
-            "skill_id": "ignite",
-            "upgrades": {}
-          },
-          "slot_0": {
-            "kind": "skill",
-            "selection": {
-              "modifier": "",
-              "payload": "resin",
-              "uid": "item.74"
-            },
-            "skill_id": "disperse",
-            "upgrades": {}
-          },
-          "slot_3": {
-            "kind": "skill",
-            "skill_id": "water_call",
-            "upgrades": {}
-          },
-          "slot_4": {
-            "kind": "skill",
-            "selection": {
-              "modifier": "",
-              "payload": "ember",
-              "uid": ""
-            },
-            "skill_id": "inscribe",
-            "upgrades": {}
-          },
-          "slot_5": {
-            "kind": "skill",
-            "skill_id": "ignite",
-            "upgrades": {}
-          }
-        },
-        "casts": [],
-        "defenses": []
+        "stamina": 100.0,
+        "ui_blocked": false
       },
-      "after": {
-        "player": {
-          "attacks": 4,
-          "base": false,
-          "channel_source": "",
-          "charge_source": "",
-          "damage_taken": 12,
-          "dead": false,
-          "guarding": false,
-          "hp": 88,
-          "mode": "attack",
-          "mp": 60,
-          "position": [
-            -2642.98486328125,
-            -1119.40405273438
-          ],
-          "stamina": 52.0,
-          "ui_blocked": false
+      "final_resources": {
+        "attacks": 4,
+        "base": false,
+        "channel_source": "",
+        "charge_source": "",
+        "damage_taken": 12,
+        "dead": false,
+        "guarding": false,
+        "hp": 88,
+        "mode": "attack",
+        "mp": 60,
+        "position": [
+          -2638.96411132812,
+          -1124.08813476562
+        ],
+        "stamina": 52.0,
+        "ui_blocked": false
+      },
+      "inventory_delta": {
+        "poison_rag": -1
+      },
+      "sprays_before": {
+        "item.74": {
+          "id": "resin_sprayer",
+          "doses": 3
+        }
+      },
+      "sprays_after": {
+        "item.74": {
+          "id": "resin_sprayer",
+          "doses": 3
+        }
+      },
+      "paid_casts": [],
+      "final_equipped_instances": [
+        {
+          "definition": "river_sabre",
+          "properties": {
+            "coating": {
+              "expires_at": 657.901315529125,
+              "id": "poison_rag"
+            }
+          },
+          "quantity": 1,
+          "uid": "item.14"
         },
-        "items": [
-          {
-            "definition": "charcoal",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.62"
-          },
-          {
-            "definition": "crystal",
-            "properties": {},
-            "quantity": 7,
-            "uid": "item.63"
-          },
-          {
-            "definition": "frost_salt",
-            "properties": {},
-            "quantity": 2,
-            "uid": "item.64"
-          },
-          {
-            "definition": "resin",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.65"
-          },
-          {
-            "definition": "sap",
-            "properties": {},
-            "quantity": 5,
-            "uid": "item.66"
-          },
-          {
-            "definition": "storm_dust",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.67"
-          },
-          {
-            "definition": "ration",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.68"
-          },
-          {
-            "definition": "clean_water",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.71"
-          },
-          {
-            "definition": "oil_bottle",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.73"
-          },
-          {
-            "definition": "resin_sprayer",
-            "properties": {
-              "doses": 3
-            },
-            "quantity": 1,
-            "uid": "item.74"
-          },
-          {
-            "definition": "fire_stone",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.75"
-          }
-        ],
-        "pack": [
-          {
-            "definition": "grain",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.69"
-          },
-          {
-            "definition": "herb",
-            "properties": {},
-            "quantity": 2,
-            "uid": "item.70"
-          },
-          {
-            "definition": "ash",
-            "properties": {},
-            "quantity": 2,
-            "uid": "item.61"
-          },
-          {
-            "definition": "cloth",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.11"
-          }
-        ],
-        "gear": [
-          {
-            "definition": "river_sabre",
-            "properties": {
-              "coating": {
-                "expires_at": 657.902027195792,
-                "id": "poison_rag"
-              }
-            },
-            "quantity": 1,
-            "uid": "item.14"
-          },
-          {
-            "definition": "river_coat",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.15"
-          }
-        ],
-        "shortcuts": {
-          "item_0": {
-            "item_id": "ration",
-            "kind": "item",
-            "uid": ""
-          },
-          "item_1": {
-            "item_id": "clean_water",
-            "kind": "item",
-            "uid": ""
-          },
-          "item_2": {
-            "item_id": "tea",
-            "kind": "item",
-            "uid": ""
-          },
-          "item_3": {
-            "item_id": "broth",
-            "kind": "item",
-            "uid": ""
-          },
-          "left": {
-            "item_id": "oil_bottle",
-            "kind": "item",
-            "uid": ""
-          },
-          "quick_e": {
-            "item_id": "poison_rag",
-            "kind": "item",
-            "uid": ""
-          },
-          "right": {
-            "kind": "skill",
-            "skill_id": "ignite",
-            "upgrades": {}
-          },
-          "slot_0": {
-            "kind": "skill",
-            "selection": {
-              "modifier": "",
-              "payload": "resin",
-              "uid": "item.74"
-            },
-            "skill_id": "disperse",
-            "upgrades": {}
-          },
-          "slot_3": {
-            "kind": "skill",
-            "skill_id": "water_call",
-            "upgrades": {}
-          },
-          "slot_4": {
-            "kind": "skill",
-            "selection": {
-              "modifier": "",
-              "payload": "ember",
-              "uid": ""
-            },
-            "skill_id": "inscribe",
-            "upgrades": {}
-          },
-          "slot_5": {
-            "kind": "skill",
-            "skill_id": "ignite",
-            "upgrades": {}
-          }
-        },
-        "casts": [],
-        "defenses": []
-      }
+        {
+          "definition": "river_coat",
+          "properties": {},
+          "quantity": 1,
+          "uid": "item.15"
+        }
+      ]
     },
     {
       "style": "throw",
-      "seconds": 5.25573833333337,
-      "damage_taken": 27,
+      "seconds": 5.57221133333334,
+      "damage_taken": 15,
       "killed": true,
-      "before": {
-        "player": {
-          "attacks": 0,
-          "base": false,
-          "channel_source": "",
-          "charge_source": "",
-          "damage_taken": 0,
-          "dead": false,
-          "guarding": false,
-          "hp": 100,
-          "mode": "idle",
-          "mp": 60,
-          "position": [
-            -3077.734375,
-            -1200.52368164062
-          ],
-          "stamina": 100.0,
-          "ui_blocked": false
-        },
-        "items": [
-          {
-            "definition": "charcoal",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.62"
-          },
-          {
-            "definition": "crystal",
-            "properties": {},
-            "quantity": 7,
-            "uid": "item.63"
-          },
-          {
-            "definition": "frost_salt",
-            "properties": {},
-            "quantity": 2,
-            "uid": "item.64"
-          },
-          {
-            "definition": "resin",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.65"
-          },
-          {
-            "definition": "sap",
-            "properties": {},
-            "quantity": 5,
-            "uid": "item.66"
-          },
-          {
-            "definition": "storm_dust",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.67"
-          },
-          {
-            "definition": "ration",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.68"
-          },
-          {
-            "definition": "clean_water",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.71"
-          },
-          {
-            "definition": "poison_rag",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.12"
-          },
-          {
-            "definition": "oil_bottle",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.73"
-          },
-          {
-            "definition": "resin_sprayer",
-            "properties": {
-              "doses": 3
-            },
-            "quantity": 1,
-            "uid": "item.74"
-          },
-          {
-            "definition": "fire_stone",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.75"
-          }
+      "initial_resources": {
+        "attacks": 0,
+        "base": false,
+        "channel_source": "",
+        "charge_source": "",
+        "damage_taken": 0,
+        "dead": false,
+        "guarding": false,
+        "hp": 100,
+        "mode": "idle",
+        "mp": 60,
+        "position": [
+          -3077.734375,
+          -1200.52368164062
         ],
-        "pack": [
-          {
-            "definition": "grain",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.69"
-          },
-          {
-            "definition": "herb",
-            "properties": {},
-            "quantity": 2,
-            "uid": "item.70"
-          },
-          {
-            "definition": "ash",
-            "properties": {},
-            "quantity": 2,
-            "uid": "item.61"
-          },
-          {
-            "definition": "cloth",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.11"
-          }
-        ],
-        "gear": [
-          {
-            "definition": "river_sabre",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.14"
-          },
-          {
-            "definition": "river_coat",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.15"
-          }
-        ],
-        "shortcuts": {
-          "item_0": {
-            "item_id": "ration",
-            "kind": "item",
-            "uid": ""
-          },
-          "item_1": {
-            "item_id": "clean_water",
-            "kind": "item",
-            "uid": ""
-          },
-          "item_2": {
-            "item_id": "tea",
-            "kind": "item",
-            "uid": ""
-          },
-          "item_3": {
-            "item_id": "broth",
-            "kind": "item",
-            "uid": ""
-          },
-          "left": {
-            "item_id": "oil_bottle",
-            "kind": "item",
-            "uid": ""
-          },
-          "quick_e": {
-            "item_id": "poison_rag",
-            "kind": "item",
-            "uid": ""
-          },
-          "right": {
-            "kind": "skill",
-            "skill_id": "ignite",
-            "upgrades": {}
-          },
-          "slot_0": {
-            "kind": "skill",
-            "selection": {
-              "modifier": "",
-              "payload": "resin",
-              "uid": "item.74"
-            },
-            "skill_id": "disperse",
-            "upgrades": {}
-          },
-          "slot_3": {
-            "kind": "skill",
-            "skill_id": "water_call",
-            "upgrades": {}
-          },
-          "slot_4": {
-            "kind": "skill",
-            "selection": {
-              "modifier": "",
-              "payload": "ember",
-              "uid": ""
-            },
-            "skill_id": "inscribe",
-            "upgrades": {}
-          },
-          "slot_5": {
-            "kind": "skill",
-            "skill_id": "ignite",
-            "upgrades": {}
-          }
-        },
-        "casts": [],
-        "defenses": []
+        "stamina": 100.0,
+        "ui_blocked": false
       },
-      "after": {
-        "player": {
-          "attacks": 4,
-          "base": false,
-          "channel_source": "",
-          "charge_source": "",
-          "damage_taken": 27,
-          "dead": false,
-          "guarding": false,
-          "hp": 73,
-          "mode": "attack",
-          "mp": 60,
-          "position": [
-            -2781.22412109375,
-            -1157.89501953125
-          ],
-          "stamina": 46.5000000000001,
-          "ui_blocked": false
+      "final_resources": {
+        "attacks": 4,
+        "base": false,
+        "channel_source": "",
+        "charge_source": "",
+        "damage_taken": 15,
+        "dead": false,
+        "guarding": false,
+        "hp": 85,
+        "mode": "attack",
+        "mp": 60,
+        "position": [
+          -2724.07055664062,
+          -1146.54113769531
+        ],
+        "stamina": 49.5000000000002,
+        "ui_blocked": false
+      },
+      "inventory_delta": {
+        "oil_bottle": -1
+      },
+      "sprays_before": {
+        "item.74": {
+          "id": "resin_sprayer",
+          "doses": 3
+        }
+      },
+      "sprays_after": {
+        "item.74": {
+          "id": "resin_sprayer",
+          "doses": 3
+        }
+      },
+      "paid_casts": [],
+      "final_equipped_instances": [
+        {
+          "definition": "river_sabre",
+          "properties": {},
+          "quantity": 1,
+          "uid": "item.14"
         },
-        "items": [
-          {
-            "definition": "charcoal",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.62"
-          },
-          {
-            "definition": "crystal",
-            "properties": {},
-            "quantity": 7,
-            "uid": "item.63"
-          },
-          {
-            "definition": "frost_salt",
-            "properties": {},
-            "quantity": 2,
-            "uid": "item.64"
-          },
-          {
-            "definition": "resin",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.65"
-          },
-          {
-            "definition": "sap",
-            "properties": {},
-            "quantity": 5,
-            "uid": "item.66"
-          },
-          {
-            "definition": "storm_dust",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.67"
-          },
-          {
-            "definition": "ration",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.68"
-          },
-          {
-            "definition": "clean_water",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.71"
-          },
-          {
-            "definition": "poison_rag",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.12"
-          },
-          {
-            "definition": "resin_sprayer",
-            "properties": {
-              "doses": 3
-            },
-            "quantity": 1,
-            "uid": "item.74"
-          },
-          {
-            "definition": "fire_stone",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.75"
-          }
-        ],
-        "pack": [
-          {
-            "definition": "grain",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.69"
-          },
-          {
-            "definition": "herb",
-            "properties": {},
-            "quantity": 2,
-            "uid": "item.70"
-          },
-          {
-            "definition": "ash",
-            "properties": {},
-            "quantity": 2,
-            "uid": "item.61"
-          },
-          {
-            "definition": "cloth",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.11"
-          }
-        ],
-        "gear": [
-          {
-            "definition": "river_sabre",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.14"
-          },
-          {
-            "definition": "river_coat",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.15"
-          }
-        ],
-        "shortcuts": {
-          "item_0": {
-            "item_id": "ration",
-            "kind": "item",
-            "uid": ""
-          },
-          "item_1": {
-            "item_id": "clean_water",
-            "kind": "item",
-            "uid": ""
-          },
-          "item_2": {
-            "item_id": "tea",
-            "kind": "item",
-            "uid": ""
-          },
-          "item_3": {
-            "item_id": "broth",
-            "kind": "item",
-            "uid": ""
-          },
-          "left": {
-            "item_id": "oil_bottle",
-            "kind": "item",
-            "uid": ""
-          },
-          "quick_e": {
-            "item_id": "poison_rag",
-            "kind": "item",
-            "uid": ""
-          },
-          "right": {
-            "kind": "skill",
-            "skill_id": "ignite",
-            "upgrades": {}
-          },
-          "slot_0": {
-            "kind": "skill",
-            "selection": {
-              "modifier": "",
-              "payload": "resin",
-              "uid": "item.74"
-            },
-            "skill_id": "disperse",
-            "upgrades": {}
-          },
-          "slot_3": {
-            "kind": "skill",
-            "skill_id": "water_call",
-            "upgrades": {}
-          },
-          "slot_4": {
-            "kind": "skill",
-            "selection": {
-              "modifier": "",
-              "payload": "ember",
-              "uid": ""
-            },
-            "skill_id": "inscribe",
-            "upgrades": {}
-          },
-          "slot_5": {
-            "kind": "skill",
-            "skill_id": "ignite",
-            "upgrades": {}
-          }
-        },
-        "casts": [],
-        "defenses": []
-      }
+        {
+          "definition": "river_coat",
+          "properties": {},
+          "quantity": 1,
+          "uid": "item.15"
+        }
+      ]
     },
     {
       "style": "spray",
-      "seconds": 4.29680533333333,
-      "damage_taken": 17,
+      "seconds": 4.2204,
+      "damage_taken": 20,
       "killed": true,
-      "before": {
-        "player": {
-          "attacks": 0,
-          "base": false,
-          "channel_source": "",
-          "charge_source": "",
-          "damage_taken": 0,
-          "dead": false,
-          "guarding": false,
-          "hp": 100,
-          "mode": "idle",
-          "mp": 60,
-          "position": [
-            -3077.734375,
-            -1200.52368164062
-          ],
-          "stamina": 100.0,
-          "ui_blocked": false
-        },
-        "items": [
-          {
-            "definition": "charcoal",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.62"
-          },
-          {
-            "definition": "crystal",
-            "properties": {},
-            "quantity": 7,
-            "uid": "item.63"
-          },
-          {
-            "definition": "frost_salt",
-            "properties": {},
-            "quantity": 2,
-            "uid": "item.64"
-          },
-          {
-            "definition": "resin",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.65"
-          },
-          {
-            "definition": "sap",
-            "properties": {},
-            "quantity": 5,
-            "uid": "item.66"
-          },
-          {
-            "definition": "storm_dust",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.67"
-          },
-          {
-            "definition": "ration",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.68"
-          },
-          {
-            "definition": "clean_water",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.71"
-          },
-          {
-            "definition": "poison_rag",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.12"
-          },
-          {
-            "definition": "oil_bottle",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.73"
-          },
-          {
-            "definition": "resin_sprayer",
-            "properties": {
-              "doses": 3
-            },
-            "quantity": 1,
-            "uid": "item.74"
-          },
-          {
-            "definition": "fire_stone",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.75"
-          }
+      "initial_resources": {
+        "attacks": 0,
+        "base": false,
+        "channel_source": "",
+        "charge_source": "",
+        "damage_taken": 0,
+        "dead": false,
+        "guarding": false,
+        "hp": 100,
+        "mode": "idle",
+        "mp": 60,
+        "position": [
+          -3077.734375,
+          -1200.52368164062
         ],
-        "pack": [
-          {
-            "definition": "grain",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.69"
-          },
-          {
-            "definition": "herb",
-            "properties": {},
-            "quantity": 2,
-            "uid": "item.70"
-          },
-          {
-            "definition": "ash",
-            "properties": {},
-            "quantity": 2,
-            "uid": "item.61"
-          },
-          {
-            "definition": "cloth",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.11"
-          }
-        ],
-        "gear": [
-          {
-            "definition": "river_sabre",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.14"
-          },
-          {
-            "definition": "river_coat",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.15"
-          }
-        ],
-        "shortcuts": {
-          "item_0": {
-            "item_id": "ration",
-            "kind": "item",
-            "uid": ""
-          },
-          "item_1": {
-            "item_id": "clean_water",
-            "kind": "item",
-            "uid": ""
-          },
-          "item_2": {
-            "item_id": "tea",
-            "kind": "item",
-            "uid": ""
-          },
-          "item_3": {
-            "item_id": "broth",
-            "kind": "item",
-            "uid": ""
-          },
-          "left": {
-            "item_id": "oil_bottle",
-            "kind": "item",
-            "uid": ""
-          },
-          "quick_e": {
-            "item_id": "poison_rag",
-            "kind": "item",
-            "uid": ""
-          },
-          "right": {
-            "kind": "skill",
-            "skill_id": "ignite",
-            "upgrades": {}
-          },
-          "slot_0": {
-            "kind": "skill",
-            "selection": {
-              "modifier": "",
-              "payload": "resin",
-              "uid": "item.74"
-            },
-            "skill_id": "disperse",
-            "upgrades": {}
-          },
-          "slot_3": {
-            "kind": "skill",
-            "skill_id": "water_call",
-            "upgrades": {}
-          },
-          "slot_4": {
-            "kind": "skill",
-            "selection": {
-              "modifier": "",
-              "payload": "ember",
-              "uid": ""
-            },
-            "skill_id": "inscribe",
-            "upgrades": {}
-          },
-          "slot_5": {
-            "kind": "skill",
-            "skill_id": "ignite",
-            "upgrades": {}
-          }
-        },
-        "casts": [
-          {
-            "action": "disperse",
-            "charge_power": 1.0,
-            "materials": {},
-            "mp_after": 58,
-            "mp_cost": 2,
-            "position": [
-              -2670.61865234375,
-              -1134.41003417969
-            ],
-            "result": "disperse",
-            "rule": "",
-            "t": 2.19271533333333
-          },
-          {
-            "action": "ignite",
-            "charge_power": 1.0,
-            "materials": {},
-            "mp_after": 54,
-            "mp_cost": 4,
-            "position": [
-              -2670.61865234375,
-              -1134.41003417969
-            ],
-            "result": "ignite",
-            "rule": "",
-            "t": 3.11483866666667
-          }
-        ],
-        "defenses": []
+        "stamina": 100.0,
+        "ui_blocked": false
       },
-      "after": {
-        "player": {
-          "attacks": 3,
-          "base": false,
-          "channel_source": "",
-          "charge_source": "",
-          "damage_taken": 17,
-          "dead": false,
-          "guarding": false,
-          "hp": 83,
-          "mode": "attack",
-          "mp": 54,
+      "final_resources": {
+        "attacks": 3,
+        "base": false,
+        "channel_source": "",
+        "charge_source": "",
+        "damage_taken": 20,
+        "dead": false,
+        "guarding": false,
+        "hp": 80,
+        "mode": "attack",
+        "mp": 54,
+        "position": [
+          -2667.75512695312,
+          -1157.52709960938
+        ],
+        "stamina": 65.1666666666667,
+        "ui_blocked": false
+      },
+      "inventory_delta": {},
+      "sprays_before": {
+        "item.74": {
+          "id": "resin_sprayer",
+          "doses": 3
+        }
+      },
+      "sprays_after": {
+        "item.74": {
+          "id": "resin_sprayer",
+          "doses": 2
+        }
+      },
+      "paid_casts": [
+        {
+          "action": "disperse",
+          "charge_power": 1.0,
+          "materials": {},
+          "mp_after": 58,
+          "mp_cost": 2,
           "position": [
-            -2680.49731445312,
-            -1187.80285644531
+            -2686.451171875,
+            -1122.74291992188
           ],
-          "stamina": 64.0,
-          "ui_blocked": false
+          "result": "disperse",
+          "rule": "",
+          "t": 2.266323
         },
-        "items": [
-          {
-            "definition": "charcoal",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.62"
-          },
-          {
-            "definition": "crystal",
-            "properties": {},
-            "quantity": 7,
-            "uid": "item.63"
-          },
-          {
-            "definition": "frost_salt",
-            "properties": {},
-            "quantity": 2,
-            "uid": "item.64"
-          },
-          {
-            "definition": "resin",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.65"
-          },
-          {
-            "definition": "sap",
-            "properties": {},
-            "quantity": 5,
-            "uid": "item.66"
-          },
-          {
-            "definition": "storm_dust",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.67"
-          },
-          {
-            "definition": "ration",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.68"
-          },
-          {
-            "definition": "clean_water",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.71"
-          },
-          {
-            "definition": "poison_rag",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.12"
-          },
-          {
-            "definition": "oil_bottle",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.73"
-          },
-          {
-            "definition": "resin_sprayer",
-            "properties": {
-              "doses": 2
-            },
-            "quantity": 1,
-            "uid": "item.74"
-          },
-          {
-            "definition": "fire_stone",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.75"
-          }
-        ],
-        "pack": [
-          {
-            "definition": "grain",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.69"
-          },
-          {
-            "definition": "herb",
-            "properties": {},
-            "quantity": 2,
-            "uid": "item.70"
-          },
-          {
-            "definition": "ash",
-            "properties": {},
-            "quantity": 2,
-            "uid": "item.61"
-          },
-          {
-            "definition": "cloth",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.11"
-          }
-        ],
-        "gear": [
-          {
-            "definition": "river_sabre",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.14"
-          },
-          {
-            "definition": "river_coat",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.15"
-          }
-        ],
-        "shortcuts": {
-          "item_0": {
-            "item_id": "ration",
-            "kind": "item",
-            "uid": ""
-          },
-          "item_1": {
-            "item_id": "clean_water",
-            "kind": "item",
-            "uid": ""
-          },
-          "item_2": {
-            "item_id": "tea",
-            "kind": "item",
-            "uid": ""
-          },
-          "item_3": {
-            "item_id": "broth",
-            "kind": "item",
-            "uid": ""
-          },
-          "left": {
-            "item_id": "oil_bottle",
-            "kind": "item",
-            "uid": ""
-          },
-          "quick_e": {
-            "item_id": "poison_rag",
-            "kind": "item",
-            "uid": ""
-          },
-          "right": {
-            "kind": "skill",
-            "skill_id": "ignite",
-            "upgrades": {}
-          },
-          "slot_0": {
-            "kind": "skill",
-            "selection": {
-              "modifier": "",
-              "payload": "resin",
-              "uid": "item.74"
-            },
-            "skill_id": "disperse",
-            "upgrades": {}
-          },
-          "slot_3": {
-            "kind": "skill",
-            "skill_id": "water_call",
-            "upgrades": {}
-          },
-          "slot_4": {
-            "kind": "skill",
-            "selection": {
-              "modifier": "",
-              "payload": "ember",
-              "uid": ""
-            },
-            "skill_id": "inscribe",
-            "upgrades": {}
-          },
-          "slot_5": {
-            "kind": "skill",
-            "skill_id": "ignite",
-            "upgrades": {}
-          }
+        {
+          "action": "ignite",
+          "charge_power": 1.0,
+          "materials": {},
+          "mp_after": 54,
+          "mp_cost": 4,
+          "position": [
+            -2686.451171875,
+            -1122.74291992188
+          ],
+          "result": "ignite",
+          "rule": "",
+          "t": 3.16425633333333
+        }
+      ],
+      "final_equipped_instances": [
+        {
+          "definition": "river_sabre",
+          "properties": {},
+          "quantity": 1,
+          "uid": "item.14"
         },
-        "casts": [
-          {
-            "action": "disperse",
-            "charge_power": 1.0,
-            "materials": {},
-            "mp_after": 58,
-            "mp_cost": 2,
-            "position": [
-              -2670.61865234375,
-              -1134.41003417969
-            ],
-            "result": "disperse",
-            "rule": "",
-            "t": 2.19271533333333
-          },
-          {
-            "action": "ignite",
-            "charge_power": 1.0,
-            "materials": {},
-            "mp_after": 54,
-            "mp_cost": 4,
-            "position": [
-              -2670.61865234375,
-              -1134.41003417969
-            ],
-            "result": "ignite",
-            "rule": "",
-            "t": 3.11483866666667
-          }
-        ],
-        "defenses": []
-      }
+        {
+          "definition": "river_coat",
+          "properties": {},
+          "quantity": 1,
+          "uid": "item.15"
+        }
+      ]
     },
     {
       "style": "combo",
-      "seconds": 4.237695,
+      "seconds": 4.30221466666667,
       "damage_taken": 0,
       "killed": true,
-      "before": {
-        "player": {
-          "attacks": 0,
-          "base": false,
-          "channel_source": "",
-          "charge_source": "",
-          "damage_taken": 0,
-          "dead": false,
-          "guarding": false,
-          "hp": 100,
-          "mode": "idle",
-          "mp": 60,
+      "initial_resources": {
+        "attacks": 0,
+        "base": false,
+        "channel_source": "",
+        "charge_source": "",
+        "damage_taken": 0,
+        "dead": false,
+        "guarding": false,
+        "hp": 100,
+        "mode": "idle",
+        "mp": 60,
+        "position": [
+          -3077.734375,
+          -1200.52368164062
+        ],
+        "stamina": 100.0,
+        "ui_blocked": false
+      },
+      "final_resources": {
+        "attacks": 0,
+        "base": false,
+        "channel_source": "",
+        "charge_source": "",
+        "damage_taken": 0,
+        "dead": false,
+        "guarding": false,
+        "hp": 100,
+        "mode": "idle",
+        "mp": 28,
+        "position": [
+          -2907.234375,
+          -1200.52368164062
+        ],
+        "stamina": 100.0,
+        "ui_blocked": false
+      },
+      "inventory_delta": {
+        "fire_stone": -1
+      },
+      "sprays_before": {
+        "item.74": {
+          "id": "resin_sprayer",
+          "doses": 3
+        }
+      },
+      "sprays_after": {
+        "item.74": {
+          "id": "resin_sprayer",
+          "doses": 3
+        }
+      },
+      "paid_casts": [
+        {
+          "action": "inscribe",
+          "charge_power": 1.0,
+          "materials": {
+            "fire_stone": 1
+          },
+          "mp_after": 52,
+          "mp_cost": 8,
           "position": [
             -3077.734375,
             -1200.52368164062
           ],
-          "stamina": 100.0,
-          "ui_blocked": false
+          "result": "inscribe",
+          "rule": "",
+          "t": 1.71666666666667
         },
-        "items": [
-          {
-            "definition": "charcoal",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.62"
-          },
-          {
-            "definition": "crystal",
-            "properties": {},
-            "quantity": 7,
-            "uid": "item.63"
-          },
-          {
-            "definition": "frost_salt",
-            "properties": {},
-            "quantity": 2,
-            "uid": "item.64"
-          },
-          {
-            "definition": "resin",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.65"
-          },
-          {
-            "definition": "sap",
-            "properties": {},
-            "quantity": 5,
-            "uid": "item.66"
-          },
-          {
-            "definition": "storm_dust",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.67"
-          },
-          {
-            "definition": "ration",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.68"
-          },
-          {
-            "definition": "clean_water",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.71"
-          },
-          {
-            "definition": "poison_rag",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.12"
-          },
-          {
-            "definition": "oil_bottle",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.73"
-          },
-          {
-            "definition": "resin_sprayer",
-            "properties": {
-              "doses": 3
-            },
-            "quantity": 1,
-            "uid": "item.74"
-          },
-          {
-            "definition": "fire_stone",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.75"
-          }
-        ],
-        "pack": [
-          {
-            "definition": "grain",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.69"
-          },
-          {
-            "definition": "herb",
-            "properties": {},
-            "quantity": 2,
-            "uid": "item.70"
-          },
-          {
-            "definition": "ash",
-            "properties": {},
-            "quantity": 2,
-            "uid": "item.61"
-          },
-          {
-            "definition": "cloth",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.11"
-          }
-        ],
-        "gear": [
-          {
-            "definition": "river_sabre",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.14"
-          },
-          {
-            "definition": "river_coat",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.15"
-          }
-        ],
-        "shortcuts": {
-          "item_0": {
-            "item_id": "ration",
-            "kind": "item",
-            "uid": ""
-          },
-          "item_1": {
-            "item_id": "clean_water",
-            "kind": "item",
-            "uid": ""
-          },
-          "item_2": {
-            "item_id": "tea",
-            "kind": "item",
-            "uid": ""
-          },
-          "item_3": {
-            "item_id": "broth",
-            "kind": "item",
-            "uid": ""
-          },
-          "left": {
-            "item_id": "oil_bottle",
-            "kind": "item",
-            "uid": ""
-          },
-          "quick_e": {
-            "item_id": "poison_rag",
-            "kind": "item",
-            "uid": ""
-          },
-          "right": {
-            "kind": "skill",
-            "skill_id": "ignite",
-            "upgrades": {}
-          },
-          "slot_0": {
-            "kind": "skill",
-            "selection": {
-              "modifier": "",
-              "payload": "resin",
-              "uid": "item.74"
-            },
-            "skill_id": "disperse",
-            "upgrades": {}
-          },
-          "slot_3": {
-            "kind": "skill",
-            "skill_id": "water_call",
-            "upgrades": {}
-          },
-          "slot_4": {
-            "kind": "skill",
-            "selection": {
-              "modifier": "",
-              "payload": "ember",
-              "uid": ""
-            },
-            "skill_id": "inscribe",
-            "upgrades": {}
-          },
-          "slot_5": {
-            "kind": "skill",
-            "skill_id": "ignite",
-            "upgrades": {}
-          }
-        },
-        "casts": [
-          {
-            "action": "inscribe",
-            "charge_power": 1.0,
-            "materials": {
-              "fire_stone": 1
-            },
-            "mp_after": 52,
-            "mp_cost": 8,
-            "position": [
-              -3077.734375,
-              -1200.52368164062
-            ],
-            "result": "inscribe",
-            "rule": "",
-            "t": 1.41513166666667
-          },
-          {
-            "action": "ignite",
-            "charge_power": 1.0,
-            "materials": {},
-            "mp_after": 40,
-            "mp_cost": 12,
-            "position": [
-              -3077.734375,
-              -1200.52368164062
-            ],
-            "result": "fireball",
-            "rule": "fire_sigil_fireball",
-            "t": 1.93997033333333
-          },
-          {
-            "action": "ignite",
-            "charge_power": 1.0,
-            "materials": {},
-            "mp_after": 29,
-            "mp_cost": 12,
-            "position": [
-              -3077.734375,
-              -1200.52368164062
-            ],
-            "result": "fireball",
-            "rule": "fire_sigil_fireball",
-            "t": 4.35096933333333
-          }
-        ],
-        "defenses": []
-      },
-      "after": {
-        "player": {
-          "attacks": 0,
-          "base": false,
-          "channel_source": "",
-          "charge_source": "",
-          "damage_taken": 0,
-          "dead": false,
-          "guarding": false,
-          "hp": 100,
-          "mode": "idle",
-          "mp": 29,
+        {
+          "action": "ignite",
+          "charge_power": 1.0,
+          "materials": {},
+          "mp_after": 40,
+          "mp_cost": 12,
           "position": [
-            -2945.734375,
+            -3077.734375,
             -1200.52368164062
           ],
-          "stamina": 100.0,
-          "ui_blocked": false
+          "result": "fireball",
+          "rule": "fire_sigil_fireball",
+          "t": 2.253718
         },
-        "items": [
-          {
-            "definition": "charcoal",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.62"
-          },
-          {
-            "definition": "crystal",
-            "properties": {},
-            "quantity": 7,
-            "uid": "item.63"
-          },
-          {
-            "definition": "frost_salt",
-            "properties": {},
-            "quantity": 2,
-            "uid": "item.64"
-          },
-          {
-            "definition": "resin",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.65"
-          },
-          {
-            "definition": "sap",
-            "properties": {},
-            "quantity": 5,
-            "uid": "item.66"
-          },
-          {
-            "definition": "storm_dust",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.67"
-          },
-          {
-            "definition": "ration",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.68"
-          },
-          {
-            "definition": "clean_water",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.71"
-          },
-          {
-            "definition": "poison_rag",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.12"
-          },
-          {
-            "definition": "oil_bottle",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.73"
-          },
-          {
-            "definition": "resin_sprayer",
-            "properties": {
-              "doses": 3
-            },
-            "quantity": 1,
-            "uid": "item.74"
-          }
-        ],
-        "pack": [
-          {
-            "definition": "grain",
-            "properties": {},
-            "quantity": 3,
-            "uid": "item.69"
-          },
-          {
-            "definition": "herb",
-            "properties": {},
-            "quantity": 2,
-            "uid": "item.70"
-          },
-          {
-            "definition": "ash",
-            "properties": {},
-            "quantity": 2,
-            "uid": "item.61"
-          },
-          {
-            "definition": "cloth",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.11"
-          }
-        ],
-        "gear": [
-          {
-            "definition": "river_sabre",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.14"
-          },
-          {
-            "definition": "river_coat",
-            "properties": {},
-            "quantity": 1,
-            "uid": "item.15"
-          }
-        ],
-        "shortcuts": {
-          "item_0": {
-            "item_id": "ration",
-            "kind": "item",
-            "uid": ""
-          },
-          "item_1": {
-            "item_id": "clean_water",
-            "kind": "item",
-            "uid": ""
-          },
-          "item_2": {
-            "item_id": "tea",
-            "kind": "item",
-            "uid": ""
-          },
-          "item_3": {
-            "item_id": "broth",
-            "kind": "item",
-            "uid": ""
-          },
-          "left": {
-            "item_id": "oil_bottle",
-            "kind": "item",
-            "uid": ""
-          },
-          "quick_e": {
-            "item_id": "poison_rag",
-            "kind": "item",
-            "uid": ""
-          },
-          "right": {
-            "kind": "skill",
-            "skill_id": "ignite",
-            "upgrades": {}
-          },
-          "slot_0": {
-            "kind": "skill",
-            "selection": {
-              "modifier": "",
-              "payload": "resin",
-              "uid": "item.74"
-            },
-            "skill_id": "disperse",
-            "upgrades": {}
-          },
-          "slot_3": {
-            "kind": "skill",
-            "skill_id": "water_call",
-            "upgrades": {}
-          },
-          "slot_4": {
-            "kind": "skill",
-            "selection": {
-              "modifier": "",
-              "payload": "ember",
-              "uid": ""
-            },
-            "skill_id": "inscribe",
-            "upgrades": {}
-          },
-          "slot_5": {
-            "kind": "skill",
-            "skill_id": "ignite",
-            "upgrades": {}
-          }
+        {
+          "action": "ignite",
+          "charge_power": 1.0,
+          "materials": {},
+          "mp_after": 28,
+          "mp_cost": 12,
+          "position": [
+            -3077.734375,
+            -1200.52368164062
+          ],
+          "result": "fireball",
+          "rule": "fire_sigil_fireball",
+          "t": 4.53737933333333
+        }
+      ],
+      "final_equipped_instances": [
+        {
+          "definition": "river_sabre",
+          "properties": {},
+          "quantity": 1,
+          "uid": "item.14"
         },
-        "casts": [
-          {
-            "action": "inscribe",
-            "charge_power": 1.0,
-            "materials": {
-              "fire_stone": 1
-            },
-            "mp_after": 52,
-            "mp_cost": 8,
-            "position": [
-              -3077.734375,
-              -1200.52368164062
-            ],
-            "result": "inscribe",
-            "rule": "",
-            "t": 1.41513166666667
-          },
-          {
-            "action": "ignite",
-            "charge_power": 1.0,
-            "materials": {},
-            "mp_after": 40,
-            "mp_cost": 12,
-            "position": [
-              -3077.734375,
-              -1200.52368164062
-            ],
-            "result": "fireball",
-            "rule": "fire_sigil_fireball",
-            "t": 1.93997033333333
-          },
-          {
-            "action": "ignite",
-            "charge_power": 1.0,
-            "materials": {},
-            "mp_after": 29,
-            "mp_cost": 12,
-            "position": [
-              -3077.734375,
-              -1200.52368164062
-            ],
-            "result": "fireball",
-            "rule": "fire_sigil_fireball",
-            "t": 4.35096933333333
-          }
-        ],
-        "defenses": []
-      }
+        {
+          "definition": "river_coat",
+          "properties": {},
+          "quantity": 1,
+          "uid": "item.15"
+        }
+      ]
     }
   ],
   "limits": [
@@ -2230,5 +635,255 @@
     "uid_preserved": true,
     "remaining_doses": 2,
     "empty_cache_growth": 0
-  }
+  },
+  "route_revision": "c139854",
+  "full_regression": {
+    "runtime_commit": "b16bbcc8e50733bb41e6a70ec8e8d278de295a89",
+    "archive": "/tmp/mygame-loop-clean-jdyu40f4",
+    "first_import_seconds": 11.0,
+    "passed": 77,
+    "total": 77,
+    "logs": "/tmp/mygame-tests-zev5d3ta"
+  },
+  "route_revision_checks": {
+    "revision": "c139854",
+    "change": "only moves guided route stopping point from -3072 to -3060, runtime code identical",
+    "archive": "/tmp/mygame-loop-route-final-efdiss2j",
+    "first_import_seconds": 8.8,
+    "tests": [
+      "content",
+      "startup",
+      "realtime_interaction"
+    ],
+    "passed": 3,
+    "logs": "/tmp/mygame-tests-vmuv9y2d"
+  },
+  "guided_route": {
+    "precombat_sha256": "91c24060735718d7d13cba6b6d919093122ee9b5fb86f047a3d239b5089675e7",
+    "cases": {
+      "combo": {
+        "seconds": 4.16853866666667,
+        "damage_taken": 0,
+        "end": {
+          "attacks": 0,
+          "base": false,
+          "channel_source": "",
+          "charge_source": "",
+          "damage_taken": 0,
+          "dead": false,
+          "guarding": false,
+          "hp": 100,
+          "mode": "idle",
+          "mp": 29,
+          "position": [
+            -2971.5078125,
+            -1199.71203613281
+          ],
+          "stamina": 100.0,
+          "ui_blocked": false
+        },
+        "casts": [
+          {
+            "action": "inscribe",
+            "charge_power": 1.0,
+            "materials": {
+              "fire_stone": 1
+            },
+            "mp_after": 52,
+            "mp_cost": 8,
+            "position": [
+              -3059.5078125,
+              -1199.71203613281
+            ],
+            "result": "inscribe",
+            "rule": "",
+            "t": 23.1702526666667
+          },
+          {
+            "action": "ignite",
+            "charge_power": 1.0,
+            "materials": {},
+            "mp_after": 40,
+            "mp_cost": 12,
+            "position": [
+              -3059.5078125,
+              -1199.71203613281
+            ],
+            "result": "fireball",
+            "rule": "fire_sigil_fireball",
+            "t": 23.691123
+          },
+          {
+            "action": "ignite",
+            "charge_power": 1.0,
+            "materials": {},
+            "mp_after": 29,
+            "mp_cost": 12,
+            "position": [
+              -3059.5078125,
+              -1199.71203613281
+            ],
+            "result": "fireball",
+            "rule": "fire_sigil_fireball",
+            "t": 26.2209224761905
+          }
+        ],
+        "loot": {
+          "river.enemy.camp.forest.3": {
+            "equipment": {},
+            "materials": {},
+            "position": [
+              -2600.0,
+              -1100.0
+            ],
+            "region": "camp",
+            "title": "流亡守备兵的遗骸"
+          }
+        },
+        "loot_at_combat_end": {
+          "river.enemy.camp.forest.3": {
+            "equipment": {
+              "river_coat": 1,
+              "river_sabre": 1
+            },
+            "materials": {
+              "cloth": 1,
+              "poison_rag": 1,
+              "ration": 1
+            },
+            "position": [
+              -2600.0,
+              -1100.0
+            ],
+            "region": "camp",
+            "title": "流亡守备兵的遗骸"
+          }
+        }
+      },
+      "basic": {
+        "seconds": 3.66079411111111,
+        "damage_taken": 13,
+        "end": {
+          "attacks": 4,
+          "base": false,
+          "channel_source": "",
+          "charge_source": "",
+          "damage_taken": 13,
+          "dead": false,
+          "guarding": false,
+          "hp": 87,
+          "mode": "attack",
+          "mp": 60,
+          "position": [
+            -2645.255859375,
+            -1118.04223632812
+          ],
+          "stamina": 52.0,
+          "ui_blocked": false
+        },
+        "casts": [],
+        "loot": {
+          "river.enemy.camp.forest.3": {
+            "equipment": {
+              "river_coat": 1,
+              "river_sabre": 1
+            },
+            "materials": {
+              "cloth": 1,
+              "ration": 1
+            },
+            "position": [
+              -2610.15966796875,
+              -1132.818359375
+            ],
+            "region": "camp",
+            "title": "流亡守备兵的遗骸"
+          }
+        },
+        "loot_at_combat_end": {
+          "river.enemy.camp.forest.3": {
+            "equipment": {
+              "river_coat": 1,
+              "river_sabre": 1
+            },
+            "materials": {
+              "cloth": 1,
+              "ration": 1
+            },
+            "position": [
+              -2610.15966796875,
+              -1132.818359375
+            ],
+            "region": "camp",
+            "title": "流亡守备兵的遗骸"
+          }
+        }
+      }
+    },
+    "safe_note": {
+      "hp": 100,
+      "closest_enemy_distance": 470.201995849609,
+      "detect_range": 440.0
+    },
+    "return_save_reentry_equal": [
+      "items",
+      "pack",
+      "gear",
+      "shortcuts",
+      "claims"
+    ]
+  },
+  "defense_and_death": {
+    "outcomes": [
+      {
+        "hp": 95,
+        "outcome": {
+          "blocked": true,
+          "damage": 5,
+          "dodged": false,
+          "guard_broken": false
+        },
+        "stamina": 88.0,
+        "t": 3.50713498941799
+      }
+    ],
+    "recovery": {
+      "attacks": 0,
+      "base": true,
+      "channel_source": "",
+      "charge_source": "",
+      "damage_taken": 100,
+      "dead": false,
+      "guarding": false,
+      "hp": 50,
+      "mode": "idle",
+      "mp": 30,
+      "position": [
+        -3700.0,
+        2100.0
+      ],
+      "stamina": 100.0,
+      "ui_blocked": false
+    },
+    "save_reentry_equal": [
+      "items",
+      "pack",
+      "gear",
+      "shortcuts",
+      "claims"
+    ]
+  },
+  "native_logs_verified": [
+    "loop-final-route",
+    "loop-final-basic",
+    "loop-final-return",
+    "loop-final-defense",
+    "loop-final-recovery-return",
+    "loop-archive-ui",
+    "loop-archive-match-basic",
+    "loop-archive-match-coat",
+    "loop-archive-match-throw",
+    "loop-archive-match-spray",
+    "loop-archive-match-combo"
+  ]
 }
