@@ -3,6 +3,8 @@
 [ext_resource type="Script" path="res://gameplay/foundation/data/attack_profile.gd" id="attack"]
 [sub_resource type="Resource" id="Attack"]
 script = ExtResource("attack")
+step_distance = 28.0
+movement_multiplier = 0.0
 interrupts_preparation = true
 motion = "thrust"
 windup = 0.38
@@ -18,5 +20,5 @@ script = ExtResource("tech")
 id = "spear_thrust"
 title = "贯步刺"
 weapon_type = "spear"
-description = "狭窄长距离刺击，命中未格挡的准备动作可打断并造成0.35秒失衡；消耗25体力，不花MP。"
+description = "锁向前踏28距离的狭窄刺击，命中未格挡的准备动作可打断并造成0.35秒失衡；消耗25体力，不花MP。"
 profile = SubResource("Attack")
