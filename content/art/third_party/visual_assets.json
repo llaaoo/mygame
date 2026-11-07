@@ -1,0 +1,194 @@
+[
+  {
+    "path": "content/art/third_party/kenney/tiny_town.png",
+    "url": "https://raw.githubusercontent.com/Two-Weeks-Team/openClawWorld/main/packages/client/public/assets/kenney/tiles/tinytown_tilemap.png",
+    "upstream_sha256": "3a54d99ecde790d4fdea207a3644cf130fc56fa838f1beb1507c185a95b8e902",
+    "vendored_sha256": "3a54d99ecde790d4fdea207a3644cf130fc56fa838f1beb1507c185a95b8e902",
+    "bytes": 5042,
+    "modification": "unmodified"
+  },
+  {
+    "path": "content/art/fonts/NotoSansSC.ttf",
+    "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/notosanssc/NotoSansSC%5Bwght%5D.ttf",
+    "upstream_sha256": "a3041811a78c361b1de50f953c805e0244951c21c5bd412f7232ef0d899af0da",
+    "vendored_sha256": "a3041811a78c361b1de50f953c805e0244951c21c5bd412f7232ef0d899af0da",
+    "bytes": 17772300,
+    "modification": "unmodified"
+  },
+  {
+    "path": "content/art/fonts/OFL.txt",
+    "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/notosanssc/OFL.txt",
+    "upstream_sha256": "1c05c68c34f9708415aada51f17e1b0092d2cea709bf4a94cd38114f9e73d7d9",
+    "vendored_sha256": "1c05c68c34f9708415aada51f17e1b0092d2cea709bf4a94cd38114f9e73d7d9",
+    "bytes": 4388,
+    "modification": "unmodified"
+  },
+  {
+    "path": "content/art/third_party/lucide/LICENSE",
+    "url": "https://raw.githubusercontent.com/lucide-icons/lucide/main/LICENSE",
+    "upstream_sha256": "b495047bd93a9b06913511076f504daba17d5bbeb3e0650f3bb53a4220329c57",
+    "vendored_sha256": "b495047bd93a9b06913511076f504daba17d5bbeb3e0650f3bb53a4220329c57",
+    "bytes": 3208,
+    "modification": "unmodified"
+  },
+  {
+    "path": "content/art/third_party/lucide/heart.svg",
+    "url": "https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/heart.svg",
+    "upstream_sha256": "70af5f30be9fcb500b852556b38dcdf8c04a4ba81fd262534fb0336bd39b3b52",
+    "vendored_sha256": "d07f23baf9d4b587d266d23aa1883d854bde67c79fa6db6c9ad0c0af1ca457d2",
+    "bytes": 368,
+    "modification": "stroke currentColor replaced with neutral UI ink"
+  },
+  {
+    "path": "content/art/third_party/lucide/droplet.svg",
+    "url": "https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/droplet.svg",
+    "upstream_sha256": "abca4df60f91c605d945c6fe5ee0e6c919b53116d81e268f4581f8841bf24751",
+    "vendored_sha256": "c535b47bcc2faca0bdef9795399a470120d9a8a5896655ea8f9bdbc390336988",
+    "bytes": 320,
+    "modification": "stroke currentColor replaced with neutral UI ink"
+  },
+  {
+    "path": "content/art/third_party/lucide/shield.svg",
+    "url": "https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/shield.svg",
+    "upstream_sha256": "be32f6a86df7cbe43a83c439dd8849e5bcf5145e484d23420c20d8b98a78e82b",
+    "vendored_sha256": "532544005a390eb8b6661a7c49d49f955de1a2461f6eebf400e1cb73cce801f3",
+    "bytes": 381,
+    "modification": "stroke currentColor replaced with neutral UI ink"
+  },
+  {
+    "path": "content/art/third_party/lucide/backpack.svg",
+    "url": "https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/backpack.svg",
+    "upstream_sha256": "239fdca9bfe7d550be2dbbbe40f3c62f748a96235cde509d15dd32596e982f95",
+    "vendored_sha256": "38f7de460011d581bdaf9854f5c3b465a9cd3ca2412e382d22f3d1fda08c9ded",
+    "bytes": 444,
+    "modification": "stroke currentColor replaced with neutral UI ink"
+  },
+  {
+    "path": "content/art/third_party/lucide/book-open.svg",
+    "url": "https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/book-open.svg",
+    "upstream_sha256": "9b9bed0ff057283d5c5c5a1c71f8d3e927db26a56639603a92fdf7b25961510e",
+    "vendored_sha256": "889237215cab23c990d5ac783f3e2ee5446a67ae0deb7149009848de841f222d",
+    "bytes": 382,
+    "modification": "stroke currentColor replaced with neutral UI ink"
+  },
+  {
+    "path": "content/art/third_party/lucide/anvil.svg",
+    "url": "https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/anvil.svg",
+    "upstream_sha256": "6587a026dd99c913aa28d348779e0b1e220e648ca1cfd2c5967d64d6169235bb",
+    "vendored_sha256": "d241d32769bdd361a72cf0860c430c0235c55b1ab0900480d5a6389df03f4e3e",
+    "bytes": 466,
+    "modification": "stroke currentColor replaced with neutral UI ink"
+  },
+  {
+    "path": "content/art/third_party/lucide/swords.svg",
+    "url": "https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/swords.svg",
+    "upstream_sha256": "2dcf7d618baa1fbf21064bc99eb754b8b6d589f444781975a6ea0008be4e2e82",
+    "vendored_sha256": "364c988f78b128a9573f02e7a5844d937d7e8b7097fb2c884f6f7c351f8e7efb",
+    "bytes": 551,
+    "modification": "stroke currentColor replaced with neutral UI ink"
+  },
+  {
+    "path": "content/art/third_party/lucide/leaf.svg",
+    "url": "https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/leaf.svg",
+    "upstream_sha256": "ac2b65d8d35b5038c9388cd1f161e74570fce6ef6a4c3d99a6b0c2bd68e0cb28",
+    "vendored_sha256": "00a86a88d7352a2bb7acb804eb91388b4db5c0ecb20848aba7f5428e9dbf8fc8",
+    "bytes": 399,
+    "modification": "stroke currentColor replaced with neutral UI ink"
+  },
+  {
+    "path": "content/art/third_party/lucide/sparkles.svg",
+    "url": "https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/sparkles.svg",
+    "upstream_sha256": "f5499f33f09d7158151e9bd2ec0faf79ff8fb57292f84fdd7286d96d0f0424d8",
+    "vendored_sha256": "b2f191be42fbc5abcf2b8ca0ee6a6ed49fe96e1dc802e9dfca7dcff31f87014a",
+    "bytes": 562,
+    "modification": "stroke currentColor replaced with neutral UI ink"
+  },
+  {
+    "path": "content/art/third_party/lucide/settings.svg",
+    "url": "https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/settings.svg",
+    "upstream_sha256": "0ae27fd0f81999229e3127ac96c5b32edfea448e291d509e76212b917551d66b",
+    "vendored_sha256": "afc4876f9bb9dfac4610e07cc7626b0d6dc609eb39f90a2e7992222ff6047cc7",
+    "bytes": 581,
+    "modification": "stroke currentColor replaced with neutral UI ink"
+  },
+  {
+    "path": "content/art/third_party/lucide/compass.svg",
+    "url": "https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/compass.svg",
+    "upstream_sha256": "c5a4d147bf48424f48b514712dd61c1b07cb689612a7baef87c88870092c1659",
+    "vendored_sha256": "0c194938334385413da53b65f1d4031291d4571202f2990700ead90c407c9e0c",
+    "bytes": 346,
+    "modification": "stroke currentColor replaced with neutral UI ink"
+  },
+  {
+    "path": "content/art/third_party/lucide/flask-conical.svg",
+    "url": "https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/flask-conical.svg",
+    "upstream_sha256": "a2ce857c159bef4c128a6d9f0b6dcbd6504ecf1a2a670ee220efd14fd032b561",
+    "vendored_sha256": "b016dbcd5185c064f837a76f3714ebb2a6afb7b7d32a057a156d98709073c763",
+    "bytes": 378,
+    "modification": "stroke currentColor replaced with neutral UI ink"
+  },
+  {
+    "path": "content/art/third_party/lucide/utensils.svg",
+    "url": "https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/utensils.svg",
+    "upstream_sha256": "9b5eb803bc342b8503b6a154ff63a0f754ba52a13fa24c2e270d2ab89c70f76a",
+    "vendored_sha256": "131daaa7f386c52670151eff86720db1a3fa5430b3d265ef2e79072afcd37711",
+    "bytes": 343,
+    "modification": "stroke currentColor replaced with neutral UI ink"
+  },
+  {
+    "path": "content/art/third_party/lucide/wind.svg",
+    "url": "https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/wind.svg",
+    "upstream_sha256": "eb35f6f00125b779a993c21ee761432faf8fc3210272c94448f63e2196d419b7",
+    "vendored_sha256": "9fa805150b0afd561cb0aa11ea4ada0edc96e243ab6a0fd38cee0ba929802328",
+    "bytes": 331,
+    "modification": "stroke currentColor replaced with neutral UI ink"
+  },
+  {
+    "path": "content/art/third_party/lucide/x.svg",
+    "url": "https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/x.svg",
+    "upstream_sha256": "4a9cdab38fbb96162e7dace28e33f4ca0e49d8963a6162abc3d4691b7d675117",
+    "vendored_sha256": "e178bb4721c20f8b2e7e7a341fbf484952336e60977d14f51c73df82da7906e6",
+    "bytes": 255,
+    "modification": "stroke currentColor replaced with neutral UI ink"
+  },
+  {
+    "path": "content/art/third_party/lucide/chevron-right.svg",
+    "url": "https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/chevron-right.svg",
+    "upstream_sha256": "2758143d7b2434e4aa7307dfd34405c87909ff4052f21b5f3f40d45224b4f19b",
+    "vendored_sha256": "fcdeecd9fb6f15d6d489ff4031c31386807d07df6156713f978a4c40ebf9a84f",
+    "bytes": 232,
+    "modification": "stroke currentColor replaced with neutral UI ink"
+  },
+  {
+    "path": "content/art/third_party/lucide/flame.svg",
+    "url": "https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/flame.svg",
+    "upstream_sha256": "cede1462a46a7a3b3daf9d101f0b59484b1d882a4c42a75670810a6d4f8d42fb",
+    "vendored_sha256": "f28e25016f92a5416b6ef8fb2bea79d78b1def91b0ce7470e24610cf2717d9d1",
+    "bytes": 309,
+    "modification": "stroke currentColor replaced with neutral UI ink"
+  },
+  {
+    "path": "content/art/third_party/lucide/snowflake.svg",
+    "url": "https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/snowflake.svg",
+    "upstream_sha256": "9b77c3f6fbd49a7669cc530f8e9d6216ff652457c16e27b2c4eb4d81ac7c4bdd",
+    "vendored_sha256": "62a0dc70d57eb239e9bdf147c3958f232294a89627c434a853f2cb5c235d24b0",
+    "bytes": 591,
+    "modification": "stroke currentColor replaced with neutral UI ink"
+  },
+  {
+    "path": "content/art/third_party/lucide/zap.svg",
+    "url": "https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/zap.svg",
+    "upstream_sha256": "4c395891eab4d1e5627c5d414a16db037317cb2f12453de0f3a1130964c6d444",
+    "vendored_sha256": "0129950ccc987ff21e5d567f0e4b5255b3770931c268d2e1818297ad9bf6f7f9",
+    "bytes": 385,
+    "modification": "stroke currentColor replaced with neutral UI ink"
+  },
+  {
+    "path": "content/art/third_party/lucide/hexagon.svg",
+    "url": "https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/hexagon.svg",
+    "upstream_sha256": "d6fe215b28eaccc1d50b89b967ae0bd6368ed602a89fd90b3c02688c15f133df",
+    "vendored_sha256": "75b9a83078c2016a57f33245648916da36e8baadb821d7568a46f90164978165",
+    "bytes": 340,
+    "modification": "stroke currentColor replaced with neutral UI ink"
+  }
+]

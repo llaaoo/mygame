@@ -37,7 +37,7 @@ func _ready() -> void:
 	box.add_child(selector)
 	var row:=HBoxContainer.new()
 	box.add_child(row)
-	start_button=FrontierWidgets.button("E  开始作业",func(): pass)
+	start_button=FrontierWidgets.button("F  开始作业",func(): pass)
 	cancel_button=FrontierWidgets.button("取消",func(): pass)
 	row.add_child(start_button)
 	row.add_child(cancel_button)

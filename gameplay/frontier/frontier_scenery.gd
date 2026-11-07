@@ -4,6 +4,28 @@ extends Node2D
 var game: GrayriverGame
 func _ready() -> void:
  z_index=-90
+ texture_filter=CanvasItem.TEXTURE_FILTER_NEAREST
+ var palette:=ShaderMaterial.new()
+ palette.shader=preload("res://gameplay/frontier/land_palette.gdshader")
+ material=palette
+ var atmosphere:=CanvasLayer.new()
+ atmosphere.name="ValleyAtmosphere"
+ atmosphere.layer=50
+ add_child(atmosphere)
+ var veil:=ColorRect.new()
+ veil.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+ veil.mouse_filter=Control.MOUSE_FILTER_IGNORE
+ var mist:=ShaderMaterial.new()
+ mist.shader=preload("res://gameplay/frontier/atmosphere.gdshader")
+ veil.material=mist
+ atmosphere.add_child(veil)
+var _last_cell:=Vector2i(99999,99999)
+func _process(_delta: float) -> void:
+ if not is_instance_valid(game.player): return
+ var cell:=Vector2i(game.player.global_position/96)
+ if cell!=_last_cell:
+  _last_cell=cell
+  queue_redraw()
 func _draw() -> void:
  var rng:=RandomNumberGenerator.new()
  rng.seed=60816
@@ -26,7 +48,7 @@ func _draw() -> void:
      draw_line(p+Vector2(i*20+3,2),p+Vector2(i*20+3,26),Color("ac9970"),2)
   return
  # Fine grasses, stones and flecks break up the large authored biomes.
- for i in range(4200):
+ for i in range(1600):
   var p:=Vector2(rng.randf_range(-4750,4750),rng.randf_range(-3550,3550))
   if absf(p.x-300)<155 or ((p-Vector2(650,-2800))/Vector2(700,420)).length()<1: continue
   var c:=Color("829066") if p.x<0 else Color("968273")
@@ -100,21 +122,21 @@ func _draw() -> void:
  _sign(Vector2(3100,-1440),"余烬旧监狱")
 func _platform(p: Vector2, size: Vector2) -> void:
  draw_rect(Rect2(p-size*.5,size),Color(0,0,0,.12))
- for x in range(int(-size.x/2),int(size.x/2),32):
-  for y in range(int(-size.y/2),int(size.y/2),24): draw_rect(Rect2(p+Vector2(x+2,y+2),Vector2(28,19)),Color("696b58"))
+ for x in range(int(-size.x/2),int(size.x/2),48):
+  for y in range(int(-size.y/2),int(size.y/2),48): FrontierArt.tile(self,Vector2i(7,3),Rect2(p+Vector2(x,y),Vector2.ONE*48),Color("a5a58d"))
 func _rails(p: Vector2) -> void:
  for y in range(-100,130,20): draw_line(p+Vector2(-29,y),p+Vector2(29,y),Color("78684d"),7)
  for x in [-20,20]: draw_line(p+Vector2(x,-110),p+Vector2(x,130),Color("9b9e91"),3)
 func _crates(p: Vector2) -> void:
  for offset in [Vector2.ZERO,Vector2(35,16)]:
-  draw_rect(Rect2(p+offset-Vector2(16,14),Vector2(32,28)),Color("5d4832"))
-  draw_rect(Rect2(p+offset-Vector2(16,14),Vector2(32,28)),Color("a38c60"),false,2)
-  draw_line(p+offset-Vector2(13,11),p+offset+Vector2(13,11),Color("88704b"),3)
+  draw_rect(Rect2(p+offset-Vector2(18,8),Vector2(38,32)),Color(0,0,0,.2))
+  FrontierArt.tile(self,Vector2i(7,8),Rect2(p+offset-Vector2(18,22),Vector2(36,36)),Color("c1b49a"))
 func _shelter(p: Vector2, color: Color) -> void:
  for x in [-60,60]: draw_line(p+Vector2(x,-8),p+Vector2(x,35),Color("756047"),5)
- draw_colored_polygon(PackedVector2Array([p+Vector2(-82,-5),p+Vector2(0,-65),p+Vector2(82,-5)]),color.darkened(.25))
- draw_colored_polygon(PackedVector2Array([p+Vector2(-82,-5),p+Vector2(0,-65),p+Vector2(0,-5)]),color)
- draw_line(p+Vector2(0,-65),p+Vector2(0,-5),color.lightened(.2),2)
+ for x in range(4):
+  var tile_x:=0 if x==0 else 2 if x==3 else 1
+  FrontierArt.tile(self,Vector2i(tile_x,4),Rect2(p+Vector2(x*40-80,-70),Vector2.ONE*40),color.lightened(.35))
+  FrontierArt.tile(self,Vector2i(tile_x,5),Rect2(p+Vector2(x*40-80,-30),Vector2.ONE*40),color.lightened(.35))
 func _brazier(p: Vector2, lit: bool) -> void:
  for x in [-18,18]: draw_line(p+Vector2(x,-5),p+Vector2(x*1.4,28),Color("46473f"),5)
  draw_rect(Rect2(p-Vector2(30,17),Vector2(60,24)),Color("373e3b"))
@@ -123,6 +145,7 @@ func _brazier(p: Vector2, lit: bool) -> void:
   draw_circle(p-Vector2(0,22),38,Color(1,.6,.15,.13))
   draw_colored_polygon(PackedVector2Array([p+Vector2(-18,-11),p+Vector2(-7,-46),p+Vector2(4,-30),p+Vector2(15,-51),p+Vector2(20,-11)]),Color("e39844"))
 func _sign(p: Vector2, title: String) -> void:
- draw_line(p,p+Vector2(0,35),Color("574a34"),5)
- draw_rect(Rect2(p-Vector2(50,15),Vector2(100,26)),Color("504a37"))
- draw_string(ThemeDB.fallback_font,p+Vector2(-45,3),title,HORIZONTAL_ALIGNMENT_LEFT,90,12,Color("cabd92"))
+ FrontierArt.tile(self,Vector2i(9,4),Rect2(p-Vector2(24,22),Vector2(48,48)),Color("beb69c"))
+ # Sign captions are local wayfinding, never a map-wide cloud of labels.
+ if is_instance_valid(game.player) and game.player.global_position.distance_to(p)<180:
+  draw_string(GameUIStyle.font(),p+Vector2(-60,-30),title,HORIZONTAL_ALIGNMENT_CENTER,120,14,Color("ded4b7"))

@@ -68,8 +68,11 @@ func _update_proximity() -> void:
 		_near = near
 		set_title(title)
 		queue_redraw()
-	_label.visible = near or (kind in ["passage", "person"] and distance < 180*180)
+	_label.visible = not world_art and (near or (kind in ["passage", "person"] and distance < 180*180))
 	_label.modulate.a = 1.0 if near else .7
+	var fuel_hint:=get_node_or_null("FuelHint") as Label
+	if fuel_hint: fuel_hint.visible=distance<180*180
+	if world_art and has_meta("survival_station"): queue_redraw()
 
 func _draw() -> void:
 	if world_art:
@@ -117,6 +120,17 @@ func _draw_frontier() -> void:
 			draw_rect(Rect2(-24,-20,48,10),Color("868a77"))
 			draw_polyline(PackedVector2Array([Vector2(-7,0),Vector2(4,-7),Vector2(4,7)]),Color("d1bf8b"),2)
 		"mechanism":
+			var station:=get_meta("survival_station") as SurvivalStationData if has_meta("survival_station") else null
+			if get_meta("survival_rest",false):
+				_draw_hearth(Vector2.ZERO,true)
+				return
+			if station and station.kind=="water":
+				texture_filter=CanvasItem.TEXTURE_FILTER_NEAREST
+				FrontierArt.tile(self,Vector2i(8,8),Rect2(-25,-28,50,50),Color("bdb8a4"))
+				return
+			if station and station.kind=="cook":
+				var burning: bool=station.lit or SurfaceManager.instance.surface_at(global_position+station.heat_offset).get("state","dry")=="burning"
+				_draw_hearth(station.heat_offset,burning)
 			draw_rect(Rect2(-20,-10,40,20),Color("6f5b40"))
 			for x in [-14,14]: draw_line(Vector2(x,5),Vector2(x,18),Color("443b2c"),5)
 			draw_line(Vector2(-13,-10),Vector2(8,0),Color("afaa8a"),3)
@@ -128,3 +142,14 @@ func _draw_frontier() -> void:
 				draw_line(Vector2(-6,-11),Vector2(6,-11),Color("71674f"),1)
 	if _near:
 		draw_colored_polygon(PackedVector2Array([Vector2(-4,-46),Vector2(4,-46),Vector2(0,-40)]),GameUIStyle.GOLD)
+
+func _draw_hearth(point: Vector2, lit: bool) -> void:
+	for i in range(8):
+		var at:=point+Vector2.from_angle(i*TAU/8)*Vector2(21,13)
+		draw_circle(at,6,Color("6d7164"))
+	draw_line(point+Vector2(-14,-5),point+Vector2(14,5),Color("5c4934"),6)
+	draw_line(point+Vector2(-14,5),point+Vector2(14,-5),Color("7b6345"),5)
+	if lit:
+		for radius in [48,34,22]: draw_circle(point,radius,Color(1,.55,.18,.035))
+		draw_colored_polygon(PackedVector2Array([point+Vector2(-13,1),point+Vector2(-8,-23),point+Vector2(-1,-16),point+Vector2(5,-35),point+Vector2(13,1)]),Color("d68d49"))
+		draw_colored_polygon(PackedVector2Array([point+Vector2(-7,2),point+Vector2(1,-18),point+Vector2(7,2)]),Color("eec780"))

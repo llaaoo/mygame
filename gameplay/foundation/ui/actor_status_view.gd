@@ -1,5 +1,6 @@
 class_name ActorStatusView
 extends VBoxContainer
+var compact := false
 var context: ActorContext
 var stamina_bar: ProgressBar
 var stability_bar: ProgressBar
@@ -15,7 +16,7 @@ func _ready() -> void:
 		caption.autowrap_mode=TextServer.AUTOWRAP_OFF
 		row.add_child(caption)
 		var bar:=ProgressBar.new()
-		bar.custom_minimum_size=Vector2(140,14)
+		bar.custom_minimum_size=Vector2(100,10)
 		bar.size_flags_vertical=Control.SIZE_SHRINK_CENTER
 		bar.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 		bar.show_percentage=false
@@ -25,8 +26,10 @@ func _ready() -> void:
 		if title=="体力": stamina_bar=bar
 		else: stability_bar=bar
 	detail=FoundationWidgets.label("",11,true)
+	detail.visible=not compact
 	add_child(detail)
 func _process(_delta: float) -> void:
+	visible=context!=null
 	if not context or not context.actions: return
 	stamina_bar.max_value=context.actions.stamina.maximum
 	stamina_bar.value=context.actions.stamina.current
@@ -36,3 +39,5 @@ func _process(_delta: float) -> void:
 	var state: String={"idle":"就绪","attack":"攻击中","dodge":"闪避中","stagger":"失衡","item":"使用物品","aim_item":"瞄准 · 松开出手","spray":"喷洒中 · 松开即停","recovery":"动作恢复"}.get(context.actions.mode,"")
 	if context.spray and context.spray.active: state+=" · "+context.items.state_text(context.spray.uid)
 	detail.text="%.1f / %.0fkg · %s · %s"%[weight,context.rules.carry_limit,"背包随身" if pack else "背包已放下",state]
+	tooltip_text=detail.text
+	if compact: detail.visible=not pack or weight>context.rules.carry_limit

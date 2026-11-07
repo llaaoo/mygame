@@ -156,6 +156,8 @@ func mount(spec: SurvivalStationData) -> void:
 	node.callback = inspect.bind(node, spec)
 	if spec.kind == "cook":
 		var marker := Label.new()
+		marker.name = "FuelHint"
+		marker.mouse_filter=Control.MOUSE_FILTER_IGNORE
 		marker.text = "干柴火位：火花点燃"
 		marker.position = spec.heat_offset + Vector2(-70, -30)
 		marker.add_theme_font_size_override("font_size", 11)

@@ -33,6 +33,9 @@ var _preparation_bar: ProgressBar
 var _cost_labels: Array[Label] = []
 var _affinity_strips: Array[ColorRect] = []
 var _icon_keys: Array = []
+var _hover_source := ""
+var _feedback_message := ""
+var _feedback_time := 0.0
 
 
 func setup(sm: SkillManager) -> void:
@@ -40,7 +43,7 @@ func setup(sm: SkillManager) -> void:
 	_skill_manager.binding_changed.connect(func(_source: String): _refresh_all(); _invalidate_previews())
 	_skill_manager.cooldown_changed.connect(_on_cooldown)
 	_skill_manager.skill_upgraded.connect(_invalidate_previews)
-	_skill_manager.cast_committed.connect(_invalidate_previews)
+	_skill_manager.cast_committed.connect(_on_cast_feedback)
 	_skill_manager.combinations.supplies.changed.connect(_invalidate_previews)
 	var buffs := sm.get_parent().get_node_or_null("BuffManager") as BuffManager
 	if buffs: buffs.buffs_changed.connect(_invalidate_previews)
@@ -86,6 +89,10 @@ func _build() -> void:
 func _process(_delta: float) -> void:
 	if not _skill_manager or not _skill_manager.combinations or not is_instance_valid(_combination_hint):
 		return
+	_feedback_time=maxf(0,_feedback_time-_delta)
+	if _feedback_message!=_skill_manager.combinations.last_message:
+		_feedback_message=_skill_manager.combinations.last_message
+		_feedback_time=3.5
 	var empower := Input.is_key_pressed(KEY_SHIFT)
 	var actor_position: Vector2 = _skill_manager.get_parent().global_position
 	if empower != _preview_empower or not actor_position.is_equal_approx(_preview_position): _invalidate_previews()
@@ -98,6 +105,7 @@ func _process(_delta: float) -> void:
 	var controller := _skill_manager.combinations
 	var actor := _skill_manager.get_parent() as Player
 	var source := actor.casting.aimed_source() if actor else ""
+	if source.is_empty(): source=_hover_source
 	var hint_instance := _skill_manager.get_instance(source if not source.is_empty() else "right")
 	if not hint_instance:
 		for candidate in _sources:
@@ -106,8 +114,10 @@ func _process(_delta: float) -> void:
 	var action := hint_instance.data if hint_instance else null
 	if not action:
 		_combination_hint.hide()
+		_hint_panel.hide()
 		return
 	_combination_hint.show()
+	_hint_panel.visible=not source.is_empty() or not controller.pending.is_empty() or _feedback_time>0
 	var previews: Dictionary = {}
 	var hint_source:=source if not source.is_empty() and _skill_manager.get_instance(source) else "right"
 	if not _skill_manager.get_instance(hint_source):
@@ -158,14 +168,20 @@ func _process(_delta: float) -> void:
 		if preview:
 			var icon_key: Variant = instance.data.icon if instance.data.icon else instance.data.icon_atlas_index
 			if _icon_keys[i] != icon_key:
-				_icons[i].texture = SkillIconCatalog.get_icon(instance.data)
+				_icons[i].texture = InterfaceIcons.skill(instance.data)
 				_icon_keys[i] = icon_key
 			_cost_labels[i].text = ("%d/次" if instance.data.cast_type=="channel" else "%d") % preview.cost
 			_cost_labels[i].modulate = GameUIStyle.TEXT_MAIN if preview.ready else GameUIStyle.GOLD
 			var accent := ElementVisuals.color_for(preview.skill.tags)
 			_affinity_strips[i].color = Color(accent, .85)
-			(_panels[i].get_theme_stylebox("panel") as StyleBoxFlat).border_color = accent if not preview.rule_id.is_empty() else GameUIStyle.PANEL_BORDER
+			(_panels[i].get_theme_stylebox("panel") as StyleBoxFlat).border_color = Color(accent,.55) if not preview.rule_id.is_empty() else GameUIStyle.PANEL_BORDER
+			_icons[i].modulate=accent.lightened(.3)
+			_cost_labels[i].visible=_hover_source==_sources[i] or source==_sources[i] or not preview.ready
 		_update_cooldown(i, preview)
+
+func _on_cast_feedback(_plan: CastPlan) -> void:
+	_feedback_time=3.5
+	_invalidate_previews()
 
 func _invalidate_previews(_a: Variant = null, _b: Variant = null, _c: Variant = null, _d: Variant = null) -> void:
 	_preview_elapsed = 0.1
@@ -176,7 +192,11 @@ func _add_item(source: String, label: String, size: Vector2) -> void:
 
 	var panel := TooltipSlot.new()
 	panel.custom_minimum_size = size
-	panel.add_theme_stylebox_override("panel", GameUIStyle.slot_style(source in ["left", "right"]))
+	panel.add_theme_stylebox_override("panel", GameUIStyle.slot_style())
+	panel.mouse_entered.connect(func(): _hover_source=source; _invalidate_previews())
+	panel.mouse_exited.connect(func():
+		if _hover_source==source: _hover_source=""
+		_invalidate_previews())
 	add_child(panel)
 	_panels.append(panel)
 
@@ -186,7 +206,8 @@ func _add_item(source: String, label: String, size: Vector2) -> void:
 	panel.add_child(inner)
 
 	var icon := TextureRect.new()
-	icon.size = size
+	icon.size = size-Vector2(16,14)
+	icon.position=Vector2(8,5)
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	icon.modulate = Color(1, 1, 1, 0.3)
@@ -226,7 +247,7 @@ func _add_item(source: String, label: String, size: Vector2) -> void:
 	_cd_labels.append(cd_label)
 
 	var bind_label := Label.new()
-	bind_label.add_theme_font_size_override("font_size", 9)
+	bind_label.add_theme_font_size_override("font_size", 11)
 	bind_label.add_theme_color_override("font_color", GameUIStyle.TEXT_MUTED)
 	bind_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	bind_label.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
@@ -251,8 +272,8 @@ func _refresh_idx(idx: int) -> void:
 	var icon := _icons[idx]
 	_icon_keys[idx] = (skill.icon if skill.icon else skill.icon_atlas_index) if skill else null
 	if skill:
-		icon.texture = SkillIconCatalog.get_icon(skill)
-		icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		icon.texture = InterfaceIcons.skill(skill)
+		icon.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 		icon.modulate = Color(1, 1, 1, 1)
 	else:
 		icon.texture = null
@@ -306,8 +327,10 @@ func _refresh_items() -> void:
 		var binding:=_skill_manager.shortcuts.binding(_sources[i])
 		if binding.get("kind","")!="item": continue
 		var view:=QuickslotView.item_state(_skill_manager.get_parent(),binding)
-		_icons[i].texture=view.icon; _icons[i].modulate=Color.WHITE if view.ready else GameUIStyle.TEXT_DISABLED
+		var definition:=ItemCatalog.default_catalog().definition(str(binding.item_id))
+		_icons[i].texture=InterfaceIcons.item(definition); _icons[i].modulate=Color.WHITE if view.ready else GameUIStyle.TEXT_DISABLED
 		_cost_labels[i].text="×%d"%view.count
-		_cd_labels[i].text=str(view.title).left(3); _cd_labels[i].visible=view.icon==null
+		_cd_labels[i].text=str(view.title).left(3); _cd_labels[i].visible=false
+		_cost_labels[i].visible=true
 		_panels[i].tooltip_text=view.title+"\n"+view.detail
 		_masks[i].visible=false; _affinity_strips[i].color=GameUIStyle.GOLD

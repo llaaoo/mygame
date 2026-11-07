@@ -25,7 +25,7 @@ var practice_available: Callable
 var menu_action: Callable
 var journal_action: Callable
 var shortcut_action: Callable
-var _modal_extent := Vector2(760,548)
+var _modal_extent := Vector2(960,570)
 var _heading_panel: PanelContainer
 var _notice: PanelContainer
 var _modal_panel: PanelContainer
@@ -42,14 +42,16 @@ func _ready() -> void:
 	panel.offset_left = -210
 	panel.offset_right = 210
 	panel.offset_top = 8
-	panel.add_theme_stylebox_override("panel", GameUIStyle.panel_style(.94, 5, GameUIStyle.BORDER_STRONG))
+	panel.add_theme_stylebox_override("panel", GameUIStyle.quiet_panel(.25))
 	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(panel)
 	var box := VBoxContainer.new()
 	panel.add_child(box)
-	heading = _label("余烬监狱", 20)
+	heading = _label("余烬监狱", 18)
 	objective = _label("", 12)
 	objective.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	objective.max_lines_visible=1
+	objective.modulate=GameUIStyle.TEXT_MUTED
 	box.add_child(heading)
 	box.add_child(objective)
 	var footer := PanelContainer.new()
@@ -59,7 +61,7 @@ func _ready() -> void:
 	footer.offset_top = -68
 	footer.offset_bottom = -18
 	footer.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	footer.add_theme_stylebox_override("panel", GameUIStyle.panel_style(.85, 4))
+	footer.add_theme_stylebox_override("panel", GameUIStyle.quiet_panel(.35))
 	add_child(footer)
 	var menu:=Button.new()
 	menu.text="Tab  远征菜单"
@@ -68,12 +70,13 @@ func _ready() -> void:
 	menu.pressed.connect(show_menu)
 	footer.add_child(menu)
 	var needs_panel := PanelContainer.new()
-	needs_panel.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
+	needs_panel.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT)
 	needs_panel.offset_left = 20
-	needs_panel.offset_right = 290
-	needs_panel.offset_top = 136
+	needs_panel.offset_right = 300
+	needs_panel.offset_top = -214
+	needs_panel.offset_bottom = -184
 	needs_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	needs_panel.add_theme_stylebox_override("panel", GameUIStyle.panel_style(.85, 4))
+	needs_panel.add_theme_stylebox_override("panel", GameUIStyle.quiet_panel(.35))
 	add_child(needs_panel)
 	_survival_label = _label("饱食100 · 饮水100 · 疲劳0", 12)
 	_survival_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -82,10 +85,10 @@ func _ready() -> void:
 	terrain.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT)
 	terrain.offset_left = 18
 	terrain.offset_right = 216
-	terrain.offset_top = -68
-	terrain.offset_bottom = -18
+	terrain.offset_top = -326
+	terrain.offset_bottom = -290
 	terrain.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	terrain.add_theme_stylebox_override("panel", GameUIStyle.panel_style(.85, 4))
+	terrain.add_theme_stylebox_override("panel", GameUIStyle.quiet_panel(.35))
 	add_child(terrain)
 	_terrain_label = _label("脚下 · 干地", 12)
 	terrain.add_child(_terrain_label)
@@ -93,9 +96,9 @@ func _ready() -> void:
 	_notice.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
 	_notice.offset_left = -250
 	_notice.offset_right = 250
-	_notice.offset_top = 112
+	_notice.offset_top = 84
 	_notice.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_notice.add_theme_stylebox_override("panel", GameUIStyle.panel_style(.94, 5, GameUIStyle.BORDER_STRONG))
+	_notice.add_theme_stylebox_override("panel", GameUIStyle.quiet_panel(.85))
 	add_child(_notice)
 	message = _label("", 14)
 	message.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -119,6 +122,7 @@ func _process(delta: float) -> void:
 		_update_terrain()
 	if not get_tree().paused:
 		_message_time -= delta
+		_notice.modulate.a=clampf(_message_time/.35,0,1)
 		if _message_time <= 0:
 			message.text = ""
 			_notice.hide()
@@ -126,10 +130,10 @@ func _process(delta: float) -> void:
 func notify(text: String) -> void:
 	_notice.show()
 	message.text = text
-	_message_time = 5.0
+	_message_time = 3.5
 
 func set_survival_status(text: String) -> void:
-	if _survival_label: _survival_label.text = text
+	if _survival_label: _survival_label.tooltip_text=text
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed or event.echo:
@@ -196,7 +200,7 @@ func close_modal() -> void:
 	_modal_panel = null
 	modal_locked = false
 
-func show_panel(title: String, text: String, buttons: Array[Dictionary], locked: bool = false, extent := Vector2(760,548)) -> void:
+func show_panel(title: String, text: String, buttons: Array[Dictionary], locked: bool = false, extent := Vector2(960,570)) -> void:
 	close_modal()
 	_modal_extent = extent
 	modal_locked = locked
@@ -213,18 +217,18 @@ func show_panel(title: String, text: String, buttons: Array[Dictionary], locked:
 	panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
 	_modal_panel = panel
 	panel.name = "ContentPanel"
-	panel.add_theme_stylebox_override("panel", GameUIStyle.panel_style(0.99, 6, GameUIStyle.BORDER_STRONG))
+	panel.add_theme_stylebox_override("panel", GameUIStyle.panel_style(0.99, 2,GameUIStyle.PANEL_BORDER))
 	backdrop.add_child(panel)
 	var margin := MarginContainer.new()
 	for side in ["left", "right", "top", "bottom"]:
-		margin.add_theme_constant_override("margin_" + side, 20)
+		margin.add_theme_constant_override("margin_" + side, 24)
 	panel.add_child(margin)
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 12)
 	margin.add_child(box)
 	var title_row := HBoxContainer.new()
 	box.add_child(title_row)
-	var title_label := _label(title, 23)
+	var title_label := _label(title, 27)
 	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	title_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	title_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
@@ -238,13 +242,18 @@ func show_panel(title: String, text: String, buttons: Array[Dictionary], locked:
 		close.pressed.connect(close_modal)
 		title_row.add_child(close)
 	box.add_child(HSeparator.new())
+	var content_row:=HBoxContainer.new()
+	content_row.add_theme_constant_override("separation",24)
+	content_row.size_flags_vertical=Control.SIZE_EXPAND_FILL
+	box.add_child(content_row)
 	var scroll := ScrollContainer.new()
 	scroll.name = "BodyScroll"
 	scroll.custom_minimum_size = Vector2(0, 100)
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	scroll.follow_focus = true
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	box.add_child(scroll)
+	scroll.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	content_row.add_child(scroll)
 	var body := RichTextLabel.new()
 	body.fit_content = true
 	body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -260,22 +269,19 @@ func show_panel(title: String, text: String, buttons: Array[Dictionary], locked:
 	scroll.resized.connect(func():
 		var current:=body_ref.get_ref() as RichTextLabel
 		if current: current.custom_minimum_size.x = maxf(1, scroll.size.x - 20))
-	var button_host: Container = box
-	if buttons.size() > 3:
-		var grid := GridContainer.new()
-		grid.columns = 2
-		grid.add_theme_constant_override("h_separation", 10)
-		grid.add_theme_constant_override("v_separation", 8)
-		if buttons.size() > 6:
-			var button_scroll := ScrollContainer.new()
-			button_scroll.follow_focus=true
-			button_scroll.custom_minimum_size.y = 176
-			box.add_child(button_scroll)
-			grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-			button_scroll.add_child(grid)
-		else:
-			box.add_child(grid)
-		button_host = grid
+	var button_host: Container=box
+	if buttons.size()>3:
+		var button_scroll:=ScrollContainer.new()
+		button_scroll.name="ActionsScroll"
+		button_scroll.custom_minimum_size.x=290
+		button_scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED
+		button_scroll.follow_focus=true
+		content_row.add_child(button_scroll)
+		var list:=VBoxContainer.new()
+		list.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+		list.add_theme_constant_override("separation",6)
+		button_scroll.add_child(list)
+		button_host=list
 	var first_button: Button
 	for entry in buttons:
 		var button := Button.new()
@@ -313,7 +319,18 @@ func _update_terrain() -> void:
 	var state: String = surfaces.surface_at(player.global_position).state
 	var title := SurfaceManager.surface_title(state)
 	var detail: String = {"dry": "Shift 施法 · 恩赐兑现", "wet": "清洗 / 凝霜 / 导电", "frozen": "凝霜控制 · 冲击可破冰", "burning": "燃烧危险 · 水可灭火", "electrified": "感电危险 · 注意站位", "poisoned": "中毒危险 · 清水可清洗", "steam": "蒸汽掩护 · 投射物减伤", "oiled": "可燃介质 · 小心引火"}.get(state, "")
-	_terrain_label.text = "脚下 · " + title + "\n" + detail
+	_terrain_label.text = title+" · "+detail
+	_terrain_label.tooltip_text="脚下介质："+title+"\n"+detail
+	_terrain_label.get_parent().visible=state!="dry"
+	if player is Player and player.survival:
+		var needs: SurvivalNeeds=player.survival.needs
+		var warnings: Array[String]=[]
+		if needs.nutrition<=20: warnings.append("饥饿")
+		if needs.hydration<=20: warnings.append("缺水")
+		if needs.fatigue>=60: warnings.append("疲惫")
+		_survival_label.text=" · ".join(warnings)+"   N 查看补给"
+		_survival_label.get_parent().visible=not warnings.is_empty()
+	else: _survival_label.get_parent().hide()
 	_terrain_label.add_theme_color_override("font_color", GameUIStyle.TEXT_MUTED if state == "dry" else Color(SurfaceCatalog.color_for(state), 1))
 
 func show_pause() -> void:
@@ -335,7 +352,7 @@ func show_journal() -> void:
 	if journal_provider.is_valid():
 		show_panel("探索日志", journal_provider.call(), [{"title": "元素关系：线索与验证", "callback": elements_requested.emit}, {"title": "实验路线与配置记录", "callback": trials_requested.emit}, {"title": "继续探索", "callback": close_modal}])
 		return
-	var text := "行动提示\n鼠标左键近战；右键或6使用火花；1震荡、3霜阵、5火阵需要探索学习。\n法阵内火花产生远程法术；新阵替换旧阵。J关闭日志。\n\n监狱路线\n营地 → 外院 → 火药库 → 重卫关隘 → 熔炉大厅\n可选支路：外院的军械档案、火药库的排水回廊。\n\n发现记录\n"
+	var text := "行动提示\n左键攻击，右键格挡；Q/E/R与1—0独立快捷槽，K编组动作或物品。\n法阵内火花产生远程法术；新阵替换旧阵。J关闭日志。\n\n监狱路线\n营地 → 外院 → 火药库 → 重卫关隘 → 熔炉大厅\n可选支路：外院的军械档案、火药库的排水回廊。\n\n发现记录\n"
 	for entry in progress.journal:
 		text += "\n%s\n%s\n" % [entry.title, entry.text]
 	if progress.journal.is_empty():
