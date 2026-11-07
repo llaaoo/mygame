@@ -4,7 +4,7 @@
 script = ExtResource("1")
 id = "arcane"
 title = "凝能阵"
-description = "不耗材料；只有一次充能，需以震荡手动触发。"
+description = "不耗材料；需以震荡手动触发。存续和使用预算见当前规则说明。"
 material_id = ""
 tags = ["arcane", "field"]
 field_type = "arcane"

@@ -23,6 +23,7 @@ enum ActionType {
 	GUARD,
 	SPRINT,
 	DROP_PACK,
+	TECHNIQUE,
 }
 
 ## ── 核心字段 ──

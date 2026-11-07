@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="WeaponMoveset" format=3]
+[ext_resource type="Script" path="res://gameplay/foundation/data/weapon_moveset.gd" id="moves"]
+[ext_resource type="Script" path="res://gameplay/foundation/data/attack_profile.gd" id="attack"]
+[sub_resource type="Resource" id="stroke0"]
+script = ExtResource("attack")
+windup = 0.16
+active = 0.12
+recovery = 0.28
+reach = 58
+angle_degrees = 100
+stamina_cost = 11
+impact = 16
+damage_multiplier = 1
+[sub_resource type="Resource" id="stroke1"]
+script = ExtResource("attack")
+windup = 0.2
+active = 0.12
+recovery = 0.32
+reach = 62
+angle_degrees = 110
+stamina_cost = 13
+impact = 23
+damage_multiplier = 1.12
+[sub_resource type="Resource" id="stroke2"]
+script = ExtResource("attack")
+windup = 0.32
+active = 0.14
+recovery = 0.4
+reach = 66
+angle_degrees = 85
+stamina_cost = 17
+impact = 34
+damage_multiplier = 1.4
+[resource]
+script = ExtResource("moves")
+weapon_type = "blade"
+attacks = [SubResource("stroke0"), SubResource("stroke1"), SubResource("stroke2")]

@@ -2,6 +2,7 @@ class_name FrontierHUD
 extends CanvasLayer
 var game: GrayriverGame
 var tracker: Button
+var time_label: Label
 var interact: Button
 var _focus: WeakRef
 var belt: Array[Button] = []
@@ -27,6 +28,11 @@ func _ready() -> void:
 	tracker.add_theme_stylebox_override("disabled",StyleBoxEmpty.new())
 	tracker.add_theme_font_size_override("font_size",14)
 	root.add_child(tracker)
+	time_label=FoundationWidgets.label("",13,true)
+	time_label.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
+	time_label.offset_left=-276; time_label.offset_right=-18
+	time_label.offset_top=4; time_label.offset_bottom=24
+	root.add_child(time_label)
 	var prompt:=PanelContainer.new()
 	prompt.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
 	prompt.offset_left=-210
@@ -63,6 +69,7 @@ func _process(delta: float) -> void:
 	_clock-=delta
 	if _clock>0 or not game.ready_for_play: return
 	_clock=.15
+	time_label.text=WorldTime.instance.stamp()
 	tracker.disabled=is_instance_valid(game.ui.modal)
 	var selecting:=is_instance_valid(game.player.material_wheel) and game.player.material_wheel.visible
 	tracker.visible=not selecting
@@ -75,7 +82,11 @@ func _process(delta: float) -> void:
 		var detail: String="K编组动作或物品"
 		var amount: String=""
 		var ready:=inst!=null
-		if binding.get("kind","")=="item":
+		if binding.get("kind","")=="technique":
+			var view:=QuickslotView.technique_state(game.player,binding)
+			title=view.title; detail=view.detail; ready=view.ready; amount="%.0f体"%view.cost
+			belt[i].icon=GameUIStyle.icon("swords")
+		elif binding.get("kind","")=="item":
 			var view:=QuickslotView.item_state(game.player,binding)
 			title=view.title; detail=view.detail; ready=view.ready; amount="×%d"%view.count
 			belt[i].icon=InterfaceIcons.item(ItemCatalog.default_catalog().definition(str(binding.item_id)))

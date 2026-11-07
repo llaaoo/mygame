@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/item_data.gd" id="item"]
+[resource]
+script = ExtResource("item")
+id = "coin"
+display_name = "河谷币"
+description = "真实库存中的货币，用于交易、训练与整修。"
+weight = 0.001
+stackable = true
+max_stack = 999
+sell_price = 1

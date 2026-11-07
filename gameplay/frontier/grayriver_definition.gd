@@ -90,6 +90,7 @@ static func build() -> ExplorationChapterData:
 				if raw.has(key): station.set(key, raw[key])
 			station.pos = vector(raw.pos)
 			station.harvest = amounts(raw.get("harvest", {}))
+			station.regeneration_hours=float(raw.get("regeneration_hours",4))
 			station.required_claims = PackedStringArray(raw.get("required_claims", []))
 			if raw.has("heat_offset"): station.heat_offset = vector(raw.heat_offset)
 			region.survival_stations.append(station)

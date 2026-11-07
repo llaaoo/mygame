@@ -45,3 +45,12 @@ func _physics_process(delta: float) -> void:
 	if _destination.distance_to(position)>30 and actor_context.region.navigation:
 		actor_context.actions.try_action(Action.move(actor_context.region.navigation.direction(position,_destination),self))
 	else: actor_context.actions.try_action(Action.move(Vector2.ZERO,self))
+
+func resume_schedule() -> void:
+	if actor_context and actor_context.relations.attitude(actor_context.id,"player")=="hostile": working=false; return
+	if not hour_query.is_valid() or not schedule or health_component.is_dead: return
+	var entry:=schedule.get_entry_for_hour(float(hour_query.call()))
+	working=entry and entry.target_marker=="work"
+	if entry and locations.has(entry.target_marker):
+		_destination=locations[entry.target_marker]
+		position=_destination

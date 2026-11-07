@@ -136,7 +136,7 @@ func _process(delta: float) -> void:
  if is_instance_valid(_state_label) and _state_label.is_inside_tree():
   var item:=_selected_item()
   if item:
-   var definition:=session.inventory.definitions.get(item.definition_id) as ItemData
+   var definition:=session.inventory.equipment_definition(item.uid) if session.inventory.definitions.get(item.definition_id) is EquipmentData else session.inventory.definitions.get(item.definition_id) as ItemData
    if definition: _state_label.text=session.inventory.state_text(item.uid)+"\n单件重量 %.1fkg · 数量 %d"%[definition.weight,item.quantity]
 func _health_changed(hp: int,_max_hp: int) -> void:
  if visible and hp<_last_health: _message="正在受伤！Esc关闭界面返回战斗。"; _message_time=3; _alert.add_theme_color_override("font_color",GameUIStyle.DANGER)
@@ -151,7 +151,7 @@ func _rows() -> Array[Dictionary]:
   var kind: String="ground" if container==ground_id else "pocket" if container.ends_with(".pocket") else "pack" if container.ends_with(".pack") else "gear"
   if container_filter!="all" and container_filter!=kind: continue
   for row in session.inventory.entries(container):
-   var definition:=session.inventory.definitions.get(row.definition) as ItemData
+   var definition:=session.inventory.equipment_definition(row.uid) if session.inventory.definitions.get(row.definition) is EquipmentData else session.inventory.definitions.get(row.definition) as ItemData
    if not definition: continue
    if mode=="equipment" and not definition is EquipmentData or mode=="supplies" and definition is EquipmentData: continue
    if selected_slot>=0 and (not definition is EquipmentData or definition.slot_type!=selected_slot): continue
@@ -165,7 +165,7 @@ func _refresh() -> void:
  FoundationWidgets.clear(_grid)
  var rows:=_rows()
  for row in rows:
-  var definition:=session.inventory.definitions.get(row.definition) as ItemData
+  var definition:=session.inventory.equipment_definition(row.uid) if session.inventory.definitions.get(row.definition) is EquipmentData else session.inventory.definitions.get(row.definition) as ItemData
   var tile:=InventoryItemTile.new(); tile.item_uid=row.uid; tile.name="Item_"+row.uid.replace(".","_")
   tile.text=definition.display_name+" ×%d\n"%row.quantity+{"pocket":"口袋","pack":"背包","gear":"已穿戴","ground":"地面"}[row.place]
   tile.icon=InterfaceIcons.item(definition); tile.expand_icon=true; tile.add_theme_constant_override("icon_max_width",26)
@@ -193,7 +193,7 @@ func _show_detail() -> void:
  if not item:
   _details.add_child(FoundationWidgets.label("选择物品，或点击身体部位查看可穿戴装备。",16,true)); return
  var location:=session.inventory.locate(item.uid)
- var definition:=session.inventory.definitions.get(item.definition_id) as ItemData
+ var definition:=session.inventory.equipment_definition(item.uid) if session.inventory.definitions.get(item.definition_id) is EquipmentData else session.inventory.definitions.get(item.definition_id) as ItemData
  _details.add_child(FoundationWidgets.label(definition.display_name,20))
  _details.add_child(FoundationWidgets.label(definition.description,14,true))
  _state_label=FoundationWidgets.label(session.inventory.state_text(item.uid)+"\n单件重量 %.1fkg · 数量 %d"%[definition.weight,item.quantity],13,true)
@@ -208,6 +208,7 @@ func _show_detail() -> void:
  if definition is EquipmentData:
   var current:=actor.get_node("EquipmentManager").get_equipment(definition.slot_type) as EquipmentData
   FoundationWidgets.disclosure(_details,"属性与当前装备比较",FoundationWidgets.comparison(current,definition))
+  if definition.moveset: FoundationWidgets.disclosure(_details,"武器动作",definition.moveset.describe())
   if location.ends_with(".gear"):
    _details.add_child(FoundationWidgets.button("卸下装备",func(): _result(actions.unequip(definition.slot_type))))
   else: _details.add_child(FoundationWidgets.button("装备这件",_equip.bind(item.uid)))
@@ -251,7 +252,7 @@ func _activate(uid: String) -> void:
  var item:=session.inventory.item(uid)
  if not item: return
  if session.inventory.locate(uid)==ground_id: _result(actions.take(ground_id,uid,item.quantity)); return
- var definition:=session.inventory.definitions.get(item.definition_id) as ItemData
+ var definition:=session.inventory.equipment_definition(item.uid) if session.inventory.definitions.get(item.definition_id) is EquipmentData else session.inventory.definitions.get(item.definition_id) as ItemData
  if definition is EquipmentData:
   if session.inventory.locate(uid).ends_with(".gear"): _result(actions.unequip(definition.slot_type))
   else: _equip(uid)

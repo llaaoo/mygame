@@ -212,6 +212,8 @@ func restore_skill_state(saved_state: Dictionary) -> void:
 		if source not in QuickslotLoadout.SOURCES: continue
 		var entry: Variant=saved_state[source]
 		if not QuickslotLoadout.valid_entry(entry): continue
+		if entry.get("kind","")=="technique":
+			shortcuts.bind_technique(source,entry.technique_id); continue
 		if entry.get("kind","")=="item":
 			shortcuts.bind_item(source,entry.item_id,str(entry.get("uid",""))); continue
 		var skill:=pool.get_skill(str(entry.get("skill_id","")))

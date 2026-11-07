@@ -68,7 +68,7 @@ static func options(actor: Player,source: String) -> Array[Dictionary]:
    if item: detail="瓶 %s · %s"%[uid.trim_prefix("item."),store.state_text(uid)]
    if not current.get("modifier","").is_empty() and selected.modifier.is_empty(): detail+=" · 确认将移除不适配修饰"
    if not payload.source_kind.is_empty(): detail="脚下法阵充能" if payload.source_kind=="field" else "附近真实残魂"
-   result.append({"variant_id":payload.id,"title":payload.title,"choice":selected,"cost":plan.cost,"ready":plan.ready,"reason":plan.reason,"detail":detail,"description":payload.describe(),"current":current==selected})
+   result.append({"variant_id":payload.id,"title":payload.title,"choice":selected,"cost":plan.cost,"ready":plan.ready,"reason":plan.reason,"detail":detail,"description":payload.describe(actor.actor_context.rules.timed_fields),"current":current==selected})
  return result
 static func select(actor: Player,source: String,choice: Dictionary) -> bool:
  if not actor.actor_context or actor.health_component.is_dead: return false

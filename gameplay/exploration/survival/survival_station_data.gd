@@ -9,5 +9,6 @@ extends Resource
 @export var lit := false
 @export var heat_offset := Vector2(96, 0)
 @export var harvest: Dictionary = {}
+@export var regeneration_hours := 4.0
 
 @export var required_claims: PackedStringArray = []

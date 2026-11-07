@@ -402,3 +402,26 @@ func prevents_actions() -> bool:
 	for instance in _instances:
 		if instance.definition.prevents_actions: return true
 	return false
+
+const PROVISION_BUFFS := ["meal_fortitude","broth_fortitude","guard_tonic","clear_tonic"]
+func provision_state() -> Array[Dictionary]:
+	var result: Array[Dictionary]=[]
+	for entry in serialize_state():
+		if entry.runtime_id in PROVISION_BUFFS: result.append({"id":entry.runtime_id,"remaining":entry.remaining})
+	return result
+static func valid_provisions(entries: Variant) -> bool:
+	if not entries is Array or entries.size()>PROVISION_BUFFS.size(): return false
+	var seen: Dictionary={}
+	for entry in entries:
+		if not entry is Dictionary or entry.get("id","") not in PROVISION_BUFFS or seen.has(entry.id) or typeof(entry.get("remaining")) not in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(entry.remaining)) or entry.remaining<=0: return false
+		var definition:=load("res://content/status/%s.tres"%entry.id) as Buff
+		if entry.remaining>definition.duration: return false
+		seen[entry.id]=true
+	return true
+func restore_provisions(entries: Array) -> void:
+	if not valid_provisions(entries): return
+	for entry in entries:
+		var definition:=load("res://content/status/%s.tres"%entry.id) as Buff
+		apply_buff(definition)
+		var instance:=_find(definition.get_runtime_id())
+		if instance: instance.remaining=float(entry.remaining)

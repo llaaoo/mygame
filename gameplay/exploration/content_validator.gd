@@ -176,6 +176,7 @@ func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 		for station in region.survival_stations:
 			if station.id.is_empty() or station_ids.has(station.id) or station.title.is_empty() or station.kind not in ["water", "cook", "forage"]: _fail(station, "Invalid/duplicate survival station")
 			station_ids[station.id] = true
+			if not is_finite(station.regeneration_hours) or station.regeneration_hours<=0 or station.regeneration_hours>24: _fail(station,"Invalid resource regeneration hours")
 			if station.kind == "forage" and station.harvest.is_empty(): _fail(station, "harvest: empty provisions")
 			_validate_materials(station, station.harvest, supplies)
 		for facility in region.facilities:

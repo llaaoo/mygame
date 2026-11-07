@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="Buff" format=3]
+[ext_resource type="Script" path="res://gameplay/status/buff.gd" id="buff"]
+[resource]
+script = ExtResource("buff")
+buff_id = "broth_fortitude"
+status_id = "broth_fortitude"
+display_name = "炖汤强身"
+exclusive_group = "meal_fortitude"
+persistent = true
+duration = 240.0
+stat_modifiers = {"endurance":3}

@@ -4,6 +4,7 @@
 script = ExtResource("1")
 material_operations = true
 physical_inventory = true
+timed_fields = true
 modern_controls = true
 field_equipment = true
 tactical_combat = true

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/item_data.gd" id="item"]
+[ext_resource type="Script" path="res://gameplay/items/item_use_definition.gd" id="use"]
+[sub_resource type="Resource" id="Use"]
+script = ExtResource("use")
+id = "book_spear_thrust"
+kind = 4
+technique_id = "spear_thrust"
+duration = 2.0
+[resource]
+script = ExtResource("item")
+id = "book_spear_thrust"
+display_name = "贯步刺武技书"
+description = "站定阅读两秒，完成后学习贯步刺并消耗此书。已学会则拒绝，不浪费书。学会后在K武技页编组。"
+weight = 0.2
+stackable = true
+max_stack = 99
+sell_price = 5
+use_profile = SubResource("Use")

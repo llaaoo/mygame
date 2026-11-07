@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/item_data.gd" id="item"]
+[ext_resource type="Script" path="res://gameplay/items/item_use_definition.gd" id="use"]
+[ext_resource type="Script" path="res://gameplay/abilities/operations/spell_payload_data.gd" id="payload"]
+[ext_resource type="Resource" path="res://content/status/clear_tonic.tres" id="buff"]
+[sub_resource type="Resource" id="Payload"]
+script = ExtResource("payload")
+id = "clear_tonic"
+title = "醒神药剂"
+statuses = [ExtResource("buff")]
+[sub_resource type="Resource" id="Use"]
+script = ExtResource("use")
+id = "clear_tonic"
+kind = 3
+payload = SubResource("Payload")
+duration = 1.0
+[resource]
+script = ExtResource("item")
+id = "clear_tonic"
+display_name = "醒神药剂"
+description = "1秒饮用，解除中毒并提供90秒毒免疫。与石肤药剂互相替换，需要择机选择。"
+weight = 0.3
+stackable = true
+max_stack = 99
+sell_price = 4
+use_profile = SubResource("Use")

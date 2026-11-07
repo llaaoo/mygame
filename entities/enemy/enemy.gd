@@ -71,6 +71,8 @@ var player: Player = null
 var attack_ready: bool = true
 var _attack_timer: float = 0.0
 var _revenge_target: Node2D = null
+var _sight_memory := 0.0
+var _last_seen_position:=Vector2.INF
 var _leash_distance: float = 500.0
 var _home_position: Vector2 = Vector2.ZERO
 var _returning_home: bool = false
@@ -213,9 +215,16 @@ func _get_current_target() -> Node2D:
 	if _is_valid_target(_revenge_target):
 		return _revenge_target
 	if _is_valid_target(player) and global_position.distance_to(player.global_position) <= detect_range * 1.35:
-		return player
+		if not actor_context or not actor_context.rules.tactical_combat or can_see(player):
+			_sight_memory=2.5; _last_seen_position=player.global_position; return player
+		if _sight_memory>0: return player
 	return null
 
+
+func can_see(target: Node2D) -> bool:
+	if not is_instance_valid(target) or not is_inside_tree(): return false
+	var query:=PhysicsRayQueryParameters2D.create(global_position,target.global_position,1,[get_rid()])
+	return get_world_2d().direct_space_state.intersect_ray(query).is_empty()
 
 func _is_valid_target(target: Node2D) -> bool:
 	if not target or not is_instance_valid(target):
@@ -282,7 +291,7 @@ func poll_actions() -> Array[Action]:
 
 func resolve_action(action: Action) -> void:
 	if not skill_manager.can_act(self): return
-	if actor_context and actor_context.actions.active() and action.action_type in [Action.ActionType.MOVE,Action.ActionType.MELEE,Action.ActionType.HEAVY_ATTACK,Action.ActionType.GUARD,Action.ActionType.USE_ITEM]:
+	if actor_context and actor_context.actions.active() and action.action_type in [Action.ActionType.MOVE,Action.ActionType.MELEE,Action.ActionType.HEAVY_ATTACK,Action.ActionType.DODGE,Action.ActionType.TECHNIQUE,Action.ActionType.GUARD,Action.ActionType.USE_ITEM]:
 		if action.action_type==Action.ActionType.MELEE: action.direction=get_target_direction()
 		actor_context.actions.try_action(action)
 		return
@@ -526,6 +535,7 @@ func _resolve_melee_hit(target: Node2D) -> void:
 
 
 func _process(delta: float) -> void:
+	_sight_memory=maxf(0,_sight_memory-delta)
 	if character_brain: character_brain.tick(delta)
 	if not attack_ready:
 		_attack_ready_remaining = maxf(0, _attack_ready_remaining - delta)

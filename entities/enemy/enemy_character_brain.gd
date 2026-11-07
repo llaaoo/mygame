@@ -5,10 +5,12 @@ const INTERVAL := 0.25
 var actor: Enemy
 var _clock := 0.0
 var _reposition := 0.0
+var _defense_cooldown := 0.0
 func _init(owner_actor: Enemy) -> void: actor = owner_actor
 func tick(delta: float) -> void:
 	_clock = maxf(0,_clock-delta)
 	_reposition = maxf(0,_reposition-delta)
+	_defense_cooldown=maxf(0,_defense_cooldown-delta)
 func refused() -> void: _reposition = 1.0
 func choose(target: Node2D) -> Array[Action]:
 	var result: Array[Action] = []
@@ -21,6 +23,40 @@ func choose(target: Node2D) -> Array[Action]:
 		var store:=actor.actor_context.items
 		var owner_id:=actor.actor_context.id
 		var weapon_uid:=str(store.equipped(owner_id).get(str(EquipmentData.SlotType.RIGHT_HAND),""))
+		if actor.surface_awareness.should_evade:
+			controller.cancel("危险地面：移动中断准备")
+			return [Action.move(actor.surface_awareness.direction,actor)]
+		# Observation of visible windup and guard, never the target's pending input.
+		var target_context:=target.get("actor_context") as ActorContext
+		var visible:=actor.can_see(target)
+		if visible: actor._last_seen_position=target.global_position
+		if not visible:
+			actions.guarding=false
+			if actor.actor_context.region.navigation: return [Action.move(actor.actor_context.region.navigation.direction(actor.position,actor._last_seen_position if actor._last_seen_position.is_finite() else actor.position),actor)]
+			return result
+		if target_context and _defense_cooldown<=0 and target_context.actions.mode=="attack" and target_context.actions.elapsed<target_context.actions.profile.windup and dist<target_context.actions.profile.reach+24 and actions.stamina.current>28:
+			_defense_cooldown=1.3
+			if target_context.actions.profile.impact>=38 or target_context.actions.profile.windup>=.35:
+				var evade:=Action.new(); evade.action_type=Action.ActionType.DODGE; evade.direction=actor.get_target_direction().orthogonal()
+				return [evade]
+			if actions.can_guard():
+				var defend:=Action.new(); defend.action_type=Action.ActionType.GUARD; defend.params["held"]=true; defend.direction=actor.get_target_direction()
+				return [defend]
+		actions.guarding=false
+		var weapon:=store.equipment_definition(weapon_uid)
+		var reach:=weapon.moveset.attacks[0].reach if weapon and weapon.moveset and not weapon.moveset.attacks.is_empty() else actor.attack_range
+		if weapon and weapon.moveset and weapon.moveset.weapon_type=="bow" and store.can_pay(owner_id,{"arrow":1},true):
+			if dist<140: return [Action.move(-actor.get_target_direction(),actor)]
+			if dist<=reach:
+				var shot:=Action.melee(actor); shot.direction=actor.get_target_direction(); return [shot]
+		if dist<=reach and weapon and weapon.world_shape in ["blade","spear","staff"]:
+			if target_context and target_context.actions.guarding and actions.stamina.current>40:
+				var heavy:=Action.new(); heavy.action_type=Action.ActionType.HEAVY_ATTACK; heavy.direction=actor.get_target_direction(); return [heavy]
+			if actions.stamina.current>=16: return [Action.melee(actor)]
+		# A visible preparation in striking distance invites pressure, not free setup.
+		if target_context and target_context.actor.get_node("SkillManager").combinations.is_busy() and dist<180 and actions.stamina.current>24:
+			return [Action.move(actor.get_target_direction(),actor)]
+
 		if dist>90 and not weapon_uid.is_empty() and not store.coating(weapon_uid) and store.can_pay(owner_id,{"poison_rag":1},true):
 			var coat:=Action.new(); coat.action_type=Action.ActionType.USE_ITEM; coat.skill_id="poison_rag"; return [coat]
 		if dist>140 and dist<320 and store.can_pay(owner_id,{"venom_bottle":1},true):
@@ -31,7 +67,7 @@ func choose(target: Node2D) -> Array[Action]:
 		if actions.stamina.current<24:
 			if dist>actor.attack_range*2 and actions.item_request.is_valid() and actor.actor_context.items.can_pay(actor.actor_context.id,{"clean_water":1},true):
 				var use:=Action.new(); use.action_type=Action.ActionType.USE_ITEM; use.skill_id="clean_water"; return [use]
-			var guard:=Action.new(); guard.action_type=Action.ActionType.GUARD; guard.params["held"]=dist<actor.attack_range*1.7; guard.direction=actor.get_target_direction()
+			var guard:=Action.new(); guard.action_type=Action.ActionType.GUARD; guard.params["held"]=false; guard.direction=actor.get_target_direction()
 			return [guard,Action.move(-actor.get_target_direction()*.5,actor)]
 		if dist>actor.attack_range and actor.actor_context.region.navigation:
 			var route:=actor.actor_context.region.navigation.direction(actor.position,target.position)

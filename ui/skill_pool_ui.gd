@@ -8,6 +8,8 @@ var _selected_skill: SkillData = null
 var _selected_item: Dictionary={}
 var _selected_choice: Dictionary={}
 var _show_items := false
+var _show_techniques := false
+var _selected_technique := ""
 
 var _background: ColorRect = null
 var _panel: Panel = null
@@ -59,7 +61,7 @@ func open() -> void:
 
 
 func open_for(skill: SkillData) -> void:
-	_selected_skill=skill; _selected_item.clear(); _selected_choice.clear(); _show_items=false
+	_selected_skill=skill; _selected_item.clear(); _selected_choice.clear(); _show_items=false; _show_techniques=false; _selected_technique=""
 	open()
 	_hint_label.text="选择来源后点击目标快捷槽；也可先绑定默认动作，再用M切换。"
 
@@ -95,8 +97,8 @@ func _build_ui() -> void:
 	var library:=VBoxContainer.new(); library.size_flags_horizontal=Control.SIZE_EXPAND_FILL; library.custom_minimum_size.x=310
 	content.add_child(library)
 	var tabs:=HBoxContainer.new(); library.add_child(tabs)
-	for pair in [["基础动作",false],["可用物品",true]]:
-		var button:=FoundationWidgets.button(pair[0],func(): _show_items=pair[1]; _selected_skill=null; _selected_item.clear(); _selected_choice.clear(); _refresh_all())
+	for pair in [["基础动作",0],["可用物品",1],["武技",2]]:
+		var button:=FoundationWidgets.button(pair[0],func(): _show_items=pair[1]==1; _show_techniques=pair[1]==2; _selected_technique=""; _selected_skill=null; _selected_item.clear(); _selected_choice.clear(); _refresh_all())
 		tabs.add_child(button)
 	var scroll:=ScrollContainer.new(); scroll.size_flags_vertical=Control.SIZE_EXPAND_FILL
 	library.add_child(scroll)
@@ -173,7 +175,10 @@ func _on_slot_clicked(event: InputEvent, source: String) -> void:
 	if not event is InputEventMouseButton:
 		return
 	if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-		if not _selected_item.is_empty() and _skill_manager:
+		if not _selected_technique.is_empty() and _skill_manager:
+			_skill_manager.shortcuts.bind_technique(source,_selected_technique)
+			_selected_technique=""; _refresh_all()
+		elif not _selected_item.is_empty() and _skill_manager:
 			_skill_manager.shortcuts.bind_item(source,_selected_item.item_id,str(_selected_item.get("uid","")))
 			_selected_item.clear(); _refresh_all()
 		elif _selected_skill and _skill_manager:
@@ -234,6 +239,11 @@ func _refresh_detail() -> void:
 	heading.text = _selected_skill.display_name if _selected_skill else "快捷项详情"
 	GameUIStyle.apply_label(heading, 16, GameUIStyle.GOLD)
 	_detail_box.add_child(heading)
+	if not _selected_technique.is_empty():
+		var data:=MartialArts.definition(_selected_technique)
+		heading.text=data.title
+		_detail_box.add_child(FoundationWidgets.label(data.description+"\n体力 %.0f · 冷却 %.0f秒\n点击右侧快捷键绑定。"%[data.profile.stamina_cost,data.cooldown],12,true))
+		return
 	if not _selected_item.is_empty():
 		var view:=QuickslotView.item_state(_skill_manager.get_parent(),_selected_item)
 		heading.text=view.title
@@ -241,7 +251,7 @@ func _refresh_detail() -> void:
 		return
 	if not _selected_skill:
 		var empty := Label.new()
-		empty.text = "选择基础动作或物品，再点右侧快捷槽。E和1相互独立；右键清空。"
+		empty.text = "选择基础动作、武技或物品，再点右侧快捷槽。E和1相互独立；右键清空。"
 		GameUIStyle.apply_label(empty, 10, GameUIStyle.TEXT_MUTED)
 		_detail_box.add_child(empty)
 		return
@@ -289,7 +299,7 @@ func _refresh_detail() -> void:
 			modifiers.item_selected.connect(func(index: int): _selected_choice["modifier"]=modifier_ids[index])
 			_detail_box.add_child(modifiers)
 			var source_hint: String="脚下"+FireSigil.title_for(payload.source_field) if payload.source_kind=="field" else "附近真实残魂" if payload.source_kind=="soul" else ""
-			_detail_box.add_child(FoundationWidgets.label(payload.describe()+"\n必需来源："+(source_hint if not source_hint.is_empty() else "无额外场地来源")+"\n实物："+(_skill_manager.combinations.supplies.title(payload.material_id)+" ×"+str(payload.quantity) if not payload.material_id.is_empty() else "不消耗材料")+"\n绑定后固定此来源；不自动准备条件或串联动作。",11,true))
+			_detail_box.add_child(FoundationWidgets.label(payload.describe(_skill_manager.get_parent().actor_context.rules.timed_fields if _skill_manager.get_parent().get("actor_context") else false)+"\n必需来源："+(source_hint if not source_hint.is_empty() else "无额外场地来源")+"\n实物："+(_skill_manager.combinations.supplies.title(payload.material_id)+" ×"+str(payload.quantity) if not payload.material_id.is_empty() else "不消耗材料")+"\n绑定后固定此来源；不自动准备条件或串联动作。",11,true))
 	if not _is_skill_unlocked(_selected_skill):
 		var locked := Label.new()
 		locked.text = "未解锁 · %s Lv.%d" % [_school_name(_selected_skill.school), _unlock_level(_selected_skill)]
@@ -358,6 +368,8 @@ func _refresh_grid() -> void:
 	for child in _skill_grid.get_children():
 		child.queue_free()
 	_skill_grid.columns=2 if _show_items else 3
+	if _show_techniques:
+		_refresh_techniques(); return
 	if _show_items:
 		_refresh_items(); return
 	if not _skill_pool: return
@@ -458,6 +470,11 @@ func _refresh_equip_slots() -> void:
 			var operation:=SpellOperationCatalog.default_catalog().operation(skill.operation_id)
 			var payload:=operation.payload(str(choice.get("payload",""))) if operation else null
 			sub_lbl.text=display_label+(" · 固定"+payload.title if payload else " · 跟随M" if operation else " · 动作")+(" · 强化%d"%total_ranks if total_ranks>0 else "")
+		elif _skill_manager.shortcuts.binding(src).get("kind","")=="technique":
+			var data:=MartialArts.definition(_skill_manager.shortcuts.binding(src).technique_id)
+			tex.texture=GameUIStyle.icon("swords"); tex.modulate=Color.WHITE
+			name_lbl.text=data.title; sub_lbl.text=display_label+" · 武技"
+			panel.tooltip_text=data.description
 		elif _skill_manager.shortcuts.binding(src).get("kind","")=="item":
 			var view:=QuickslotView.item_state(_skill_manager.get_parent(),_skill_manager.shortcuts.binding(src))
 			tex.texture=view.icon; tex.modulate=Color.WHITE
@@ -565,3 +582,17 @@ func _refresh_items() -> void:
 				if event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_LEFT and event.pressed:
 					_selected_item=binding; _selected_skill=null; _selected_choice.clear(); _refresh_detail())
 			_skill_grid.add_child(card)
+
+func _refresh_techniques() -> void:
+	if not _skill_manager: return
+	var actor:=_skill_manager.get_parent() as Player
+	if not actor or not actor.actor_context: return
+	_skill_grid.columns=1
+	for id in MartialArts.IDS:
+		var data:=MartialArts.definition(id)
+		var known: bool=actor.actor_context.martial.learned.has(id)
+		var button:=FoundationWidgets.button(data.title+(" · 已学" if known else " · 训练师或武技书"),_select_technique.bind(id),not known)
+		_skill_grid.add_child(button)
+func _select_technique(id: String) -> void:
+	_selected_skill=null; _selected_item.clear(); _selected_choice.clear(); _selected_technique=id
+	_refresh_detail()

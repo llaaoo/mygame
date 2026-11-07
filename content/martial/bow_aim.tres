@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="MartialTechnique" format=3]
+[ext_resource type="Script" path="res://gameplay/martial/martial_technique.gd" id="tech"]
+[ext_resource type="Script" path="res://gameplay/foundation/data/attack_profile.gd" id="attack"]
+[sub_resource type="Resource" id="Attack"]
+script = ExtResource("attack")
+windup = 0.85
+active = 0.08
+recovery = 0.55
+reach = 680
+angle_degrees = 8
+stamina_cost = 24
+impact = 35
+damage_multiplier = 1.8
+ammo_id = "arrow"
+projectile_speed = 820.0
+[resource]
+script = ExtResource("tech")
+id = "bow_aim"
+title = "蓄力穿射"
+weapon_type = "bow"
+description = "站定蓄力，较远射程与高冲击；消耗24体力及1支实物箭，不花MP。"
+profile = SubResource("Attack")

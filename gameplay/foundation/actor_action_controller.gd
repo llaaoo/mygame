@@ -1,6 +1,8 @@
 class_name ActorActionController
 extends Node2D
 ## One physical action executor for every actor. Clocks are driven once in physics.
+signal action_refused(reason: String)
+var _feedback_cooldown := 0.0
 var context: ActorContext
 var stamina: StaminaComponent
 var stability: StabilityComponent
@@ -26,12 +28,18 @@ var needs:=SurvivalNeeds.new()
 var input_suppressed := 0.0
 var operation_id := 0
 var attack_weapon_uid := ""
+var combo_index := 0
+var combo_remaining := 0.0
+var combo_weapon := ""
+var _launched := false
+var _ammo_uid := ""
 func active() -> bool:
 	return context and context.rules and context.rules.tactical_combat
 func busy() -> bool: return mode!="idle"
 func _physics_process(delta: float) -> void:
 	if not active() or not is_instance_valid(context.actor): return
 	if context.actor.process_mode==Node.PROCESS_MODE_DISABLED: return
+	_feedback_cooldown=maxf(0,_feedback_cooldown-delta)
 	input_suppressed=maxf(0,input_suppressed-delta)
 	if "ui_blocked" in context.actor and context.actor.ui_blocked:
 		clear_input()
@@ -39,7 +47,11 @@ func _physics_process(delta: float) -> void:
 		return
 	if input_provider.is_valid() and input_suppressed==0:
 		movement=Vector2.ZERO
-		for action: Action in input_provider.call(): try_action(action)
+		for action: Action in input_provider.call():
+			var result:=try_action(action)
+			if not result.accepted and result.reason not in ["buffered","unpaired_release"] and action.action_type in [Action.ActionType.TECHNIQUE,Action.ActionType.MELEE,Action.ActionType.HEAVY_ATTACK] and _feedback_cooldown<=0:
+				_feedback_cooldown=.8
+				action_refused.emit({"stamina":"体力不足","ammunition":"口袋中缺少箭矢","busy":"当前动作尚未结束","stale_binding":"快捷绑定已改变","controlled":"控制状态中","stagger":"失衡中"}.get(result.reason,result.reason))
 	advance(delta)
 func try_action(action: Action) -> OperationResult:
 	var actor:=context.actor if context else null
@@ -53,7 +65,7 @@ func try_action(action: Action) -> OperationResult:
 		var casting: PlayerCastingController=actor.casting
 		if not casting.aiming_sources.has(action.skill_source) and casting._channeling_source!=action.skill_source and not casting._charge_source_matches(action.skill_source): return OperationResult.reject("unpaired_release")
 	if mode=="spray" and action.action_type in [Action.ActionType.DODGE,Action.ActionType.MELEE,Action.ActionType.HEAVY_ATTACK]: context.spray.stop()
-	if mode=="item" and (action.action_type in [Action.ActionType.MELEE,Action.ActionType.HEAVY_ATTACK,Action.ActionType.DODGE,Action.ActionType.CAST] or action.action_type==Action.ActionType.MOVE and action.direction.length_squared()>.01): cancel("other_action")
+	if mode=="item" and (action.action_type in [Action.ActionType.MELEE,Action.ActionType.HEAVY_ATTACK,Action.ActionType.TECHNIQUE,Action.ActionType.DODGE,Action.ActionType.CAST] or action.action_type==Action.ActionType.MOVE and action.direction.length_squared()>.01): cancel("other_action")
 	match action.action_type:
 		Action.ActionType.MOVE:
 			movement=action.direction.limit_length(1)
@@ -92,14 +104,32 @@ func try_action(action: Action) -> OperationResult:
 			if not ("field_work" in actor and actor.field_work) and not context.item_actions.busy() and SurvivalCatalog.FOODS.has(action.skill_id):
 				mode="item"; elapsed=0; remaining=SurvivalCatalog.FOODS[action.skill_id].seconds; movement=Vector2.ZERO
 			return OperationResult.success()
-		Action.ActionType.MELEE,Action.ActionType.HEAVY_ATTACK:
+		Action.ActionType.MELEE,Action.ActionType.HEAVY_ATTACK,Action.ActionType.TECHNIQUE:
 			if busy(): return _queue(action)
 			var equipment:=actor.get_node_or_null("EquipmentManager") as EquipmentManager
 			var weapon:=equipment.get_equipment(EquipmentData.SlotType.RIGHT_HAND) if equipment else null
-			profile=weapon.attack_profile if weapon and weapon.attack_profile else AttackProfile.new()
-			attack_weapon_uid=str(context.items.equipped(context.id).get(str(EquipmentData.SlotType.RIGHT_HAND),""))
-			if action.action_type==Action.ActionType.HEAVY_ATTACK: profile=profile.heavy()
-			if not stamina.spend(profile.stamina_cost*burden_cost()*activity_efficiency(SkillMastery.School.MELEE)): return OperationResult.reject("stamina")
+			var weapon_uid:=str(context.items.equipped(context.id).get(str(EquipmentData.SlotType.RIGHT_HAND),""))
+			var next_combo:=0 if combo_remaining<=0 or combo_weapon!=weapon_uid else combo_index
+			var candidate:=weapon.attack_profile if weapon and weapon.attack_profile else AttackProfile.new()
+			if weapon and weapon.moveset and not weapon.moveset.attacks.is_empty(): candidate=weapon.moveset.attacks[next_combo%weapon.moveset.attacks.size()]
+			if action.action_type==Action.ActionType.TECHNIQUE:
+				if not action.skill_source.is_empty():
+					var manager:=actor.get_node("SkillManager") as SkillManager
+					if manager.shortcuts.revision(action.skill_source)!=int(action.params.get("binding_revision",-1)) or manager.shortcuts.binding(action.skill_source).get("technique_id","")!=action.skill_id: return OperationResult.reject("stale_binding")
+				var reason:=context.martial.reason(action.skill_id,context)
+				if not reason.is_empty(): return OperationResult.reject(reason)
+				candidate=MartialArts.definition(action.skill_id).profile
+			elif action.action_type==Action.ActionType.HEAVY_ATTACK: candidate=candidate.heavy()
+			var cost:=candidate.stamina_cost*burden_cost()*activity_efficiency(SkillMastery.School.MELEE)
+			if stamina.current<cost: return OperationResult.reject("stamina")
+			var ammo_uid:=context.items.ready_uid(context.id,candidate.ammo_id) if not candidate.ammo_id.is_empty() else ""
+			if not candidate.ammo_id.is_empty() and ammo_uid.is_empty(): return OperationResult.reject("ammunition")
+			stamina.spend(cost)
+			profile=candidate; attack_weapon_uid=weapon_uid; _launched=false; _ammo_uid=ammo_uid
+			combo_weapon=weapon_uid
+			combo_index=(next_combo+1)%weapon.moveset.attacks.size() if weapon and weapon.moveset and action.action_type==Action.ActionType.MELEE else 0
+			combo_remaining=remaining+profile.windup+profile.active+profile.recovery+(weapon.moveset.chain_window if weapon and weapon.moveset else 0.0)
+			if action.action_type==Action.ActionType.TECHNIQUE: context.martial.accepted(action.skill_id,context.items.clock_seconds)
 			_cancel_work(); _cancel_cast()
 			needs.exert(.2,context.actor.get_node("StatsComponent").effective_stat("endurance"))
 			mode="attack"; elapsed=0; remaining=profile.windup+profile.active+profile.recovery
@@ -130,6 +160,7 @@ func advance(delta: float) -> void:
 	var actor:=context.actor
 	if actor.get_node("HealthComponent").is_dead:
 		cancel("dead"); return
+	combo_remaining=maxf(0,combo_remaining-delta)
 	_move_age+=delta
 	if _move_age>.3 and not input_provider.is_valid(): movement=Vector2.ZERO
 	_buffer_time=maxf(0,_buffer_time-delta)
@@ -154,7 +185,11 @@ func advance(delta: float) -> void:
 		if mode=="attack" and elapsed>=profile.windup and old_elapsed<profile.windup+profile.active:
 			var after:=elapsed
 			elapsed=minf(elapsed,profile.windup+profile.active)
-			_scan_contacts()
+			if profile.projectile_speed>0:
+				if not _launched:
+					_launched=true
+					_launch_arrow()
+			else: _scan_contacts()
 			elapsed=after
 		if remaining==0 and mode not in ["aim_item","spray"] and not (mode=="item" and context.item_actions.busy()):
 			if mode=="stagger": stability.recovered()
@@ -180,6 +215,16 @@ func advance(delta: float) -> void:
 		if not busy() and not guarding: facing=direction.normalized()
 	if "facing_direction" in actor: actor.facing_direction=facing
 	queue_redraw()
+func _launch_arrow() -> void:
+	if str(context.items.equipped(context.id).get(str(EquipmentData.SlotType.RIGHT_HAND),""))!=attack_weapon_uid or not context.items.spend_instance(context.id,_ammo_uid,"quantity",1):
+		action_refused.emit("箭矢或武器来源已改变，射击取消。")
+		return
+	_ammo_uid=""
+	var arrow:=WeaponArrow.new(); arrow.context=context; arrow.profile=profile; arrow.direction=facing; arrow.family=_family
+	var coating:=context.items.coating(attack_weapon_uid)
+	if coating:
+		arrow.tags.append_array(coating.payload.tags); arrow.statuses=coating.payload.statuses.duplicate()
+	context.region.root.add_child(arrow); arrow.global_position=context.actor.global_position
 func _scan_contacts() -> void:
 	var actor:=context.actor
 	var shape:=CircleShape2D.new()
@@ -251,6 +296,7 @@ func defend(hit: HitContext,result: HitResult,impact: float) -> void:
 		var duration:=stability.receive(impact)
 		if duration>0: interrupt(duration)
 func interrupt(seconds: float) -> void:
+	combo_remaining=0; combo_index=0; _ammo_uid=""
 	if context.item_actions: context.item_actions.cancel()
 	if context.spray: context.spray.stop()
 	_cancel_work(); _cancel_cast()
@@ -258,6 +304,7 @@ func interrupt(seconds: float) -> void:
 	var duration:=maxf(seconds,remaining if mode=="stagger" else 0.0)
 	mode="stagger"; elapsed=0; remaining=duration
 func cancel(_reason := "cancelled") -> void:
+	combo_remaining=0; combo_index=0; _ammo_uid=""
 	operation_id+=1
 	mode="idle"; remaining=0; elapsed=0
 	_hit_targets.clear()
@@ -290,4 +337,15 @@ func activity_efficiency(school: SkillMastery.School) -> float:
 
 func can_guard() -> bool:
 	var manager:=context.actor.get_node_or_null("EquipmentManager") as EquipmentManager
+	var weapon:=manager.get_equipment(EquipmentData.SlotType.RIGHT_HAND) if manager else null
+	if weapon and weapon.moveset and weapon.moveset.weapon_type=="bow": return false
 	return manager and manager.get_all_equipped().any(func(item): return item.world_shape in ["shield","blade","spear","staff"])
+
+## A time jump advances recovery but never moves a physics body by hours of delta.
+func rest_elapsed(seconds: float) -> void:
+	if context.item_actions: context.item_actions.cancel()
+	if context.spray: context.spray.stop()
+	_cancel_cast()
+	cancel("rest_time")
+	stamina.advance(seconds)
+	stability.advance(seconds)

@@ -22,7 +22,9 @@ var _active_set_bonuses: Array[Dictionary] = []
 func equip(equipment: EquipmentData) -> bool:
 	if inventory_store and equipment:
 		var uid:=inventory_store.find_owned(actor_id,equipment.id)
-		if uid.is_empty(): return get_equipment(equipment.slot_type)==equipment
+		if uid.is_empty():
+			var current:=get_equipment(equipment.slot_type)
+			return current!=null and current.id==equipment.id
 		return inventory_store.equip(actor_id,uid).accepted
 	if not equipment:
 		return false
@@ -208,12 +210,16 @@ func bind_inventory(store: InventoryService,id: String) -> void:
 	_refresh_from_store()
 func _refresh_from_store() -> void:
 	var worn:=inventory_store.equipped(actor_id)
-	if worn==_store_loadout: return
-	_store_loadout=worn
+	var signature:=worn.duplicate(true)
+	for slot in worn:
+		var item:=inventory_store.item(worn[slot])
+		if item: signature["properties."+str(slot)]=item.properties.duplicate(true)
+	if signature==_store_loadout: return
+	_store_loadout=signature
 	_equipped.clear()
 	for slot in worn:
 		var instance:=inventory_store.item(worn[slot])
-		if instance: _equipped[int(slot)]=inventory_store.definitions.get(instance.definition_id)
+		if instance: _equipped[int(slot)]=inventory_store.equipment_definition(instance.uid)
 	_rebuild_loadout_effects()
 	loadout_changed.emit()
 func _exit_tree() -> void:

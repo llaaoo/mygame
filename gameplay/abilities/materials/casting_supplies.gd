@@ -30,6 +30,7 @@ func _init() -> void:
 	for id in MATERIAL_IDS:
 		catalog[id] = load("res://content/casting_materials/%s.tres" % id)
 		crafting_recipes[id] = load("res://content/crafting/%s.tres" % id)
+	for id in ["arrows","guard_tonic","clear_tonic"]: crafting_recipes[id]=load("res://content/crafting/%s.tres"%id)
 	for recipe in SpellOperationCatalog.default_catalog().recipes: crafting_recipes[recipe.id]=recipe
 
 func count(id: String) -> int:

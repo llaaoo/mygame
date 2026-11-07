@@ -88,6 +88,9 @@ func _draw() -> void:
 				draw_line(Vector2(13, 6), Vector2(26, -17), Color("151c22"), 6)
 				draw_line(Vector2(13, 6), Vector2(26, -17), c, 3)
 				draw_line(Vector2(10, 0), Vector2(21, 5), Color("a88343"), 3)
+			"bow":
+				draw_arc(Vector2(12,0),19,-PI/2,PI/2,20,c,3,true)
+				draw_line(Vector2(12,-19),Vector2(12,19),Color("ddd0ad"),1,true)
 			"spear":
 				draw_line(Vector2(15, 19), Vector2(20, -23), Color("654d35"), 3)
 				draw_colored_polygon(PackedVector2Array([Vector2(16, -20), Vector2(20, -32), Vector2(24, -20)]), c)

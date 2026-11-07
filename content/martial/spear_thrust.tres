@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="MartialTechnique" format=3]
+[ext_resource type="Script" path="res://gameplay/martial/martial_technique.gd" id="tech"]
+[ext_resource type="Script" path="res://gameplay/foundation/data/attack_profile.gd" id="attack"]
+[sub_resource type="Resource" id="Attack"]
+script = ExtResource("attack")
+windup = 0.38
+active = 0.14
+recovery = 0.52
+reach = 145
+angle_degrees = 26
+stamina_cost = 25
+impact = 38
+damage_multiplier = 1.6
+[resource]
+script = ExtResource("tech")
+id = "spear_thrust"
+title = "贯步刺"
+weapon_type = "spear"
+description = "狭窄长距离刺击，提前拉开身位换取命中；消耗25体力，不花MP。"
+profile = SubResource("Attack")

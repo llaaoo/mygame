@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="EquipmentData" format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/equipment_data.gd" id="item"]
+[ext_resource type="Resource" path="res://content/weapons/bow.tres" id="moves"]
+[ext_resource type="Script" path="res://gameplay/inventory/data/casting_equipment_profile.gd" id="cast"]
+[sub_resource type="Resource" id="Cast"]
+script = ExtResource("cast")
+[resource]
+script = ExtResource("item")
+casting_profile = SubResource("Cast")
+icon_atlas_index = 18
+id = "river_bow"
+display_name = "河谷猎弓"
+description = "左键拉弓，起手承诺较长，命中会被墙阻挡。每次消耗口袋中一支箭；没有箭会拒绝。无法格挡。"
+slot_type = 6
+item_type = 3
+weight = 1.8
+sell_price = 10
+world_shape = "bow"
+world_color = Color(0.65,0.43,0.24,1)
+moveset = ExtResource("moves")
+stat_modifiers = {"attack_damage":2}

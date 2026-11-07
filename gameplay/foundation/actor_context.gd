@@ -11,6 +11,7 @@ var relations: RelationService
 var item_actions: Node
 var spray: Node
 var actions: ActorActionController
+var martial:=MartialArts.new()
 var inspect_requested: Callable
 var hostile_requested: Callable
 var panel_requested: Callable

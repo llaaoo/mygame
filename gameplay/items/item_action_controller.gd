@@ -26,6 +26,7 @@ func begin(id: String,aim := false,requested_direction:=Vector2.ZERO,shortcut_so
 	var definition:=context.items.definitions.get(source.definition_id) as ItemData
 	if not definition or not definition.use_profile or definition.use_profile.kind==ItemUseDefinition.Kind.SPRAY: return false
 	profile=definition.use_profile
+	if profile.kind==ItemUseDefinition.Kind.BOOK and context.martial.learned.has(profile.technique_id): return false
 	weapon_uid=str(context.items.equipped(context.id).get(str(EquipmentData.SlotType.RIGHT_HAND),""))
 	if profile.kind==ItemUseDefinition.Kind.COATING and weapon_uid.is_empty(): return false
 	if context.actions.stamina.current<profile.stamina: return false
@@ -73,6 +74,7 @@ func advance(delta: float) -> void:
 func commit() -> bool:
 	if not busy() or not available() or not context.region.available(generation) or context.actions.operation_id!=operation_id or context.actor.get_node("HealthComponent").hp<hp or context.items.locate(uid)!=context.id+".pocket": cancel(); return false
 	if profile.kind==ItemUseDefinition.Kind.COATING and str(context.items.equipped(context.id).get(str(EquipmentData.SlotType.RIGHT_HAND),""))!=weapon_uid: cancel(); return false
+	if profile.kind==ItemUseDefinition.Kind.BOOK and context.martial.learned.has(profile.technique_id): cancel(); return false
 	var plan:=CastPlan.new(); plan.actor=context.actor; plan.action=SkillData.new(); plan.action.operation_id="item_use"; plan.stamina_cost=profile.stamina
 	plan.instance_costs=[{"uid":uid,"property":"quantity","amount":1}]
 	var supplies: CastingSupplies=context.actor.get_node("SkillManager").combinations.supplies
@@ -83,6 +85,11 @@ func commit() -> bool:
 		if not weapon: transaction.rollback(); cancel(); return false
 		var props:=weapon.properties.duplicate(true); props.coating={"id":profile.id,"expires_at":context.items.clock_seconds+profile.coating_seconds}
 		context.items.set_properties(weapon_uid,props)
+	elif profile.kind==ItemUseDefinition.Kind.CONSUMABLE:
+		var buffs:=context.actor.get_node("BuffManager") as BuffManager
+		for status in profile.payload.statuses: buffs.apply_buff(status,context.actor)
+	elif profile.kind==ItemUseDefinition.Kind.BOOK:
+		context.martial.learn(profile.technique_id)
 	else:
 		var projectile: ThrownDose=projectile_factory.call() if projectile_factory.is_valid() else ThrownDose.new()
 		if not is_instance_valid(projectile): transaction.rollback(); cancel(); return false

@@ -21,6 +21,7 @@ func _physics_process(delta: float) -> void:
 	if context.items.pay(context.id,{item_id:1},true):
 		context.actions.needs.consume(item_id)
 		var buffs:=context.actor.get_node_or_null("BuffManager") as BuffManager
+		if buffs and item_id in ["ration","broth"]: buffs.apply_buff(load("res://content/status/%s.tres"%("meal_fortitude" if item_id=="ration" else "broth_fortitude")))
 		if buffs and item_id=="tea": buffs.remove_status("poison")
 		if buffs and item_id=="dirty_water": buffs.apply_buff(load("res://gameplay/abilities/data/poison.tres"))
 		NeedsRecovery.apply(context.actor,context.actions.needs)
