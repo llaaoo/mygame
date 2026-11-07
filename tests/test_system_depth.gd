@@ -132,7 +132,11 @@ func run() -> void:
 	check(not actor.field_work.start_selected(),"Poisoned actor bypassed safe-rest gate")
 	actor.field_work.close_panel(); buffs.remove_status("poison")
 	# Physical save/reentry preserves identities, upgrade, knowledge and buff remainder.
+	make_ready(store,"ration")
+	game.survival.begin_eating("ration"); actor.field_work.tick(2)
 	buffs.apply_buff(load("res://content/status/guard_tonic.tres")); buffs.tick(14)
+	actor.health_component.hp=actor.health_component.max_hp
+	var saved_health:=actor.health_component.hp
 	var clock:=store.clock_seconds
 	game._save_progress()
 	await fixture.close()
@@ -141,7 +145,9 @@ func run() -> void:
 	check(store.item(uid)!=null and store.item(uid).properties.upgrade_level==1 and actor.actor_context.martial.learned.has("spear_thrust"),"Save/reentry lost gear or knowledge")
 	check(store.clock_seconds>=clock and store.clock_seconds<clock+2 and WorldTime.instance.day()==2,"Save/reentry reset persistent time")
 	var restored: Array=actor.get_node("BuffManager").provision_state()
-	check(restored.size()==1 and restored[0].remaining<=76 and restored[0].remaining>73,"Save/reentry refilled potion duration")
+	var tonic: Array=restored.filter(func(entry): return entry.id=="guard_tonic")
+	check(restored.size()==2 and tonic.size()==1 and tonic[0].remaining<=76 and tonic[0].remaining>73,"Save/reentry refilled potion duration")
+	check(actor.health_component.hp==saved_health and actor.health_component.max_hp>=saved_health and saved_health>100,"Save/reentry clamped food-boosted health before restoring its buff")
 	var invalid:=game.session.snapshot(); invalid.actors.player.martial.ready_at={"blade_breaker":NAN}
 	check(not CampaignSession.valid_snapshot(invalid),"Invalid physical cooldown accepted from save")
 	await fixture.close()

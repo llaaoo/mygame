@@ -122,10 +122,6 @@ func bind_actor(actor: CharacterBody2D,id: String,legacy_counts: Dictionary = {}
 		if not actor.skill_manager.binding_changed.is_connected(actor.input_controller.shortcut_changed): actor.skill_manager.binding_changed.connect(actor.input_controller.shortcut_changed)
 	return context
 func _restore_actor(actor: CharacterBody2D,record: Dictionary) -> void:
-	var health:=actor.get_node("HealthComponent") as HealthComponent
-	health.hp=clampi(int(record.get("hp",health.hp)),1,health.max_hp)
-	var mana:=actor.get_node_or_null("ManaComponent") as ManaComponent
-	if mana: mana.mp=clampi(int(record.get("mp",mana.mp)),0,mana.max_mp)
 	if record.get("position") is Array: actor.position=Vector2(float(record.position[0]),float(record.position[1]))
 	if "story_truce" in actor: actor.story_truce=bool(record.get("truce",actor.story_truce))
 	actor.actor_context.actions.stamina.restore(record.get("stamina",{}))
@@ -137,6 +133,10 @@ func _restore_actor(actor: CharacterBody2D,record: Dictionary) -> void:
 	for entry in provisions: entry.remaining=maxf(0,float(entry.remaining)-away)
 	provisions=provisions.filter(func(entry): return entry.remaining>0)
 	(actor.get_node("BuffManager") as BuffManager).restore_provisions(provisions)
+	var health:=actor.get_node("HealthComponent") as HealthComponent
+	health.hp=clampi(int(record.get("hp",health.hp)),1,health.max_hp)
+	var mana:=actor.get_node_or_null("ManaComponent") as ManaComponent
+	if mana: mana.mp=clampi(int(record.get("mp",mana.mp)),0,mana.max_mp)
 func capture_actors() -> void:
 	if not rules.physical_inventory: return
 	for id in actors:
