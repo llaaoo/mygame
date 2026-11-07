@@ -6,7 +6,7 @@ var interface_root: Node
 var world_root: Node2D
 var session: CampaignSession
 var rules: RulesetDefinition=RulesetDefinition.new()
-var catalog := ExplorationContentCatalog.new()
+var catalog: ExplorationContentCatalog
 const SAVE_SLOT := 2
 const SECTION := "exploration_mvp"
 var save_slot := SAVE_SLOT
@@ -39,10 +39,11 @@ var deliveries: SupplyDeliveryService
 var alchemy: AlchemyRepairService
 var survival: SurvivalService
 var retreat: ExpeditionRetreat
-var _generator := RunRoomGenerator.new()
 var _renderer := PrisonArena.new()
 
 func _ready() -> void:
+	if not catalog:
+		catalog=ExplorationContentCatalog.new()
 	interface_root=Node.new()
 	interface_root.name="Interface"
 	add_child(interface_root)

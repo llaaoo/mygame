@@ -200,6 +200,9 @@ func _setup_combat_debugger() -> void:
 	player.get_parent().add_child.call_deferred(debug_ui)
 
 func _setup_quest_manager() -> void:
+	# Campaign quests are owned by ExplorationProgressService, not the legacy NPC tracker.
+	if player.exploration_mode:
+		return
 	if player.quest_manager:
 		return
 	player.quest_manager = QuestManager.new(player)

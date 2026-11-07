@@ -1,0 +1,303 @@
+{
+  "all_authored_skill_definition_count": 69,
+  "authored_skills_without_direct_current_source": [
+    "arcane_dash",
+    "blizzard",
+    "charged_fireball",
+    "cinder_volley",
+    "ember_orb",
+    "flame_storm",
+    "frost_lance",
+    "glacial_orb",
+    "ice_armor",
+    "ice_explosion",
+    "ice_storm",
+    "lightning_bolt",
+    "magma_pool",
+    "miasma_ring",
+    "phase_blink",
+    "plague_bolt",
+    "radiant_aegis",
+    "shadow_bolt",
+    "shadow_step",
+    "solar_spear",
+    "static_nova",
+    "storm_field",
+    "summon_golem",
+    "summon_skeleton",
+    "summon_wisp",
+    "thunder_orb",
+    "tidal_orb",
+    "venom_burst"
+  ],
+  "conditional_results_with_sources": {
+    "ancestral_ward": "soul_focus",
+    "arcane_burst": "arcane_energy_pulse",
+    "echo_barrage": "echo_spark",
+    "echo_wave": "echo_pulse",
+    "ember_focus": "terrain_fire_focus",
+    "fire_sigil_burst": "fire_energy_pulse",
+    "fireball": "fire_energy_ignite",
+    "flow_attunement": "terrain_water_focus",
+    "frost_bolt": "frost_energy_ignite",
+    "frost_ring": "frost_energy_pulse",
+    "frost_stride": "terrain_frost_focus",
+    "guard_release": "ward_energy_pulse",
+    "resonant_guard": "ward_focus",
+    "restoring_echo": "echo_water",
+    "soul_cleanse": "soul_water",
+    "soul_lance": "soul_spark",
+    "soul_nova": "soul_pulse",
+    "spore_bolt": "echo_venom",
+    "static_focus": "terrain_lightning_focus",
+    "storm_bolt": "storm_energy_ignite",
+    "storm_ring": "storm_energy_pulse",
+    "venom_accord": "terrain_poison_focus"
+  },
+  "crafting_recipe_count": 20,
+  "crafting_recipe_world_sources": {
+    "ash": [
+      "river.handbook"
+    ],
+    "echo_ink": [
+      "river.echo"
+    ],
+    "fire_rag": [
+      "river.handbook"
+    ],
+    "fire_stone": [
+      "river.handbook"
+    ],
+    "frost_salt": [
+      "river.focus"
+    ],
+    "oil_bottle": [
+      "river.handbook"
+    ],
+    "paralytic_bottle": [
+      "river.venom"
+    ],
+    "paralytic_extract": [
+      "river.venom"
+    ],
+    "paralytic_sprayer": [
+      "river.venom"
+    ],
+    "poison_rag": [
+      "river.handbook"
+    ],
+    "potent_sprayer": [
+      "river.venom"
+    ],
+    "potent_venom": [
+      "river.venom"
+    ],
+    "resin": [
+      "river.handbook"
+    ],
+    "resin_sprayer": [
+      "river.handbook"
+    ],
+    "storm_dust": [
+      "river.storm"
+    ],
+    "venom_bottle": [
+      "river.venom"
+    ],
+    "venom_extract": [
+      "river.venom"
+    ],
+    "venom_sprayer": [
+      "river.venom"
+    ],
+    "ward_powder": [
+      "river.focus"
+    ],
+    "water_sprayer": [
+      "river.handbook"
+    ]
+  },
+  "current_equipment": [
+    "cadence_gloves",
+    "covenant_ring",
+    "keeper_ring",
+    "river_boots",
+    "river_coat",
+    "river_foreman_coat",
+    "river_oath_blade",
+    "river_sabre",
+    "river_shield",
+    "river_spear",
+    "river_staff",
+    "river_survey_spear",
+    "soul_amulet"
+  ],
+  "equipment_world_sources": {
+    "cadence_gloves": [
+      "river_caster",
+      "river.storm"
+    ],
+    "covenant_ring": [
+      "river.prison_reserve"
+    ],
+    "keeper_ring": [
+      "river.pulse"
+    ],
+    "river_boots": [
+      "river_hunter",
+      "river_mine_quartermaster"
+    ],
+    "river_coat": [
+      "river_guard",
+      "river_bridge_keeper"
+    ],
+    "river_foreman_coat": [
+      "river_mine_quartermaster",
+      "river_prison_veteran"
+    ],
+    "river_oath_blade": [
+      "river_prison_veteran"
+    ],
+    "river_sabre": [
+      "river_guard",
+      "river_bridge_keeper"
+    ],
+    "river_shield": [
+      "river_bridge_keeper",
+      "river_prison_veteran"
+    ],
+    "river_spear": [
+      "river_hunter"
+    ],
+    "river_staff": [
+      "river_caster"
+    ],
+    "river_survey_spear": [
+      "river_mine_quartermaster"
+    ],
+    "soul_amulet": [
+      "river.focus"
+    ]
+  },
+  "kind": "authored_resource_sources",
+  "known_pool_definition_count": 11,
+  "legacy_equipment": [
+    "chronoglass",
+    "cinder_amulet",
+    "cinder_boots",
+    "cinder_hood",
+    "cinder_robe",
+    "cinder_staff",
+    "grave_grimoire",
+    "grave_mace",
+    "headsman_axe",
+    "horned_warhelm",
+    "midas_gauntlet",
+    "night_blade",
+    "night_gloves",
+    "night_leggings",
+    "night_mail",
+    "night_mask",
+    "night_ring",
+    "pilgrim_robe",
+    "round_guard",
+    "storm_staff",
+    "sun_crown",
+    "sun_king_plate",
+    "tide_hood",
+    "tide_staff",
+    "vanguard_cuirass",
+    "vanguard_gauntlets",
+    "vanguard_greaves",
+    "vanguard_helmet",
+    "vanguard_shield",
+    "void_robe"
+  ],
+  "legacy_room_skill_rewards": [
+    "fireball",
+    "cinder_volley",
+    "solar_spear",
+    "magma_pool",
+    "ember_orb",
+    "flame_storm",
+    "lightning_bolt",
+    "thunder_orb",
+    "storm_field",
+    "static_nova",
+    "poison_cloud",
+    "plague_bolt",
+    "venom_burst",
+    "miasma_ring",
+    "charged_fireball",
+    "summon_skeleton",
+    "summon_wisp",
+    "summon_golem",
+    "tidal_orb",
+    "radiant_aegis",
+    "frost_lance",
+    "glacial_orb",
+    "ice_armor",
+    "ice_storm",
+    "ice_explosion",
+    "blizzard",
+    "arcane_dash",
+    "shadow_bolt",
+    "shadow_step",
+    "phase_blink"
+  ],
+  "note": "Entries without direct sources may belong to legacy room rewards, skill trees, dynamic elemental knowledge or tools; do not delete from this list alone.",
+  "npc_actions_with_sources": {
+    "fire_sigil": [
+      "river_caster"
+    ],
+    "focus": [
+      "river_hunter",
+      "river_caster",
+      "river_guard",
+      "river_bridge_keeper",
+      "river_mine_quartermaster",
+      "river_prison_veteran"
+    ],
+    "ignite": [
+      "river_caster"
+    ],
+    "venom_mist": [
+      "river_caster"
+    ],
+    "water_call": [
+      "river_caster"
+    ]
+  },
+  "player_actions_with_world_sources": {
+    "disperse": [
+      "river.handbook",
+      "river.venom"
+    ],
+    "focus": [
+      "river.focus",
+      "river.echo"
+    ],
+    "ignite": [
+      "starter"
+    ],
+    "inscribe": [
+      "river.fire",
+      "river.frost",
+      "river.storm"
+    ],
+    "pulse": [
+      "river.pulse"
+    ],
+    "soul_harvest": [
+      "river.soul"
+    ],
+    "water_call": [
+      "river.handbook"
+    ]
+  },
+  "pool_entries_without_direct_current_source": [],
+  "quests": 11,
+  "recipes_without_note_source": [],
+  "regions": 4,
+  "scope": "Grayriver definitions; not a runtime coverage or dead-code proof"
+}

@@ -1,0 +1,159 @@
+[
+  {
+    "label": "开始河谷旅程",
+    "op": "click"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3500.0,
+      2350.0
+    ]
+  },
+  {
+    "capture": "01-handbook-final",
+    "key": "E",
+    "op": "key"
+  },
+  {
+    "label": "记入日志，继续探索",
+    "op": "click"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3850.0,
+      2350.0
+    ]
+  },
+  {
+    "key": "E",
+    "op": "key"
+  },
+  {
+    "label": "记入日志，继续探索",
+    "op": "click"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3400.0,
+      1850.0
+    ]
+  },
+  {
+    "capture": "03-stove-final",
+    "key": "E",
+    "op": "key"
+  },
+  {
+    "key": "Escape",
+    "op": "key"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3100.0,
+      1850.0
+    ]
+  },
+  {
+    "key": "E",
+    "op": "key"
+  },
+  {
+    "label": "加工：火石",
+    "op": "click"
+  },
+  {
+    "label": "继续探索",
+    "op": "click"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3400.0,
+      1260.0
+    ]
+  },
+  {
+    "capture": "06-sign-final",
+    "key": "E",
+    "op": "key"
+  },
+  {
+    "label": "记入日志，继续探索",
+    "op": "click"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3500.0,
+      900.0
+    ]
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3500.0,
+      0.0
+    ]
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3260.0,
+      -780.0
+    ]
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3072.0,
+      -1200.0
+    ],
+    "tolerance": 6.0
+  },
+  {
+    "capture": "07-safe-preparation-final",
+    "key": "E",
+    "op": "key"
+  },
+  {
+    "label": "precombat-final",
+    "op": "save"
+  },
+  {
+    "label": "记入日志，继续探索",
+    "op": "click"
+  },
+  {
+    "key": "M",
+    "op": "key"
+  },
+  {
+    "label": "铭刻法阵 · 凝能阵",
+    "op": "click"
+  },
+  {
+    "capture": "08-select-firestone-final",
+    "label": "选择：火石阵",
+    "op": "click"
+  },
+  {
+    "label": "返回材料总览",
+    "op": "click"
+  },
+  {
+    "label": "继续探索",
+    "op": "click"
+  },
+  {
+    "capture": "09-fireball-result-final",
+    "op": "duel",
+    "style": "combo"
+  },
+  {
+    "op": "quit"
+  }
+]

@@ -1,5 +1,7 @@
 # 📘 项目完整分析文档 — "Study" 项目
 
+> 本文保留早期结构分析；当前入口、实际接入及冗余清理以 [项目使用盘点](PROJECT_USAGE_AUDIT.md) 和 [架构边界](ARCHITECTURE.md) 为准。
+
 > 历史分析资料：本文记录重构前的状态与建议。2026-11-04后的实际模块、已完成项目和测试以[项目架构](./ARCHITECTURE.md)及[重构进展](./REFACTOR_PROGRESS.md)为准。
 
 
