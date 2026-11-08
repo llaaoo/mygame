@@ -3,6 +3,7 @@
 [ext_resource type="Resource" path="res://gameplay/abilities/data/glacial_orb_data.tres" id="effect"]
 [resource]
 script = ExtResource("data")
+affinity = "frost"
 id = "glacial_orb"
 title = "霜盐追踪核"
 description = "霜盐追踪核；消耗真实材料，所选来源失效时拒绝，不自动换源。"

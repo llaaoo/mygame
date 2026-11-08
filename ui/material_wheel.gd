@@ -108,7 +108,7 @@ func _refresh() -> void:
    var old: Dictionary=entries[index]
    var found:=false
    for entry in live:
-    if entry.variant_id==old.variant_id and entry.choice.uid==old.choice.uid:
+    if entry.variant_id==old.variant_id and entry.choice.get("uid","")==old.choice.get("uid",""):
      var updated: Dictionary=entry.duplicate(true); updated["alternatives"]=old.get("alternatives",[])
      entries[index]=updated; found=true; break
    if not found:
@@ -122,7 +122,7 @@ func _refresh() -> void:
   _labels[i].text=""
   if index>=entries.size(): continue
   var entry: Dictionary=entries[index]
-  _labels[i].text=("✓ " if entry.current else "")+entry.title+"\n%d MP"%entry.cost+((" · 瓶%s"%str(entry.choice.uid).trim_prefix("item.")) if not str(entry.choice.uid).is_empty() else "")
+  _labels[i].text=("✓ " if entry.current else "")+entry.title+"\n%d MP"%entry.cost+((" · 瓶%s"%str(entry.choice.get("uid","")).trim_prefix("item.")) if not str(entry.choice.get("uid","")).is_empty() else "")
   _labels[i].add_theme_color_override("font_color",GameUIStyle.TEXT_MAIN if entry.ready else GameUIStyle.TEXT_MUTED)
  _update_detail(); _ring.queue_redraw()
 func _update_detail() -> void:
@@ -169,7 +169,7 @@ func _input(event: InputEvent) -> void:
    if alternatives.size()>1:
     var position:=0
     for i in range(alternatives.size()):
-     if alternatives[i].choice.uid==entries[index].choice.uid: position=i; break
+     if alternatives[i].choice.get("uid","")==entries[index].choice.get("uid",""): position=i; break
     var changed: Dictionary=alternatives[posmod(position+step,alternatives.size())].duplicate(true)
     changed["alternatives"]=alternatives; entries[index]=changed
    else: page=posmod(page+step,maxi(1,ceili(entries.size()/8.0)))

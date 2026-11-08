@@ -18,12 +18,23 @@ func _ready() -> void:
 	interaction.set_callback(func(visitor: Node2D):
 		if can_serve(visitor):
 			if service_request.is_valid(): service_request.call()
-		elif notify.is_valid(): notify.call("当前无法提供服务：未当值、已死亡或关系敌对。"))
+		elif notify.is_valid(): notify.call(service_reason(visitor)))
 	add_child(interaction)
-func can_serve(visitor: Node2D) -> bool:
-	if health_component.is_dead or not working or not actor_context or not is_instance_valid(visitor) or visitor.position.distance_to(position)>=80: return false
+func service_reason(visitor: Node2D) -> String:
+	if health_component.is_dead: return "此人已死亡，无法提供服务。"
+	if not actor_context or not is_instance_valid(visitor): return "服务暂时不可用。"
 	var context:=visitor.get("actor_context") as ActorContext
-	return not context or actor_context.relations.attitude(actor_context.id,context.id)!="hostile"
+	if context and actor_context.relations.attitude(actor_context.id,context.id)=="hostile": return "对方与你敌对，拒绝提供服务。"
+	if visitor.position.distance_to(position)>=80: return "请再靠近一些。"
+	if not working:
+		var hours: PackedStringArray=[]
+		if schedule:
+			for entry in schedule.entries:
+				if entry.target_marker=="work": hours.append("%02d:00—%02d:00"%[entry.start_hour,entry.end_hour])
+		return "当前未当值。"+("当值时段："+"、".join(hours)+"；白天返回工作点，或在篝火按小时休息。" if not hours.is_empty() else "稍后再来。")
+	return ""
+func can_serve(visitor: Node2D) -> bool:
+	return service_reason(visitor).is_empty()
 func _physics_process(delta: float) -> void:
 	if not actor_context or health_component.is_dead: return
 	_clock-=delta

@@ -2,6 +2,7 @@
 [ext_resource type="Script" path="res://gameplay/abilities/operations/spell_payload_data.gd" id="1"]
 [resource]
 script = ExtResource("1")
+affinity = "arcane"
 id = "arcane"
 title = "凝能阵"
 description = "不耗材料；需以震荡手动触发。存续和使用预算见当前规则说明。"

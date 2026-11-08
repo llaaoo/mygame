@@ -3,6 +3,7 @@
 [ext_resource type="Resource" path="res://gameplay/abilities/data/magma_pool_data.tres" id="effect"]
 [resource]
 script = ExtResource("data")
+affinity = "fire"
 id = "magma_pool"
 title = "树脂焚区"
 description = "树脂焚区；消耗真实材料，所选来源失效时拒绝，不自动换源。"

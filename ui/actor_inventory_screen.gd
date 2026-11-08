@@ -49,6 +49,19 @@ func open(focus := "all",ground := "") -> void:
  mode=focus; ground_id=ground; selected=""; selected_slot=-1; container_filter="all"
  _search.text=""; _last_health=actor.health_component.hp
  _dirty=true; show(); GameUIStyle.begin_modal(self); _refresh()
+func open_item(definition_id: String) -> void:
+ open()
+ for container in session.inventory.actor_containers(actor.actor_context.id):
+  for row in session.inventory.entries(container):
+   if row.definition==definition_id:
+    _select(row.uid)
+    var tile: Control=_tiles.get(row.uid)
+    if tile:
+     var parent:=tile.get_parent()
+     while parent:
+      if parent is ScrollContainer: parent.ensure_control_visible(tile)
+      parent=parent.get_parent()
+    return
 func close() -> void:
  _popup.hide(); hide(); GameUIStyle.end_modal(self)
 func _input(event: InputEvent) -> void:

@@ -3,6 +3,7 @@
 [ext_resource type="Resource" path="res://gameplay/abilities/data/resonant_guard_result.tres" id="effect"]
 [resource]
 script = ExtResource("data")
+affinity = "ward"
 id = "attune_ward"
 title = "守护阵调谐"
 effect = ExtResource("effect")

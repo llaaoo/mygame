@@ -45,6 +45,8 @@ func bind_technique(source: String,id: String) -> bool:
 func clear(source: String) -> bool:
 	if source not in SOURCES: return false
 	_bindings.erase(source); _touch(source); return true
+func invalidate_source(source: String) -> void:
+	if instance(source): _touch(source)
 func _touch(source: String) -> void:
 	_revisions[source]=revision(source)+1
 	changed.emit(source)
@@ -70,9 +72,15 @@ static func valid_entry(entry: Variant) -> bool:
 		return not (definition is EquipmentData or definition.use_profile and definition.use_profile.kind==ItemUseDefinition.Kind.SPRAY) or not entry.get("uid","").is_empty()
 	if not entry.get("skill_id","") is String or not entry.get("upgrades",{}) is Dictionary or not entry.get("selection",{}) is Dictionary: return false
 	for key in entry.get("selection",{}):
-		if key not in ["payload","modifier","uid"] or not entry.selection[key] is String: return false
+		if key not in ["payload","modifier","uid","mode"] or not entry.selection[key] is String: return false
 	var choice: Dictionary=entry.get("selection",{})
-	if not choice.is_empty():
+	if choice.has("mode"):
+		if choice!={"mode":"auto"}: return false
+		var supported:=false
+		for candidate in SpellOperationCatalog.default_catalog().operations:
+			if candidate.action.get_id()==entry.get("skill_id","") and candidate.action.operation_id!="disperse" and candidate.payloads.any(func(payload: SpellPayloadData): return not payload.affinity.is_empty()): supported=true
+		if not supported: return false
+	elif not choice.is_empty():
 		var operation: SpellOperationData
 		for candidate in SpellOperationCatalog.default_catalog().operations:
 			if candidate.action.get_id()==entry.get("skill_id",""): operation=candidate; break

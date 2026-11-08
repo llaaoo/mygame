@@ -60,6 +60,10 @@ func open() -> void:
 	GameUIStyle.begin_modal(self)
 
 
+func open_techniques() -> void:
+	_selected_skill=null; _selected_item.clear(); _selected_choice.clear(); _show_items=false; _show_techniques=true; _selected_technique=""
+	open()
+	_refresh_all()
 func open_for(skill: SkillData) -> void:
 	_selected_skill=skill; _selected_item.clear(); _selected_choice.clear(); _show_items=false; _show_techniques=false; _selected_technique=""
 	open()
@@ -208,7 +212,8 @@ func _equip(source: String, skill: SkillData) -> bool:
 		if skill.get_id() in ["ignite","pulse","water_call"]: choice={"payload":"","modifier":"","uid":""}
 		else:
 			var operation:=SpellOperationCatalog.default_catalog().operation(skill.operation_id)
-			if operation and not operation.default_payload.is_empty(): choice={"payload":operation.default_payload,"modifier":"","uid":""}
+			if operation and _skill_manager.spell_forms.supports(skill): choice={"mode":"auto"}
+			elif operation and not operation.default_payload.is_empty(): choice={"payload":operation.default_payload,"modifier":"","uid":""}
 	return _skill_manager.equip_source(source,skill,choice)
 
 func _unequip(source: String) -> void:
@@ -266,15 +271,15 @@ func _refresh_detail() -> void:
 	if not _selected_skill.operation_id.is_empty():
 		var operation:=SpellOperationCatalog.default_catalog().operation(_selected_skill.operation_id)
 		var choices:=OptionButton.new(); choices.fit_to_longest_item=false; choices.clip_text=true
-		choices.add_item("动作默认来源（M按槽切换）")
+		choices.add_item("智能跟随最近施法元素" if _skill_manager.spell_forms.supports(_selected_skill) else "动作默认来源（M按槽切换）")
 		for payload in operation.payloads:
 			choices.add_item(payload.title)
 			if _selected_choice.get("payload","")==payload.id: choices.select(choices.item_count-1)
 		choices.item_selected.connect(func(index: int):
-			_selected_choice={} if index==0 else {"payload":operation.payloads[index-1].id,"modifier":"","uid":""}
+			_selected_choice=({"mode":"auto"} if _skill_manager.spell_forms.supports(_selected_skill) else {}) if index==0 else {"payload":operation.payloads[index-1].id,"modifier":"","uid":""}
 			_refresh_detail())
 		_detail_box.add_child(choices)
-		if not _selected_choice.is_empty():
+		if not _selected_choice.is_empty() and _selected_choice.get("mode","")!="auto":
 			var payload:=operation.payload(str(_selected_choice.payload))
 			if operation.action.operation_id=="disperse":
 				var bottles:=OptionButton.new(); bottles.fit_to_longest_item=false

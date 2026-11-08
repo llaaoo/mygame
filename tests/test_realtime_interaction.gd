@@ -8,7 +8,7 @@ func choose(payload: String,uid := "") -> void:
  var wheel:=game.player.material_wheel
  var index:=-1
  for i in range(wheel.entries.size()):
-  if wheel.entries[i].choice.payload==payload: index=i; break
+  if wheel.entries[i].choice.get("payload","")==payload: index=i; break
  check(index>=0,"Missing wheel payload: "+payload)
  if index<0: return
  while wheel.page!=index/8:
@@ -17,7 +17,7 @@ func choose(payload: String,uid := "") -> void:
  if not uid.is_empty():
   var motion:=InputEventMouseMotion.new(); motion.position=point; motion.global_position=point; root.push_input(motion,true); await frames()
   for attempt in range(8):
-   if wheel.entries[index].choice.uid==uid: break
+   if wheel.entries[index].choice.get("uid","")==uid: break
    await mouse(MOUSE_BUTTON_WHEEL_DOWN,true,point)
  await point_click(point)
 func item_click(uid: String) -> void:
@@ -85,7 +85,7 @@ func run() -> void:
  var wheel:=actor.material_wheel
  var index:=0
  for i in range(wheel.entries.size()):
-  if wheel.entries[i].choice.payload=="frost": index=i
+  if wheel.entries[i].choice.get("payload","")=="frost": index=i
  var point:=wheel._ring.position+Vector2(180,180)+Vector2.from_angle(-PI/2+index*TAU/8)*125
  var move:=InputEventMouseMotion.new(); move.position=point; move.global_position=point; root.push_input(move,true); await frames()
  check(actor.actor_context.actions.guarding and actor.get_mouse_direction().is_equal_approx(wheel.opening_direction),"Opening selector dropped held guard or changed defense direction")

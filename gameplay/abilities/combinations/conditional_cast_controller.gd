@@ -362,6 +362,7 @@ func clear_field_type(type: String) -> void:
 	field = live.back() if not live.is_empty() else null
 
 func reset_session(keep_cooldowns := false) -> void:
+	if _manager and _manager.spell_forms: _manager.spell_forms.clear()
 	cancel("休整")
 	clear_field()
 	if not keep_cooldowns:
@@ -527,6 +528,10 @@ func _health(actor: Node2D) -> int:
 func _dead(actor: Node2D) -> bool:
 	var health := actor.get_node_or_null("HealthComponent")
 	return bool(health.is_dead) if health else false
+
+func report_feedback(message: String) -> void:
+	_message(message)
+	feedback_requested.emit(message)
 
 func _message(message: String) -> void:
 	last_message = message

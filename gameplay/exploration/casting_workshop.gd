@@ -119,13 +119,13 @@ func _craft_rows(screen: ExpeditionScreen, selected: String, query: String) -> v
 	var recipe_ids:=supplies.crafting_recipes.keys()
 	recipe_ids.sort_custom(func(a: String,b: String):
 		if supplies.knows_recipe(a)!=supplies.knows_recipe(b): return supplies.knows_recipe(a)
-		return supplies.title(a)<supplies.title(b))
+		return supplies.title(supplies.crafting_recipes[a].output_id)<supplies.title(supplies.crafting_recipes[b].output_id))
 	for id in recipe_ids:
 		var recipe: CraftingRecipe=supplies.crafting_recipes[id]
-		if not query.is_empty() and not (supplies.title(id)+supplies.describe_cost(recipe.inputs)).to_lower().contains(query.to_lower()): continue
+		if not query.is_empty() and not (supplies.title(recipe.output_id)+supplies.describe_cost(recipe.inputs)).to_lower().contains(query.to_lower()): continue
 		var learned:=supplies.knows_recipe(id)
-		var button:=FoundationWidgets.button(supplies.title(id)+"
-"+("原料齐备" if supplies.can_pay(recipe.inputs) else "缺少原料") if learned else supplies.title(id)+"
+		var button:=FoundationWidgets.button(supplies.title(recipe.output_id)+"
+"+("原料齐备" if supplies.can_pay(recipe.inputs) else "缺少原料") if learned else supplies.title(recipe.output_id)+"
 尚未学会",_craft_select.bind(screen,id))
 		button.alignment=HORIZONTAL_ALIGNMENT_LEFT
 		button.clip_text=true
@@ -144,8 +144,8 @@ func _craft_detail(screen: ExpeditionScreen,id: String) -> void:
 		screen.detail.add_child(FoundationWidgets.label("寻找探索记录，学习第一份配方。",16,true))
 		return
 	var recipe: CraftingRecipe=supplies.crafting_recipes[id]
-	var card:=FoundationWidgets.card(screen.detail,supplies.title(id),"产出 ×%d · 持有 %d"%[recipe.output_count,supplies.count(id)])
-	var definition:=ItemCatalog.default_catalog().definition(id)
+	var card:=FoundationWidgets.card(screen.detail,supplies.title(recipe.output_id),"产出 ×%d · 持有 %d"%[recipe.output_count,supplies.count(recipe.output_id)])
+	var definition:=ItemCatalog.default_catalog().definition(recipe.output_id)
 	if definition: card.add_child(FoundationWidgets.label(definition.description,14))
 	card.add_child(HSeparator.new())
 	card.add_child(FoundationWidgets.label("所需原料",15))
@@ -155,13 +155,30 @@ func _craft_detail(screen: ExpeditionScreen,id: String) -> void:
 		if count<int(recipe.inputs[material]): line.add_theme_color_override("font_color",GameUIStyle.GOLD)
 		card.add_child(line)
 	if not supplies.knows_recipe(id): card.add_child(FoundationWidgets.label("尚未学会 · 探索记录可解锁",14,true))
-	var action:=FoundationWidgets.button("加工："+supplies.title(id),_craft_selected.bind(screen,id),not supplies.knows_recipe(id) or not supplies.can_pay(recipe.inputs))
+	var action:=FoundationWidgets.button("加工："+supplies.title(recipe.output_id),_craft_selected.bind(screen,id),not supplies.knows_recipe(id) or not supplies.can_pay(recipe.inputs))
 	action.icon=GameUIStyle.icon("anvil"); action.expand_icon=true; action.add_theme_constant_override("icon_max_width",20)
 	screen.detail.add_child(action)
+	if supplies.inventory_store:
+		var pocket:=supplies.inventory_store.count(supplies.actor_id,recipe.output_id,false,true)
+		card.add_child(FoundationWidgets.label("当前口袋%d / 背包%d；战斗施法只使用口袋材料。"%[pocket,supplies.count(recipe.output_id)-pocket],14,true))
+		if supplies.count(recipe.output_id)>0: screen.detail.add_child(FoundationWidgets.button("整理："+supplies.title(recipe.output_id),_prepare_output.bind(recipe.output_id)))
+
+func _prepare_output(id: String) -> void:
+	game.ui.close_modal()
+	game.inventory_screen.open_item(id)
 
 func _craft_selected(screen: ExpeditionScreen,id: String) -> void:
 	# Same domain transaction as keyboard interaction; the view only refreshes its snapshot.
-	if game.is_at_base() and game.player.skill_manager.combinations.supplies.craft(id): game._save_progress()
+	var supplies: CastingSupplies=game.player.skill_manager.combinations.supplies
+	var recipe:=supplies.crafting_recipes.get(id) as CraftingRecipe
+	var message:="未完成：请检查工作台范围、配方、原料及产出空间。"
+	if game.is_at_base() and recipe and supplies.craft(id):
+		game._save_progress()
+		var pocket:=supplies.inventory_store.count(supplies.actor_id,recipe.output_id,false,true) if supplies.inventory_store else supplies.count(recipe.output_id)
+		message="制成%s ×%d · 当前口袋%d / 背包%d"%[supplies.title(recipe.output_id),recipe.output_count,pocket,supplies.count(recipe.output_id)-pocket]
+		if pocket==0: message+=" · 先点整理，移入口袋后才能用于战斗。"
+	game.ui.notify(message)
+	screen.status.text=message
 	_craft_rows(screen,id,screen.search.text)
 
 func recycling_available() -> bool:

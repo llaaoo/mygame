@@ -23,6 +23,7 @@ var material_operations := false
 var restrict_actions := false
 var known_actions: Dictionary = {}
 var shortcuts:=QuickslotLoadout.new()
+var spell_forms: SpellFormAssist
 var left_hand: SkillInstance:
 	get: return shortcuts.instance("left")
 var right_hand: SkillInstance:
@@ -98,6 +99,9 @@ func enable_material_operations() -> void:
 
 func _ready() -> void:
 	shortcuts.changed.connect(_binding_changed)
+	spell_forms=SpellFormAssist.new(self)
+	cast_committed.connect(spell_forms.observe)
+	spell_forms.changed.connect(_forms_changed)
 	# 自动创建 executor（如果未从外部注入）
 	if not executor:
 		executor = SkillExecutor.new()
@@ -234,6 +238,7 @@ func restore_campaign_cooldowns(data: Dictionary,elapsed:=0.0) -> void:
 			instance.total_cooldown=float(data.get("source_duration",{}).get(source,instance.total_cooldown))
 
 func restore_skill_state(saved_state: Dictionary) -> void:
+	if spell_forms: spell_forms.clear()
 	if not pool: return
 	for source in saved_state:
 		if source not in QuickslotLoadout.SOURCES: continue
@@ -265,9 +270,26 @@ func can_use(source: String) -> bool:
 	return _cooldowns.get(source, 0.0) <= 0.0
 
 
+func selection_for_source(source: String) -> Dictionary:
+	return spell_forms.resolve(source) if material_operations and spell_forms else shortcuts.selection(source)
+
+func _forms_changed() -> void:
+	for source in QuickslotLoadout.SOURCES:
+		if not spell_forms.automatic(source): continue
+		shortcuts.invalidate_source(source)
+		var actor:=get_parent() as Player
+		if actor and actor.casting:
+			actor.casting.cancel_source(source)
+			actor.input_controller.suppress_source(source)
+
 func preview_source(source: String,empower := false) -> CastPlan:
 	var inst:=get_instance(source)
-	return combinations.preview(inst.data,get_parent(),empower,shortcuts.selection(source)) if inst else CastPlan.new()
+	if not inst: return CastPlan.new()
+	var plan:=combinations.preview(inst.data,get_parent(),empower,selection_for_source(source))
+	if spell_forms.automatic(source):
+		var reason:=spell_forms.unavailable_reason(inst.data)
+		if not reason.is_empty(): plan.ready=false; plan.reason=reason
+	return plan
 
 func get_cooldown_state(source: String, plan: CastPlan = null) -> Dictionary:
 	var inst := _find_instance(source)
@@ -284,11 +306,20 @@ func get_cooldown_total(source: String) -> float:
 	return get_cooldown_state(source).duration
 
 ## Validate the same explicit request that execution will accept.
+func report_refusal(source: String,context: CastContext = null) -> void:
+	var instance:=get_instance(source)
+	if not instance: return
+	var plan:=combinations.preview(instance.data,get_parent(),context.empower if context else false,context.selection if context and not context.selection.is_empty() else selection_for_source(source))
+	var reason:=plan.reason if not plan.ready else "动作条件已变化，请重新按键。"
+	if spell_forms.automatic(source) and not spell_forms.unavailable_reason(instance.data).is_empty(): reason=spell_forms.unavailable_reason(instance.data)
+	var stock:=QuickslotMaterials.stock_text(get_parent(),plan.material_costs)
+	combinations.report_feedback(instance.data.display_name+"："+reason+("\n"+stock if not stock.is_empty() else ""))
+
 func can_start(source: String, caster: Node2D, context: CastContext) -> bool:
 	if not can_act(caster): return false
 	var inst := _find_instance(source)
 	if context and context.binding_revision>=0 and shortcuts.revision(source)!=context.binding_revision: return false
-	var selection: Dictionary=context.selection if context and not context.selection.is_empty() else shortcuts.selection(source)
+	var selection: Dictionary=context.selection if context and not context.selection.is_empty() else selection_for_source(source)
 	if not context or not context.has_valid_target() or _executing or not inst or not knows_action(inst.data) or inst.data.combination_only:
 		return false
 	if combinations and combinations.handles(inst.data):
@@ -361,7 +392,7 @@ func _execute_with_context(skill: SkillData, source: String, caster: Node2D, ctx
 	if not ctx or not ctx.has_valid_target() or _executing or not knows_action(skill):
 		return false
 	if ctx.binding_revision>=0 and shortcuts.revision(source)!=ctx.binding_revision: return false
-	if ctx.selection.is_empty(): ctx.selection=shortcuts.selection(source)
+	if ctx.selection.is_empty(): ctx.selection=selection_for_source(source)
 	if skill.combination_only:
 		return false
 	if skill.operation_id=="disperse" and "actor_context" in caster and caster.actor_context and caster.actor_context.spray:

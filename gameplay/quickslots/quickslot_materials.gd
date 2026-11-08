@@ -31,7 +31,7 @@ static func _basic_options(actor: Player,source: String) -> Array[Dictionary]:
  var manager:=actor.skill_manager
  var skill:=manager.get_instance(source).data
  var supplies:=manager.combinations.supplies
- var current:=manager.shortcuts.selection(source)
+ var current:=manager.selection_for_source(source)
  var candidates:=modifier_ids(manager,skill)
  for id in candidates:
   var choice: Dictionary={"payload":"","modifier":id,"uid":""}
@@ -48,7 +48,14 @@ static func options(actor: Player,source: String) -> Array[Dictionary]:
  if not actor.actor_context or not available(manager,source): return result
  if not entry: return _basic_options(actor,source)
  var store:=actor.actor_context.items
- var current:=manager.shortcuts.selection(source)
+ var current:=manager.selection_for_source(source)
+ var automatic:=manager.spell_forms.automatic(source)
+ if manager.spell_forms.supports(entry.action):
+  var preview:=manager.combinations.preview(entry.action,actor,Input.is_key_pressed(KEY_SHIFT),manager.spell_forms.resolve_automatic(entry.action))
+  var reason:=manager.spell_forms.unavailable_reason(entry.action)
+  if not reason.is_empty(): preview.ready=false; preview.reason=reason
+  var following:=entry.payload(str(manager.spell_forms.resolve_automatic(entry.action).get("payload","")))
+  result.append({"variant_id":"auto","title":"跟随·"+following.title if following else "智能跟随","choice":{"mode":"auto"},"cost":preview.cost,"ready":preview.ready,"reason":preview.reason,"detail":manager.spell_forms.label(source) if automatic else "跟随最近成功施法的元素","description":"只改变后续形式；仍须真实来源和手动释放。滚轮/M可固定形式。","current":automatic})
  for payload in entry.payloads:
   var choice: Dictionary={"payload":payload.id,"modifier":str(current.get("modifier","")),"uid":""}
   var composed:=entry.compose(payload)
@@ -64,16 +71,18 @@ static func options(actor: Player,source: String) -> Array[Dictionary]:
    var plan:=manager.combinations.preview(entry.action,actor,Input.is_key_pressed(KEY_SHIFT),selected)
    var count:=store.count(actor.actor_context.id,payload.material_id,false,true) if not payload.material_id.is_empty() else -1
    var item:=store.item(uid) if not uid.is_empty() else null
-   var detail: String="无需实物" if count<0 else "口袋 ×%d"%count
+   var detail: String="无需实物" if count<0 else "口袋%d / 背包%d"%[count,maxi(0,store.count(actor.actor_context.id,payload.material_id)-count)]
    if item: detail="瓶 %s · %s"%[uid.trim_prefix("item."),store.state_text(uid)]
    if not current.get("modifier","").is_empty() and selected.modifier.is_empty(): detail+=" · 确认将移除不适配修饰"
    if not payload.source_kind.is_empty(): detail="脚下法阵充能" if payload.source_kind=="field" else "附近真实残魂"
-   result.append({"variant_id":payload.id,"title":payload.title,"choice":selected,"cost":plan.cost,"ready":plan.ready,"reason":plan.reason,"detail":detail,"description":payload.describe(actor.actor_context.rules.timed_fields),"current":current==selected})
+   result.append({"variant_id":payload.id,"title":payload.title,"choice":selected,"cost":plan.cost,"ready":plan.ready,"reason":plan.reason,"detail":detail,"description":payload.describe(actor.actor_context.rules.timed_fields),"current":not automatic and current==selected})
  return result
 static func select(actor: Player,source: String,choice: Dictionary) -> bool:
  if not actor.actor_context or actor.health_component.is_dead: return false
- var entry:=operation(actor.skill_manager,source)
  if not available(actor.skill_manager,source): return false
+ var entry:=operation(actor.skill_manager,source)
+ if choice=={"mode":"auto"}:
+  return actor.skill_manager.spell_forms.supports(actor.skill_manager.get_instance(source).data) and actor.skill_manager.shortcuts.set_selection(source,choice)
  if not entry:
   for candidate in _basic_options(actor,source):
    if candidate.choice==choice: return actor.skill_manager.shortcuts.set_selection(source,choice)
@@ -86,3 +95,29 @@ static func select(actor: Player,source: String,choice: Dictionary) -> bool:
   if not item or item.definition_id!=entry.payload(str(choice.payload)).material_id or actor.actor_context.items.locate(uid)!=actor.actor_context.id+".pocket": return false
  # Selecting missing material is allowed and remains visibly unavailable; no implicit fallback.
  return actor.skill_manager.shortcuts.set_selection(source,choice)
+
+static func cycle(actor: Player,source: String,step: int) -> bool:
+ var entries:=options(actor,source)
+ if entries.is_empty(): return false
+ var index:=-1
+ for i in range(entries.size()):
+  if entries[i].current: index=i; break
+ if index<0 and step<0: index=0
+ for offset in range(1,entries.size()+1):
+  var candidate: Dictionary=entries[posmod(index+step*offset,entries.size())]
+  if select(actor,source,candidate.choice):
+   var message: String=InputBindings.label(InputBindings.action_for_source(source))+" · "+str(candidate.title)+" · "+str(candidate.detail)
+   if not candidate.ready: message+="\n"+str(candidate.reason)
+   actor.skill_manager.combinations.report_feedback(message)
+   return true
+ return false
+static func stock_text(actor: Node2D,costs: Dictionary) -> String:
+ if not actor or not "actor_context" in actor or not actor.actor_context: return ""
+ var parts: PackedStringArray=[]
+ var context: ActorContext=actor.actor_context
+ for id in costs:
+  var pocket:=context.items.count(context.id,id,false,true)
+  var pack:=maxi(0,context.items.count(context.id,id)-pocket)
+  var definition:=ItemCatalog.default_catalog().definition(id)
+  parts.append("%s：口袋%d / 背包%d · 需%d"%[definition.display_name if definition else id,pocket,pack,costs[id]])
+ return "；".join(parts)

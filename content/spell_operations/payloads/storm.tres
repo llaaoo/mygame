@@ -2,6 +2,7 @@
 [ext_resource type="Script" path="res://gameplay/abilities/operations/spell_payload_data.gd" id="1"]
 [resource]
 script = ExtResource("1")
+affinity = "storm"
 id = "storm"
 title = "雷晶阵"
 description = "雷晶粉提供雷阵介质；由后续基础动作与已知反应决定释放结果。"

@@ -3,6 +3,7 @@
 [ext_resource type="Resource" path="res://gameplay/abilities/data/cinder_volley_data.tres" id="effect"]
 [resource]
 script = ExtResource("data")
+affinity = "fire"
 id = "cinder_volley"
 title = "树脂散射"
 description = "树脂散射；消耗真实材料，所选来源失效时拒绝，不自动换源。"

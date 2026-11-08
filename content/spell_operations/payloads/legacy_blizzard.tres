@@ -3,6 +3,7 @@
 [ext_resource type="Resource" path="res://gameplay/abilities/data/blizzard_data.tres" id="effect"]
 [resource]
 script = ExtResource("data")
+affinity = "frost"
 id = "blizzard"
 title = "霜盐暴雪"
 description = "霜盐暴雪；消耗真实材料，所选来源失效时拒绝，不自动换源。"

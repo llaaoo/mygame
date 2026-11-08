@@ -2,6 +2,7 @@
 [ext_resource type="Script" path="res://gameplay/abilities/operations/spell_payload_data.gd" id="data"]
 [resource]
 script = ExtResource("data")
+affinity = "ward"
 id = "ward_rune"
 title = "守护法阵"
 material_id = "ward_powder"

@@ -3,6 +3,7 @@
 [ext_resource type="Resource" path="res://gameplay/abilities/data/summon_wisp_data.tres" id="effect"]
 [resource]
 script = ExtResource("data")
+affinity = "fire"
 id = "summon_wisp"
 title = "炭屑火灵"
 description = "炭屑火灵；消耗真实材料，所选来源失效时拒绝，不自动换源。"

@@ -3,6 +3,7 @@
 [ext_resource type="Resource" path="res://gameplay/abilities/data/solar_spear_data.tres" id="effect"]
 [resource]
 script = ExtResource("data")
+affinity = "fire"
 id = "solar_spear"
 title = "守护粉贯穿"
 description = "守护粉贯穿；消耗真实材料，所选来源失效时拒绝，不自动换源。"
