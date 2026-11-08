@@ -5,7 +5,7 @@ func show_arrival() -> void:
 	game.ui.show_panel("灰河谷 · 自由远征",arrival+"\n\n林地、矿道、湖岸、工区和湿地互相连通，旧监狱在东北。北桥和南侧浅滩始终开放，修复木桥可缩短往返。镇中艾妲记录你的发现与世界成果。\n\nF观察敌人或搜刮遗骸，物品取自真实穿戴和剩余行囊；取不下的留在原地，F打开战利品面板，T尽量取走全部。\n\nTab远征面板 · J委托 · I行囊 · O穿戴 · N补给 · G地图
 7烤饼、8清水、9茶、0炖汤（默认，可在K改放动作或物品）；仍需站定使用，受伤会打断。
 普通基础动作默认按下即施放；可在操作设置切回按住预览、松开施放。
-Q/E/R与1—0独立快捷槽 · F交互 · M/按住中键选材 · K编组\n界面不会暂停世界；背包可右键丢弃，地面物资用F拾取。轮盘打开时按动作快捷键选槽，再选介质；同种喷剂可滚轮切瓶。\n地图只记录亲自到过的地点。动作、材料和恩赐需要亲手组合，系统不会自动准备。F5存档，F9读档；独立旅程不覆盖监狱验证场。",[{"title":"开始河谷旅程","callback":game.ui.close_modal},{"title":"查看日志","callback":game.ui.show_journal}])
+Q/E/R与1—0独立快捷槽 · F交互 · M/按住中键选材 · K编组\n界面不会暂停世界；背包可右键丢弃，地面物资用F拾取。轮盘打开时按动作快捷键选槽，再选介质；同种喷剂可滚轮切瓶。\n地图只记录亲自到过的地点。动作、材料和恩赐需要亲手组合，系统不会自动准备。F5存档，F9读档；独立旅程不覆盖监狱验证场。",[{"title":"开始河谷旅程","callback":game.ui.close_modal},{"title":"查看日志","callback":game.ui.show_journal},{"title":"重新开始灰河谷","callback":game.confirm_new_journey}])
 func _update_objective() -> void:
 	if not game.current_data: return
 	game.ui.heading.text = game.current_data.title + (" · 河谷镇" if game.is_at_base() else " · 野外" if game.region_id=="camp" else "")

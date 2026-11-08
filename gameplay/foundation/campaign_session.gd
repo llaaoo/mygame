@@ -36,6 +36,8 @@ var belt: Array[Dictionary]:
 var _pack_nodes: Dictionary={}
 var _ground_nodes: Dictionary={}
 var _activity_families: Dictionary={}
+var _pending_effect_time: Dictionary={}
+var restoring_effects := false
 func configure(content: ExplorationContentCatalog,profile: RulesetDefinition) -> void:
 	catalog=content
 	rules=profile
@@ -50,6 +52,7 @@ func configure(content: ExplorationContentCatalog,profile: RulesetDefinition) ->
 func restore(data: Dictionary) -> bool:
 	if not valid_snapshot(data): return false
 	if data.has("inventory") and not inventory.valid_definitions(data.inventory): return false
+	_pending_effect_time.clear()
 	state=data.duplicate(true)
 	inventory.clock_seconds=float(data.get("clock_seconds",0))
 	if data.has("inventory"): inventory.restore(data.inventory)
@@ -73,6 +76,7 @@ func bind_actor(actor: CharacterBody2D,id: String,legacy_counts: Dictionary = {}
 	context.hostile_requested=hostility_changed
 	actor.actor_context=context
 	actors[id]=weakref(actor)
+	(actor.get_node("BuffManager") as BuffManager).source_resolver=actor_for_id
 	actor.get_node("HealthComponent").died.connect(mark_dead.bind(actor))
 	actor.get_node("HealthComponent").died.connect((actor.get_node("BuffManager") as BuffManager).buildup.clear)
 	var components:=preload("res://gameplay/foundation/actor_components.tscn").instantiate() as ActorComponents
@@ -132,17 +136,36 @@ func _restore_actor(actor: CharacterBody2D,record: Dictionary) -> void:
 	actor.actor_context.actions.stamina.restore(record.get("stamina",{}))
 	actor.actor_context.actions.needs.restore(record.get("needs",{}))
 	var away:=maxf(0,inventory.clock_seconds-float(record.get("updated_at",inventory.clock_seconds)))
-	(actor.get_node("BuffManager") as BuffManager).buildup.restore(record.get("buildup",{}),away)
+	var buffs:=actor.get_node("BuffManager") as BuffManager
+	if record.has("effects"):
+		buffs.restore_campaign_state(record.effects,actor_for_id)
+	else:
+		# Older campaigns stored food/potions only; import their actual remainders.
+		buffs.restore_campaign_state({"schema":1,"entries":[],"immunity":{}})
+		buffs.restore_provisions(record.get("provisions",[]))
+	buffs.buildup.restore(record.get("buildup",{}))
+	actor.get_node("SkillManager").restore_campaign_cooldowns(record.get("cooldowns",{}),away)
+	if away>0: _pending_effect_time[actor.actor_context.id]=away
 	if away>0: actor.actor_context.actions.needs.tick(away,actor.get_node("StatsComponent").effective_stat("endurance"),rules.is_base(record.region,actor.position))
 	actor.actor_context.martial.restore(record.get("martial",{}))
-	var provisions: Array=record.get("provisions",[]).duplicate(true)
-	for entry in provisions: entry.remaining=maxf(0,float(entry.remaining)-away)
-	provisions=provisions.filter(func(entry): return entry.remaining>0)
-	(actor.get_node("BuffManager") as BuffManager).restore_provisions(provisions)
 	var health:=actor.get_node("HealthComponent") as HealthComponent
 	health.hp=clampi(int(record.get("hp",health.hp)),1,health.max_hp)
 	var mana:=actor.get_node_or_null("ManaComponent") as ManaComponent
 	if mana: mana.mp=clampi(int(record.get("mp",mana.mp)),0,mana.max_mp)
+
+func restore_actor_state(actor: CharacterBody2D) -> void:
+	var id: String=actor.actor_context.id
+	if actor_records.has(id): _restore_actor(actor,actor_records[id])
+
+func finish_effect_restoration() -> void:
+	restoring_effects=true
+	var pending:=_pending_effect_time.duplicate(); _pending_effect_time.clear()
+	for id in pending:
+		var actor:=actor_for_id(id)
+		if not is_instance_valid(actor) or actor.get_node("HealthComponent").is_dead: continue
+		if actor is Enemy: actor.player=actor_for_id("player")
+		(actor.get_node("BuffManager") as BuffManager).advance_campaign_time(float(pending[id]))
+	restoring_effects=false
 func capture_actors() -> void:
 	if not rules.physical_inventory: return
 	for id in actors:
@@ -151,7 +174,7 @@ func capture_actors() -> void:
 		var health:=actor.get_node("HealthComponent") as HealthComponent
 		if health.is_dead: continue
 		var mana:=actor.get_node_or_null("ManaComponent") as ManaComponent
-		actor_records[id]={"buildup":(actor.get_node("BuffManager") as BuffManager).buildup.snapshot(),"updated_at":inventory.clock_seconds,"hp":health.hp,"mp":mana.mp if mana else 0,"position":[actor.position.x,actor.position.y],"region":region.id,"stamina":actor.actor_context.actions.stamina.snapshot(),"needs":actor.actor_context.actions.needs.serialize(),"martial":actor.actor_context.martial.snapshot(),"provisions":(actor.get_node("BuffManager") as BuffManager).provision_state(),"truce":bool(actor.story_truce) if "story_truce" in actor else false,"dead":false}
+		actor_records[id]={"effects":(actor.get_node("BuffManager") as BuffManager).campaign_state(),"cooldowns":actor.get_node("SkillManager").campaign_cooldowns(),"buildup":(actor.get_node("BuffManager") as BuffManager).buildup.snapshot(),"updated_at":inventory.clock_seconds,"hp":health.hp,"mp":mana.mp if mana else 0,"position":[actor.position.x,actor.position.y],"region":region.id,"stamina":actor.actor_context.actions.stamina.snapshot(),"needs":actor.actor_context.actions.needs.serialize(),"martial":actor.actor_context.martial.snapshot(),"provisions":(actor.get_node("BuffManager") as BuffManager).provision_state(),"truce":bool(actor.story_truce) if "story_truce" in actor else false,"dead":false}
 func snapshot() -> Dictionary:
 	capture_actors()
 	if sync_extra.is_valid(): sync_extra.call()
@@ -288,6 +311,8 @@ static func valid_snapshot(data: Variant) -> bool:
 		var record=data.actors[id]
 		if not id is String or not record is Dictionary or not record.get("hp") is int or record.hp<0 or record.hp>100000 or not record.get("dead") is bool or not record.get("region") is String: return false
 		if not SurvivalNeeds.valid(record.get("needs",{})) or not MartialArts.valid(record.get("martial",{})) or not BuffManager.valid_provisions(record.get("provisions",[])) or not StatusBuildup.valid(record.get("buildup",{})): return false
+		if record.has("effects") and not BuffManager.valid_campaign_state(record.effects): return false
+		if not SkillManager.valid_campaign_cooldowns(record.get("cooldowns",{})): return false
 		if typeof(record.get("updated_at",0)) not in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(record.get("updated_at",0))) or record.get("updated_at",0)<0 or record.get("updated_at",0)>data.get("clock_seconds",0): return false
 		var stamina=record.get("stamina",{})
 		if not stamina is Dictionary: return false

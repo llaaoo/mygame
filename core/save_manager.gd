@@ -12,6 +12,7 @@ var active_slot: int = 1
 var _sections: Dictionary = {}
 var _loading := false
 var progress_only := false
+var last_journey_archive := ""
 signal progress_reload_requested
 signal before_save
 
@@ -74,6 +75,20 @@ func save_game(slot: int) -> bool:
 func read_slot(slot: int) -> REPOSITORY.ReadResult:
 	last_read = repository.read(_path(slot))
 	return last_read
+
+func start_new_campaign(slot: int,section: String,fresh_progress: Dictionary) -> bool:
+	if _loading: return false
+	_loading=true
+	before_save.emit()
+	var current:=SaveData.Root.new()
+	current.meta=_collect_meta(); current.player=_collect_player(); current.world=_collect_world(); current.quest=_collect_quests(); current.extensions=_collect_extensions()
+	var fresh:=SaveData.Root.new()
+	fresh.meta=SaveData.MetaData.new(); fresh.player=SaveData.PlayerData.new(); fresh.world=SaveData.WorldData.new(); fresh.quest=SaveData.QuestSave.new()
+	fresh.extensions={section:fresh_progress.duplicate(true)}
+	last_journey_archive=repository.start_new(_path(slot),fresh.serialize(),current.serialize())
+	if last_journey_archive.is_empty(): _loading=false; return false
+	# The outgoing runtime cannot autosave old progress over the new slot.
+	return true
 
 func read_extension(slot: int, section_id: String) -> Dictionary:
 	var result := read_slot(slot)

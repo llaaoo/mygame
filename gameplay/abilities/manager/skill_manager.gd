@@ -206,6 +206,33 @@ func upgrade_source(source: String, upgrade_id: String) -> bool:
 func serialize_skill_state() -> Dictionary:
 	return shortcuts.snapshot()
 
+func campaign_cooldowns() -> Dictionary:
+	var total: Dictionary={}
+	for source in QuickslotLoadout.SOURCES:
+		var instance:=shortcuts.instance(source)
+		if instance: total[source]=instance.total_cooldown
+	return {"source":_cooldowns.duplicate(),"source_duration":total,"action":combinations.cooldowns.duplicate(),"duration":combinations.cooldown_durations.duplicate()}
+static func valid_campaign_cooldowns(data: Variant) -> bool:
+	if not data is Dictionary: return false
+	for group in ["source","source_duration","action","duration"]:
+		if not data.get(group,{}) is Dictionary or data.get(group,{}).size()>256: return false
+		for key in data.get(group,{}):
+			var value=data[group][key]
+			if not key is String or key.length()>256 or typeof(value) not in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(value)) or value<0 or value>86400: return false
+	return true
+func restore_campaign_cooldowns(data: Dictionary,elapsed:=0.0) -> void:
+	if not valid_campaign_cooldowns(data): return
+	_cooldowns=data.get("source",{}).duplicate()
+	combinations.cooldowns=data.get("action",{}).duplicate()
+	combinations.cooldown_durations=data.get("duration",{}).duplicate()
+	for group in [_cooldowns,combinations.cooldowns]:
+		for key in group: group[key]=maxf(0,float(group[key])-elapsed)
+	for source in QuickslotLoadout.SOURCES:
+		var instance:=shortcuts.instance(source)
+		if instance:
+			instance.current_cooldown=float(_cooldowns.get(source,0))
+			instance.total_cooldown=float(data.get("source_duration",{}).get(source,instance.total_cooldown))
+
 func restore_skill_state(saved_state: Dictionary) -> void:
 	if not pool: return
 	for source in saved_state:

@@ -1,0 +1,309 @@
+{
+  "date": "2026-11-08 Asia/Shanghai",
+  "code_commit": "fc6c18deb1414269241efa98ec899bea1ba692a1",
+  "archive": "/tmp/mygame-persistence-verified-cold-zr96x3fd",
+  "platform": "Linux / Godot 4.6.3 / X11 dummy / Mesa llvmpipe GL compatibility",
+  "input": "Godot keyboard/pointer input events; controlled mechanism fixtures plus separate normal-AI authored-budget route",
+  "natural_route": {
+    "path": "tools/playtests/combat_depth_route.json",
+    "steps": 71,
+    "output": "/tmp/grayriver-first30/persistence-cold-expedition",
+    "precombat_sha256": "8219dc952ce991b1cfe6de243874b49b83d337af472462f806e91c88169fdd0e",
+    "return_save_sha256": "0d41a50c4cd593dec11612869c7dcee28c6c5bdd16f0335d41cbc0145910df63",
+    "reload_comparisons": {
+      "items": true,
+      "gear": true,
+      "materials": true,
+      "shortcuts": true,
+      "martial": true,
+      "loot_records": true,
+      "claims": true,
+      "saved_hp": true,
+      "fire_stone_not_refilled": true
+    },
+    "duels": [
+      {
+        "style": "combo",
+        "target": "river.enemy.camp.forest.3",
+        "seconds": 4.28815,
+        "wall_seconds": 4.34622,
+        "damage_taken": 0,
+        "killed": true,
+        "before_player": {
+          "attacks": 0,
+          "base": false,
+          "channel_source": "",
+          "charge_source": "",
+          "damage_taken": 0,
+          "dead": false,
+          "guarding": false,
+          "hp": 100,
+          "mode": "idle",
+          "mp": 60,
+          "position": [
+            -3058.28857421875,
+            -1216.78149414062
+          ],
+          "stamina": 100.0,
+          "ui_blocked": false
+        },
+        "after_player": {
+          "attacks": 0,
+          "base": false,
+          "channel_source": "",
+          "charge_source": "",
+          "damage_taken": 0,
+          "dead": false,
+          "guarding": false,
+          "hp": 100,
+          "mode": "idle",
+          "mp": 29,
+          "position": [
+            -3058.28857421875,
+            -1216.78149414062
+          ],
+          "stamina": 100.0,
+          "ui_blocked": false
+        },
+        "before_materials": {
+          "ash": 2,
+          "charcoal": 5,
+          "clean_water": 4,
+          "crystal": 8,
+          "fire_stone": 1,
+          "frost_salt": 2,
+          "grain": 3,
+          "herb": 2,
+          "ration": 2,
+          "resin": 2,
+          "sap": 9,
+          "storm_dust": 3
+        },
+        "after_materials": {
+          "ash": 2,
+          "charcoal": 5,
+          "clean_water": 4,
+          "crystal": 8,
+          "frost_salt": 2,
+          "grain": 3,
+          "herb": 2,
+          "ration": 2,
+          "resin": 2,
+          "sap": 9,
+          "storm_dust": 3
+        },
+        "casts": [
+          {
+            "action": "inscribe",
+            "charge_power": 1.0,
+            "materials": {
+              "fire_stone": 1
+            },
+            "mp_after": 52,
+            "mp_cost": 8,
+            "position": [
+              -3058.28857421875,
+              -1216.78149414062
+            ],
+            "result": "inscribe",
+            "rule": "",
+            "t": 42.9370926666667
+          },
+          {
+            "action": "ignite",
+            "charge_power": 1.0,
+            "materials": {},
+            "mp_after": 40,
+            "mp_cost": 12,
+            "position": [
+              -3058.28857421875,
+              -1216.78149414062
+            ],
+            "result": "fireball",
+            "rule": "fire_sigil_fireball",
+            "t": 43.5000203333334
+          },
+          {
+            "action": "ignite",
+            "charge_power": 1.0,
+            "materials": {},
+            "mp_after": 29,
+            "mp_cost": 12,
+            "position": [
+              -3058.28857421875,
+              -1216.78149414062
+            ],
+            "result": "fireball",
+            "rule": "fire_sigil_fireball",
+            "t": 45.9190306666667
+          }
+        ]
+      },
+      {
+        "style": "martial",
+        "target": "river.enemy.camp.forest.4",
+        "seconds": 3.42020566666669,
+        "wall_seconds": 3.878607,
+        "damage_taken": 14,
+        "killed": true,
+        "before_player": {
+          "attacks": 0,
+          "base": false,
+          "channel_source": "",
+          "charge_source": "",
+          "damage_taken": 0,
+          "dead": false,
+          "guarding": false,
+          "hp": 100,
+          "mode": "idle",
+          "mp": 60,
+          "position": [
+            -2445.96044921875,
+            -1494.416015625
+          ],
+          "stamina": 100.0,
+          "ui_blocked": false
+        },
+        "after_player": {
+          "attacks": 3,
+          "base": false,
+          "channel_source": "",
+          "charge_source": "",
+          "damage_taken": 14,
+          "dead": false,
+          "guarding": false,
+          "hp": 86,
+          "mode": "attack",
+          "mp": 60,
+          "position": [
+            -2224.99609375,
+            -1522.14111328125
+          ],
+          "stamina": 60.3333333333337,
+          "ui_blocked": false
+        },
+        "before_materials": {
+          "ash": 2,
+          "charcoal": 5,
+          "clean_water": 4,
+          "cloth": 1,
+          "crystal": 8,
+          "frost_salt": 2,
+          "grain": 3,
+          "herb": 2,
+          "poison_rag": 1,
+          "ration": 3,
+          "resin": 2,
+          "sap": 9,
+          "storm_dust": 3
+        },
+        "after_materials": {
+          "ash": 2,
+          "charcoal": 5,
+          "clean_water": 4,
+          "cloth": 1,
+          "crystal": 8,
+          "frost_salt": 2,
+          "grain": 3,
+          "herb": 2,
+          "poison_rag": 1,
+          "ration": 3,
+          "resin": 2,
+          "sap": 9,
+          "storm_dust": 3
+        },
+        "casts": [
+          {
+            "action": "inscribe",
+            "charge_power": 1.0,
+            "materials": {
+              "fire_stone": 1
+            },
+            "mp_after": 52,
+            "mp_cost": 8,
+            "position": [
+              -3058.28857421875,
+              -1216.78149414062
+            ],
+            "result": "inscribe",
+            "rule": "",
+            "t": 42.9370926666667
+          },
+          {
+            "action": "ignite",
+            "charge_power": 1.0,
+            "materials": {},
+            "mp_after": 40,
+            "mp_cost": 12,
+            "position": [
+              -3058.28857421875,
+              -1216.78149414062
+            ],
+            "result": "fireball",
+            "rule": "fire_sigil_fireball",
+            "t": 43.5000203333334
+          },
+          {
+            "action": "ignite",
+            "charge_power": 1.0,
+            "materials": {},
+            "mp_after": 29,
+            "mp_cost": 12,
+            "position": [
+              -3058.28857421875,
+              -1216.78149414062
+            ],
+            "result": "fireball",
+            "rule": "fire_sigil_fireball",
+            "t": 45.9190306666667
+          }
+        ]
+      }
+    ]
+  },
+  "native": {
+    "persistence-final-new-journey": {
+      "log": "/tmp/grayriver-first30/persistence-final-new-journey/runtime.log",
+      "diagnostics": [
+        "WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver."
+      ],
+      "log_sha256": "c6778b1245224f9b0239e80fa14f2deafcba08800af5609b489f0a6ee2b595cc"
+    },
+    "persistence-final-inventory": {
+      "log": "/tmp/grayriver-first30/persistence-final-inventory/runtime.log",
+      "diagnostics": [
+        "WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver."
+      ],
+      "log_sha256": "2dd2cfceb17390d73efb9141ba2ec921fd5cd9ad43cf8dfa491eb9cb0c4140a9"
+    },
+    "persistence-cold-expedition": {
+      "log": "/tmp/grayriver-first30/persistence-cold-expedition/runtime.log",
+      "diagnostics": [
+        "WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver."
+      ],
+      "log_sha256": "04bc9453bdf6972dc3197ad2ba1655ad12a2d9f6e0683b6a257d10ca4b4c375a"
+    },
+    "persistence-cold-reloaded": {
+      "log": "/tmp/grayriver-first30/persistence-cold-reloaded/runtime.log",
+      "diagnostics": [
+        "WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver."
+      ],
+      "log_sha256": "6a8d588b7111e83a2e22078c4b514becc86ee48df0b8601e5b063004dee3562c"
+    }
+  },
+  "limits": [
+    "Guided navigation/input, not blind human first play",
+    "UI/effect fault probes use controlled stocks/actors; natural route separately uses normal AI",
+    "Software-rendered cloud window is not target-device performance evidence",
+    "Ordinary I/O fault injection does not prove multi-file power-loss atomicity"
+  ],
+  "actions": "disabled",
+  "regression": {
+    "command": "python3 tools/run_tests.py --suite all --jobs 3 --timeout 120",
+    "result": "91/91 checks passed",
+    "first_import": "PASS import (8.8s)",
+    "logs": "/tmp/mygame-tests-dcbcwt_f",
+    "output": "docs/validation/persistence_restart_regression.txt",
+    "source": "git archive fc6c18deb1414269241efa98ec899bea1ba692a1; no .godot before import"
+  }
+}

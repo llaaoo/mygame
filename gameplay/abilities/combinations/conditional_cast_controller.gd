@@ -361,11 +361,12 @@ func clear_field_type(type: String) -> void:
 	var live := live_fields().filter(func(item: FireSigil): return item.field_type != type)
 	field = live.back() if not live.is_empty() else null
 
-func reset_session() -> void:
+func reset_session(keep_cooldowns := false) -> void:
 	cancel("休整")
 	clear_field()
-	cooldowns.clear()
-	cooldown_durations.clear()
+	if not keep_cooldowns:
+		cooldowns.clear()
+		cooldown_durations.clear()
 	_recovery = 0.0
 	last_message = ""
 

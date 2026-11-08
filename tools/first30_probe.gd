@@ -53,7 +53,9 @@ func write_json(name: String,data: Variant) -> void:
 	var f:=FileAccess.open(output.path_join(name),FileAccess.WRITE)
 	f.store_string(JSON.stringify(data,"  "))
 func settle(n:=3) -> void:
-	for i in range(n): await physics_frame
+	# Software rendering can run several physics catch-up frames before a GUI
+	# frame. Wait for both so the next input observes the updated live layout.
+	for i in range(n): await physics_frame; await process_frame
 func key_event(code: Key,pressed: bool) -> void:
 	var event:=InputEventKey.new(); event.keycode=code; event.physical_keycode=code; event.pressed=pressed
 	Input.parse_input_event(event); held[code]=pressed
