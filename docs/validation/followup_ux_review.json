@@ -1,0 +1,4039 @@
+{
+  "schema": 1,
+  "date": "2026-11-08",
+  "baseline": "43c14dab138139b3bfd168ff6e792da379b90718",
+  "scope": "review only; findings remain unfixed",
+  "findings": [
+    {
+      "id": "FOLLOW-01",
+      "priority": "P1",
+      "title": "automatic attunement blocks existing water surface combination",
+      "evidence": "controlled_probe.result"
+    },
+    {
+      "id": "FOLLOW-02",
+      "priority": "P1",
+      "title": "world scroll retains an invalid old shortcut after rebinding",
+      "steps": [
+        32,
+        34,
+        37
+      ]
+    },
+    {
+      "id": "FOLLOW-03",
+      "priority": "P2",
+      "title": "first scroll notch changes only mode, repeating the same actual form",
+      "steps": [
+        13,
+        15,
+        17
+      ]
+    },
+    {
+      "id": "FOLLOW-04",
+      "priority": "P2",
+      "title": "duplicated refusal and unrelated default-action preview overlap interaction HUD",
+      "steps": [
+        13
+      ]
+    },
+    {
+      "id": "FOLLOW-05",
+      "priority": "P2",
+      "title": "field requirement overwrites material stock detail in wheel",
+      "steps": [
+        21
+      ]
+    },
+    {
+      "id": "FOLLOW-06",
+      "priority": "P2",
+      "title": "batch trade lacks total/readiness and conflates refusal reasons",
+      "steps": [
+        43,
+        49,
+        51
+      ]
+    }
+  ],
+  "native_method": {
+    "platform": "Linux X11 / Godot 4.6.3 / GL Compatibility / llvmpipe / Dummy audio",
+    "window": [
+      1152,
+      648
+    ],
+    "seed": "real return save from previous normal-AI playtest, copied to isolated XDG directory",
+    "seed_sha256": "6fe2f3cd5bf3bc4d3f343f46321b5a167bfb7bc786ab551f0478656a909a30c1",
+    "ai": "normal, in-town interaction review; no new combat conclusions",
+    "input": "real Godot keyboard and pointer events with author-known navigation",
+    "state_injection": false,
+    "exit_code": 0,
+    "request_count": 53,
+    "driver_errors": [
+      {
+        "request": {
+          "id": 27.0,
+          "label": "快捷键 E",
+          "op": "label_click"
+        },
+        "error": "missing_label: 快捷键 E"
+      }
+    ],
+    "diagnostics": [
+      "only unsupported VSync mode warning"
+    ],
+    "limits": [
+      "not blind human play",
+      "diagnostic waits advance world time",
+      "no Windows, audio, physical device feel or performance validation"
+    ]
+  },
+  "controlled_probe": {
+    "method": "explicit knowledge/rule/position fixture; real casting APIs create water and apply buff; no injected surface/affinity",
+    "command": "XDG_DATA_HOME=/tmp/followup-water-data XDG_CONFIG_HOME=/tmp/followup-water-config XDG_CACHE_HOME=/tmp/followup-water-cache godot --headless --path . --script /tmp/review-water.gd",
+    "source": "extends SceneTree\nconst Fixture=preload(\"res://tests/support/grayriver_fixture.gd\")\nfunc _init() -> void: call_deferred(\"run\")\nfunc describe(plan: CastPlan) -> Dictionary:\n return {\"ready\":plan.ready,\"reason\":plan.reason,\"rule\":plan.rule_id,\"effect\":plan.effect_label,\"cost\":plan.cost,\"selection\":plan.selection}\nfunc run() -> void:\n var fixture:=Fixture.new(self); var game: GrayriverGame=await fixture.boot()\n var actor:=game.player; var manager:=actor.skill_manager\n game.progress.actions[\"focus\"]=true; game.progress.actions[\"water_call\"]=true\n game.progress.spell_rules[\"terrain_water_focus\"]=true; game._apply_knowledge()\n actor.position=Vector2(-3500,2300)\n var water:=manager.pool.get_skill(\"water_call\"); var focus:=SpellOperationCatalog.default_catalog().operation(\"attune\").action\n manager.equip_source(\"left\",water,{\"payload\":\"\",\"modifier\":\"\",\"uid\":\"\"})\n manager.equip_source(\"quick_e\",focus,{\"mode\":\"auto\"})\n var accepted:=manager.use_source(\"left\",actor,CastContext.at_position(actor,actor.position,water))\n manager.combinations.tick(1)\n for i in range(8): await process_frame\n var surface:=SurfaceManager.instance.surface_at(actor.position)\n var result: Dictionary={\"fixture\":\"explicit focus/water knowledge and terrain_water_focus rule; no injected surface or affinity\",\"water_accepted\":accepted,\"surface\":surface.state if surface else \"\",\"affinity\":manager.spell_forms.affinity,\"automatic\":describe(manager.preview_source(\"quick_e\",true))}\n var before:=actor.mana_component.mp\n var context:=CastContext.simple(actor,Vector2.RIGHT,focus); context.empower=true\n result[\"auto_accepted\"]=manager.use_source(\"quick_e\",actor,context)\n result[\"auto_mana_delta\"]=before-actor.mana_component.mp\n manager.shortcuts.set_selection(\"quick_e\",{\"payload\":\"basic\",\"modifier\":\"\",\"uid\":\"\"})\n result[\"manual_basic\"]=describe(manager.preview_source(\"quick_e\",true))\n context=CastContext.simple(actor,Vector2.RIGHT,focus); context.empower=true\n result[\"manual_accepted\"]=manager.use_source(\"quick_e\",actor,context)\n manager.combinations.tick(1)\n result[\"flow_status\"]=actor.get_node(\"BuffManager\").has_buff(\"flow_attunement\")\n result[\"manual_mana_delta\"]=before-actor.mana_component.mp\n var file:=FileAccess.open(\"/tmp/followup-water.json\",FileAccess.WRITE); file.store_string(JSON.stringify(result,\"  \"));file.close()\n print(\"REVIEW_WATER \",JSON.stringify(result))\n await fixture.close(); quit()\n",
+    "result": {
+      "affinity": "water",
+      "auto_accepted": false,
+      "auto_mana_delta": 0,
+      "automatic": {
+        "cost": 8,
+        "effect": "调谐",
+        "ready": false,
+        "reason": "这个动作没有当前元素的形式；用滚轮/M手动选择，不会自动换成其他元素。",
+        "rule": "terrain_water_focus",
+        "selection": {
+          "modifier": "",
+          "payload": "",
+          "uid": ""
+        }
+      },
+      "fixture": "explicit focus/water knowledge and terrain_water_focus rule; no injected surface or affinity",
+      "flow_status": true,
+      "manual_accepted": true,
+      "manual_basic": {
+        "cost": 8,
+        "effect": "流息",
+        "ready": true,
+        "reason": "",
+        "rule": "terrain_water_focus",
+        "selection": {
+          "modifier": "",
+          "payload": "basic",
+          "uid": ""
+        }
+      },
+      "manual_mana_delta": 8,
+      "surface": "wet",
+      "water_accepted": true
+    },
+    "exit_code": 0,
+    "diagnostics": [],
+    "meaning_of_exit": "evidence collection completed, not a passing regression test or normal player input proof"
+  },
+  "captures": [
+    {
+      "path": "docs/review/followup-ux/feedback-overlap.png",
+      "sha256": "b3b17da157635c5a99ce185299b0fc99750f75c3fcd2db30a58b57e4b5c9cf14"
+    },
+    {
+      "path": "docs/review/followup-ux/same-form-first-notch.png",
+      "sha256": "19528eedf6484e57e190abaf6b69ebccf645221c245dd96e2a19b78ef77e4c85"
+    },
+    {
+      "path": "docs/review/followup-ux/material-count-hidden.png",
+      "sha256": "7b0c9c14b4ffb305060281b66460783ea93fb51a38f5b5e170fa35e988aef40c"
+    },
+    {
+      "path": "docs/review/followup-ux/stale-scroll-target.png",
+      "sha256": "88f4c57baf6cce1b3b42bff8d0c09b60cbcee819b70adb8f274ab585baadac4e"
+    },
+    {
+      "path": "docs/review/followup-ux/batch-total-hidden.png",
+      "sha256": "f2cfd4192048bcd33c2f650762bd12ff946d11aeed743387e8143e419176bacb"
+    }
+  ],
+  "request_timeline": [
+    {
+      "id": 1.0,
+      "label": "开始河谷旅程",
+      "op": "click"
+    },
+    {
+      "id": 2.0,
+      "op": "walk",
+      "point": [
+        -3100.0,
+        1850.0
+      ]
+    },
+    {
+      "id": 3.0,
+      "key": "F",
+      "op": "key"
+    },
+    {
+      "id": 4.0,
+      "label": "火石",
+      "op": "click"
+    },
+    {
+      "id": 5.0,
+      "label": "加工：火石",
+      "op": "click"
+    },
+    {
+      "id": 6.0,
+      "key": "Escape",
+      "op": "key"
+    },
+    {
+      "action": "移至背包",
+      "id": 7.0,
+      "item": "cloth",
+      "op": "inventory"
+    },
+    {
+      "action": "移至口袋",
+      "id": 8.0,
+      "item": "fire_stone",
+      "op": "inventory"
+    },
+    {
+      "id": 9.0,
+      "key": "5",
+      "op": "key"
+    },
+    {
+      "id": 10.0,
+      "op": "wait",
+      "seconds": 1.1
+    },
+    {
+      "id": 11.0,
+      "key": "E",
+      "op": "hold_key"
+    },
+    {
+      "id": 12.0,
+      "key": "E",
+      "op": "release_key"
+    },
+    {
+      "capture": "01-auto-refusal-overlap",
+      "id": 13.0,
+      "op": "inspect"
+    },
+    {
+      "id": 14.0,
+      "op": "scroll",
+      "point": [
+        550.0,
+        300.0
+      ],
+      "steps": 1.0
+    },
+    {
+      "capture": "02-first-notch-same-form",
+      "id": 15.0,
+      "op": "inspect"
+    },
+    {
+      "id": 16.0,
+      "op": "scroll",
+      "point": [
+        550.0,
+        300.0
+      ],
+      "steps": 1.0
+    },
+    {
+      "capture": "03-second-notch-new-form",
+      "id": 17.0,
+      "op": "inspect"
+    },
+    {
+      "id": 18.0,
+      "key": "M",
+      "op": "key"
+    },
+    {
+      "id": 19.0,
+      "key": "E",
+      "op": "key"
+    },
+    {
+      "id": 20.0,
+      "op": "scroll",
+      "point": [
+        701.0,
+        289.0
+      ],
+      "steps": 0.0
+    },
+    {
+      "capture": "04-source-hides-material-count",
+      "id": 21.0,
+      "op": "inspect"
+    },
+    {
+      "id": 22.0,
+      "key": "Escape",
+      "op": "key"
+    },
+    {
+      "id": 23.0,
+      "key": "K",
+      "op": "key"
+    },
+    {
+      "id": 24.0,
+      "label": "可用物品",
+      "op": "click"
+    },
+    {
+      "capture": "05-item-binding-options",
+      "id": 25.0,
+      "op": "inspect"
+    },
+    {
+      "id": 26.0,
+      "label": "饮用水",
+      "op": "label_click"
+    },
+    {
+      "id": 27.0,
+      "label": "快捷键 E",
+      "op": "label_click"
+    },
+    {
+      "id": 28.0,
+      "op": "inspect"
+    },
+    {
+      "id": 29.0,
+      "op": "point_click",
+      "point": [
+        950.0,
+        241.0
+      ]
+    },
+    {
+      "id": 30.0,
+      "key": "Escape",
+      "op": "key"
+    },
+    {
+      "id": 31.0,
+      "key": "5",
+      "op": "wheel",
+      "payload": "ember"
+    },
+    {
+      "capture": "06-after-rebind-valid-wheel-target",
+      "id": 32.0,
+      "op": "inspect"
+    },
+    {
+      "id": 33.0,
+      "op": "scroll",
+      "point": [
+        550.0,
+        300.0
+      ],
+      "steps": 1.0
+    },
+    {
+      "capture": "07-stale-world-scroll-target",
+      "id": 34.0,
+      "op": "inspect"
+    },
+    {
+      "id": 35.0,
+      "key": "5",
+      "op": "key"
+    },
+    {
+      "id": 36.0,
+      "op": "scroll",
+      "point": [
+        550.0,
+        300.0
+      ],
+      "steps": 1.0
+    },
+    {
+      "capture": "08-fresh-key-restores-scroll",
+      "id": 37.0,
+      "op": "inspect"
+    },
+    {
+      "id": 38.0,
+      "op": "walk",
+      "point": [
+        -3210.0,
+        2220.0
+      ]
+    },
+    {
+      "id": 39.0,
+      "key": "F",
+      "op": "key"
+    },
+    {
+      "id": 40.0,
+      "label": "购买实物",
+      "op": "click"
+    },
+    {
+      "capture": "09-buying-quantity-options",
+      "id": 41.0,
+      "op": "inspect"
+    },
+    {
+      "id": 42.0,
+      "label": "炭屑 ×5 · 2币",
+      "op": "click"
+    },
+    {
+      "capture": "10-batch-price-before",
+      "id": 43.0,
+      "op": "inspect"
+    },
+    {
+      "id": 44.0,
+      "op": "point_click",
+      "point": [
+        700.0,
+        379.0
+      ]
+    },
+    {
+      "id": 45.0,
+      "key": "Home",
+      "op": "key"
+    },
+    {
+      "id": 46.0,
+      "key": "Delete",
+      "op": "key"
+    },
+    {
+      "id": 47.0,
+      "op": "type",
+      "text": "3"
+    },
+    {
+      "id": 48.0,
+      "key": "Enter",
+      "op": "key"
+    },
+    {
+      "capture": "11-batch-total-not-shown",
+      "id": 49.0,
+      "op": "inspect"
+    },
+    {
+      "id": 50.0,
+      "label": "购买所选数量",
+      "op": "click"
+    },
+    {
+      "capture": "12-ambiguous-trade-refusal",
+      "id": 51.0,
+      "op": "inspect"
+    },
+    {
+      "id": 52.0,
+      "key": "Escape",
+      "op": "key"
+    },
+    {
+      "id": 53.0,
+      "op": "quit"
+    }
+  ],
+  "observations": [
+    {
+      "request": {
+        "capture": "01-auto-refusal-overlap",
+        "id": 13.0,
+        "op": "inspect"
+      },
+      "error": "",
+      "state": {
+        "spell_affinity": "fire",
+        "effective_forms": {
+          "quick_e": {
+            "modifier": "",
+            "payload": "charged_fireball",
+            "uid": ""
+          },
+          "right": {},
+          "slot_0": {},
+          "slot_3": {},
+          "slot_4": {
+            "modifier": "",
+            "payload": "ember",
+            "uid": ""
+          },
+          "slot_5": {}
+        },
+        "player": {
+          "attacks": 0,
+          "base": true,
+          "channel_source": "",
+          "charge_source": "",
+          "damage_taken": 0,
+          "dead": false,
+          "guarding": false,
+          "hp": 100,
+          "mode": "idle",
+          "mp": 52,
+          "position": [
+            -3102.98291015625,
+            1856.49096679688
+          ],
+          "stamina": 100.0,
+          "ui_blocked": false
+        },
+        "date": "第1天 10:41",
+        "materials": {
+          "arrow": 6,
+          "ash": 2,
+          "charcoal": 2,
+          "clean_water": 4,
+          "cloth": 1,
+          "coin": 1,
+          "crystal": 7,
+          "frost_salt": 2,
+          "grain": 3,
+          "herb": 2,
+          "poison_rag": 1,
+          "ration": 3,
+          "resin": 1,
+          "sap": 6,
+          "storm_dust": 3
+        },
+        "items": [
+          {
+            "definition": "ash",
+            "properties": {},
+            "quantity": 2,
+            "uid": "item.77"
+          },
+          {
+            "definition": "charcoal",
+            "properties": {},
+            "quantity": 2,
+            "uid": "item.78"
+          },
+          {
+            "definition": "crystal",
+            "properties": {},
+            "quantity": 7,
+            "uid": "item.79"
+          },
+          {
+            "definition": "frost_salt",
+            "properties": {},
+            "quantity": 2,
+            "uid": "item.80"
+          },
+          {
+            "definition": "resin",
+            "properties": {},
+            "quantity": 1,
+            "uid": "item.81"
+          },
+          {
+            "definition": "sap",
+            "properties": {},
+            "quantity": 6,
+            "uid": "item.82"
+          },
+          {
+            "definition": "storm_dust",
+            "properties": {},
+            "quantity": 3,
+            "uid": "item.83"
+          },
+          {
+            "definition": "ration",
+            "properties": {},
+            "quantity": 3,
+            "uid": "item.84"
+          },
+          {
+            "definition": "grain",
+            "properties": {},
+            "quantity": 3,
+            "uid": "item.85"
+          },
+          {
+            "definition": "herb",
+            "properties": {},
+            "quantity": 2,
+            "uid": "item.86"
+          },
+          {
+            "definition": "clean_water",
+            "properties": {},
+            "quantity": 4,
+            "uid": "item.87"
+          }
+        ],
+        "pack": [
+          {
+            "definition": "arrow",
+            "properties": {},
+            "quantity": 6,
+            "uid": "item.93"
+          },
+          {
+            "definition": "coin",
+            "properties": {},
+            "quantity": 1,
+            "uid": "item.88"
+          },
+          {
+            "definition": "poison_rag",
+            "properties": {},
+            "quantity": 1,
+            "uid": "item.28"
+          },
+          {
+            "definition": "cloth",
+            "properties": {},
+            "quantity": 1,
+            "uid": "item.27"
+          }
+        ],
+        "shortcuts": {
+          "item_0": {
+            "item_id": "ration",
+            "kind": "item",
+            "uid": ""
+          },
+          "item_1": {
+            "item_id": "clean_water",
+            "kind": "item",
+            "uid": ""
+          },
+          "item_2": {
+            "item_id": "tea",
+            "kind": "item",
+            "uid": ""
+          },
+          "item_3": {
+            "item_id": "broth",
+            "kind": "item",
+            "uid": ""
+          },
+          "left": {
+            "kind": "technique",
+            "technique_id": "blade_breaker"
+          },
+          "quick_e": {
+            "kind": "skill",
+            "selection": {
+              "mode": "auto"
+            },
+            "skill_id": "project",
+            "upgrades": {}
+          },
+          "right": {
+            "kind": "skill",
+            "skill_id": "ignite",
+            "upgrades": {}
+          },
+          "slot_0": {
+            "kind": "skill",
+            "skill_id": "disperse",
+            "upgrades": {}
+          },
+          "slot_3": {
+            "kind": "skill",
+            "skill_id": "water_call",
+            "upgrades": {}
+          },
+          "slot_4": {
+            "kind": "skill",
+            "selection": {
+              "modifier": "",
+              "payload": "ember",
+              "uid": ""
+            },
+            "skill_id": "inscribe",
+            "upgrades": {}
+          },
+          "slot_5": {
+            "kind": "skill",
+            "skill_id": "ignite",
+            "upgrades": {}
+          }
+        },
+        "fields": [
+          {
+            "charges": 6,
+            "position": [
+              -3102.98291015625,
+              1856.49096679688
+            ],
+            "remaining": 179.245718888889,
+            "type": "fire"
+          }
+        ],
+        "notice": "聚能投射：施法材料不足：火石 ×1（持有0）\n火石：口袋0 / 背包0 · 需1",
+        "casts": [
+          {
+            "action": "inscribe",
+            "charge_power": 1.0,
+            "materials": {
+              "fire_stone": 1
+            },
+            "mp_after": 52,
+            "mp_cost": 8,
+            "position": [
+              -3102.98291015625,
+              1856.49096679688
+            ],
+            "result": "inscribe",
+            "rule": "",
+            "t": 37.1958262222223
+          }
+        ],
+        "ui": {
+          "fatigue": 5.28214808,
+          "hydration": 92.8122713916676,
+          "last_spell_source": "quick_e",
+          "merchant": {
+            "arrow": 30,
+            "book_spear_thrust": 1,
+            "charcoal": 5,
+            "clean_water": 4,
+            "clear_tonic": 2,
+            "cloth": 6,
+            "coin": 151,
+            "crystal": 4,
+            "guard_tonic": 2,
+            "metal_scrap": 10,
+            "ration": 6,
+            "sap": 9
+          },
+          "nutrition": 95.2081809277777,
+          "production": {
+            "jobs": {},
+            "schema": 1
+          },
+          "selected_inventory": "",
+          "viewport": [
+            1152,
+            648
+          ],
+          "wheel_entries": [],
+          "wheel_last_source": "quick_e",
+          "visible_text": [
+            "灰河谷 · 河谷镇",
+            "河谷镇 · 可以整备、烹饪、训练和交付",
+            "Tab  远征菜单",
+            "聚能投射：施法材料不足：火石 ×1（持有0）\n火石：口袋0 / 背包0 · 需1",
+            "旅程  /  J\n选择要追踪的委托",
+            "第1天 10:41",
+            "F  镇中工作台：制造与炼制",
+            "7  ×3",
+            "8  ×4",
+            "9  ×0",
+            "0  ×0"
+          ]
+        }
+      }
+    },
+    {
+      "request": {
+        "capture": "02-first-notch-same-form",
+        "id": 15.0,
+        "op": "inspect"
+      },
+      "error": "",
+      "state": {
+        "spell_affinity": "fire",
+        "effective_forms": {
+          "quick_e": {
+            "modifier": "",
+            "payload": "charged_fireball",
+            "uid": ""
+          },
+          "right": {},
+          "slot_0": {},
+          "slot_3": {},
+          "slot_4": {
+            "modifier": "",
+            "payload": "ember",
+            "uid": ""
+          },
+          "slot_5": {}
+        },
+        "player": {
+          "attacks": 0,
+          "base": true,
+          "channel_source": "",
+          "charge_source": "",
+          "damage_taken": 0,
+          "dead": false,
+          "guarding": false,
+          "hp": 100,
+          "mode": "idle",
+          "mp": 52,
+          "position": [
+            -3102.98291015625,
+            1856.49096679688
+          ],
+          "stamina": 100.0,
+          "ui_blocked": false
+        },
+        "date": "第1天 10:42",
+        "materials": {
+          "arrow": 6,
+          "ash": 2,
+          "charcoal": 2,
+          "clean_water": 4,
+          "cloth": 1,
+          "coin": 1,
+          "crystal": 7,
+          "frost_salt": 2,
+          "grain": 3,
+          "herb": 2,
+          "poison_rag": 1,
+          "ration": 3,
+          "resin": 1,
+          "sap": 6,
+          "storm_dust": 3
+        },
+        "items": [
+          {
+            "definition": "ash",
+            "properties": {},
+            "quantity": 2,
+            "uid": "item.77"
+          },
+          {
+            "definition": "charcoal",
+            "properties": {},
+            "quantity": 2,
+            "uid": "item.78"
+          },
+          {
+            "definition": "crystal",
+            "properties": {},
+            "quantity": 7,
+            "uid": "item.79"
+          },
+          {
+            "definition": "frost_salt",
+            "properties": {},
+            "quantity": 2,
+            "uid": "item.80"
+          },
+          {
+            "definition": "resin",
+            "properties": {},
+            "quantity": 1,
+            "uid": "item.81"
+          },
+          {
+            "definition": "sap",
+            "properties": {},
+            "quantity": 6,
+            "uid": "item.82"
+          },
+          {
+            "definition": "storm_dust",
+            "properties": {},
+            "quantity": 3,
+            "uid": "item.83"
+          },
+          {
+            "definition": "ration",
+            "properties": {},
+            "quantity": 3,
+            "uid": "item.84"
+          },
+          {
+            "definition": "grain",
+            "properties": {},
+            "quantity": 3,
+            "uid": "item.85"
+          },
+          {
+            "definition": "herb",
+            "properties": {},
+            "quantity": 2,
+            "uid": "item.86"
+          },
+          {
+            "definition": "clean_water",
+            "properties": {},
+            "quantity": 4,
+            "uid": "item.87"
+          }
+        ],
+        "pack": [
+          {
+            "definition": "arrow",
+            "properties": {},
+            "quantity": 6,
+            "uid": "item.93"
+          },
+          {
+            "definition": "coin",
+            "properties": {},
+            "quantity": 1,
+            "uid": "item.88"
+          },
+          {
+            "definition": "poison_rag",
+            "properties": {},
+            "quantity": 1,
+            "uid": "item.28"
+          },
+          {
+            "definition": "cloth",
+            "properties": {},
+            "quantity": 1,
+            "uid": "item.27"
+          }
+        ],
+        "shortcuts": {
+          "item_0": {
+            "item_id": "ration",
+            "kind": "item",
+            "uid": ""
+          },
+          "item_1": {
+            "item_id": "clean_water",
+            "kind": "item",
+            "uid": ""
+          },
+          "item_2": {
+            "item_id": "tea",
+            "kind": "item",
+            "uid": ""
+          },
+          "item_3": {
+            "item_id": "broth",
+            "kind": "item",
+            "uid": ""
+          },
+          "left": {
+            "kind": "technique",
+            "technique_id": "blade_breaker"
+          },
+          "quick_e": {
+            "kind": "skill",
+            "selection": {
+              "modifier": "",
+              "payload": "charged_fireball",
+              "uid": ""
+            },
+            "skill_id": "project",
+            "upgrades": {}
+          },
+          "right": {
+            "kind": "skill",
+            "skill_id": "ignite",
+            "upgrades": {}
+          },
+          "slot_0": {
+            "kind": "skill",
+            "skill_id": "disperse",
+            "upgrades": {}
+          },
+          "slot_3": {
+            "kind": "skill",
+            "skill_id": "water_call",
+            "upgrades": {}
+          },
+          "slot_4": {
+            "kind": "skill",
+            "selection": {
+              "modifier": "",
+              "payload": "ember",
+              "uid": ""
+            },
+            "skill_id": "inscribe",
+            "upgrades": {}
+          },
+          "slot_5": {
+            "kind": "skill",
+            "skill_id": "ignite",
+            "upgrades": {}
+          }
+        },
+        "fields": [
+          {
+            "charges": 6,
+            "position": [
+              -3102.98291015625,
+              1856.49096679688
+            ],
+            "remaining": 178.545918777778,
+            "type": "fire"
+          }
+        ],
+        "notice": "E · 火石核心 · 脚下法阵充能\n施法材料不足：火石 ×1（持有0）",
+        "casts": [
+          {
+            "action": "inscribe",
+            "charge_power": 1.0,
+            "materials": {
+              "fire_stone": 1
+            },
+            "mp_after": 52,
+            "mp_cost": 8,
+            "position": [
+              -3102.98291015625,
+              1856.49096679688
+            ],
+            "result": "inscribe",
+            "rule": "",
+            "t": 37.1958262222223
+          }
+        ],
+        "ui": {
+          "fatigue": 5.28214808,
+          "hydration": 92.7947763888898,
+          "last_spell_source": "quick_e",
+          "merchant": {
+            "arrow": 30,
+            "book_spear_thrust": 1,
+            "charcoal": 5,
+            "clean_water": 4,
+            "clear_tonic": 2,
+            "cloth": 6,
+            "coin": 151,
+            "crystal": 4,
+            "guard_tonic": 2,
+            "metal_scrap": 10,
+            "ration": 6,
+            "sap": 9
+          },
+          "nutrition": 95.1965175925926,
+          "production": {
+            "jobs": {},
+            "schema": 1
+          },
+          "selected_inventory": "",
+          "viewport": [
+            1152,
+            648
+          ],
+          "wheel_entries": [],
+          "wheel_last_source": "quick_e",
+          "visible_text": [
+            "灰河谷 · 河谷镇",
+            "河谷镇 · 可以整备、烹饪、训练和交付",
+            "Tab  远征菜单",
+            "E · 火石核心 · 脚下法阵充能\n施法材料不足：火石 ×1（持有0）",
+            "旅程  /  J\n选择要追踪的委托",
+            "第1天 10:41",
+            "F  镇中工作台：制造与炼制",
+            "7  ×3",
+            "8  ×4",
+            "9  ×0",
+            "0  ×0"
+          ]
+        }
+      }
+    },
+    {
+      "request": {
+        "capture": "03-second-notch-new-form",
+        "id": 17.0,
+        "op": "inspect"
+      },
+      "error": "",
+      "state": {
+        "spell_affinity": "fire",
+        "effective_forms": {
+          "quick_e": {
+            "modifier": "",
+            "payload": "cinder_volley",
+            "uid": ""
+          },
+          "right": {},
+          "slot_0": {},
+          "slot_3": {},
+          "slot_4": {
+            "modifier": "",
+            "payload": "ember",
+            "uid": ""
+          },
+          "slot_5": {}
+        },
+        "player": {
+          "attacks": 0,
+          "base": true,
+          "channel_source": "",
+          "charge_source": "",
+          "damage_taken": 0,
+          "dead": false,
+          "guarding": false,
+          "hp": 100,
+          "mode": "idle",
+          "mp": 52,
+          "position": [
+            -3102.98291015625,
+            1856.49096679688
+          ],
+          "stamina": 100.0,
+          "ui_blocked": false
+        },
+        "date": "第1天 10:42",
+        "materials": {
+          "arrow": 6,
+          "ash": 2,
+          "charcoal": 2,
+          "clean_water": 4,
+          "cloth": 1,
+          "coin": 1,
+          "crystal": 7,
+          "frost_salt": 2,
+          "grain": 3,
+          "herb": 2,
+          "poison_rag": 1,
+          "ration": 3,
+          "resin": 1,
+          "sap": 6,
+          "storm_dust": 3
+        },
+        "items": [
+          {
+            "definition": "ash",
+            "properties": {},
+            "quantity": 2,
+            "uid": "item.77"
+          },
+          {
+            "definition": "charcoal",
+            "properties": {},
+            "quantity": 2,
+            "uid": "item.78"
+          },
+          {
+            "definition": "crystal",
+            "properties": {},
+            "quantity": 7,
+            "uid": "item.79"
+          },
+          {
+            "definition": "frost_salt",
+            "properties": {},
+            "quantity": 2,
+            "uid": "item.80"
+          },
+          {
+            "definition": "resin",
+            "properties": {},
+            "quantity": 1,
+            "uid": "item.81"
+          },
+          {
+            "definition": "sap",
+            "properties": {},
+            "quantity": 6,
+            "uid": "item.82"
+          },
+          {
+            "definition": "storm_dust",
+            "properties": {},
+            "quantity": 3,
+            "uid": "item.83"
+          },
+          {
+            "definition": "ration",
+            "properties": {},
+            "quantity": 3,
+            "uid": "item.84"
+          },
+          {
+            "definition": "grain",
+            "properties": {},
+            "quantity": 3,
+            "uid": "item.85"
+          },
+          {
+            "definition": "herb",
+            "properties": {},
+            "quantity": 2,
+            "uid": "item.86"
+          },
+          {
+            "definition": "clean_water",
+            "properties": {},
+            "quantity": 4,
+            "uid": "item.87"
+          }
+        ],
+        "pack": [
+          {
+            "definition": "arrow",
+            "properties": {},
+            "quantity": 6,
+            "uid": "item.93"
+          },
+          {
+            "definition": "coin",
+            "properties": {},
+            "quantity": 1,
+            "uid": "item.88"
+          },
+          {
+            "definition": "poison_rag",
+            "properties": {},
+            "quantity": 1,
+            "uid": "item.28"
+          },
+          {
+            "definition": "cloth",
+            "properties": {},
+            "quantity": 1,
+            "uid": "item.27"
+          }
+        ],
+        "shortcuts": {
+          "item_0": {
+            "item_id": "ration",
+            "kind": "item",
+            "uid": ""
+          },
+          "item_1": {
+            "item_id": "clean_water",
+            "kind": "item",
+            "uid": ""
+          },
+          "item_2": {
+            "item_id": "tea",
+            "kind": "item",
+            "uid": ""
+          },
+          "item_3": {
+            "item_id": "broth",
+            "kind": "item",
+            "uid": ""
+          },
+          "left": {
+            "kind": "technique",
+            "technique_id": "blade_breaker"
+          },
+          "quick_e": {
+            "kind": "skill",
+            "selection": {
+              "modifier": "",
+              "payload": "cinder_volley",
+              "uid": ""
+            },
+            "skill_id": "project",
+            "upgrades": {}
+          },
+          "right": {
+            "kind": "skill",
+            "skill_id": "ignite",
+            "upgrades": {}
+          },
+          "slot_0": {
+            "kind": "skill",
+            "skill_id": "disperse",
+            "upgrades": {}
+          },
+          "slot_3": {
+            "kind": "skill",
+            "skill_id": "water_call",
+            "upgrades": {}
+          },
+          "slot_4": {
+            "kind": "skill",
+            "selection": {
+              "modifier": "",
+              "payload": "ember",
+              "uid": ""
+            },
+            "skill_id": "inscribe",
+            "upgrades": {}
+          },
+          "slot_5": {
+            "kind": "skill",
+            "skill_id": "ignite",
+            "upgrades": {}
+          }
+        },
+        "fields": [
+          {
+            "charges": 6,
+            "position": [
+              -3102.98291015625,
+              1856.49096679688
+            ],
+            "remaining": 177.808206888889,
+            "type": "fire"
+          }
+        ],
+        "notice": "E · 树脂散射 · 脚下法阵充能",
+        "casts": [
+          {
+            "action": "inscribe",
+            "charge_power": 1.0,
+            "materials": {
+              "fire_stone": 1
+            },
+            "mp_after": 52,
+            "mp_cost": 8,
+            "position": [
+              -3102.98291015625,
+              1856.49096679688
+            ],
+            "result": "inscribe",
+            "rule": "",
+            "t": 37.1958262222223
+          }
+        ],
+        "ui": {
+          "fatigue": 5.28214808,
+          "hydration": 92.7763335916676,
+          "last_spell_source": "quick_e",
+          "merchant": {
+            "arrow": 30,
+            "book_spear_thrust": 1,
+            "charcoal": 5,
+            "clean_water": 4,
+            "clear_tonic": 2,
+            "cloth": 6,
+            "coin": 151,
+            "crystal": 4,
+            "guard_tonic": 2,
+            "metal_scrap": 10,
+            "ration": 6,
+            "sap": 9
+          },
+          "nutrition": 95.1842223944444,
+          "production": {
+            "jobs": {},
+            "schema": 1
+          },
+          "selected_inventory": "",
+          "viewport": [
+            1152,
+            648
+          ],
+          "wheel_entries": [],
+          "wheel_last_source": "quick_e",
+          "visible_text": [
+            "灰河谷 · 河谷镇",
+            "河谷镇 · 可以整备、烹饪、训练和交付",
+            "Tab  远征菜单",
+            "E · 树脂散射 · 脚下法阵充能",
+            "旅程  /  J\n选择要追踪的委托",
+            "第1天 10:42",
+            "F  镇中工作台：制造与炼制",
+            "7  ×3",
+            "8  ×4",
+            "9  ×0",
+            "0  ×0"
+          ]
+        }
+      }
+    },
+    {
+      "request": {
+        "capture": "04-source-hides-material-count",
+        "id": 21.0,
+        "op": "inspect"
+      },
+      "error": "",
+      "state": {
+        "spell_affinity": "fire",
+        "effective_forms": {
+          "quick_e": {
+            "modifier": "",
+            "payload": "cinder_volley",
+            "uid": ""
+          },
+          "right": {},
+          "slot_0": {},
+          "slot_3": {},
+          "slot_4": {
+            "modifier": "",
+            "payload": "ember",
+            "uid": ""
+          },
+          "slot_5": {}
+        },
+        "player": {
+          "attacks": 0,
+          "base": true,
+          "channel_source": "",
+          "charge_source": "",
+          "damage_taken": 0,
+          "dead": false,
+          "guarding": false,
+          "hp": 100,
+          "mode": "idle",
+          "mp": 56,
+          "position": [
+            -3102.98291015625,
+            1856.49096679688
+          ],
+          "stamina": 100.0,
+          "ui_blocked": false
+        },
+        "date": "第1天 10:44",
+        "materials": {
+          "arrow": 6,
+          "ash": 2,
+          "charcoal": 2,
+          "clean_water": 4,
+          "cloth": 1,
+          "coin": 1,
+          "crystal": 7,
+          "frost_salt": 2,
+          "grain": 3,
+          "herb": 2,
+          "poison_rag": 1,
+          "ration": 3,
+          "resin": 1,
+          "sap": 6,
+          "storm_dust": 3
+        },
+        "items": [
+          {
+            "definition": "ash",
+            "properties": {},
+            "quantity": 2,
+            "uid": "item.77"
+          },
+          {
+            "definition": "charcoal",
+            "properties": {},
+            "quantity": 2,
+            "uid": "item.78"
+          },
+          {
+            "definition": "crystal",
+            "properties": {},
+            "quantity": 7,
+            "uid": "item.79"
+          },
+          {
+            "definition": "frost_salt",
+            "properties": {},
+            "quantity": 2,
+            "uid": "item.80"
+          },
+          {
+            "definition": "resin",
+            "properties": {},
+            "quantity": 1,
+            "uid": "item.81"
+          },
+          {
+            "definition": "sap",
+            "properties": {},
+            "quantity": 6,
+            "uid": "item.82"
+          },
+          {
+            "definition": "storm_dust",
+            "properties": {},
+            "quantity": 3,
+            "uid": "item.83"
+          },
+          {
+            "definition": "ration",
+            "properties": {},
+            "quantity": 3,
+            "uid": "item.84"
+          },
+          {
+            "definition": "grain",
+            "properties": {},
+            "quantity": 3,
+            "uid": "item.85"
+          },
+          {
+            "definition": "herb",
+            "properties": {},
+            "quantity": 2,
+            "uid": "item.86"
+          },
+          {
+            "definition": "clean_water",
+            "properties": {},
+            "quantity": 4,
+            "uid": "item.87"
+          }
+        ],
+        "pack": [
+          {
+            "definition": "arrow",
+            "properties": {},
+            "quantity": 6,
+            "uid": "item.93"
+          },
+          {
+            "definition": "coin",
+            "properties": {},
+            "quantity": 1,
+            "uid": "item.88"
+          },
+          {
+            "definition": "poison_rag",
+            "properties": {},
+            "quantity": 1,
+            "uid": "item.28"
+          },
+          {
+            "definition": "cloth",
+            "properties": {},
+            "quantity": 1,
+            "uid": "item.27"
+          }
+        ],
+        "shortcuts": {
+          "item_0": {
+            "item_id": "ration",
+            "kind": "item",
+            "uid": ""
+          },
+          "item_1": {
+            "item_id": "clean_water",
+            "kind": "item",
+            "uid": ""
+          },
+          "item_2": {
+            "item_id": "tea",
+            "kind": "item",
+            "uid": ""
+          },
+          "item_3": {
+            "item_id": "broth",
+            "kind": "item",
+            "uid": ""
+          },
+          "left": {
+            "kind": "technique",
+            "technique_id": "blade_breaker"
+          },
+          "quick_e": {
+            "kind": "skill",
+            "selection": {
+              "modifier": "",
+              "payload": "cinder_volley",
+              "uid": ""
+            },
+            "skill_id": "project",
+            "upgrades": {}
+          },
+          "right": {
+            "kind": "skill",
+            "skill_id": "ignite",
+            "upgrades": {}
+          },
+          "slot_0": {
+            "kind": "skill",
+            "skill_id": "disperse",
+            "upgrades": {}
+          },
+          "slot_3": {
+            "kind": "skill",
+            "skill_id": "water_call",
+            "upgrades": {}
+          },
+          "slot_4": {
+            "kind": "skill",
+            "selection": {
+              "modifier": "",
+              "payload": "ember",
+              "uid": ""
+            },
+            "skill_id": "inscribe",
+            "upgrades": {}
+          },
+          "slot_5": {
+            "kind": "skill",
+            "skill_id": "ignite",
+            "upgrades": {}
+          }
+        },
+        "fields": [
+          {
+            "charges": 6,
+            "position": [
+              -3102.98291015625,
+              1856.49096679688
+            ],
+            "remaining": 176.537385555556,
+            "type": "fire"
+          }
+        ],
+        "notice": "E · 树脂散射 · 脚下法阵充能",
+        "casts": [
+          {
+            "action": "inscribe",
+            "charge_power": 1.0,
+            "materials": {
+              "fire_stone": 1
+            },
+            "mp_after": 52,
+            "mp_cost": 8,
+            "position": [
+              -3102.98291015625,
+              1856.49096679688
+            ],
+            "result": "inscribe",
+            "rule": "",
+            "t": 37.1958262222223
+          }
+        ],
+        "ui": {
+          "fatigue": 5.28214808,
+          "hydration": 92.7445630583343,
+          "last_spell_source": "quick_e",
+          "merchant": {
+            "arrow": 30,
+            "book_spear_thrust": 1,
+            "charcoal": 5,
+            "clean_water": 4,
+            "clear_tonic": 2,
+            "cloth": 6,
+            "coin": 151,
+            "crystal": 4,
+            "guard_tonic": 2,
+            "metal_scrap": 10,
+            "ration": 6,
+            "sap": 9
+          },
+          "nutrition": 95.1630420388889,
+          "production": {
+            "jobs": {},
+            "schema": 1
+          },
+          "selected_inventory": "",
+          "viewport": [
+            1152,
+            648
+          ],
+          "wheel_entries": [
+            {
+              "variant_id": "auto",
+              "title": "跟随·火石核心",
+              "choice": {
+                "mode": "auto"
+              },
+              "cost": 20,
+              "ready": false,
+              "reason": "施法材料不足：火石 ×1（持有0）",
+              "detail": "跟随最近成功施法的元素",
+              "current": false
+            },
+            {
+              "variant_id": "charged_fireball",
+              "title": "火石核心",
+              "choice": {
+                "modifier": "",
+                "payload": "charged_fireball",
+                "uid": ""
+              },
+              "cost": 20,
+              "ready": false,
+              "reason": "施法材料不足：火石 ×1（持有0）",
+              "detail": "脚下法阵充能",
+              "current": false
+            },
+            {
+              "variant_id": "cinder_volley",
+              "title": "树脂散射",
+              "choice": {
+                "modifier": "",
+                "payload": "cinder_volley",
+                "uid": ""
+              },
+              "cost": 20,
+              "ready": true,
+              "reason": "",
+              "detail": "脚下法阵充能",
+              "current": true
+            },
+            {
+              "variant_id": "ember_orb",
+              "title": "炭屑重核",
+              "choice": {
+                "modifier": "",
+                "payload": "ember_orb",
+                "uid": ""
+              },
+              "cost": 24,
+              "ready": true,
+              "reason": "",
+              "detail": "脚下法阵充能",
+              "current": false
+            },
+            {
+              "variant_id": "glacial_orb",
+              "title": "霜盐追踪核",
+              "choice": {
+                "modifier": "",
+                "payload": "glacial_orb",
+                "uid": ""
+              },
+              "cost": 18,
+              "ready": false,
+              "reason": "所选法阵不在脚下或充能已耗尽；不会替换来源",
+              "detail": "脚下法阵充能",
+              "current": false
+            },
+            {
+              "variant_id": "thunder_orb",
+              "title": "雷晶追踪核",
+              "choice": {
+                "modifier": "",
+                "payload": "thunder_orb",
+                "uid": ""
+              },
+              "cost": 23,
+              "ready": false,
+              "reason": "所选法阵不在脚下或充能已耗尽；不会替换来源",
+              "detail": "脚下法阵充能",
+              "current": false
+            },
+            {
+              "variant_id": "tidal_orb",
+              "title": "清水追踪核",
+              "choice": {
+                "modifier": "",
+                "payload": "tidal_orb",
+                "uid": ""
+              },
+              "cost": 18,
+              "ready": false,
+              "reason": "所选法阵不在脚下或充能已耗尽；不会替换来源",
+              "detail": "脚下法阵充能",
+              "current": false
+            },
+            {
+              "variant_id": "plague_bolt",
+              "title": "毒萃穿刺",
+              "choice": {
+                "modifier": "",
+                "payload": "plague_bolt",
+                "uid": ""
+              },
+              "cost": 18,
+              "ready": false,
+              "reason": "所选法阵不在脚下或充能已耗尽；不会替换来源",
+              "detail": "脚下法阵充能",
+              "current": false
+            },
+            {
+              "variant_id": "shadow_bolt",
+              "title": "回响暗蚀",
+              "choice": {
+                "modifier": "",
+                "payload": "shadow_bolt",
+                "uid": ""
+              },
+              "cost": 18,
+              "ready": false,
+              "reason": "所选法阵不在脚下或充能已耗尽；不会替换来源",
+              "detail": "脚下法阵充能",
+              "current": false
+            },
+            {
+              "variant_id": "solar_spear",
+              "title": "守护粉贯穿",
+              "choice": {
+                "modifier": "",
+                "payload": "solar_spear",
+                "uid": ""
+              },
+              "cost": 32,
+              "ready": false,
+              "reason": "施法材料不足：守护粉 ×1（持有0）",
+              "detail": "脚下法阵充能",
+              "current": false
+            }
+          ],
+          "wheel_last_source": "quick_e",
+          "visible_text": [
+            "E\n聚能投射",
+            "跟随·火石核心\n20 MP",
+            "火石核心\n20 MP",
+            "✓ 树脂散射\n20 MP",
+            "炭屑重核\n24 MP",
+            "霜盐追踪核\n18 MP",
+            "雷晶追踪核\n23 MP",
+            "清水追踪核\n18 MP",
+            "毒萃穿刺\n18 MP",
+            "快捷选材 · 世界持续运行\nQ/E/R与数字键选择动作 · 滚轮翻页 / 同类切瓶",
+            "树脂散射 · 20 MP · 脚下法阵充能\n可释放 · 确认后按原快捷键施放\n第1/2页 · 中键松开 / M模式点击确认 · Esc取消",
+            "Tab  远征菜单",
+            "第1天 10:43",
+            "7  ×3",
+            "8  ×4",
+            "9  ×0",
+            "0  ×0"
+          ]
+        }
+      }
+    },
+    {
+      "request": {
+        "id": 27.0,
+        "label": "快捷键 E",
+        "op": "label_click"
+      },
+      "error": "missing_label: 快捷键 E",
+      "state": {
+        "spell_affinity": "fire",
+        "effective_forms": {
+          "quick_e": {
+            "modifier": "",
+            "payload": "cinder_volley",
+            "uid": ""
+          },
+          "right": {},
+          "slot_0": {},
+          "slot_3": {},
+          "slot_4": {
+            "modifier": "",
+            "payload": "ember",
+            "uid": ""
+          },
+          "slot_5": {}
+        },
+        "player": {
+          "attacks": 0,
+          "base": true,
+          "channel_source": "",
+          "charge_source": "",
+          "damage_taken": 0,
+          "dead": false,
+          "guarding": false,
+          "hp": 100,
+          "mode": "idle",
+          "mp": 60,
+          "position": [
+            -3102.98291015625,
+            1856.49096679688
+          ],
+          "stamina": 100.0,
+          "ui_blocked": true
+        },
+        "date": "第1天 12:50",
+        "materials": {
+          "arrow": 6,
+          "ash": 2,
+          "charcoal": 2,
+          "clean_water": 4,
+          "cloth": 1,
+          "coin": 1,
+          "crystal": 7,
+          "frost_salt": 2,
+          "grain": 3,
+          "herb": 2,
+          "poison_rag": 1,
+          "ration": 3,
+          "resin": 1,
+          "sap": 6,
+          "storm_dust": 3
+        },
+        "items": [
+          {
+            "definition": "ash",
+            "properties": {},
+            "quantity": 2,
+            "uid": "item.77"
+          },
+          {
+            "definition": "charcoal",
+            "properties": {},
+            "quantity": 2,
+            "uid": "item.78"
+          },
+          {
+            "definition": "crystal",
+            "properties": {},
+            "quantity": 7,
+            "uid": "item.79"
+          },
+          {
+            "definition": "frost_salt",
+            "properties": {},
+            "quantity": 2,
+            "uid": "item.80"
+          },
+          {
+            "definition": "resin",
+            "properties": {},
+            "quantity": 1,
+            "uid": "item.81"
+          },
+          {
+            "definition": "sap",
+            "properties": {},
+            "quantity": 6,
+            "uid": "item.82"
+          },
+          {
+            "definition": "storm_dust",
+            "properties": {},
+            "quantity": 3,
+            "uid": "item.83"
+          },
+          {
+            "definition": "ration",
+            "properties": {},
+            "quantity": 3,
+            "uid": "item.84"
+          },
+          {
+            "definition": "grain",
+            "properties": {},
+            "quantity": 3,
+            "uid": "item.85"
+          },
+          {
+            "definition": "herb",
+            "properties": {},
+            "quantity": 2,
+            "uid": "item.86"
+          },
+          {
+            "definition": "clean_water",
+            "properties": {},
+            "quantity": 4,
+            "uid": "item.87"
+          }
+        ],
+        "pack": [
+          {
+            "definition": "arrow",
+            "properties": {},
+            "quantity": 6,
+            "uid": "item.93"
+          },
+          {
+            "definition": "coin",
+            "properties": {},
+            "quantity": 1,
+            "uid": "item.88"
+          },
+          {
+            "definition": "poison_rag",
+            "properties": {},
+            "quantity": 1,
+            "uid": "item.28"
+          },
+          {
+            "definition": "cloth",
+            "properties": {},
+            "quantity": 1,
+            "uid": "item.27"
+          }
+        ],
+        "shortcuts": {
+          "item_0": {
+            "item_id": "ration",
+            "kind": "item",
+            "uid": ""
+          },
+          "item_1": {
+            "item_id": "clean_water",
+            "kind": "item",
+            "uid": ""
+          },
+          "item_2": {
+            "item_id": "tea",
+            "kind": "item",
+            "uid": ""
+          },
+          "item_3": {
+            "item_id": "broth",
+            "kind": "item",
+            "uid": ""
+          },
+          "left": {
+            "kind": "technique",
+            "technique_id": "blade_breaker"
+          },
+          "quick_e": {
+            "kind": "skill",
+            "selection": {
+              "modifier": "",
+              "payload": "cinder_volley",
+              "uid": ""
+            },
+            "skill_id": "project",
+            "upgrades": {}
+          },
+          "right": {
+            "kind": "skill",
+            "skill_id": "ignite",
+            "upgrades": {}
+          },
+          "slot_0": {
+            "kind": "skill",
+            "skill_id": "disperse",
+            "upgrades": {}
+          },
+          "slot_3": {
+            "kind": "skill",
+            "skill_id": "water_call",
+            "upgrades": {}
+          },
+          "slot_4": {
+            "kind": "skill",
+            "selection": {
+              "modifier": "",
+              "payload": "ember",
+              "uid": ""
+            },
+            "skill_id": "inscribe",
+            "upgrades": {}
+          },
+          "slot_5": {
+            "kind": "skill",
+            "skill_id": "ignite",
+            "upgrades": {}
+          }
+        },
+        "fields": [
+          {
+            "charges": 2,
+            "position": [
+              -3102.98291015625,
+              1856.49096679688
+            ],
+            "remaining": 49.9707188888892,
+            "type": "fire"
+          }
+        ],
+        "notice": "",
+        "casts": [
+          {
+            "action": "inscribe",
+            "charge_power": 1.0,
+            "materials": {
+              "fire_stone": 1
+            },
+            "mp_after": 52,
+            "mp_cost": 8,
+            "position": [
+              -3102.98291015625,
+              1856.49096679688
+            ],
+            "result": "inscribe",
+            "rule": "",
+            "t": 37.1958262222223
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "capture": "06-after-rebind-valid-wheel-target",
+        "id": 32.0,
+        "op": "inspect"
+      },
+      "error": "",
+      "state": {
+        "spell_affinity": "fire",
+        "effective_forms": {
+          "right": {},
+          "slot_0": {},
+          "slot_3": {},
+          "slot_4": {
+            "modifier": "",
+            "payload": "ember",
+            "uid": ""
+          },
+          "slot_5": {}
+        },
+        "player": {
+          "attacks": 0,
+          "base": true,
+          "channel_source": "",
+          "charge_source": "",
+          "damage_taken": 0,
+          "dead": false,
+          "guarding": false,
+          "hp": 100,
+          "mode": "idle",
+          "mp": 60,
+          "position": [
+            -3102.98291015625,
+            1856.49096679688
+          ],
+          "stamina": 100.0,
+          "ui_blocked": false
+        },
+        "date": "第1天 13:22",
+        "materials": {
+          "arrow": 6,
+          "ash": 2,
+          "charcoal": 2,
+          "clean_water": 4,
+          "cloth": 1,
+          "coin": 1,
+          "crystal": 7,
+          "frost_salt": 2,
+          "grain": 3,
+          "herb": 2,
+          "poison_rag": 1,
+          "ration": 3,
+          "resin": 1,
+          "sap": 6,
+          "storm_dust": 3
+        },
+        "items": [
+          {
+            "definition": "ash",
+            "properties": {},
+            "quantity": 2,
+            "uid": "item.77"
+          },
+          {
+            "definition": "charcoal",
+            "properties": {},
+            "quantity": 2,
+            "uid": "item.78"
+          },
+          {
+            "definition": "crystal",
+            "properties": {},
+            "quantity": 7,
+            "uid": "item.79"
+          },
+          {
+            "definition": "frost_salt",
+            "properties": {},
+            "quantity": 2,
+            "uid": "item.80"
+          },
+          {
+            "definition": "resin",
+            "properties": {},
+            "quantity": 1,
+            "uid": "item.81"
+          },
+          {
+            "definition": "sap",
+            "properties": {},
+            "quantity": 6,
+            "uid": "item.82"
+          },
+          {
+            "definition": "storm_dust",
+            "properties": {},
+            "quantity": 3,
+            "uid": "item.83"
+          },
+          {
+            "definition": "ration",
+            "properties": {},
+            "quantity": 3,
+            "uid": "item.84"
+          },
+          {
+            "definition": "grain",
+            "properties": {},
+            "quantity": 3,
+            "uid": "item.85"
+          },
+          {
+            "definition": "herb",
+            "properties": {},
+            "quantity": 2,
+            "uid": "item.86"
+          },
+          {
+            "definition": "clean_water",
+            "properties": {},
+            "quantity": 4,
+            "uid": "item.87"
+          }
+        ],
+        "pack": [
+          {
+            "definition": "arrow",
+            "properties": {},
+            "quantity": 6,
+            "uid": "item.93"
+          },
+          {
+            "definition": "coin",
+            "properties": {},
+            "quantity": 1,
+            "uid": "item.88"
+          },
+          {
+            "definition": "poison_rag",
+            "properties": {},
+            "quantity": 1,
+            "uid": "item.28"
+          },
+          {
+            "definition": "cloth",
+            "properties": {},
+            "quantity": 1,
+            "uid": "item.27"
+          }
+        ],
+        "shortcuts": {
+          "item_0": {
+            "item_id": "ration",
+            "kind": "item",
+            "uid": ""
+          },
+          "item_1": {
+            "item_id": "clean_water",
+            "kind": "item",
+            "uid": ""
+          },
+          "item_2": {
+            "item_id": "tea",
+            "kind": "item",
+            "uid": ""
+          },
+          "item_3": {
+            "item_id": "broth",
+            "kind": "item",
+            "uid": ""
+          },
+          "left": {
+            "kind": "technique",
+            "technique_id": "blade_breaker"
+          },
+          "quick_e": {
+            "item_id": "clean_water",
+            "kind": "item",
+            "uid": ""
+          },
+          "right": {
+            "kind": "skill",
+            "skill_id": "ignite",
+            "upgrades": {}
+          },
+          "slot_0": {
+            "kind": "skill",
+            "skill_id": "disperse",
+            "upgrades": {}
+          },
+          "slot_3": {
+            "kind": "skill",
+            "skill_id": "water_call",
+            "upgrades": {}
+          },
+          "slot_4": {
+            "kind": "skill",
+            "selection": {
+              "modifier": "",
+              "payload": "ember",
+              "uid": ""
+            },
+            "skill_id": "inscribe",
+            "upgrades": {}
+          },
+          "slot_5": {
+            "kind": "skill",
+            "skill_id": "ignite",
+            "upgrades": {}
+          }
+        },
+        "fields": [
+          {
+            "charges": 1,
+            "position": [
+              -3102.98291015625,
+              1856.49096679688
+            ],
+            "remaining": 18.3345262222225,
+            "type": "fire"
+          }
+        ],
+        "notice": "",
+        "casts": [
+          {
+            "action": "inscribe",
+            "charge_power": 1.0,
+            "materials": {
+              "fire_stone": 1
+            },
+            "mp_after": 52,
+            "mp_cost": 8,
+            "position": [
+              -3102.98291015625,
+              1856.49096679688
+            ],
+            "result": "inscribe",
+            "rule": "",
+            "t": 37.1958262222223
+          }
+        ],
+        "ui": {
+          "fatigue": 5.28214808,
+          "hydration": 88.7894915750011,
+          "last_spell_source": "quick_e",
+          "merchant": {
+            "arrow": 30,
+            "book_spear_thrust": 1,
+            "charcoal": 5,
+            "clean_water": 4,
+            "clear_tonic": 2,
+            "cloth": 6,
+            "coin": 151,
+            "crystal": 4,
+            "guard_tonic": 2,
+            "metal_scrap": 10,
+            "ration": 6,
+            "sap": 9
+          },
+          "nutrition": 92.5263277166666,
+          "production": {
+            "jobs": {},
+            "schema": 1
+          },
+          "selected_inventory": "",
+          "viewport": [
+            1152,
+            648
+          ],
+          "wheel_entries": [],
+          "wheel_last_source": "slot_4",
+          "visible_text": [
+            "灰河谷 · 河谷镇",
+            "河谷镇 · 可以整备、烹饪、训练和交付",
+            "Tab  远征菜单",
+            "旅程  /  J\n选择要追踪的委托",
+            "第1天 13:22",
+            "F  镇中工作台：制造与炼制",
+            "7  ×3",
+            "8  ×4",
+            "9  ×0",
+            "0  ×0"
+          ]
+        }
+      }
+    },
+    {
+      "request": {
+        "capture": "07-stale-world-scroll-target",
+        "id": 34.0,
+        "op": "inspect"
+      },
+      "error": "",
+      "state": {
+        "spell_affinity": "fire",
+        "effective_forms": {
+          "right": {},
+          "slot_0": {},
+          "slot_3": {},
+          "slot_4": {
+            "modifier": "",
+            "payload": "ember",
+            "uid": ""
+          },
+          "slot_5": {}
+        },
+        "player": {
+          "attacks": 0,
+          "base": true,
+          "channel_source": "",
+          "charge_source": "",
+          "damage_taken": 0,
+          "dead": false,
+          "guarding": false,
+          "hp": 100,
+          "mode": "idle",
+          "mp": 60,
+          "position": [
+            -3102.98291015625,
+            1856.49096679688
+          ],
+          "stamina": 100.0,
+          "ui_blocked": false
+        },
+        "date": "第1天 13:22",
+        "materials": {
+          "arrow": 6,
+          "ash": 2,
+          "charcoal": 2,
+          "clean_water": 4,
+          "cloth": 1,
+          "coin": 1,
+          "crystal": 7,
+          "frost_salt": 2,
+          "grain": 3,
+          "herb": 2,
+          "poison_rag": 1,
+          "ration": 3,
+          "resin": 1,
+          "sap": 6,
+          "storm_dust": 3
+        },
+        "items": [
+          {
+            "definition": "ash",
+            "properties": {},
+            "quantity": 2,
+            "uid": "item.77"
+          },
+          {
+            "definition": "charcoal",
+            "properties": {},
+            "quantity": 2,
+            "uid": "item.78"
+          },
+          {
+            "definition": "crystal",
+            "properties": {},
+            "quantity": 7,
+            "uid": "item.79"
+          },
+          {
+            "definition": "frost_salt",
+            "properties": {},
+            "quantity": 2,
+            "uid": "item.80"
+          },
+          {
+            "definition": "resin",
+            "properties": {},
+            "quantity": 1,
+            "uid": "item.81"
+          },
+          {
+            "definition": "sap",
+            "properties": {},
+            "quantity": 6,
+            "uid": "item.82"
+          },
+          {
+            "definition": "storm_dust",
+            "properties": {},
+            "quantity": 3,
+            "uid": "item.83"
+          },
+          {
+            "definition": "ration",
+            "properties": {},
+            "quantity": 3,
+            "uid": "item.84"
+          },
+          {
+            "definition": "grain",
+            "properties": {},
+            "quantity": 3,
+            "uid": "item.85"
+          },
+          {
+            "definition": "herb",
+            "properties": {},
+            "quantity": 2,
+            "uid": "item.86"
+          },
+          {
+            "definition": "clean_water",
+            "properties": {},
+            "quantity": 4,
+            "uid": "item.87"
+          }
+        ],
+        "pack": [
+          {
+            "definition": "arrow",
+            "properties": {},
+            "quantity": 6,
+            "uid": "item.93"
+          },
+          {
+            "definition": "coin",
+            "properties": {},
+            "quantity": 1,
+            "uid": "item.88"
+          },
+          {
+            "definition": "poison_rag",
+            "properties": {},
+            "quantity": 1,
+            "uid": "item.28"
+          },
+          {
+            "definition": "cloth",
+            "properties": {},
+            "quantity": 1,
+            "uid": "item.27"
+          }
+        ],
+        "shortcuts": {
+          "item_0": {
+            "item_id": "ration",
+            "kind": "item",
+            "uid": ""
+          },
+          "item_1": {
+            "item_id": "clean_water",
+            "kind": "item",
+            "uid": ""
+          },
+          "item_2": {
+            "item_id": "tea",
+            "kind": "item",
+            "uid": ""
+          },
+          "item_3": {
+            "item_id": "broth",
+            "kind": "item",
+            "uid": ""
+          },
+          "left": {
+            "kind": "technique",
+            "technique_id": "blade_breaker"
+          },
+          "quick_e": {
+            "item_id": "clean_water",
+            "kind": "item",
+            "uid": ""
+          },
+          "right": {
+            "kind": "skill",
+            "skill_id": "ignite",
+            "upgrades": {}
+          },
+          "slot_0": {
+            "kind": "skill",
+            "skill_id": "disperse",
+            "upgrades": {}
+          },
+          "slot_3": {
+            "kind": "skill",
+            "skill_id": "water_call",
+            "upgrades": {}
+          },
+          "slot_4": {
+            "kind": "skill",
+            "selection": {
+              "modifier": "",
+              "payload": "ember",
+              "uid": ""
+            },
+            "skill_id": "inscribe",
+            "upgrades": {}
+          },
+          "slot_5": {
+            "kind": "skill",
+            "skill_id": "ignite",
+            "upgrades": {}
+          }
+        },
+        "fields": [
+          {
+            "charges": 1,
+            "position": [
+              -3102.98291015625,
+              1856.49096679688
+            ],
+            "remaining": 17.6541385555558,
+            "type": "fire"
+          }
+        ],
+        "notice": "",
+        "casts": [
+          {
+            "action": "inscribe",
+            "charge_power": 1.0,
+            "materials": {
+              "fire_stone": 1
+            },
+            "mp_after": 52,
+            "mp_cost": 8,
+            "position": [
+              -3102.98291015625,
+              1856.49096679688
+            ],
+            "result": "inscribe",
+            "rule": "",
+            "t": 37.1958262222223
+          }
+        ],
+        "ui": {
+          "fatigue": 5.28214808,
+          "hydration": 88.7724818833345,
+          "last_spell_source": "quick_e",
+          "merchant": {
+            "arrow": 30,
+            "book_spear_thrust": 1,
+            "charcoal": 5,
+            "clean_water": 4,
+            "clear_tonic": 2,
+            "cloth": 6,
+            "coin": 151,
+            "crystal": 4,
+            "guard_tonic": 2,
+            "metal_scrap": 10,
+            "ration": 6,
+            "sap": 9
+          },
+          "nutrition": 92.5149879222222,
+          "production": {
+            "jobs": {},
+            "schema": 1
+          },
+          "selected_inventory": "",
+          "viewport": [
+            1152,
+            648
+          ],
+          "wheel_entries": [],
+          "wheel_last_source": "slot_4",
+          "visible_text": [
+            "灰河谷 · 河谷镇",
+            "河谷镇 · 可以整备、烹饪、训练和交付",
+            "Tab  远征菜单",
+            "旅程  /  J\n选择要追踪的委托",
+            "第1天 13:22",
+            "F  镇中工作台：制造与炼制",
+            "7  ×3",
+            "8  ×4",
+            "9  ×0",
+            "0  ×0"
+          ]
+        }
+      }
+    },
+    {
+      "request": {
+        "capture": "08-fresh-key-restores-scroll",
+        "id": 37.0,
+        "op": "inspect"
+      },
+      "error": "",
+      "state": {
+        "spell_affinity": "fire",
+        "effective_forms": {
+          "right": {},
+          "slot_0": {},
+          "slot_3": {},
+          "slot_4": {
+            "modifier": "",
+            "payload": "frost",
+            "uid": ""
+          },
+          "slot_5": {}
+        },
+        "player": {
+          "attacks": 0,
+          "base": true,
+          "channel_source": "",
+          "charge_source": "",
+          "damage_taken": 0,
+          "dead": false,
+          "guarding": false,
+          "hp": 100,
+          "mode": "idle",
+          "mp": 60,
+          "position": [
+            -3102.98291015625,
+            1856.49096679688
+          ],
+          "stamina": 100.0,
+          "ui_blocked": false
+        },
+        "date": "第1天 13:24",
+        "materials": {
+          "arrow": 6,
+          "ash": 2,
+          "charcoal": 2,
+          "clean_water": 4,
+          "cloth": 1,
+          "coin": 1,
+          "crystal": 7,
+          "frost_salt": 2,
+          "grain": 3,
+          "herb": 2,
+          "poison_rag": 1,
+          "ration": 3,
+          "resin": 1,
+          "sap": 6,
+          "storm_dust": 3
+        },
+        "items": [
+          {
+            "definition": "ash",
+            "properties": {},
+            "quantity": 2,
+            "uid": "item.77"
+          },
+          {
+            "definition": "charcoal",
+            "properties": {},
+            "quantity": 2,
+            "uid": "item.78"
+          },
+          {
+            "definition": "crystal",
+            "properties": {},
+            "quantity": 7,
+            "uid": "item.79"
+          },
+          {
+            "definition": "frost_salt",
+            "properties": {},
+            "quantity": 2,
+            "uid": "item.80"
+          },
+          {
+            "definition": "resin",
+            "properties": {},
+            "quantity": 1,
+            "uid": "item.81"
+          },
+          {
+            "definition": "sap",
+            "properties": {},
+            "quantity": 6,
+            "uid": "item.82"
+          },
+          {
+            "definition": "storm_dust",
+            "properties": {},
+            "quantity": 3,
+            "uid": "item.83"
+          },
+          {
+            "definition": "ration",
+            "properties": {},
+            "quantity": 3,
+            "uid": "item.84"
+          },
+          {
+            "definition": "grain",
+            "properties": {},
+            "quantity": 3,
+            "uid": "item.85"
+          },
+          {
+            "definition": "herb",
+            "properties": {},
+            "quantity": 2,
+            "uid": "item.86"
+          },
+          {
+            "definition": "clean_water",
+            "properties": {},
+            "quantity": 4,
+            "uid": "item.87"
+          }
+        ],
+        "pack": [
+          {
+            "definition": "arrow",
+            "properties": {},
+            "quantity": 6,
+            "uid": "item.93"
+          },
+          {
+            "definition": "coin",
+            "properties": {},
+            "quantity": 1,
+            "uid": "item.88"
+          },
+          {
+            "definition": "poison_rag",
+            "properties": {},
+            "quantity": 1,
+            "uid": "item.28"
+          },
+          {
+            "definition": "cloth",
+            "properties": {},
+            "quantity": 1,
+            "uid": "item.27"
+          }
+        ],
+        "shortcuts": {
+          "item_0": {
+            "item_id": "ration",
+            "kind": "item",
+            "uid": ""
+          },
+          "item_1": {
+            "item_id": "clean_water",
+            "kind": "item",
+            "uid": ""
+          },
+          "item_2": {
+            "item_id": "tea",
+            "kind": "item",
+            "uid": ""
+          },
+          "item_3": {
+            "item_id": "broth",
+            "kind": "item",
+            "uid": ""
+          },
+          "left": {
+            "kind": "technique",
+            "technique_id": "blade_breaker"
+          },
+          "quick_e": {
+            "item_id": "clean_water",
+            "kind": "item",
+            "uid": ""
+          },
+          "right": {
+            "kind": "skill",
+            "skill_id": "ignite",
+            "upgrades": {}
+          },
+          "slot_0": {
+            "kind": "skill",
+            "skill_id": "disperse",
+            "upgrades": {}
+          },
+          "slot_3": {
+            "kind": "skill",
+            "skill_id": "water_call",
+            "upgrades": {}
+          },
+          "slot_4": {
+            "kind": "skill",
+            "selection": {
+              "modifier": "",
+              "payload": "frost",
+              "uid": ""
+            },
+            "skill_id": "inscribe",
+            "upgrades": {}
+          },
+          "slot_5": {
+            "kind": "skill",
+            "skill_id": "ignite",
+            "upgrades": {}
+          }
+        },
+        "fields": [
+          {
+            "charges": 1,
+            "position": [
+              -3102.98291015625,
+              1856.49096679688
+            ],
+            "remaining": 16.5207188888892,
+            "type": "fire"
+          }
+        ],
+        "notice": "5 · 霜盐阵 · 口袋2 / 背包0",
+        "casts": [
+          {
+            "action": "inscribe",
+            "charge_power": 1.0,
+            "materials": {
+              "fire_stone": 1
+            },
+            "mp_after": 52,
+            "mp_cost": 8,
+            "position": [
+              -3102.98291015625,
+              1856.49096679688
+            ],
+            "result": "inscribe",
+            "rule": "",
+            "t": 37.1958262222223
+          }
+        ],
+        "ui": {
+          "fatigue": 5.28214808,
+          "hydration": 88.7441463916678,
+          "last_spell_source": "slot_4",
+          "merchant": {
+            "arrow": 30,
+            "book_spear_thrust": 1,
+            "charcoal": 5,
+            "clean_water": 4,
+            "clear_tonic": 2,
+            "cloth": 6,
+            "coin": 151,
+            "crystal": 4,
+            "guard_tonic": 2,
+            "metal_scrap": 10,
+            "ration": 6,
+            "sap": 9
+          },
+          "nutrition": 92.4960975944444,
+          "production": {
+            "jobs": {},
+            "schema": 1
+          },
+          "selected_inventory": "",
+          "viewport": [
+            1152,
+            648
+          ],
+          "wheel_entries": [],
+          "wheel_last_source": "slot_4",
+          "visible_text": [
+            "灰河谷 · 河谷镇",
+            "河谷镇 · 可以整备、烹饪、训练和交付",
+            "Tab  远征菜单",
+            "5 · 霜盐阵 · 口袋2 / 背包0",
+            "旅程  /  J\n选择要追踪的委托",
+            "第1天 13:24",
+            "F  镇中工作台：制造与炼制",
+            "7  ×3",
+            "8  ×4",
+            "9  ×0",
+            "0  ×0"
+          ]
+        }
+      }
+    },
+    {
+      "request": {
+        "capture": "10-batch-price-before",
+        "id": 43.0,
+        "op": "inspect"
+      },
+      "error": "",
+      "state": {
+        "spell_affinity": "fire",
+        "effective_forms": {
+          "right": {},
+          "slot_0": {},
+          "slot_3": {},
+          "slot_4": {
+            "modifier": "",
+            "payload": "frost",
+            "uid": ""
+          },
+          "slot_5": {}
+        },
+        "player": {
+          "attacks": 0,
+          "base": true,
+          "channel_source": "",
+          "charge_source": "",
+          "damage_taken": 0,
+          "dead": false,
+          "guarding": false,
+          "hp": 100,
+          "mode": "idle",
+          "mp": 60,
+          "position": [
+            -3215.7685546875,
+            2204.44140625
+          ],
+          "stamina": 100.0,
+          "ui_blocked": true
+        },
+        "date": "第1天 17:21",
+        "materials": {
+          "arrow": 6,
+          "ash": 2,
+          "charcoal": 2,
+          "clean_water": 4,
+          "cloth": 1,
+          "coin": 1,
+          "crystal": 7,
+          "frost_salt": 2,
+          "grain": 3,
+          "herb": 2,
+          "poison_rag": 1,
+          "ration": 3,
+          "resin": 1,
+          "sap": 6,
+          "storm_dust": 3
+        },
+        "items": [
+          {
+            "definition": "ash",
+            "properties": {},
+            "quantity": 2,
+            "uid": "item.77"
+          },
+          {
+            "definition": "charcoal",
+            "properties": {},
+            "quantity": 2,
+            "uid": "item.78"
+          },
+          {
+            "definition": "crystal",
+            "properties": {},
+            "quantity": 7,
+            "uid": "item.79"
+          },
+          {
+            "definition": "frost_salt",
+            "properties": {},
+            "quantity": 2,
+            "uid": "item.80"
+          },
+          {
+            "definition": "resin",
+            "properties": {},
+            "quantity": 1,
+            "uid": "item.81"
+          },
+          {
+            "definition": "sap",
+            "properties": {},
+            "quantity": 6,
+            "uid": "item.82"
+          },
+          {
+            "definition": "storm_dust",
+            "properties": {},
+            "quantity": 3,
+            "uid": "item.83"
+          },
+          {
+            "definition": "ration",
+            "properties": {},
+            "quantity": 3,
+            "uid": "item.84"
+          },
+          {
+            "definition": "grain",
+            "properties": {},
+            "quantity": 3,
+            "uid": "item.85"
+          },
+          {
+            "definition": "herb",
+            "properties": {},
+            "quantity": 2,
+            "uid": "item.86"
+          },
+          {
+            "definition": "clean_water",
+            "properties": {},
+            "quantity": 4,
+            "uid": "item.87"
+          }
+        ],
+        "pack": [
+          {
+            "definition": "arrow",
+            "properties": {},
+            "quantity": 6,
+            "uid": "item.93"
+          },
+          {
+            "definition": "coin",
+            "properties": {},
+            "quantity": 1,
+            "uid": "item.88"
+          },
+          {
+            "definition": "poison_rag",
+            "properties": {},
+            "quantity": 1,
+            "uid": "item.28"
+          },
+          {
+            "definition": "cloth",
+            "properties": {},
+            "quantity": 1,
+            "uid": "item.27"
+          }
+        ],
+        "shortcuts": {
+          "item_0": {
+            "item_id": "ration",
+            "kind": "item",
+            "uid": ""
+          },
+          "item_1": {
+            "item_id": "clean_water",
+            "kind": "item",
+            "uid": ""
+          },
+          "item_2": {
+            "item_id": "tea",
+            "kind": "item",
+            "uid": ""
+          },
+          "item_3": {
+            "item_id": "broth",
+            "kind": "item",
+            "uid": ""
+          },
+          "left": {
+            "kind": "technique",
+            "technique_id": "blade_breaker"
+          },
+          "quick_e": {
+            "item_id": "clean_water",
+            "kind": "item",
+            "uid": ""
+          },
+          "right": {
+            "kind": "skill",
+            "skill_id": "ignite",
+            "upgrades": {}
+          },
+          "slot_0": {
+            "kind": "skill",
+            "skill_id": "disperse",
+            "upgrades": {}
+          },
+          "slot_3": {
+            "kind": "skill",
+            "skill_id": "water_call",
+            "upgrades": {}
+          },
+          "slot_4": {
+            "kind": "skill",
+            "selection": {
+              "modifier": "",
+              "payload": "frost",
+              "uid": ""
+            },
+            "skill_id": "inscribe",
+            "upgrades": {}
+          },
+          "slot_5": {
+            "kind": "skill",
+            "skill_id": "ignite",
+            "upgrades": {}
+          }
+        },
+        "fields": [],
+        "notice": "",
+        "casts": [
+          {
+            "action": "inscribe",
+            "charge_power": 1.0,
+            "materials": {
+              "fire_stone": 1
+            },
+            "mp_after": 52,
+            "mp_cost": 8,
+            "position": [
+              -3102.98291015625,
+              1856.49096679688
+            ],
+            "result": "inscribe",
+            "rule": "",
+            "t": 37.1958262222223
+          }
+        ],
+        "ui": {
+          "fatigue": 5.28214808,
+          "hydration": 82.8050229893948,
+          "last_spell_source": "slot_4",
+          "merchant": {
+            "arrow": 30,
+            "book_spear_thrust": 1,
+            "charcoal": 5,
+            "clean_water": 4,
+            "clear_tonic": 2,
+            "cloth": 6,
+            "coin": 151,
+            "crystal": 4,
+            "guard_tonic": 2,
+            "metal_scrap": 10,
+            "ration": 6,
+            "sap": 9
+          },
+          "nutrition": 88.5366819929293,
+          "production": {
+            "jobs": {},
+            "schema": 1
+          },
+          "selected_inventory": "",
+          "viewport": [
+            1152,
+            648
+          ],
+          "wheel_entries": [],
+          "wheel_last_source": "slot_4",
+          "visible_text": [
+            "灰河谷 · 河谷镇",
+            "河谷镇 · 可以整备、烹饪、训练和交付",
+            "Tab  远征菜单",
+            "灰河谷 · 整修铺",
+            "关闭",
+            "整修铺",
+            "出售 / 拆解 / 强化",
+            "购买实物",
+            "店内排产",
+            "随身河谷币 1 · 店家河谷币 151 · 金属碎料 0",
+            "金属碎料 ×10 · 2币",
+            "炭屑 ×5 · 2币",
+            "树液 ×9 · 2币",
+            "晶砂 ×4 · 2币",
+            "布料 ×6 · 2币",
+            "烤饼 ×6 · 2币",
+            "饮用水 ×4 · 2币",
+            "木杆箭 ×30 · 2币",
+            "石肤药剂 ×2 · 8币",
+            "醒神药剂 ×2 · 8币",
+            "贯步刺武技书 ×1 · 10币",
+            "炭屑",
+            "随身物资；数量与位置保存在真实容器中。\n",
+            "购买一件 · 2币",
+            "1",
+            "购买所选数量",
+            "购买整叠",
+            "交易库存有限；装备先卸下再整修。整修保留同一件实物，涂层不会重置。",
+            "旅程  /  J\n选择要追踪的委托",
+            "第1天 17:21",
+            "F  整修铺：交易、拆解与强化",
+            "7  ×3",
+            "8  ×4",
+            "9  ×0",
+            "0  ×0"
+          ]
+        }
+      }
+    },
+    {
+      "request": {
+        "capture": "11-batch-total-not-shown",
+        "id": 49.0,
+        "op": "inspect"
+      },
+      "error": "",
+      "state": {
+        "spell_affinity": "fire",
+        "effective_forms": {
+          "right": {},
+          "slot_0": {},
+          "slot_3": {},
+          "slot_4": {
+            "modifier": "",
+            "payload": "frost",
+            "uid": ""
+          },
+          "slot_5": {}
+        },
+        "player": {
+          "attacks": 0,
+          "base": true,
+          "channel_source": "",
+          "charge_source": "",
+          "damage_taken": 0,
+          "dead": false,
+          "guarding": false,
+          "hp": 100,
+          "mode": "idle",
+          "mp": 60,
+          "position": [
+            -3215.7685546875,
+            2204.44140625
+          ],
+          "stamina": 100.0,
+          "ui_blocked": true
+        },
+        "date": "第1天 17:59",
+        "materials": {
+          "arrow": 6,
+          "ash": 2,
+          "charcoal": 2,
+          "clean_water": 4,
+          "cloth": 1,
+          "coin": 1,
+          "crystal": 7,
+          "frost_salt": 2,
+          "grain": 3,
+          "herb": 2,
+          "poison_rag": 1,
+          "ration": 3,
+          "resin": 1,
+          "sap": 6,
+          "storm_dust": 3
+        },
+        "items": [
+          {
+            "definition": "ash",
+            "properties": {},
+            "quantity": 2,
+            "uid": "item.77"
+          },
+          {
+            "definition": "charcoal",
+            "properties": {},
+            "quantity": 2,
+            "uid": "item.78"
+          },
+          {
+            "definition": "crystal",
+            "properties": {},
+            "quantity": 7,
+            "uid": "item.79"
+          },
+          {
+            "definition": "frost_salt",
+            "properties": {},
+            "quantity": 2,
+            "uid": "item.80"
+          },
+          {
+            "definition": "resin",
+            "properties": {},
+            "quantity": 1,
+            "uid": "item.81"
+          },
+          {
+            "definition": "sap",
+            "properties": {},
+            "quantity": 6,
+            "uid": "item.82"
+          },
+          {
+            "definition": "storm_dust",
+            "properties": {},
+            "quantity": 3,
+            "uid": "item.83"
+          },
+          {
+            "definition": "ration",
+            "properties": {},
+            "quantity": 3,
+            "uid": "item.84"
+          },
+          {
+            "definition": "grain",
+            "properties": {},
+            "quantity": 3,
+            "uid": "item.85"
+          },
+          {
+            "definition": "herb",
+            "properties": {},
+            "quantity": 2,
+            "uid": "item.86"
+          },
+          {
+            "definition": "clean_water",
+            "properties": {},
+            "quantity": 4,
+            "uid": "item.87"
+          }
+        ],
+        "pack": [
+          {
+            "definition": "arrow",
+            "properties": {},
+            "quantity": 6,
+            "uid": "item.93"
+          },
+          {
+            "definition": "coin",
+            "properties": {},
+            "quantity": 1,
+            "uid": "item.88"
+          },
+          {
+            "definition": "poison_rag",
+            "properties": {},
+            "quantity": 1,
+            "uid": "item.28"
+          },
+          {
+            "definition": "cloth",
+            "properties": {},
+            "quantity": 1,
+            "uid": "item.27"
+          }
+        ],
+        "shortcuts": {
+          "item_0": {
+            "item_id": "ration",
+            "kind": "item",
+            "uid": ""
+          },
+          "item_1": {
+            "item_id": "clean_water",
+            "kind": "item",
+            "uid": ""
+          },
+          "item_2": {
+            "item_id": "tea",
+            "kind": "item",
+            "uid": ""
+          },
+          "item_3": {
+            "item_id": "broth",
+            "kind": "item",
+            "uid": ""
+          },
+          "left": {
+            "kind": "technique",
+            "technique_id": "blade_breaker"
+          },
+          "quick_e": {
+            "item_id": "clean_water",
+            "kind": "item",
+            "uid": ""
+          },
+          "right": {
+            "kind": "skill",
+            "skill_id": "ignite",
+            "upgrades": {}
+          },
+          "slot_0": {
+            "kind": "skill",
+            "skill_id": "disperse",
+            "upgrades": {}
+          },
+          "slot_3": {
+            "kind": "skill",
+            "skill_id": "water_call",
+            "upgrades": {}
+          },
+          "slot_4": {
+            "kind": "skill",
+            "selection": {
+              "modifier": "",
+              "payload": "frost",
+              "uid": ""
+            },
+            "skill_id": "inscribe",
+            "upgrades": {}
+          },
+          "slot_5": {
+            "kind": "skill",
+            "skill_id": "ignite",
+            "upgrades": {}
+          }
+        },
+        "fields": [],
+        "notice": "",
+        "casts": [
+          {
+            "action": "inscribe",
+            "charge_power": 1.0,
+            "materials": {
+              "fire_stone": 1
+            },
+            "mp_after": 52,
+            "mp_cost": 8,
+            "position": [
+              -3102.98291015625,
+              1856.49096679688
+            ],
+            "result": "inscribe",
+            "rule": "",
+            "t": 37.1958262222223
+          }
+        ],
+        "ui": {
+          "fatigue": 5.28214808,
+          "hydration": 81.8471845666676,
+          "last_spell_source": "slot_4",
+          "merchant": {
+            "arrow": 30,
+            "book_spear_thrust": 1,
+            "charcoal": 5,
+            "clean_water": 4,
+            "clear_tonic": 2,
+            "cloth": 6,
+            "coin": 151,
+            "crystal": 4,
+            "guard_tonic": 2,
+            "metal_scrap": 10,
+            "ration": 6,
+            "sap": 9
+          },
+          "nutrition": 87.8981230444445,
+          "production": {
+            "jobs": {},
+            "schema": 1
+          },
+          "selected_inventory": "",
+          "viewport": [
+            1152,
+            648
+          ],
+          "wheel_entries": [],
+          "wheel_last_source": "slot_4",
+          "visible_text": [
+            "灰河谷 · 河谷镇",
+            "河谷镇 · 可以整备、烹饪、训练和交付",
+            "Tab  远征菜单",
+            "灰河谷 · 整修铺",
+            "关闭",
+            "整修铺",
+            "出售 / 拆解 / 强化",
+            "购买实物",
+            "店内排产",
+            "随身河谷币 1 · 店家河谷币 151 · 金属碎料 0",
+            "金属碎料 ×10 · 2币",
+            "炭屑 ×5 · 2币",
+            "树液 ×9 · 2币",
+            "晶砂 ×4 · 2币",
+            "布料 ×6 · 2币",
+            "烤饼 ×6 · 2币",
+            "饮用水 ×4 · 2币",
+            "木杆箭 ×30 · 2币",
+            "石肤药剂 ×2 · 8币",
+            "醒神药剂 ×2 · 8币",
+            "贯步刺武技书 ×1 · 10币",
+            "炭屑",
+            "随身物资；数量与位置保存在真实容器中。\n",
+            "购买一件 · 2币",
+            "3",
+            "购买所选数量",
+            "购买整叠",
+            "交易库存有限；装备先卸下再整修。整修保留同一件实物，涂层不会重置。",
+            "旅程  /  J\n选择要追踪的委托",
+            "第1天 17:59",
+            "F  整修铺：交易、拆解与强化",
+            "7  ×3",
+            "8  ×4",
+            "9  ×0",
+            "0  ×0"
+          ]
+        }
+      }
+    },
+    {
+      "request": {
+        "capture": "12-ambiguous-trade-refusal",
+        "id": 51.0,
+        "op": "inspect"
+      },
+      "error": "",
+      "state": {
+        "spell_affinity": "fire",
+        "effective_forms": {
+          "right": {},
+          "slot_0": {},
+          "slot_3": {},
+          "slot_4": {
+            "modifier": "",
+            "payload": "frost",
+            "uid": ""
+          },
+          "slot_5": {}
+        },
+        "player": {
+          "attacks": 0,
+          "base": true,
+          "channel_source": "",
+          "charge_source": "",
+          "damage_taken": 0,
+          "dead": false,
+          "guarding": false,
+          "hp": 100,
+          "mode": "idle",
+          "mp": 60,
+          "position": [
+            -3215.7685546875,
+            2204.44140625
+          ],
+          "stamina": 100.0,
+          "ui_blocked": true
+        },
+        "date": "第1天 18:01",
+        "materials": {
+          "arrow": 6,
+          "ash": 2,
+          "charcoal": 2,
+          "clean_water": 4,
+          "cloth": 1,
+          "coin": 1,
+          "crystal": 7,
+          "frost_salt": 2,
+          "grain": 3,
+          "herb": 2,
+          "poison_rag": 1,
+          "ration": 3,
+          "resin": 1,
+          "sap": 6,
+          "storm_dust": 3
+        },
+        "items": [
+          {
+            "definition": "ash",
+            "properties": {},
+            "quantity": 2,
+            "uid": "item.77"
+          },
+          {
+            "definition": "charcoal",
+            "properties": {},
+            "quantity": 2,
+            "uid": "item.78"
+          },
+          {
+            "definition": "crystal",
+            "properties": {},
+            "quantity": 7,
+            "uid": "item.79"
+          },
+          {
+            "definition": "frost_salt",
+            "properties": {},
+            "quantity": 2,
+            "uid": "item.80"
+          },
+          {
+            "definition": "resin",
+            "properties": {},
+            "quantity": 1,
+            "uid": "item.81"
+          },
+          {
+            "definition": "sap",
+            "properties": {},
+            "quantity": 6,
+            "uid": "item.82"
+          },
+          {
+            "definition": "storm_dust",
+            "properties": {},
+            "quantity": 3,
+            "uid": "item.83"
+          },
+          {
+            "definition": "ration",
+            "properties": {},
+            "quantity": 3,
+            "uid": "item.84"
+          },
+          {
+            "definition": "grain",
+            "properties": {},
+            "quantity": 3,
+            "uid": "item.85"
+          },
+          {
+            "definition": "herb",
+            "properties": {},
+            "quantity": 2,
+            "uid": "item.86"
+          },
+          {
+            "definition": "clean_water",
+            "properties": {},
+            "quantity": 4,
+            "uid": "item.87"
+          }
+        ],
+        "pack": [
+          {
+            "definition": "arrow",
+            "properties": {},
+            "quantity": 6,
+            "uid": "item.93"
+          },
+          {
+            "definition": "coin",
+            "properties": {},
+            "quantity": 1,
+            "uid": "item.88"
+          },
+          {
+            "definition": "poison_rag",
+            "properties": {},
+            "quantity": 1,
+            "uid": "item.28"
+          },
+          {
+            "definition": "cloth",
+            "properties": {},
+            "quantity": 1,
+            "uid": "item.27"
+          }
+        ],
+        "shortcuts": {
+          "item_0": {
+            "item_id": "ration",
+            "kind": "item",
+            "uid": ""
+          },
+          "item_1": {
+            "item_id": "clean_water",
+            "kind": "item",
+            "uid": ""
+          },
+          "item_2": {
+            "item_id": "tea",
+            "kind": "item",
+            "uid": ""
+          },
+          "item_3": {
+            "item_id": "broth",
+            "kind": "item",
+            "uid": ""
+          },
+          "left": {
+            "kind": "technique",
+            "technique_id": "blade_breaker"
+          },
+          "quick_e": {
+            "item_id": "clean_water",
+            "kind": "item",
+            "uid": ""
+          },
+          "right": {
+            "kind": "skill",
+            "skill_id": "ignite",
+            "upgrades": {}
+          },
+          "slot_0": {
+            "kind": "skill",
+            "skill_id": "disperse",
+            "upgrades": {}
+          },
+          "slot_3": {
+            "kind": "skill",
+            "skill_id": "water_call",
+            "upgrades": {}
+          },
+          "slot_4": {
+            "kind": "skill",
+            "selection": {
+              "modifier": "",
+              "payload": "frost",
+              "uid": ""
+            },
+            "skill_id": "inscribe",
+            "upgrades": {}
+          },
+          "slot_5": {
+            "kind": "skill",
+            "skill_id": "ignite",
+            "upgrades": {}
+          }
+        },
+        "fields": [],
+        "notice": "未完成：货币不足，或对方没有空间接收付款。",
+        "casts": [
+          {
+            "action": "inscribe",
+            "charge_power": 1.0,
+            "materials": {
+              "fire_stone": 1
+            },
+            "mp_after": 52,
+            "mp_cost": 8,
+            "position": [
+              -3102.98291015625,
+              1856.49096679688
+            ],
+            "result": "inscribe",
+            "rule": "",
+            "t": 37.1958262222223
+          }
+        ],
+        "ui": {
+          "fatigue": 5.28214808,
+          "hydration": 81.8169143916676,
+          "last_spell_source": "slot_4",
+          "merchant": {
+            "arrow": 30,
+            "book_spear_thrust": 1,
+            "charcoal": 5,
+            "clean_water": 4,
+            "clear_tonic": 2,
+            "cloth": 6,
+            "coin": 151,
+            "crystal": 4,
+            "guard_tonic": 2,
+            "metal_scrap": 10,
+            "ration": 6,
+            "sap": 9
+          },
+          "nutrition": 87.8779429277779,
+          "production": {
+            "jobs": {},
+            "schema": 1
+          },
+          "selected_inventory": "",
+          "viewport": [
+            1152,
+            648
+          ],
+          "wheel_entries": [],
+          "wheel_last_source": "slot_4",
+          "visible_text": [
+            "灰河谷 · 河谷镇",
+            "河谷镇 · 可以整备、烹饪、训练和交付",
+            "Tab  远征菜单",
+            "未完成：货币不足，或对方没有空间接收付款。",
+            "灰河谷 · 整修铺",
+            "关闭",
+            "整修铺",
+            "出售 / 拆解 / 强化",
+            "购买实物",
+            "店内排产",
+            "随身河谷币 1 · 店家河谷币 151 · 金属碎料 0",
+            "金属碎料 ×10 · 2币",
+            "炭屑 ×5 · 2币",
+            "树液 ×9 · 2币",
+            "晶砂 ×4 · 2币",
+            "布料 ×6 · 2币",
+            "烤饼 ×6 · 2币",
+            "饮用水 ×4 · 2币",
+            "木杆箭 ×30 · 2币",
+            "石肤药剂 ×2 · 8币",
+            "醒神药剂 ×2 · 8币",
+            "贯步刺武技书 ×1 · 10币",
+            "炭屑",
+            "随身物资；数量与位置保存在真实容器中。\n",
+            "购买一件 · 2币",
+            "3",
+            "购买所选数量",
+            "购买整叠",
+            "交易库存有限；装备先卸下再整修。整修保留同一件实物，涂层不会重置。",
+            "旅程  /  J\n选择要追踪的委托",
+            "第1天 18:01",
+            "F  整修铺：交易、拆解与强化",
+            "7  ×3",
+            "8  ×4",
+            "9  ×0",
+            "0  ×0"
+          ]
+        }
+      }
+    },
+    {
+      "request": {
+        "id": 53.0,
+        "op": "quit"
+      },
+      "error": "",
+      "state": {
+        "spell_affinity": "fire",
+        "effective_forms": {
+          "right": {},
+          "slot_0": {},
+          "slot_3": {},
+          "slot_4": {
+            "modifier": "",
+            "payload": "frost",
+            "uid": ""
+          },
+          "slot_5": {}
+        },
+        "player": {
+          "attacks": 0,
+          "base": true,
+          "channel_source": "",
+          "charge_source": "",
+          "damage_taken": 0,
+          "dead": false,
+          "guarding": false,
+          "hp": 100,
+          "mode": "idle",
+          "mp": 60,
+          "position": [
+            -3215.7685546875,
+            2204.44140625
+          ],
+          "stamina": 100.0,
+          "ui_blocked": false
+        },
+        "date": "第1天 18:01",
+        "materials": {
+          "arrow": 6,
+          "ash": 2,
+          "charcoal": 2,
+          "clean_water": 4,
+          "cloth": 1,
+          "coin": 1,
+          "crystal": 7,
+          "frost_salt": 2,
+          "grain": 3,
+          "herb": 2,
+          "poison_rag": 1,
+          "ration": 3,
+          "resin": 1,
+          "sap": 6,
+          "storm_dust": 3
+        },
+        "items": [
+          {
+            "definition": "ash",
+            "properties": {},
+            "quantity": 2,
+            "uid": "item.77"
+          },
+          {
+            "definition": "charcoal",
+            "properties": {},
+            "quantity": 2,
+            "uid": "item.78"
+          },
+          {
+            "definition": "crystal",
+            "properties": {},
+            "quantity": 7,
+            "uid": "item.79"
+          },
+          {
+            "definition": "frost_salt",
+            "properties": {},
+            "quantity": 2,
+            "uid": "item.80"
+          },
+          {
+            "definition": "resin",
+            "properties": {},
+            "quantity": 1,
+            "uid": "item.81"
+          },
+          {
+            "definition": "sap",
+            "properties": {},
+            "quantity": 6,
+            "uid": "item.82"
+          },
+          {
+            "definition": "storm_dust",
+            "properties": {},
+            "quantity": 3,
+            "uid": "item.83"
+          },
+          {
+            "definition": "ration",
+            "properties": {},
+            "quantity": 3,
+            "uid": "item.84"
+          },
+          {
+            "definition": "grain",
+            "properties": {},
+            "quantity": 3,
+            "uid": "item.85"
+          },
+          {
+            "definition": "herb",
+            "properties": {},
+            "quantity": 2,
+            "uid": "item.86"
+          },
+          {
+            "definition": "clean_water",
+            "properties": {},
+            "quantity": 4,
+            "uid": "item.87"
+          }
+        ],
+        "pack": [
+          {
+            "definition": "arrow",
+            "properties": {},
+            "quantity": 6,
+            "uid": "item.93"
+          },
+          {
+            "definition": "coin",
+            "properties": {},
+            "quantity": 1,
+            "uid": "item.88"
+          },
+          {
+            "definition": "poison_rag",
+            "properties": {},
+            "quantity": 1,
+            "uid": "item.28"
+          },
+          {
+            "definition": "cloth",
+            "properties": {},
+            "quantity": 1,
+            "uid": "item.27"
+          }
+        ],
+        "shortcuts": {
+          "item_0": {
+            "item_id": "ration",
+            "kind": "item",
+            "uid": ""
+          },
+          "item_1": {
+            "item_id": "clean_water",
+            "kind": "item",
+            "uid": ""
+          },
+          "item_2": {
+            "item_id": "tea",
+            "kind": "item",
+            "uid": ""
+          },
+          "item_3": {
+            "item_id": "broth",
+            "kind": "item",
+            "uid": ""
+          },
+          "left": {
+            "kind": "technique",
+            "technique_id": "blade_breaker"
+          },
+          "quick_e": {
+            "item_id": "clean_water",
+            "kind": "item",
+            "uid": ""
+          },
+          "right": {
+            "kind": "skill",
+            "skill_id": "ignite",
+            "upgrades": {}
+          },
+          "slot_0": {
+            "kind": "skill",
+            "skill_id": "disperse",
+            "upgrades": {}
+          },
+          "slot_3": {
+            "kind": "skill",
+            "skill_id": "water_call",
+            "upgrades": {}
+          },
+          "slot_4": {
+            "kind": "skill",
+            "selection": {
+              "modifier": "",
+              "payload": "frost",
+              "uid": ""
+            },
+            "skill_id": "inscribe",
+            "upgrades": {}
+          },
+          "slot_5": {
+            "kind": "skill",
+            "skill_id": "ignite",
+            "upgrades": {}
+          }
+        },
+        "fields": [],
+        "notice": "未完成：货币不足，或对方没有空间接收付款。",
+        "casts": [
+          {
+            "action": "inscribe",
+            "charge_power": 1.0,
+            "materials": {
+              "fire_stone": 1
+            },
+            "mp_after": 52,
+            "mp_cost": 8,
+            "position": [
+              -3102.98291015625,
+              1856.49096679688
+            ],
+            "result": "inscribe",
+            "rule": "",
+            "t": 37.1958262222223
+          }
+        ]
+      }
+    }
+  ],
+  "verification": "JSON, screenshot hashes, links, diff formatting; full regression not rerun for documentation-only review"
+}
