@@ -4,6 +4,8 @@ extends Resource
 ## an optional SkillData effect supplies existing geometry/status execution.
 @export var id := ""
 @export var title := ""
+## Explicit element family for input assistance; chemistry/requirements still use existing fields.
+@export var affinity := ""
 @export_multiline var description := ""
 @export var material_id := ""
 @export var quantity := 1

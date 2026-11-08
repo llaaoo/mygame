@@ -137,13 +137,13 @@ func wheel_choice(key: String,payload: String,uid: String) -> String:
 	if not wheel.visible: return "wheel_not_open"
 	var index:=-1
 	for i in range(wheel.entries.size()):
-		if wheel.entries[i].choice.payload==payload: index=i; break
+		if wheel.entries[i].choice.get("payload","")==payload or payload=="auto" and wheel.entries[i].choice.get("mode","")=="auto": index=i; break
 	if index<0: return "wheel_payload_missing"
 	var point:=wheel._ring.position+Vector2(180,180)+Vector2.from_angle(-PI/2+(index%8)*TAU/8)*125
 	var motion:=InputEventMouseMotion.new(); motion.position=point; Input.parse_input_event(motion); await settle(2)
 	if not uid.is_empty():
 		for attempt in range(10):
-			if wheel.entries[index].choice.uid==uid: break
+			if wheel.entries[index].choice.get("uid","")==uid: break
 			await mouse(MOUSE_BUTTON_WHEEL_DOWN)
 	var sequence:=game.player.actor_context.actions._attack_sequence
 	await click_point(point)
@@ -205,7 +205,7 @@ func snapshot() -> Dictionary:
 	var slots: Array[String]=[]
 	for i in range(6):
 		var inst:=actor.skill_manager.get_slot(i); slots.append(inst.data.get_id() if inst else "")
-	return {"active_seconds":active_time,"wall_usec":Time.get_ticks_usec(),"paused":paused,"simulation":GameRuntime.instance.is_processing(),"shortcuts":actor.skill_manager.shortcuts.snapshot(),"wheel":{"visible":actor.material_wheel.visible,"source":actor.material_wheel.source},"player":{"ui_blocked":actor.ui_blocked,"attacks":actor.actor_context.actions._attack_sequence,"position":[actor.position.x,actor.position.y],"hp":actor.health_component.hp,"mp":actor.mana_component.mp,"damage_taken":damage_taken,"stamina":actor.actor_context.actions.stamina.current,"mode":actor.actor_context.actions.mode,"dead":actor.health_component.is_dead,"base":game.is_at_base(),"guarding":actor.actor_context.actions.guarding,"charge_source":actor.casting._charging_source,"channel_source":actor.casting._channeling_source},"materials":actor.skill_manager.combinations.supplies.amounts,"items":game.session.inventory.entries("player.pocket"),"gear":game.session.inventory.entries("player.gear"),"pack":game.session.inventory.entries("player.pack"),"runtime_scripts":runtime_scripts(),"claims":game.progress.claims.keys(),"loot_records":game.progress.loot_records.duplicate(true),"known_actions":actor.skill_manager.known_actions,"selected":actor.skill_manager.combinations.supplies.selected,"fields":fields,"slots":slots,"hands":{"q":actor.skill_manager.left_hand.data.get_id() if actor.skill_manager.left_hand else "","r":actor.skill_manager.right_hand.data.get_id() if actor.skill_manager.right_hand else ""},"tracker":game.frontier_hud.tracker.text,"objective":game.ui.objective.text,"notice":game.ui.message.text,"modal_texts":texts,"buttons":buttons,"enemies":enemies,"casts":casts,"melee_hits":melee_hits,"defenses":defenses,"physical_actions":physical_actions,"campaign_clock":game.session.inventory.clock_seconds,"date":WorldTime.instance.stamp(),"martial":actor.actor_context.martial.snapshot(),"save_path":ProjectSettings.globalize_path("user://save_3.sav"),"display":DisplayServer.get_name()}
+	return {"spell_affinity":actor.skill_manager.spell_forms.affinity,"effective_forms":form_snapshot(),"active_seconds":active_time,"wall_usec":Time.get_ticks_usec(),"paused":paused,"simulation":GameRuntime.instance.is_processing(),"shortcuts":actor.skill_manager.shortcuts.snapshot(),"wheel":{"visible":actor.material_wheel.visible,"source":actor.material_wheel.source},"player":{"ui_blocked":actor.ui_blocked,"attacks":actor.actor_context.actions._attack_sequence,"position":[actor.position.x,actor.position.y],"hp":actor.health_component.hp,"mp":actor.mana_component.mp,"damage_taken":damage_taken,"stamina":actor.actor_context.actions.stamina.current,"mode":actor.actor_context.actions.mode,"dead":actor.health_component.is_dead,"base":game.is_at_base(),"guarding":actor.actor_context.actions.guarding,"charge_source":actor.casting._charging_source,"channel_source":actor.casting._channeling_source},"materials":actor.skill_manager.combinations.supplies.amounts,"items":game.session.inventory.entries("player.pocket"),"gear":game.session.inventory.entries("player.gear"),"pack":game.session.inventory.entries("player.pack"),"runtime_scripts":runtime_scripts(),"claims":game.progress.claims.keys(),"loot_records":game.progress.loot_records.duplicate(true),"known_actions":actor.skill_manager.known_actions,"selected":actor.skill_manager.combinations.supplies.selected,"fields":fields,"slots":slots,"hands":{"q":actor.skill_manager.left_hand.data.get_id() if actor.skill_manager.left_hand else "","r":actor.skill_manager.right_hand.data.get_id() if actor.skill_manager.right_hand else ""},"tracker":game.frontier_hud.tracker.text,"objective":game.ui.objective.text,"notice":game.ui.message.text,"modal_texts":texts,"buttons":buttons,"enemies":enemies,"casts":casts,"melee_hits":melee_hits,"defenses":defenses,"physical_actions":physical_actions,"campaign_clock":game.session.inventory.clock_seconds,"date":WorldTime.instance.stamp(),"martial":actor.actor_context.martial.snapshot(),"save_path":ProjectSettings.globalize_path("user://save_3.sav"),"display":DisplayServer.get_name()}
 func move_input(direction: Vector2) -> void:
 	for pair in [[KEY_D,direction.x>.35],[KEY_A,direction.x<-.35],[KEY_S,direction.y>.35],[KEY_W,direction.y<-.35]]:
 		if bool(held.get(pair[0],false))!=bool(pair[1]): key_event(pair[0],pair[1])
@@ -354,3 +354,9 @@ func bind_technique(id: String,source: String) -> String:
 	await settle(3); await click_point(slot.get_global_rect().get_center())
 	await tap(KEY_ESCAPE)
 	return "" if game.player.skill_manager.shortcuts.binding(source).get("technique_id","")==id else "technique_not_bound"
+
+func form_snapshot() -> Dictionary:
+	var forms: Dictionary={}
+	for source in QuickslotLoadout.SOURCES:
+		if game.player.skill_manager.get_instance(source): forms[source]=game.player.skill_manager.selection_for_source(source)
+	return forms

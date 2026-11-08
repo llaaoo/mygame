@@ -262,6 +262,7 @@ func _on_health_changed(current_hp: int, max_hp: int) -> void:
 	health_changed.emit(current_hp, max_hp)
 
 func _on_died() -> void:
+	if skill_manager.spell_forms: skill_manager.spell_forms.clear()
 	if is_instance_valid(material_wheel): material_wheel.close()
 	GameUIStyle.close_gameplay_views(self)
 	set_process(false)
@@ -399,6 +400,7 @@ func cancel_active_input(reason: String) -> void:
 
 
 func cancel_region_actions() -> void:
+	if skill_manager.spell_forms: skill_manager.spell_forms.clear()
 	if actor_context and actor_context.actions: actor_context.actions.cancel("region_left")
 	if actor_context and actor_context.item_actions: actor_context.item_actions.cancel()
 	if actor_context and actor_context.spray: actor_context.spray.stop()

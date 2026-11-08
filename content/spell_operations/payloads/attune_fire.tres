@@ -3,6 +3,7 @@
 [ext_resource type="Resource" path="res://gameplay/abilities/data/ember_focus_result.tres" id="effect"]
 [resource]
 script = ExtResource("data")
+affinity = "fire"
 id = "attune_fire"
 title = "火阵调谐"
 effect = ExtResource("effect")

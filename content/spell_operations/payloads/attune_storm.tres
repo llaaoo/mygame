@@ -3,6 +3,7 @@
 [ext_resource type="Resource" path="res://gameplay/abilities/data/static_focus_result.tres" id="effect"]
 [resource]
 script = ExtResource("data")
+affinity = "storm"
 id = "attune_storm"
 title = "雷阵调谐"
 effect = ExtResource("effect")

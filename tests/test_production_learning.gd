@@ -16,6 +16,8 @@ func run() -> void:
 	store.clock_seconds+=120; production.advance()
 	check(store.count(merchant,"fire_stone")==2 and store.count(merchant,"charcoal")==charcoal-4 and store.count(merchant,"crystal")==crystal-2,"Production did not transform exact real stock")
 	check(store.count(merchant,"coin")==coins and game.player.stats_component.experience==xp,"NPC production minted money or player XP")
+	check(game.progress.journal.any(func(entry: Dictionary): return entry.id=="service.production.town.fire_stone" and entry.text.contains("返回整修铺购买")),"Production completion did not leave a persistent, truthful merchant record")
+	check(game.ui._pending_notices.size()>0,"Production completion was overwritten instead of queued behind other feedback")
 	var completed:=store.snapshot(); production.advance()
 	check(store.snapshot()==completed and not production.status("town.fire_stone").scheduled,"Completed work replayed")
 	check(production.start("town.arrows").accepted,"Arrow order failed")

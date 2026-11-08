@@ -1,5 +1,7 @@
 # 项目架构与维护边界
 
+2026-11-08：[操作闭环与智能施法](PLAYER_FLOW_AND_SPELL_ASSIST.md)加入由SkillManager持有的瞬态SpellFormAssist；QuickslotLoadout仍独占绑定，形式解析继续进入同一CastPlan和事务。生产事实由适配器请求日志与排队通知，UI不增加库存或施法权威。
+
 2026-11-06。RPG 所有权与角色组合升级见 [RPG 基座](./RPG_FOUNDATION.md)。本文件定义当前边界；[运行时拓扑](./RUNTIME_TOPOLOGY.md)说明时序，[战斗契约](./COMBAT_CONTRACTS.md)与[世界契约](./WORLD_CONTRACTS.md)说明领域规则。[重构进展](./REFACTOR_PROGRESS.md)记录验收范围。早期项目分析文档保留为历史资料。
 
 2026-11-07 UTC的[系统深化](SYSTEM_DEPTH.md)沿用这些边界：WeaponMoveset/MartialTechnique为Resource，MartialArts为角色持有的RefCounted状态，ActorActionController执行物理动作，TownServices为灰河谷服务适配器，InventoryService提交UID交易/拆解/强化，WorldTime投影持久时钟。

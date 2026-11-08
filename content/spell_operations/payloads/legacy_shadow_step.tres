@@ -3,6 +3,7 @@
 [ext_resource type="Resource" path="res://gameplay/abilities/data/shadow_step_data.tres" id="effect"]
 [resource]
 script = ExtResource("data")
+affinity = "arcane"
 id = "shadow_step"
 title = "墨印突袭"
 description = "墨印突袭；消耗真实材料，所选来源失效时拒绝，不自动换源。"

@@ -31,6 +31,7 @@ func validation_errors() -> Array[String]:
 			if not medium or medium.id.is_empty() or payload_ids.has(medium.id):
 				errors.append("Duplicate/invalid payload"); continue
 			payload_ids[medium.id]=true
+			if not medium.affinity.is_empty() and medium.affinity not in SpellFormAssist.AFFINITIES: errors.append("Unknown payload affinity")
 			if medium.source_kind not in ["","field","soul"]: errors.append("Unknown source kind")
 			if medium.source_kind=="field" and medium.source_field not in ["arcane","fire","frost","storm","ward"]: errors.append("Unknown rune source")
 			if not entry.action.field_type.is_empty() and medium.field_type.is_empty(): errors.append("Inscription payload needs a field type")

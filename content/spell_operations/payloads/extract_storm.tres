@@ -3,6 +3,7 @@
 [ext_resource type="Resource" path="res://content/spell_operations/energy/storm.tres" id="effect"]
 [resource]
 script = ExtResource("data")
+affinity = "storm"
 id = "extract_storm"
 title = "雷阵充能"
 effect = ExtResource("effect")

@@ -3,6 +3,7 @@
 [ext_resource type="Resource" path="res://gameplay/abilities/data/storm_field_data.tres" id="effect"]
 [resource]
 script = ExtResource("data")
+affinity = "storm"
 id = "storm_field"
 title = "雷晶雷场"
 description = "雷晶雷场；消耗真实材料，所选来源失效时拒绝，不自动换源。"

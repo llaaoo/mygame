@@ -81,7 +81,7 @@ func run() -> void:
  await capture("07-payloads")
  var target:=-1
  for i in range(wheel.entries.size()):
-  if wheel.entries[i].choice.payload=="resin": target=i
+  if wheel.entries[i].choice.get("payload","")=="resin": target=i
  check(target>=0,"Learned resin payload missing from wheel")
  # An unavailable bottle stays visible and cannot silently bind a future replacement.
  await key(KEY_ESCAPE,true); await key(KEY_ESCAPE,false)

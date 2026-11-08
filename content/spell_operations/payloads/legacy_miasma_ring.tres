@@ -3,6 +3,7 @@
 [ext_resource type="Resource" path="res://gameplay/abilities/data/miasma_ring_data.tres" id="effect"]
 [resource]
 script = ExtResource("data")
+affinity = "poison"
 id = "miasma_ring"
 title = "毒萃瘴环"
 description = "毒萃瘴环；消耗真实材料，所选来源失效时拒绝，不自动换源。"

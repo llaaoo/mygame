@@ -13,6 +13,14 @@ func _queue_save() -> void:
 	_save_dirty = true
 	_save_delay = 1.0
 
+func record_service_result(id: String,title: String,text: String) -> void:
+	for entry in game.progress.journal:
+		if entry.id==id:
+			entry.title=title; entry.text=text
+			_queue_save(); changed.emit(); return
+	game.progress.journal.append({"id":id,"title":title,"text":text})
+	_queue_save(); changed.emit()
+
 func tick(delta: float) -> void:
 	if _save_dirty and game.ready_for_play and not game.get_tree().paused:
 		_save_delay -= delta
@@ -58,6 +66,8 @@ func _apply_knowledge() -> void:
 						break
 			if slot >= 0:
 				sm.equip_slot(slot, sm.pool.get_skill(pair[0]))
+				var instance:=sm.get_slot(slot)
+				if sm.material_operations and instance and sm.spell_forms.supports(instance.data): sm.shortcuts.set_selection("slot_%d"%slot,{"mode":"auto"})
 	if sm.material_operations and game.progress.actions.has("water_call") and not previous.has("water_call"):
 		for i in range(SkillManager.MAX_SLOTS):
 			if sm.shortcuts.binding("slot_%d"%i).is_empty():

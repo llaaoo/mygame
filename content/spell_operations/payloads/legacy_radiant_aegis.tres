@@ -3,6 +3,7 @@
 [ext_resource type="Resource" path="res://gameplay/abilities/data/radiant_aegis_data.tres" id="effect"]
 [resource]
 script = ExtResource("data")
+affinity = "ward"
 id = "radiant_aegis"
 title = "守护再生"
 description = "守护再生；消耗真实材料，所选来源失效时拒绝，不自动换源。"

@@ -2,6 +2,7 @@
 [ext_resource type="Script" path="res://gameplay/abilities/operations/spell_payload_data.gd" id="1"]
 [resource]
 script = ExtResource("1")
+affinity = "fire"
 id = "ember"
 title = "火石阵"
 description = "火石提供火阵介质；由之后亲手执行的火花、震荡或凝神按已知关系触发。"

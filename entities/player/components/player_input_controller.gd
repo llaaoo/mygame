@@ -8,6 +8,7 @@ var _ui_click_pending := false
 var _attack_suppressed := false
 var _suppressed_sources: Dictionary={}
 var _fresh_after_ui: Dictionary={}
+var last_spell_source := ""
 var _focus: Node2D
 var _focus_frame := -1
 var _focus_origin := Vector2.INF
@@ -125,6 +126,7 @@ func _poll_shortcut(actions: Array[Action],source: String,pressed: bool) -> void
 	_poll_cast_edge(actions,source,pressed)
 
 func _poll_cast_edge(actions: Array[Action], source: String, pressed: bool) -> void:
+	if pressed: last_spell_source=source
 	if not _can_cast_source(source):
 		return
 	var released := not pressed
@@ -136,7 +138,7 @@ func _poll_cast_edge(actions: Array[Action], source: String, pressed: bool) -> v
 	action.params["quick_cast"] = quick
 	action.cast_context = CastContext.at_position(player, CastContext.ground_point(player, player.get_global_mouse_position(), skill.cast_distance), skill) if skill.ground_targeted else CastContext.simple(player, action.direction, skill)
 	action.cast_context.empower = Input.is_key_pressed(KEY_SHIFT)
-	action.cast_context.selection=player.skill_manager.shortcuts.selection(source)
+	action.cast_context.selection=player.skill_manager.selection_for_source(source)
 	action.cast_context.binding_revision=player.skill_manager.shortcuts.revision(source)
 	actions.append(action)
 
@@ -197,7 +199,8 @@ func execute_action(action: Action) -> void:
 						casting.hide_aim()
 					return
 				if not ActionResolver.validate(player, action):
-					# MP/冷却不足，清除瞄准但不执行
+					player.skill_manager.report_refusal(action.skill_source,action.cast_context)
+					# Clear aim after reporting the actual refusal.
 					casting.aiming_sources.erase(action.skill_source)
 					if casting.aiming_sources.is_empty():
 						casting.hide_aim()
@@ -213,6 +216,7 @@ func execute_action(action: Action) -> void:
 					if ActionResolver.validate(player,action):
 						_cast_source(action.skill_source,action.cast_context)
 						player.state_machine.transition_to("skill")
+					else: player.skill_manager.report_refusal(action.skill_source,action.cast_context)
 					return
 				# CAST_PRESS — 总是显示瞄准
 				casting.aiming_sources[action.skill_source] = true
@@ -247,7 +251,7 @@ func _cast_source(source: String, context: CastContext = null) -> void:
 			return
 		context.charge_power = casting._charge_power
 		casting._cancel_charge()
-	player.skill_manager.use_source(source, player, context)
+	if not player.skill_manager.use_source(source, player, context): player.skill_manager.report_refusal(source,context)
 
 func request_interaction(target: Node2D) -> bool:
 	if player.ui_blocked or player.health_component.is_dead or not is_instance_valid(target) or interaction_target(true)!=target: return false
@@ -279,12 +283,18 @@ func _try_interact(expected: Node2D = null, targeted := false) -> void:
 				CombatEventBus.instance.emit(ev)
 
 func _unhandled_input(event: InputEvent) -> void:
-	if player.ui_blocked or casting.aiming_sources.is_empty():
-		return
-	if not event is InputEventMouseButton or not event.pressed:
-		return
+	if player.ui_blocked or get_tree().paused or player.health_component.is_dead: return
+	if not event is InputEventMouseButton or not event.pressed: return
 	if event.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
-		casting.cancel_all()
+		if player.material_wheel.visible or _pointer_over_interface(): return
+		var source:=casting.aimed_source()
+		if source.is_empty(): source=last_spell_source
+		if source.is_empty(): source=player.material_wheel.last_source
+		if not QuickslotMaterials.available(player.skill_manager,source): return
+		player.cancel_active_input("切换形式：取消未提交准备")
+		suppress_source(source)
+		if QuickslotMaterials.cycle(player,source,1 if event.button_index==MOUSE_BUTTON_WHEEL_DOWN else -1):
+			last_spell_source=source
 		get_viewport().set_input_as_handled()
 
 

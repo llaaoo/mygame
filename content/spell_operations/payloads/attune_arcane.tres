@@ -3,6 +3,7 @@
 [ext_resource type="Resource" path="res://gameplay/abilities/data/focus_data.tres" id="effect"]
 [resource]
 script = ExtResource("data")
+affinity = "arcane"
 id = "attune_arcane"
 title = "凝能阵调谐"
 effect = ExtResource("effect")

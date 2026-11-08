@@ -14,17 +14,24 @@ var _detail: VBoxContainer
 var _search: LineEdit
 var _status: Label
 var _open := false
+var journal_page := "quests"
+var _contexts: Dictionary={}
+func remember_record(id: String) -> void:
+	journal_page="knowledge"
+	_contexts["knowledge"]={"query":"","selected":id,"filter":0}
+func _remember() -> void:
+	_contexts[page]={"query":query,"selected":selected,"filter":filter_index}
 
 func _init(owner_game: GrayriverGame) -> void: game=owner_game
 func handle_shortcut(key: int) -> bool:
 	if game.ui.modal_locked: return false
-	var target: String = {KEY_J:"quests",KEY_O:"equipment",KEY_I:"inventory",KEY_N:"supplies",KEY_TAB:"actions"}.get(key,"")
+	var target: String = {KEY_J:journal_page,KEY_O:"equipment",KEY_I:"inventory",KEY_N:"supplies",KEY_TAB:"actions"}.get(key,"")
 	if target.is_empty(): return false
 	if key==KEY_TAB and is_instance_valid(game.ui.modal):
 		if game.ui.modal.get_meta("frontier_page","").is_empty(): return false
-		game.ui.close_modal(); _open=false; return true
+		_remember(); game.ui.close_modal(); _open=false; return true
 	if is_instance_valid(game.ui.modal) and game.ui.modal.get_meta("frontier_page","")==target:
-		game.ui.close_modal()
+		_remember(); game.ui.close_modal()
 		_open=false
 	else: open(target)
 	return true
@@ -35,11 +42,14 @@ func open(tab := "quests", source := "") -> void:
 		game.ui.close_modal()
 		game.inventory_screen.open("all" if tab=="inventory" else tab)
 		return
+	if _open and is_instance_valid(game.ui.modal) and game.ui.modal.get_meta("frontier_page","")==page: _remember()
 	page=tab
+	if page in ["quests","knowledge"]: journal_page=page
 	loot_id=source
-	query=""
-	selected=""
-	filter_index=0
+	var context: Dictionary=_contexts.get(page,{})
+	query="" # A fresh open must not hide entries behind an old text search.
+	selected=str(context.get("selected",""))
+	filter_index=int(context.get("filter",0))
 	_open=true
 	var root:=preload("res://gameplay/foundation/ui/expedition_screen.tscn").instantiate() as ExpeditionScreen
 	var tabs:=root.tabs
@@ -55,11 +65,13 @@ func open(tab := "quests", source := "") -> void:
 	if page == "loot": root.footer.add_child(W.label("遗骸 · 未取走的东西会留在原处。%s尽量取走全部；点击选择，Esc关闭。"%InputBindings.label("loot_all"),13,true))
 	var tools:=root.tools
 	_search=root.search
+	_search.text=query
 	_search.text_changed.connect(func(value: String): query=value; _refresh_rows())
 	if page in ["equipment","supplies","quests"]:
 		var filter := OptionButton.new()
 		var choices: Array = ["全部","持有","已装备","武器","防具","饰物"] if page == "equipment" else ["全部","可使用","材料"] if page == "supplies" else ["进行中","可交付","已完成","全部"]
 		for title in choices: filter.add_item(title)
+		filter.select(filter_index)
 		filter.item_selected.connect(func(index: int): filter_index=index; _refresh_rows())
 		tools.add_child(filter)
 	_status=root.status
@@ -138,7 +150,9 @@ func _refresh_rows() -> void:
 	var available:=entries().filter(func(entry: Dictionary): return query.is_empty() or query.to_lower() in (entry.title+entry.text).to_lower())
 	available.sort_custom(func(a: Dictionary,b: Dictionary): return a.title.naturalnocasecmp_to(b.title)<0)
 	_status.text="%d项 · 背包 %d/%d格 · 水囊 %d/%d"%[available.size(),game.player.inventory.capacity-game.player.inventory.empty_slot_count(),game.player.inventory.capacity,SurvivalCatalog.water_count(game.survival.supplies),SurvivalCatalog.WATER_CAPACITY]
-	if not available.any(func(entry: Dictionary): return entry.id==selected): selected=available[0].id if not available.is_empty() else ""
+	if not available.any(func(entry: Dictionary): return entry.id==selected):
+		selected=available[0].id if not available.is_empty() else ""
+		if page=="quests" and available.any(func(entry: Dictionary): return entry.id==game.progress.tracked_quest): selected=game.progress.tracked_quest
 	for entry in available:
 		var button:=W.button(entry.title+"\n"+entry.subtitle,_select.bind(entry.id))
 		button.name="Entry_"+str(entry.id).replace(":","_")
@@ -158,6 +172,7 @@ func _refresh_rows() -> void:
 
 func _select(id: String) -> void:
 	selected=id
+	_remember()
 	for child in _rows.get_children():
 		if child is Button:
 			child.button_pressed=child.name=="Entry_"+id.replace(":","_")

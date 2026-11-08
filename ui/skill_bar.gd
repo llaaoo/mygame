@@ -124,7 +124,7 @@ func _process(_delta: float) -> void:
 	if not _skill_manager.get_instance(hint_source):
 		for candidate in _sources:
 			if _skill_manager.get_instance(candidate)==hint_instance: hint_source=candidate; break
-	var hint_key := hash([hint_instance.base_data, hint_instance.upgrade_ranks,_skill_manager.shortcuts.selection(hint_source)])
+	var hint_key := hash([hint_instance.base_data, hint_instance.upgrade_ranks,_skill_manager.selection_for_source(hint_source)])
 	previews[hint_key] = _skill_manager.preview_source(hint_source, empower)
 	var plan: CastPlan = previews[hint_key]
 	var action_name: String = action.display_name
@@ -157,15 +157,15 @@ func _process(_delta: float) -> void:
 		_variant_labels[i].text=""
 		if instance and not instance.data.operation_id.is_empty():
 			var operation:=SpellOperationCatalog.default_catalog().operation(instance.data.operation_id)
-			var choice:=_skill_manager.shortcuts.selection(_sources[i])
+			var choice:=_skill_manager.selection_for_source(_sources[i])
 			var payload:=operation.payload(str(choice.get("payload",controller.supplies.selected.get(instance.data.get_id(),operation.default_payload)))) if operation else null
-			if payload: _variant_labels[i].text=payload.title.left(2)
+			if payload: _variant_labels[i].text=("随"+payload.title.left(1)) if _skill_manager.spell_forms.automatic(_sources[i]) else payload.title.left(2)
 		elif instance:
-			var modifier:=str(_skill_manager.shortcuts.selection(_sources[i]).get("modifier",""))
+			var modifier:=str(_skill_manager.selection_for_source(_sources[i]).get("modifier",""))
 			if not modifier.is_empty(): _variant_labels[i].text=controller.supplies.title(modifier).left(2)
 		var preview: CastPlan
 		if instance and (controller.handles(instance.data) or not instance.data.operation_id.is_empty()):
-			var key := hash([instance.base_data, instance.upgrade_ranks,_skill_manager.shortcuts.selection(_sources[i])])
+			var key := hash([instance.base_data, instance.upgrade_ranks,_skill_manager.selection_for_source(_sources[i])])
 			if not previews.has(key):
 				previews[key] = _skill_manager.preview_source(_sources[i], empower)
 			preview = previews[key]
@@ -174,7 +174,7 @@ func _process(_delta: float) -> void:
 				var alternate := _skill_manager.preview_source(_sources[i], not empower)
 				previews[comparison_key] = instance.data.display_name + "\n\n普通 · " + _brief_plan(alternate if empower else preview) + "\n\nShift · " + _brief_plan(preview if empower else alternate) + "\n\n数字为本次MP费用 · K配置此槽，未固定来源时跟随M"
 			var binding:=InputBindings.action_for_source(_sources[i])
-			_panels[i].tooltip_text = "按键："+InputBindings.labels(binding)+"\n"+previews[comparison_key]
+			_panels[i].tooltip_text = "按键："+InputBindings.labels(binding)+"\n"+previews[comparison_key]+"\n"+_skill_manager.spell_forms.label(_sources[i])+" · 世界滚轮切换最近动作形式\n"+QuickslotMaterials.stock_text(actor,preview.material_costs)
 		if preview:
 			var icon_key: Variant = instance.data.icon if instance.data.icon else instance.data.icon_atlas_index
 			if _icon_keys[i] != icon_key:

@@ -181,8 +181,8 @@ func build_summary(candidate: EquipmentData = null) -> String:
 
 func change_reason() -> String:
 	if game.rules.field_equipment:
-		if game.player.health_component.is_dead or game.player.field_work.is_busy() or (game.player.actor_context and game.player.actor_context.actions.busy()) or game.player.skill_manager.combinations.is_busy() or not game.player.casting.aiming_sources.is_empty(): return "先结束当前动作，再手动换装。"
-		return "附近有敌人，先脱离战斗再换装。" if game.has_hostiles_near(game.player.position) else ""
+		if game.player.health_component.is_dead or game.player.field_work.is_busy() or (game.player.actor_context and game.player.actor_context.actions.busy()) or game.player.skill_manager.combinations.is_busy() or not game.player.casting.aiming_sources.is_empty(): return "先结束当前动作，再整备口袋或装备。"
+		return "附近有敌对者，请再拉开距离，然后整备口袋或装备。" if game.has_hostiles_near(game.player.position) else ""
 	return "返回营地整备。" if not game.is_at_base() else ""
 
 func removal_reason(_slot: int) -> String:

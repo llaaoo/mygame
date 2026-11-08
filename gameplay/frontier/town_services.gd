@@ -12,6 +12,9 @@ var market: MarketDefinition
 var training: TrainingCatalog
 var _screen: ExpeditionScreen
 var _selling := true
+var _selected_uid := ""
+var _trade_quantity: SpinBox
+var _quantity_value := 1
 func _init(owner_game: GrayriverGame,market_profile: MarketDefinition=null,training_profile: TrainingCatalog=null) -> void:
 	game=owner_game
 	market=market_profile if market_profile else load("res://content/frontier/town_market.tres") as MarketDefinition
@@ -36,18 +39,19 @@ func price(uid: String,buying: bool) -> int:
 	var base:=maxi(definition.sell_price,8 if definition is EquipmentData else 1)
 	base+=clampi(int(item.properties.get("upgrade_level",0)),0,3)*2
 	return base*2 if buying else base
-func transact(uid: String,selling: bool) -> OperationResult:
+func transact(uid: String,selling: bool,quantity := 1) -> OperationResult:
 	if not reason().is_empty(): return OperationResult.reject(reason())
 	var store:=game.session.inventory
 	var item:=store.item(uid)
 	if not item or item.definition_id=="coin": return OperationResult.reject("不可交易")
-	return store.trade_instance(market.actor_id if selling else "player","player" if selling else market.actor_id,uid,1,price(uid,not selling))
+	return store.trade_instance(market.actor_id if selling else "player","player" if selling else market.actor_id,uid,quantity,price(uid,not selling)*quantity)
 func salvage(uid: String,upgrade: bool) -> OperationResult:
 	if not reason().is_empty(): return OperationResult.reject(reason())
 	return game.session.inventory.upgrade_instance("player",uid) if upgrade else game.session.inventory.dismantle_instance("player",uid)
 func show(selling := true) -> void:
 	if not reason().is_empty(): game.ui.notify(reason()); return
 	_selling=selling
+	_selected_uid=""; _quantity_value=1
 	ensure_stock()
 	_screen=preload("res://gameplay/foundation/ui/expedition_screen.tscn").instantiate() as ExpeditionScreen
 	_screen.get_node("Navigation/Caption").text="整修铺"
@@ -64,17 +68,23 @@ func _rows(query: String) -> void:
 	W.clear(_screen.rows); W.clear(_screen.detail)
 	var store:=game.session.inventory
 	_screen.status.text="随身河谷币 %d · 店家河谷币 %d · 金属碎料 %d"%[store.count("player","coin"),store.count(market.actor_id,"coin"),store.count("player","metal_scrap")]
+	var shown: Array[String]=[]
 	for container in store.actor_containers("player" if _selling else market.actor_id):
 		for row in store.entries(container):
 			var definition:=store.definitions[row.definition] as ItemData
 			if row.definition=="coin" or not query.is_empty() and not definition.display_name.contains(query): continue
 			var data:=store.equipment_definition(row.uid) if definition is EquipmentData else definition
+			shown.append(row.uid)
 			_screen.rows.add_child(W.button("%s ×%d · %d币"%[data.display_name,row.quantity,price(row.uid,not _selling)],_detail.bind(row.uid)))
+	if _selected_uid in shown: _detail(_selected_uid)
+	else: _selected_uid=""
 func _detail(uid: String) -> void:
 	W.clear(_screen.detail)
 	var store:=game.session.inventory
 	var item:=store.item(uid)
 	if not item: return
+	if _selected_uid!=uid: _quantity_value=1
+	_selected_uid=uid
 	var definition:=store.definitions[item.definition_id] as ItemData
 	var data:=store.equipment_definition(uid) if definition is EquipmentData else definition
 	_screen.detail.add_child(W.label(data.display_name,22))
@@ -83,16 +93,29 @@ func _detail(uid: String) -> void:
 		W.disclosure(_screen.detail,"当前装备属性",W.comparison(null,data))
 		if data.moveset: W.disclosure(_screen.detail,"武器动作",data.moveset.describe())
 	_screen.detail.add_child(W.button(("出售一件" if _selling else "购买一件")+" · %d币"%price(uid,not _selling),_request.bind("trade",uid)))
+	if item.quantity>1:
+		_trade_quantity=SpinBox.new(); _trade_quantity.min_value=1; _trade_quantity.max_value=item.quantity; _trade_quantity.step=1; _trade_quantity.value=mini(_quantity_value,item.quantity)
+		_trade_quantity.value_changed.connect(func(value: float): _quantity_value=int(value))
+		_screen.detail.add_child(_trade_quantity)
+		_screen.detail.add_child(W.button("出售所选数量" if _selling else "购买所选数量",_request.bind("trade_quantity",uid)))
+		_screen.detail.add_child(W.button("出售整叠" if _selling else "购买整叠",_request.bind("trade_stack",uid)))
 	if _selling and definition is EquipmentData:
 		var level:=clampi(int(item.properties.get("upgrade_level",0)),0,3)
 		_screen.detail.add_child(W.label("强化每级：主手攻击+1；其余装备生命上限+4。最高+3。",14,true))
 		_screen.detail.add_child(W.button("拆解 · 获得%d金属碎料（销毁这件装备）"%(2+level),_request.bind("dismantle",uid)))
 		_screen.detail.add_child(W.button("强化 · %d币 + %d金属碎料"%[5*(level+1),2*(level+1)],_request.bind("upgrade",uid),level>=3))
 func _request(method: String,uid: String) -> void:
-	var result:=transact(uid,_selling) if method=="trade" else salvage(uid,method=="upgrade")
-	game.ui.notify("完成："+{"trade":"交易","dismantle":"拆解","upgrade":"强化"}[method] if result.accepted else "未完成："+str(ERRORS.get(result.reason,result.reason)))
+	var focused:=_screen.get_viewport().gui_get_focus_owner()
+	var focus_text: String=focused.text if focused is Button else ""
+	var item:=game.session.inventory.item(uid)
+	var quantity:=item.quantity if method=="trade_stack" and item else _quantity_value if method=="trade_quantity" else 1
+	var trade:=method.begins_with("trade")
+	var result:=transact(uid,_selling,quantity) if trade else salvage(uid,method=="upgrade")
+	game.ui.notify("完成："+("交易 ×%d"%result.moved if trade else {"dismantle":"拆解","upgrade":"强化"}[method]) if result.accepted else "未完成："+str(ERRORS.get(result.reason,result.reason)))
 	if result.accepted: game._save_progress()
 	_rows(_screen.search.text)
+	for button in _screen.detail.find_children("*","Button",true,false):
+		if not focus_text.is_empty() and button.text==focus_text: button.grab_focus(); break
 
 func show_training() -> void:
 	var npc:=game.session.actor_for_id(training.actor_id)
@@ -105,6 +128,7 @@ func show_training() -> void:
 		var price_text:=game.player.skill_manager.combinations.supplies.describe_cost(offer.costs)
 		if offer.costs.size()==1 and offer.costs.has("coin"): price_text="%d币"%offer.costs.coin
 		options.append({"title":data.title+(" · 已学会" if known else " · "+price_text)+(_requirements_hint(offer) if not known else ""),"disabled":not refused.is_empty(),"callback":_teach.bind(offer.id)})
+	options.append({"title":"打开武技快捷编组","callback":_open_techniques})
 	options.append({"title":"分配已有属性点","callback":game.presenter._show_training})
 	game.ui.show_panel("武技训练师","武技消耗体力与对应武器资源，不消耗MP。购买只解锁知识；到K的武技页亲手绑定快捷键。刀破势、矛控距、杖压制、弓蓄射各有起手与恢复风险。",options)
 func _teach(id: String) -> void:
@@ -113,8 +137,11 @@ func _teach(id: String) -> void:
 	var offer:=training.offer(id)
 	if not is_instance_valid(npc) or npc.health_component.is_dead or game.session.relations.attitude(npc.actor_context.id,"player")=="hostile" or not npc.working or npc.global_position.distance_to(game.player.global_position)>150 or game.has_hostiles_near(game.player.global_position) or context.actions.busy() or not offer: return
 	var result:=TechniqueLearning.purchase(offer,context,training.actor_id)
-	if not result.accepted: game.ui.notify(str(ERRORS.get(result.reason,result.reason)))
+	game.ui.notify("已学会"+offer.technique.title+" · 点打开武技快捷编组，再选择槽位。" if result.accepted else str(ERRORS.get(result.reason,result.reason)))
 	game._save_progress(); show_training()
+func _open_techniques() -> void:
+	game.ui.close_modal()
+	game.player.skill_pool_ui.open_techniques()
 func _requirements_hint(offer: LearningOffer) -> String:
 	var parts: PackedStringArray=[]
 	for requirement in offer.requirements: parts.append(requirement.hint)
@@ -167,5 +194,6 @@ func _production_request(id: String,cancel_order: bool) -> void:
 	if cancel_order: game.session.production.cancel(id)
 	else:
 		var result:=game.session.production.start(id)
-		if not result.accepted: game.ui.notify(result.reason)
+		game.ui.notify("已安排一批，完成后返回整修铺购买。" if result.accepted else "未排产："+result.reason)
+	if cancel_order: game.ui.notify("已停止排产。")
 	game._save_progress(); show_production()

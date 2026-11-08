@@ -3,6 +3,7 @@
 [ext_resource type="Resource" path="res://gameplay/abilities/data/charged_fireball_data.tres" id="effect"]
 [resource]
 script = ExtResource("data")
+affinity = "fire"
 id = "charged_fireball"
 title = "火石核心"
 description = "火石核心；消耗真实材料，所选来源失效时拒绝，不自动换源。"

@@ -185,6 +185,7 @@ func inspect_discovery(entry: ExplorationDiscoveryData, node: ExplorationInterac
 			game.ui.notify("测绘员已沿清理过的道路返回营地。回去交付委托可领取成长奖励。")
 		if entry.hide_when_claimed and is_instance_valid(node) and not game.equipment_service.has_pending_rewards(entry):
 			node.queue_free()
+	if "hub" in game and game.hub: game.hub.remember_record(entry.id)
 	var brief := first_read and not full and not entry.intro_text.is_empty()
 	var text := entry.intro_text + "\n\n完整用法已记入J日志，可随时回看。" if brief else entry.text
 	var buttons: Array[Dictionary] = [{"title": "记入日志，继续探索", "callback": game.ui.close_modal}]

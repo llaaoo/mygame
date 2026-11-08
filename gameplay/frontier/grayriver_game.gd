@@ -139,8 +139,9 @@ func _bootstrap() -> void:
 	ui.pause_provider = show_valley_pause
 	ui.map_provider = show_map
 	ui.menu_action=hub.open.bind("actions","")
-	ui.journal_action=hub.open.bind("quests","")
+	ui.journal_action=func(): hub.open(hub.journal_page)
 	ui.shortcut_action=hub.handle_shortcut
+	session.facts.committed.connect(_service_feedback)
 	frontier_hud=FrontierHUD.new()
 	frontier_hud.game=self
 	add_child(frontier_hud)
@@ -224,3 +225,12 @@ func _mount_trainer(point: Vector2,request: Callable) -> void:
 		npc.set_meta("frontier_claim",id)
 	var npc:=session.mount_actor(load("res://gameplay/foundation/service_npc.tscn"),id,point,configure_actor)
 	if npc: session.relations.memberships[id]="civilian"
+
+func _service_feedback(fact: Dictionary) -> void:
+	if fact.kind!="production_completed": return
+	var definition:=session.production.catalog.definition(str(fact.data.get("id","")))
+	if not definition: return
+	var title:=player.skill_manager.combinations.supplies.title(definition.recipe.output_id)
+	var text:="店家已制成%s ×%d · 返回整修铺购买。"%[title,definition.recipe.output_count]
+	progress_service.record_service_result("service.production."+definition.id,"整修铺完工："+title,WorldTime.instance.stamp()+"\n"+text+"货品属于店家；价格和余量以实际库存为准。")
+	ui.queue_notice(text)

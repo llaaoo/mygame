@@ -3,6 +3,7 @@
 [ext_resource type="Resource" path="res://gameplay/abilities/data/summon_golem_data.tres" id="effect"]
 [resource]
 script = ExtResource("data")
+affinity = "arcane"
 id = "summon_golem"
 title = "晶砂构体"
 description = "晶砂构体；消耗真实材料，所选来源失效时拒绝，不自动换源。"

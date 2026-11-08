@@ -16,6 +16,7 @@ var objective: Label
 var message: Label
 var modal: CanvasLayer
 var _message_time := 0.0
+var _pending_notices: Array[String]=[]
 var progress: ExplorationProgress
 var modal_locked := false
 var journal_provider: Callable
@@ -132,6 +133,12 @@ func _process(delta: float) -> void:
 		if _message_time <= 0:
 			message.text = ""
 			_notice.hide()
+			if not _pending_notices.is_empty(): notify(_pending_notices.pop_front())
+
+func queue_notice(text: String) -> void:
+	if text in _pending_notices: return
+	if _pending_notices.size()>=5: _pending_notices.pop_front()
+	_pending_notices.append(text)
 
 func notify(text: String) -> void:
 	_notice.show()

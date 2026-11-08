@@ -3,6 +3,7 @@
 [ext_resource type="Resource" path="res://gameplay/abilities/data/frost_stride_result.tres" id="effect"]
 [resource]
 script = ExtResource("data")
+affinity = "frost"
 id = "attune_frost"
 title = "霜阵调谐"
 effect = ExtResource("effect")

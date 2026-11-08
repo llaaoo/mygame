@@ -3,6 +3,7 @@
 [ext_resource type="Resource" path="res://gameplay/abilities/data/plague_bolt_data.tres" id="effect"]
 [resource]
 script = ExtResource("data")
+affinity = "poison"
 id = "plague_bolt"
 title = "毒萃穿刺"
 description = "毒萃穿刺；消耗真实材料，所选来源失效时拒绝，不自动换源。"

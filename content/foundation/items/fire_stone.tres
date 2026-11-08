@@ -4,7 +4,7 @@
 script = ExtResource("1")
 id = "fire_stone"
 display_name = "火石"
-description = "刻阵时消耗，构成有两次充能的火阵。"
+description = "铭刻火阵或形成火系投射核心时消耗；存续、触发消耗与本次费用见技能预览。"
 weight = 0.2
 stackable = true
 max_stack = 99

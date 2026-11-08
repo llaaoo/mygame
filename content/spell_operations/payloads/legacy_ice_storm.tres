@@ -3,6 +3,7 @@
 [ext_resource type="Resource" path="res://gameplay/abilities/data/ice_storm_data.tres" id="effect"]
 [resource]
 script = ExtResource("data")
+affinity = "frost"
 id = "ice_storm"
 title = "霜盐冰风暴"
 description = "霜盐冰风暴；消耗真实材料，所选来源失效时拒绝，不自动换源。"

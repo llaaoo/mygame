@@ -99,7 +99,7 @@ func _cancel_channel() -> void:
 
 func _payload_signature(skill: SkillData) -> int:
 	var supplies:=player.skill_manager.combinations.supplies
-	var choice:=player.skill_manager.shortcuts.selection(_channeling_source)
+	var choice:=player.skill_manager.selection_for_source(_channeling_source)
 	return hash(choice) if not choice.is_empty() else hash([supplies.selected.get(skill.get_id(),""),supplies.prepared_uids.get(skill.get_id(),""),supplies.modifiers.get(skill.get_id(),"")])
 
 func _channel_tick(mana_cost: int) -> bool:
@@ -108,7 +108,7 @@ func _channel_tick(mana_cost: int) -> bool:
 	if not _channel_skill.operation_id.is_empty() and _payload_signature(_channel_skill)!=_channel_payload_signature: return false
 	var ctx := CastContext.simple(player, player.get_mouse_direction(), _channel_skill)
 	ctx.empower=_channel_empower
-	ctx.selection=player.skill_manager.shortcuts.selection(_channeling_source)
+	ctx.selection=player.skill_manager.selection_for_source(_channeling_source)
 	ctx.binding_revision=_channel_revision
 	return player.skill_manager.use_channel_tick(_channeling_source, player, ctx, mana_cost)
 

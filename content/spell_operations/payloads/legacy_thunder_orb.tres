@@ -3,6 +3,7 @@
 [ext_resource type="Resource" path="res://gameplay/abilities/data/thunder_orb_data.tres" id="effect"]
 [resource]
 script = ExtResource("data")
+affinity = "storm"
 id = "thunder_orb"
 title = "雷晶追踪核"
 description = "雷晶追踪核；消耗真实材料，所选来源失效时拒绝，不自动换源。"
