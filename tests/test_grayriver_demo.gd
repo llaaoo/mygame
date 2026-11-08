@@ -67,6 +67,7 @@ func run() -> void:
     check(node.completed,"Actual hit/surface path failed "+id)
     used_magic+=1
    check(game.progress.claims.has(id),"Puzzle world fact missing "+id)
+   check(not game.ui.message.text.contains("营地可直达此处"),"Dungeon stair falsely promised a direct camp shortcut")
    var before_stock:=game.session.inventory.snapshot()
    check(not game.progress_service.solve_puzzle(node.spec,node.spec.work_methods[0].id) and game.session.inventory.snapshot()==before_stock,"Repeated puzzle charged/rewarded "+id)
    game.player.field_work.close_panel(); game.ui.close_modal()

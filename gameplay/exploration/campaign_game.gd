@@ -382,10 +382,12 @@ func _on_spell_object_solved(spec: SpellPuzzleData) -> void:
 			player.field_work.cancel("设备已解封")
 			player.field_work.close_panel()
 		var unlocked: Array[String] = []
+		var camp_direct := false
 		for exit in current_data.exits:
 			if spec.id in exit.required_claims and exit.claims_satisfied(progress):
 				unlocked.append(exit.title)
-		ui.notify((spec.completion_text if not spec.completion_text.is_empty() else "解开：" + spec.title + " · 材料已收入行囊，按M查看。") + ("\n捷径已开启：" + "、".join(unlocked) + "；营地可直达此处。" if not unlocked.is_empty() else ""))
+				if not exit.camp_return_title.is_empty(): camp_direct = true
+		ui.notify((spec.completion_text if not spec.completion_text.is_empty() else "解开：" + spec.title + " · 材料已收入行囊，按M查看。") + ("\n捷径已开启：" + "、".join(unlocked) + ("；营地可直达此处。" if camp_direct else "；使用现场出口通行。") if not unlocked.is_empty() else ""))
 
 func can_practice() -> bool:
 	return ready_for_play and not _switching and not _defeated and not player.health_component.is_dead and not practice_active and progress.cleared.has(region_id) and not current_data.encounters.is_empty() and active_enemies.is_empty()
