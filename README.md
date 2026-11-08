@@ -1,5 +1,7 @@
 # 灰河谷 · 2D 开放区域与现场组合冒险
 
+武器抹布现提供元素附加伤害与异常积累；Shift+武技可显式消耗主手附魔，按刀/矛/杖/弓释放短扇斩、窄束、前进波或命中扩散。见[武器附魔](docs/WEAPON_ENCHANTMENT.md)及[验收](docs/WEAPON_ENCHANTMENT_VALIDATION.md)。
+
 现有武器进一步区分碰撞前踏、站定与恢复；敌人按真实攻击方向、防御窗口、地面危险和射界选择动作。控制不可无限续满，材料可与击退联动。见[对策与站位](docs/COUNTERPLAY.md)及[实测记录](docs/COUNTERPLAY_VALIDATION.md)。
 
 左键固定武器攻击，右键按住格挡；Q/E/R与1—0是13个独立快捷槽，可绑定动作或物品，F交互，现场作业C切换，遗骸面板T全部取走。历史奖励技能已逐项归入现有组合或新的材料操作：聚能投射、塑形、移形、引导介质；新技法随现有记录学习，旧已读档只补知识。操作见[战斗、探索与鼠标整备](docs/CONTROL_SCHEME.md)，技能接入见[技能能力迁移](docs/LEGACY_SKILL_INTEGRATION.md)。

@@ -105,7 +105,12 @@ func _poll_shortcut(actions: Array[Action],source: String,pressed: bool) -> void
 		if pressed:
 			var request:=Action.new(); request.action_type=Action.ActionType.TECHNIQUE; request.source=player
 			request.skill_id=entry.technique_id; request.skill_source=source; request.direction=player.get_mouse_direction()
-			request.params={"binding_revision":player.skill_manager.shortcuts.revision(source)}
+			request.params={"binding_revision":player.skill_manager.shortcuts.revision(source),"release_enchantment":Input.is_key_pressed(KEY_SHIFT)}
+			if request.params.release_enchantment:
+				var context:=player.actor_context
+				var uid:=str(context.items.equipped(context.id).get(str(EquipmentData.SlotType.RIGHT_HAND),""))
+				request.params["enchantment_weapon_uid"]=uid
+				request.params["enchantment_state"]=context.items.coating_state(uid)
 			actions.append(request)
 		return
 	if entry.get("kind","")=="item":

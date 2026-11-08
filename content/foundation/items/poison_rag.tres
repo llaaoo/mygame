@@ -5,7 +5,7 @@
 script = ExtResource("1")
 id = "poison_rag"
 display_name = "毒抹布"
-description = "使用后涂附当前武器60秒；移动、攻击或受伤打断。"
+description = "涂附当前武器60秒：命中附加4毒伤、积累60毒素；Shift+武技可消耗涂层释放毒性。准备时移动、攻击或受伤会中断。"
 use_profile = ExtResource("use")
 weight = 0.3
 stackable = true

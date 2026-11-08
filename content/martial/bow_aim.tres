@@ -24,3 +24,7 @@ title = "蓄力穿射"
 weapon_type = "bow"
 description = "站定蓄力，命中未格挡的准备动作可打断，射程更远；消耗24体力及1支实物箭，不花MP。"
 profile = SubResource("Attack")
+
+release_reach = 70.0
+release_angle = 360.0
+release_speed = 420.0

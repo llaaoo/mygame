@@ -13,6 +13,7 @@ func _init(bus: CombatEventBus,executor: CombatExecutor = null) -> void:
 
 func _ready() -> void:
 	if _executor: _executor.defense_resolved.connect(_on_defense)
+	if _executor: _executor.enchantment_triggered.connect(_on_enchantment)
 	_bus.subscribe(CombatEvent.Type.ON_DAMAGE, _on_damage)
 	_bus.subscribe(CombatEvent.Type.ON_HEAL, _on_heal)
 	_bus.subscribe(CombatEvent.Type.ON_DODGE, _on_dodge)
@@ -21,6 +22,7 @@ func _ready() -> void:
 
 func _exit_tree() -> void:
 	if is_instance_valid(_executor) and _executor.defense_resolved.is_connected(_on_defense): _executor.defense_resolved.disconnect(_on_defense)
+	if is_instance_valid(_executor) and _executor.enchantment_triggered.is_connected(_on_enchantment): _executor.enchantment_triggered.disconnect(_on_enchantment)
 	if not is_instance_valid(_bus):
 		return
 	_bus.unsubscribe(CombatEvent.Type.ON_DAMAGE, _on_damage)
@@ -71,3 +73,7 @@ func _on_defense(target: Node2D,outcome: Dictionary) -> void:
 	if not world: return
 	var title: String="精准格挡" if outcome.get("parried",false) else "打断" if outcome.get("interrupted",false) else "击退" if outcome.get("pushed",false) else "闪避" if outcome.dodged else "破防" if outcome.guard_broken else "格挡·减伤" if outcome.damage>0 else "格挡"
 	DamageNumber.spawn_reaction(world,title,target.global_position)
+
+func _on_enchantment(target: Node2D,title: String) -> void:
+	var world:=_target_world(target)
+	if world: DamageNumber.spawn_reaction(world,"积累触发 · "+title,target.global_position)

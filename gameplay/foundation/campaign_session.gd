@@ -74,6 +74,7 @@ func bind_actor(actor: CharacterBody2D,id: String,legacy_counts: Dictionary = {}
 	actor.actor_context=context
 	actors[id]=weakref(actor)
 	actor.get_node("HealthComponent").died.connect(mark_dead.bind(actor))
+	actor.get_node("HealthComponent").died.connect((actor.get_node("BuffManager") as BuffManager).buildup.clear)
 	var components:=preload("res://gameplay/foundation/actor_components.tscn").instantiate() as ActorComponents
 	actor.add_child(components)
 	components.configure(context)
@@ -131,6 +132,7 @@ func _restore_actor(actor: CharacterBody2D,record: Dictionary) -> void:
 	actor.actor_context.actions.stamina.restore(record.get("stamina",{}))
 	actor.actor_context.actions.needs.restore(record.get("needs",{}))
 	var away:=maxf(0,inventory.clock_seconds-float(record.get("updated_at",inventory.clock_seconds)))
+	(actor.get_node("BuffManager") as BuffManager).buildup.restore(record.get("buildup",{}),away)
 	if away>0: actor.actor_context.actions.needs.tick(away,actor.get_node("StatsComponent").effective_stat("endurance"),rules.is_base(record.region,actor.position))
 	actor.actor_context.martial.restore(record.get("martial",{}))
 	var provisions: Array=record.get("provisions",[]).duplicate(true)
@@ -149,7 +151,7 @@ func capture_actors() -> void:
 		var health:=actor.get_node("HealthComponent") as HealthComponent
 		if health.is_dead: continue
 		var mana:=actor.get_node_or_null("ManaComponent") as ManaComponent
-		actor_records[id]={"updated_at":inventory.clock_seconds,"hp":health.hp,"mp":mana.mp if mana else 0,"position":[actor.position.x,actor.position.y],"region":region.id,"stamina":actor.actor_context.actions.stamina.snapshot(),"needs":actor.actor_context.actions.needs.serialize(),"martial":actor.actor_context.martial.snapshot(),"provisions":(actor.get_node("BuffManager") as BuffManager).provision_state(),"truce":bool(actor.story_truce) if "story_truce" in actor else false,"dead":false}
+		actor_records[id]={"buildup":(actor.get_node("BuffManager") as BuffManager).buildup.snapshot(),"updated_at":inventory.clock_seconds,"hp":health.hp,"mp":mana.mp if mana else 0,"position":[actor.position.x,actor.position.y],"region":region.id,"stamina":actor.actor_context.actions.stamina.snapshot(),"needs":actor.actor_context.actions.needs.serialize(),"martial":actor.actor_context.martial.snapshot(),"provisions":(actor.get_node("BuffManager") as BuffManager).provision_state(),"truce":bool(actor.story_truce) if "story_truce" in actor else false,"dead":false}
 func snapshot() -> Dictionary:
 	capture_actors()
 	if sync_extra.is_valid(): sync_extra.call()
@@ -285,7 +287,7 @@ static func valid_snapshot(data: Variant) -> bool:
 	for id in data.actors:
 		var record=data.actors[id]
 		if not id is String or not record is Dictionary or not record.get("hp") is int or record.hp<0 or record.hp>100000 or not record.get("dead") is bool or not record.get("region") is String: return false
-		if not SurvivalNeeds.valid(record.get("needs",{})) or not MartialArts.valid(record.get("martial",{})) or not BuffManager.valid_provisions(record.get("provisions",[])): return false
+		if not SurvivalNeeds.valid(record.get("needs",{})) or not MartialArts.valid(record.get("martial",{})) or not BuffManager.valid_provisions(record.get("provisions",[])) or not StatusBuildup.valid(record.get("buildup",{})): return false
 		if typeof(record.get("updated_at",0)) not in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(record.get("updated_at",0))) or record.get("updated_at",0)<0 or record.get("updated_at",0)>data.get("clock_seconds",0): return false
 		var stamina=record.get("stamina",{})
 		if not stamina is Dictionary: return false

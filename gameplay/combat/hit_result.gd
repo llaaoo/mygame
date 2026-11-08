@@ -7,6 +7,8 @@ var status_accepted := false
 var rejection := ""
 var attempted_damage := 0
 var damage_dealt := 0
+var elemental_damage := 0
+var buildup_triggered := false
 
 var parried := false
 var interrupted := false

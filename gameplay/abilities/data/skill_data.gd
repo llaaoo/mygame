@@ -26,6 +26,11 @@ enum SkillType {
 @export var field_charges := 2
 @export var field_duration := 15.0
 @export var contact_statuses: Array[Buff]=[]
+## Runtime physical/elemental packet, not a separate skill or damage entry point.
+var weapon_enchantment: WeaponEnchantment
+var enchantment_bonus := 0
+var enchantment_buildup := 0.0
+var enchantment_only := false
 @export var preparation := 0.25
 @export var combination_only: bool = false  ## Result effect; not an equippable player action.
 @export var icon: Texture2D

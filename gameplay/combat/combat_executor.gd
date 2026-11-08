@@ -3,6 +3,7 @@ extends Node
 signal damage_applied(source: Node2D, target: Node2D, amount: int)
 signal harmful_contact_applied(source: Node2D,target: Node2D)
 signal defense_resolved(target: Node2D,outcome: Dictionary)
+signal enchantment_triggered(target: Node2D,title: String)
 ## 战斗执行器 — 唯一控制流入口
 ##
 ## 原则（Single Authority Rule）：
@@ -65,9 +66,10 @@ static func same_combat_owner(source: Node2D, target: Node2D) -> bool:
 	var target_owner: Node2D=target.get_combat_owner() if target.has_method("get_combat_owner") else target
 	return is_instance_valid(source_owner) and source_owner==target_owner and (source_owner!=source or target_owner!=target)
 
-static func report_hit(caster: Node2D, target: Node2D, damage: int, position: Vector2, skill: SkillData = null, tags: Array = [], family_id: String = "", impact: float = 0.0, strike: AttackProfile = null) -> HitResult:
+static func report_hit(caster: Node2D, target: Node2D, damage: int, position: Vector2, skill: SkillData = null, tags: Array = [], family_id: String = "", impact: float = 0.0, strike: AttackProfile = null, origin:=Vector2.INF) -> HitResult:
 	var context := HitContext.new(caster, target, damage, position, skill, tags, family_id)
 	context.strike=strike
+	if origin.is_finite(): context.origin=origin
 	var result := HitResult.new()
 	result.attempted_damage = context.damage
 	if not is_instance_valid(target) or not target.has_method("take_damage"):
@@ -77,6 +79,10 @@ static func report_hit(caster: Node2D, target: Node2D, damage: int, position: Ve
 		result.rejection="same_owner"
 		return result
 	var health := target.get_node_or_null("HealthComponent") as HealthComponent
+	var immunity:=target.get_node_or_null("BuffManager") as BuffManager
+	if skill and skill.enchantment_only and skill.weapon_enchantment and immunity and immunity.is_immune(skill.weapon_enchantment.status.status_id):
+		result.rejection="element_immune"
+		return result
 	if health and health.is_dead:
 		result.rejection = "dead"
 		return result
@@ -116,6 +122,14 @@ static func report_hit(caster: Node2D, target: Node2D, damage: int, position: Ve
 		if harmful and instance: instance.harmful_contact_applied.emit(caster,target)
 	if result.damage_accepted and is_instance_valid(target):
 		_apply_damage(target, int(round(context.damage * context.incoming_multiplier)), context.tags, caster)
+		if not context.periodic and skill and skill.weapon_enchantment and not result.blocked and is_instance_valid(health) and not health.is_dead and health.hp<before:
+			var coating:=skill.weapon_enchantment
+			if ElementCatalog.can_affect(target,coating.status.status_id):
+				var prior:=health.hp
+				_apply_damage(target,roundi(skill.enchantment_bonus*context.incoming_multiplier),coating.tags,caster)
+				result.elemental_damage=maxi(0,prior-health.hp)
+				if result.status_accepted and not health.is_dead:
+					result.buildup_triggered=target_buffs.accumulate_enchantment(coating,skill.enchantment_buildup,caster,skill)
 	if is_instance_valid(health):
 		result.damage_dealt = maxi(0, before - health.hp)
 		health.end_hit_group()
@@ -124,6 +138,7 @@ static func report_hit(caster: Node2D, target: Node2D, damage: int, position: Ve
 	if instance:
 		instance._current_family = previous_family
 		instance._current_hit = previous_hit
+		if result.buildup_triggered and is_instance_valid(target): instance.enchantment_triggered.emit(target,skill.weapon_enchantment.status.display_name)
 	return _complete_defense(target,result)
 
 

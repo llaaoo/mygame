@@ -40,7 +40,7 @@ func run() -> void:
 	var attack:=Action.melee(actor); attack.direction=Vector2.RIGHT
 	check(ctx.actions.try_action(attack).accepted,"Coated weapon attack refused")
 	ctx.actions.advance(ctx.actions.profile.windup); ctx.actions.contact(melee_target)
-	check(melee_buffs.has_buff("poison") and melee_buffs.capture_status("poison").buff.tick_damage==3,"Real weapon contact lost its UID coating payload")
+	check(not melee_buffs.has_buff("poison") and is_equal_approx(float(melee_buffs.buildup.snapshot().get("venom",{}).get("value",0)),60),"Real coated contact failed to accumulate toxin instead of applying instant poison")
 	ctx.actions.cancel()
 	check(use.begin("fire_rag"),"Replacing coating refused"); use.advance(1.2)
 	check(store.coating(weapon).id=="fire_rag" and store.item(weapon).properties.coating.size()==2,"Coatings accumulated instead of replacing")

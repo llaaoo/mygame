@@ -17,9 +17,15 @@ func _process(delta: float) -> void:
 	_clock=.1
 	var plan := actor.skill_manager.combinations.pending
 	var physical:=actor.actor_context.actions if actor.actor_context else null
-	var in_combat:=not actor.story_truce and physical and (physical.busy() or physical.guarding or is_instance_valid(actor.player) and actor.player.actor_context and (actor.player.actor_context.actions.busy() or actor.player.actor_context.actions.guarding or actor.player.actor_context.actions.counter_remaining>0))
+	var buffs:=actor.get_node("BuffManager") as BuffManager
+	var partial:=buffs.buildup.snapshot()
+	var in_combat:=not actor.story_truce and physical and (not partial.is_empty() or buffs.has_buff("burning") or buffs.has_buff("poison") or physical.busy() or physical.guarding or is_instance_valid(actor.player) and actor.player.actor_context and (actor.player.actor_context.actions.busy() or actor.player.actor_context.actions.guarding or actor.player.actor_context.actions.counter_remaining>0))
 	_label.position.y=-76 if in_combat else -98
 	_label.text=actor.enemy_name
+	for id in partial:
+		var buildup: Dictionary=partial[id]
+		var definition:=WeaponEnchantment.definition(id)
+		_label.text+=" · %s蓄积%.0f%%"%[ElementCatalog.affinity_label(definition.tags),100*float(buildup.value)/definition.threshold]
 	if not in_combat: _label.text+="\nMP %d/%d"%[actor.mana_component.mp,actor.mana_component.max_mp]
 	for entry in (actor.get_node("BuffManager") as BuffManager).get_active_buff_entries():
 		if entry.status_id in ["ember_focus","focus","frost_stride","resonant_guard"]:

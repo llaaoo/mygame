@@ -9,6 +9,8 @@ var tags: Array[String]=["physical","projectile"]
 var statuses: Array[Buff]=[]
 var travelled := 0.0
 var damage := 0
+var enchantment: WeaponEnchantment
+var release_technique: MartialTechnique
 func _physics_process(delta: float) -> void:
 	if not context or not is_instance_valid(context.actor) or not context.region.available(): queue_free(); return
 	var distance:=minf(profile.reach-travelled,profile.projectile_speed*delta)
@@ -20,7 +22,16 @@ func _physics_process(delta: float) -> void:
 		if target and not target.has_method("take_damage"): target=target.owner as Node2D
 		if target and target.has_method("take_damage"):
 			var skill:=SkillData.new(); skill.id="weapon_arrow"; skill.tags=tags.duplicate(); skill.contact_statuses=statuses.duplicate()
-			CombatExecutor.report_hit(context.actor,target,damage,hit.position,skill,skill.tags,family,profile.impact,profile)
+			if enchantment:
+				skill.weapon_enchantment=enchantment
+				skill.enchantment_bonus=enchantment.release_damage if release_technique else enchantment.bonus_damage
+				skill.enchantment_buildup=enchantment.release_buildup if release_technique else enchantment.buildup
+			CombatExecutor.report_hit(context.actor,target,damage,hit.position,skill,skill.tags,family,profile.impact,profile,Vector2(hit.position)-direction*8)
+		if release_technique:
+			var wave:=EnchantmentWave.new(); wave.context=context; wave.enchantment=enchantment; wave.technique=release_technique
+			wave.direction=direction; wave.family=family
+			if target and target.has_method("take_damage"): wave.hit_targets[target.get_instance_id()]=true
+			context.region.root.add_child(wave); wave.global_position=Vector2(hit.position)-direction*2
 		queue_free(); return
 	global_position+=direction*distance; travelled+=distance
 	if travelled>=profile.reach: queue_free()

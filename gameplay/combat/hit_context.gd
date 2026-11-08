@@ -8,6 +8,7 @@ var target: Node2D
 var skill: SkillData
 var damage: int
 var position: Vector2
+var origin:=Vector2.INF
 var tags: Array
 var family_id: String
 var periodic := false
@@ -15,6 +16,7 @@ var incoming_multiplier := 1.0
 
 func _init(caster: Node2D, receiver: Node2D, amount: int, point: Vector2, definition: SkillData, hit_tags: Array, family: String) -> void:
 	source = caster
+	if is_instance_valid(caster): origin=caster.global_position
 	target = receiver
 	damage = maxi(0, amount)
 	position = point

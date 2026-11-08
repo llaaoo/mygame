@@ -22,3 +22,7 @@ title = "破势斩"
 weapon_type = "blade"
 description = "站定起手、挥出时小步前踏，对正面格挡造成2.1倍体力压力，适合抓格挡和敌人收招；消耗26体力，不花MP。"
 profile = SubResource("Attack")
+
+release_reach = 140.0
+release_angle = 110.0
+release_speed = 600.0

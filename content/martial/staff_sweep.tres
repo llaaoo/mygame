@@ -22,3 +22,7 @@ title = "压阵横扫"
 weapon_type = "staff"
 description = "站定锁向横扫，未被格挡的命中会击退64距离，碰到墙体停下，同一目标0.9秒内不再被击退；起手慢，适合惩罚近身围堵；消耗30体力。"
 profile = SubResource("Attack")
+
+release_reach = 260.0
+release_angle = 105.0
+release_speed = 420.0

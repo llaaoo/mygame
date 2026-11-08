@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="WeaponEnchantment" format=3]
+[ext_resource type="Script" path="res://gameplay/items/weapon_enchantment.gd" id="data"]
+[ext_resource type="Resource" path="res://content/spell_operations/statuses/toxin.tres" id="status"]
+[resource]
+script = ExtResource("data")
+id = "venom"
+title = "毒附魔"
+tags = ["poison"]
+color = Color(0.42, 0.8, 0.2, 1)
+bonus_damage = 4
+buildup = 60.0
+status = ExtResource("status")
+release_damage = 12

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="WeaponEnchantment" format=3]
+[ext_resource type="Script" path="res://gameplay/items/weapon_enchantment.gd" id="data"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/burning.tres" id="status"]
+[resource]
+script = ExtResource("data")
+id = "flame"
+title = "火附魔"
+tags = ["fire"]
+color = Color(1, 0.38, 0.12, 1)
+bonus_damage = 6
+buildup = 50.0
+status = ExtResource("status")
+release_damage = 18
