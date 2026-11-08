@@ -1,0 +1,83 @@
+[
+  {
+    "t": 1.120992237702012e-06,
+    "target_screen": [
+      365,
+      142,
+      2
+    ],
+    "distance_pixels": 276.05253123273474,
+    "move": [
+      "a",
+      "w"
+    ],
+    "mode": "melee"
+  },
+  {
+    "t": 0.28169891799916513,
+    "target_screen": [
+      399,
+      175,
+      2
+    ],
+    "distance_pixels": 228.80996481796853,
+    "move": [
+      "a",
+      "w"
+    ],
+    "mode": "melee"
+  },
+  {
+    "t": 0.5284978080017027,
+    "target_screen": [
+      451,
+      226,
+      2
+    ],
+    "distance_pixels": 156.40012787718558,
+    "move": [
+      "a",
+      "w"
+    ],
+    "mode": "melee"
+  },
+  {
+    "t": 0.7779871799866669,
+    "target_screen": [
+      494,
+      269,
+      2
+    ],
+    "distance_pixels": 96.56603957913983,
+    "move": [
+      "a",
+      "w"
+    ],
+    "mode": "melee"
+  },
+  {
+    "t": 1.0088359490036964,
+    "target_screen": [
+      524,
+      299,
+      2
+    ],
+    "distance_pixels": 56.08029957123981,
+    "move": [
+      "a",
+      "w"
+    ],
+    "mode": "melee"
+  },
+  {
+    "t": 1.3039774780045263,
+    "target_screen": [
+      538,
+      325,
+      2
+    ],
+    "distance_pixels": 38.3275357934736,
+    "move": [],
+    "mode": "melee"
+  }
+]

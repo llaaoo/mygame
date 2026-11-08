@@ -1,0 +1,218 @@
+{"wall": 1794148165.8058476, "commands": [["wait", 2], ["shot", "/tmp/senior-start2.png"]]}
+{"wall": 1794148174.026633, "commands": [["click", 566, 454], ["shot", "/tmp/senior-world.png"]]}
+{"wall": 1794148181.447296, "commands": [["key", "Return"], ["wait", 1], ["shot", "/tmp/senior-world.png"]]}
+{"wall": 1794148187.8097064, "commands": [["key", "d", 0.45], ["key", "s", 0.65], ["key", "f"], ["shot", "/tmp/senior-manual.png"]]}
+{"wall": 1794148193.4981005, "commands": [["key", "a", 0.21], ["key", "w", 0.2], ["key", "f"], ["shot", "/tmp/senior-manual.png"]]}
+{"wall": 1794148200.2371547, "commands": [["key", "d", 0.3], ["key", "s", 0.35], ["key", "f"], ["shot", "/tmp/senior-manual.png"]]}
+{"wall": 1794148205.5499136, "commands": [["key", "f"], ["wait", 0.4], ["shot", "/tmp/senior-manual.png"]]}
+{"wall": 1794148217.129836, "commands": [["click", 569, 507], ["key", "a", 0.9], ["shot", "/tmp/senior-ration.png"]]}
+{"wall": 1794148221.0591002, "commands": [["key", "f"], ["shot", "/tmp/senior-ration2.png"]]}
+{"wall": 1794148234.9291725, "commands": [["click", 570, 506], ["key", "n"], ["shot", "/tmp/senior-inventory.png"]]}
+{"wall": 1794148241.2830663, "commands": [["key", "n"], ["wait", 0.8], ["shot", "/tmp/senior-inventory.png"]]}
+{"wall": 1794148252.0437047, "commands": [["click", 562, 300], ["wait", 0.5], ["shot", "/tmp/senior-inventory-detail.png"], ["key", "Escape"], ["key", "w", 0.8], ["key", "d", 0.55], ["wait", 0.5], ["shot", "/tmp/senior-workbench.png"]]}
+{"wall": 1794148259.0773754, "commands": [["key", "d", 0.43], ["wait", 0.4], ["key", "f"], ["wait", 0.4], ["shot", "/tmp/senior-camp.png"]]}
+{"wall": 1794148274.6136904, "commands": [["key", "Escape"], ["key", "d", 0.85], ["wait", 0.4], ["key", "f"], ["wait", 0.5], ["shot", "/tmp/senior-bench.png"]]}
+{"wall": 1794148281.512826, "commands": [["key", "Escape"], ["wait", 0.6], ["shot", "/tmp/senior-bench2.png"]]}
+{"wall": 1794148289.7977428, "commands": [["key", "s", 0.27], ["wait", 0.4], ["key", "f"], ["wait", 0.6], ["shot", "/tmp/senior-craft.png"]]}
+{"wall": 1794148296.3892052, "commands": [["click", 150, 222], ["wait", 0.5], ["shot", "/tmp/senior-shopbuy.png"]]}
+{"wall": 1794148302.9915948, "commands": [["key", "Escape"], ["wait", 0.4], ["key", "Tab"], ["wait", 0.6], ["shot", "/tmp/senior-menu.png"]]}
+{"wall": 1794148309.3694084, "commands": [["click", 404, 230], ["wait", 0.6], ["shot", "/tmp/senior-craftpage.png"]]}
+{"wall": 1794148319.0642595, "commands": [["key", "Escape"], ["key", "w", 1.1], ["wait", 0.5], ["shot", "/tmp/senior-north-town.png"]]}
+{"wall": 1794148325.9856756, "commands": [["key", "d", 0.34], ["wait", 0.4], ["key", "f"], ["wait", 0.6], ["shot", "/tmp/senior-castingbench.png"]]}
+{"wall": 1794148336.4619205, "commands": [["click", 468, 444, 5], ["click", 468, 444, 5], ["click", 468, 444, 5], ["wait", 0.5], ["shot", "/tmp/senior-recipes.png"]]}
+{"wall": 1794148345.0743992, "commands": [["click", 467, 444, 5], ["click", 467, 444, 5], ["click", 467, 444, 5], ["click", 467, 444, 5], ["wait", 0.5], ["shot", "/tmp/senior-recipes2.png"]]}
+{"wall": 1794148352.076264, "commands": [["click", 383, 393], ["wait", 0.4], ["click", 817, 453], ["wait", 0.6], ["shot", "/tmp/senior-flint-made.png"]]}
+{"wall": 1794148358.6942198, "commands": [["click", 833, 507], ["wait", 0.7], ["shot", "/tmp/senior-flint-made.png"]]}
+{"wall": 1794148368.3385851, "commands": [["key", "Escape"], ["key", "m"], ["wait", 0.6], ["shot", "/tmp/senior-wheel.png"]]}
+{"wall": 1794148382.8462741, "commands": [["key", "Escape"], ["key", "a", 1.5], ["key", "w", 2.1], ["wait", 0.5], ["shot", "/tmp/senior-north-road.png"]]}
+{"wall": 1794148401.5626597, "commands": [["key", "d", 0.5], ["key", "s", 0.1], ["wait", 0.4], ["key", "f"], ["wait", 0.5], ["shot", "/tmp/senior-road-note.png"]]}
+{"wall": 1794148413.1133165, "commands": [["click", 571, 507], ["key", "a", 0.5], ["key", "w", 3.5], ["wait", 0.5], ["shot", "/tmp/senior-forest.png"]]}
+{"wall": 1794148423.8314934, "commands": [["key", "w", 2.8], ["key", "d", 0.65], ["wait", 0.5], ["shot", "/tmp/senior-forest2.png"]]}
+{"wall": 1794148433.5380974, "commands": [["key", "a", 1.65], ["wait", 0.6], ["shot", "/tmp/senior-camp-approach.png"]]}
+{"wall": 1794148438.6611722, "commands": [["key", "f"], ["wait", 0.5], ["shot", "/tmp/senior-west-sign.png"]]}
+{"wall": 1794148451.4948862, "commands": [["click", 566, 507], ["key", "d", 1.65], ["key", "w", 2.0], ["key", "d", 1.0], ["wait", 0.5], ["shot", "/tmp/senior-hunter-near.png"]]}
+{"wall": 1794148459.3299923, "commands": [["key", "w", 0.4], ["wait", 0.4], ["key", "f"], ["wait", 0.5], ["shot", "/tmp/senior-chest.png"]]}
+{"wall": 1794148466.1536, "commands": [["key", "Escape"], ["key", "g"], ["wait", 0.6], ["shot", "/tmp/senior-map.png"]]}
+{"wall": 1794148475.357324, "commands": [["key", "Escape"], ["key", "d", 1.25], ["key", "w", 1.2], ["wait", 0.5], ["shot", "/tmp/senior-hunter3.png"]]}
+{"wall": 1794148485.7607613, "commands": [["key", "d", 1.5], ["key", "s", 0.25], ["wait", 0.5], ["shot", "/tmp/senior-hunter4.png"]]}
+{"wall": 1794148493.8214614, "commands": [["key", "d", 0.43], ["wait", 0.4], ["key", "f"], ["wait", 0.5], ["shot", "/tmp/senior-hunter-note.png"]]}
+{"wall": 1794148500.2414012, "commands": [["click", 571, 554], ["wait", 0.6], ["shot", "/tmp/senior-pendant.png"]]}
+{"wall": 1794148508.7402627, "commands": [["click", 570, 554], ["wait", 0.5], ["shot", "/tmp/senior-gearmenu.png"]]}
+{"wall": 1794148514.9731948, "commands": [["click", 405, 302], ["click", 405, 302], ["wait", 0.5], ["shot", "/tmp/senior-pendant-equipped.png"]]}
+{"wall": 1794148526.5926075, "commands": [["click", 975, 402], ["wait", 0.5], ["shot", "/tmp/senior-pendant-equipped.png"], ["key", "Escape"], ["wait", 0.4], ["key", "w", 1.0], ["key", "d", 1.2], ["wait", 0.5], ["shot", "/tmp/senior-next.png"]]}
+{"wall": 1794148534.685453, "commands": [["key", "d", 0.42], ["key", "w", 0.16], ["wait", 0.4], ["key", "f"], ["wait", 0.5], ["shot", "/tmp/senior-crystal.png"]]}
+{"wall": 1794148543.9829202, "commands": [["key", "f"], ["wait", 2.6], ["key", "Escape"], ["key", "g"], ["wait", 0.5], ["shot", "/tmp/senior-map2.png"]]}
+{"wall": 1794148551.7106664, "commands": [["key", "g"], ["wait", 0.6], ["shot", "/tmp/senior-map2.png"]]}
+{"wall": 1794148562.3481836, "commands": [["key", "Escape"], ["wait", 0.5], ["key", "d", 1.2], ["key", "w", 0.65], ["wait", 0.5], ["shot", "/tmp/senior-mine.png"]]}
+{"wall": 1794148569.264871, "commands": [["key", "w", 0.27], ["wait", 0.4], ["key", "f"], ["wait", 0.5], ["shot", "/tmp/senior-mine-cart.png"]]}
+{"wall": 1794148577.8664334, "commands": [["key", "d", 0.43], ["key", "w", 0.28], ["wait", 0.4], ["key", "f"], ["wait", 1], ["shot", "/tmp/senior-mine-entry.png"]]}
+{"wall": 1794148587.0327973, "commands": [["key", "d", 0.24], ["key", "s", 0.6], ["wait", 0.4], ["key", "f"], ["wait", 0.5], ["shot", "/tmp/senior-mine-note.png"]]}
+{"wall": 1794148595.977346, "commands": [["click", 565, 507], ["wait", 0.4], ["key", "d", 1.45], ["wait", 0.4], ["shot", "/tmp/senior-mine-enemy.png"]]}
+{"wall": 1794148605.4648874, "commands": [["move", 790, 280], ["key", "r"], ["wait", 0.8], ["key", "r"], ["wait", 0.8], ["shot", "/tmp/senior-first-combat.png"]]}
+{"wall": 1794148618.3921618, "commands": [["key", "a", 1.2], ["key", "7"], ["wait", 1], ["shot", "/tmp/senior-death.png"]]}
+{"wall": 1794148629.4879448, "commands": [["click", 566, 552], ["wait", 1], ["shot", "/tmp/senior-respawn.png"]]}
+{"wall": 1794148651.5113492, "commands": [["key", "d", 0.46], ["wait", 0.4], ["key", "f"], ["wait", 0.4], ["key", "c"], ["wait", 0.4], ["key", "f"], ["wait", 4.5], ["shot", "/tmp/senior-rested.png"]]}
+{"wall": 1794148662.093338, "commands": [["key", "d", 1.2], ["key", "w", 0.8], ["wait", 0.5], ["key", "f"], ["wait", 0.6], ["shot", "/tmp/senior-board.png"]]}
+{"wall": 1794148670.435271, "commands": [["key", "Escape"], ["wait", 0.4], ["key", "d", 0.4], ["wait", 0.4], ["key", "f"], ["wait", 0.5], ["shot", "/tmp/senior-board2.png"]]}
+{"wall": 1794148680.243597, "commands": [["key", "w", 0.36], ["key", "a", 0.22], ["wait", 0.4], ["key", "f"], ["wait", 0.5], ["shot", "/tmp/senior-board3.png"]]}
+{"wall": 1794148686.6691976, "commands": [["key", "j"], ["wait", 0.5], ["shot", "/tmp/senior-quests.png"]]}
+{"wall": 1794148692.1851642, "commands": [["click", 153, 224], ["wait", 0.5], ["shot", "/tmp/senior-quests.png"]]}
+{"wall": 1794148699.4838572, "commands": [["click", 391, 546], ["wait", 0.5], ["shot", "/tmp/senior-quest-knowledge.png"]]}
+{"wall": 1794148706.0787733, "commands": [["click", 831, 490], ["key", "Escape"], ["wait", 0.5], ["shot", "/tmp/senior-track.png"]]}
+{"wall": 1794148718.6904101, "commands": [["key", "w", 4.0], ["wait", 0.5], ["shot", "/tmp/senior-tracked-north.png"]]}
+{"wall": 1794148728.5323112, "commands": [["key", "w", 3.8], ["wait", 0.5], ["shot", "/tmp/senior-hunter-final.png"]]}
+{"wall": 1794148739.3257987, "commands": [["key", "a", 0.3], ["key", "w", 2.7], ["key", "d", 0.25], ["wait", 0.5], ["shot", "/tmp/senior-hunter-final2.png"]]}
+{"wall": 1794148747.2530785, "commands": [["key", "w", 0.33], ["key", "d", 0.18], ["wait", 0.4], ["key", "f"], ["wait", 0.5], ["shot", "/tmp/senior-hunter-note-final.png"]]}
+{"wall": 1794148758.0866535, "commands": [["click", 566, 507], ["wait", 0.4], ["key", "a", 0.4], ["key", "m"], ["wait", 0.3], ["key", "5"], ["wait", 0.5], ["shot", "/tmp/senior-array-wheel.png"]]}
+{"wall": 1794148798.108777, "commands": [["click", 565, 554], ["wait", 0.7], ["key", "d", 0.46], ["wait", 0.3], ["key", "f"], ["wait", 0.3], ["key", "c"], ["wait", 0.3], ["key", "f"], ["wait", 4.5], ["key", "w", 7.8], ["wait", 0.5], ["shot", "/tmp/senior-third-expedition.png"]]}
+{"wall": 1794148805.4722612, "commands": [["key", "m"], ["wait", 0.4], ["key", "5"], ["wait", 0.5], ["shot", "/tmp/senior-array-wheel3.png"]]}
+{"wall": 1794148816.764718, "commands": [["click", 698, 282], ["wait", 0.4], ["key", "w", 1.8], ["key", "d", 0.6], ["wait", 0.5], ["shot", "/tmp/senior-fire-ready.png"]]}
+{"wall": 1794148829.3432596, "commands": [["move", 855, 230], ["key", "5"], ["wait", 1.1], ["key", "r"], ["wait", 0.55], ["key", "r"], ["wait", 0.55], ["key", "r"], ["wait", 0.55], ["key", "r"], ["key", "a", 0.7], ["wait", 0.3], ["shot", "/tmp/senior-fire-fight.png"]]}
+{"wall": 1794148839.5817318, "commands": [["key", "5"], ["wait", 2.5], ["shot", "/tmp/senior-array-test.png"]]}
+{"wall": 1794148854.209249, "commands": [["key", "d", 0.9], ["wait", 0.4], ["shot", "/tmp/senior-lure.png"], ["key", "a", 0.9], ["wait", 0.5], ["shot", "/tmp/senior-lure-back.png"]]}
+{"wall": 1794148866.2418466, "commands": [["key", "d", 1.55], ["key", "w", 0.15], ["wait", 0.4], ["key", "f"], ["wait", 0.5], ["shot", "/tmp/senior-hunter-loot.png"]]}
+{"wall": 1794148886.5094242, "commands": [["key", "d", 0.85], ["wait", 0.25], ["key", "a", 1.7], ["wait", 0.25], ["shot", "/tmp/senior-enemy-lure2.png"]]}
+{"wall": 1794148901.621176, "commands": [["key", "w", 0.4], ["key", "d", 1.2], ["wait", 0.3], ["shot", "/tmp/senior-hunter-attack-position.png"]]}
+{"wall": 1794148912.6233213, "commands": [["key", "d", 0.5], ["key", "w", 0.65], ["wait", 0.4], ["key", "f"], ["wait", 0.5], ["shot", "/tmp/senior-hunter-stash.png"]]}
+{"wall": 1794148925.3455336, "commands": [["move", 541, 367], ["key", "r"], ["key", "w", 0.6], ["key", "r"], ["key", "w", 0.6], ["key", "r"], ["key", "w", 0.6], ["wait", 0.3], ["shot", "/tmp/senior-flee-combat.png"]]}
+{"wall": 1794148950.6734278, "commands": [["click", 566, 554], ["wait", 0.8], ["key", "d", 1.1], ["key", "s", 0.2], ["wait", 0.4], ["key", "f"], ["wait", 0.5], ["shot", "/tmp/senior-shopnight.png"]]}
+{"wall": 1794148959.4572148, "commands": [["key", "Escape"], ["wait", 0.4], ["key", "s", 0.3], ["wait", 0.4], ["key", "f"], ["wait", 0.5], ["shot", "/tmp/senior-shopnight2.png"]]}
+{"wall": 1794148966.7034798, "commands": [["key", "d", 0.28], ["key", "w", 0.12], ["wait", 0.4], ["key", "f"], ["wait", 0.5], ["shot", "/tmp/senior-shopnight3.png"]]}
+{"wall": 1794148973.5389233, "commands": [["click", 401, 436], ["wait", 0.5], ["shot", "/tmp/senior-sell.png"]]}
+{"wall": 1794148989.7451508, "commands": [["click", 763, 378], ["hold", "Control_L", 1], ["key", "a"], ["hold", "Control_L", 0], ["key", "8"], ["key", "Return"], ["click", 822, 464], ["click", 150, 224], ["click", 468, 443, 5], ["click", 468, 443, 5], ["click", 468, 443, 5], ["click", 468, 443, 5], ["click", 468, 443, 5], ["click", 468, 443, 5], ["wait", 0.5], ["shot", "/tmp/senior-buygear.png"]]}
+{"wall": 1794148996.8058844, "commands": [["click", 148, 181], ["wait", 0.3], ["shot", "/tmp/senior-sell2.png"]]}
+{"wall": 1794149011.6525958, "commands": [["click", 400, 309], ["click", 763, 378], ["hold", "Control_L", 1], ["key", "a"], ["hold", "Control_L", 0], ["key", "8"], ["key", "Return"], ["click", 822, 464], ["click", 150, 224], ["click", 468, 443, 5], ["click", 468, 443, 5], ["click", 468, 443, 5], ["click", 468, 443, 5], ["click", 468, 443, 5], ["click", 468, 443, 5], ["click", 400, 423], ["wait", 0.5], ["shot", "/tmp/senior-sword.png"]]}
+{"wall": 1794149019.9525998, "commands": [["click", 830, 435], ["wait", 0.5], ["key", "Escape"], ["wait", 0.4], ["key", "o"], ["wait", 0.5], ["shot", "/tmp/senior-swordinventory.png"]]}
+{"wall": 1794149027.3274987, "commands": [["click", 402, 300], ["wait", 0.4], ["shot", "/tmp/senior-sworddetail.png"]]}
+{"wall": 1794149039.8095005, "commands": [["click", 971, 441], ["wait", 0.3], ["key", "Escape"], ["wait", 0.4], ["key", "F5"], ["wait", 0.5], ["shot", "/tmp/senior-saved.png"], ["key", "Escape"], ["wait", 0.5], ["shot", "/tmp/senior-system.png"]]}
+{"wall": 1794149134.4928806, "commands": [["wait", 2], ["shot", "/tmp/senior-reloaded.png"]]}
+{"wall": 1794149147.4808445, "commands": [["click", 570, 455], ["wait", 0.4], ["key", "w", 0.92], ["key", "a", 0.28], ["wait", 0.4], ["key", "f"], ["wait", 0.5], ["shot", "/tmp/senior-craftagain.png"]]}
+{"wall": 1794149158.9700909, "commands": [["key", "Return"], ["wait", 0.6], ["key", "w", 0.92], ["key", "a", 0.28], ["wait", 0.4], ["key", "f"], ["wait", 0.5], ["shot", "/tmp/senior-craftagain.png"]]}
+{"wall": 1794149175.7867033, "commands": [["key", "d", 0.65], ["key", "w", 0.23], ["wait", 0.4], ["key", "f"], ["wait", 0.4], ["click", 469, 443, 5], ["click", 469, 443, 5], ["click", 469, 443, 5], ["click", 469, 443, 5], ["click", 469, 443, 5], ["click", 469, 443, 5], ["click", 469, 443, 5], ["wait", 0.5], ["shot", "/tmp/senior-recipes-again.png"]]}
+{"wall": 1794149201.8313026, "commands": [["click", 384, 453], ["wait", 0.35], ["click", 833, 507], ["wait", 0.35], ["click", 833, 507], ["wait", 0.4], ["key", "Escape"], ["wait", 0.4], ["key", "w", 8.2], ["wait", 0.4], ["shot", "/tmp/senior-fourth-north.png"]]}
+{"wall": 1794149225.6180987, "commands": [["key", "w", 0.65], ["wait", 0.4], ["shot", "/tmp/senior-fourth-position.png"]]}
+{"wall": 1794149239.009395, "commands": [["key", "5"], ["wait", 2.5], ["key", "d", 0.8], ["wait", 0.4], ["shot", "/tmp/senior-fourth-enemy.png"], ["key", "a", 0.8], ["wait", 0.3], ["shot", "/tmp/senior-fourth-array.png"]]}
+{"wall": 1794149259.914484, "commands": [["move", 891, 190], ["key", "r"], ["wait", 1.1], ["move", 760, 250], ["key", "r"], ["wait", 1.1], ["move", 650, 290], ["key", "r"], ["wait", 0.5], ["click", 640, 310], ["wait", 0.8], ["click", 640, 310], ["wait", 0.8], ["click", 640, 310], ["key", "a", 0.5], ["wait", 0.3], ["shot", "/tmp/senior-fourth-battle.png"]]}
+{"wall": 1794149270.044316, "commands": [["key", "d", 1.1], ["key", "w", 0.28], ["wait", 0.4], ["key", "f"], ["wait", 0.5], ["shot", "/tmp/senior-first-loot.png"]]}
+{"wall": 1794149279.4793408, "commands": [["key", "t"], ["wait", 0.5], ["shot", "/tmp/senior-lootall.png"], ["key", "Escape"], ["wait", 0.4], ["key", "o"], ["wait", 0.4], ["shot", "/tmp/senior-lootgear.png"]]}
+{"wall": 1794149287.620778, "commands": [["click", 568, 298], ["wait", 0.4], ["shot", "/tmp/senior-armordetail.png"]]}
+{"wall": 1794149305.1214256, "commands": [["click", 976, 375], ["wait", 0.35], ["drag", 400, 300, 570, 568], ["wait", 0.5], ["shot", "/tmp/senior-drop.png"], ["key", "Escape"], ["wait", 0.4], ["key", "f"], ["wait", 0.5], ["shot", "/tmp/senior-groundpickup.png"]]}
+{"wall": 1794149313.0303185, "commands": [["click", 768, 206], ["wait", 0.4], ["shot", "/tmp/senior-groundtab.png"]]}
+{"wall": 1794149319.501053, "commands": [["click", 399, 300], ["wait", 0.3], ["shot", "/tmp/senior-grounddetail.png"]]}
+{"wall": 1794149330.9733486, "commands": [["click", 972, 351], ["key", "Escape"], ["wait", 0.4], ["key", "w", 0.8], ["key", "d", 0.45], ["wait", 0.4], ["key", "f"], ["wait", 0.5], ["shot", "/tmp/senior-west-archive.png"]]}
+{"wall": 1794149348.3278508, "commands": [["key", "w", 0.14], ["wait", 0.4], ["key", "f"], ["wait", 0.5], ["shot", "/tmp/senior-chestclose.png"]]}
+{"wall": 1794149356.1429925, "commands": [["key", "g"], ["wait", 0.5], ["shot", "/tmp/senior-map3.png"]]}
+{"wall": 1794149373.4082232, "commands": [["key", "Escape"], ["wait", 0.4], ["key", "s", 0.7], ["key", "a", 1.9], ["wait", 0.5], ["shot", "/tmp/senior-west-cellar.png"]]}
+{"wall": 1794149383.9627512, "commands": [["key", "s", 0.6], ["key", "a", 1.4], ["wait", 0.5], ["shot", "/tmp/senior-west-cellar2.png"]]}
+{"wall": 1794149394.5717325, "commands": [["key", "s", 0.4], ["key", "a", 1.35], ["wait", 0.4], ["key", "f"], ["wait", 1], ["shot", "/tmp/senior-tomb-entry.png"]]}
+{"wall": 1794149403.2730587, "commands": [["key", "w", 0.8], ["wait", 0.4], ["key", "f"], ["wait", 0.5], ["shot", "/tmp/senior-tomb-note.png"]]}
+{"wall": 1794149414.9061003, "commands": [["click", 563, 507], ["wait", 0.4], ["key", "s", 1.6], ["wait", 0.4], ["key", "f"], ["wait", 0.5], ["shot", "/tmp/senior-tomb-south-note.png"]]}
+{"wall": 1794149426.1761992, "commands": [["click", 563, 507], ["wait", 0.4], ["key", "d", 1.8], ["wait", 0.5], ["shot", "/tmp/senior-tomb-corridor.png"]]}
+{"wall": 1794149441.4787416, "commands": [["move", 782, 448], ["key", "d", 0.48], ["key", "s", 0.25], ["click", 603, 332], ["wait", 0.5], ["click", 603, 332], ["wait", 0.5], ["click", 603, 332], ["wait", 0.5], ["click", 603, 332], ["key", "a", 0.6], ["wait", 0.3], ["shot", "/tmp/senior-tomb-melee.png"]]}
+{"wall": 1794149502.3194344, "commands": [["click", 565, 554], ["wait", 0.7], ["key", "Tab"], ["wait", 0.4], ["click", 149, 400], ["wait", 0.5], ["shot", "/tmp/senior-controls.png"]]}
+{"wall": 1794149512.9060557, "commands": [["click", 931, 499, 5], ["click", 931, 499, 5], ["click", 931, 499, 5], ["click", 931, 499, 5], ["click", 931, 499, 5], ["wait", 0.5], ["shot", "/tmp/senior-controls2.png"]]}
+{"wall": 1794149521.7179663, "commands": [["click", 931, 499, 5], ["click", 931, 499, 5], ["click", 931, 499, 5], ["click", 931, 499, 5], ["wait", 0.5], ["shot", "/tmp/senior-controls3.png"]]}
+{"wall": 1794149596.3982253, "commands": [["key", "Escape"], ["wait", 0.4], ["key", "d", 1.1], ["key", "w", 8.7], ["wait", 0.4], ["key", "s", 0.7], ["key", "a", 2.2], ["wait", 0.4], ["shot", "/tmp/senior-return-tomb.png"]]}
+{"wall": 1794149609.7820482, "commands": [["key", "s", 0.6], ["key", "a", 1.4], ["wait", 0.4], ["shot", "/tmp/senior-return-tomb2.png"]]}
+{"wall": 1794149616.3615298, "commands": [["key", "g"], ["wait", 0.4], ["shot", "/tmp/senior-lostmap.png"]]}
+{"wall": 1794149627.058032, "commands": [["key", "Escape"], ["wait", 0.4], ["key", "w", 1.6], ["wait", 0.4], ["shot", "/tmp/senior-tombagain-exterior.png"]]}
+{"wall": 1794149642.1332035, "commands": [["key", "d", 0.15], ["key", "w", 0.2], ["wait", 0.3], ["key", "f"], ["wait", 0.7], ["key", "s", 0.8], ["key", "d", 1.8], ["wait", 0.2]]}
+{"wall": 1794149651.8557932, "commands": [["shot", "/tmp/senior-tomb-assisted.png"]]}
+{"wall": 1794149668.4907248, "commands": [["key", "f"], ["wait", 0.4], ["key", "t"], ["wait", 0.3], ["key", "Escape"], ["wait", 0.4], ["key", "d", 1.0], ["wait", 0.5], ["shot", "/tmp/senior-tomb-purifier.png"]]}
+{"wall": 1794149679.7507966, "commands": [["key", "s", 0.3], ["key", "d", 1.9], ["wait", 0.5], ["shot", "/tmp/senior-tomb-east.png"]]}
+{"wall": 1794149693.243104, "commands": [["key", "d", 1.15], ["key", "w", 0.8], ["wait", 0.4], ["shot", "/tmp/senior-tomb-east2.png"]]}
+{"wall": 1794149700.2357845, "commands": [["shot", "/tmp/senior-tomb-second-assisted.png"]]}
+{"wall": 1794149747.38594, "commands": [["click", 563, 554], ["wait", 0.7], ["key", "w", 7.1], ["key", "a", 1.5], ["key", "g"], ["wait", 0.4], ["shot", "/tmp/senior-tomb-route-map.png"]]}
+{"wall": 1794149771.02275, "commands": [["key", "Escape"], ["wait", 0.4], ["key", "w", 1.8], ["key", "a", 0.13], ["wait", 0.3], ["key", "f"], ["wait", 0.6], ["key", "s", 1.1], ["key", "d", 4.9], ["key", "w", 0.8], ["wait", 0.2]]}
+{"wall": 1794149774.7480242, "commands": [["shot", "/tmp/senior-tomb-second-fight.png"]]}
+{"wall": 1794149791.5608885, "commands": [["key", "a", 0.29], ["key", "w", 0.41], ["wait", 0.4], ["key", "f"], ["wait", 0.6], ["shot", "/tmp/senior-tomb-reenter.png"]]}
+{"wall": 1794149805.3332663, "commands": [["key", "s", 1.1], ["key", "d", 4.9], ["key", "w", 0.8], ["wait", 0.2]]}
+{"wall": 1794149808.9655726, "commands": [["shot", "/tmp/senior-tomb-second-fight2.png"]]}
+{"wall": 1794149851.3176413, "commands": [["key", "a", 0.2], ["key", "s", 1.0], ["wait", 0.4], ["shot", "/tmp/senior-tomb-bypass.png"]]}
+{"wall": 1794149863.93373, "commands": [["key", "d", 2.5], ["key", "w", 0.8], ["wait", 0.1]]}
+{"wall": 1794149873.5901673, "commands": [["shot", "/tmp/senior-tomb-mage-result.png"]]}
+{"wall": 1794149899.1059039, "commands": [["key", "f"], ["wait", 0.4], ["key", "t"], ["wait", 0.3], ["key", "Escape"], ["wait", 0.4], ["key", "w", 0.8], ["key", "a", 1.0], ["wait", 0.2]]}
+{"wall": 1794149902.7688508, "commands": [["shot", "/tmp/senior-tomb-purify-search.png"]]}
+{"wall": 1794149913.6979728, "commands": [["key", "w", 0.75], ["key", "d", 0.9], ["wait", 0.4], ["key", "f"], ["wait", 0.5], ["shot", "/tmp/senior-tomb-door.png"]]}
+{"wall": 1794149928.24028, "commands": [["shot", "/tmp/senior-tomb-thirdfight.png"]]}
+{"wall": 1794149951.363809, "commands": [["shot", "/tmp/senior-tomb-thirdfinish.png"]]}
+{"wall": 1794150033.29814, "commands": [["click", 563, 554], ["wait", 0.7], ["key", "w", 7.1], ["key", "a", 1.5], ["key", "g"], ["wait", 0.4], ["click", 142, 307], ["wait", 0.3], ["key", "Escape"], ["wait", 0.4], ["shot", "/tmp/senior-tomb-waypoint.png"]]}
+{"wall": 1794150046.4538965, "commands": [["key", "w", 1.8], ["wait", 0.4], ["shot", "/tmp/senior-tomb-waypoint2.png"]]}
+{"wall": 1794150056.4051833, "commands": [["key", "a", 0.24], ["key", "w", 0.13], ["wait", 0.4], ["key", "f"], ["wait", 0.6], ["shot", "/tmp/senior-tomb-final-reentry.png"]]}
+{"wall": 1794150082.6562693, "commands": [["key", "s", 1.5], ["key", "d", 6.2], ["key", "w", 1.9], ["wait", 0.1]]}
+{"wall": 1794150086.2079546, "commands": [["shot", "/tmp/senior-tomb-third-final.png"]]}
+{"wall": 1794150107.1691759, "commands": [["key", "a", 0.9], ["key", "w", 0.8], ["wait", 0.1]]}
+{"wall": 1794150112.1760466, "commands": [["shot", "/tmp/senior-tomb-third-actual.png"]]}
+{"wall": 1794150140.1102884, "commands": [["key", "f"], ["wait", 0.35], ["key", "t"], ["wait", 0.3], ["key", "Escape"], ["wait", 0.35], ["key", "w", 0.55], ["key", "d", 2.0], ["wait", 0.4], ["key", "f"], ["wait", 0.5], ["shot", "/tmp/senior-tomb-northeast.png"]]}
+{"wall": 1794150149.6628609, "commands": [["key", "d", 0.23], ["key", "w", 0.08], ["wait", 0.4], ["key", "f"], ["wait", 0.5], ["shot", "/tmp/senior-purifier-found.png"]]}
+{"wall": 1794150170.637383, "commands": [["key", "Escape"], ["wait", 0.4], ["key", "k"], ["wait", 0.5], ["shot", "/tmp/senior-loadout.png"]]}
+{"wall": 1794150205.0279303, "commands": [["key", "Escape"], ["wait", 0.4], ["key", "Escape"], ["wait", 0.4], ["click", 875, 295], ["wait", 3.8], ["shot", "/tmp/senior-return-base.png"]]}
+{"wall": 1794150226.915023, "commands": [["key", "8"], ["wait", 1.4], ["key", "g"], ["wait", 0.4], ["click", 303, 278], ["key", "Escape"], ["wait", 0.4], ["shot", "/tmp/senior-hunter-waypoint.png"]]}
+{"wall": 1794150246.1750345, "commands": [["key", "w", 9.0], ["key", "d", 1.1], ["wait", 0.4], ["shot", "/tmp/senior-hunter-maproute.png"]]}
+{"wall": 1794150266.362278, "commands": [["key", "w", 2.4], ["key", "d", 0.8], ["wait", 0.4], ["shot", "/tmp/senior-hunter-maproute2.png"]]}
+{"wall": 1794150278.6232247, "commands": [["key", "a", 1.6], ["wait", 0.4], ["shot", "/tmp/senior-hunter-west-search.png"]]}
+{"wall": 1794150288.3405788, "commands": [["key", "a", 0.25], ["key", "w", 1.6], ["wait", 0.4], ["shot", "/tmp/senior-hunter-nw-search.png"]]}
+{"wall": 1794150313.0625987, "commands": [["key", "a", 1.8], ["key", "w", 1.2], ["wait", 0.1]]}
+{"wall": 1794150316.6784863, "commands": [["shot", "/tmp/senior-west-search2.png"]]}
+{"wall": 1794150341.7304504, "commands": [["key", "w", 3.0], ["key", "d", 1.4], ["wait", 0.1]]}
+{"wall": 1794150345.4892066, "commands": [["shot", "/tmp/senior-northwest-edge.png"]]}
+{"wall": 1794150365.8742766, "commands": [["key", "g"], ["wait", 0.4], ["shot", "/tmp/senior-lake-route-map.png"]]}
+{"wall": 1794150403.5002458, "commands": [["click", 580, 215], ["key", "Escape"], ["wait", 0.4], ["key", "d", 10.0], ["key", "s", 0.35], ["wait", 0.1]]}
+{"wall": 1794150407.1891742, "commands": [["shot", "/tmp/senior-east-roam.png"]]}
+{"wall": 1794150432.653227, "commands": [["key", "d", 1.8], ["key", "s", 0.6], ["wait", 0.1]]}
+{"wall": 1794150436.5952785, "commands": [["shot", "/tmp/senior-lake-bank.png"]]}
+{"wall": 1794150476.989804, "commands": [["key", "g"], ["wait", 0.4], ["click", 743, 200], ["key", "Escape"], ["wait", 0.4], ["key", "w", 2.5], ["key", "d", 5.5], ["key", "s", 0.8], ["wait", 0.1]]}
+{"wall": 1794150481.0013084, "commands": [["shot", "/tmp/senior-lake-north-route.png"]]}
+{"wall": 1794150700.234311, "commands": [["key", "g"], ["shot", "/tmp/senior-map-current.png"]]}
+{"wall": 1794150718.3898575, "commands": [["key", "Escape"], ["key", "s", 6.5], ["key", "d", 3.0], ["shot", "/tmp/senior-river-crossing.png"]]}
+{"wall": 1794150738.1857474, "commands": [["key", "7"], ["key", "8"], ["key", "a", 3], ["key", "s", 6], ["key", "d", 4], ["key", "g"], ["shot", "/tmp/senior-map-cross-route.png"]]}
+{"wall": 1794150748.5185099, "commands": [["key", "Escape"], ["key", "w", 1.1], ["key", "d", 4], ["shot", "/tmp/senior-bridge.png"]]}
+{"wall": 1794150758.4095855, "commands": [["key", "w", 4.5], ["shot", "/tmp/senior-lake-east.png"]]}
+{"wall": 1794150762.2027524, "commands": [["shot", "/tmp/senior-lake-east-after.png"]]}
+{"wall": 1794150770.0726023, "commands": [["key", "d", 1.5], ["key", "w", 1.5], ["key", "f"], ["shot", "/tmp/senior-lake-entrance.png"]]}
+{"wall": 1794150791.5655732, "commands": [["key", "a", 1.3], ["key", "s", 1.2], ["key", "f"], ["shot", "/tmp/senior-lake-gate-note.png"], ["key", "F5"]]}
+{"wall": 1794150809.609836, "commands": [["key", "d", 0.55], ["key", "w", 0.35], ["key", "f"], ["shot", "/tmp/senior-lake-sign.png"], ["key", "F5"]]}
+{"wall": 1794150824.4669983, "commands": [["key", "F5"], ["shot", "/tmp/senior-firstphase-sealed.png"]]}
+{"wall": 1794150871.4427998, "commands": [["wait", 2], ["click", 560, 452], ["key", "Return"], ["key", "Escape"], ["shot", "/tmp/senior-phaseb-menu.png"]]}
+{"wall": 1794150895.31493, "commands": [["click", 860, 295], ["wait", 3.5], ["key", "a", 3.2], ["key", "w", 10], ["key", "f"], ["shot", "/tmp/senior-phaseb-bell-return.png"]]}
+{"wall": 1794150900.941236, "commands": [["key", "g"], ["shot", "/tmp/senior-b-map.png"]]}
+{"wall": 1794150917.6892323, "commands": [["key", "Escape"], ["key", "d", 1.35], ["key", "s", 0.4], ["key", "f"], ["wait", 0.6], ["key", "s", 2.15], ["key", "d", 4.6], ["shot", "/tmp/senior-bell-cleanser-near.png"]]}
+{"wall": 1794150921.3280373, "commands": [["shot", "/tmp/senior-bell-cleanser-afterfight.png"]]}
+{"wall": 1794150943.9376025, "commands": [["key", "g"], ["click", 142, 307], ["shot", "/tmp/senior-bell-guided-map.png"]]}
+{"wall": 1794150955.624923, "commands": [["key", "Escape"], ["key", "s", 0.3], ["key", "a", 4.5], ["wait", 0.25], ["shot", "/tmp/senior-bell-approach.png"]]}
+{"wall": 1794150967.3724415, "commands": [["key", "s", 0.6], ["key", "a", 3.2], ["shot", "/tmp/senior-bell-approach2.png"]]}
+{"wall": 1794150983.3328357, "commands": [["key", "f"], ["wait", 0.6], ["key", "s", 2.1], ["key", "d", 5.25], ["shot", "/tmp/senior-bell-cleanser-actual.png"]]}
+{"wall": 1794150993.3643568, "commands": [["key", "f"], ["shot", "/tmp/senior-bell-cleanser-ui.png"]]}
+{"wall": 1794150999.3696768, "commands": [["key", "t"], ["key", "Escape"], ["shot", "/tmp/senior-bell-postfourth.png"]]}
+{"wall": 1794151009.3666146, "commands": [["key", "a", 0.7], ["key", "s", 0.13], ["key", "f"], ["shot", "/tmp/senior-cleanser-work-panel.png"]]}
+{"wall": 1794151029.0397968, "commands": [["key", "f"], ["wait", 6.4], ["shot", "/tmp/senior-cleanser-completed.png"], ["key", "d", 2.0], ["key", "w", 4.2], ["key", "f"], ["shot", "/tmp/senior-seal-unlocked.png"]]}
+{"wall": 1794151049.9840326, "commands": [["key", "f"], ["wait", 6.4], ["shot", "/tmp/senior-seal-complete.png"], ["key", "d", 0.4], ["key", "s", 0.22], ["key", "f"], ["wait", 0.6], ["shot", "/tmp/senior-bell-depths-entry.png"]]}
+{"wall": 1794151064.6931787, "commands": [["key", "d", 0.5], ["key", "s", 1.8], ["key", "f"], ["shot", "/tmp/senior-bell-receipt.png"]]}
+{"wall": 1794151077.3652523, "commands": [["key", "f"], ["wait", 0.3], ["shot", "/tmp/senior-receipt-text.png"]]}
+{"wall": 1794151092.8991582, "commands": [["key", "Escape"], ["key", "d", 3.4], ["wait", 0.2]]}
+{"wall": 1794151113.5367758, "commands": [["shot", "/tmp/senior-depths-fight2.png"]]}
+{"wall": 1794151136.0013132, "commands": [["key", "w", 1.4], ["wait", 0.1]]}
+{"wall": 1794151136.5098314, "commands": [["shot", "/tmp/senior-depths-recovery.png"]]}
+{"wall": 1794151251.546435, "commands": [["click", 566, 554], ["wait", 0.4], ["key", "a", 1.8], ["key", "w", 9], ["key", "g"], ["shot", "/tmp/senior-b-recovery-map.png"]]}
+{"wall": 1794151270.563573, "commands": [["key", "Escape"], ["key", "a", 0.8], ["key", "w", 7.8], ["key", "d", 0.8], ["wait", 0.3], ["shot", "/tmp/senior-recovery-bell-gate.png"]]}
+{"wall": 1794151287.8040144, "commands": [["key", "d", 0.16], ["key", "s", 0.24], ["wait", 0.3], ["key", "f"], ["wait", 0.5], ["key", "s", 2.1], ["key", "d", 6.1], ["wait", 0.2], ["key", "f"], ["shot", "/tmp/senior-bell-names.png"]]}
+{"wall": 1794151304.0037835, "commands": [["key", "d", 1.1], ["key", "s", 0.1], ["wait", 0.3], ["key", "f"], ["wait", 0.3], ["shot", "/tmp/senior-names-text.png"], ["key", "Escape"], ["key", "w", 4], ["key", "d", 0.6], ["wait", 0.3], ["key", "f"], ["wait", 0.5], ["shot", "/tmp/senior-depths-returned.png"]]}
+{"wall": 1794151335.8384972, "commands": [["key", "s", 0.9], ["key", "d", 3.9], ["key", "w", 0.9], ["key", "d", 1.8], ["wait", 0.1]]}
+{"wall": 1794151348.2966523, "commands": [["shot", "/tmp/senior-depths-central-battle.png"]]}
+{"wall": 1794151363.764047, "commands": [["key", "f"], ["wait", 0.2], ["key", "t"], ["key", "Escape"], ["key", "d", 1.25], ["key", "s", 0.6], ["wait", 0.3], ["key", "f"], ["wait", 0.3], ["shot", "/tmp/senior-core-work-panel.png"]]}
+{"wall": 1794151385.0200913, "commands": [["key", "f"], ["wait", 6.4], ["shot", "/tmp/senior-bell-core-complete.png"], ["key", "s", 1.0], ["key", "d", 0.2], ["wait", 0.3], ["key", "f"], ["wait", 0.6], ["shot", "/tmp/senior-bell-shortcut-return.png"], ["key", "Escape"], ["shot", "/tmp/senior-bell-retreat-menu.png"]]}
+{"wall": 1794151398.8201008, "commands": [["click", 870, 294], ["wait", 3.5], ["key", "n"], ["shot", "/tmp/senior-supplies-current.png"]]}
+{"wall": 1794151414.2693594, "commands": [["key", "n"], ["wait", 0.3], ["shot", "/tmp/senior-supplies-panel.png"]]}
+{"wall": 1794151428.9582865, "commands": [["key", "Escape"], ["key", "7"], ["wait", 3], ["shot", "/tmp/senior-eat-success.png"], ["key", "8"], ["wait", 3], ["shot", "/tmp/senior-drink-success.png"], ["key", "j"], ["wait", 0.3], ["shot", "/tmp/senior-final-quests-list.png"]]}
+{"wall": 1794151435.3416777, "commands": [["click", 153, 223], ["shot", "/tmp/senior-quests-return.png"]]}
+{"wall": 1794151450.8062727, "commands": [["wait", 0.7], ["shot", "/tmp/senior-quests-wait.png"]]}
+{"wall": 1794151461.387805, "commands": [["click", 440, 508, 5], ["click", 440, 508, 5], ["click", 440, 508, 5], ["wait", 0.7], ["shot", "/tmp/senior-quests-scrolled.png"]]}
+{"wall": 1794151471.9741764, "commands": [["click", 440, 508, 5], ["click", 440, 508, 5], ["click", 440, 508, 5], ["click", 440, 508, 5], ["wait", 0.7], ["shot", "/tmp/senior-quests-bottom.png"]]}
+{"wall": 1794151480.0134838, "commands": [["click", 396, 542], ["wait", 0.7], ["shot", "/tmp/senior-names-deliver-ready.png"], ["click", 815, 541], ["wait", 0.7], ["shot", "/tmp/senior-names-delivered.png"]]}
+{"wall": 1794151487.1844237, "commands": [["click", 814, 452], ["wait", 0.8], ["shot", "/tmp/senior-names-report-town.png"]]}
+{"wall": 1794151494.0659933, "commands": [["click", 1032, 141], ["wait", 0.5], ["shot", "/tmp/senior-quest-filter-options.png"]]}
+{"wall": 1794151503.9933512, "commands": [["click", 1032, 231], ["wait", 0.7], ["shot", "/tmp/senior-quest-delivered-confirmed.png"], ["key", "Escape"], ["key", "d", 0.6], ["wait", 0.3], ["key", "f"], ["wait", 0.7], ["shot", "/tmp/senior-camp-cooking-panel.png"]]}
+{"wall": 1794151531.3076904, "commands": [["key", "Escape"], ["key", "w", 0.9], ["key", "d", 0.3], ["wait", 0.4], ["key", "f"], ["wait", 0.7], ["shot", "/tmp/senior-stove-work.png"]]}
+{"wall": 1794151546.5476236, "commands": [["key", "f"], ["wait", 3.6], ["shot", "/tmp/senior-cooking-completed.png"], ["key", "Escape"], ["key", "j"], ["wait", 0.7], ["click", 1031, 141], ["wait", 0.4], ["click", 1034, 203], ["wait", 0.7], ["shot", "/tmp/senior-deliverable-meal.png"]]}
+{"wall": 1794151568.4854507, "commands": [["click", 1033, 141], ["wait", 0.3], ["click", 1034, 263], ["wait", 0.5], ["click", 445, 140], ["key", "Control_L"], ["hold", "Control_L", 1], ["key", "a"], ["hold", "Control_L", 0], ["shot", "/tmp/senior-final-quest-all.png"], ["key", "Escape"], ["key", "F5"], ["wait", 0.7], ["shot", "/tmp/senior-final-save.png"]]}
+{"wall": 1794151621.878017, "commands": [["wait", 1], ["click", 560, 451], ["key", "Return"], ["wait", 0.8], ["key", "j"], ["wait", 0.7], ["click", 152, 223], ["wait", 0.7], ["click", 1033, 141], ["wait", 0.4], ["click", 1035, 231], ["wait", 0.7], ["shot", "/tmp/senior-reload-completed-quest.png"]]}

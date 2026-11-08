@@ -1,0 +1,17 @@
+import os,sys,subprocess,time,pathlib,shutil,hashlib
+root=pathlib.Path('/tmp/grayriver-senior')/sys.argv[1];root.mkdir(parents=True,exist_ok=True)
+if len(sys.argv)>2:
+ data=root/'data/godot/app_userdata/Study';data.mkdir(parents=True,exist_ok=True);shutil.copyfile(sys.argv[2],data/'save_3.sav');(root/'seed.sha256').write_text(hashlib.sha256(pathlib.Path(sys.argv[2]).read_bytes()).hexdigest())
+xlog=(root/'xorg.log').open('a');log=(root/'runtime.log').open('a')
+display=os.environ.get('GRAYRIVER_DISPLAY',':97')
+x=subprocess.Popen(['Xorg',display,'-config','/tmp/grayriver-loot-visual/xorg.conf','-noreset','-nolisten','tcp'],stdout=xlog,stderr=subprocess.STDOUT)
+try:
+ for _ in range(50):
+  if pathlib.Path('/tmp/.X11-unix/X'+display.lstrip(':')).exists():break
+  time.sleep(.1)
+ env=os.environ.copy();env.update(DISPLAY=display,GRAYRIVER_FIRST30_OUTPUT=str(root),XDG_DATA_HOME=str(root/'data'),XDG_CONFIG_HOME=str(root/'config'),XDG_CACHE_HOME=str(root/'cache'))
+ print('Graphical probe:',root,flush=True)
+ r=subprocess.run(['godot','--path',os.environ.get('GRAYRIVER_TEST_PROJECT','/workspace/mygame'),'--rendering-method','gl_compatibility','--audio-driver','Dummy','--resolution','1152x648','res://grayriver.tscn'],env=env,stdout=log,stderr=subprocess.STDOUT,timeout=18000)
+ print('Godot exit:',r.returncode,flush=True)
+finally:
+ x.terminate();x.wait(timeout=5);log.close();xlog.close()

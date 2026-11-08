@@ -1,0 +1,65 @@
+{
+  "baseline": "e6c1685fed761fab72052e151d50277262a64f8e",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "godot": "4.6.3.stable.official",
+  "display": ":93",
+  "rendering": "gl_compatibility",
+  "audio": "Dummy; auditory experience not evaluated",
+  "resolution": [
+    1152,
+    648
+  ],
+  "phase_a": {
+    "batches": 175,
+    "wasd_hold_seconds": 274.2700000000002,
+    "other_key_hold_seconds": 18.239999999999974,
+    "explicit_wait_seconds": 145.40000000000026,
+    "click_count": 100,
+    "drag_count": 1,
+    "shot_count": 170,
+    "first_record_utc": "2026-11-08T14:29:25.805848+00:00",
+    "last_record_utc": "2026-11-08T15:13:44.466998+00:00",
+    "elapsed_wall_seconds": 2658.6611506938934
+  },
+  "phase_b": {
+    "batches": 43,
+    "wasd_hold_seconds": 99.46999999999997,
+    "other_key_hold_seconds": 6.240000000000005,
+    "explicit_wait_seconds": 61.15000000000003,
+    "click_count": 27,
+    "drag_count": 0,
+    "shot_count": 51,
+    "first_record_utc": "2026-11-08T15:14:31.442800+00:00",
+    "last_record_utc": "2026-11-08T15:27:01.878017+00:00",
+    "elapsed_wall_seconds": 750.4352171421051
+  },
+  "timing_caveat": "Wall intervals contain reasoning, tools and reading. Input hold and explicit waits are lower bounds, not human content duration. UI and world continue. Restart idle and source reading excluded as content time.",
+  "launch": "GRAYRIVER_DISPLAY=:93 python3 /tmp/grayriver-senior-runner.py fresh-20261108",
+  "xdg": {
+    "XDG_DATA_HOME": "/tmp/grayriver-senior/fresh-20261108/data",
+    "XDG_CONFIG_HOME": "/tmp/grayriver-senior/fresh-20261108/config",
+    "XDG_CACHE_HOME": "/tmp/grayriver-senior/fresh-20261108/cache"
+  },
+  "fresh_save_evidence": {
+    "no_seed_argument": true,
+    "no_seed_sha256_file": true,
+    "opening_screenshot": "screenshots/001-fresh-opening.png",
+    "initial_data": "empty task-specific XDG; no save copied; initial emptiness is operator record, not a separately retained filesystem listing"
+  },
+  "combat_assist": {
+    "phase_a_nonempty_runs": 4,
+    "phase_a_approx_seconds": 31.5,
+    "phase_b_nonempty_runs": 3,
+    "phase_b_approx_seconds": 41.7,
+    "scope": "visible screenshot red/blue bar recognition, WASD, mouse aim, primary attack and block; no automatic spells/material preparation; v1 unused ranged branch never invoked",
+    "limitations": [
+      "fixed player screen center fails at camera clamp",
+      "v1 low HP recognition can produce false matches",
+      "no-target attempts stop after 3 seconds",
+      "dark modal detection stops on death/modal"
+    ]
+  },
+  "shutdown": "F5 then SIGTERM, not an in-game quit menu; previous WM_DELETE attempt failed and caused short accidental duplicate launch (no gameplay input during duplicate); runtime first portion was overwritten/NUL and is incomplete",
+  "ending_reached": false,
+  "save_sha256": "65fce86a0781be7fbc924bd20219b30a3052d09def0fc847a4700be494f8c5ed"
+}
