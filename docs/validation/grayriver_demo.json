@@ -1,0 +1,59 @@
+{
+  "date": "2026-11-08 Asia/Shanghai",
+  "source_commit": "2fe77f77b9368efb628462da12111d072009e575",
+  "baseline": "e9c72fbb5537c780f1b39a4cf968c46ac3daa4fe",
+  "content": {
+    "regions": 10,
+    "interior_regions": 9,
+    "encounters": 43,
+    "puzzles": 15,
+    "quests": 19,
+    "added_interiors": 6,
+    "added_encounters": 21,
+    "added_puzzles": 10,
+    "added_quests": 8
+  },
+  "regression": {
+    "command": "python3 tools/run_tests.py --suite all",
+    "archive_without_godot_cache": true,
+    "import_passed": true,
+    "passed": 98,
+    "total": 98,
+    "exit_code": 0,
+    "log": "grayriver_demo_regression.txt"
+  },
+  "accelerated_run": {
+    "passed": 97,
+    "total": 98,
+    "failed": "campaign_effects",
+    "jobs": 4,
+    "subsequent_targeted_pass": true,
+    "subsequent_final_full_default_pass": true
+  },
+  "native": {
+    "normal_ai_upper_floor_battles": 4,
+    "guided_inputs": true,
+    "frozen_ai_in_normal_run": false,
+    "fixture_integration_separate": true,
+    "real_uid_loot": true,
+    "paid_live_work": true,
+    "real_purchase_and_downstairs_entry": true,
+    "reentry_exact": [
+      "materials",
+      "items",
+      "pack",
+      "gear",
+      "loot_records"
+    ],
+    "final_ui_purchase_buttons_disabled": true
+  },
+  "duration": {
+    "design_minutes": [
+      100,
+      140
+    ],
+    "measured_blind_two_hour_acceptance": false,
+    "all_expeditions_normal_ai_completion": false
+  },
+  "actions_workflows_reenabled": false
+}
