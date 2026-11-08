@@ -33,3 +33,16 @@ Buff可显式配置`survives_death`，默认定时状态不跨死亡。食品目
 本轮不批量增加新技能/专精内容。现有横扫课程的实物战杖条件展示世界条件的真实接入；前置链、互斥及书的共同限制通过独立领域验证。后续作者可以增加资源定义和学习来源，新的动作语义仍需扩展代码。[内容接入指南](CONTENT_AUTHORING.md)列出具体目录、字段、登记、验证及兼容要求。
 
 验证器现在联查食品身份/互斥槽、武技重复ID/循环/不可满足前置、课程引用/费用/条件、生产原料/产出和店家初始库存。纯定义使用Resource，生产与学习服务使用RefCounted，场景入口装配服务；没有增加Autoload、ECS或通用脚本语言。
+
+## 最终验证
+
+生产代码`1d9aa43a916c01bf7fb6fad9790e5b717d4b4859`从`git archive`导出到`/tmp/mygame-extensibility-cold-xj0uaa77`，无`.godot`开始首次导入9.9秒，**94/94**通过。输出见[完整回归](validation/system_extensibility_regression.txt)，覆盖及原生日志散列见[验证数据](validation/system_extensibility_review.json)。新增三项分别为`provision_lifecycle`、`production_learning`、`extensibility_input`；新旅程检查还验证旧排产队列不会带入新档。
+
+同一归档原生窗口完成F开整修铺、鼠标安排箭、真实一小时休息、店存箭24→30、购买实际战杖、满足实物条件后学习横扫、960×600窗口安排/取消，以及开放面板中的订单完成与控件身份保留。此专项使用明确的库存/位置夹具、正常AI与模拟；面板完成观察另有一次受控时钟跳转，不冒充自然时间盲测。截图审查后已修正排产说明误显示玩家持有量的问题，当前读取店家实际原料。
+
+另一个隔离原生进程完成原有71步默认预算路线：读手册、取口粮、制火石、北路手动选材/布阵/火球、搜刮、返镇穿戴/出售/训练、第二次交战与保存。正常AI和自然恢复开启，没有授予物资、知识、瞬移或冻结敌人。游戏生成的返镇档在第三个进程重进，初始仍59HP；物品UID/数量、穿戴、材料、快捷绑定、武技、遗骸与发现一致。此进程在开场面板停留期间世界继续运行并自动保存，随后F9读取的是更新后的68HP档；不将该读档说成原59HP档。严格的无回复F9/死亡/迁移边界由领域专项独立验证。
+
+三份最终原生日志仅有软件驱动不支持切换VSync的启动警告，无脚本错误或其他警告。平台为云端Linux/Godot4.6.3/Xorg dummy/Mesa llvmpipe/OpenGL compatibility；Godot输入事件与有指导路线不代表实体键鼠/真人盲测、目标设备性能或完整数值平衡。GitHub Actions保持停用。
+
+- [小窗口排产与店家真实库存](review/system-extensibility/production-small.png)
+- [实际课程的学习条件](review/system-extensibility/course-requirement.png)

@@ -1,0 +1,69 @@
+{
+  "date": "2026-11-08 Asia/Shanghai",
+  "code_commit": "1d9aa43a916c01bf7fb6fad9790e5b717d4b4859",
+  "archive": "/tmp/mygame-extensibility-cold-xj0uaa77",
+  "regression": {
+    "command": "python3 tools/run_tests.py --suite all --jobs 3 --timeout 120",
+    "result": "94/94 checks passed",
+    "import": "PASS import (9.9s)",
+    "logs": "/tmp/mygame-tests-4qjph6xf",
+    "output": "docs/validation/system_extensibility_regression.txt"
+  },
+  "coverage": {
+    "provision_lifecycle": "Actual ordinary consumption/replacement/dispel, one clock, real death before recovery/save, death reentry, retained cooldowns, real v8 phantom-food/water/tea migration without replaying cleanse",
+    "production_learning": "Real stock conservation; deadlines/reentry; missing material/capacity; blocking/resume/cancel/idempotence; no money/XP minting; conditional courses/payment rollback; world discovery gating; book prerequisites/exclusivity; invalid/cyclic content",
+    "extensibility_input": "Actual F, shop, queue, one-hour rest, purchase, weapon-required course, 960x600 cancel, live UI control retention and source-owner stock display; save/reentry; controlled stock/position fixture, normal AI; one deliberate clock jump for open-UI deadline observation"
+  },
+  "natural_route": {
+    "file": "tools/playtests/combat_depth_route.json",
+    "steps": 71,
+    "output": "/tmp/grayriver-first30/extensibility-cold-expedition",
+    "saved_hp": 59,
+    "initial_reentry_hp": 59,
+    "post_f9_hp": 68,
+    "comparisons": {
+      "items": true,
+      "gear": true,
+      "materials": true,
+      "shortcuts": true,
+      "martial": true,
+      "loot_records": true,
+      "claims": true,
+      "initial_hp": true
+    },
+    "precombat_sha256": "e62c466737e764701f9e7325bc524bd11bc3588a3ac67cde344a1d29514108e4",
+    "returned_sha256": "2a4ed75b6e71b8f43b08a64122d7adeb8752c0cde9745eb49e292a5b10db22ed",
+    "note": "Normal AI, authored resources and default regeneration. World continued during arrival menu; post-F9 reads this process newer autosave, not the original HP59 checkpoint."
+  },
+  "native": {
+    "extensibility-cold-services": {
+      "log": "/tmp/grayriver-first30/extensibility-cold-services/runtime.log",
+      "sha256": "ce8e9d62399f06f44970c0cde1e884336c6f3fa8747c708adcf4eabc837f69b5",
+      "diagnostics": [
+        "WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver."
+      ]
+    },
+    "extensibility-cold-expedition": {
+      "log": "/tmp/grayriver-first30/extensibility-cold-expedition/runtime.log",
+      "sha256": "7ba1404a881449b3e632d6620a4d7c27872e9815583cd410fbf43b7bd56d9c42",
+      "diagnostics": [
+        "WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver."
+      ]
+    },
+    "extensibility-cold-reentry": {
+      "log": "/tmp/grayriver-first30/extensibility-cold-reentry/runtime.log",
+      "sha256": "119f2e423668ae960e4948b8e0e59d06779d610a45d4665dfe9e04b239034df7",
+      "diagnostics": [
+        "WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver."
+      ]
+    }
+  },
+  "limits": [
+    "Cloud Linux / Godot4.6.3 / Xorg dummy / Mesa llvmpipe GL compatibility; not target-device performance",
+    "Godot input events, guided navigation rather than physical devices or blind human first play",
+    "Controlled service/mechanism fixtures are separate from normal authored-budget 71-step route",
+    "Production is finite stock processing, not a full autonomous town economy",
+    "Prerequisite and exclusivity support does not imply many new martial skills were added"
+  ],
+  "actions": "disabled"
+}
