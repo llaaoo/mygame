@@ -4,6 +4,7 @@ extends Resource
 enum Kind { CLAIM, CLEAR, INVENTORY, RELATION, KNOWLEDGE }
 @export var kind: Kind = Kind.CLAIM
 @export var key := ""
+@export var hint := ""
 @export var quantity := 1
 @export_enum("neutral","friendly","hostile") var attitude := "neutral"
 func satisfied(query: ConditionQuery) -> bool:

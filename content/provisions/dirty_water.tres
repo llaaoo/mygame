@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ProvisionDefinition" load_steps=3 format=3]
+[ext_resource type="Script" path="res://gameplay/exploration/survival/provision_definition.gd" id="def"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/poison.tres" id="effect"]
+[resource]
+script = ExtResource("def")
+id = "dirty_water"
+nutrition = 0.0
+hydration = 25.0
+fatigue = 0.0
+seconds = 1.0
+description = "应急饮水+25，但会施加中毒；不获得饮水恢复增益。可先过滤煮沸。"
+effect = ExtResource("effect")

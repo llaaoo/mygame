@@ -18,7 +18,7 @@ func _ready() -> void:
 	interaction.set_callback(func(visitor: Node2D):
 		if can_serve(visitor):
 			if service_request.is_valid(): service_request.call()
-		elif notify.is_valid(): notify.call("训练师正在休息或对你抱有敌意。服务时间：06:00—22:00。"))
+		elif notify.is_valid(): notify.call("当前无法提供服务：未当值、已死亡或关系敌对。"))
 	add_child(interaction)
 func can_serve(visitor: Node2D) -> bool:
 	if health_component.is_dead or not working or not actor_context or not is_instance_valid(visitor) or visitor.position.distance_to(position)>=80: return false

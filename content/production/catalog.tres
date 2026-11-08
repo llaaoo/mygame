@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="ProductionCatalog" load_steps=6 format=3]
+[ext_resource type="Script" path="res://gameplay/foundation/data/production_catalog.gd" id="catalog"]
+[ext_resource type="Script" path="res://gameplay/foundation/data/production_definition.gd" id="def"]
+[ext_resource type="Resource" path="res://content/production/arrows.tres" id="arrows"]
+[ext_resource type="Resource" path="res://content/production/fire_stone.tres" id="fire_stone"]
+[ext_resource type="Resource" path="res://content/production/guard_tonic.tres" id="guard_tonic"]
+[resource]
+script = ExtResource("catalog")
+entries = Array[ExtResource("def")]([ExtResource("arrows"), ExtResource("fire_stone"), ExtResource("guard_tonic")])

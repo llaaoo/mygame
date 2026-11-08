@@ -301,10 +301,7 @@ func _complete(option: FieldWorkMethod, node: Node2D, spec: SurvivalStationData)
 	match parts[0]:
 		"eat":
 			needs.consume(parts[1])
-			var buffs := game.player.get_node("BuffManager") as BuffManager
-			if parts[1] in ["ration","broth"]: buffs.apply_buff(load("res://content/status/%s.tres"%("meal_fortitude" if parts[1]=="ration" else "broth_fortitude")))
-			if parts[1] == "tea": buffs.remove_status("poison")
-			if parts[1] == "dirty_water": buffs.apply_buff(load("res://gameplay/abilities/data/poison.tres"))
+
 		"harvest":
 			needs.harvests[spec.id] = spec.regeneration_hours*3600.0/WorldTime.instance.time_scale
 		"basic":

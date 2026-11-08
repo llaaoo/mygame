@@ -43,7 +43,8 @@ func run() -> void:
 		var before:=entry(state,id); var after:=entry(restored,id)
 		check(not after.is_empty() and float(after.remaining)<=float(before.remaining)+.001 and float(after.remaining)>float(before.remaining)-1,"Save/reentry erased or renewed effect: "+id)
 	check(actor.health_component.hp==75 and actor.mana_component.mp==31,"Reload healed or refilled actual vitals")
-	check(store.coating_state(uid)==coating and actor.actor_context.actions.stamina.current<=44,"Reload changed coating UID/expiry or refilled stamina")
+	var elapsed:=float(entry(state,"meal_fortitude").remaining)-float(entry(restored,"meal_fortitude").remaining)
+	check(store.coating_state(uid)==coating and actor.actor_context.actions.stamina.current<=40+elapsed*actor.actor_context.actions.stamina.regeneration+.1,"Reload changed coating UID/expiry or refilled stamina")
 	check(actor.skill_manager.combinations.cooldowns.get("ignite",0)>4 and actor.skill_manager._cooldowns.get("right",0)>3 and actor.actor_context.martial.reason("staff_sweep",actor.actor_context)=="武技尚在冷却","Reload cleared real cooldowns")
 	check(entry(restored,"burning").source_id==foe_id and float(entry(restored,"burning").source_magic)==original_magic,"Reload lost damage identity/strength")
 	foe=game.session.actor_for_id(foe_id) as Enemy
@@ -102,7 +103,7 @@ func run() -> void:
 	var legacy:=repository.read("user://save_3.sav").data
 	legacy.version=7
 	for record: Dictionary in legacy.extensions[section].foundation.actors.values():
-		record.erase("effects"); record.erase("cooldowns")
+		record.erase("effects"); record.erase("cooldowns"); record.erase("provision_schema")
 	var file:=FileAccess.open("user://save_3.sav",FileAccess.WRITE); file.store_var(legacy); file.close()
 	fixture=Fixture.new(self); game=await fixture.boot(true)
 	buffs=game.player.get_node("BuffManager") as BuffManager

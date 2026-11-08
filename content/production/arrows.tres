@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="ProductionDefinition" load_steps=3 format=3]
+[ext_resource type="Script" path="res://gameplay/foundation/data/production_definition.gd" id="def"]
+[ext_resource type="Resource" path="res://content/crafting/arrows.tres" id="recipe"]
+[resource]
+script = ExtResource("def")
+id = "town.arrows"
+actor_id = "river.merchant"
+recipe = ExtResource("recipe")
+work_hours = 1.0

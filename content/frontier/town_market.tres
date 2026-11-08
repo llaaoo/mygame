@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="MarketDefinition" format=3]
+[ext_resource type="Script" path="res://gameplay/frontier/market_definition.gd" id="def"]
+[resource]
+script = ExtResource("def")
+actor_id = "river.merchant"
+initial_stock = {"coin":160,"metal_scrap":12,"charcoal":6,"sap":6,"crystal":4,"cloth":6,"ration":6,"clean_water":4,"river_sabre":1,"river_spear":1,"river_staff":1,"river_bow":1,"arrow":24,"guard_tonic":2,"clear_tonic":2,"book_spear_thrust":1}
+region_id = "camp"
+position = Vector2(-3210,2200)
+service_range = 150.0

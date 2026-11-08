@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="LearningOffer" format=3]
+[ext_resource type="Script" path="res://gameplay/martial/learning_offer.gd" id="offer"]
+[ext_resource type="Resource" path="res://content/martial/staff_sweep.tres" id="technique"]
+[ext_resource type="Script" path="res://gameplay/foundation/data/world_condition.gd" id="condition"]
+[sub_resource type="Resource" id="Weapon"]
+script = ExtResource("condition")
+kind = 2
+key = "river_staff"
+quantity = 1
+hint = "携带一把战杖（可已装备）"
+[resource]
+script = ExtResource("offer")
+id = "staff_sweep"
+technique = ExtResource("technique")
+costs = {"coin":8}
+requirements = Array[ExtResource("condition")]([SubResource("Weapon")])

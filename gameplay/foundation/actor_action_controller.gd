@@ -212,7 +212,7 @@ func advance(delta: float) -> void:
 		needs.tick(delta,stats.effective_stat("endurance") if stats else 10,context.rules.is_base(context.region.id,actor.position))
 		NeedsRecovery.apply(actor,needs)
 	multiplier=(.35 if needs.hydration<=20 else 1.0)*(.5 if needs.fatigue>=85 else .75 if needs.fatigue>=60 else 1.0)
-	bonus=(2.0 if needs.water_remaining>0 else 0.0)+(2.0 if needs.meal_remaining>0 else 0.0)+equipment_value("stamina_recovery")
+	bonus=float(needs.recovery().stamina_bonus)+equipment_value("stamina_recovery")
 	stamina.configure(stats.effective_stat("endurance") if stats else 10,multiplier,bonus)
 	stamina.advance(delta,guarding)
 	stability.advance(delta)

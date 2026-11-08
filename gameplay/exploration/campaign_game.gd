@@ -66,11 +66,13 @@ func _bootstrap() -> void:
 	session.name="CampaignSession"
 	add_child(session)
 	session.configure(catalog,rules)
+	session.production.configure(session.inventory,ProductionCatalog.default_catalog(),3600.0/WorldTime.instance.time_scale)
 	progress.condition_query=ConditionQuery.new()
 	progress.condition_query.progress=progress
 	progress.condition_query.items=session.inventory
 	progress.condition_query.relations=session.relations
 	progress.condition_query.regions=catalog.regions
+	session.condition_query=progress.condition_query
 	session.save_requested=_queue_save
 	session.inspect_actor=inspect_actor
 	session.hostility_changed=actor_became_hostile
@@ -341,6 +343,7 @@ func _on_player_died() -> void:
 		return
 	_defeated = true
 	if trial_recorder and trial_recorder.active: trial_recorder.call_deferred("finish", "死亡中断")
+	if player.actor_context: session.mark_dead(player)
 	progress.deaths += 1
 	player.skill_manager.combinations.supplies.clear_selection()
 	player.skill_manager.combinations.cancel("死亡")

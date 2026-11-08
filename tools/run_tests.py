@@ -13,6 +13,7 @@ import time
 ROOT = Path(__file__).resolve().parents[1]
 QUICK = ["save_system", "save_recovery", "skill_catalog", "skill_upgrades", "room_generation"]
 INTEGRATION = [
+    "provision_lifecycle", "production_learning", "extensibility_input",
     "campaign_effects", "inventory_stability", "new_journey",
     "weapon_enchantment", "enchantment_input",
     "counterplay", "counterplay_input", "counterplay_encounters", "combat_tactics", "tactical_ai", "tactics_input", "system_depth", "weapon_actions", "depth_input",

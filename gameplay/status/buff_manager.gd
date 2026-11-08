@@ -21,6 +21,8 @@ var _restoring_campaign := false
 
 func _ready() -> void:
 	attributes = ActorAttributes.new(get_parent())
+	var health:=get_parent().get_node_or_null("HealthComponent") as HealthComponent
+	if health: health.died.connect(_on_actor_died)
 	process_mode = Node.PROCESS_MODE_DISABLED
 	_register_with_simulation()
 
@@ -345,6 +347,53 @@ func clear_temporary(keep_campaign := false) -> void:
 		if not instance.definition.persistent and not (keep_campaign and _campaign_eligible(instance.definition)):
 			_remove(instance, RemovalReason.REGION_CLEANUP)
 
+func _on_actor_died() -> void:
+	# Child readiness installs this before the actor publishes death/recovery.
+	buildup.clear(); _control_immunity.clear()
+	_restoring_campaign=true
+	for instance: StatusInstance in _instances.duplicate():
+		if instance.definition.duration>0 and not instance.definition.survives_death:
+			_remove(instance,RemovalReason.RESTORED)
+	_restoring_campaign=false
+	buffs_changed.emit()
+
+func provision(group: String) -> Dictionary:
+	for instance in _instances:
+		if instance.definition.provision_group==group:
+			return {"id":instance.definition.provision_id,"remaining":instance.remaining}
+	return {"id":"","remaining":0.0}
+
+func set_provision(group: String,id: String,remaining: float,restoring := false) -> void:
+	if group not in ["meal","water","tea"] or not is_finite(remaining): return
+	var previous_restoring:=_restoring_campaign
+	if restoring: _restoring_campaign=true
+	for instance: StatusInstance in _instances.duplicate():
+		if instance.definition.provision_group==group: _remove(instance,RemovalReason.RESTORED)
+	var entry:=ProvisionCatalog.default_catalog().definition(id)
+	if remaining>0 and entry and entry.effect and entry.effect.provision_group==group:
+		if restoring:
+			_serial+=1
+			var instance:=StatusInstance.new(_serial,entry.effect)
+			instance.remaining=minf(remaining,entry.effect.duration); instance.source_resolver=source_resolver
+			_instances.append(instance); _rebuild_attributes()
+		else:
+			apply_buff(entry.effect)
+			var instance:=_find(entry.effect.get_runtime_id())
+			if instance: instance.remaining=minf(remaining,entry.effect.duration)
+	_restoring_campaign=previous_restoring
+	if restoring: buffs_changed.emit()
+
+func provision_recovery() -> Dictionary:
+	var result: Dictionary={"health_bonus":0.0,"mana_bonus":0.0,"stamina_bonus":0.0,"mana_sources":{}}
+	for instance in _instances:
+		var buff:=instance.definition
+		if buff.provision_group.is_empty(): continue
+		result.health_bonus+=buff.health_recovery_bonus
+		result.mana_bonus+=buff.mana_recovery_bonus
+		result.stamina_bonus+=buff.stamina_recovery_bonus
+		result.mana_sources["food" if buff.provision_group=="meal" else buff.provision_group]=buff.mana_recovery_bonus
+	return result
+
 static func _campaign_path(definition: Buff) -> String:
 	return str(definition.get_meta("definition_path",definition.resource_path))
 static func _campaign_eligible(definition: Buff) -> bool:
@@ -364,12 +413,16 @@ func campaign_state() -> Dictionary:
 static func valid_campaign_state(data: Variant) -> bool:
 	if not data is Dictionary or data.get("schema")!=1 or not data.get("entries") is Array or data.entries.size()>64 or not data.get("immunity") is Dictionary or data.immunity.size()>64: return false
 	var unique: Dictionary={}
+	var groups: Dictionary={}
 	for entry in data.entries:
 		if not entry is Dictionary or not entry.get("path") is String or not entry.get("id") is String or not entry.get("source_id","") is String or str(entry.get("source_id","")).length()>256: return false
 		var definition:=campaign_definition(entry.path)
 		if not definition or definition.get_runtime_id()!=entry.id or not entry.get("stacks") is int or entry.stacks<1 or entry.stacks>maxi(64,definition.max_stacks): return false
 		if unique.has(entry.id) and definition.stack_behavior!=Buff.StackBehavior.INDEPENDENT: return false
 		unique[entry.id]=true
+		if not definition.exclusive_group.is_empty():
+			if groups.has(definition.exclusive_group) and groups[definition.exclusive_group]!=entry.id: return false
+			groups[definition.exclusive_group]=entry.id
 		for key in ["duration","remaining","elapsed","source_magic"]:
 			if typeof(entry.get(key)) not in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(entry[key])) or float(entry[key])<0: return false
 		if entry.duration<=0 or entry.duration>86400 or entry.remaining<=0 or entry.remaining>entry.duration or entry.source_magic>1000000: return false
@@ -501,6 +554,7 @@ func prevents_actions() -> bool:
 		if instance.definition.prevents_actions: return true
 	return false
 
+## Frozen legacy projection. Current food/drink definitions use ProvisionCatalog.
 const PROVISION_BUFFS := ["meal_fortitude","broth_fortitude","guard_tonic","clear_tonic"]
 func provision_state() -> Array[Dictionary]:
 	var result: Array[Dictionary]=[]

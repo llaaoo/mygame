@@ -11,6 +11,12 @@ enum StackBehavior { REFRESH, INTENSITY, INDEPENDENT }
 @export var category: Category = Category.BUFF
 @export var exclusive_group: String = ""
 @export var persistent := false
+@export var survives_death := false
+@export var provision_group := ""
+@export var provision_id := ""
+@export var health_recovery_bonus := 0.0
+@export var mana_recovery_bonus := 0.0
+@export var stamina_recovery_bonus := 0.0
 @export var duration: float = 0.0
 @export var tick_interval: float = 0.0
 @export var stack_behavior: StackBehavior = StackBehavior.REFRESH

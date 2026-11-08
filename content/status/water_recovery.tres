@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="Buff" format=3]
+[ext_resource type="Script" path="res://gameplay/status/buff.gd" id="buff"]
+[resource]
+script = ExtResource("buff")
+buff_id = "water_recovery"
+status_id = "water_recovery"
+display_name = "饮水恢复"
+exclusive_group = "water"
+persistent = true
+duration = 120.0
+provision_group = "water"
+provision_id = "clean_water"
+health_recovery_bonus = 0.0
+mana_recovery_bonus = 0.5
+stamina_recovery_bonus = 2.0

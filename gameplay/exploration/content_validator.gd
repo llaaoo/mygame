@@ -8,6 +8,10 @@ func _fail(resource: Resource, message: String) -> void:
 
 func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 	failures.clear()
+	for definitions in [ProvisionCatalog.default_catalog(),ProductionCatalog.default_catalog(),MartialCatalog.default_catalog(),TrainingCatalog.default_catalog()]:
+		for error in definitions.validate(): _fail(definitions,error)
+	var market:=load("res://content/frontier/town_market.tres") as MarketDefinition
+	if not market or not market.valid(): _fail(market,"Invalid market stock definition")
 	if not _validate_entries(catalog.chapter):
 		return failures.duplicate()
 	var supplies := CastingSupplies.new()
