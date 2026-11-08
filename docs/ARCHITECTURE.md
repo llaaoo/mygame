@@ -78,3 +78,5 @@ UI可以调用领域服务请求训练、制造、交付或施法，由服务验
 2026-11-07：实时界面与物品管理见[REALTIME_INVENTORY](REALTIME_INVENTORY.md)。`QuickslotMaterials`统一按槽选材查询/请求，`InventoryActions`注入库存管理权限与保存行为，`GroundItems`只投影库存cache；UI不持有第二份绑定或战利品。菜单仅接管输入，`ActorActionController.advance`与世界保持运行。
 
 实时首玩复测补强见[游玩循环审查](GRAYRIVER_LOOP_REVIEW.md)。`CombatExecutor.defense_resolved`在命中组与资源结算完成后广播只读防御结果，由注入执行器的伤害文字组件展示；不把表现事件用于扣款或伤害。空`ground.*`容器由库存事务回收，独立落地身份不会在当前会话重用。
+
+2026-11-08：[状态、生产与知识扩展](SYSTEM_EXTENSIBILITY.md)明确食品时钟与死亡策略、纯值排产状态、原子库存加工和武技/课程Resource目录；内容登记与失败边界见[接入指南](CONTENT_AUTHORING.md)。`TownServices`只装配商店/训练师配置与UI，排产、知识、库存仍各有唯一权威。

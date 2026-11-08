@@ -637,6 +637,24 @@ func trade_instance(buyer: String,seller: String,uid: String,quantity: int,price
 	_publish("trade_committed",buyer,{"partner":seller,"uid":uid,"quantity":quantity,"price":price})
 	return OperationResult.success(quantity)
 
+func preview_craft(actor: String,costs: Dictionary,outputs: Dictionary) -> OperationResult:
+	return _craft(actor,costs,outputs,false)
+func craft_batch(actor: String,costs: Dictionary,outputs: Dictionary) -> OperationResult:
+	return _craft(actor,costs,outputs,true)
+func _craft(actor: String,costs: Dictionary,outputs: Dictionary,commit_result: bool) -> OperationResult:
+	if not has_container(actor+".pack") or costs.is_empty() or outputs.is_empty(): return OperationResult.reject("invalid_recipe")
+	for group in [costs,outputs]:
+		for key in group:
+			if not key is String or not definitions.has(key) or not group[key] is int or group[key]<1 or group[key]>999: return OperationResult.reject("invalid_recipe")
+	var scratch:=_scratch([actor])
+	if not scratch.pay(actor,costs): return OperationResult.reject("materials")
+	for key in outputs:
+		if scratch.receive(actor,key,outputs[key])!=outputs[key]: return OperationResult.reject("capacity")
+	if commit_result:
+		_adopt(scratch,[actor])
+		_publish("craft_committed",actor,{"inputs":costs.duplicate(),"outputs":outputs.duplicate()})
+	return OperationResult.success()
+
 func dismantle_instance(actor: String,uid: String) -> OperationResult:
 	var entry:=item(uid)
 	if not entry or not definitions.get(entry.definition_id) is EquipmentData or locate(uid) not in actor_containers(actor): return OperationResult.reject("unequip_first")

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="TrainingCatalog" load_steps=8 format=3]
+[ext_resource type="Script" path="res://gameplay/martial/training_catalog.gd" id="catalog"]
+[ext_resource type="Script" path="res://gameplay/martial/learning_offer.gd" id="def"]
+[ext_resource type="Resource" path="res://content/training/blade_breaker.tres" id="blade_breaker"]
+[ext_resource type="Resource" path="res://content/training/spear_thrust.tres" id="spear_thrust"]
+[ext_resource type="Resource" path="res://content/training/staff_sweep.tres" id="staff_sweep"]
+[ext_resource type="Resource" path="res://content/training/bow_aim.tres" id="bow_aim"]
+[ext_resource type="Resource" path="res://content/foundation/trainer_schedule.tres" id="schedule"]
+[resource]
+script = ExtResource("catalog")
+offers = Array[ExtResource("def")]([ExtResource("blade_breaker"), ExtResource("spear_thrust"), ExtResource("staff_sweep"), ExtResource("bow_aim")])
+schedule = ExtResource("schedule")
+actor_id = "river.enemy.service.trainer"
+work_position = Vector2(-3300,2350)
+rest_position = Vector2(-3960,2680)

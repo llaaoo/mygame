@@ -2,7 +2,7 @@ class_name SaveRepository
 extends RefCounted
 ## Owns file validation, migration and replacement. Never restores gameplay state.
 
-const VERSION := 8
+const VERSION := 9
 enum Status { MISSING, VALID, RECOVERED, INVALID, UNSUPPORTED_VERSION, IO_ERROR }
 var section_validators: Dictionary = {}
 
@@ -95,6 +95,9 @@ func migrate(raw: Dictionary) -> Dictionary:
 				data["extensions"]=data.get("extensions",{})
 			7:
 				# Campaign effects/cooldowns are optional on older actor records.
+				data["extensions"]=data.get("extensions",{})
+			8:
+				# Bound provision clocks and production orders require the v9 reader.
 				data["extensions"]=data.get("extensions",{})
 		version += 1
 		data["version"] = version

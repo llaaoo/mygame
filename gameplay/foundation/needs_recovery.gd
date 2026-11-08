@@ -11,4 +11,4 @@ static func apply(actor: Node2D,needs: SurvivalNeeds) -> void:
 	if mana:
 		mana.regen_multiplier=recovery.mana_multiplier
 		mana.regen_bonus=recovery.mana_bonus
-		mana.regen_bonus_sources={"food":.5 if needs.meal=="broth" and needs.meal_remaining>0 else 0.0,"water":.5 if needs.water_remaining>0 else 0.0,"tea":1.0 if needs.tea_remaining>0 else 0.0}
+		mana.regen_bonus_sources=recovery.mana_sources.duplicate()

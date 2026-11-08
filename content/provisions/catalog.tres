@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ProvisionCatalog" load_steps=8 format=3]
+[ext_resource type="Script" path="res://gameplay/exploration/survival/provision_catalog.gd" id="catalog"]
+[ext_resource type="Script" path="res://gameplay/exploration/survival/provision_definition.gd" id="def"]
+[ext_resource type="Resource" path="res://content/provisions/ration.tres" id="ration"]
+[ext_resource type="Resource" path="res://content/provisions/broth.tres" id="broth"]
+[ext_resource type="Resource" path="res://content/provisions/clean_water.tres" id="clean_water"]
+[ext_resource type="Resource" path="res://content/provisions/tea.tres" id="tea"]
+[ext_resource type="Resource" path="res://content/provisions/dirty_water.tres" id="dirty_water"]
+[resource]
+script = ExtResource("catalog")
+provisions = Array[ExtResource("def")]([ExtResource("ration"), ExtResource("broth"), ExtResource("clean_water"), ExtResource("tea"), ExtResource("dirty_water")])

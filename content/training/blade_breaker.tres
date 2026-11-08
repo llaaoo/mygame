@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="LearningOffer" format=3]
+[ext_resource type="Script" path="res://gameplay/martial/learning_offer.gd" id="offer"]
+[ext_resource type="Resource" path="res://content/martial/blade_breaker.tres" id="technique"]
+[resource]
+script = ExtResource("offer")
+id = "blade_breaker"
+technique = ExtResource("technique")
+costs = {"coin":8}

@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ProvisionDefinition" load_steps=3 format=3]
+[ext_resource type="Script" path="res://gameplay/exploration/survival/provision_definition.gd" id="def"]
+[ext_resource type="Resource" path="res://content/status/tea_recovery.tres" id="effect"]
+[resource]
+script = ExtResource("def")
+id = "tea"
+nutrition = 0.0
+hydration = 25.0
+fatigue = -15.0
+seconds = 0.5
+description = "0.5秒饮用；饮水+25、疲劳-15；解除当前中毒，150秒法力回复+1/秒；不提供持续毒免疫。"
+effect = ExtResource("effect")

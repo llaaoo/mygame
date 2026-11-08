@@ -2,24 +2,30 @@ class_name TownServices
 extends RefCounted
 ## Chapter adapter: proximity and service presentation. Inventory owns all mutations.
 const MERCHANT := "river.merchant"
-const STOCK := {"coin":160,"metal_scrap":12,"charcoal":6,"sap":6,"crystal":4,"cloth":6,"ration":6,"clean_water":4,"river_sabre":1,"river_spear":1,"river_staff":1,"river_bow":1,"arrow":24,"guard_tonic":2,"clear_tonic":2,"book_spear_thrust":1}
+static var STOCK: Dictionary:
+	get: return (load("res://content/frontier/town_market.tres") as MarketDefinition).initial_stock.duplicate()
 const ERRORS := {"not_owned":"物品已离开原来的容器。","payment_or_capacity":"货币不足，或对方没有空间接收付款。","capacity":"容器空间不足，未扣除物品或货币。","materials":"货币或金属碎料不足。","maximum_level":"已达到最高强化等级。","unequip_first":"请先卸下这件装备，再带来整修。"}
 const POINT := Vector2(-3210,2200)
 const W := preload("res://gameplay/foundation/ui/widgets.gd")
 var game: GrayriverGame
+var market: MarketDefinition
+var training: TrainingCatalog
 var _screen: ExpeditionScreen
 var _selling := true
-func _init(owner_game: GrayriverGame) -> void: game=owner_game
+func _init(owner_game: GrayriverGame,market_profile: MarketDefinition=null,training_profile: TrainingCatalog=null) -> void:
+	game=owner_game
+	market=market_profile if market_profile else load("res://content/frontier/town_market.tres") as MarketDefinition
+	training=training_profile if training_profile else TrainingCatalog.default_catalog()
 func ensure_stock() -> void:
 	var store:=game.session.inventory
-	if store.has_container(MERCHANT+".pack"): return
-	store.ensure_actor(MERCHANT)
+	if store.has_container(market.actor_id+".pack"): return
+	store.ensure_actor(market.actor_id)
 	store.begin_batch()
-	for id in STOCK:
-		store.receive(MERCHANT,id,int(STOCK[id]),true)
+	for id in market.initial_stock:
+		store.receive(market.actor_id,id,int(market.initial_stock[id]),true)
 	store.end_batch()
 func reason() -> String:
-	if game.region_id!="camp" or game.player.global_position.distance_to(POINT)>150: return "请靠近镇中整修铺。"
+	if game.region_id!=market.region_id or game.player.global_position.distance_to(market.position)>market.service_range: return "请靠近镇中整修铺。"
 	if game.has_hostiles_near(game.player.global_position) or game.player.actor_context.actions.busy(): return "先结束战斗与动作。"
 	return ""
 func price(uid: String,buying: bool) -> int:
@@ -35,7 +41,7 @@ func transact(uid: String,selling: bool) -> OperationResult:
 	var store:=game.session.inventory
 	var item:=store.item(uid)
 	if not item or item.definition_id=="coin": return OperationResult.reject("不可交易")
-	return store.trade_instance(MERCHANT if selling else "player","player" if selling else MERCHANT,uid,1,price(uid,not selling))
+	return store.trade_instance(market.actor_id if selling else "player","player" if selling else market.actor_id,uid,1,price(uid,not selling))
 func salvage(uid: String,upgrade: bool) -> OperationResult:
 	if not reason().is_empty(): return OperationResult.reject(reason())
 	return game.session.inventory.upgrade_instance("player",uid) if upgrade else game.session.inventory.dismantle_instance("player",uid)
@@ -47,6 +53,7 @@ func show(selling := true) -> void:
 	_screen.get_node("Navigation/Caption").text="整修铺"
 	_screen.tabs.add_child(W.button("出售 / 拆解 / 强化",show.bind(true)))
 	_screen.tabs.add_child(W.button("购买实物",show.bind(false)))
+	_screen.tabs.add_child(W.button("店内排产",show_production))
 	_screen.search.text_changed.connect(func(query: String): _rows(query))
 	var hint:=W.label("交易库存有限；装备先卸下再整修。整修保留同一件实物，涂层不会重置。",12,true)
 	hint.size_flags_horizontal=Control.SIZE_EXPAND_FILL
@@ -56,8 +63,8 @@ func show(selling := true) -> void:
 func _rows(query: String) -> void:
 	W.clear(_screen.rows); W.clear(_screen.detail)
 	var store:=game.session.inventory
-	_screen.status.text="随身河谷币 %d · 店家河谷币 %d · 金属碎料 %d"%[store.count("player","coin"),store.count(MERCHANT,"coin"),store.count("player","metal_scrap")]
-	for container in store.actor_containers("player" if _selling else MERCHANT):
+	_screen.status.text="随身河谷币 %d · 店家河谷币 %d · 金属碎料 %d"%[store.count("player","coin"),store.count(market.actor_id,"coin"),store.count("player","metal_scrap")]
+	for container in store.actor_containers("player" if _selling else market.actor_id):
 		for row in store.entries(container):
 			var definition:=store.definitions[row.definition] as ItemData
 			if row.definition=="coin" or not query.is_empty() and not definition.display_name.contains(query): continue
@@ -88,26 +95,77 @@ func _request(method: String,uid: String) -> void:
 	_rows(_screen.search.text)
 
 func show_training() -> void:
-	var npc:=game.session.actor_for_id("river.enemy.service.trainer")
-	if not is_instance_valid(npc) or npc.global_position.distance_to(game.player.global_position)>150 or not npc.working: game.ui.notify("请靠近当值的训练师。"); return
+	var npc:=game.session.actor_for_id(training.actor_id)
+	if not is_instance_valid(npc) or npc.health_component.is_dead or game.session.relations.attitude(npc.actor_context.id,"player")=="hostile" or npc.global_position.distance_to(game.player.global_position)>150 or not npc.working: game.ui.notify("请靠近当值的训练师。"); return
 	var options: Array[Dictionary]=[]
-	for id in MartialArts.IDS:
-		var data:=MartialArts.definition(id)
-		var known: bool=game.player.actor_context.martial.learned.has(id)
-		options.append({"title":data.title+(" · 已学会" if known else " · %d币"%data.price),"disabled":known,"callback":_teach.bind(id)})
+	for offer in training.offers:
+		var data:=offer.technique
+		var known: bool=game.player.actor_context.martial.learned.has(data.id)
+		var refused:=TechniqueLearning.reason(offer,game.player.actor_context)
+		var price_text:=game.player.skill_manager.combinations.supplies.describe_cost(offer.costs)
+		if offer.costs.size()==1 and offer.costs.has("coin"): price_text="%d币"%offer.costs.coin
+		options.append({"title":data.title+(" · 已学会" if known else " · "+price_text)+(_requirements_hint(offer) if not known else ""),"disabled":not refused.is_empty(),"callback":_teach.bind(offer.id)})
 	options.append({"title":"分配已有属性点","callback":game.presenter._show_training})
 	game.ui.show_panel("武技训练师","武技消耗体力与对应武器资源，不消耗MP。购买只解锁知识；到K的武技页亲手绑定快捷键。刀破势、矛控距、杖压制、弓蓄射各有起手与恢复风险。",options)
 func _teach(id: String) -> void:
-	var npc:=game.session.actor_for_id("river.enemy.service.trainer")
+	var npc:=game.session.actor_for_id(training.actor_id)
 	var context:=game.player.actor_context
-	var data:=MartialArts.definition(id)
-	if not is_instance_valid(npc) or not npc.working or npc.global_position.distance_to(game.player.global_position)>150 or game.has_hostiles_near(game.player.global_position) or context.actions.busy() or not data or context.martial.learned.has(id): return
-	var store:=game.session.inventory
-	store.begin_batch()
-	if store.exchange("player","river.enemy.service.trainer",{"coin":data.price},{}).accepted:
-		context.martial.learn(id)
-		game.session.facts.publish("technique_learned","player",{"id":id,"source":"trainer"})
-	else: game.ui.notify("河谷币或对方容器空间不足。")
-	store.end_batch()
-	game._save_progress()
-	show_training()
+	var offer:=training.offer(id)
+	if not is_instance_valid(npc) or npc.health_component.is_dead or game.session.relations.attitude(npc.actor_context.id,"player")=="hostile" or not npc.working or npc.global_position.distance_to(game.player.global_position)>150 or game.has_hostiles_near(game.player.global_position) or context.actions.busy() or not offer: return
+	var result:=TechniqueLearning.purchase(offer,context,training.actor_id)
+	if not result.accepted: game.ui.notify(str(ERRORS.get(result.reason,result.reason)))
+	game._save_progress(); show_training()
+func _requirements_hint(offer: LearningOffer) -> String:
+	var parts: PackedStringArray=[]
+	for requirement in offer.requirements: parts.append(requirement.hint)
+	var refused:=game.player.actor_context.martial.learn_reason(offer.technique.id)
+	if not refused.is_empty() and refused!="已学会": parts.append(refused)
+	return "\n"+"；".join(parts) if not parts.is_empty() else ""
+
+func show_production() -> void:
+	if not reason().is_empty(): game.ui.notify(reason()); return
+	game.session.production.advance()
+	var screen:=preload("res://gameplay/foundation/ui/expedition_screen.tscn").instantiate() as ExpeditionScreen
+	screen.get_node("Navigation/Caption").text="店内排产"
+	screen.search.placeholder_text="搜索配方或原料…"
+	screen.status.text="原料与成品属于店家 · 可出售采集材料供货，再购买真实成品"
+	screen.footer.add_child(W.button("回到整修铺",show.bind(false)))
+	var live_rows: Array[Dictionary]=[]
+	for definition in game.session.production.catalog.entries:
+		if definition.actor_id!=market.actor_id: continue
+		var title:=game.player.skill_manager.combinations.supplies.title(definition.recipe.output_id)
+		var card:=W.card(screen.rows,title+" ×%d"%definition.recipe.output_count,"每批%.0f游戏小时"%definition.work_hours)
+		var input_label:=W.label("",14,true); card.add_child(input_label)
+		var label:=W.label("",14,true); card.add_child(label)
+		var button:=W.button("",Callable()); card.add_child(button)
+		button.pressed.connect(func(): _production_request(definition.id,bool(button.get_meta("cancel_order",false))))
+		var row: Dictionary={"id":definition.id,"title":title,"label":label,"button":button,"inputs":input_label,"host":card.get_parent(),"search":title+game.player.skill_manager.combinations.supplies.describe_cost(definition.recipe.inputs)}
+		live_rows.append(row); _refresh_production_row(row)
+	screen.search.text_changed.connect(func(query: String):
+		for row in live_rows: row.host.visible=query.is_empty() or str(row.search).contains(query))
+	var timer:=Timer.new(); timer.wait_time=1; timer.autostart=true; screen.add_child(timer)
+	timer.timeout.connect(func():
+		for row in live_rows: _refresh_production_row(row))
+	screen.detail.add_child(W.label("排产不预扣原料、不预留货品。工期完成时检查店家真实库存并加工；缺料或满库会等候，恢复后重新计工期。停止不会扣原料；已完成成品留在店内。休息推进工期，离线不推进，不会补满货物或生成河谷币。",14,true))
+	game.ui.show_view("整修铺 · 店内排产",screen)
+func _refresh_production_row(row: Dictionary) -> void:
+	var state:=game.session.production.status(row.id)
+	var definition:=game.session.production.catalog.definition(row.id)
+	var inputs: PackedStringArray=[]
+	for key in definition.recipe.inputs:
+		inputs.append("%s ×%d（店存%d）"%[game.player.skill_manager.combinations.supplies.title(key),definition.recipe.inputs[key],game.session.inventory.count(definition.actor_id,key)])
+	row.inputs.text="原料："+" · ".join(inputs)
+	var detail: String="未排产"
+	if state.scheduled:
+		detail="等候原料/库容；恢复后重新计工期" if state.blocked else "剩余%.1f游戏小时 · %d批"%[state.remaining*WorldTime.instance.time_scale/3600.0,state.batches]
+	if not str(state.reason).is_empty(): detail+=" · "+str({"materials":"缺少配方原料","capacity":"成品库容不足"}.get(state.reason,state.reason))
+	row.label.text="店存%d · "%state.stock+detail
+	row.button.text="停止排产" if state.scheduled else "安排一批 · "+str(row.title)
+	row.button.set_meta("cancel_order",state.scheduled)
+func _production_request(id: String,cancel_order: bool) -> void:
+	if not reason().is_empty(): game.ui.notify(reason()); return
+	if cancel_order: game.session.production.cancel(id)
+	else:
+		var result:=game.session.production.start(id)
+		if not result.accepted: game.ui.notify(result.reason)
+	game._save_progress(); show_production()

@@ -51,6 +51,7 @@ func run() -> void:
 	player.actor_context.martial.learn("staff_sweep"); player.skill_manager.shortcuts.bind_technique("quick_e","staff_sweep")
 	(player.get_node("BuffManager") as BuffManager).apply_buff(load("res://content/spell_operations/statuses/toxin.tres"),player)
 	stock.clock_seconds+=100
+	check(game.session.production.start("town.arrows").accepted,"Restart production fixture failed")
 	game._save_progress()
 	var independent: String="user://save_2.sav"; repository.write(independent,payload("independent"))
 	var independent_bytes:=FileAccess.get_file_as_bytes(independent)
@@ -72,6 +73,7 @@ func run() -> void:
 	check(not game.progress.claims.has("test.previous") and not game.progress.actions.has("water_call") and game.progress.waypoint.is_empty() and not game.progress.choices.has("river.rehearsal"),"Restart retained old knowledge/world state")
 	check(player.stats_component.level==1 and player.stats_component.attribute_points==0 and player.actor_context.martial.learned.is_empty(),"Restart retained growth or martial knowledge")
 	check(stock.item(old_uid)==null and stock.count("player","coin")==0 and (player.get_node("BuffManager") as BuffManager).campaign_state().entries.is_empty(),"Restart retained old equipment, money or effects")
+	check(game.session.production.snapshot().jobs.is_empty(),"Restart retained old production orders")
 	check(stock.clock_seconds<10 and game.is_at_base() and player.actor_context.actions.mode=="idle","Restart retained old time/location/action")
 	check(player.skill_manager.shortcuts.binding("quick_e").get("kind","")!="technique" and player.skill_manager.combinations.cooldowns.is_empty(),"Restart retained bindings or cooldowns")
 	var fresh:=stock.snapshot_owners(["player"])

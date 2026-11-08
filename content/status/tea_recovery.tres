@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="Buff" format=3]
+[ext_resource type="Script" path="res://gameplay/status/buff.gd" id="buff"]
+[resource]
+script = ExtResource("buff")
+buff_id = "tea_recovery"
+status_id = "tea_recovery"
+display_name = "醒神茶"
+exclusive_group = "tea"
+persistent = true
+duration = 150.0
+cleanse_statuses = Array[String](["poison"])
+provision_group = "tea"
+provision_id = "tea"
+health_recovery_bonus = 0.0
+mana_recovery_bonus = 1.0
+stamina_recovery_bonus = 0.0

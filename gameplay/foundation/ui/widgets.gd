@@ -15,7 +15,7 @@ static func button(text: String, action: Callable, disabled := false) -> Button:
 	node.disabled = disabled
 	node.tooltip_text = text
 	GameUIStyle.apply_button(node)
-	node.pressed.connect(action)
+	if action.is_valid(): node.pressed.connect(action)
 	return node
 static func card(host: Node, title: String, subtitle := "") -> VBoxContainer:
 	var panel := PanelContainer.new()

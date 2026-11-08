@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ProvisionDefinition" load_steps=3 format=3]
+[ext_resource type="Script" path="res://gameplay/exploration/survival/provision_definition.gd" id="def"]
+[ext_resource type="Resource" path="res://content/status/water_recovery.tres" id="effect"]
+[resource]
+script = ExtResource("def")
+id = "clean_water"
+nutrition = 0.0
+hydration = 40.0
+fatigue = 0.0
+seconds = 1.0
+description = "饮水+40，120秒法力回复+0.5/秒；同类饮水刷新，不叠加。"
+effect = ExtResource("effect")

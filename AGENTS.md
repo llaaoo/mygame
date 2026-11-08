@@ -92,6 +92,7 @@
 
 - [README](README.md)：当前入口、启动方式与操作。
 - [架构边界](docs/ARCHITECTURE.md)、[运行时拓扑](docs/RUNTIME_TOPOLOGY.md)：职责与时序。
+- [内容接入与扩展](docs/CONTENT_AUTHORING.md)：食品/状态、武技前置与课程、真实库存排产的Resource登记、生命周期和校验。
 - [RPG基座](docs/RPG_FOUNDATION.md)：共同角色规则、库存所有权与场景组合。
 - [物品动作与真实来源](docs/ITEM_ACTIONS_AND_REACTIONS.md)：最新涂附、投掷、喷洒、调谐、汲取及存档规则。
 - [战斗契约](docs/COMBAT_CONTRACTS.md)、[世界契约](docs/WORLD_CONTRACTS.md)：命中、事务与世界领域边界。

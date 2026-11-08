@@ -2,8 +2,11 @@ class_name CampaignSession
 extends Node
 ## Composition/lifetime owner. Content adapters bind callbacks; domain objects receive capabilities.
 var rules: RulesetDefinition
+var condition_query: ConditionQuery
 var region:=RegionContext.new()
 var inventory:=InventoryService.new()
+var production:=ProductionService.new()
+var _production_time := 0.0
 var facts:=GameplayFacts.new()
 var relations:=RelationService.new()
 var actor_records: Dictionary={}
@@ -56,6 +59,7 @@ func restore(data: Dictionary) -> bool:
 	state=data.duplicate(true)
 	inventory.clock_seconds=float(data.get("clock_seconds",0))
 	if data.has("inventory"): inventory.restore(data.inventory)
+	production.restore(data.get("production",{}))
 	actor_records=data.get("actors",{}).duplicate(true)
 	proficiency=data.get("proficiency",{}).duplicate(true)
 	if data.has("relations"): relations.restore(data.relations)
@@ -65,6 +69,9 @@ func bind_actor(actor: CharacterBody2D,id: String,legacy_counts: Dictionary = {}
 	if not persistent: id="trial.%d.%s"%[region.generation,id]
 	context.actor=actor; context.id=id; context.rules=rules; context.region=region
 	context.items=inventory; context.facts=facts; context.relations=relations
+	context.learning_query=ConditionQuery.new()
+	context.learning_query.actor_id=id; context.learning_query.items=inventory; context.learning_query.relations=relations
+	if condition_query: context.learning_query.progress=condition_query.progress; context.learning_query.regions=condition_query.regions
 	context.reward_eligible=bool(actor.get("rewards_enabled")) if "rewards_enabled" in actor else true
 	context.persistent=persistent
 	context.loot_eligible=rules.physical_inventory and persistent and id!="player"
@@ -113,6 +120,7 @@ func bind_actor(actor: CharacterBody2D,id: String,legacy_counts: Dictionary = {}
 		if manager: manager.bind_inventory(inventory,id)
 		if "inventory" in actor and actor.inventory: actor.inventory.bind_container(inventory,id+".pack")
 	if rules.physical_inventory and actor_records.has(id): _restore_actor(actor,actor_records[id])
+	else: context.actions.needs.bind_effects(actor.get_node("BuffManager"),true)
 	if rules.material_operations: actor.get_node("SkillManager").enable_material_operations()
 	if rules.tactical_combat and actor is Player:
 		actor.state_machine.process_mode=Node.PROCESS_MODE_DISABLED
@@ -144,6 +152,7 @@ func _restore_actor(actor: CharacterBody2D,record: Dictionary) -> void:
 		buffs.restore_campaign_state({"schema":1,"entries":[],"immunity":{}})
 		buffs.restore_provisions(record.get("provisions",[]))
 	buffs.buildup.restore(record.get("buildup",{}))
+	actor.actor_context.actions.needs.bind_effects(buffs,not record.has("provision_schema"))
 	actor.get_node("SkillManager").restore_campaign_cooldowns(record.get("cooldowns",{}),away)
 	if away>0: _pending_effect_time[actor.actor_context.id]=away
 	if away>0: actor.actor_context.actions.needs.tick(away,actor.get_node("StatsComponent").effective_stat("endurance"),rules.is_base(record.region,actor.position))
@@ -173,12 +182,15 @@ func capture_actors() -> void:
 		if not is_instance_valid(actor) or actor.is_queued_for_deletion() or not actor.actor_context.persistent: continue
 		var health:=actor.get_node("HealthComponent") as HealthComponent
 		if health.is_dead: continue
-		var mana:=actor.get_node_or_null("ManaComponent") as ManaComponent
-		actor_records[id]={"effects":(actor.get_node("BuffManager") as BuffManager).campaign_state(),"cooldowns":actor.get_node("SkillManager").campaign_cooldowns(),"buildup":(actor.get_node("BuffManager") as BuffManager).buildup.snapshot(),"updated_at":inventory.clock_seconds,"hp":health.hp,"mp":mana.mp if mana else 0,"position":[actor.position.x,actor.position.y],"region":region.id,"stamina":actor.actor_context.actions.stamina.snapshot(),"needs":actor.actor_context.actions.needs.serialize(),"martial":actor.actor_context.martial.snapshot(),"provisions":(actor.get_node("BuffManager") as BuffManager).provision_state(),"truce":bool(actor.story_truce) if "story_truce" in actor else false,"dead":false}
+		actor_records[id]=_actor_record(actor)
+func _actor_record(actor: CharacterBody2D) -> Dictionary:
+	var health:=actor.get_node("HealthComponent") as HealthComponent
+	var mana:=actor.get_node_or_null("ManaComponent") as ManaComponent
+	return {"provision_schema":1,"effects":(actor.get_node("BuffManager") as BuffManager).campaign_state(),"cooldowns":actor.get_node("SkillManager").campaign_cooldowns(),"buildup":(actor.get_node("BuffManager") as BuffManager).buildup.snapshot(),"updated_at":inventory.clock_seconds,"hp":health.hp,"mp":mana.mp if mana else 0,"position":[actor.position.x,actor.position.y],"region":region.id,"stamina":actor.actor_context.actions.stamina.snapshot(),"needs":actor.actor_context.actions.needs.serialize(),"martial":actor.actor_context.martial.snapshot(),"provisions":(actor.get_node("BuffManager") as BuffManager).provision_state(),"truce":bool(actor.story_truce) if "story_truce" in actor else false,"dead":health.is_dead}
 func snapshot() -> Dictionary:
 	capture_actors()
 	if sync_extra.is_valid(): sync_extra.call()
-	return {"schema":1,"clock_seconds":inventory.clock_seconds,"shortcut_schema":1,"inventory":persistent_inventory(),"actors":actor_records.duplicate(true),"relations":relations.snapshot(),"proficiency":proficiency.duplicate(true)}
+	return {"schema":1,"clock_seconds":inventory.clock_seconds,"shortcut_schema":1,"production":production.snapshot(),"inventory":persistent_inventory(),"actors":actor_records.duplicate(true),"relations":relations.snapshot(),"proficiency":proficiency.duplicate(true)}
 func leave_region() -> void:
 	capture_actors()
 	for id in actors.keys():
@@ -223,7 +235,8 @@ func mark_dead(actor: CharacterBody2D) -> void:
 	if not actor.actor_context.persistent: return
 	var id: String=actor.actor_context.id
 	if actor_records.get(id,{}).get("dead",false): return
-	actor_records[id]={"dead":true,"hp":0,"region":region.id,"position":[actor.position.x,actor.position.y]}
+	actor_records[id]=_actor_record(actor)
+	actor_records[id].dead=true; actor_records[id].hp=0
 	facts.publish("actor_died",id,{"region":region.id,"reward_eligible":actor.actor_context.reward_eligible})
 	if actor.actor_context.loot_eligible and death_handler.is_valid(): death_handler.call(actor)
 func drop_pack(actor_id: String) -> bool:
@@ -300,6 +313,7 @@ static func valid_snapshot(data: Variant) -> bool:
 	if not data is Dictionary: return false
 	if data.is_empty(): return true
 	if typeof(data.get("clock_seconds",0)) not in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(data.get("clock_seconds",0))) or data.get("clock_seconds",0)<0 or data.get("clock_seconds",0)>1000000000: return false
+	if not ProductionService.valid_snapshot(data.get("production",{})): return false
 	if data.has("shortcut_schema") and (not data.shortcut_schema is int or data.shortcut_schema!=1): return false
 	if data.has("belt"):
 		if not data.belt is Array or data.belt.size()!=4: return false
@@ -311,6 +325,7 @@ static func valid_snapshot(data: Variant) -> bool:
 		var record=data.actors[id]
 		if not id is String or not record is Dictionary or not record.get("hp") is int or record.hp<0 or record.hp>100000 or not record.get("dead") is bool or not record.get("region") is String: return false
 		if not SurvivalNeeds.valid(record.get("needs",{})) or not MartialArts.valid(record.get("martial",{})) or not BuffManager.valid_provisions(record.get("provisions",[])) or not StatusBuildup.valid(record.get("buildup",{})): return false
+		if record.has("provision_schema") and (not record.provision_schema is int or record.provision_schema!=1): return false
 		if record.has("effects") and not BuffManager.valid_campaign_state(record.effects): return false
 		if not SkillManager.valid_campaign_cooldowns(record.get("cooldowns",{})): return false
 		if typeof(record.get("updated_at",0)) not in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(record.get("updated_at",0))) or record.get("updated_at",0)<0 or record.get("updated_at",0)>data.get("clock_seconds",0): return false
@@ -384,7 +399,12 @@ func mount_actor(scene: PackedScene,id: String,position: Vector2,configure_actor
 	return actor
 
 func _process(delta: float) -> void:
-	if rules and rules.physical_inventory and region.available(): inventory.clock_seconds+=delta
+	if rules and rules.physical_inventory and region.available():
+		inventory.clock_seconds+=delta
+		_production_time+=delta
+		if _production_time>=1:
+			_production_time=0
+			production.advance()
 func restore_shortcuts(actor: Player) -> void:
 	if int(state.get("shortcut_schema",0))==1: return
 	var previous: Array=state.get("belt",[{"id":"ration"},{"id":"clean_water"},{"id":"tea"},{"id":"broth"}])
@@ -437,6 +457,7 @@ func execute_item_request(actor_id: String,request: Action) -> bool:
 func advance_rest_time(seconds: float) -> void:
 	if not is_finite(seconds) or seconds<=0: return
 	inventory.clock_seconds+=seconds
+	production.advance()
 	for id in actors:
 		var actor:=actor_for_id(id)
 		if not is_instance_valid(actor) or id=="player": continue

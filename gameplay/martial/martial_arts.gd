@@ -1,14 +1,30 @@
 class_name MartialArts
 extends RefCounted
 ## Actor-owned knowledge and physical cooldowns. No spell instances or mana costs.
-const IDS := ["blade_breaker","spear_thrust","staff_sweep","bow_aim"]
+static var IDS: Array[String]:
+	get: return MartialCatalog.default_catalog().ids()
+var catalog: MartialCatalog
 var learned: Dictionary={}
 var ready_at: Dictionary={}
 static func definition(id: String) -> MartialTechnique:
-	return load("res://content/martial/%s.tres"%id) as MartialTechnique if id in IDS else null
+	return MartialCatalog.default_catalog().definition(id)
 func learn(id: String) -> bool:
-	if not definition(id) or learned.has(id): return false
+	if not learn_reason(id).is_empty(): return false
 	learned[id]=true; return true
+func learn_reason(id: String) -> String:
+	var definitions:=catalog if catalog else MartialCatalog.default_catalog()
+	var data:=definitions.definition(id)
+	if not data: return "未知武技"
+	if learned.has(id): return "已学会"
+	for required in data.prerequisites:
+		if not learned.has(required):
+			var entry:=definitions.definition(required)
+			return "先学习："+(entry.title if entry else "前置武技")
+	if not data.exclusive_group.is_empty():
+		for known in learned:
+			var entry:=definitions.definition(known)
+			if entry and entry.exclusive_group==data.exclusive_group: return "已选择互斥专精："+entry.title
+	return ""
 func reason(id: String,context: ActorContext) -> String:
 	var data:=definition(id)
 	if not data or not learned.has(id): return "尚未学习武技"

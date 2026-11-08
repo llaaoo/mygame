@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ProvisionDefinition" load_steps=3 format=3]
+[ext_resource type="Script" path="res://gameplay/exploration/survival/provision_definition.gd" id="def"]
+[ext_resource type="Resource" path="res://content/status/broth_fortitude.tres" id="effect"]
+[resource]
+script = ExtResource("def")
+id = "broth"
+nutrition = 35.0
+hydration = 20.0
+fatigue = -8.0
+seconds = 1.5
+description = "饱食+35、饮水+20、疲劳-8；240秒耐力+3、生命回复+0.4/秒、法力回复+0.5/秒，替换原食物。"
+effect = ExtResource("effect")
