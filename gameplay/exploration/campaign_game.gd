@@ -29,6 +29,7 @@ var _save_dirty: bool:
 	get: return progress_service._save_dirty if progress_service else false
 var persistence_enabled := true
 var ready_for_play := false
+var _restarting := false
 var quests: Array[ExplorationQuestData] = []
 var equipment_service: ExpeditionEquipment
 var inventory_actions: InventoryActions
@@ -294,6 +295,7 @@ func _change_region(destination: String, arrival: Vector2 = Vector2.INF) -> void
 	player.ui_blocked = false
 	_switching = false
 	_update_objective()
+	session.finish_effect_restoration()
 	region_changed.emit(destination)
 	_save_progress()
 
@@ -364,6 +366,7 @@ func reload_progress() -> void:
 	session.restore_shortcuts(player)
 	_restore_character()
 	equipment_service.restore()
+	session.restore_actor_state(player)
 	knowledge.restore_clues()
 	survival.restore(progress.survival_state)
 	var start := start_location()
@@ -386,6 +389,27 @@ func can_practice() -> bool:
 
 func _queue_save() -> void:
 	progress_service._queue_save()
+
+func confirm_new_journey() -> void:
+	if _restarting: return
+	ui.show_panel("重新开始灰河谷？","人物成长、技能知识、背包与穿戴、任务、探索、敌人和游戏时间都会从初始状态开始。\n\n当前旅程与原主/备份存档会先归档保留。操作设置与监狱独立存档保留。",[{"title":"取消，继续当前旅程","callback":ui.close_modal},{"title":"归档旧旅程并重新开始","callback":func(): call_deferred("start_new_journey")}])
+
+func start_new_journey() -> void:
+	if _restarting or not ready_for_play: return
+	var scene:=load(scene_file_path) as PackedScene
+	if not scene:
+		ui.notify("无法重新打开当前游戏场景，当前旅程保持。")
+		return
+	_restarting=true
+	if not SaveManager.instance.start_new_campaign(save_slot,save_section,ExplorationProgress.new().serialize_save_data()):
+		_restarting=false
+		ui.notify("新旅程未建立：无法安全归档或写入存档，当前旅程保持。")
+		return
+	persistence_enabled=false; ready_for_play=false
+	if trial_recorder: trial_recorder.active=false
+	GameUIStyle.close_gameplay_views(player); ui.close_modal()
+	var error:=get_tree().change_scene_to_packed(scene)
+	if error!=OK: ui.notify("新存档已建立，但场景切换失败；请退出重进。旧旅程已归档，当前运行不会覆盖新存档。")
 
 func _apply_knowledge() -> void:
 	progress_service._apply_knowledge()

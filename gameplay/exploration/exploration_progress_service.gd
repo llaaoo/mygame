@@ -90,11 +90,13 @@ func _restore_player() -> void:
 	game.player.state_machine.transition_to("idle")
 	game.player.mana_component.mp_regen_rate = 5.0 if game.progress.choices.get("waterworks_choice", "") == "conduit" else 3.0
 	game.player.health_component.regen_rate = 0.6
-	game.player.skill_manager.combinations.reset_session()
+	game.player.skill_manager.combinations.reset_session(game.rules.physical_inventory)
 
 func _save_progress() -> void:
 	if not game.persistence_enabled:
 		return
+	if game.session and game.session.restoring_effects:
+		_queue_save(); return
 	if SaveManager.instance.save_game(game.save_slot):
 		_save_dirty = false
 	else:

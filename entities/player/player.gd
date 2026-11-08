@@ -412,7 +412,7 @@ func cancel_region_actions() -> void:
 	casting.cancel_all()
 	if summon_manager:
 		summon_manager.clear_all()
-	get_node("BuffManager").clear_temporary()
+	get_node("BuffManager").clear_temporary(actor_context!=null and actor_context.rules.physical_inventory)
 
 func _setup_event_bus() -> void:
 	bindings.call_deferred("_setup_event_bus")

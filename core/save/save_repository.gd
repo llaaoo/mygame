@@ -2,7 +2,7 @@ class_name SaveRepository
 extends RefCounted
 ## Owns file validation, migration and replacement. Never restores gameplay state.
 
-const VERSION := 7
+const VERSION := 8
 enum Status { MISSING, VALID, RECOVERED, INVALID, UNSUPPORTED_VERSION, IO_ERROR }
 var section_validators: Dictionary = {}
 
@@ -45,6 +45,25 @@ func write(path: String, data: Dictionary) -> bool:
 			return false
 	return _replace_file(path + ".tmp", path) == OK
 
+## Explicit new game: archive raw files and current memory, then install fresh
+## primary AND backup. A later recovery cannot resurrect the previous journey.
+func start_new(path: String,fresh: Dictionary,current: Dictionary) -> String:
+	if not _valid_shape(fresh) or not _valid_shape(current) or int(fresh.get("version",0))!=VERSION: return ""
+	var archive:=path.get_base_dir().path_join("journey_archive").path_join(path.get_file().get_basename()+"_%d_%d"%[Time.get_unix_time_from_system(),Time.get_ticks_usec()])
+	if DirAccess.make_dir_recursive_absolute(archive)!=OK: return ""
+	for suffix in ["",".bak",".tmp"]:
+		if FileAccess.file_exists(path+suffix) and _copy_file(path+suffix,archive.path_join("original.sav"+suffix))!=OK: return ""
+	if _write_file(archive.path_join("latest.sav"),current)!=OK: return ""
+	if _write_file(path+".new.tmp",fresh)!=OK or _write_file(path+".new.bak.tmp",fresh)!=OK: return ""
+	if _replace_file(path+".new.bak.tmp",path+".bak")!=OK: return ""
+	if _replace_file(path+".new.tmp",path)!=OK:
+		var backup:=archive.path_join("original.sav.bak")
+		if FileAccess.file_exists(backup):
+			if _copy_file(backup,path+".rollback.tmp")==OK: _replace_file(path+".rollback.tmp",path+".bak")
+		else: DirAccess.remove_absolute(path+".bak")
+		return ""
+	return archive
+
 func migrate(raw: Dictionary) -> Dictionary:
 	var data := raw.duplicate(true)
 	if not data.get("version", 1) is int:
@@ -73,6 +92,9 @@ func migrate(raw: Dictionary) -> Dictionary:
 				data["extensions"]=data.get("extensions",{})
 			6:
 				# v7 stores mixed quickslot bindings; legacy belt import happens at actor binding.
+				data["extensions"]=data.get("extensions",{})
+			7:
+				# Campaign effects/cooldowns are optional on older actor records.
 				data["extensions"]=data.get("extensions",{})
 		version += 1
 		data["version"] = version

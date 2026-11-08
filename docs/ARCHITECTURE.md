@@ -63,6 +63,8 @@ UI可以调用领域服务请求训练、制造、交付或施法，由服务验
 
 ## 验证与后续
 
+个人定时状态与冷却由`BuffManager`、`SkillManager`提供纯值快照，`CampaignSession`负责来源ID解析与按游戏时间恢复。离区效果在全区域角色挂载后结算，复用正常命中、死亡、奖励和真实UID战利品链；不以读档重放施加事件。`SaveRepository.start_new`先归档再建立新主/备份，`SaveManager`阻止旧场景回写，`CampaignGame`重建场景。边界与实测见[状态一致性、稳定行囊与新旅程](PERSISTENCE_RESTART_PLAN.md)。
+
 统一入口：`python3 tools/run_tests.py`。每项检查隔离数据/配置/缓存，保留日志并设置超时；脚本错误、警告及非零退出均失败。GitHub Actions保持停用，验证在云环境运行。新增内容先运行内容验证，再运行受影响的玩法检查。
 
 当前架构重构以已复现缺陷和可维护性目标为范围；手感、画面、数值平衡和目标设备性能仍需试玩或profile。后续新增功能由产品需求决定，不以增加抽象层作为目标。

@@ -16,6 +16,7 @@ var _changed := false
 var _health_dirty := false
 var _mana_dirty := false
 var _transaction_snapshot: Dictionary = {}
+var _restoring_campaign := false
 
 func _ready() -> void:
 	attributes = ActorAttributes.new(get_parent())
@@ -28,6 +29,9 @@ func _register_with_simulation() -> void:
 
 func tick(delta: float) -> void:
 	buildup.tick(delta)
+	_tick_effects(delta)
+
+func _tick_effects(delta: float) -> void:
 	for key in _control_immunity.keys():
 		_control_immunity[key]=maxf(0,float(_control_immunity[key])-delta)
 		if _control_immunity[key]==0: _control_immunity.erase(key)
@@ -79,6 +83,7 @@ func apply_buff(buff: Buff, source: Node2D = null, skill: SkillData = null) -> b
 func _refresh_source(instance: StatusInstance, source: Node2D, skill: SkillData) -> void:
 	if is_instance_valid(source):
 		instance.source_ref = weakref(source)
+		instance.source_id=source.actor_context.id if "actor_context" in source and source.actor_context else ""
 		instance.source_skill = skill
 		var stats := source.get_node_or_null("StatsComponent")
 		instance.source_magic = stats.magic_damage if stats else 0.0
@@ -120,7 +125,7 @@ func capture_status(id: String) -> Dictionary:
 	return _snapshot(instance) if instance else {}
 
 func _snapshot(instance: StatusInstance) -> Dictionary:
-	return {"instance": instance, "buff": instance.definition, "remaining": instance.remaining, "stacks": instance.stacks, "elapsed": instance.elapsed, "source_magic": instance.source_magic}
+	return {"instance": instance, "buff": instance.definition, "remaining": instance.remaining, "stacks": instance.stacks, "elapsed": instance.elapsed, "source_magic": instance.source_magic,"source_ref":instance.source_ref,"source_id":instance.source_id,"source_skill":instance.source_skill,"source_resolver":instance.source_resolver}
 
 func restore_status_snapshot(snapshot: Dictionary) -> void:
 	if snapshot.is_empty():
@@ -130,6 +135,7 @@ func restore_status_snapshot(snapshot: Dictionary) -> void:
 	instance.stacks = snapshot.stacks
 	instance.elapsed = snapshot.elapsed
 	instance.source_magic = snapshot.source_magic
+	instance.source_ref=snapshot.source_ref; instance.source_id=snapshot.source_id; instance.source_skill=snapshot.source_skill; instance.source_resolver=snapshot.source_resolver
 	if instance not in _instances:
 		_instances.append(instance)
 	_touch_status(instance.definition.status_id)
@@ -154,6 +160,7 @@ func finish_transaction(commit: bool) -> Callable:
 			instance.remaining = snapshot.remaining
 			instance.stacks = snapshot.stacks
 			instance.elapsed = snapshot.elapsed
+			instance.source_magic=snapshot.source_magic; instance.source_ref=snapshot.source_ref; instance.source_id=snapshot.source_id; instance.source_skill=snapshot.source_skill; instance.source_resolver=snapshot.source_resolver
 			_instances.append(instance)
 		_control_immunity=_transaction_snapshot.get("control_immunity",{}).duplicate()
 		buildup.restore(_transaction_snapshot.get("buildup",{}))
@@ -170,6 +177,7 @@ func finish_transaction(commit: bool) -> Callable:
 	return _publish.bind(events, changed, false)
 
 func _notify(applied: bool, buff: Buff, reason: RemovalReason = RemovalReason.DISPELLED) -> void:
+	if _restoring_campaign: return
 	var event := {"applied": applied, "buff": buff, "reason": reason}
 	if _in_transaction:
 		_events.append(event)
@@ -326,12 +334,89 @@ func clear_all(reason: RemovalReason = RemovalReason.DISPELLED) -> void:
 	for instance: StatusInstance in _instances.duplicate():
 		_remove(instance, reason)
 
-func clear_temporary() -> void:
-	buildup.clear()
-	_control_immunity.clear()
+func clear_temporary(keep_campaign := false) -> void:
+	if not keep_campaign:
+		buildup.clear()
+		_control_immunity.clear()
 	for instance: StatusInstance in _instances.duplicate():
-		if not instance.definition.persistent:
+		if not instance.definition.persistent and not (keep_campaign and _campaign_eligible(instance.definition)):
 			_remove(instance, RemovalReason.REGION_CLEANUP)
+
+static func _campaign_path(definition: Buff) -> String:
+	return str(definition.get_meta("definition_path",definition.resource_path))
+static func _campaign_eligible(definition: Buff) -> bool:
+	return definition.duration>0 and definition.exclusive_group!="stored_energy" and not _campaign_path(definition).is_empty()
+static func campaign_definition(path: String) -> Buff:
+	if not path.ends_with(".tres") or not (path.begins_with("res://content/") or path.begins_with("res://gameplay/abilities/data/")) or not ResourceLoader.exists(path): return null
+	var definition:=load(path) as Buff
+	return definition if definition and definition.exclusive_group!="stored_energy" else null
+
+func campaign_state() -> Dictionary:
+	var entries: Array[Dictionary]=[]
+	for instance in _instances:
+		if not _campaign_eligible(instance.definition): continue
+		entries.append({"path":_campaign_path(instance.definition),"id":instance.definition.get_runtime_id(),"duration":instance.definition.duration,"remaining":instance.remaining,"stacks":instance.stacks,"elapsed":instance.elapsed,"source_magic":instance.source_magic,"source_id":instance.source_id})
+	return {"schema":1,"entries":entries,"immunity":_control_immunity.duplicate()}
+
+static func valid_campaign_state(data: Variant) -> bool:
+	if not data is Dictionary or data.get("schema")!=1 or not data.get("entries") is Array or data.entries.size()>64 or not data.get("immunity") is Dictionary or data.immunity.size()>64: return false
+	var unique: Dictionary={}
+	for entry in data.entries:
+		if not entry is Dictionary or not entry.get("path") is String or not entry.get("id") is String or not entry.get("source_id","") is String or str(entry.get("source_id","")).length()>256: return false
+		var definition:=campaign_definition(entry.path)
+		if not definition or definition.get_runtime_id()!=entry.id or not entry.get("stacks") is int or entry.stacks<1 or entry.stacks>maxi(64,definition.max_stacks): return false
+		if unique.has(entry.id) and definition.stack_behavior!=Buff.StackBehavior.INDEPENDENT: return false
+		unique[entry.id]=true
+		for key in ["duration","remaining","elapsed","source_magic"]:
+			if typeof(entry.get(key)) not in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(entry[key])) or float(entry[key])<0: return false
+		if entry.duration<=0 or entry.duration>86400 or entry.remaining<=0 or entry.remaining>entry.duration or entry.source_magic>1000000: return false
+		if entry.elapsed>maxf(0,definition.tick_interval)+.00001: return false
+	for key in data.immunity:
+		var value=data.immunity[key]
+		if not key is String or key.is_empty() or typeof(value) not in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(value)) or value<=0 or value>86400: return false
+	return true
+
+func restore_campaign_state(data: Dictionary,resolver: Callable=Callable()) -> void:
+	if not valid_campaign_state(data): return
+	_restoring_campaign=true
+	# Equipment's permanent contribution remains owned by EquipmentManager.
+	for instance: StatusInstance in _instances.duplicate():
+		if not instance.definition.persistent or instance.definition.duration>0: _remove(instance,RemovalReason.RESTORED)
+	_control_immunity=data.immunity.duplicate()
+	for entry in data.entries:
+		var definition:=campaign_definition(entry.path).duplicate() as Buff
+		definition.duration=float(entry.duration); definition.set_meta("definition_path",entry.path)
+		_serial+=1
+		var instance:=StatusInstance.new(_serial,definition)
+		instance.remaining=float(entry.remaining); instance.elapsed=float(entry.elapsed)
+		instance.stacks=clampi(entry.stacks,1,stack_limit(definition)); instance.source_magic=float(entry.source_magic)
+		instance.source_id=str(entry.get("source_id","")); instance.source_resolver=resolver
+		_instances.append(instance)
+	_rebuild_attributes()
+	_restoring_campaign=false
+	buffs_changed.emit()
+
+## Settle a finite backlog at status/tick/immunity boundaries, never moving bodies
+## or replaying old on-apply/on-expire visual/proc events in the new region.
+func advance_campaign_time(seconds: float) -> void:
+	buildup.tick(seconds)
+	_restoring_campaign=true
+	var left:=seconds
+	while left>.000001 and (not _instances.is_empty() or not _control_immunity.is_empty()):
+		var step:=left
+		var timed:=false
+		for instance in _instances:
+			if instance.definition.duration<=0: continue
+			timed=true; step=minf(step,instance.remaining)
+			if instance.definition.tick_interval>0: step=minf(step,maxf(.000001,instance.definition.tick_interval-instance.elapsed))
+		for value in _control_immunity.values(): timed=true; step=minf(step,float(value))
+		if not timed: break
+		step=maxf(.000001,step)
+		_tick_effects(step); left-=step
+		var health:=get_parent().get_node_or_null("HealthComponent") as HealthComponent
+		if health and health.is_dead: break
+	_restoring_campaign=false
+	buffs_changed.emit()
 
 func accumulate_enchantment(definition: WeaponEnchantment,amount: float,source: Node2D,skill: SkillData) -> bool:
 	if is_immune(definition.status.status_id) or has_buff(definition.status.status_id): return false

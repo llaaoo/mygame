@@ -31,6 +31,9 @@ var _last_health:=100
 var _alert: Label
 var _message := ""
 var _message_time := 0.0
+var _tiles: Dictionary={}
+var _detail_signature: Dictionary={}
+var _portrait_signature: Array=[]
 func _ready() -> void:
  layer=GameUIStyle.LAYER_MODAL
  add_to_group("modal_ui")
@@ -160,21 +163,40 @@ func _rows() -> Array[Dictionary]:
  return rows
 func _refresh() -> void:
  _dirty=false; _refresh_time=0
- _portrait.refresh()
+ var gear: Array=[session.inventory.entries(actor.actor_context.id+".gear"),session.inventory.is_attached(actor.actor_context.id+".pack")]
+ if gear!=_portrait_signature:
+  _portrait_signature=gear.duplicate(true); _portrait.refresh()
  _refresh_stats()
- FoundationWidgets.clear(_grid)
  var rows:=_rows()
- for row in rows:
+ var retained: Dictionary={}
+ for index in range(rows.size()):
+  var row: Dictionary=rows[index]
   var definition:=session.inventory.equipment_definition(row.uid) if session.inventory.definitions.get(row.definition) is EquipmentData else session.inventory.definitions.get(row.definition) as ItemData
-  var tile:=InventoryItemTile.new(); tile.item_uid=row.uid; tile.name="Item_"+row.uid.replace(".","_")
-  tile.text=definition.display_name+" ×%d\n"%row.quantity+{"pocket":"口袋","pack":"背包","gear":"已穿戴","ground":"地面"}[row.place]
-  tile.icon=InterfaceIcons.item(definition); tile.expand_icon=true; tile.add_theme_constant_override("icon_max_width",26)
-  tile.custom_minimum_size=Vector2(110,72); tile.size_flags_horizontal=Control.SIZE_EXPAND_FILL; tile.clip_text=true
+  var tile:=_tiles.get(row.uid) as InventoryItemTile
+  if not is_instance_valid(tile):
+   tile=InventoryItemTile.new(); tile.item_uid=row.uid; tile.name="Item_"+row.uid.replace(".","_")
+   tile.expand_icon=true; tile.add_theme_constant_override("icon_max_width",26)
+   tile.custom_minimum_size=Vector2(110,72); tile.size_flags_horizontal=Control.SIZE_EXPAND_FILL; tile.clip_text=true
+   tile.pressed.connect(_select.bind(row.uid)); tile.activated.connect(_activate); tile.secondary_requested.connect(_context)
+   _tiles[row.uid]=tile; _grid.add_child(tile)
+  var caption: String=definition.display_name+" ×%d\n"%row.quantity+{"pocket":"口袋","pack":"背包","gear":"已穿戴","ground":"地面"}[row.place]
+  if tile.text!=caption: tile.text=caption
+  tile.icon=InterfaceIcons.item(definition)
   tile.tooltip_text=definition.display_name+"\n"+session.inventory.state_text(row.uid)
   GameUIStyle.apply_button(tile,GameUIStyle.ACCENT,selected==row.uid)
-  tile.pressed.connect(_select.bind(row.uid)); tile.activated.connect(_activate); tile.secondary_requested.connect(_context)
-  _grid.add_child(tile)
- if rows.is_empty(): _grid.add_child(FoundationWidgets.label("这里没有符合条件的实物。",14,true))
+  if tile.get_index()!=index: _grid.move_child(tile,index)
+  retained[row.uid]=true
+ for uid in _tiles.keys():
+  if retained.has(uid): continue
+  var tile:=_tiles[uid] as InventoryItemTile
+  _tiles.erase(uid)
+  if is_instance_valid(tile):
+   _grid.remove_child(tile); tile.queue_free()
+ var placeholder:=_grid.get_node_or_null("EmptyInventory") as Label
+ if rows.is_empty() and not placeholder:
+  placeholder=FoundationWidgets.label("这里没有符合条件的实物。",14,true); placeholder.name="EmptyInventory"; _grid.add_child(placeholder)
+ elif not rows.is_empty() and placeholder:
+  _grid.remove_child(placeholder); placeholder.queue_free()
  _show_detail()
 func _refresh_stats() -> void:
  var stats:=actor.stats_component
@@ -187,9 +209,12 @@ func _select_slot(slot: int) -> void:
  selected=str(session.inventory.equipped(actor.actor_context.id).get(str(slot),"")); _invalidate()
 func _selected_item() -> ItemInstance: return session.inventory.item(selected)
 func _show_detail() -> void:
- var old_quantity:=int(_quantity.value) if is_instance_valid(_quantity) else 1
- FoundationWidgets.clear(_details); _quantity=null
  var item:=_selected_item()
+ var signature: Dictionary={"uid":selected,"item":item.snapshot() if item else {},"location":session.inventory.locate(selected),"gear":session.inventory.entries(actor.actor_context.id+".gear"),"accessible":session.inventory.actor_containers(actor.actor_context.id),"ground":ground_id}
+ if signature==_detail_signature: return
+ _detail_signature=signature.duplicate(true)
+ var old_quantity:=int(_quantity.value) if is_instance_valid(_quantity) else 1
+ FoundationWidgets.clear(_details); _quantity=null; _state_label=null
  if not item:
   _details.add_child(FoundationWidgets.label("选择物品，或点击身体部位查看可穿戴装备。",16,true)); return
  var location:=session.inventory.locate(item.uid)
