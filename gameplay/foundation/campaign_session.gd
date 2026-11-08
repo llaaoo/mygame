@@ -76,6 +76,7 @@ func bind_actor(actor: CharacterBody2D,id: String,legacy_counts: Dictionary = {}
 	context.hostile_requested=hostility_changed
 	actor.actor_context=context
 	actors[id]=weakref(actor)
+	(actor.get_node("BuffManager") as BuffManager).source_resolver=actor_for_id
 	actor.get_node("HealthComponent").died.connect(mark_dead.bind(actor))
 	actor.get_node("HealthComponent").died.connect((actor.get_node("BuffManager") as BuffManager).buildup.clear)
 	var components:=preload("res://gameplay/foundation/actor_components.tscn").instantiate() as ActorComponents

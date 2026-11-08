@@ -78,6 +78,11 @@ func run() -> void:
 	buffs.apply_buff(load("res://content/spell_operations/statuses/paralysis.tres"),actor)
 	buffs.advance_campaign_time(10)
 	check(not buffs.prevents_actions() and not buffs.is_immune("paralysis"),"Time jump extended control or its recovery window")
+	var living:=game.active_enemies[0]
+	var living_id: String=living.actor_context.id
+	buffs.apply_buff(load("res://gameplay/abilities/data/burning.tres"),living)
+	await fixture.travel(destination); await fixture.travel("camp")
+	check(buffs._find("burning").source()==game.session.actor_for_id(living_id),"Live cross-region effect lost its remounted source identity")
 	var bad:=state.duplicate(true); bad.entries[0].remaining=INF
 	check(not BuffManager.valid_campaign_state(bad),"Nonfinite effects accepted")
 	bad=state.duplicate(true); bad.entries[0].path="res://core/game_runtime.gd"

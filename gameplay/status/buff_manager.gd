@@ -10,6 +10,7 @@ var _instances: Array[StatusInstance] = []
 var _status_versions: Dictionary = {}
 var _serial := 0
 var attributes: ActorAttributes
+var source_resolver: Callable
 var _in_transaction := false
 var _events: Array[Dictionary] = []
 var _changed := false
@@ -75,6 +76,7 @@ func apply_buff(buff: Buff, source: Node2D = null, skill: SkillData = null) -> b
 		return true
 	_serial += 1
 	var instance := StatusInstance.new(_serial, buff, source, skill)
+	instance.source_resolver=source_resolver
 	_instances.append(instance)
 	_rebuild_attributes()
 	_notify(true, buff)
@@ -83,6 +85,7 @@ func apply_buff(buff: Buff, source: Node2D = null, skill: SkillData = null) -> b
 func _refresh_source(instance: StatusInstance, source: Node2D, skill: SkillData) -> void:
 	if is_instance_valid(source):
 		instance.source_ref = weakref(source)
+		instance.source_resolver=source_resolver
 		instance.source_id=source.actor_context.id if "actor_context" in source and source.actor_context else ""
 		instance.source_skill = skill
 		var stats := source.get_node_or_null("StatsComponent")
