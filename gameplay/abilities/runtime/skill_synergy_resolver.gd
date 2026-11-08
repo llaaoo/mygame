@@ -51,6 +51,8 @@ func _cooldown_key(synergy: SkillSynergyData, target: Node2D) -> String:
 	return "%s:%s" % [synergy.id, target.get_instance_id()]
 
 func _can_trigger(synergy: SkillSynergyData, event: CombatEvent) -> bool:
+	var hit:=event.data.get("hit_result") as HitResult
+	if event.skill.weapon_enchantment and hit and (hit.blocked or not hit.damage_accepted): return false
 	if float(_cooldowns.get(_cooldown_key(synergy, event.target), 0)) > 0:
 		return false
 	var target_buffs := event.target.get_node_or_null("BuffManager") as BuffManager

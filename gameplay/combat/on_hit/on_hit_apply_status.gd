@@ -27,6 +27,7 @@ static func create(tag: String, buff_path: String) -> OnHitApplyStatus:
 
 
 func _execute(ev: CombatEvent) -> void:
+	if ev.skill and ev.skill.weapon_enchantment and required_skill_tag in ev.skill.weapon_enchantment.tags: return
 	var result := ev.data.get("hit_result") as HitResult
 	if result and not result.status_accepted:
 		return

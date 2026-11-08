@@ -2,6 +2,7 @@ class_name BuffManager
 extends Node
 
 signal buffs_changed
+var buildup:=StatusBuildup.new()
 enum RemovalReason { EXPIRED, CONSUMED, DISPELLED, REPLACED, REGION_CLEANUP, RESTORED }
 
 var _control_immunity: Dictionary={}
@@ -26,6 +27,7 @@ func _register_with_simulation() -> void:
 
 
 func tick(delta: float) -> void:
+	buildup.tick(delta)
 	for key in _control_immunity.keys():
 		_control_immunity[key]=maxf(0,float(_control_immunity[key])-delta)
 		if _control_immunity[key]==0: _control_immunity.erase(key)
@@ -135,7 +137,7 @@ func restore_status_snapshot(snapshot: Dictionary) -> void:
 
 func begin_transaction() -> void:
 	assert(not _in_transaction)
-	_transaction_snapshot = {"control_immunity":_control_immunity.duplicate(),"instances": _instances.map(_snapshot), "versions": _status_versions.duplicate()}
+	_transaction_snapshot = {"buildup":buildup.snapshot(),"control_immunity":_control_immunity.duplicate(),"instances": _instances.map(_snapshot), "versions": _status_versions.duplicate()}
 	_in_transaction = true
 	_events.clear()
 	_changed = false
@@ -154,6 +156,7 @@ func finish_transaction(commit: bool) -> Callable:
 			instance.elapsed = snapshot.elapsed
 			_instances.append(instance)
 		_control_immunity=_transaction_snapshot.get("control_immunity",{}).duplicate()
+		buildup.restore(_transaction_snapshot.get("buildup",{}))
 		_status_versions = _transaction_snapshot.versions
 		_rebuild_attributes()
 		_health_dirty = false
@@ -319,14 +322,21 @@ func restore_state(entries: Array[Dictionary]) -> void:
 	_rebuild_attributes()
 
 func clear_all(reason: RemovalReason = RemovalReason.DISPELLED) -> void:
+	buildup.clear()
 	for instance: StatusInstance in _instances.duplicate():
 		_remove(instance, reason)
 
 func clear_temporary() -> void:
+	buildup.clear()
 	_control_immunity.clear()
 	for instance: StatusInstance in _instances.duplicate():
 		if not instance.definition.persistent:
 			_remove(instance, RemovalReason.REGION_CLEANUP)
+
+func accumulate_enchantment(definition: WeaponEnchantment,amount: float,source: Node2D,skill: SkillData) -> bool:
+	if is_immune(definition.status.status_id) or has_buff(definition.status.status_id): return false
+	if not buildup.add(definition,amount): return false
+	return apply_buff(definition.status,source,skill)
 
 func _apply_tick(instance: StatusInstance) -> void:
 	var buff := instance.definition

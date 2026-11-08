@@ -587,6 +587,28 @@ func coating(uid: String) -> ItemUseDefinition:
 	if float(state.get("expires_at",0))<=clock_seconds: return null
 	var definition:=definitions.get(state.get("id","")) as ItemData
 	return definition.use_profile if definition else null
+
+func coating_state(uid: String) -> Dictionary:
+	var entry:=item(uid)
+	return entry.properties.get("coating",{}).duplicate(true) if entry and coating(uid) else {}
+
+## Validate all costs before publishing either the arrow or the consumed coating.
+func commit_weapon_release(actor: String,uid: String,ammo_uid: String,expected: Dictionary,consume: bool,ammo_id := "") -> bool:
+	if str(equipped(actor).get(str(EquipmentData.SlotType.RIGHT_HAND),""))!=uid: return false
+	if not expected.is_empty() and coating_state(uid)!=expected: return false
+	if consume and expected.is_empty(): return false
+	if not ammo_uid.is_empty():
+		var ammo:=item(ammo_uid)
+		if not ammo or locate(ammo_uid)!=actor+".pocket" or ammo.quantity<1 or ammo.definition_id!=ammo_id: return false
+	begin_batch()
+	if not ammo_uid.is_empty(): spend_instance(actor,ammo_uid,"quantity",1)
+	if consume:
+		var props:=item(uid).properties.duplicate(true)
+		props.erase("coating")
+		set_properties(uid,props)
+		_publish("enchantment_released",actor,{"weapon_uid":uid,"coating":expected.id})
+	end_batch()
+	return true
 func state_text(uid: String) -> String:
 	var entry:=_instance(uid)
 	if not entry: return ""

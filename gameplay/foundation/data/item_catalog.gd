@@ -17,6 +17,8 @@ func equipment() -> Array[EquipmentData]:
 
 func validation_errors() -> Array[String]:
 	var errors: Array[String]=[]
+	for id in MartialArts.IDS:
+		if not MartialArts.definition(id).valid(): errors.append("Invalid martial release: "+id)
 	var seen: Dictionary={}
 	for item in items:
 		if not item or item.id.is_empty() or seen.has(item.id):

@@ -22,3 +22,7 @@ title = "贯步刺"
 weapon_type = "spear"
 description = "锁向前踏28距离的狭窄刺击，命中未格挡的准备动作可打断并造成0.35秒失衡；消耗25体力，不花MP。"
 profile = SubResource("Attack")
+
+release_reach = 320.0
+release_angle = 14.0
+release_speed = 820.0

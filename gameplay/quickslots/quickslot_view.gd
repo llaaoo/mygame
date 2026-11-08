@@ -27,7 +27,9 @@ static func item_state(actor: Node2D,binding: Dictionary) -> Dictionary:
 			ItemUseDefinition.Kind.THROWABLE: result.detail+="\n按住瞄准、松开投掷；右键或Esc取消。"
 			ItemUseDefinition.Kind.CONSUMABLE: result.detail+="\n站定饮用，完成才消费；药效按类别互斥，剩余时长保存。"
 			ItemUseDefinition.Kind.BOOK: result.detail+="\n站定阅读，学会才消费；已学会不会浪费。"
-			ItemUseDefinition.Kind.COATING: result.detail+="\n使用抹布涂附当前武器，完成才消费。"
+			ItemUseDefinition.Kind.COATING:
+				result.detail+="\n使用抹布涂附当前武器，完成才消费。"
+				if definition.use_profile.enchantment: result.detail+="\n"+definition.use_profile.enchantment.describe()
 	return result
 
 static func technique_state(actor: Node2D,binding: Dictionary) -> Dictionary:
@@ -36,4 +38,9 @@ static func technique_state(actor: Node2D,binding: Dictionary) -> Dictionary:
 	var context:=actor.get("actor_context") as ActorContext
 	if not data or not context: return {"title":"未学习武技","ready":false,"detail":"","remaining":0.0,"cost":0.0}
 	var reason:=context.martial.reason(id,context)
-	return {"title":data.title,"ready":reason.is_empty(),"detail":data.description+"\n"+reason,"remaining":maxf(0,float(context.martial.ready_at.get(id,0))-context.items.clock_seconds),"cost":data.profile.stamina_cost}
+	var uid:=str(context.items.equipped(context.id).get(str(EquipmentData.SlotType.RIGHT_HAND),""))
+	var coating:=context.items.coating(uid)
+	var detail:=data.description+"\n"+reason
+	if coating and coating.enchantment: detail+="\n"+context.items.state_text(uid)+"\nShift+武技：消耗整层附魔，释放距离%.0f / 扇面%.0f°。"%[data.release_reach,data.release_angle]
+	else: detail+="\n涂附后可按Shift+武技释放元素；当前没有可用附魔。"
+	return {"title":data.title,"ready":reason.is_empty(),"detail":detail,"element":coating.enchantment.title if coating and coating.enchantment else "","remaining":maxf(0,float(context.martial.ready_at.get(id,0))-context.items.clock_seconds),"cost":data.profile.stamina_cost}

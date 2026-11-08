@@ -43,6 +43,10 @@ var combo_remaining := 0.0
 var combo_weapon := ""
 var _launched := false
 var _ammo_uid := ""
+var _coating_state: Dictionary={}
+var _enchantment: WeaponEnchantment
+var _release_technique: MartialTechnique
+var _release_committed := false
 func active() -> bool:
 	return context and context.rules and context.rules.tactical_combat
 func busy() -> bool: return mode!="idle"
@@ -139,6 +143,10 @@ func try_action(action: Action) -> OperationResult:
 			if stamina.current<cost: return OperationResult.reject("stamina")
 			var ammo_uid:=context.items.ready_uid(context.id,candidate.ammo_id) if not candidate.ammo_id.is_empty() else ""
 			if not candidate.ammo_id.is_empty() and ammo_uid.is_empty(): return OperationResult.reject("ammunition")
+			var coating:=context.items.coating(weapon_uid)
+			var release:=action.action_type==Action.ActionType.TECHNIQUE and bool(action.params.get("release_enchantment",false))
+			if release and (not coating or not coating.enchantment): return OperationResult.reject("武器没有可释放的元素附魔")
+			if release and action.params.has("enchantment_state") and (str(action.params.get("enchantment_weapon_uid",""))!=weapon_uid or action.params.enchantment_state!=context.items.coating_state(weapon_uid)): return OperationResult.reject("所选附魔已改变")
 			stamina.spend(cost)
 			counter_strike=counter_remaining>0 and candidate.projectile_speed==0
 			if counter_strike:
@@ -147,6 +155,10 @@ func try_action(action: Action) -> OperationResult:
 				counter_remaining=0
 			if not input_provider.is_valid(): movement=Vector2.ZERO
 			profile=candidate; attack_weapon_uid=weapon_uid; _launched=false; _ammo_uid=ammo_uid
+			_coating_state=context.items.coating_state(weapon_uid)
+			_enchantment=coating.enchantment if coating else null
+			_release_technique=MartialArts.definition(action.skill_id) if release else null
+			_release_committed=false
 			combo_weapon=weapon_uid
 			combo_index=(next_combo+1)%weapon.moveset.attacks.size() if weapon and weapon.moveset and action.action_type==Action.ActionType.MELEE else 0
 			combo_remaining=remaining+profile.windup+profile.active+profile.recovery+(weapon.moveset.chain_window if weapon and weapon.moveset else 0.0)
@@ -155,7 +167,7 @@ func try_action(action: Action) -> OperationResult:
 			needs.exert(.2,context.actor.get_node("StatsComponent").effective_stat("endurance"))
 			mode="attack"; elapsed=0; remaining=profile.windup+profile.active+profile.recovery
 			facing=action.direction.normalized() if action.direction.length_squared()>.01 else facing
-			_hit_targets.clear()
+			_hit_targets={}
 			_attack_sequence+=1
 			_family="weapon.%s.%d"%[context.id,_attack_sequence]
 			guarding=false
@@ -214,6 +226,7 @@ func advance(delta: float) -> void:
 		elapsed+=delta
 		remaining=maxf(0,remaining-delta)
 		if mode=="attack" and elapsed>=profile.windup and old_elapsed<profile.windup+profile.active:
+			if not _commit_weapon_release(): cancel("source_changed"); action_refused.emit("武器、附魔或箭矢来源已改变，攻击取消。"); return
 			var active_delta:=maxf(0,minf(elapsed,profile.windup+profile.active)-maxf(old_elapsed,profile.windup))
 			if profile.step_distance>0: actor.move_and_collide(facing*profile.step_distance*active_delta/profile.active)
 			var after:=elapsed
@@ -249,22 +262,28 @@ func advance(delta: float) -> void:
 	if "facing_direction" in actor: actor.facing_direction=facing
 	queue_redraw()
 func _launch_arrow() -> void:
-	if str(context.items.equipped(context.id).get(str(EquipmentData.SlotType.RIGHT_HAND),""))!=attack_weapon_uid or not context.items.spend_instance(context.id,_ammo_uid,"quantity",1):
-		action_refused.emit("箭矢或武器来源已改变，射击取消。")
-		return
-	_ammo_uid=""
 	var arrow:=WeaponArrow.new(); arrow.context=context; arrow.profile=profile; arrow.direction=facing; arrow.family=_family
 	arrow.damage=roundi(float(context.actor.get("attack_damage") if "attack_damage" in context.actor else context.actor.combat_component.attack_damage)*profile.damage_multiplier)
-	var coating:=context.items.coating(attack_weapon_uid)
-	if coating:
-		arrow.tags.append_array(coating.payload.tags); arrow.statuses=coating.payload.statuses.duplicate()
+	arrow.enchantment=_enchantment; arrow.release_technique=_release_technique
+	if _enchantment: arrow.tags.append_array(_enchantment.tags)
 	context.region.root.add_child(arrow); arrow.global_position=context.actor.global_position
+
+func _commit_weapon_release() -> bool:
+	if _release_committed: return true
+	if not context.region.available() or not context.items.commit_weapon_release(context.id,attack_weapon_uid,_ammo_uid,_coating_state,_release_technique!=null,profile.ammo_id): return false
+	_release_committed=true; _ammo_uid=""
+	if _release_technique and profile.projectile_speed==0:
+		var wave:=EnchantmentWave.new(); wave.context=context; wave.enchantment=_enchantment; wave.technique=_release_technique
+		wave.direction=facing; wave.family=_family
+		wave.hit_targets=_hit_targets
+		context.region.root.add_child(wave); wave.global_position=context.actor.global_position
+	return true
 func equipment_value(key: String) -> float:
 	var equipment:=context.actor.get_node_or_null("EquipmentManager") as EquipmentManager
 	return equipment.get_modifier_value(key) if equipment else 0.0
 func attack_observation() -> Dictionary:
 	if mode!="attack" or not profile: return {}
-	return {"serial":_attack_sequence,"windup":maxf(0,profile.windup-elapsed),"reach":profile.reach+profile.step_distance,"direction":facing,"angle":profile.angle_degrees,"heavy":profile.guard_pressure>1 or profile.windup>=.35}
+	return {"serial":_attack_sequence,"windup":maxf(0,profile.windup-elapsed),"reach":maxf(profile.reach+profile.step_distance,_release_technique.release_reach if _release_technique else 0),"direction":facing,"angle":maxf(profile.angle_degrees,_release_technique.release_angle if _release_technique else 0),"heavy":profile.guard_pressure>1 or profile.windup>=.35 or _release_technique!=null}
 func is_preparing() -> bool:
 	var manager:=context.actor.get_node("SkillManager") as SkillManager
 	var preparing:=manager.combinations.is_busy() or mode in ["item","aim_item","spray"] or mode=="attack" and profile and profile.projectile_speed>0 and elapsed<profile.windup
@@ -277,7 +296,7 @@ func resolve_strike(hit: HitContext,result: HitResult) -> void:
 	if hit.strike.interrupts_preparation and hit.was_preparing and not hit.control_protected:
 		interrupt(.35); result.interrupted=true
 	if hit.strike.push_distance>0 and push_recovery<=0 and is_instance_valid(hit.source):
-		var direction: Vector2=context.actor.global_position-hit.source.global_position
+		var direction: Vector2=context.actor.global_position-hit.origin
 		if direction.is_zero_approx(): direction=-facing
 		_push_remaining=.18; _push_velocity=direction.normalized()*hit.strike.push_distance/.18
 		push_recovery=.9
@@ -307,6 +326,7 @@ func contact(target: Node2D) -> HitResult:
 	if not context.actor.get_world_2d().direct_space_state.intersect_ray(ray).is_empty(): return rejected
 	var id:=target.get_instance_id()
 	if _hit_targets.has(id): return rejected
+	if not _commit_weapon_release(): return rejected
 	_hit_targets[id]=true
 	var tags: Array[String]=["melee","physical"]
 	var buffs:=context.actor.get_node_or_null("BuffManager") as BuffManager
@@ -315,11 +335,11 @@ func contact(target: Node2D) -> HitResult:
 		tags.append_array(imbued)
 	var skill:=SkillData.new()
 	skill.id="weapon_contact"
-	var weapon_uid: String=context.items.equipped(context.id).get(str(EquipmentData.SlotType.RIGHT_HAND),"")
-	var coating:=context.items.coating(weapon_uid) if weapon_uid==attack_weapon_uid else null
-	if coating:
-		tags.append_array(coating.payload.tags)
-		skill.contact_statuses=coating.payload.statuses.duplicate()
+	if _enchantment:
+		tags.append_array(_enchantment.tags)
+		skill.weapon_enchantment=_enchantment
+		skill.enchantment_bonus=_enchantment.release_damage if _release_technique else _enchantment.bonus_damage
+		skill.enchantment_buildup=_enchantment.release_buildup if _release_technique else _enchantment.buildup
 	skill.tags=tags
 	var damage:=roundi(float(context.actor.get("attack_damage") if "attack_damage" in context.actor else context.actor.combat_component.attack_damage)*profile.damage_multiplier)
 	var result:=CombatExecutor.report_hit(context.actor,target,damage,target.global_position,skill,tags,_family,profile.impact,profile)
@@ -334,7 +354,7 @@ func defend(hit: HitContext,result: HitResult,impact: float) -> void:
 	impact*=1-clampf(equipment_value("impact_resistance"),0,.4)
 	var physical: bool="melee" in hit.tags or "physical" in hit.tags
 	if guarding and physical and is_instance_valid(hit.source):
-		var direction: Vector2=hit.source.global_position-context.actor.global_position
+		var direction: Vector2=hit.origin-context.actor.global_position
 		if direction.is_zero_approx() or facing.dot(direction.normalized())>=cos(deg_to_rad(60)):
 			var manager:=context.actor.get_node_or_null("EquipmentManager") as EquipmentManager
 			var shield:=manager and manager.get_all_equipped().any(func(item): return item.world_shape=="shield")
@@ -372,7 +392,7 @@ func cancel(_reason := "cancelled") -> void:
 	counter_remaining=0; counter_strike=false; _push_remaining=0
 	operation_id+=1
 	mode="idle"; remaining=0; elapsed=0
-	_hit_targets.clear()
+	_hit_targets={}
 	clear_input()
 func clear_input() -> void:
 	movement=Vector2.ZERO; guarding=false; sprinting=false
@@ -394,6 +414,9 @@ func _draw() -> void:
 	if not active(): return
 	if mode=="attack" and elapsed<profile.windup:
 		var angle:=facing.angle()
+		if _release_technique:
+			var half:=deg_to_rad(_release_technique.release_angle*.5)
+			draw_arc(Vector2.ZERO,_release_technique.release_reach,angle-half,angle+half,36,Color(_enchantment.color,.5),2,true)
 		draw_arc(Vector2.ZERO,profile.reach,angle-deg_to_rad(profile.angle_degrees*.5),angle+deg_to_rad(profile.angle_degrees*.5),20,Color(1,.35,.18,.65) if profile.guard_pressure>1 or profile.windup>=.35 else Color(1,.7,.3,.6),2,true)
 		if profile.guard_pressure>1:
 			var marker:=facing*32
