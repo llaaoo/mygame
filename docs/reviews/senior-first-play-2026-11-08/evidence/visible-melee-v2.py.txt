@@ -1,0 +1,66 @@
+import ctypes as c,time,subprocess,json,sys,math
+from pathlib import Path
+import numpy as np
+from PIL import Image
+x=c.CDLL('libX11.so.6');t=c.CDLL('libXtst.so.6');x.XOpenDisplay.restype=c.c_void_p;d=x.XOpenDisplay(b':93')
+x.XStringToKeysym.argtypes=[c.c_char_p];x.XStringToKeysym.restype=c.c_ulong;x.XKeysymToKeycode.argtypes=[c.c_void_p,c.c_ulong];x.XKeysymToKeycode.restype=c.c_ubyte;x.XFlush.argtypes=[c.c_void_p]
+t.XTestFakeKeyEvent.argtypes=[c.c_void_p,c.c_uint,c.c_int,c.c_ulong];t.XTestFakeButtonEvent.argtypes=[c.c_void_p,c.c_uint,c.c_int,c.c_ulong];t.XTestFakeMotionEvent.argtypes=[c.c_void_p,c.c_int,c.c_int,c.c_int,c.c_ulong]
+def key(k,on):t.XTestFakeKeyEvent(d,x.XKeysymToKeycode(d,x.XStringToKeysym(k.encode())),on,0);x.XFlush(d)
+def button(b,on):t.XTestFakeButtonEvent(d,b,on,0);x.XFlush(d)
+def aim(px,py):t.XTestFakeMotionEvent(d,-1,int(px),int(py),0);x.XFlush(d)
+def detect(im):
+ a=np.array(im.convert('RGB')).astype(int);r,g,b=a[:,:,0],a[:,:,1],a[:,:,2]
+ m=(r>180)&(r<215)&(g>48)&(g<76)&(b>35)&(b<57);m[470:]=False
+ rows=[]
+ for y in range(10,470):
+  idx=np.flatnonzero(m[y]);
+  if len(idx)<1:continue
+  chunks=np.split(idx,np.where(np.diff(idx)>1)[0]+1)
+  for q in chunks:
+   if 1<=len(q)<=47:rows.append((int(q[0]),y,len(q)))
+ candidates=[]
+ for xx,yy,ww in rows:
+  if any(abs(xx-z[0])<5 and abs(yy-z[1])<5 for z in candidates):continue
+  # A health bar has a second matching horizontal scanline.
+  if not any(abs(xx-v[0])<3 and yy<v[1]<yy+4 for v in rows):continue
+  patch=a[yy+3:yy+12,xx:xx+47];blue=(patch[:,:,2]>120)&(patch[:,:,1]>75)&(patch[:,:,1]<185)&(patch[:,:,0]<115)&(patch[:,:,2]>patch[:,:,1]*1.2)
+  if blue.sum()<90 or not (blue.sum(axis=1)>=30).any():continue
+  candidates.append((xx,yy,ww))
+ return [(xx+23,yy+38,ww) for xx,yy,ww in candidates]
+if len(sys.argv)>1 and sys.argv[1]=='detect':
+ print(detect(Image.open(sys.argv[2])));sys.exit()
+mode=sys.argv[1] if len(sys.argv)>1 else 'melee';duration=float(sys.argv[2]) if len(sys.argv)>2 else 25
+root=Path('/tmp/grayriver-senior/fresh-20261108/combat-'+str(int(time.time())));root.mkdir();out=[];held=set();start=time.monotonic();nextattack=0;nextcast=0;guarduntil=0;lastseen=start
+try:
+ while time.monotonic()-start<duration:
+  now=time.monotonic();subprocess.run(['import','-display',':93','-window','root',str(root/'live.png')],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+  im=Image.open(root/'live.png');targets=detect(im)
+  # Do not attempt to act after a modal/death panel appears.
+  aa=np.array(im.convert('RGB'))[50:600,100:1050];dark=(aa[:,:,0]<20)&(aa[:,:,1]<30)&(aa[:,:,2]<30)
+  if dark.mean()>.65:break
+  if not targets:
+   for k in list(held):key(k,0)
+   held.clear();button(3,0)
+   if now-lastseen>3:break
+   time.sleep(.12);continue
+  lastseen=now;target=min(targets,key=lambda q:(q[0]-576)**2+(q[1]-320)**2);tx,ty,hpwidth=target;dx=tx-576;dy=ty-320;dist=math.hypot(dx,dy);aim(tx,ty)
+  move=set()
+  if mode=='melee':
+   if dist>52:
+    if dx>18:move.add('d')
+    if dx< -18:move.add('a')
+    if dy>18:move.add('s')
+    if dy< -18:move.add('w')
+   if dist<83 and now>=nextattack:
+    button(3,0);button(1,1);time.sleep(.07);button(1,0);nextattack=now+1.05;guarduntil=now+.45
+   elif now>guarduntil:button(3,1)
+  for k in ['w','a','s','d']:
+   if (k in move)!=(k in held):key(k,int(k in move))
+  held=move
+  if len(out)%8==0:im.save(root/('frame-%04d.png'%len(out)))
+  out.append({'t':now-start,'target_screen':target,'distance_pixels':dist,'move':list(move),'mode':mode})
+  time.sleep(.11)
+finally:
+ for k in held:key(k,0)
+ button(3,0);button(1,0)
+ (root/'observations.json').write_text(json.dumps(out,indent=2));print(root);print('frames',len(out),'seconds',time.monotonic()-start)

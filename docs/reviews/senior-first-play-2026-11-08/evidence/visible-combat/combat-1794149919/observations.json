@@ -1,0 +1,265 @@
+[
+  {
+    "t": 8.138202247209847e-05,
+    "target_screen": [
+      253,
+      105,
+      46
+    ],
+    "distance_pixels": 388.0128863839447,
+    "move": [
+      "w",
+      "a"
+    ],
+    "mode": "melee"
+  },
+  {
+    "t": 0.2813028100063093,
+    "target_screen": [
+      262,
+      115,
+      46
+    ],
+    "distance_pixels": 374.9946666287402,
+    "move": [
+      "w",
+      "a"
+    ],
+    "mode": "melee"
+  },
+  {
+    "t": 0.5212037790042814,
+    "target_screen": [
+      295,
+      152,
+      46
+    ],
+    "distance_pixels": 327.3912033027155,
+    "move": [
+      "w",
+      "a"
+    ],
+    "mode": "melee"
+  },
+  {
+    "t": 0.7712203630071599,
+    "target_screen": [
+      324,
+      180,
+      46
+    ],
+    "distance_pixels": 288.277643947636,
+    "move": [
+      "w",
+      "a"
+    ],
+    "mode": "melee"
+  },
+  {
+    "t": 1.0086805430182721,
+    "target_screen": [
+      342,
+      199,
+      46
+    ],
+    "distance_pixels": 263.4331034627197,
+    "move": [
+      "w",
+      "a"
+    ],
+    "mode": "melee"
+  },
+  {
+    "t": 1.264247348997742,
+    "target_screen": [
+      369,
+      225,
+      46
+    ],
+    "distance_pixels": 227.75864418282788,
+    "move": [
+      "w",
+      "a"
+    ],
+    "mode": "melee"
+  },
+  {
+    "t": 1.5041692900122143,
+    "target_screen": [
+      392,
+      249,
+      46
+    ],
+    "distance_pixels": 197.2232237846243,
+    "move": [
+      "w",
+      "a"
+    ],
+    "mode": "melee"
+  },
+  {
+    "t": 1.7317850340041332,
+    "target_screen": [
+      425,
+      297,
+      46
+    ],
+    "distance_pixels": 152.74161188098023,
+    "move": [
+      "w",
+      "a"
+    ],
+    "mode": "melee"
+  },
+  {
+    "t": 2.0119649060070515,
+    "target_screen": [
+      465,
+      338,
+      46
+    ],
+    "distance_pixels": 112.44998888394787,
+    "move": [
+      "a"
+    ],
+    "mode": "melee"
+  },
+  {
+    "t": 2.2805412060115486,
+    "target_screen": [
+      488,
+      352,
+      46
+    ],
+    "distance_pixels": 93.637599285757,
+    "move": [
+      "s",
+      "a"
+    ],
+    "mode": "melee"
+  },
+  {
+    "t": 2.5201516640081536,
+    "target_screen": [
+      532,
+      346,
+      46
+    ],
+    "distance_pixels": 51.10772935672255,
+    "move": [],
+    "mode": "melee"
+  },
+  {
+    "t": 2.8366944740118925,
+    "target_screen": [
+      539,
+      327,
+      46
+    ],
+    "distance_pixels": 37.656340767525464,
+    "move": [],
+    "mode": "melee"
+  },
+  {
+    "t": 3.0636032490001526,
+    "target_screen": [
+      539,
+      327,
+      29
+    ],
+    "distance_pixels": 37.656340767525464,
+    "move": [],
+    "mode": "melee"
+  },
+  {
+    "t": 3.2926723020209465,
+    "target_screen": [
+      539,
+      327,
+      29
+    ],
+    "distance_pixels": 37.656340767525464,
+    "move": [],
+    "mode": "melee"
+  },
+  {
+    "t": 3.5152040180109907,
+    "target_screen": [
+      539,
+      327,
+      29
+    ],
+    "distance_pixels": 37.656340767525464,
+    "move": [],
+    "mode": "melee"
+  },
+  {
+    "t": 3.7513041390047874,
+    "target_screen": [
+      540,
+      345,
+      30
+    ],
+    "distance_pixels": 43.829214001622255,
+    "move": [],
+    "mode": "melee"
+  },
+  {
+    "t": 4.063296031003119,
+    "target_screen": [
+      542,
+      360,
+      29
+    ],
+    "distance_pixels": 52.49761899362675,
+    "move": [
+      "s",
+      "a"
+    ],
+    "mode": "melee"
+  },
+  {
+    "t": 4.335573404998286,
+    "target_screen": [
+      547,
+      348,
+      10
+    ],
+    "distance_pixels": 40.311288741492746,
+    "move": [],
+    "mode": "melee"
+  },
+  {
+    "t": 4.58549962201505,
+    "target_screen": [
+      539,
+      329,
+      11
+    ],
+    "distance_pixels": 38.07886552931954,
+    "move": [],
+    "mode": "melee"
+  },
+  {
+    "t": 4.829147462005494,
+    "target_screen": [
+      539,
+      329,
+      11
+    ],
+    "distance_pixels": 38.07886552931954,
+    "move": [],
+    "mode": "melee"
+  },
+  {
+    "t": 5.146899984014453,
+    "target_screen": [
+      539,
+      329,
+      11
+    ],
+    "distance_pixels": 38.07886552931954,
+    "move": [],
+    "mode": "melee"
+  }
+]

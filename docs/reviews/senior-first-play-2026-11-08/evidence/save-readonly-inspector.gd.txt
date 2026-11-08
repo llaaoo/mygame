@@ -1,0 +1,13 @@
+extends SceneTree
+func _initialize() -> void:
+ var f := FileAccess.open('/workspace/mygame/docs/reviews/senior-first-play-2026-11-08/evidence/final-normal-save_3.sav',FileAccess.READ)
+ var d: Dictionary=f.get_var(false)
+ print(JSON.stringify(d.keys()))
+ if d.has('extensions'):
+  var p: Dictionary=d.extensions.get('grayriver_frontier',{})
+  var claims: Dictionary=p.get('claims',{})
+  var picked={}
+  for k in ['demo.bell.cleanser','demo.bell.seal','demo.bell.receipt','demo.bell.core','quest.river_bell_names','quest.river_bell_inquiry','quest.river_demo_finale','demo.watch.signal']:
+   picked[k]=claims.has(k)
+  print(JSON.stringify({'deaths':p.get('deaths'),'visited':p.get('visited'),'completed':p.get('completed'),'claims':picked,'journey':p.get('journey')}))
+ quit()

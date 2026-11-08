@@ -298,3 +298,5 @@ godot --headless --path . --script res://tools/validate_mvp_content.gd
 武器与AI深化：[精准格挡、武技用途、动作表现与小队节奏](docs/COMBAT_DEPTH.md)。
 
 灰河谷最新可玩结构、巡河任务线与验收边界见[巡河demo](docs/GRAYRIVER_DEMO.md)。
+
+[独立子agent首玩评审与分阶段建议](docs/reviews/senior-first-play-2026-11-08/REPORT.md)：基于 `e6c1685` 新档，含实测证据、未验证范围和待实施方案。

@@ -1,0 +1,29 @@
+{
+  "read_method": "Standalone Godot SceneTree; FileAccess.READ/get_var(false); no project/domain APIs, no writes",
+  "deaths": 7,
+  "visited": [
+    "camp",
+    "river_bell",
+    "river_bell_depths",
+    "river_mine",
+    "river_watch"
+  ],
+  "completed": false,
+  "claims": {
+    "demo.bell.cleanser": true,
+    "demo.bell.seal": true,
+    "demo.bell.receipt": true,
+    "demo.bell.core": true,
+    "demo.watch.signal": false,
+    "quest.river_bell_names": true,
+    "quest.river_bell_inquiry": false,
+    "quest.river_demo_finale": false
+  },
+  "journey": {
+    "position": [
+      -3397.5,
+      1786.5
+    ],
+    "region": "camp"
+  }
+}
