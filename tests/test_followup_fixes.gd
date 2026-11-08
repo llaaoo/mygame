@@ -1,6 +1,7 @@
 extends "res://tests/support/input_scene_probe.gd"
 const Fixture=preload("res://tests/support/grayriver_fixture.gd")
 func run() -> void:
+ root.size=Vector2i(1152,648)
  var fixture:=Fixture.new(self); game=await fixture.boot()
  var actor:=game.player; var manager:=actor.skill_manager; var store:=game.session.inventory
  for id in ["focus","water_call","inscribe","project"]: game.progress.actions[id]=true
@@ -65,6 +66,18 @@ func run() -> void:
  var snapshot:=store.snapshot()
  check(game.town_services.preview_trade(uid,false,3).reason=="currency" and store.snapshot()==snapshot,"Trade preview lacks specific reason or changes inventory")
  check(not game.town_services.transact(uid,false,3).accepted and store.snapshot()==snapshot,"Rejected quantity trade altered stock/payment")
+ game.town_services.show(false); await frames()
+ await click("炭屑 ×6 · 2币")
+ var quantity:=game.town_services._trade_quantity
+ var arrow:=quantity.get_global_rect().position+Vector2(quantity.size.x-8,8)
+ await point_click(arrow); await point_click(arrow)
+ check(int(quantity.value)==3,"Actual quantity arrows did not select three")
+ var details:=game.town_services._screen.detail
+ check(details.find_children("*","Label",true,false).any(func(n): return n.text.contains("总价6币") and n.text.contains("缺少6币")),"Quantity UI lacks total/shortfall")
+ check(details.find_children("*","Button",true,false).filter(func(n): return n.text.begins_with("购买")).all(func(n): return n.disabled),"Unaffordable purchase button remains enabled")
+ await click("购买所选数量")
+ check(store.snapshot()==snapshot,"Disabled real purchase click changed inventory")
+ await capture("followup-trade-total")
  await fixture.close()
  if failures.is_empty(): print("PASS followup fixes: actual intelligent flow, terrain/Shift/source invalidation matrix, distinct scrolling, preserved costs/instances, invalid-binding recovery, complete source detail and atomic read-only trade preview")
  quit(0 if failures.is_empty() else 1)

@@ -96,7 +96,7 @@ func _detail(uid: String) -> void:
 	if data is EquipmentData:
 		W.disclosure(_screen.detail,"当前装备属性",W.comparison(null,data))
 		if data.moveset: W.disclosure(_screen.detail,"武器动作",data.moveset.describe())
-	_screen.detail.add_child(W.button(("出售一件" if _selling else "购买一件")+" · %d币"%price(uid,not _selling),_request.bind("trade",uid)))
+	_screen.detail.add_child(W.button(("出售一件" if _selling else "购买一件")+" · %d币"%price(uid,not _selling),_request.bind("trade",uid),not preview_trade(uid,_selling,1).accepted))
 	if item.quantity>1:
 		_trade_quantity=SpinBox.new(); _trade_quantity.min_value=1; _trade_quantity.max_value=item.quantity; _trade_quantity.step=1; _trade_quantity.value=mini(_quantity_value,item.quantity)
 		_screen.detail.add_child(_trade_quantity)
