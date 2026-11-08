@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="ActorCharacterData" load_steps=12 format=3]
+[ext_resource type="Script" path="res://gameplay/characters/actor_character_data.gd" id="data"]
+[ext_resource type="Script" path="res://gameplay/abilities/loadout/skill_loadout.gd" id="loadout"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/fire_sigil_data.tres" id="fire_sigil"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/ignite_data.tres" id="ignite"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/focus_data.tres" id="focus"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/water_call_data.tres" id="water_call"]
+[ext_resource type="Resource" path="res://content/exploration/equipment/cadence_gloves.tres" id="gloves"]
+[ext_resource type="Resource" path="res://content/frontier/equipment/river_staff.tres" id="river_staff"]
+[ext_resource type="Resource" path="res://gameplay/abilities/data/venom_mist_data.tres" id="spray"]
+[ext_resource type="Resource" path="res://content/tactics/pressure.tres" id="temperament"]
+[sub_resource type="Resource" id="Loadout"]
+script = ExtResource("loadout")
+right_hand = "ignite"
+slots = Array[String](["fire_sigil", "focus", "water_call", "venom_mist"])
+[resource]
+script = ExtResource("data")
+temperament = ExtResource("temperament")
+id = "river_sluice_alchemist"
+title = "泵站刻阵工"
+strength = 2
+intelligence = 6
+agility = 6
+endurance = 6
+base_move_speed = 100.0
+melee_multiplier = 0.6
+skills = [ExtResource("fire_sigil"), ExtResource("ignite"), ExtResource("focus"), ExtResource("water_call"), ExtResource("spray")]
+loadout = SubResource("Loadout")
+combinations = PackedStringArray("fire_sigil_fireball", "fire_sigil_focus")
+equipment = [ExtResource("gloves"), ExtResource("river_staff")]
+materials = {"ward_powder": 1, "fire_stone": 1, "venom_sprayer":1, "clear_tonic":1}

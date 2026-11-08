@@ -7,4 +7,5 @@ extends Resource
 @export var pos: Vector2 = Vector2.ZERO
 @export var choices: Array[ExplorationWorldChoiceData] = []
 
+@export var irreversible := false
 @export var required_claims: PackedStringArray = []

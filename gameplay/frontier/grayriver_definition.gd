@@ -115,6 +115,7 @@ static func build() -> ExplorationChapterData:
 				puzzle.materials = amounts(raw.get("materials", {}))
 				for route_data in raw.routes:
 					var route := SpellPuzzleRoute.new()
+					route.id = route_data.get("id", "")
 					route.steps = PackedStringArray(route_data.get("steps", []))
 					route.required_surface = route_data.get("required_surface", "")
 					route.hold_seconds = float(route_data.get("hold_seconds", 0))
@@ -127,6 +128,8 @@ static func build() -> ExplorationChapterData:
 			if raw.has("template"): facility = load("res://content/exploration/%s.tres" % raw.template).duplicate(true)
 			else:
 				for key in ["id", "title", "service", "requires_clear", "description"]: facility.set(key, raw[key])
+				facility.required_claims = PackedStringArray(raw.get("required_claims", []))
+				facility.completion_text = raw.get("completion_text", "")
 				facility.assembly = work_method(raw.assembly)
 			facility.pos = vector(raw.pos)
 			region.facilities.append(facility)
@@ -141,6 +144,7 @@ static func build() -> ExplorationChapterData:
 			event.id=raw.id
 			event.title=raw.title
 			event.text=raw.text
+			event.irreversible=raw.get("irreversible",false)
 			event.pos=vector(raw.pos)
 			event.required_claims=PackedStringArray(raw.get("required_claims",[]))
 			for choice_data in raw.choices:
@@ -148,6 +152,7 @@ static func build() -> ExplorationChapterData:
 				choice.id=choice_data.id
 				choice.title=choice_data.title
 				choice.text=choice_data.text
+				choice.grants_claims=PackedStringArray(choice_data.get("grants_claims",[]))
 				event.choices.append(choice)
 			region.events.append(event)
 		for raw in entry.get("valves", []):
@@ -184,6 +189,7 @@ static func build() -> ExplorationChapterData:
 		quest.id = raw.id
 		quest.title = raw.title
 		quest.description = raw.description
+		quest.unlock_claims = PackedStringArray(raw.get("unlock_claims", []))
 		quest.required_claims = PackedStringArray(raw.required_claims)
 		quest.required_clears = PackedStringArray(raw.get("required_clears", []))
 		quest.attribute_points = int(raw.points)

@@ -13,6 +13,7 @@ func show_arrival() -> void:
 		text = "监狱封锁已解除，可以回访遗漏支路或尝试不同操作。" if game.progress.completed else "已恢复你的知识、装备、材料与探索进度。"
 		var reports: Array[String] = []
 		for quest in game.quests:
+			if not quest.available(game.progress): continue
 			if (quest.is_complete(game.progress) or quest.has_available_approach(game.progress, game.player.stats_component)) and not game.progress.claims.has("quest." + quest.id): reports.append(quest.title)
 		if not reports.is_empty(): text += "\n\n可交付委托：" + "、".join(reports)
 		var passages: Array[String] = []
@@ -69,6 +70,7 @@ func _show_quests() -> void:
 	var text := "艾妲：把你发现的知识和监狱的变化带回来。奖励每项只发放一次，重置遭遇不会重复领取。\n\n" if game.progress.claims.has("cartographer_rescued") else "委托留在营地，随时可以查看和交付。奖励每项只发放一次。\n\n"
 	var buttons: Array[Dictionary] = []
 	for quest in game.quests:
+		if not quest.available(game.progress): continue
 		var claimed := game.progress.claims.has("quest." + quest.id)
 		var complete := quest.is_complete(game.progress)
 		var alternate := quest.has_available_approach(game.progress, game.player.stats_component)
@@ -111,8 +113,8 @@ func _show_world_event(entry: ExplorationWorldEventData) -> void:
 	var buttons: Array[Dictionary] = []
 	for choice in entry.choices:
 		text += choice.title + ("（当前）" if selected == choice.id else "") + "\n" + choice.text + "\n\n"
-		buttons.append({"title": choice.title, "disabled": selected == choice.id, "callback": _choose_world_event.bind(entry, choice)})
-	text += "只能维持一条水路；可以回来改道。效果从下一次进入区域生效，不会重新生成已清场的敌人。"
+		buttons.append({"title": choice.title, "disabled": selected == choice.id or entry.irreversible and not selected.is_empty(), "callback": _choose_world_event.bind(entry, choice)})
+	text += "此决定不可撤销；设施与路线从下次进入区域生效。" if entry.irreversible else "只能维持一条水路；可以回来改道。效果从下一次进入区域生效，不会重新生成已清场的敌人。"
 	buttons.append({"title": "稍后决定", "callback": game.ui.close_modal})
 	game.ui.show_panel(entry.title, text, buttons)
 
@@ -155,6 +157,7 @@ func journal_text() -> String:
 	text += "\n保留与兑现\n普通施法保留恩赐；Shift请求消费适配恩赐，形态与总成本见技能槽预览。节律护手可改为部分消费：保留当前剩余时长50%，较弱伤害倍率，每份另加3 MP。蕴魂、回响和护盾不受部分消费影响。\n"
 	text += "\n营地委托（回营地交付）\n"
 	for quest in game.quests:
+		if not quest.available(game.progress): continue
 		text += "%s · %s · %d/%d\n%s\n" % [quest.title, "已交付" if game.progress.claims.has("quest." + quest.id) else ("可交付" if quest.is_complete(game.progress) else "进行中"), quest.objective_count(game.progress), quest.required_claims.size() + quest.required_clears.size(), quest.description]
 	text += "\n魂术与装备\n战死守卫留下60秒残魂，汲魂转为45秒蕴魂。普通施法保留，Shift用火花/震荡/凝神/水引各兑现1层；回响和护盾爆破保持更高优先级。O查看固定装备、来源与取舍，营地可换装。\n"
 	text += "\n已学组合\n"

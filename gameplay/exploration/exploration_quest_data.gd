@@ -4,6 +4,7 @@ extends Resource
 @export var id: String
 @export var title: String
 @export_multiline var description: String
+@export var unlock_claims: PackedStringArray = []
 @export var required_claims: PackedStringArray
 @export var required_clears: PackedStringArray
 @export var attribute_points := 1
@@ -15,8 +16,13 @@ func find_approach(approach_id: String) -> ExplorationQuestApproachData:
 		if approach.id == approach_id: return approach
 	return null
 
+func available(progress: ExplorationProgress) -> bool:
+	for key in unlock_claims:
+		if not progress.claims.has(key): return false
+	return true
+
 func can_claim(progress: ExplorationProgress, stats: StatsComponent, approach_id: String = "") -> bool:
-	if progress.claims.has("quest." + id): return false
+	if not available(progress) or progress.claims.has("quest." + id): return false
 	if approach_id.is_empty(): return is_complete(progress)
 	var approach := find_approach(approach_id)
 	return approach != null and approach.available(progress, stats)

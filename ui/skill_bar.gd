@@ -35,8 +35,6 @@ var _variant_labels: Array[Label] = []
 var _affinity_strips: Array[ColorRect] = []
 var _icon_keys: Array = []
 var _hover_source := ""
-var _feedback_message := ""
-var _feedback_time := 0.0
 
 
 func setup(sm: SkillManager) -> void:
@@ -90,10 +88,6 @@ func _build() -> void:
 func _process(_delta: float) -> void:
 	if not _skill_manager or not _skill_manager.combinations or not is_instance_valid(_combination_hint):
 		return
-	_feedback_time=maxf(0,_feedback_time-_delta)
-	if _feedback_message!=_skill_manager.combinations.last_message:
-		_feedback_message=_skill_manager.combinations.last_message
-		_feedback_time=3.5
 	var empower := Input.is_key_pressed(KEY_SHIFT)
 	var actor_position: Vector2 = _skill_manager.get_parent().global_position
 	if empower != _preview_empower or not actor_position.is_equal_approx(_preview_position): _invalidate_previews()
@@ -118,7 +112,7 @@ func _process(_delta: float) -> void:
 		_hint_panel.hide()
 		return
 	_combination_hint.show()
-	_hint_panel.visible=(not source.is_empty() or not controller.pending.is_empty() or _feedback_time>0) and not (actor and is_instance_valid(actor.material_wheel) and actor.material_wheel.visible)
+	_hint_panel.visible=(not source.is_empty() or not controller.pending.is_empty()) and not (actor and is_instance_valid(actor.material_wheel) and actor.material_wheel.visible)
 	var previews: Dictionary = {}
 	var hint_source:=source if not source.is_empty() and _skill_manager.get_instance(source) else "right"
 	if not _skill_manager.get_instance(hint_source):
@@ -143,8 +137,6 @@ func _process(_delta: float) -> void:
 		text += "\n准备：%s · %.1fs" % [controller.pending.effect_label, maxf(0, controller.pending.remaining)]
 	elif not plan.ready:
 		text += "\n" + plan.reason
-	elif source.is_empty() and not controller.last_message.is_empty():
-		text += "\n" + controller.last_message
 	_combination_hint.text = text
 	_preparation_bar.visible = not controller.pending.is_empty()
 	if _preparation_bar.visible:
@@ -190,7 +182,6 @@ func _process(_delta: float) -> void:
 		_update_cooldown(i, preview)
 
 func _on_cast_feedback(_plan: CastPlan) -> void:
-	_feedback_time=3.5
 	_invalidate_previews()
 
 func _invalidate_previews(_a: Variant = null, _b: Variant = null, _c: Variant = null, _d: Variant = null) -> void:

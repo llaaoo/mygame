@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="SpellOperationData" load_steps=12 format=3]
+[gd_resource type="Resource" script_class="SpellOperationData" load_steps=17 format=3]
 [ext_resource type="Script" path="res://gameplay/abilities/operations/spell_operation_data.gd" id="data"]
 [ext_resource type="Resource" path="res://content/spell_operations/attune.tres" id="action"]
 [ext_resource type="Resource" path="res://content/spell_operations/payloads/basic.tres" id="basic"]
@@ -10,10 +10,15 @@
 [ext_resource type="Resource" path="res://content/spell_operations/payloads/attune_arcane.tres" id="attune_arcane"]
 [ext_resource type="Resource" path="res://content/spell_operations/payloads/attune_ward.tres" id="attune_ward"]
 [ext_resource type="Resource" path="res://content/spell_operations/payloads/legacy_ice_armor.tres" id="legacy_ice_armor"]
+[ext_resource type="Resource" path="res://content/spell_operations/payloads/terrain_water.tres" id="terrain_water"]
+[ext_resource type="Resource" path="res://content/spell_operations/payloads/terrain_poison.tres" id="terrain_poison"]
+[ext_resource type="Resource" path="res://content/spell_operations/payloads/terrain_fire.tres" id="terrain_fire"]
+[ext_resource type="Resource" path="res://content/spell_operations/payloads/terrain_frost.tres" id="terrain_frost"]
+[ext_resource type="Resource" path="res://content/spell_operations/payloads/terrain_storm.tres" id="terrain_storm"]
 [resource]
 script = ExtResource("data")
 action = ExtResource("action")
 aliases = PackedStringArray("echo_mark", "ice_armor")
 knowledge_actions = PackedStringArray("focus","echo_mark")
 default_payload = "basic"
-payloads = [ExtResource("basic"), ExtResource("echo"), ExtResource("ward"), ExtResource("attune_fire"), ExtResource("attune_frost"), ExtResource("attune_storm"), ExtResource("attune_arcane"), ExtResource("attune_ward"), ExtResource("legacy_ice_armor")]
+payloads = [ExtResource("basic"), ExtResource("echo"), ExtResource("ward"), ExtResource("attune_fire"), ExtResource("attune_frost"), ExtResource("attune_storm"), ExtResource("attune_arcane"), ExtResource("attune_ward"), ExtResource("legacy_ice_armor"), ExtResource("terrain_water"), ExtResource("terrain_poison"), ExtResource("terrain_fire"), ExtResource("terrain_frost"), ExtResource("terrain_storm")]

@@ -1,0 +1,50 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:364)
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+⏰ WorldTime 启动: 08:00
+🏛️ GameRuntime: 五大 Runtime 初始化完成
+   CommandBus       : ✅
+   CombatExecutor   : ✅
+   CombatEventBus   : ✅
+   WorldRuntime     : ✅
+   SimulationRuntime: ✅
+   WorldTime        : ✅
+⚡ 已注册触发效果: OnKillBonusExp
+📊 CombatDebugger: trace enabled
+⏰ 08:00 (☀️ 白天)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚔️  CombatTrace  #1 | cast_water_call
+   技能: 水引 | 事件数: 13 | 最终伤害: 0
+   伤害链: (no modifiers)
+    1. ▶  cast: 水引
+    2. ▶  PHASE: MODIFIER
+    3. ▶  PHASE: EFFECT
+    4. ▶  PHASE: EVENT
+    5. ▶  PHASE: POST
+    6. ⚡ done: 水引 | success=OK ✅
+    7. ▶  PHASE: IDLE
+    8. ▶  PHASE: MODIFIER
+    9. ▶  PHASE: EFFECT
+   10. ▶  PHASE: EVENT
+   11. 📡 ON_CAST → ?  [tags=["water", "aoe"], extra={  }]
+   12. ▶  PHASE: POST
+   13. ▶  PHASE: IDLE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚔️  CombatTrace  #2 | cast_flow_attunement
+   技能: 流息 | 事件数: 6 | 最终伤害: 0
+   伤害链: (no modifiers)
+    1. ▶  cast: 流息
+    2. ▶  PHASE: MODIFIER
+    3. ▶  PHASE: EFFECT
+    4. ▶  PHASE: EVENT
+    5. ▶  PHASE: POST
+    6. ⚡ done: 流息 | success=OK ✅
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PASS followup fixes: actual intelligent flow, terrain/Shift/source invalidation matrix, distinct scrolling, preserved costs/instances, invalid-binding recovery, complete source detail and atomic read-only trade preview

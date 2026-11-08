@@ -29,7 +29,7 @@ func _complete(method: FieldWorkMethod,node: Node2D,spec: DeliverySiteData) -> b
 	if not game.progress.claim(spec.id,spec.title,"实际交付："+method.title+"。"+spec.completion_text,[],[]):
 		supplies.finish_transaction(false)
 		return false
-	supplies.grant(spec.rewards)
+	game.grant_material_reward(spec.id, spec.title, spec.pos, spec.rewards)
 	game.progress.choices[spec.id]=method.id
 	game.builder.mount_available_stations()
 	var notify:=supplies.finish_transaction(true)

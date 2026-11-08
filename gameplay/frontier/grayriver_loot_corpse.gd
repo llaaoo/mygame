@@ -17,6 +17,9 @@ func _ready() -> void:
 func refresh() -> void:
 	var record: Dictionary = service.game.progress.loot_records[loot_id]
 	var empty: bool = record.equipment.is_empty() and record.materials.is_empty()
+	if loot_id.begins_with("cache."):
+		visible = not empty
+		if empty: remove_from_group("interactable")
 	set_title(record.title + (" · 已搜空" if empty else " · 搜刮"))
 	gear.items.clear()
 	gear.inventory_store=service.game.session.inventory
@@ -31,6 +34,11 @@ func refresh() -> void:
 
 func _draw() -> void:
 	draw_circle(Vector2(0, 5), 23, Color(0,0,0,.25))
+	if loot_id.begins_with("cache."):
+		draw_rect(Rect2(-18,-10,36,28), Color("493f2d"))
+		draw_rect(Rect2(-18,-10,36,28), Color("b69c67"), false, 2)
+		if _near: draw_arc(Vector2.ZERO,27,0,TAU,32,Color("d5b66c"),1,true)
+		return
 	draw_line(Vector2(-14,4),Vector2(10,4),Color("56544b"),12)
 	draw_circle(Vector2(-20,4),7,Color("8c8170"))
 	if _near: draw_arc(Vector2.ZERO,27,0,TAU,32,Color("d5b66c"),1,true)

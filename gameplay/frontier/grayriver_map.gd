@@ -19,7 +19,7 @@ func project(point: Vector2) -> Vector2:
 func unproject(point: Vector2) -> Vector2:
 	return (point-size*.5-pan)/_scale()
 func center_player() -> void:
-	var point: Vector2=game.player.position if game.region_id=="camp" else game.catalog.regions[game.region_id].exits[0].arrival
+	var point: Vector2=game.player.position if game.region_id=="camp" else game.guidance.overworld_point(game.region_id)
 	pan=-point*_scale()
 	_limit_pan()
 func _limit_pan() -> void:
@@ -58,7 +58,7 @@ func _draw() -> void:
 	var font:=get_theme_default_font()
 	var goal:=game.guidance.tracked()
 	if not goal.is_empty() and goal.known:
-		var point: Vector2=goal.position if goal.region=="camp" else game.catalog.regions[goal.region].exits[0].arrival
+		var point: Vector2=goal.position if goal.region=="camp" else game.guidance.overworld_point(goal.region)
 		var marker:=project(point)
 		draw_arc(marker,9,0,TAU,24,GameUIStyle.GOLD,2)
 		draw_string(font,marker+Vector2(12,15),goal.title,HORIZONTAL_ALIGNMENT_LEFT,-1,13,GameUIStyle.GOLD)
@@ -77,6 +77,6 @@ func _draw() -> void:
 		draw_line(at-Vector2(3,3),at+Vector2(3,3),Color("e2ab66"),2)
 		draw_line(at+Vector2(-3,3),at+Vector2(3,-3),Color("e2ab66"),2)
 	var position:=game.player.position
-	if game.region_id!="camp": position=game.catalog.regions[game.region_id].exits[0].arrival
+	if game.region_id!="camp": position=game.guidance.overworld_point(game.region_id)
 	draw_circle(project(position),5,Color("70deff"))
-	draw_string(font,Vector2(24,20),"北 ↑  蓝点：你/入口  橙叉：未取遗骸  暗处：未探索",HORIZONTAL_ALIGNMENT_LEFT,-1,13,GameUIStyle.TEXT_MAIN)
+	draw_string(font,Vector2(24,20),"北 ↑  蓝点：你/入口  橙叉：未取物资  暗处：未探索",HORIZONTAL_ALIGNMENT_LEFT,-1,13,GameUIStyle.TEXT_MAIN)
