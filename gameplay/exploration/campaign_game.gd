@@ -494,3 +494,6 @@ func actor_became_hostile(actor: CharacterBody2D) -> void:
 	progress.cleared.erase(region_id)
 
 func record_actor_loot(_actor: CharacterBody2D) -> void: pass
+
+func grant_material_reward(source_id: String, title: String, point: Vector2, materials: Dictionary) -> void:
+	player.skill_manager.combinations.supplies.grant(materials)

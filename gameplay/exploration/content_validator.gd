@@ -230,6 +230,10 @@ func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 				if choice.id.is_empty() or choices.has(choice.id) or choice.text.is_empty():
 					_fail(choice, "Invalid/duplicate world choice")
 				choices[choice.id] = true
+				if not event.irreversible and not choice.grants_claims.is_empty(): _fail(choice, "Persistent consequences require an irreversible event")
+				for id in choice.grants_claims:
+					_claim(claims, id, choice)
+					completion_claims[id] = true
 		for puzzle in region.spell_objects:
 			_claim(claims, puzzle.id, puzzle)
 			completion_claims[puzzle.id] = true
@@ -313,6 +317,8 @@ func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 		quest_ids[quest.id] = true
 		if quest.attribute_points <= 0 or quest.id.is_empty() or quest.required_claims.is_empty():
 			_fail(quest, "Invalid quest reward/objectives")
+		for id in quest.unlock_claims:
+			if not claims.has(id): _fail(quest, "Missing quest availability clue: " + id)
 		for id in quest.required_claims:
 			if not claims.has(id):
 				_fail(quest, "Missing quest discovery: " + id)

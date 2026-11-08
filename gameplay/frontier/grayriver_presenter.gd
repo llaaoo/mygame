@@ -17,6 +17,7 @@ func journal_text() -> String:
 	text += (game as GrayriverGame).discovered_places()
 	text += "\n镇中委托\n"
 	for quest in game.quests:
+		if not quest.available(game.progress): continue
 		text += quest.title+" · "+("已交付" if game.progress.claims.has("quest."+quest.id) else "可交付" if quest.is_complete(game.progress) else "进行中")+"\n"+quest.description+"\n"
 	text += "\n已学制造配方\n"
 	var supplies:=game.player.skill_manager.combinations.supplies
@@ -39,4 +40,4 @@ func journal_text() -> String:
 func _choose_world_event(entry: ExplorationWorldEventData, choice: ExplorationWorldChoiceData) -> void:
 	if not game.progress_service.choose_world_event(entry,choice):return
 	game.ui.close_modal()
-	game.ui.notify("水路已调整："+choice.title+"。从下一次进入区域生效，已击败敌人和永久成果保留。")
+	game.ui.notify("决定已记录："+choice.title+"。设施与路线从下一次进入区域生效。")

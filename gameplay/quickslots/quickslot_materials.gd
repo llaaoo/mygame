@@ -55,7 +55,11 @@ static func options(actor: Player,source: String) -> Array[Dictionary]:
   var reason:=manager.spell_forms.unavailable_reason(entry.action)
   if not reason.is_empty(): preview.ready=false; preview.reason=reason
   var following:=entry.payload(str(manager.spell_forms.resolve_automatic(entry.action).get("payload","")))
-  result.append({"variant_id":"auto","title":"跟随·"+following.title if following else "智能跟随","choice":{"mode":"auto"},"cost":preview.cost,"ready":preview.ready,"reason":preview.reason,"detail":manager.spell_forms.label(source) if automatic else "跟随最近成功施法的元素","description":"只改变后续形式；仍须真实来源和手动释放。滚轮/M可固定形式。","current":automatic})
+  var auto_detail:=manager.spell_forms.label(source) if automatic else "跟随最近成功施法的元素"
+  auto_detail+=" · "+stock_text(actor,preview.material_costs)
+  if following and not following.source_kind.is_empty(): auto_detail+=" · "+_source_hint(following)
+  if following and following.required_rule: auto_detail+=" · "+following.required_rule.condition_label()
+  result.append({"variant_id":"auto","title":"跟随·"+following.title if following else "智能跟随","choice":{"mode":"auto"},"cost":preview.cost,"ready":preview.ready,"reason":preview.reason,"detail":auto_detail,"description":"只改变后续形式；仍须真实来源和手动释放。滚轮/M可固定形式。","current":automatic})
  for payload in entry.payloads:
   var choice: Dictionary={"payload":payload.id,"modifier":str(current.get("modifier","")),"uid":""}
   var composed:=entry.compose(payload)
@@ -74,7 +78,8 @@ static func options(actor: Player,source: String) -> Array[Dictionary]:
    var detail: String="无需实物" if count<0 else "口袋%d / 背包%d"%[count,maxi(0,store.count(actor.actor_context.id,payload.material_id)-count)]
    if item: detail="瓶 %s · %s"%[uid.trim_prefix("item."),store.state_text(uid)]
    if not current.get("modifier","").is_empty() and selected.modifier.is_empty(): detail+=" · 确认将移除不适配修饰"
-   if not payload.source_kind.is_empty(): detail="脚下法阵充能" if payload.source_kind=="field" else "附近真实残魂"
+   if not payload.source_kind.is_empty(): detail+=" · "+_source_hint(payload)
+   if payload.required_rule: detail+=" · "+payload.required_rule.condition_label()
    result.append({"variant_id":payload.id,"title":payload.title,"choice":selected,"cost":plan.cost,"ready":plan.ready,"reason":plan.reason,"detail":detail,"description":payload.describe(actor.actor_context.rules.timed_fields),"current":not automatic and current==selected})
  return result
 static func select(actor: Player,source: String,choice: Dictionary) -> bool:
@@ -99,12 +104,15 @@ static func select(actor: Player,source: String,choice: Dictionary) -> bool:
 static func cycle(actor: Player,source: String,step: int) -> bool:
  var entries:=options(actor,source)
  if entries.is_empty(): return false
+ var actual:=actor.skill_manager.selection_for_source(source)
  var index:=-1
  for i in range(entries.size()):
   if entries[i].current: index=i; break
  if index<0 and step<0: index=0
  for offset in range(1,entries.size()+1):
   var candidate: Dictionary=entries[posmod(index+step*offset,entries.size())]
+  var candidate_actual: Dictionary=actor.skill_manager.spell_forms.resolve_automatic(actor.skill_manager.get_instance(source).data) if candidate.choice.get("mode","")=="auto" else candidate.choice
+  if candidate_actual==actual: continue
   if select(actor,source,candidate.choice):
    var message: String=InputBindings.label(InputBindings.action_for_source(source))+" · "+str(candidate.title)+" · "+str(candidate.detail)
    if not candidate.ready: message+="\n"+str(candidate.reason)
@@ -121,3 +129,6 @@ static func stock_text(actor: Node2D,costs: Dictionary) -> String:
   var definition:=ItemCatalog.default_catalog().definition(id)
   parts.append("%s：口袋%d / 背包%d · 需%d"%[definition.display_name if definition else id,pocket,pack,costs[id]])
  return "；".join(parts)
+
+static func _source_hint(payload: SpellPayloadData) -> String:
+ return "脚下"+FireSigil.title_for(payload.source_field)+"充能" if payload.source_kind=="field" else "附近真实残魂"

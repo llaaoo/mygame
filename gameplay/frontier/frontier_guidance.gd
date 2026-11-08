@@ -37,19 +37,35 @@ func town_orientation() -> Dictionary:
 	return {}
 
 func route_target(goal: Dictionary) -> Vector2:
-	if goal.is_empty() or not goal.known: return Vector2.INF
-	if game.region_id == goal.region: return goal.position
-	var candidates: Array[ExplorationExitData]=[]
-	if game.region_id!="camp":
-		for exit in game.current_data.exits:
-			if exit.target=="camp" and exit.claims_satisfied(game.progress): candidates.append(exit)
-		candidates.sort_custom(func(a: ExplorationExitData,b: ExplorationExitData): return a.pos.distance_to(game.player.position)+a.arrival.distance_to(goal.position)<b.pos.distance_to(game.player.position)+b.arrival.distance_to(goal.position))
-	else:
-		for exit in game.current_data.exits:
-			if exit.target==goal.region and exit.claims_satisfied(game.progress): candidates.append(exit)
-		candidates.sort_custom(func(a: ExplorationExitData,b: ExplorationExitData): return a.pos.distance_to(game.player.position)<b.pos.distance_to(game.player.position))
-	if not candidates.is_empty(): return candidates[0].pos
+	if goal.is_empty() or str(goal.region).is_empty(): return Vector2.INF
+	if game.region_id == goal.region: return goal.position if goal.known else Vector2.INF
+	# Search the actual exit graph: lower floors need their parent stair, not
+	# a nonexistent direct camp exit. Only already-open gates are traversable.
+	var queue: Array[Dictionary] = [{"region":game.region_id,"first":Vector2.INF}]
+	var seen: Dictionary = {game.region_id:true}
+	while not queue.is_empty():
+		var step: Dictionary = queue.pop_front()
+		var exits: Array[ExplorationExitData] = []
+		exits.assign(game.catalog.regions[step.region].exits)
+		exits.sort_custom(func(a: ExplorationExitData,b: ExplorationExitData): return a.pos.distance_squared_to(game.player.position)<b.pos.distance_squared_to(game.player.position))
+		for passage in exits:
+			if not passage.claims_satisfied(game.progress) or seen.has(passage.target): continue
+			var first: Vector2 = passage.pos if step.region == game.region_id else step.first
+			if passage.target == goal.region: return first
+			seen[passage.target] = true
+			queue.append({"region":passage.target,"first":first})
 	return Vector2.INF
+func overworld_point(region: String) -> Vector2:
+	# Follow the authored return chain, including parents of deeper floors.
+	var seen: Dictionary = {}
+	while region != "camp" and not seen.has(region) and game.catalog.regions.has(region):
+		seen[region] = true
+		var exits: Array[ExplorationExitData] = game.catalog.regions[region].exits
+		if exits.is_empty(): break
+		var passage := exits[0]
+		if passage.target == "camp": return passage.arrival
+		region = passage.target
+	return Vector2.ZERO
 func pin(id: String) -> void:
 	if not game.quests.any(func(quest): return quest.id == id): return
 	game.progress.tracked_quest = id

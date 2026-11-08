@@ -130,6 +130,7 @@ func entries() -> Array[Dictionary]:
 					result.append({"id":"uid:"+row.uid,"item":row.definition,"uid":row.uid,"title":definition.display_name,"text":definition.description,"subtitle":("口袋 · " if source.ends_with("pocket") else "背包 · ")+game.session.inventory.state_text(row.uid)})
 		"quests":
 			for quest in game.quests:
+				if not quest.available(game.progress): continue
 				var done:=game.progress.claims.has("quest."+quest.id)
 				var ready:=quest.is_complete(game.progress) and not done
 				if filter_index == 0 and done or filter_index == 1 and not ready or filter_index == 2 and not done: continue

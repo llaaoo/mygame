@@ -296,3 +296,5 @@ godot --headless --path . --script res://tools/validate_mvp_content.gd
 当前系统深化与游玩入口：[时间、采集、整修、武器武技与增益](docs/SYSTEM_DEPTH.md)，[实测与覆盖边界](docs/SYSTEM_DEPTH_VALIDATION.md)。
 
 武器与AI深化：[精准格挡、武技用途、动作表现与小队节奏](docs/COMBAT_DEPTH.md)。
+
+灰河谷最新可玩结构、巡河任务线与验收边界见[巡河demo](docs/GRAYRIVER_DEMO.md)。

@@ -4,7 +4,7 @@ extends RefCounted
 const MERCHANT := "river.merchant"
 static var STOCK: Dictionary:
 	get: return (load("res://content/frontier/town_market.tres") as MarketDefinition).initial_stock.duplicate()
-const ERRORS := {"not_owned":"物品已离开原来的容器。","payment_or_capacity":"货币不足，或对方没有空间接收付款。","capacity":"容器空间不足，未扣除物品或货币。","materials":"货币或金属碎料不足。","maximum_level":"已达到最高强化等级。","unequip_first":"请先卸下这件装备，再带来整修。"}
+const ERRORS := {"currency":"付款方河谷币不足。","payment_capacity":"收款方没有空间接收河谷币。","not_owned":"物品已离开原来的容器。","payment_or_capacity":"货币不足，或对方没有空间接收付款。","capacity":"容器空间不足，未扣除物品或货币。","materials":"货币或金属碎料不足。","maximum_level":"已达到最高强化等级。","unequip_first":"请先卸下这件装备，再带来整修。"}
 const POINT := Vector2(-3210,2200)
 const W := preload("res://gameplay/foundation/ui/widgets.gd")
 var game: GrayriverGame
@@ -45,6 +45,10 @@ func transact(uid: String,selling: bool,quantity := 1) -> OperationResult:
 	var item:=store.item(uid)
 	if not item or item.definition_id=="coin": return OperationResult.reject("不可交易")
 	return store.trade_instance(market.actor_id if selling else "player","player" if selling else market.actor_id,uid,quantity,price(uid,not selling)*quantity)
+func preview_trade(uid: String,selling: bool,quantity: int) -> OperationResult:
+	if not reason().is_empty(): return OperationResult.reject(reason())
+	var store:=game.session.inventory
+	return store.preview_trade_instance(market.actor_id if selling else "player","player" if selling else market.actor_id,uid,quantity,price(uid,not selling)*quantity)
 func salvage(uid: String,upgrade: bool) -> OperationResult:
 	if not reason().is_empty(): return OperationResult.reject(reason())
 	return game.session.inventory.upgrade_instance("player",uid) if upgrade else game.session.inventory.dismantle_instance("player",uid)
@@ -95,10 +99,25 @@ func _detail(uid: String) -> void:
 	_screen.detail.add_child(W.button(("出售一件" if _selling else "购买一件")+" · %d币"%price(uid,not _selling),_request.bind("trade",uid)))
 	if item.quantity>1:
 		_trade_quantity=SpinBox.new(); _trade_quantity.min_value=1; _trade_quantity.max_value=item.quantity; _trade_quantity.step=1; _trade_quantity.value=mini(_quantity_value,item.quantity)
-		_trade_quantity.value_changed.connect(func(value: float): _quantity_value=int(value))
 		_screen.detail.add_child(_trade_quantity)
-		_screen.detail.add_child(W.button("出售所选数量" if _selling else "购买所选数量",_request.bind("trade_quantity",uid)))
-		_screen.detail.add_child(W.button("出售整叠" if _selling else "购买整叠",_request.bind("trade_stack",uid)))
+		var totals:=W.label("",14,true); _screen.detail.add_child(totals)
+		var selected_button:=W.button("出售所选数量" if _selling else "购买所选数量",_request.bind("trade_quantity",uid)); _screen.detail.add_child(selected_button)
+		var stack_button:=W.button("出售整叠" if _selling else "购买整叠",_request.bind("trade_stack",uid)); _screen.detail.add_child(stack_button)
+		var refresh_totals:=func(value: float):
+			_quantity_value=int(value)
+			var unit_price:=price(uid,not _selling)
+			var payer:=market.actor_id if _selling else "player"
+			var funds:=store.count(payer,"coin")
+			var total:=unit_price*_quantity_value
+			var preview:=preview_trade(uid,_selling,_quantity_value)
+			totals.text="总价%d币 · %s持有%d币 · 资金最多%d件"%[total,"店家" if _selling else "你",funds,mini(item.quantity,funds/maxi(1,unit_price))]
+			if funds<total: totals.text+=" · 缺少%d币"%(total-funds)
+			elif not preview.accepted: totals.text+=" · "+str(ERRORS.get(preview.reason,preview.reason))
+			else: totals.text+=" · 付款后余%d币"%(funds-total)
+			selected_button.disabled=not preview.accepted
+			stack_button.disabled=not preview_trade(uid,_selling,item.quantity).accepted
+		_trade_quantity.value_changed.connect(refresh_totals)
+		refresh_totals.call(_trade_quantity.value)
 	if _selling and definition is EquipmentData:
 		var level:=clampi(int(item.properties.get("upgrade_level",0)),0,3)
 		_screen.detail.add_child(W.label("强化每级：主手攻击+1；其余装备生命上限+4。最高+3。",14,true))

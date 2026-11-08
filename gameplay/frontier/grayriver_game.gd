@@ -110,7 +110,12 @@ func _process(delta: float) -> void:
 	if progress.claims.has("quest.river_warden") and not progress.completed:
 		progress.completed=true
 		_save_progress()
-		ui.notify("灰河谷通路已恢复。你仍可探索遗漏地点、处理委托或回访设施。")
+		ui.notify("旧监狱封锁已解除。镇中巡河悬赏仍在等待烽堡、遗钟与泵站的调查结果。")
+	if progress.claims.has("quest.river_demo_finale") and not progress.claims.has("demo.ending_seen"):
+		progress.claim("demo.ending_seen", "灰河谷：水声重归", "巡河调查完成。仍可返回遗迹收集遗漏物资与处理支线。", [], [])
+		_save_progress()
+		var outcome := "清水重新流向东岸，泵站外的取水处与柴灶已经启用。" if progress.claims.has("demo.water_restored") else "压力被封存在井下，维护竖井已成为通往东岸的捷径。"
+		ui.show_panel("灰河谷 / 巡河终章", outcome+"\n\n已踏足地点 %d · 已交付委托 %d · 倒下次数 %d\n\n你可以继续探索，或在系统菜单保存并退出。" % [progress.visited.size(), quests.filter(func(q: ExplorationQuestData): return progress.claims.has("quest."+q.id)).size(), progress.deaths], [{"title":"继续在河谷行路", "callback":ui.close_modal}])
 func show_map() -> void:
 	var root:=VBoxContainer.new()
 	root.add_child(FrontierWidgets.label("滚轮缩放 · 中键/右键拖动 · 左键放置路标 · 暗处为未探索地区",13,true))
@@ -234,3 +239,6 @@ func _service_feedback(fact: Dictionary) -> void:
 	var text:="店家已制成%s ×%d · 返回整修铺购买。"%[title,definition.recipe.output_count]
 	progress_service.record_service_result("service.production."+definition.id,"整修铺完工："+title,WorldTime.instance.stamp()+"\n"+text+"货品属于店家；价格和余量以实际库存为准。")
 	ui.queue_notice(text)
+
+func grant_material_reward(source_id: String, title: String, point: Vector2, materials: Dictionary) -> void:
+	loot.grant_cache(source_id, title, point, materials)

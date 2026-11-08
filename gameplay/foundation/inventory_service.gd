@@ -622,19 +622,25 @@ func state_text(uid: String) -> String:
 
 ## A specific instance changes owner, including its coating, doses and upgrade level.
 ## Work on a private inventory first; observers see only the final atomic state.
+func preview_trade_instance(buyer: String,seller: String,uid: String,quantity: int,price: int) -> OperationResult:
+	return _trade_instance(buyer,seller,uid,quantity,price,false)
 func trade_instance(buyer: String,seller: String,uid: String,quantity: int,price: int) -> OperationResult:
+	return _trade_instance(buyer,seller,uid,quantity,price,true)
+func _trade_instance(buyer: String,seller: String,uid: String,quantity: int,price: int,commit_result: bool) -> OperationResult:
 	var entry:=item(uid)
 	if buyer==seller or not entry or quantity<=0 or quantity>entry.quantity or price<0 or locate(uid) not in actor_containers(seller): return OperationResult.reject("not_owned")
+	if count(buyer,"coin")<price: return OperationResult.reject("currency")
 	var scratch:=_scratch([buyer,seller])
-	if price>0 and not scratch.exchange(buyer,seller,{"coin":price},{}).accepted: return OperationResult.reject("payment_or_capacity")
+	if price>0 and not scratch.exchange(buyer,seller,{"coin":price},{}).accepted: return OperationResult.reject("payment_capacity")
 	var moved:=false
 	for destination in scratch.actor_containers(buyer):
 		if definitions[entry.definition_id] is EquipmentData and destination!=buyer+".pack": continue
 		if scratch.commit(scratch.preview(scratch.locate(uid),destination,uid,quantity)).accepted:
 			moved=true; break
 	if not moved: return OperationResult.reject("capacity")
-	_adopt(scratch,[buyer,seller])
-	_publish("trade_committed",buyer,{"partner":seller,"uid":uid,"quantity":quantity,"price":price})
+	if commit_result:
+		_adopt(scratch,[buyer,seller])
+		_publish("trade_committed",buyer,{"partner":seller,"uid":uid,"quantity":quantity,"price":price})
 	return OperationResult.success(quantity)
 
 func preview_craft(actor: String,costs: Dictionary,outputs: Dictionary) -> OperationResult:

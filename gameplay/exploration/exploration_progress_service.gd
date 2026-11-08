@@ -188,7 +188,10 @@ func choose_world_event(entry: ExplorationWorldEventData, choice: ExplorationWor
 		return false
 	for id in entry.required_claims:
 		if not game.progress.claims.has(id): return false
+	if entry.irreversible and game.progress.claims.has(entry.id): return false
 	game.progress.choices[entry.id] = choice.id
+	for id in choice.grants_claims:
+		game.progress.claim(id, choice.title, choice.text, [], [])
 	var record := choice.title + "：" + choice.text
 	if not game.progress.claim(entry.id, entry.title, record, [], []):
 		for note in game.progress.journal:
@@ -207,7 +210,7 @@ func discover(entry: ExplorationDiscoveryData) -> bool:
 			_save_progress()
 		return reward
 	if game.knowledge: game.knowledge.read_clues(entry)
-	game.player.skill_manager.combinations.supplies.grant(entry.materials)
+	game.grant_material_reward(entry.id, entry.title, entry.pos, entry.materials)
 	_apply_knowledge()
 	if entry.heal:
 		game.player.heal(60, "discovery")
@@ -242,7 +245,7 @@ func solve_puzzle(spec: SpellPuzzleData, method_id: String = "") -> bool:
 		supplies.finish_transaction(false)
 		return false
 	if not spec.work_methods.is_empty(): game.progress.choices[spec.id] = method_id
-	supplies.grant(spec.materials)
+	game.grant_material_reward(spec.id, spec.title, spec.pos, spec.materials)
 	var notify := supplies.finish_transaction(true)
 	_queue_save()
 	if notify.is_valid(): notify.call()

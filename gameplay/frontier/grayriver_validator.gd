@@ -34,4 +34,21 @@ static func validate(raw: Dictionary) -> Array[String]:
 			for j in range(region.get(collection,[]).size()):
 				var point:Vector2=GrayriverDefinition.vector(region[collection][j].pos)
 				if not point.is_finite() or absf(point.x)>float(region.size[0])*.5-30 or absf(point.y)>float(region.size[1])*.5-30:errors.append(field+".%s[%d].pos: outside region"%[collection,j])
+	# The first exit is the return chain used by multi-floor map projection.
+	for region in raw.get("regions",[]):
+		if region.id=="camp": continue
+		var chain: Dictionary={}
+		var current: Dictionary=region
+		while current.id!="camp":
+			var exits: Array=current.get("exits",[])
+			if chain.has(current.id) or exits.is_empty():
+				errors.append(str(region.id)+".exits[0]: return chain must reach camp without cycles")
+				break
+			chain[current.id]=true
+			if not exits[0].get("required_claims",[]).is_empty(): errors.append(str(current.id)+".exits[0]: return route must be unconditional")
+			var parents: Array=raw.regions.filter(func(r: Dictionary): return r.id==exits[0].target)
+			if parents.is_empty():
+				errors.append(str(current.id)+".exits[0]: missing return region")
+				break
+			current=parents[0]
 	return errors

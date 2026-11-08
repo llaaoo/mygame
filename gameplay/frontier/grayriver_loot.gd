@@ -140,7 +140,9 @@ func _ensure_source(id: String) -> void:
 	var record: Dictionary=game.progress.loot_records[id]
 	store.begin_batch()
 	for key in record.equipment: store.receive(id,key,int(record.equipment[key]),true)
-	for key in record.materials: store.receive(id,key,int(record.materials[key]),true)
+	for key in record.materials:
+		if id.begins_with("cache."): store.receive_into(id+".pack",key,int(record.materials[key]),true)
+		else: store.receive(id,key,int(record.materials[key]),true)
 	store.end_batch()
 func _refresh_record(id: String) -> void:
 	var store:=game.session.inventory
@@ -152,7 +154,7 @@ func _refresh_record(id: String) -> void:
 		for entry in store.entries(source):
 			var kind: String="equipment" if store.definitions.get(entry.definition) is EquipmentData else "materials"
 			record[kind][entry.definition]=int(record[kind].get(entry.definition,0))+entry.quantity
-func _take_instances(id: String,kind: String,key: String,selected_uid := "") -> int:
+func _take_instances(id: String,kind: String,key: String,selected_uid := "", persist := true) -> int:
 	_ensure_source(id)
 	var store:=game.session.inventory
 	var taken:=0
@@ -178,7 +180,7 @@ func _take_instances(id: String,kind: String,key: String,selected_uid := "") -> 
 		game.progress.claims["loot."+id]=true
 		(corpses[id] as GrayriverLootCorpse).refresh()
 	store.end_batch()
-	if taken>0:
+	if taken>0 and persist:
 		game.survival.supplies.changed.emit()
 		game._save_progress()
 	return taken
@@ -194,3 +196,15 @@ func instance_entries(id: String) -> Array[Dictionary]:
 			if not definition: continue
 			result.append({"id":"uid:"+row.uid,"uid":row.uid,"kind":"equipment" if definition is EquipmentData else "materials","item":row.definition,"title":definition.display_name,"text":definition.description,"subtitle":"×%d · %s"%[row.quantity,store.state_text(row.uid)],"icon":definition.get_icon_texture() if definition is EquipmentData else definition.icon})
 	return result
+
+func grant_cache(source_id: String, title: String, point: Vector2, materials: Dictionary) -> void:
+	if materials.is_empty(): return
+	var id := "cache." + source_id
+	if not game.progress.loot_records.has(id):
+		game.progress.loot_records[id] = {"region":game.region_id,"position":[point.x, point.y+72],"title":title+" · 留存物资","equipment":{},"materials":materials.duplicate()}
+		_mount(id)
+	# The same instance transfer as corpse loot preserves capacity, water caps
+	# and UID state. Full inventory leaves a persistent physical remainder.
+	_take_instances(id, "", "", "", false)
+	var record: Dictionary = game.progress.loot_records[id]
+	if not record.materials.is_empty(): game.ui.notify("容量不足的奖励已留在附近物资箱；腾出空间后靠近F领取。")

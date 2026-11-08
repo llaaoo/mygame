@@ -282,15 +282,18 @@ func _try_interact(expected: Node2D = null, targeted := false) -> void:
 				var ev := CombatEvent.create(CombatEvent.Type.ON_INTERACT, player, nearest)
 				CombatEventBus.instance.emit(ev)
 
+func scroll_source() -> String:
+	for source in [casting.aimed_source(),last_spell_source,player.material_wheel.last_source]:
+		if QuickslotMaterials.available(player.skill_manager,source): return source
+	return ""
+
 func _unhandled_input(event: InputEvent) -> void:
 	if player.ui_blocked or get_tree().paused or player.health_component.is_dead: return
 	if not event is InputEventMouseButton or not event.pressed: return
 	if event.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
 		if player.material_wheel.visible or _pointer_over_interface(): return
-		var source:=casting.aimed_source()
-		if source.is_empty(): source=last_spell_source
-		if source.is_empty(): source=player.material_wheel.last_source
-		if not QuickslotMaterials.available(player.skill_manager,source): return
+		var source:=scroll_source()
+		if source.is_empty(): return
 		player.cancel_active_input("切换形式：取消未提交准备")
 		suppress_source(source)
 		if QuickslotMaterials.cycle(player,source,1 if event.button_index==MOUSE_BUTTON_WHEEL_DOWN else -1):

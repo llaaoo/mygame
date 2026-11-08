@@ -296,6 +296,51 @@
             "cloth": 4,
             "book_spear_thrust": 1
           }
+        },
+        {
+          "id": "demo.route_brief",
+          "title": "巡河悬赏：三处失联",
+          "pos": [
+            -2790,
+            2360
+          ],
+          "text": "巡河员失联前留下三处地点：北岸灰脊烽堡、西侧遗钟墓道、东岸沉水泵站。先到山脚档案馆取调度令，再调查烽堡。三处均有可撤退入口，不必一次走完。J选择“巡河·失去的烽火”并追踪；G查看路标。出发前备食物、水、修补布及少量废金属。地下机关都保留手动作业办法；付出的时间和物资与施法路线不同。最终须连同旧监狱封锁一起解决，再回镇交付巡河总报告。"
+        },
+        {
+          "id": "demo.sign_watch",
+          "title": "北岸岔路：灰脊烽堡",
+          "pos": [
+            1600,
+            -2600
+          ],
+          "text": "沿东岸向北走至山崖脚的烽堡入口。烽堡弓手有真实射界，沿掩体接近；入口内左侧是安全整备区，先读告示再向东。"
+        },
+        {
+          "id": "demo.sign_bell",
+          "title": "西林旧墓路标",
+          "pos": [
+            -3980,
+            -900
+          ],
+          "text": "西侧山壁通向遗钟墓道。墓中有毒地与封存记录，先找侧廊净化装置。入口可直接撤回森林；先读碑再靠近敌人。"
+        },
+        {
+          "id": "demo.sign_cistern",
+          "title": "下游泵站路标",
+          "pos": [
+            2100,
+            1400
+          ],
+          "text": "向东南进入沉水泵站。水面导电，木架可切断视线；操作机关前先清理附近敌人。入口侧有取水口，污染未处理前只出未净化水。"
+        },
+        {
+          "id": "demo.wateryard.sign",
+          "title": "东岸取水场告示",
+          "pos": [
+            2800,
+            1530
+          ],
+          "text": "沉水总闸恢复供水后，这里开放清水口和常明柴灶；如果封存压力，则维护储备箱可以取用，井下竖井也成为捷径。这里不会同时提供两种后果。"
         }
       ],
       "stations": [
@@ -459,6 +504,32 @@
             "frost_salt": 2
           },
           "regeneration_hours": 8
+        },
+        {
+          "id": "demo.restored_water",
+          "title": "复水后的东岸清水口",
+          "kind": "water",
+          "pos": [
+            2950,
+            1450
+          ],
+          "clean": true,
+          "required_claims": [
+            "demo.water_restored"
+          ]
+        },
+        {
+          "id": "demo.restored_cook",
+          "title": "复水场常明柴灶",
+          "kind": "cook",
+          "pos": [
+            3120,
+            1450
+          ],
+          "lit": true,
+          "required_claims": [
+            "demo.water_restored"
+          ]
         }
       ],
       "patches": [
@@ -585,6 +656,39 @@
               }
             }
           ]
+        },
+        {
+          "id": "demo.maintenance_cache",
+          "title": "封压后保住的维护箱",
+          "pos": [
+            2976,
+            1376
+          ],
+          "hint": "封压后可用：手动开箱3秒；或冲击震开。",
+          "routes": [
+            {
+              "steps": [
+                "impact"
+              ]
+            }
+          ],
+          "work": [
+            {
+              "id": "maintenance_cache_work",
+              "title": "手动检修：封压后保住的维护箱",
+              "duration": 3,
+              "material_costs": {}
+            }
+          ],
+          "materials": {
+            "coin": 12,
+            "metal_scrap": 3,
+            "guard_tonic": 1
+          },
+          "required_claims": [
+            "demo.pressure_contained"
+          ],
+          "completion_text": "维护储备已取出；箱子不会在重进时补满。"
         }
       ],
       "facilities": [
@@ -742,6 +846,48 @@
             "river.mine_shore"
           ],
           "locked_message": "出口从内部坍塌，先在矿道侧廊加固承梁。"
+        },
+        {
+          "title": "进入灰脊烽堡",
+          "pos": [
+            1650,
+            -3200
+          ],
+          "target": "river_watch",
+          "arrival": [
+            -1250,
+            0
+          ],
+          "required_claims": [],
+          "locked_message": "通路尚未接通。先阅读入口说明，处理本层的机关；返回入口始终可撤退。"
+        },
+        {
+          "title": "进入遗钟墓道",
+          "pos": [
+            -4300,
+            -900
+          ],
+          "target": "river_bell",
+          "arrival": [
+            -1250,
+            0
+          ],
+          "required_claims": [],
+          "locked_message": "通路尚未接通。先阅读入口说明，处理本层的机关；返回入口始终可撤退。"
+        },
+        {
+          "title": "进入沉水泵站",
+          "pos": [
+            2300,
+            1650
+          ],
+          "target": "river_cistern",
+          "arrival": [
+            -1250,
+            0
+          ],
+          "required_claims": [],
+          "locked_message": "通路尚未接通。先阅读入口说明，处理本层的机关；返回入口始终可撤退。"
         }
       ],
       "encounters": [
@@ -929,6 +1075,34 @@
           },
           "completion_text": "索砾收好了修复原料，交给你谷粮2与苦叶2。艾妲可以记录运料恢复。",
           "already_text": "运料已经补齐。货物只交一次，谷粮和苦叶也不会重复发放。"
+        },
+        {
+          "id": "demo.relief_delivery",
+          "title": "巡河远征补给交付",
+          "pos": [
+            -2730,
+            2120
+          ],
+          "description": "烽堡启用后，镇民需要布料2、烤饼2补充北岸避风棚。交付4秒；消耗真实库存。",
+          "completion_text": "北岸队伍收到补给，给你的返程费用装进了钱袋。",
+          "required_claims": [
+            "demo.watch.signal"
+          ],
+          "rewards": {
+            "coin": 8,
+            "tea": 1
+          },
+          "methods": [
+            {
+              "id": "demo_relief",
+              "title": "交付巡河补给",
+              "duration": 4,
+              "material_costs": {
+                "cloth": 2,
+                "ration": 2
+              }
+            }
+          ]
         }
       ],
       "events": [
@@ -1055,6 +1229,15 @@
           ],
           "text": "水工守卫仍听命于旧监狱的火焰领主。查明工区污染后，可沿北岸或东侧驿道深入。",
           "requires_clear": true
+        },
+        {
+          "id": "demo.dispatch",
+          "title": "巡河调度令",
+          "pos": [
+            -550,
+            420
+          ],
+          "text": "失联队长把北岸烽堡的风井关闭了。先在上层修好风门，再下风井找信号台。返回镇中可分段交付记录，不必带满背包继续深入。遗钟墓的回执提到下游水闸；三份记录共同说明河谷污染的源头。"
         }
       ],
       "encounters": [
@@ -1470,6 +1653,1342 @@
           "kind": "wall"
         }
       ]
+    },
+    {
+      "id": "river_watch",
+      "title": "灰脊烽堡 / 风门庭院",
+      "description": "先读西侧岗哨说明；向东沿上下两条掩体路推进。风门修复后，东北楼梯通向风井。",
+      "entry": [
+        -1250,
+        0
+      ],
+      "size": [
+        3000,
+        2000
+      ],
+      "obstacles": [
+        {
+          "position": [
+            -430,
+            0
+          ],
+          "size": [
+            130,
+            500
+          ],
+          "kind": "pillar"
+        },
+        {
+          "position": [
+            170,
+            -480
+          ],
+          "size": [
+            520,
+            100
+          ],
+          "kind": "barricade"
+        },
+        {
+          "position": [
+            260,
+            440
+          ],
+          "size": [
+            500,
+            100
+          ],
+          "kind": "barricade"
+        },
+        {
+          "position": [
+            820,
+            0
+          ],
+          "size": [
+            120,
+            420
+          ],
+          "kind": "pillar"
+        }
+      ],
+      "encounters": [
+        {
+          "id": "river_watch.1",
+          "pos": [
+            -400,
+            -660
+          ],
+          "character": "watch_archer",
+          "profile": "hunter",
+          "group": "river_watch.1"
+        },
+        {
+          "id": "river_watch.2",
+          "pos": [
+            320,
+            40
+          ],
+          "character": "guard",
+          "profile": "guard",
+          "group": "river_watch.2"
+        },
+        {
+          "id": "river_watch.3",
+          "pos": [
+            700,
+            -640
+          ],
+          "character": "watch_archer",
+          "profile": "hunter",
+          "group": "river_watch.3"
+        },
+        {
+          "id": "river_watch.4",
+          "pos": [
+            1040,
+            500
+          ],
+          "character": "hunter",
+          "profile": "hunter",
+          "group": "river_watch.4"
+        }
+      ],
+      "notes": [
+        {
+          "id": "demo.watch.entry",
+          "title": "烽堡岗哨须知",
+          "pos": [
+            -1250,
+            -300
+          ],
+          "text": "整备区在这块告示以西；最靠近的弓手在东北侧掩体后。先装水、整理口袋，再沿南侧避开直射。东北风门可依次用冰与冲击解冻震开，也可花废金属1、布料1站定6秒检修。被击中会中断作业，先清理视线内敌人。风门只开启下层楼梯，不影响身后的出口。"
+        },
+        {
+          "id": "demo.watch.supply",
+          "title": "岗哨应急箱",
+          "pos": [
+            -1250,
+            270
+          ],
+          "text": "封签只够支撑一次出发。这里的物资不会随重进补满。",
+          "materials": {
+            "cloth": 2,
+            "metal_scrap": 2,
+            "ration": 2,
+            "frost_salt": 1,
+            "arrow": 6
+          }
+        },
+        {
+          "id": "demo.watch.roll",
+          "title": "被撕下的巡哨名册",
+          "pos": [
+            1120,
+            720
+          ],
+          "text": "奥伦的名字被抹去，却仍留着维护队的印记。名册请带回镇中；弓手的箭来自有限箭袋，不会在战斗中补满。",
+          "requires_clear": true,
+          "materials": {
+            "coin": 4
+          }
+        }
+      ],
+      "puzzles": [
+        {
+          "id": "demo.watch.windgate",
+          "title": "冻死的风门",
+          "pos": [
+            1120,
+            -736
+          ],
+          "hint": "冰→冲击；或废金属1、布料1检修6秒。接通后开放风井楼梯。",
+          "routes": [
+            {
+              "steps": [
+                "ice",
+                "impact"
+              ]
+            }
+          ],
+          "work": [
+            {
+              "id": "windgate_work",
+              "title": "手动检修：冻死的风门",
+              "duration": 6,
+              "material_costs": {
+                "metal_scrap": 1,
+                "cloth": 1
+              }
+            }
+          ],
+          "materials": {},
+          "required_claims": [],
+          "completion_text": "风门缓缓打开。东北楼梯可通往烽堡风井；回城出口仍可使用。"
+        }
+      ],
+      "exits": [
+        {
+          "title": "撤回北岸",
+          "pos": [
+            -1350,
+            0
+          ],
+          "target": "camp",
+          "arrival": [
+            1650,
+            -3060
+          ],
+          "required_claims": [],
+          "locked_message": "通路尚未接通。先阅读入口说明，处理本层的机关；返回入口始终可撤退。"
+        },
+        {
+          "title": "沿楼梯下风井",
+          "pos": [
+            1330,
+            -600
+          ],
+          "target": "river_watch_vault",
+          "arrival": [
+            -1250,
+            0
+          ],
+          "required_claims": [
+            "demo.watch.windgate"
+          ],
+          "locked_message": "通路尚未接通。先阅读入口说明，处理本层的机关；返回入口始终可撤退。"
+        }
+      ],
+      "stations": [
+        {
+          "id": "demo.watch.herbs",
+          "title": "岗哨药草畦",
+          "kind": "forage",
+          "pos": [
+            -1250,
+            530
+          ],
+          "harvest": {
+            "herb": 1
+          },
+          "regeneration_hours": 12
+        }
+      ],
+      "facilities": [
+        {
+          "id": "demo.watch.refuge",
+          "title": "岗哨避风棚",
+          "pos": [
+            -1250,
+            730
+          ],
+          "service": "outpost",
+          "requires_clear": false,
+          "description": "布料1、炭屑1搭起避风棚；这里可按小时休息，烹饪仍需真实燃料。",
+          "assembly": {
+            "id": "watch_shelter",
+            "title": "修补避风棚",
+            "duration": 4,
+            "material_costs": {
+              "cloth": 1,
+              "charcoal": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "river_watch_vault",
+      "title": "灰脊烽堡 / 风井信号台",
+      "description": "侧廊可避开正中队长；先检查南侧信号继电器。完成后从维护梯直接返回北岸。",
+      "entry": [
+        -1250,
+        0
+      ],
+      "size": [
+        3000,
+        2000
+      ],
+      "obstacles": [
+        {
+          "position": [
+            -500,
+            -300
+          ],
+          "size": [
+            110,
+            500
+          ],
+          "kind": "pillar"
+        },
+        {
+          "position": [
+            150,
+            0
+          ],
+          "size": [
+            480,
+            110
+          ],
+          "kind": "barricade"
+        },
+        {
+          "position": [
+            760,
+            -430
+          ],
+          "size": [
+            130,
+            400
+          ],
+          "kind": "pillar"
+        }
+      ],
+      "encounters": [
+        {
+          "id": "river_watch_vault.1",
+          "pos": [
+            -250,
+            500
+          ],
+          "character": "guard",
+          "profile": "guard",
+          "group": "river_watch_vault.1"
+        },
+        {
+          "id": "river_watch_vault.2",
+          "pos": [
+            500,
+            -580
+          ],
+          "character": "watch_archer",
+          "profile": "hunter",
+          "group": "river_watch_vault.2"
+        },
+        {
+          "id": "river_watch_vault.3",
+          "pos": [
+            1000,
+            120
+          ],
+          "character": "watch_captain",
+          "profile": "guard",
+          "group": "river_watch_vault.3"
+        }
+      ],
+      "notes": [
+        {
+          "id": "demo.watch.warning",
+          "title": "风井维护便笺",
+          "pos": [
+            -1250,
+            -300
+          ],
+          "text": "信号台被两道接点隔离。先修南侧继电器，再去东侧台座。队长手里的剑、盾与护衣就是他的实物战利品；需要装备空间。不要为了读便笺靠近台座，当前入口仍在安全距离。"
+        },
+        {
+          "id": "demo.watch.resin",
+          "title": "维护油柜",
+          "pos": [
+            -1120,
+            560
+          ],
+          "text": "柜中留下修补料与点火用料。",
+          "materials": {
+            "metal_scrap": 2,
+            "charcoal": 2,
+            "sap": 1,
+            "fire_rag": 1
+          }
+        }
+      ],
+      "puzzles": [
+        {
+          "id": "demo.watch.relay",
+          "title": "风井继电器",
+          "pos": [
+            96,
+            736
+          ],
+          "hint": "水→雷电；或废金属1检修6秒。",
+          "routes": [
+            {
+              "steps": [
+                "water",
+                "lightning"
+              ]
+            }
+          ],
+          "work": [
+            {
+              "id": "relay_work",
+              "title": "手动检修：风井继电器",
+              "duration": 6,
+              "material_costs": {
+                "metal_scrap": 1
+              }
+            }
+          ],
+          "materials": {
+            "storm_dust": 1
+          },
+          "required_claims": [],
+          "completion_text": "继电器接通，信号台的外锁解除。"
+        },
+        {
+          "id": "demo.watch.signal",
+          "title": "失落的信号台",
+          "pos": [
+            1248,
+            352
+          ],
+          "hint": "让炉内真实火焰保持1秒；或炭屑2、树液1补炉6秒。",
+          "routes": [
+            {
+              "required_surface": "burning",
+              "hold_seconds": 1
+            }
+          ],
+          "work": [
+            {
+              "id": "signal_work",
+              "title": "手动检修：失落的信号台",
+              "duration": 6,
+              "material_costs": {
+                "charcoal": 2,
+                "sap": 1
+              }
+            }
+          ],
+          "materials": {
+            "coin": 8,
+            "echo_ink": 1
+          },
+          "required_claims": [
+            "demo.watch.relay"
+          ],
+          "completion_text": "烽火重新照向遗钟墓道。失联记录指向西林的净化侧廊：先打开侧廊，再去钟下封室查回执。J可交付烽堡调查，镇中总报告需三处调查与旧监狱解封。"
+        }
+      ],
+      "exits": [
+        {
+          "title": "返回庭院",
+          "pos": [
+            -1350,
+            0
+          ],
+          "target": "river_watch",
+          "arrival": [
+            1200,
+            -600
+          ],
+          "required_claims": [],
+          "locked_message": "通路尚未接通。先阅读入口说明，处理本层的机关；返回入口始终可撤退。"
+        },
+        {
+          "title": "维护梯返回北岸",
+          "pos": [
+            1330,
+            700
+          ],
+          "target": "camp",
+          "arrival": [
+            1650,
+            -3060
+          ],
+          "required_claims": [
+            "demo.watch.signal"
+          ],
+          "locked_message": "通路尚未接通。先阅读入口说明，处理本层的机关；返回入口始终可撤退。"
+        }
+      ]
+    },
+    {
+      "id": "river_bell",
+      "title": "遗钟墓道 / 净化侧廊",
+      "description": "长廊毒地可从南侧绕过。先恢复净化架，再打开北侧下行门。",
+      "entry": [
+        -1250,
+        0
+      ],
+      "size": [
+        3000,
+        2000
+      ],
+      "obstacles": [
+        {
+          "position": [
+            -400,
+            -360
+          ],
+          "size": [
+            120,
+            500
+          ],
+          "kind": "pillar"
+        },
+        {
+          "position": [
+            180,
+            300
+          ],
+          "size": [
+            660,
+            100
+          ],
+          "kind": "barricade"
+        },
+        {
+          "position": [
+            700,
+            -350
+          ],
+          "size": [
+            120,
+            430
+          ],
+          "kind": "pillar"
+        }
+      ],
+      "encounters": [
+        {
+          "id": "river_bell.1",
+          "pos": [
+            -350,
+            470
+          ],
+          "character": "bell_keeper",
+          "profile": "hunter",
+          "group": "river_bell.1"
+        },
+        {
+          "id": "river_bell.2",
+          "pos": [
+            240,
+            -600
+          ],
+          "character": "hunter",
+          "profile": "hunter",
+          "group": "river_bell.2"
+        },
+        {
+          "id": "river_bell.3",
+          "pos": [
+            930,
+            150
+          ],
+          "character": "sluice_alchemist",
+          "profile": "sentry",
+          "group": "river_bell.3"
+        },
+        {
+          "id": "river_bell.4",
+          "pos": [
+            1020,
+            740
+          ],
+          "character": "guard",
+          "profile": "guard",
+          "group": "river_bell.4"
+        }
+      ],
+      "notes": [
+        {
+          "id": "demo.bell.entry",
+          "title": "墓门外的拓印",
+          "pos": [
+            -1250,
+            -300
+          ],
+          "text": "入口这里可整备。毒地在中央长廊，沿南侧可绕行。净化架需要水→火冲洗焚除，或者苦叶2、布料1手工净化6秒。之后再去东北的下行门。法术路线消耗自己的介质，现场作业会被受击打断；不是免费替代。"
+        },
+        {
+          "id": "demo.bell.supply",
+          "title": "守墓人遗下的药包",
+          "pos": [
+            -1250,
+            300
+          ],
+          "text": "保留给仍愿意清理墓道的人。",
+          "materials": {
+            "herb": 3,
+            "cloth": 2,
+            "clean_water": 1,
+            "clear_tonic": 1
+          }
+        },
+        {
+          "id": "demo.bell.names",
+          "title": "石壁上的无名者",
+          "pos": [
+            1120,
+            730
+          ],
+          "text": "失联者曾在此庇护受伤的泵工。名录记载了他们的工牌，而非祭品。",
+          "requires_clear": true,
+          "materials": {
+            "coin": 4
+          }
+        }
+      ],
+      "puzzles": [
+        {
+          "id": "demo.bell.cleanser",
+          "title": "腐蚀的净化架",
+          "pos": [
+            544,
+            736
+          ],
+          "hint": "依次水→火；或苦叶2、布料1净化6秒。",
+          "routes": [
+            {
+              "steps": [
+                "water",
+                "fire"
+              ]
+            }
+          ],
+          "work": [
+            {
+              "id": "cleanser_work",
+              "title": "手动检修：腐蚀的净化架",
+              "duration": 6,
+              "material_costs": {
+                "herb": 2,
+                "cloth": 1
+              }
+            }
+          ],
+          "materials": {},
+          "required_claims": [],
+          "completion_text": "净化架恢复，重进本层时中央毒地停止渗出；北侧封条已经可以处理。"
+        },
+        {
+          "id": "demo.bell.seal",
+          "title": "下行门的脆裂封条",
+          "pos": [
+            1184,
+            -672
+          ],
+          "hint": "火→冲击；或废金属1撬松6秒。",
+          "routes": [
+            {
+              "steps": [
+                "fire",
+                "impact"
+              ]
+            }
+          ],
+          "work": [
+            {
+              "id": "seal_work",
+              "title": "手动检修：下行门的脆裂封条",
+              "duration": 6,
+              "material_costs": {
+                "metal_scrap": 1
+              }
+            }
+          ],
+          "materials": {},
+          "required_claims": [
+            "demo.bell.cleanser"
+          ],
+          "completion_text": "下行门开启。钟下封室保留着泵站工牌的最后回执。"
+        }
+      ],
+      "exits": [
+        {
+          "title": "撤回西林",
+          "pos": [
+            -1350,
+            0
+          ],
+          "target": "camp",
+          "arrival": [
+            -4160,
+            -900
+          ],
+          "required_claims": [],
+          "locked_message": "通路尚未接通。先阅读入口说明，处理本层的机关；返回入口始终可撤退。"
+        },
+        {
+          "title": "下到钟下封室",
+          "pos": [
+            1330,
+            -600
+          ],
+          "target": "river_bell_depths",
+          "arrival": [
+            -1250,
+            0
+          ],
+          "required_claims": [
+            "demo.bell.seal"
+          ],
+          "locked_message": "通路尚未接通。先阅读入口说明，处理本层的机关；返回入口始终可撤退。"
+        }
+      ],
+      "patches": [
+        {
+          "pos": [
+            96,
+            32
+          ],
+          "state": "poisoned",
+          "radius": 128,
+          "duration": 120,
+          "disabled_by_claim": "demo.bell.cleanser"
+        }
+      ]
+    },
+    {
+      "id": "river_bell_depths",
+      "title": "遗钟墓道 / 钟下封室",
+      "description": "环绕石柱可切断术士视线；东西两端留下调音记录和泵工回执。",
+      "entry": [
+        -1250,
+        0
+      ],
+      "size": [
+        3000,
+        2000
+      ],
+      "obstacles": [
+        {
+          "position": [
+            -400,
+            0
+          ],
+          "size": [
+            160,
+            400
+          ],
+          "kind": "pillar"
+        },
+        {
+          "position": [
+            300,
+            -440
+          ],
+          "size": [
+            450,
+            100
+          ],
+          "kind": "barricade"
+        },
+        {
+          "position": [
+            300,
+            440
+          ],
+          "size": [
+            450,
+            100
+          ],
+          "kind": "barricade"
+        },
+        {
+          "position": [
+            920,
+            -230
+          ],
+          "size": [
+            100,
+            360
+          ],
+          "kind": "pillar"
+        }
+      ],
+      "encounters": [
+        {
+          "id": "river_bell_depths.1",
+          "pos": [
+            -250,
+            -630
+          ],
+          "character": "sluice_alchemist",
+          "profile": "sentry",
+          "group": "river_bell_depths.1"
+        },
+        {
+          "id": "river_bell_depths.2",
+          "pos": [
+            470,
+            620
+          ],
+          "character": "bell_keeper",
+          "profile": "hunter",
+          "group": "river_bell_depths.2"
+        },
+        {
+          "id": "river_bell_depths.3",
+          "pos": [
+            1050,
+            120
+          ],
+          "character": "bell_keeper",
+          "profile": "hunter",
+          "group": "river_bell_depths.3"
+        }
+      ],
+      "notes": [
+        {
+          "id": "demo.bell.warning",
+          "title": "调音人的笔录",
+          "pos": [
+            -1250,
+            -300
+          ],
+          "text": "回声不接受胡乱敲击：先凝霜，再加热，最后冲击。不会这些动作也可用晶砂1、布料1校准6秒。先读南侧回执再去东侧钟座。记录揭示：泵站既可恢复供水，也可永久封压，无法两全。"
+        },
+        {
+          "id": "demo.bell.receipt",
+          "title": "泵工最后的回执",
+          "pos": [
+            -1080,
+            600
+          ],
+          "text": "工牌背面写着：沉水压力井的两个控制器要分别解除，再去总闸决定水路。复水能让东岸取到清水，封压则保留竖井作为捷径。请带回镇中。",
+          "materials": {
+            "crystal": 2,
+            "cloth": 1,
+            "echo_ink": 1
+          }
+        }
+      ],
+      "puzzles": [
+        {
+          "id": "demo.bell.core",
+          "title": "失调的遗钟",
+          "pos": [
+            1248,
+            352
+          ],
+          "hint": "冰→火→冲击；或晶砂1、布料1校准6秒。",
+          "routes": [
+            {
+              "steps": [
+                "ice",
+                "fire",
+                "impact"
+              ]
+            }
+          ],
+          "work": [
+            {
+              "id": "core_work",
+              "title": "手动检修：失调的遗钟",
+              "duration": 6,
+              "material_costs": {
+                "crystal": 1,
+                "cloth": 1
+              }
+            }
+          ],
+          "materials": {
+            "ward_powder": 1,
+            "coin": 8
+          },
+          "required_claims": [
+            "demo.bell.receipt"
+          ],
+          "completion_text": "钟声穿过旧水道，回执被完整译出。下一站：东岸沉水泵站，先修进水轮，再下压力井。返回镇中可交付遗钟回执。"
+        }
+      ],
+      "exits": [
+        {
+          "title": "返回净化侧廊",
+          "pos": [
+            -1350,
+            0
+          ],
+          "target": "river_bell",
+          "arrival": [
+            1200,
+            -600
+          ],
+          "required_claims": [],
+          "locked_message": "通路尚未接通。先阅读入口说明，处理本层的机关；返回入口始终可撤退。"
+        },
+        {
+          "title": "旧运尸坡返回西林",
+          "pos": [
+            1330,
+            700
+          ],
+          "target": "camp",
+          "arrival": [
+            -4160,
+            -900
+          ],
+          "required_claims": [
+            "demo.bell.core"
+          ],
+          "locked_message": "通路尚未接通。先阅读入口说明，处理本层的机关；返回入口始终可撤退。"
+        }
+      ]
+    },
+    {
+      "id": "river_cistern",
+      "title": "沉水泵站 / 进水大厅",
+      "description": "湿地与木架构成两条通路。进水轮修好后可下井；后门仍能退出。",
+      "entry": [
+        -1250,
+        0
+      ],
+      "size": [
+        3000,
+        2000
+      ],
+      "obstacles": [
+        {
+          "position": [
+            -460,
+            -280
+          ],
+          "size": [
+            130,
+            500
+          ],
+          "kind": "pillar"
+        },
+        {
+          "position": [
+            200,
+            360
+          ],
+          "size": [
+            650,
+            100
+          ],
+          "kind": "barricade"
+        },
+        {
+          "position": [
+            800,
+            -360
+          ],
+          "size": [
+            100,
+            450
+          ],
+          "kind": "pillar"
+        }
+      ],
+      "encounters": [
+        {
+          "id": "river_cistern.1",
+          "pos": [
+            -370,
+            500
+          ],
+          "character": "watch_archer",
+          "profile": "hunter",
+          "group": "river_cistern.1"
+        },
+        {
+          "id": "river_cistern.2",
+          "pos": [
+            340,
+            -580
+          ],
+          "character": "sluice_alchemist",
+          "profile": "sentry",
+          "group": "river_cistern.2"
+        },
+        {
+          "id": "river_cistern.3",
+          "pos": [
+            930,
+            210
+          ],
+          "character": "guard",
+          "profile": "guard",
+          "group": "river_cistern.3"
+        },
+        {
+          "id": "river_cistern.4",
+          "pos": [
+            1060,
+            730
+          ],
+          "character": "hunter",
+          "profile": "hunter",
+          "group": "river_cistern.4"
+        }
+      ],
+      "notes": [
+        {
+          "id": "demo.cistern.entry",
+          "title": "泵站值班规程",
+          "pos": [
+            -1250,
+            -300
+          ],
+          "text": "入口安全区只到西侧木架前。中央水面会导电；远程敌人可以用木架遮挡。进水轮可用冰→冲击解卡，也可花废金属2修理6秒。修完才能下压力井。取水口未复水前产出未净化水，须用锅煮净。"
+        },
+        {
+          "id": "demo.cistern.supply",
+          "title": "检修工的午餐柜",
+          "pos": [
+            -1250,
+            300
+          ],
+          "text": "有人把食物与检修件留在同一格。整理背包后再拿。",
+          "materials": {
+            "metal_scrap": 3,
+            "cloth": 1,
+            "ration": 2,
+            "charcoal": 2
+          }
+        },
+        {
+          "id": "demo.cistern.shift",
+          "title": "两班交接记录",
+          "pos": [
+            1120,
+            740
+          ],
+          "text": "复水会冲毁维护竖井，封压则永久停掉这段供水。总闸在下层最东端，控制器分别位于南北两侧；决定前始终可以撤离。",
+          "requires_clear": true
+        }
+      ],
+      "puzzles": [
+        {
+          "id": "demo.cistern.intake",
+          "title": "锈死的进水轮",
+          "pos": [
+            1184,
+            -672
+          ],
+          "hint": "冰→冲击；或废金属2检修6秒。",
+          "routes": [
+            {
+              "steps": [
+                "ice",
+                "impact"
+              ]
+            }
+          ],
+          "work": [
+            {
+              "id": "intake_work",
+              "title": "手动检修：锈死的进水轮",
+              "duration": 6,
+              "material_costs": {
+                "metal_scrap": 2
+              }
+            }
+          ],
+          "materials": {
+            "frost_salt": 1
+          },
+          "required_claims": [],
+          "completion_text": "进水轮转动，北侧楼梯可下到压力井。"
+        }
+      ],
+      "exits": [
+        {
+          "title": "撤回东岸",
+          "pos": [
+            -1350,
+            0
+          ],
+          "target": "camp",
+          "arrival": [
+            2160,
+            1650
+          ],
+          "required_claims": [],
+          "locked_message": "通路尚未接通。先阅读入口说明，处理本层的机关；返回入口始终可撤退。"
+        },
+        {
+          "title": "下到压力井",
+          "pos": [
+            1330,
+            -600
+          ],
+          "target": "river_cistern_depths",
+          "arrival": [
+            -1250,
+            0
+          ],
+          "required_claims": [
+            "demo.cistern.intake"
+          ],
+          "locked_message": "通路尚未接通。先阅读入口说明，处理本层的机关；返回入口始终可撤退。"
+        }
+      ],
+      "stations": [
+        {
+          "id": "demo.cistern.water",
+          "title": "泵站旧取水口",
+          "kind": "water",
+          "pos": [
+            -1250,
+            570
+          ],
+          "clean": false
+        }
+      ],
+      "patches": [
+        {
+          "pos": [
+            96,
+            32
+          ],
+          "state": "wet",
+          "radius": 128,
+          "duration": 120
+        }
+      ]
+    },
+    {
+      "id": "river_cistern_depths",
+      "title": "沉水泵站 / 压力井",
+      "description": "南北两组控制器可任意顺序处理。总闸的两种结局会永久改变东岸设施与路线。",
+      "entry": [
+        -1250,
+        0
+      ],
+      "size": [
+        3000,
+        2000
+      ],
+      "obstacles": [
+        {
+          "position": [
+            -450,
+            0
+          ],
+          "size": [
+            100,
+            430
+          ],
+          "kind": "pillar"
+        },
+        {
+          "position": [
+            200,
+            -340
+          ],
+          "size": [
+            120,
+            350
+          ],
+          "kind": "pillar"
+        },
+        {
+          "position": [
+            200,
+            340
+          ],
+          "size": [
+            120,
+            350
+          ],
+          "kind": "pillar"
+        },
+        {
+          "position": [
+            800,
+            0
+          ],
+          "size": [
+            100,
+            360
+          ],
+          "kind": "pillar"
+        }
+      ],
+      "encounters": [
+        {
+          "id": "river_cistern_depths.1",
+          "pos": [
+            -170,
+            -610
+          ],
+          "character": "sluice_alchemist",
+          "profile": "sentry",
+          "group": "river_cistern_depths.1"
+        },
+        {
+          "id": "river_cistern_depths.2",
+          "pos": [
+            450,
+            600
+          ],
+          "character": "watch_archer",
+          "profile": "hunter",
+          "group": "river_cistern_depths.2"
+        },
+        {
+          "id": "river_cistern_depths.3",
+          "pos": [
+            1060,
+            0
+          ],
+          "character": "watch_captain",
+          "profile": "guard",
+          "group": "river_cistern_depths.3"
+        }
+      ],
+      "notes": [
+        {
+          "id": "demo.cistern.warning",
+          "title": "压力井操作牌",
+          "pos": [
+            -1250,
+            -300
+          ],
+          "text": "请先清理两侧控制器附近的敌人。北侧过热：用水降温或花清水1、布料1检修；南侧锁紧：用火→冲击或花废金属1、炭屑1检修。每项手工作业6秒，会被伤害打断。总闸只接受两项都完成后的明确选择。"
+        },
+        {
+          "id": "demo.cistern.reserve",
+          "title": "压力井备用箱",
+          "pos": [
+            -1120,
+            570
+          ],
+          "text": "只取需要的数量，剩余物资仍保存在来源中。",
+          "materials": {
+            "clean_water": 2,
+            "cloth": 1,
+            "metal_scrap": 2,
+            "charcoal": 2,
+            "guard_tonic": 1
+          }
+        }
+      ],
+      "puzzles": [
+        {
+          "id": "demo.cistern.cooler",
+          "title": "过热的北侧控制器",
+          "pos": [
+            544,
+            -736
+          ],
+          "hint": "水；或清水1、布料1降温检修6秒。",
+          "routes": [
+            {
+              "steps": [
+                "water"
+              ]
+            }
+          ],
+          "work": [
+            {
+              "id": "cooler_work",
+              "title": "手动检修：过热的北侧控制器",
+              "duration": 6,
+              "material_costs": {
+                "clean_water": 1,
+                "cloth": 1
+              }
+            }
+          ],
+          "materials": {},
+          "required_claims": [],
+          "completion_text": "北侧控制器降温，总闸还需要南侧锁扣。"
+        },
+        {
+          "id": "demo.cistern.lock",
+          "title": "紧闭的南侧锁扣",
+          "pos": [
+            544,
+            736
+          ],
+          "hint": "火→冲击；或废金属1、炭屑1检修6秒。",
+          "routes": [
+            {
+              "steps": [
+                "fire",
+                "impact"
+              ]
+            }
+          ],
+          "work": [
+            {
+              "id": "lock_work",
+              "title": "手动检修：紧闭的南侧锁扣",
+              "duration": 6,
+              "material_costs": {
+                "metal_scrap": 1,
+                "charcoal": 1
+              }
+            }
+          ],
+          "materials": {},
+          "required_claims": [],
+          "completion_text": "南侧锁扣松开。两侧就绪后，到东侧总闸决定河谷水路。"
+        }
+      ],
+      "exits": [
+        {
+          "title": "返回进水大厅",
+          "pos": [
+            -1350,
+            0
+          ],
+          "target": "river_cistern",
+          "arrival": [
+            1200,
+            -600
+          ],
+          "required_claims": [],
+          "locked_message": "通路尚未接通。先阅读入口说明，处理本层的机关；返回入口始终可撤退。"
+        },
+        {
+          "title": "维护竖井直达东岸",
+          "pos": [
+            1330,
+            700
+          ],
+          "target": "camp",
+          "arrival": [
+            3000,
+            1200
+          ],
+          "required_claims": [
+            "demo.pressure_contained"
+          ],
+          "locked_message": "通路尚未接通。先阅读入口说明，处理本层的机关；返回入口始终可撤退。"
+        }
+      ],
+      "events": [
+        {
+          "id": "demo.cistern.decision",
+          "title": "沉水总闸：不可撤销的决定",
+          "pos": [
+            1280,
+            0
+          ],
+          "text": "最后的水压只能送向一条旧管线。现在可以先返回，不必立即决定。恢复供水会在东岸开放清水取水口与可用柴灶；永久封压会开放本层直接通往东岸的维护竖井，并保住维护储备。两项互斥，无法反复领取。",
+          "irreversible": true,
+          "required_claims": [
+            "demo.cistern.cooler",
+            "demo.cistern.lock"
+          ],
+          "choices": [
+            {
+              "id": "restore",
+              "title": "恢复东岸供水",
+              "text": "返回东岸取水场，下次进入河谷时清水口和柴灶可用。维护竖井被水冲毁。",
+              "grants_claims": [
+                "demo.water_restored"
+              ]
+            },
+            {
+              "id": "contain",
+              "title": "永久封存压力",
+              "text": "本层东南维护竖井成为返回东岸的捷径；取水场维护箱可用，但不会恢复供水。",
+              "grants_claims": [
+                "demo.pressure_contained"
+              ]
+            }
+          ]
+        }
+      ]
     }
   ],
   "landmarks": [
@@ -1553,6 +3072,33 @@
         950
       ],
       "description": "被截的运料线与遗落材料箱。"
+    },
+    {
+      "id": "river_watch",
+      "title": "灰脊烽堡",
+      "pos": [
+        1650,
+        -3200
+      ],
+      "description": "双层远征遗迹；入口可撤退，机关具有施法和手动作业路线。"
+    },
+    {
+      "id": "river_bell",
+      "title": "遗钟墓道",
+      "pos": [
+        -4300,
+        -900
+      ],
+      "description": "双层远征遗迹；入口可撤退，机关具有施法和手动作业路线。"
+    },
+    {
+      "id": "river_cistern",
+      "title": "沉水泵站",
+      "pos": [
+        2300,
+        1650
+      ],
+      "description": "双层远征遗迹；入口可撤退，机关具有施法和手动作业路线。"
     }
   ],
   "roads": [
@@ -1656,6 +3202,48 @@
       [
         3300,
         -1600
+      ]
+    ],
+    [
+      [
+        1120,
+        -2208
+      ],
+      [
+        1600,
+        -2600
+      ],
+      [
+        1650,
+        -3200
+      ]
+    ],
+    [
+      [
+        -3500,
+        -900
+      ],
+      [
+        -3980,
+        -900
+      ],
+      [
+        -4300,
+        -900
+      ]
+    ],
+    [
+      [
+        900,
+        1200
+      ],
+      [
+        2100,
+        1400
+      ],
+      [
+        2300,
+        1650
       ]
     ]
   ],
@@ -1774,6 +3362,124 @@
         "river.veteran_settled"
       ],
       "points": 1
+    },
+    {
+      "id": "river_watch_survey",
+      "title": "巡河·失去的烽火",
+      "description": "档案馆取调度令→北岸烽堡风门→风井继电器→信号台。先沿南侧掩体接敌，准备充分再下风井；可分段返回镇中整备。",
+      "required_claims": [
+        "demo.dispatch",
+        "demo.watch.windgate",
+        "demo.watch.relay",
+        "demo.watch.signal"
+      ],
+      "unlock_claims": [
+        "demo.route_brief"
+      ],
+      "required_clears": [],
+      "points": 2
+    },
+    {
+      "id": "river_watch_names",
+      "title": "烽堡·带回名字",
+      "description": "烽堡庭院东南角的巡哨名册记录了失联者；带回镇中。",
+      "required_claims": [
+        "demo.watch.roll"
+      ],
+      "unlock_claims": [
+        "demo.watch.entry"
+      ],
+      "required_clears": [],
+      "points": 1
+    },
+    {
+      "id": "river_watch_relief",
+      "title": "烽堡·让灯火有人守",
+      "description": "恢复烽火后，在镇中巡河补给处交付布料2与烤饼2。物资可采集、制造、购买或从战利品获得。",
+      "required_claims": [
+        "demo.relief_delivery"
+      ],
+      "unlock_claims": [
+        "demo.watch.signal"
+      ],
+      "required_clears": [],
+      "points": 1
+    },
+    {
+      "id": "river_bell_inquiry",
+      "title": "巡河·钟下的回执",
+      "description": "西林遗钟墓：净化侧廊→下行门→阅读泵工回执→校准遗钟。沿南侧避开毒地；在安全入口读说明。",
+      "required_claims": [
+        "demo.bell.cleanser",
+        "demo.bell.seal",
+        "demo.bell.receipt",
+        "demo.bell.core"
+      ],
+      "unlock_claims": [
+        "demo.watch.signal"
+      ],
+      "required_clears": [],
+      "points": 2
+    },
+    {
+      "id": "river_bell_names",
+      "title": "遗钟·未被抹掉的名字",
+      "description": "找出墓道东南石壁上的无名者，查明失联巡河员庇护了谁。",
+      "required_claims": [
+        "demo.bell.names"
+      ],
+      "unlock_claims": [
+        "demo.bell.entry"
+      ],
+      "required_clears": [],
+      "points": 1
+    },
+    {
+      "id": "river_cistern_survey",
+      "title": "巡河·最后一道水闸",
+      "description": "东岸沉水泵站：修进水轮→下井→分别解除南北控制器→明确决定总闸。复水与封压后果互斥；可先撤退。",
+      "required_claims": [
+        "demo.cistern.intake",
+        "demo.cistern.cooler",
+        "demo.cistern.lock",
+        "demo.cistern.decision"
+      ],
+      "unlock_claims": [
+        "demo.bell.core"
+      ],
+      "required_clears": [],
+      "points": 2
+    },
+    {
+      "id": "river_cistern_log",
+      "title": "泵站·交接的代价",
+      "description": "在进水大厅东南角找到交接记录，确认两条管线为什么不能同时保留。",
+      "required_claims": [
+        "demo.cistern.shift"
+      ],
+      "unlock_claims": [
+        "demo.cistern.entry"
+      ],
+      "required_clears": [],
+      "points": 1
+    },
+    {
+      "id": "river_demo_finale",
+      "title": "巡河·灰河谷总报告",
+      "description": "带回档案馆卷宗、烽堡信号、遗钟回执与泵站最终决定，并解除旧监狱封锁。回镇任务板交付总报告，结束本次巡河篇章；其他委托仍可继续。",
+      "required_claims": [
+        "river.dossier",
+        "demo.watch.signal",
+        "demo.bell.core",
+        "demo.cistern.decision"
+      ],
+      "unlock_claims": [
+        "demo.route_brief"
+      ],
+      "required_clears": [
+        "river_prison"
+      ],
+      "points": 2
     }
   ]
 }

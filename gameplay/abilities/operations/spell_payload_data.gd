@@ -23,8 +23,11 @@ extends Resource
 @export var effect: SkillData
 @export var source_field := ""
 @export var source_kind := ""
+## Existing combination must actually resolve; no fallback to its base effect.
+@export var required_rule: SpellCombinationRule
 func describe(timed_fields := false) -> String:
 	var text:=description
+	if required_rule: text+="\n条件："+required_rule.condition_label()
 	if effect:
 		text+="\n效果："+effect.display_name+"\n"+effect.description
 	if damage>0: text+="\n直接伤害 %d"%damage

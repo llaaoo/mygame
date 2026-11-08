@@ -202,6 +202,8 @@ func build_plan(skill: SkillData, actor: Node2D, empower: bool = false,selection
 		names.append(component.skill.display_name + ("〔" + component.medium_label + "〕" if not component.medium_label.is_empty() else ""))
 	result.skill = components[0].skill
 	if explicit_source and medium and medium.source_kind=="field" and source_fields.is_empty(): result.operation_reason="所选法阵不在脚下或充能已耗尽；不会替换来源"
+	if medium and medium.required_rule and not components.any(func(component: CastComponent): return component.rule_id==medium.required_rule.id):
+		result.operation_reason=("尚未掌握这个地面组合：" if not learned_rules.has(medium.required_rule.id) else "需要：")+medium.required_rule.condition_label()
 	result.field = components[0].field
 	result.material_id = components[0].material_id
 	result.effect_label = " + ".join(names)
