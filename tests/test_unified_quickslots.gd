@@ -162,7 +162,7 @@ func run() -> void:
 	game._save_progress(); await fixture.close()
 	game=await fixture.boot(true)
 	check(game.player.skill_manager.shortcuts.binding("item_0").is_empty(),"Legacy belt reimported after player cleared a migrated slot")
-	check(SaveRepository.new().read("user://save_3.sav").data.version==7,"Mixed shortcuts did not upgrade the real save version")
+	check(SaveRepository.new().read("user://save_3.sav").data.version==SaveRepository.VERSION,"Mixed shortcuts did not upgrade the real save version")
 	await fixture.close()
 	if failures.is_empty(): print("PASS unified quickslots: real E skill/1 food, UID equipment policy, independent rune media/shared cooldown, stale throw release, half-bottle stop, coating, 7 skill and persisted mixed bindings")
 	quit(0 if failures.is_empty() else 1)
