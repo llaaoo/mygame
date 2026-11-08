@@ -22,8 +22,14 @@
 
 第二场游戏2.62秒、墙钟2.66秒，受伤14，MP60→60；含中毒全程累计受伤29，返镇生命73。没有增发物资、冻结该路线AI、提高上限或重置遭遇。此流程检查旧闭环，新释放机制主要由上面的真实输入及正常AI局部样本证明。
 
+## 独立进程重进
+
+归档原生输入`/tmp/grayriver-first30/enchantment-archive-input/runtime.log`通过，与开发样本一致。另用其实际存档启动独立原生进程`/tmp/grayriver-first30/enchantment-archive-reentry/`：战杖UID `item.77`仍装备、无coating属性，火抹布已消费，E仍绑定横扫，MP60、动作idle；真实点击进入旅程并退出成功。无脚本错误，未从模板补回涂层。
+
 ## 提交归档
 
-开发完整88/88通过，日志`/tmp/enchantment-work-all.log`、`/tmp/mygame-tests-j49reo6g/`；之后增加墙体裁切/来袭快照等边界，匹配5/5通过，日志`/tmp/mygame-tests-6txxwv73/`。最终提交归档结果完成后补入。
+开发完整88/88通过，日志`/tmp/enchantment-work-all.log`、`/tmp/mygame-tests-j49reo6g/`；之后增加墙体裁切/来袭快照等边界，匹配5/5通过，日志`/tmp/mygame-tests-6txxwv73/`。最终代码提交`5c139e2a4715eebc79480022f3d6fe7a753a8b38`以`git archive`导出到`/tmp/mygame-enchantment-clean-wygdEm`，无`.godot`缓存。执行`python3 tools/run_tests.py --suite all --jobs 3 --timeout 120`：首次导入9.9秒通过，**88/88全部通过**，退出0，无runner诊断。总日志`/tmp/enchantment-cold-all.log`，分项日志与隔离存档`/tmp/mygame-tests-v9vhhvgx/`。同一归档的真实键鼠与独立原生进程重进也通过。随后只补充本验证文档；Actions未启用。
+
+覆盖限制：当前为火/毒与四种现有武技的联动，机制夹具和正常AI局部样本不代表完整平衡；旧流程只分段完成，背包点击一次失败仍明确保留，不能宣称连续无误首玩或目标硬件性能已验收。
 
 ![真实输入的火焰波；受控整备与站位，目标正常AI](playtests/enchantment_wave.png)
