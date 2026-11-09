@@ -37,10 +37,12 @@ static func technique_state(actor: Node2D,binding: Dictionary) -> Dictionary:
 	var data:=MartialArts.definition(id)
 	var context:=actor.get("actor_context") as ActorContext
 	if not data or not context: return {"title":"未学习武技","ready":false,"detail":"","remaining":0.0,"cost":0.0}
-	var reason:=context.martial.reason(id,context)
+	var view:=context.actions.technique_view(id,Input.is_key_pressed(KEY_CTRL),Input.is_key_pressed(KEY_SHIFT))
+	var reason: String=view.reason
 	var uid:=str(context.items.equipped(context.id).get(str(EquipmentData.SlotType.RIGHT_HAND),""))
 	var coating:=context.items.coating(uid)
-	var detail:=data.description+"\n"+reason
+	var detail:=data.description+"\n"+data.followup_description()+"\n"+reason
+	if view.linked: detail="接势就绪 · "+str(view.title)+"\n"+detail
 	if coating and coating.enchantment: detail+="\n"+context.items.state_text(uid)+"\nShift+武技：消耗整层附魔，释放距离%.0f / 扇面%.0f°。"%[data.release_reach,data.release_angle]
 	else: detail+="\n涂附后可按Shift+武技释放元素；当前没有可用附魔。"
-	return {"title":data.title,"ready":reason.is_empty(),"detail":detail,"element":coating.enchantment.title if coating and coating.enchantment else "","remaining":maxf(0,float(context.martial.ready_at.get(id,0))-context.items.clock_seconds),"cost":data.profile.stamina_cost}
+	return {"title":view.title,"ready":reason.is_empty(),"detail":detail,"linked":view.linked,"element":coating.enchantment.title if coating and coating.enchantment else "","remaining":maxf(0,float(context.martial.ready_at.get(id,0))-context.items.clock_seconds),"cost":view.cost}

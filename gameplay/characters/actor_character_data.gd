@@ -14,6 +14,7 @@ extends Resource
 @export var health_regen := 0.0
 @export var mana_regen := 2.0
 @export var skills: Array[SkillData] = []
+@export var techniques: Array[String]=[]
 @export var combinations: PackedStringArray = []
 @export var loadout: SkillLoadout
 @export var materials: Dictionary = {}
@@ -31,6 +32,9 @@ func validation_errors(available_rules: Variant = null) -> Array[String]:
 	for key in ["health_regen","mana_regen"]:
 		if not is_finite(get(key)) or get(key) < 0: errors.append("Invalid recovery: "+key)
 	var known := {}
+	var martial:=MartialArts.new()
+	for technique in techniques:
+		if not martial.learn(technique): errors.append("Invalid/duplicate initial technique: "+technique)
 	for skill in skills:
 		if not skill or skill.combination_only or known.has(skill.get_id()): errors.append("Invalid/duplicate base action")
 		else: known[skill.get_id()] = true

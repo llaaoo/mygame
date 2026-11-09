@@ -3,12 +3,9 @@ extends "res://tests/support/input_scene_probe.gd"
 const Fixture=preload("res://tests/support/grayriver_fixture.gd")
 var starts: Array[Dictionary]=[]
 func aim(point: Vector2) -> void:
-	var event:=InputEventMouseMotion.new(); event.position=root.get_canvas_transform()*point; event.global_position=event.position
-	if DisplayServer.get_name()!="headless": Input.warp_mouse(event.position)
-	Input.parse_input_event(event); Input.flush_buffered_events(); await frames(1)
+	await aim_world(point)
 func mouse(held: bool) -> void:
-	var event:=InputEventMouseButton.new(); event.button_index=MOUSE_BUTTON_LEFT; event.pressed=held; event.position=root.get_mouse_position(); event.global_position=event.position
-	Input.parse_input_event(event); Input.flush_buffered_events(); await frames(1)
+	await pointer_button(MOUSE_BUTTON_LEFT,held)
 func press() -> void: await mouse(true); await mouse(false)
 func wait_idle() -> void:
 	for i in range(180):

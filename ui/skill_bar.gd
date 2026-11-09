@@ -352,6 +352,7 @@ func _refresh_items() -> void:
 		if binding.get("kind","")=="technique":
 			var view:=QuickslotView.technique_state(_skill_manager.get_parent(),binding)
 			_variant_labels[i].text=str(view.get("element","")) if not str(view.get("element","")).is_empty() else "武技"
+			if view.get("linked",false): _variant_labels[i].text="接势"
 			_icons[i].texture=GameUIStyle.icon("swords"); _icons[i].modulate=Color.WHITE if view.ready else GameUIStyle.TEXT_DISABLED
 			_cost_labels[i].text="%.0f体"%view.cost; _cost_labels[i].visible=true
 			_cd_labels[i].text="%.1f"%view.remaining; _cd_labels[i].visible=view.remaining>0

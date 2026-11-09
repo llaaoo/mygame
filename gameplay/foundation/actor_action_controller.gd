@@ -72,6 +72,28 @@ func combo_snapshot() -> Dictionary:
 	return view
 func attack_stamina_cost(strike: AttackProfile) -> float:
 	return strike.stamina_cost*burden_cost()*activity_efficiency(SkillMastery.School.MELEE)
+func technique_view(id: String,force_base := false,release_enchantment := false) -> Dictionary:
+	var data:=MartialArts.definition(id)
+	if not data: return {}
+	var recovering:=mode=="attack" and profile and elapsed>=profile.windup+profile.active
+	var uid:=str(context.items.equipped(context.id).get(str(EquipmentData.SlotType.RIGHT_HAND),""))
+	var linked:=not force_base and uid==combo.weapon_uid and combo.permits_followup(data,recovering)
+	var candidate:=data.followup_profile if linked else data.profile
+	var cost:=attack_stamina_cost(candidate)
+	var reason:=context.martial.reason(id,context)
+	if reason.is_empty() and stamina.current<cost: reason="体力不足"
+	if reason.is_empty() and not candidate.ammo_id.is_empty() and context.items.ready_uid(context.id,candidate.ammo_id).is_empty(): reason="口袋缺箭"
+	if reason.is_empty() and release_enchantment:
+		var coating:=context.items.coating(uid)
+		if not coating or not coating.enchantment: reason="武器没有可释放的元素附魔"
+	return {"profile":candidate,"linked":linked,"family":combo.family if linked else "","reason":reason,"cost":cost,"title":candidate.title if linked else data.title}
+func capture_technique_intent(action: Action,force_base := false) -> Action:
+	var captured:=action.copy_intent()
+	var view:=technique_view(action.skill_id,force_base,bool(action.params.get("release_enchantment",false)))
+	captured.params["followup_family"]=str(view.get("family",""))
+	return captured
+func confirm_weapon_hit(family: String,result: HitResult,target: Node2D) -> void:
+	if is_instance_valid(target) and "actor_context" in target and target.get("actor_context")!=null and result.damage_accepted and result.damage_dealt>0 and not result.blocked: combo.confirm_contact(family)
 func _physics_process(delta: float) -> void:
 	if not active() or not is_instance_valid(context.actor): return
 	if context.actor.process_mode==Node.PROCESS_MODE_DISABLED: return
@@ -158,13 +180,20 @@ func try_action(action: Action) -> OperationResult:
 			var weapon_uid:=str(context.items.equipped(context.id).get(str(EquipmentData.SlotType.RIGHT_HAND),""))
 			var weapon:=context.items.equipment_definition(weapon_uid)
 			var candidate:=next_attack_profile(action.action_type==Action.ActionType.HEAVY_ATTACK)
+			var linked_technique:=false
 			if action.action_type==Action.ActionType.TECHNIQUE:
 				if not action.skill_source.is_empty():
 					var manager:=actor.get_node("SkillManager") as SkillManager
 					if manager.shortcuts.revision(action.skill_source)!=int(action.params.get("binding_revision",-1)) or manager.shortcuts.binding(action.skill_source).get("technique_id","")!=action.skill_id: return OperationResult.reject("stale_binding")
 				var reason:=context.martial.reason(action.skill_id,context)
 				if not reason.is_empty(): return OperationResult.reject(reason)
-				candidate=MartialArts.definition(action.skill_id).profile
+				var data:=MartialArts.definition(action.skill_id)
+				var requested_family:=str(action.params.get("followup_family",""))
+				if not requested_family.is_empty():
+					if requested_family!=combo.family or not combo.permits_followup(data): return OperationResult.reject("接势窗口已失效")
+					candidate=data.followup_profile
+					linked_technique=true
+				else: candidate=data.profile
 			var cost:=attack_stamina_cost(candidate)
 			if stamina.current<cost: return OperationResult.reject("stamina")
 			var ammo_uid:=context.items.ready_uid(context.id,candidate.ammo_id) if not candidate.ammo_id.is_empty() else ""
@@ -187,16 +216,16 @@ func try_action(action: Action) -> OperationResult:
 			_release_committed=false
 			if action.action_type==Action.ActionType.TECHNIQUE: context.martial.accepted(action.skill_id,context.items.clock_seconds)
 			_cancel_work(); _cancel_cast()
-			if action.action_type==Action.ActionType.MELEE: combo.begin(weapon_uid,weapon.moveset if weapon else null)
+			_attack_sequence+=1
+			_family="weapon.%s.%d"%[context.id,_attack_sequence]
+			if action.action_type==Action.ActionType.MELEE: combo.begin(weapon_uid,weapon.moveset if weapon else null,_family)
 			else: combo.reset()
 			needs.exert(.2,context.actor.get_node("StatsComponent").effective_stat("endurance"))
 			mode="attack"; elapsed=0; remaining=profile.windup+profile.active+profile.recovery
 			facing=action.direction.normalized() if action.direction.length_squared()>.01 else facing
 			_hit_targets={}
-			_attack_sequence+=1
-			_family="weapon.%s.%d"%[context.id,_attack_sequence]
 			guarding=false
-			if context.facts: context.facts.publish("physical_action_started",context.id,{"family":_family,"technique":action.skill_id if action.action_type==Action.ActionType.TECHNIQUE else "","weapon_uid":attack_weapon_uid,"stamina":cost,"counter":counter_strike,"stroke_index":combo.current_index,"stroke_title":profile.title,"stroke_count":combo.moveset.attacks.size() if combo.active else 0})
+			if context.facts: context.facts.publish("physical_action_started",context.id,{"family":_family,"technique":action.skill_id if action.action_type==Action.ActionType.TECHNIQUE else "","weapon_uid":attack_weapon_uid,"stamina":cost,"counter":counter_strike,"stroke_index":combo.current_index,"stroke_title":profile.title,"stroke_count":combo.moveset.attacks.size() if combo.active else 0,"followup":linked_technique})
 			return OperationResult.success()
 		Action.ActionType.DODGE:
 			if busy() and mode!="attack": return OperationResult.reject("busy")
@@ -378,6 +407,7 @@ func contact(target: Node2D) -> HitResult:
 	skill.tags=tags
 	var damage:=roundi(float(context.actor.get("attack_damage") if "attack_damage" in context.actor else context.actor.combat_component.attack_damage)*profile.damage_multiplier)
 	var result:=CombatExecutor.report_hit(context.actor,target,damage,target.global_position,skill,tags,_family,profile.impact,profile)
+	confirm_weapon_hit(_family,result,target)
 	if result.damage_dealt>0 and not result.blocked: ActorCombatModel.apply_melee_surface(target,tags)
 	if result.damage_dealt>0 and context.reward_eligible and context.facts and (not "rewards_enabled" in target or target.rewards_enabled): context.facts.publish("melee_hit",context.id,{"target":str(id),"damage":result.damage_dealt,"family":_family})
 	return result

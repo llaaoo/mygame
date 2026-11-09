@@ -11,6 +11,18 @@ func frames(n:=4) -> void:
 func key(code: Key,held: bool,unicode_value:=0) -> void:
 	var event:=InputEventKey.new(); event.keycode=code; event.physical_keycode=code; event.pressed=held; event.unicode=unicode_value
 	Input.parse_input_event(event); Input.flush_buffered_events(); await frames()
+func aim_world(point: Vector2) -> void:
+	# Input.parse_input_event consumes window pixels. Headless windows may be 64²
+	# while the logical game canvas is 1152×648; preserve stretch and letterboxing.
+	var event:=InputEventMouseMotion.new()
+	event.position=root.get_screen_transform()*root.get_canvas_transform()*point
+	event.global_position=event.position
+	if DisplayServer.get_name()!="headless": Input.warp_mouse(event.position)
+	Input.parse_input_event(event); Input.flush_buffered_events(); await frames(1)
+func pointer_button(button: MouseButton,held: bool) -> void:
+	var event:=InputEventMouseButton.new(); event.button_index=button; event.pressed=held
+	event.position=root.get_screen_transform()*root.get_mouse_position(); event.global_position=event.position
+	Input.parse_input_event(event); Input.flush_buffered_events(); await frames(1)
 func point_click(point: Vector2) -> void:
 	var motion:=InputEventMouseMotion.new(); motion.position=point; motion.global_position=point
 	root.push_input(motion,true); Input.flush_buffered_events(); await frames()

@@ -15,6 +15,21 @@ angle_degrees = 175
 stamina_cost = 30
 impact = 65
 damage_multiplier = 1.1
+[sub_resource type="Resource" id="Followup"]
+script = ExtResource("attack")
+step_distance = 0.0
+movement_multiplier = 0.0
+push_distance = 48.0
+motion = "sweep"
+windup = 0.36
+active = 0.22
+recovery = 0.64
+reach = 84
+angle_degrees = 210
+stamina_cost = 30
+impact = 65
+damage_multiplier = 1.1
+title = "回旋压阵"
 [resource]
 script = ExtResource("tech")
 id = "staff_sweep"
@@ -26,3 +41,6 @@ profile = SubResource("Attack")
 release_reach = 260.0
 release_angle = 105.0
 release_speed = 420.0
+
+followup_after = Array[int]([1])
+followup_profile = SubResource("Followup")

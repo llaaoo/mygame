@@ -45,6 +45,14 @@ func _process(_delta: float) -> void:
 		combo_label.text=("%s · %d/%d %s · %s"%[chain.weapon,int(chain.index)+1,chain.count,chain.title,chain.phase]) if chain.active else ("左键接续 · %d/%d %s · %.1f秒"%[int(chain.index)+1,chain.count,chain.title,chain.remaining])
 		if not chain.active and not str(chain.reason).is_empty(): combo_label.text+=" · "+str(chain.reason)
 		combo_label.modulate=Color("dacb93") if chain.active else Color("abc8b7")
+		var manager:=context.actor.get_node("SkillManager") as SkillManager
+		for source in QuickslotLoadout.SOURCES:
+			var binding:=manager.shortcuts.binding(source)
+			if binding.get("kind","")!="technique": continue
+			var view:=context.actions.technique_view(str(binding.technique_id),Input.is_key_pressed(KEY_CTRL),Input.is_key_pressed(KEY_SHIFT))
+			if not view.is_empty() and view.linked and str(view.reason).is_empty():
+				combo_label.text+="\n可接 %s · %s"%[InputBindings.label(InputBindings.action_for_source(source)),view.title]
+				break
 	var uid:=str(context.items.equipped(context.id).get(str(EquipmentData.SlotType.RIGHT_HAND),""))
 	var coating:=context.items.coating(uid)
 	enchantment_label.visible=coating!=null and coating.enchantment!=null

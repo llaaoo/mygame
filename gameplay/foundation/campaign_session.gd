@@ -120,7 +120,10 @@ func bind_actor(actor: CharacterBody2D,id: String,legacy_counts: Dictionary = {}
 		if manager: manager.bind_inventory(inventory,id)
 		if "inventory" in actor and actor.inventory: actor.inventory.bind_container(inventory,id+".pack")
 	if rules.physical_inventory and actor_records.has(id): _restore_actor(actor,actor_records[id])
-	else: context.actions.needs.bind_effects(actor.get_node("BuffManager"),true)
+	else:
+		context.actions.needs.bind_effects(actor.get_node("BuffManager"),true)
+		if actor is Enemy and actor.character_definition:
+			for technique in actor.character_definition.techniques: context.martial.learn(technique)
 	if rules.material_operations: actor.get_node("SkillManager").enable_material_operations()
 	if rules.tactical_combat and actor is Player:
 		actor.state_machine.process_mode=Node.PROCESS_MODE_DISABLED

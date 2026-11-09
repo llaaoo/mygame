@@ -16,6 +16,7 @@ script = ExtResource("data")
 temperament = ExtResource("temperament")
 id = "river_watch_captain"
 title = "失联队长·奥伦"
+techniques = Array[String](["blade_breaker"])
 strength = 9
 intelligence = 3
 agility = 8

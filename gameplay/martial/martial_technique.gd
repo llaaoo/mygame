@@ -7,10 +7,25 @@ extends Resource
 @export var cooldown := 6.0
 @export var price := 8
 @export var profile: AttackProfile
+## An explicit input can take this route after a confirmed normal stroke.
+@export var followup_after: Array[int]=[]
+@export var followup_profile: AttackProfile
 @export var prerequisites: Array[String]=[]
 @export var exclusive_group := ""
 @export var release_reach := 140.0
 @export var release_angle := 110.0
 @export var release_speed := 600.0
 func valid() -> bool:
+	if followup_after.is_empty()!=(followup_profile==null): return false
+	if followup_profile and (not followup_profile.valid() or followup_profile.title.is_empty() or (weapon_type=="bow")!=(followup_profile.projectile_speed>0)): return false
+	var seen: Dictionary={}
+	for stage in followup_after:
+		if stage<0 or seen.has(stage): return false
+		seen[stage]=true
 	return not id.is_empty() and not title.is_empty() and weapon_type in WeaponMoveset.TITLES and is_finite(cooldown) and cooldown>=0 and cooldown<=86400 and price>=0 and profile!=null and profile.valid() and is_finite(release_reach) and release_reach>0 and release_reach<=400 and is_finite(release_angle) and release_angle>0 and release_angle<=360 and is_finite(release_speed) and release_speed>0 and release_speed<=1200
+
+func followup_description() -> String:
+	if not followup_profile: return ""
+	var stages:=PackedStringArray()
+	for stage in followup_after: stages.append(str(stage+1))
+	return "接势 · %s：普攻第%s段造成未格挡的有效伤害后，在收招/接续窗口手动按武技键。起手%.2f秒 · 距离%.0f · 扇面%.0f° · 推移%.0f · 体力%.0f；沿用同一冷却。Ctrl+武技键固定常规形式，Shift仍显式释放附魔。"%[followup_profile.title,"/".join(stages),followup_profile.windup,followup_profile.reach,followup_profile.angle_degrees,followup_profile.push_distance,followup_profile.stamina_cost]

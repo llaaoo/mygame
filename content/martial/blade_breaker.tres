@@ -15,6 +15,21 @@ angle_degrees = 90
 stamina_cost = 26
 impact = 70
 damage_multiplier = 1.35
+[sub_resource type="Resource" id="Followup"]
+script = ExtResource("attack")
+step_distance = 6.0
+movement_multiplier = 0.0
+guard_pressure = 2.1
+motion = "slash"
+windup = 0.28
+active = 0.15
+recovery = 0.62
+reach = 62
+angle_degrees = 65
+stamina_cost = 26
+impact = 70
+damage_multiplier = 1.35
+title = "截势斩"
 [resource]
 script = ExtResource("tech")
 id = "blade_breaker"
@@ -26,3 +41,6 @@ profile = SubResource("Attack")
 release_reach = 140.0
 release_angle = 110.0
 release_speed = 600.0
+
+followup_after = Array[int]([1])
+followup_profile = SubResource("Followup")
