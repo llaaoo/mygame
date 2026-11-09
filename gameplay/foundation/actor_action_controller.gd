@@ -42,12 +42,14 @@ var input_suppressed := 0.0
 var operation_id := 0
 var attack_weapon_uid := ""
 var combo:=WeaponComboState.new()
+var weapon_art:=WeaponArtState.new()
 var _launched := false
 var _ammo_uid := ""
 var _coating_state: Dictionary={}
 var _enchantment: WeaponEnchantment
 var _release_technique: MartialTechnique
 var _release_committed := false
+var _current_technique := ""
 func active() -> bool:
 	return context and context.rules and context.rules.tactical_combat
 func busy() -> bool: return mode!="idle"
@@ -61,7 +63,9 @@ func inventory_changed() -> void:
 	if not context or not context.items: return
 	var uid:=str(context.items.equipped(context.id).get(str(EquipmentData.SlotType.RIGHT_HAND),""))
 	if mode=="attack" and attack_weapon_uid!=uid: cancel("weapon_changed")
-	elif not combo.weapon_uid.is_empty() and combo.weapon_uid!=uid: combo.reset()
+	elif not combo.weapon_uid.is_empty() and combo.weapon_uid!=uid or not weapon_art.weapon_uid.is_empty() and weapon_art.weapon_uid!=uid: _clear_sequences()
+func _clear_sequences() -> void:
+	combo.reset(); weapon_art.reset()
 func combo_snapshot() -> Dictionary:
 	var view:=combo.snapshot()
 	if not view.is_empty() and combo.active:
@@ -77,7 +81,7 @@ func technique_view(id: String,force_base := false,release_enchantment := false)
 	if not data: return {}
 	var recovering:=mode=="attack" and profile and elapsed>=profile.windup+profile.active
 	var uid:=str(context.items.equipped(context.id).get(str(EquipmentData.SlotType.RIGHT_HAND),""))
-	var linked:=not force_base and uid==combo.weapon_uid and combo.permits_followup(data,recovering)
+	var linked:=not force_base and uid==combo.weapon_uid and combo.permits_followup(data,recovering,weapon_art.confirmed(combo.family))
 	var candidate:=data.followup_profile if linked else data.profile
 	var cost:=attack_stamina_cost(candidate)
 	var reason:=context.martial.reason(id,context)
@@ -92,8 +96,63 @@ func capture_technique_intent(action: Action,force_base := false) -> Action:
 	var view:=technique_view(action.skill_id,force_base,bool(action.params.get("release_enchantment",false)))
 	captured.params["followup_family"]=str(view.get("family",""))
 	return captured
+func weapon_art_view(release_enchantment := false) -> Dictionary:
+	var recovering:=mode=="attack" and profile and elapsed>=profile.windup+profile.active
+	var uid:=str(context.items.equipped(context.id).get(str(EquipmentData.SlotType.RIGHT_HAND),""))
+	if uid.is_empty() or uid!=weapon_art.weapon_uid: return {}
+	var choices: Array[Dictionary]=[]
+	for id in context.martial.learned:
+		var data:=MartialArts.definition(id)
+		if not data: continue
+		var weapon:=context.items.equipment_definition(uid)
+		if not weapon or not weapon.moveset or data.weapon_type!=weapon.moveset.weapon_type: continue
+		for route in data.art_routes:
+			var match_result:=weapon_art.match_route(route,recovering)
+			if match_result.is_empty(): continue
+			var candidate:=data.profile if route.form==MartialRoute.Form.BASE else data.followup_profile
+			var reason:=context.martial.reason(id,context)
+			var cost:=attack_stamina_cost(candidate)
+			if reason.is_empty() and stamina.current<cost: reason="体力不足"
+			if reason.is_empty() and not candidate.ammo_id.is_empty() and context.items.ready_uid(context.id,candidate.ammo_id).is_empty(): reason="口袋缺箭"
+			if reason.is_empty() and release_enchantment:
+				var coating:=context.items.coating(uid)
+				if not coating or not coating.enchantment: reason="武器没有可释放的元素附魔"
+			choices.append({"technique":id,"route":route.id,"token":match_result.token,"remaining":match_result.remaining,"recovering":match_result.recovering,"title":data.title if route.form==MartialRoute.Form.BASE else candidate.title,"reason":reason,"cost":cost,"profile":candidate,"length":route.sequence.size(),"priority":route.priority})
+	if choices.is_empty(): return {}
+	choices.sort_custom(func(a: Dictionary,b: Dictionary):
+		if a.length!=b.length: return a.length>b.length
+		if a.priority!=b.priority: return a.priority>b.priority
+		return str(a.technique)+str(a.route)<str(b.technique)+str(b.route))
+	return choices[0]
+func capture_weapon_art(direction: Vector2,release_enchantment := false) -> Action:
+	var request:=Action.new(); request.action_type=Action.ActionType.TECHNIQUE; request.source=context.actor; request.direction=direction
+	request.params={"weapon_art":true,"release_enchantment":release_enchantment}
+	var view:=weapon_art_view(release_enchantment)
+	if view.is_empty(): return request
+	request.skill_id=view.technique
+	request.params["art_route"]=view.route; request.params["art_token"]=view.token
+	if release_enchantment:
+		request.params["enchantment_weapon_uid"]=weapon_art.weapon_uid
+		request.params["enchantment_state"]=context.items.coating_state(weapon_art.weapon_uid)
+	return request
+func technique_status(include_cooldowns := true) -> String:
+	if mode=="attack" and not _current_technique.is_empty():
+		var data:=MartialArts.definition(_current_technique)
+		var phase:="起手" if elapsed<profile.windup else "挥出" if elapsed<profile.windup+profile.active else "收招"
+		return (profile.title if not profile.title.is_empty() else data.title)+" · "+phase
+	if not include_cooldowns: return ""
+	var uid:=str(context.items.equipped(context.id).get(str(EquipmentData.SlotType.RIGHT_HAND),""))
+	var weapon:=context.items.equipment_definition(uid)
+	if not weapon or not weapon.moveset: return ""
+	var entries:=PackedStringArray()
+	for id in context.martial.learned:
+		var data:=MartialArts.definition(id)
+		var seconds:=maxf(0,float(context.martial.ready_at.get(id,0))-context.items.clock_seconds)
+		if data and not data.art_routes.is_empty() and data.weapon_type==weapon.moveset.weapon_type and seconds>0: entries.append("%s %.1f秒"%[data.title,seconds])
+	return "武技冷却 · "+" / ".join(entries) if not entries.is_empty() else ""
 func confirm_weapon_hit(family: String,result: HitResult,target: Node2D) -> void:
-	if is_instance_valid(target) and "actor_context" in target and target.get("actor_context")!=null and result.damage_accepted and result.damage_dealt>0 and not result.blocked: combo.confirm_contact(family)
+	if is_instance_valid(target) and "actor_context" in target and target.get("actor_context")!=null and result.damage_accepted and result.damage_dealt>0 and not result.blocked:
+		weapon_art.confirm_contact(family)
 func _physics_process(delta: float) -> void:
 	if not active() or not is_instance_valid(context.actor): return
 	if context.actor.process_mode==Node.PROCESS_MODE_DISABLED: return
@@ -142,7 +201,7 @@ func try_action(action: Action) -> OperationResult:
 				if context.spray: context.spray.stop()
 			var next_guard:=bool(action.params.get("held",false)) and not busy() and can_guard()
 			if next_guard and not guarding:
-				combo.reset()
+				_clear_sequences()
 				guard_age=0
 				_parry_spent=parry_retry>0
 				parry_retry=PARRY_RETRY
@@ -154,28 +213,29 @@ func try_action(action: Action) -> OperationResult:
 			return OperationResult.success()
 		Action.ActionType.DROP_PACK:
 			if busy() or not pack_request.is_valid(): return OperationResult.reject("busy")
-			combo.reset()
+			_clear_sequences()
 			return OperationResult.success() if pack_request.call() else OperationResult.reject("unavailable")
 		Action.ActionType.CAST:
 			if busy(): return _queue(action)
-			combo.reset()
+			_clear_sequences()
 			guarding=false
 			if legacy_request.is_valid(): legacy_request.call(action)
 			return OperationResult.success()
 		Action.ActionType.INTERACT:
 			if mode=="stagger": return OperationResult.reject("stagger")
-			combo.reset()
+			_clear_sequences()
 			if legacy_request.is_valid(): legacy_request.call(action)
 			return OperationResult.success()
 		Action.ActionType.USE_ITEM:
 			if not item_request.is_valid(): return OperationResult.reject("unavailable")
 			if not action.params.get("release",false) and (busy() or "field_work" in actor and actor.field_work and actor.field_work.is_busy()): return OperationResult.reject("busy")
 			if not item_request.call(action): return OperationResult.reject("unavailable")
-			combo.reset()
+			_clear_sequences()
 			if not ("field_work" in actor and actor.field_work) and not context.item_actions.busy() and SurvivalCatalog.FOODS.has(action.skill_id):
 				mode="item"; elapsed=0; remaining=SurvivalCatalog.FOODS[action.skill_id].seconds; movement=Vector2.ZERO
 			return OperationResult.success()
 		Action.ActionType.MELEE,Action.ActionType.HEAVY_ATTACK,Action.ActionType.TECHNIQUE:
+			if action.params.get("weapon_art",false) and action.skill_id.is_empty(): return OperationResult.reject("武技未发动：先完成对应连招，K查看条件")
 			if busy(): return _queue(action)
 			var weapon_uid:=str(context.items.equipped(context.id).get(str(EquipmentData.SlotType.RIGHT_HAND),""))
 			var weapon:=context.items.equipment_definition(weapon_uid)
@@ -189,8 +249,14 @@ func try_action(action: Action) -> OperationResult:
 				if not reason.is_empty(): return OperationResult.reject(reason)
 				var data:=MartialArts.definition(action.skill_id)
 				var requested_family:=str(action.params.get("followup_family",""))
-				if not requested_family.is_empty():
-					if requested_family!=combo.family or not combo.permits_followup(data): return OperationResult.reject("接势窗口已失效")
+				if action.params.get("weapon_art",false):
+					var route:=data.art_route(str(action.params.get("art_route","")))
+					var match_result:=weapon_art.match_route(route) if route and weapon_art.weapon_uid==weapon_uid else {}
+					if match_result.is_empty() or str(match_result.token)!=str(action.params.get("art_token","")): return OperationResult.reject("武技窗口已失效")
+					candidate=data.profile if route.form==MartialRoute.Form.BASE else data.followup_profile
+					linked_technique=route.form==MartialRoute.Form.FOLLOWUP
+				elif not requested_family.is_empty():
+					if requested_family!=combo.family or not combo.permits_followup(data,false,weapon_art.confirmed(combo.family)): return OperationResult.reject("接势窗口已失效")
 					candidate=data.followup_profile
 					linked_technique=true
 				else: candidate=data.profile
@@ -210,6 +276,7 @@ func try_action(action: Action) -> OperationResult:
 				counter_remaining=0
 			if not input_provider.is_valid(): movement=Vector2.ZERO
 			profile=candidate; attack_weapon_uid=weapon_uid; _launched=false; _ammo_uid=ammo_uid
+			_current_technique=action.skill_id if action.action_type==Action.ActionType.TECHNIQUE else ""
 			_coating_state=context.items.coating_state(weapon_uid)
 			_enchantment=coating.enchantment if coating else null
 			_release_technique=MartialArts.definition(action.skill_id) if release else null
@@ -220,18 +287,20 @@ func try_action(action: Action) -> OperationResult:
 			_family="weapon.%s.%d"%[context.id,_attack_sequence]
 			if action.action_type==Action.ActionType.MELEE: combo.begin(weapon_uid,weapon.moveset if weapon else null,_family)
 			else: combo.reset()
+			if action.action_type in [Action.ActionType.MELEE,Action.ActionType.HEAVY_ATTACK]: weapon_art.begin(weapon_uid,"light" if action.action_type==Action.ActionType.MELEE else "heavy",_family,weapon.moveset.chain_window if weapon and weapon.moveset else .65)
+			else: weapon_art.reset()
 			needs.exert(.2,context.actor.get_node("StatsComponent").effective_stat("endurance"))
 			mode="attack"; elapsed=0; remaining=profile.windup+profile.active+profile.recovery
 			facing=action.direction.normalized() if action.direction.length_squared()>.01 else facing
 			_hit_targets={}
 			guarding=false
-			if context.facts: context.facts.publish("physical_action_started",context.id,{"family":_family,"technique":action.skill_id if action.action_type==Action.ActionType.TECHNIQUE else "","weapon_uid":attack_weapon_uid,"stamina":cost,"counter":counter_strike,"stroke_index":combo.current_index,"stroke_title":profile.title,"stroke_count":combo.moveset.attacks.size() if combo.active else 0,"followup":linked_technique})
+			if context.facts: context.facts.publish("physical_action_started",context.id,{"family":_family,"technique":action.skill_id if action.action_type==Action.ActionType.TECHNIQUE else "","weapon_uid":attack_weapon_uid,"stamina":cost,"counter":counter_strike,"stroke_index":combo.current_index,"stroke_title":profile.title,"stroke_count":combo.moveset.attacks.size() if combo.active else 0,"followup":linked_technique,"art_route":str(action.params.get("art_route","")),"weapon_art":bool(action.params.get("weapon_art",false))})
 			return OperationResult.success()
 		Action.ActionType.DODGE:
 			if busy() and mode!="attack": return OperationResult.reject("busy")
 			if mode=="attack" and elapsed<profile.windup+profile.active: return OperationResult.reject("committed_attack")
 			if not stamina.spend(20*burden_cost()*clampf(1+equipment_value("dodge_cost"),.6,1.5)): return OperationResult.reject("stamina")
-			combo.reset(); _buffer=null; _buffer_time=0
+			_clear_sequences(); _buffer=null; _buffer_time=0
 			_cancel_work(); _cancel_cast()
 			needs.exert(.5,context.actor.get_node("StatsComponent").effective_stat("endurance"))
 			mode="dodge"; elapsed=0; remaining=.35
@@ -257,6 +326,7 @@ func advance(delta: float) -> void:
 	counter_remaining=maxf(0,counter_remaining-delta)
 	push_recovery=maxf(0,push_recovery-delta)
 	combo.advance(delta,str(context.items.equipped(context.id).get(str(EquipmentData.SlotType.RIGHT_HAND),"")))
+	weapon_art.advance(delta,str(context.items.equipped(context.id).get(str(EquipmentData.SlotType.RIGHT_HAND),"")))
 	_move_age+=delta
 	if _move_age>.3 and not input_provider.is_valid(): movement=Vector2.ZERO
 	var status:=actor.get_node_or_null("BuffManager") as BuffManager
@@ -297,7 +367,8 @@ func advance(delta: float) -> void:
 			elapsed=after
 		if remaining==0 and mode not in ["aim_item","spray"] and not (mode=="item" and context.item_actions.busy()):
 			if mode=="stagger": stability.recovered()
-			if mode=="attack" and _release_committed: combo.complete()
+			if mode=="attack" and _release_committed:
+				combo.complete(); weapon_art.complete(maxf(0,delta-completion_offset))
 			mode="idle"
 			# Compare the expiry with the completion inside this physics step,
 			# before aging it. Exact-boundary presses must not be discarded.
@@ -336,6 +407,7 @@ func _commit_weapon_release() -> bool:
 	if _release_committed: return true
 	if not context.region.available() or not context.items.commit_weapon_release(context.id,attack_weapon_uid,_ammo_uid,_coating_state,_release_technique!=null,profile.ammo_id): return false
 	_release_committed=true; _ammo_uid=""
+	weapon_art.released(_family)
 	if _release_technique and profile.projectile_speed==0:
 		var wave:=EnchantmentWave.new(); wave.context=context; wave.enchantment=_enchantment; wave.technique=_release_technique
 		wave.direction=facing; wave.family=_family
@@ -444,7 +516,7 @@ func defend(hit: HitContext,result: HitResult,impact: float) -> void:
 func interrupt(seconds: float) -> void:
 	# Repeated impact may drain stability, but cannot renew a committed stagger.
 	if mode=="stagger": return
-	combo.reset(); _ammo_uid=""
+	_clear_sequences(); _ammo_uid=""
 	counter_remaining=0; counter_strike=false; _push_remaining=0
 	if context.item_actions: context.item_actions.cancel()
 	if context.spray: context.spray.stop()
@@ -453,14 +525,14 @@ func interrupt(seconds: float) -> void:
 	mode="stagger"; elapsed=0; remaining=seconds
 func cancel(_reason := "cancelled") -> void:
 	if _reason in ["dead","scope_left","rest_time"]: push_recovery=0
-	combo.reset(); _ammo_uid=""
+	_clear_sequences(); _ammo_uid=""
 	counter_remaining=0; counter_strike=false; _push_remaining=0
 	operation_id+=1
 	mode="idle"; remaining=0; elapsed=0
 	_hit_targets={}
 	clear_input()
 func clear_input() -> void:
-	combo.reset()
+	_clear_sequences()
 	movement=Vector2.ZERO; guarding=false; sprinting=false
 	_buffer=null; _buffer_time=0
 func burden_cost() -> float:

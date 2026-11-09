@@ -7,6 +7,7 @@ var stability_bar: ProgressBar
 var detail: Label
 var enchantment_label: Label
 var combo_label: Label
+var art_label: Label
 func _ready() -> void:
 	mouse_filter=Control.MOUSE_FILTER_IGNORE
 	for title in ["体力","稳定"]:
@@ -36,9 +37,23 @@ func _ready() -> void:
 	combo_label=FoundationWidgets.label("",11,true)
 	combo_label.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	add_child(combo_label)
+	art_label=FoundationWidgets.label("",11,true)
+	art_label.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	add_child(art_label)
 func _process(_delta: float) -> void:
 	visible=context!=null
 	if not context or not context.actions: return
+	var art:=context.actions.weapon_art_view(Input.is_key_pressed(KEY_SHIFT))
+	var martial_state:=context.actions.technique_status(art.is_empty())
+	art_label.visible=not art.is_empty() or not martial_state.is_empty()
+	if not art.is_empty():
+		art_label.text="%s · %s · %s"%[InputBindings.label("weapon_art"),art.title,"收招后" if art.recovering else "%.1f秒"%art.remaining]
+		if not str(art.reason).is_empty(): art_label.text+="\n"+str(art.reason)
+		art_label.modulate=GameUIStyle.GOLD if str(art.reason).is_empty() else GameUIStyle.TEXT_DISABLED
+		art_label.tooltip_text="手动发动武技 · 体力%.0f · Shift显式释放实际附魔"%art.cost
+	elif not martial_state.is_empty():
+		art_label.text=martial_state; art_label.tooltip_text=martial_state
+		art_label.modulate=GameUIStyle.TEXT_MUTED
 	var chain:=context.actions.combo_snapshot()
 	combo_label.visible=not chain.is_empty()
 	if not chain.is_empty():
@@ -46,7 +61,7 @@ func _process(_delta: float) -> void:
 		if not chain.active and not str(chain.reason).is_empty(): combo_label.text+=" · "+str(chain.reason)
 		combo_label.modulate=Color("dacb93") if chain.active else Color("abc8b7")
 		var manager:=context.actor.get_node("SkillManager") as SkillManager
-		for source in QuickslotLoadout.SOURCES:
+		for source in QuickslotLoadout.SOURCES if art.is_empty() else []:
 			var binding:=manager.shortcuts.binding(source)
 			if binding.get("kind","")!="technique": continue
 			var view:=context.actions.technique_view(str(binding.technique_id),Input.is_key_pressed(KEY_CTRL),Input.is_key_pressed(KEY_SHIFT))

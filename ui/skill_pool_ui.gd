@@ -271,8 +271,9 @@ func _refresh_detail() -> void:
 	_detail_box.add_child(heading)
 	if not _selected_technique.is_empty():
 		var data:=MartialArts.definition(_selected_technique)
+		_detail_box.add_child(FoundationWidgets.label(data.art_description(InputBindings.label("weapon_art")),12,true))
 		heading.text=data.title
-		_detail_box.add_child(FoundationWidgets.label(data.description+"\n体力 %.0f · 冷却 %.0f秒\n涂附后Shift+武技可消耗整层元素，释放距离%.0f / 扇面%.0f°；普通武技保留涂层。\n"%[data.profile.stamina_cost,data.cooldown,data.release_reach,data.release_angle]+data.followup_description()+"\n点击右侧快捷键绑定。",12,true))
+		_detail_box.add_child(FoundationWidgets.label(data.description+"\n体力 %.0f · 冷却 %.0f秒\n涂附后Shift+武技可消耗整层元素，释放距离%.0f / 扇面%.0f°；普通武技保留涂层。\n"%[data.profile.stamina_cost,data.cooldown,data.release_reach,data.release_angle]+data.followup_description()+"\n也可单独绑定；右键快捷槽可清除绑定。",12,true))
 		return
 	if not _selected_item.is_empty():
 		var view:=QuickslotView.item_state(_skill_manager.get_parent(),_selected_item)

@@ -6,6 +6,7 @@ var casting: PlayerCastingController
 var _mouse_shortcuts: Dictionary={}
 var _ui_click_pending := false
 var _attack_suppressed := false
+var _art_suppressed := false
 var _suppressed_sources: Dictionary={}
 var _fresh_after_ui: Dictionary={}
 var last_spell_source := ""
@@ -54,6 +55,8 @@ func poll_universal_actions() -> Array[Action]:
 		actions.append(hit)
 
 	# Every shortcut can carry a skill or an item. Input only proposes requests.
+	if tactical and not selecting and not _art_suppressed and Input.is_action_just_pressed("weapon_art"):
+		actions.append(player.actor_context.actions.capture_weapon_art(player.get_mouse_direction(),Input.is_key_pressed(KEY_SHIFT)))
 	for source in QuickslotLoadout.SOURCES:
 		if selecting: continue
 		var input_action:=action_for_source(source)
@@ -70,6 +73,10 @@ func _ready() -> void:
 	get_window().focus_exited.connect(_focus_lost)
 
 func _input(event: InputEvent) -> void:
+	if (event is InputEventKey or event is InputEventMouseButton) and InputMap.has_action("weapon_art"):
+		if event.is_action_pressed("weapon_art") and not (event is InputEventKey and event.echo):
+			_art_suppressed=player.ui_blocked or get_tree().paused or is_instance_valid(player.material_wheel) and player.material_wheel.visible or event is InputEventMouseButton and _pointer_over_interface()
+		elif event.is_action_released("weapon_art"): _art_suppressed=false
 	if event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_LEFT and event.pressed:
 		if not player.ui_blocked and not get_tree().paused and not (is_instance_valid(player.material_wheel) and player.material_wheel.visible): _attack_suppressed=false
 	# Global Input edges survive handled UI events. Preserve a genuinely new press

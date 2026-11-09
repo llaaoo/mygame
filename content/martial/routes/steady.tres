@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="MartialRoute" format=3]
+[ext_resource type="Script" path="res://gameplay/martial/martial_route.gd" id="route"]
+[resource]
+script = ExtResource("route")
+id = "steady"
+sequence = Array[String](["light"])
+form = 1
+hit_rule = 1
+window = 0.9

@@ -151,7 +151,7 @@ func run() -> void:
 	enemy.actions.contact(actor); enemy.actions.advance(enemy.actions.remaining)
 	var brain:=EnemyCharacterBrain.new(target); brain._offense_cooldown=1
 	var choices:=brain.choose(actor)
-	check(choices.size()==1 and choices[0].action_type==Action.ActionType.TECHNIQUE and not str(choices[0].params.get("followup_family","")).is_empty(),"Normal AI decision ignored a confirmed learned followup")
+	check(choices.size()==1 and choices[0].action_type==Action.ActionType.TECHNIQUE and (not str(choices[0].params.get("followup_family","")).is_empty() or not str(choices[0].params.get("art_token","")).is_empty()),"Normal AI decision ignored a confirmed learned followup")
 	if choices.size()==1 and choices[0].action_type==Action.ActionType.TECHNIQUE:
 		check(enemy.actions.try_action(choices[0]).accepted and enemy.actions.profile==MartialArts.definition("blade_breaker").followup_profile,"AI followup bypassed shared execution")
 	var invalid:=MartialArts.definition("blade_breaker").duplicate(true) as MartialTechnique

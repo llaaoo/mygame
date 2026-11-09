@@ -3,10 +3,11 @@ extends RefCounted
 ## Gameplay defaults and user overrides have one owner. Menu-only bindings can
 ## overlap world bindings; UI ownership prevents them firing in both contexts.
 const PATH := "user://actor_bindings.cfg"
-const LAYOUT_VERSION := 5
+const LAYOUT_VERSION := 6
 const KEYS := {
 	"move_left":KEY_A,"move_right":KEY_D,"move_up":KEY_W,"move_down":KEY_S,
 	"dodge":KEY_SPACE,"interact":KEY_F,"loot_all":KEY_T,"field_method":KEY_C,
+	"weapon_art":KEY_V,
 	"skill_1":KEY_1,"skill_2":KEY_2,"skill_3":KEY_3,
 	"skill_4":KEY_4,"skill_5":KEY_5,"skill_6":KEY_6,
 	"cast_left":KEY_Q,"cast_e":KEY_E,"skill":KEY_R,"sprint":KEY_ALT,"drop_pack":KEY_B,
@@ -77,6 +78,15 @@ static func install() -> void:
 				if context(other)==context(action) and _same(event,overrides[other]): occupied=true
 			if not occupied: remaining.append(event)
 		bindings[action]=remaining
+	# A new core action must not steal an older customized shortcut.
+	if bindings.weapon_art.is_empty():
+		for code in [KEY_V,KEY_Z,KEY_X,KEY_H,KEY_Y,KEY_U,KEY_P,KEY_L]:
+			var event:=_key(code); var occupied:=false
+			for other in bindings:
+				if context(other)!="world": continue
+				for binding in bindings[other]:
+					if _same(event,binding): occupied=true
+			if not occupied: bindings.weapon_art=[event]; break
 	_apply(bindings)
 static func assign(action: String,event: InputEvent,save := true) -> OperationResult:
 	var owned:=defaults()

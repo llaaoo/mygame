@@ -21,6 +21,7 @@ func aim_world(point: Vector2) -> void:
 	Input.parse_input_event(event); Input.flush_buffered_events(); await frames(1)
 func pointer_button(button: MouseButton,held: bool) -> void:
 	var event:=InputEventMouseButton.new(); event.button_index=button; event.pressed=held
+	event.ctrl_pressed=Input.is_key_pressed(KEY_CTRL); event.shift_pressed=Input.is_key_pressed(KEY_SHIFT); event.alt_pressed=Input.is_key_pressed(KEY_ALT)
 	event.position=root.get_screen_transform()*root.get_mouse_position(); event.global_position=event.position
 	Input.parse_input_event(event); Input.flush_buffered_events(); await frames(1)
 func point_click(point: Vector2) -> void:

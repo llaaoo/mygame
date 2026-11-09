@@ -36,7 +36,7 @@ func prime(weapon: String,id: String) -> void:
 		if actions.technique_view(id).linked: break
 		await frames(1)
 	check(actions.technique_view(id).linked,"Real weapon contact did not offer a followup")
-	if not actions.technique_view(id).linked: print("PRIME_DIAG ",JSON.stringify({"weapon":weapon,"facing":str(actions.facing),"player":str(actor.position),"target":str(target.position),"hp":target.health_component.hp,"dead":target.health_component.is_dead,"confirmed":actions.combo.hit_confirmed,"chain":actions.combo_snapshot()}))
+	if not actions.technique_view(id).linked: print("PRIME_DIAG ",JSON.stringify({"weapon":weapon,"facing":str(actions.facing),"player":str(actor.position),"target":str(target.position),"hp":target.health_component.hp,"dead":target.health_component.is_dead,"confirmed":actions.weapon_art.confirmed(actions.combo.family),"chain":actions.combo_snapshot()}))
 func run() -> void:
 	var fixture:=Fixture.new(self); game=await fixture.boot(true)
 	GameRuntime.instance.set_process(true)

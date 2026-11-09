@@ -147,7 +147,7 @@ func show_training() -> void:
 		var price_text:=game.player.skill_manager.combinations.supplies.describe_cost(offer.costs)
 		if offer.costs.size()==1 and offer.costs.has("coin"): price_text="%d币"%offer.costs.coin
 		options.append({"title":data.title+(" · 已学会" if known else " · "+price_text)+(_requirements_hint(offer) if not known else ""),"disabled":not refused.is_empty(),"callback":_teach.bind(offer.id)})
-	options.append({"title":"打开武技快捷编组","callback":_open_techniques})
+	options.append({"title":"查看武技与连招","callback":_open_techniques})
 	options.append({"title":"分配已有属性点","callback":game.presenter._show_training})
 	game.ui.show_panel("武技训练师","武技消耗体力与对应武器资源，不消耗MP。购买只解锁知识；到K的武技页亲手绑定快捷键。刀破势、矛控距、杖压制、弓蓄射各有起手与恢复风险。",options)
 func _teach(id: String) -> void:
@@ -156,7 +156,7 @@ func _teach(id: String) -> void:
 	var offer:=training.offer(id)
 	if not is_instance_valid(npc) or npc.health_component.is_dead or game.session.relations.attitude(npc.actor_context.id,"player")=="hostile" or not npc.working or npc.global_position.distance_to(game.player.global_position)>150 or game.has_hostiles_near(game.player.global_position) or context.actions.busy() or not offer: return
 	var result:=TechniqueLearning.purchase(offer,context,training.actor_id)
-	game.ui.notify("已学会"+offer.technique.title+" · 点打开武技快捷编组，再选择槽位。" if result.accepted else str(ERRORS.get(result.reason,result.reason)))
+	game.ui.notify("已学会"+offer.technique.title+" · 连招后按"+InputBindings.label("weapon_art")+"发动，K查看条件，无需占快捷槽。" if result.accepted else str(ERRORS.get(result.reason,result.reason)))
 	game._save_progress(); show_training()
 func _open_techniques() -> void:
 	game.ui.close_modal()
