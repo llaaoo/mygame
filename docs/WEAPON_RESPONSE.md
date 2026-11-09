@@ -42,4 +42,4 @@ HUD仅在存在待尝试输入时临时显示“攻击/武技已输入 · 收招
 - E独立触发横扫，前摇持D仍站定，收招中段速度约176，完整步速330。三次攻击分别按真实配置消耗15、20、30体力，MP保持60。
 - [原生运行日志](playtests/weapon-response/native-input.log)、[10秒录像](playtests/weapon-response/native-input.mp4)、[缓存提示](playtests/weapon-response/queued-staff-stroke.png)、[收招移动](playtests/weapon-response/moving-during-recovery.png)。录像为云端软件渲染与采集，不用于目标设备帧率验收。
 
-全套归档回归结果在完成后追加，不能以以上定向通过代替完整结果。GitHub Actions保持停用。
+完整回归：提交 `f139495cdd237e8c0db1175a0620a0574792eff5` 经 `git archive` 导出至全新目录，确认不存在 `.godot` 后运行 `python3 tools/run_tests.py --suite all`。首次导入通过，**103/103 checks passed**，runner最终退出码0；[完整runner日志](playtests/weapon-response/archive-all.log)。覆盖附魔投送/箭矢、战术AI、同预算对战、存档恢复、界面输入及生命周期；本次随后仅追加本文结果和日志，不改已测执行代码。GitHub Actions保持停用。
