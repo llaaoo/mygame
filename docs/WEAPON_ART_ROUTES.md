@@ -27,7 +27,7 @@
 - 同时匹配时先选较长序列，再按内容显式优先级选择；注册校验拒绝同武器类型、同序列、同优先级的歧义。匹配只看已学会的武技，不授予隐藏知识。
 - 轻击、重击和武技各自消费真实体力。弓的轻射、重射和随后武技各用一支实物箭，所以轻→重→武技总共三支；离弦才提交，打断不凭空消耗或生成箭。MP规则不变。
 - Shift+共用武技键显式请求释放同一把真实武器的附魔；在输入时锁定涂层状态，实际挥出/离弦时提交。缺涂层的预览灰显；不会自动涂附、补阵或换源。
-- 成功发动武技立即消费窗口，与同一武技旧入口共用冷却。HUD随后显示招式起手/挥出/收招及真实冷却，不需要保留一个快捷槽才能查看。过期、格挡开始、闪避、其他动作、开菜单、离区、死亡、休息和读档清理序列。
+- 成功发动武技立即消费窗口，与同一武技旧入口共用冷却。HUD随后显示招式起手/挥出/收招及真实冷却，不需要保留一个快捷槽才能查看。普通走位与冲刺可在窗口内调整距离，仍支付实际冲刺费用；过期、格挡开始、闪避、施法、使用物品、交互、开菜单、离区、死亡、休息和读档清理序列。
 - 输入历史最多四击，属于角色短期状态，不写Resource、装备或存档。旧箭只能确认仍保留的同family事实，不能恢复被清理的记录；迟到命中不会改变已捕获的V请求。
 
 原有独立武技绑定保留，供旧存档和习惯继续使用，不自动清空用户槽位。主流程不再要求这些绑定；K中右键原槽可自行清除，把位置留给物品或法术。旧Ctrl+独立武技键固定常规形式的规则只用于该旧入口，共用键始终由连招路线决定形式。
@@ -53,4 +53,4 @@
 
 [原生图形日志](playtests/shared-weapon-arts/native-input.log)、[录像](playtests/shared-weapon-arts/native-input.mp4)、[刀剑](playtests/shared-weapon-arts/shared-art-blade.png)、[长矛](playtests/shared-weapon-arts/shared-art-spear.png)、[战杖](playtests/shared-weapon-arts/shared-art-staff.png)、[弓](playtests/shared-weapon-arts/shared-art-bow.png)、[同键切换接势分支](playtests/shared-weapon-arts/shared-art-flow.png)。云端Linux Xorg、Godot 4.6.3兼容渲染，不代表目标设备性能。
 
-完整干净归档回归结果在runner最终退出后追加。GitHub Actions保持停用。
+完整回归：最终执行代码提交 `3d3fdd81ab00a7953593781f2058cd006895b81a` 经 `git archive` 导出至新目录，确认无 `.godot` 后执行 `python3 tools/run_tests.py --suite all`。首次导入通过，**110/110 checks passed**，runner最终退出码0；[完整runner日志](playtests/shared-weapon-arts/archive-all.log)。随后仅更新本文及图形证据，不改已测执行代码。GitHub Actions保持停用。
