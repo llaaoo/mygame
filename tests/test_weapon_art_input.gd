@@ -2,6 +2,11 @@ extends "res://tests/support/input_scene_probe.gd"
 ## Live world/AI; real physical inputs in a controlled safe location.
 const Fixture=preload("res://tests/support/grayriver_fixture.gd")
 var starts: Array[Dictionary]=[]
+var refusals: Array[String]=[]
+# Process each real modifier edge once; recording a screenshot must not consume the input window.
+func ctrl_key(held: bool) -> void:
+	var event:=InputEventKey.new(); event.keycode=KEY_CTRL; event.physical_keycode=KEY_CTRL; event.pressed=held
+	Input.parse_input_event(event); Input.flush_buffered_events(); await frames(1)
 func click_attack(heavy := false) -> void:
 
 	await pointer_button(MOUSE_BUTTON_LEFT,true)
@@ -27,6 +32,7 @@ func run() -> void:
 	GameRuntime.instance.set_process(true)
 	for foe in game.active_enemies: foe.process_mode=Node.PROCESS_MODE_INHERIT
 	var actor:=game.player; var actions:=actor.actor_context.actions; var store:=game.session.inventory
+	actions.action_refused.connect(func(reason: String): refusals.append(reason))
 	actor.health_component.regen_rate=.6; actor.mana_component.mp_regen_rate=3
 	actor.position=Vector2(-4000,800); actor.get_node("Camera2D").reset_smoothing()
 	for id in ["river_sabre","river_spear","river_staff","river_bow"]: store.receive("player",id,1)
@@ -51,7 +57,7 @@ func run() -> void:
 		var art:=actions.weapon_art_view()
 		check(not art.is_empty() and art.route=="power" and art.technique==pair[1] and art.remaining>.8,"Actual light/hold-heavy did not open the shared-key window")
 		await capture("shared-art-"+MartialArts.definition(pair[1]).weapon_type)
-		await key(KEY_CTRL,true); await click_attack(); await key(KEY_CTRL,false)
+		await ctrl_key(true); await click_attack(); await ctrl_key(false)
 		check(starts.size()==before+3 and starts.back().weapon_art and starts.back().art_route=="power" and starts.back().technique==pair[1],"Ctrl+LMB did not select the current weapon's authored art")
 		check(actions.technique_status().contains(MartialArts.definition(pair[1]).title),"Shared art gave no executing-name feedback")
 		await idle(); await frames(8)
@@ -69,19 +75,19 @@ func run() -> void:
 	await aim_world(actor.position+Vector2(150,0)); await click_attack(); await idle()
 	check(not actions.weapon_art_view().is_empty() and actions.weapon_art_view().route=="flow","Actual terminal hit did not select the flow branch")
 	await capture("shared-art-flow")
-	# Remap through the same binding owner; actual H input executes the window.
+	# Direct art-key remaps are retired; actual Ctrl+LMB executes the flow.
 	var event:=InputEventKey.new(); event.keycode=KEY_H; event.physical_keycode=KEY_H
 	check(not InputBindings.assign("weapon_art",event,false).accepted,"Retired direct art key could be rebound")
-	await key(KEY_CTRL,true); await press_art(); await key(KEY_CTRL,false)
+	await ctrl_key(true); await press_art(); await ctrl_key(false)
 	check(starts.back().weapon_art and starts.back().art_route=="flow" and actions.profile.title=="截势斩","Ctrl+LMB lost the exact flow route")
 	target.position=actor.position+Vector2(1000,0); await idle()
 	check(QuickslotLoadout.SOURCES.all(func(source): return actor.skill_manager.shortcuts.binding(source).get("kind","")!="technique"),"Universal arts silently occupied shortcut slots")
 	await ready("blade_breaker")
 	await aim_world(actor.position+Vector2(150,0)); await click_attack(); await idle(); await click_attack(true); await idle()
 	check(not actions.weapon_art_view().is_empty(),"No window for interface cancellation test")
-	await key(KEY_I,true); await key(KEY_I,false); await key(KEY_CTRL,true)
+	await key(KEY_I,true); await key(KEY_I,false); await ctrl_key(true)
 	await key(KEY_ESCAPE,true); await key(KEY_ESCAPE,false)
-	var count:=starts.size(); await frames(10); await key(KEY_CTRL,false)
+	var count:=starts.size(); await frames(10); await ctrl_key(false)
 	check(actions.weapon_art_view().is_empty() and starts.size()==count and not paused,"Held art input escaped the live interface")
 	# Use another authored foe: the previous confirmed flow may have killed its target.
 	for foe in game.active_enemies:
@@ -99,11 +105,12 @@ func run() -> void:
 	var choices:=actions.weapon_art_view()
 	check(choices.alternatives.size()==2 and choices.route=="power","Actual heavy contact failed to offer two equipped arts")
 	var deadline: float=choices.remaining
-	await key(KEY_CTRL,true); await key(KEY_CTRL,false)
+	await ctrl_key(true); await ctrl_key(false)
 	check(actions.weapon_art_view().route=="power_followup" and actions.weapon_art_view().remaining<deadline,"Ctrl tap failed to select the second art or refreshed the window")
+	print("ART_SWITCH_INPUT ",JSON.stringify({"selected":actions.weapon_art_view().route,"remaining":actions.weapon_art_view().remaining,"stamina":actions.stamina.current}))
+	await ctrl_key(true); await press_art(); await ctrl_key(false)
 	await capture("same-combo-second-art")
-	await key(KEY_CTRL,true); await press_art(); await key(KEY_CTRL,false)
-	check(starts.back().art_route=="power_followup" and starts.back().followup,"Execution chord changed the Ctrl-selected art")
+	check(starts.back().art_route=="power_followup" and starts.back().followup,"Execution chord failed to execute the Ctrl-selected art: "+str(refusals)+"; last="+JSON.stringify(starts.back()))
 	if is_instance_valid(target): target.position=actor.position+Vector2(1000,0)
 	await idle()
 	await key(KEY_F5,true); await key(KEY_F5,false); await key(KEY_F9,true); await key(KEY_F9,false)
