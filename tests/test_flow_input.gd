@@ -68,13 +68,14 @@ func run() -> void:
  check(casts==1 and manager.selection_for_source("quick_e").get("payload","")=="attune_fire","Real inscription did not update automatic follow-up form")
  await key(KEY_E,true); await key(KEY_E,false); await frames(40)
  check(casts==2 and actor.get_node("BuffManager").has_buff("ember_focus"),"E did not execute the real following attunement")
+ await create_timer(focus.cooldown+.3).timeout
  var snapshot:=store.snapshot(); var mana:=actor.mana_component.mp
  await scroll(MOUSE_BUTTON_WHEEL_DOWN)
  check(manager.shortcuts.selection("quick_e").get("payload")=="basic" and casts==2 and actor.mana_component.mp==mana and store.snapshot()==snapshot,"World scroll did not fix a form, or cast/spent resources")
  await scroll(MOUSE_BUTTON_WHEEL_UP)
- check(manager.shortcuts.selection("quick_e")=={"mode":"auto"},"World scroll could not return to intelligent mode")
+ check(manager.shortcuts.selection("quick_e").get("payload","")=="attune_fire","World scroll did not return to the executable fire form")
  await key(KEY_M,true); await key(KEY_M,false); await key(KEY_E,true); await key(KEY_E,false); await frames(20)
- check(actor.material_wheel.visible and actor.material_wheel.entries.any(func(row: Dictionary): return row.variant_id=="auto" and row.current),"Live wheel failed to show/refresh the automatic choice")
+ check(actor.material_wheel.visible and not actor.material_wheel.entries.is_empty() and actor.material_wheel.entries.all(func(row: Dictionary): return row.is_empty() or row.ready and row.variant_id!="auto"),"Live wheel failed to show only currently executable concrete forms")
  await capture("automatic-follow-and-wheel")
  await key(KEY_ESCAPE,true); await key(KEY_ESCAPE,false)
  await create_timer(rune.cooldown+.4).timeout

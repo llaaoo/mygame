@@ -43,14 +43,14 @@ func followup_description() -> String:
 	if not followup_profile: return ""
 	var stages:=PackedStringArray()
 	for stage in followup_after: stages.append(str(stage+1))
-	return "接势 · %s：普攻第%s段造成未格挡的有效伤害后，在收招/接续窗口手动按武技键。起手%.2f秒 · 距离%.0f · 扇面%.0f° · 推移%.0f · 体力%.0f；沿用同一冷却。Ctrl+武技键固定常规形式，Shift仍显式释放附魔。"%[followup_profile.title,"/".join(stages),followup_profile.windup,followup_profile.reach,followup_profile.angle_degrees,followup_profile.push_distance,followup_profile.stamina_cost]
+	return "接势 · %s：普攻第%s段造成未格挡的有效伤害后，在收招/接续窗口手动按武技键。起手%.2f秒 · 距离%.0f · 扇面%.0f° · 推移%.0f · 体力%.0f；沿用同一冷却。按K配置连招，轻点Ctrl切换，Ctrl+Shift+左键显式释放附魔。"%[followup_profile.title,"/".join(stages),followup_profile.windup,followup_profile.reach,followup_profile.angle_degrees,followup_profile.push_distance,followup_profile.stamina_cost]
 func art_route(route_id: String) -> MartialRoute:
 	for route in art_routes:
 		if route.id==route_id: return route
 	return null
 func art_description(key_label: String) -> String:
-	if art_routes.is_empty(): return "此武技尚无连招路线，可选择独立快捷绑定。"
-	var text:="学习后无需占用快捷槽。共用武技键：%s；完成收招后开始窗口，短按速发，长按蓄力重发；Shift+该键显式释放附魔。"%key_label
+	if art_routes.is_empty(): return "此武技尚无可发动的连招路线。"
+	var text:="每个组合最多两招，轻点Ctrl切换。发动：%s；完成收招后开始窗口，短按速发，长按蓄力重发；Shift+该键显式释放附魔。"%key_label
 	for route in art_routes:
 		text+="\n%s → %s · %.1f秒窗口"%[route.describe(),followup_profile.title if route.form==MartialRoute.Form.FOLLOWUP else title,route.window]
 	return text

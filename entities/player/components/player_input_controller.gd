@@ -6,7 +6,7 @@ var casting: PlayerCastingController
 var _mouse_shortcuts: Dictionary={}
 var _ui_click_pending := false
 var _attack_suppressed := false
-var _art_suppressed := false
+var _cycle_pending := false
 var _weapon_edges: Array[Action]=[]
 var _suppressed_sources: Dictionary={}
 var _fresh_after_ui: Dictionary={}
@@ -62,8 +62,6 @@ func poll_universal_actions() -> Array[Action]:
 		actions.append(hit)
 
 	# Every shortcut can carry a skill or an item. Input only proposes requests.
-	if tactical and not selecting and not _art_suppressed and Input.is_action_just_pressed("weapon_art") and not Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) and not Input.is_action_just_released("attack"):
-		actions.append(player.actor_context.actions.capture_weapon_art(player.get_mouse_direction(),Input.is_key_pressed(KEY_SHIFT)))
 	for source in QuickslotLoadout.SOURCES:
 		if selecting: continue
 		var input_action:=action_for_source(source)
@@ -80,10 +78,14 @@ func _ready() -> void:
 	get_window().focus_exited.connect(_focus_lost)
 
 func _input(event: InputEvent) -> void:
-	if (event is InputEventKey or event is InputEventMouseButton) and InputMap.has_action("weapon_art"):
-		if event.is_action_pressed("weapon_art") and not (event is InputEventKey and event.echo):
-			_art_suppressed=player.ui_blocked or get_tree().paused or is_instance_valid(player.material_wheel) and player.material_wheel.visible or event is InputEventMouseButton and _pointer_over_interface()
-		elif event.is_action_released("weapon_art"): _art_suppressed=false
+	if event is InputEventKey and event.keycode==KEY_CTRL and not event.echo:
+		if event.pressed:
+			_cycle_pending=not player.ui_blocked and not get_tree().paused and not Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) and not (is_instance_valid(player.material_wheel) and player.material_wheel.visible)
+		else:
+			if _cycle_pending and not player.ui_blocked and not get_tree().paused and not (is_instance_valid(player.material_wheel) and player.material_wheel.visible):
+				var cycle:=Action.melee(player); cycle.params["cycle_weapon_art"]=true; _weapon_edges.append(cycle)
+			_cycle_pending=false
+	if event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_LEFT and event.pressed: _cycle_pending=false
 	if event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_LEFT and event.pressed:
 		if not player.ui_blocked and not get_tree().paused and not (is_instance_valid(player.material_wheel) and player.material_wheel.visible): _attack_suppressed=false
 	# Global Input edges survive handled UI events. Preserve a genuinely new press
@@ -117,17 +119,6 @@ func _poll_shortcut(actions: Array[Action],source: String,pressed: bool) -> void
 	if is_instance_valid(player.material_wheel): player.material_wheel.remember_source(source)
 	var entry:=player.skill_manager.shortcuts.binding(source)
 	if entry.get("kind","")=="technique":
-		if pressed:
-			var request:=Action.new(); request.action_type=Action.ActionType.TECHNIQUE; request.source=player
-			request.skill_id=entry.technique_id; request.skill_source=source; request.direction=player.get_mouse_direction()
-			request.params={"binding_revision":player.skill_manager.shortcuts.revision(source),"release_enchantment":Input.is_key_pressed(KEY_SHIFT)}
-			request=player.actor_context.actions.capture_technique_intent(request,Input.is_key_pressed(KEY_CTRL))
-			if request.params.release_enchantment:
-				var context:=player.actor_context
-				var uid:=str(context.items.equipped(context.id).get(str(EquipmentData.SlotType.RIGHT_HAND),""))
-				request.params["enchantment_weapon_uid"]=uid
-				request.params["enchantment_state"]=context.items.coating_state(uid)
-			actions.append(request)
 		return
 	if entry.get("kind","")=="item":
 		var definition:=ItemCatalog.default_catalog().definition(str(entry.item_id))
@@ -367,6 +358,7 @@ func shortcut_changed(source: String) -> void:
 	if player.actor_context.item_actions.input_source==source: player.actor_context.item_actions.cancel()
 
 func _focus_lost() -> void:
+	_cycle_pending=false
 	_weapon_edges.clear()
 	if player.actor_context: player.actor_context.actions.clear_input()
 	_fresh_after_ui.clear()
@@ -409,10 +401,12 @@ func _poll_shortcut_edges(actions: Array[Action],source: String,input_action: St
 func suppress_source(source: String) -> void:
 	_suppressed_sources[source]=true
 func suppress_held_shortcuts() -> void:
+	_cycle_pending=false
 	_fresh_after_ui.clear()
 	for source in QuickslotLoadout.SOURCES:
 		if Input.is_action_pressed(action_for_source(source)): suppress_source(source)
 func cancel_weapon_input() -> void:
+	_cycle_pending=false
 	_weapon_edges.clear()
 	_attack_suppressed=true
 func pointer_consumed() -> void:

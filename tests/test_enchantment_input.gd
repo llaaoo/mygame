@@ -20,7 +20,6 @@ func run() -> void:
 	stock.receive("player","river_staff",1); stock.receive_into("player.pocket","fire_rag",1)
 	var uid:=stock.find_owned("player","river_staff"); stock.equip("player",uid)
 	actor.actor_context.martial.learn("staff_sweep")
-	actor.skill_manager.shortcuts.bind_technique("quick_e","staff_sweep")
 	actor.skill_manager.shortcuts.bind_item("left","fire_rag")
 	var base:=Vector2(-4000,800); actor.position=base; actor.get_node("Camera2D").reset_smoothing()
 	var target:=game.active_enemies[0]
@@ -40,6 +39,14 @@ func run() -> void:
 	check(triggered.size()==1 and buffs.has_buff("burning") and stock.coating(uid)!=null,"Second LMB failed to trigger burning while preserving the coating")
 	await capture("enchantment-threshold-trigger")
 	await create_timer(.7).timeout
+	# Earn a light-heavy route away from the foes, preserving the real coating.
+	await aim_world(actor.position+Vector2(0,-150))
+	await pointer_button(MOUSE_BUTTON_LEFT,true); await pointer_button(MOUSE_BUTTON_LEFT,false)
+	await create_timer(1.0).timeout
+	await pointer_button(MOUSE_BUTTON_LEFT,true); await create_timer(.37).timeout; await pointer_button(MOUSE_BUTTON_LEFT,false)
+	for i in range(130):
+		if actor.actor_context.actions.mode=="idle": break
+		await frames(1)
 	# Second target keeps authored AI, resources and caps; its response may evade.
 	var foe: Enemy
 	for enemy in game.active_enemies:
@@ -49,10 +56,10 @@ func run() -> void:
 	foe.position=base+Vector2(210,0); foe._home_position=foe.position; foe.process_mode=Node.PROCESS_MODE_INHERIT
 	var hp:=foe.health_component.hp
 	await frames(4); aim_at(foe.position)
-	await key(KEY_SHIFT,true); await key(KEY_E,true)
-	check(actor.actor_context.actions.mode=="attack" and stock.coating(uid)!=null,"Shift+E did not preserve coating during its windup")
+	await key(KEY_CTRL,true); await key(KEY_SHIFT,true); await pointer_button(MOUSE_BUTTON_LEFT,true); await pointer_button(MOUSE_BUTTON_LEFT,false)
+	check(actor.actor_context.actions.mode=="attack" and stock.coating(uid)!=null,"Ctrl+Shift+LMB did not preserve coating during its windup")
 	await capture("enchantment-wave-warning")
-	await key(KEY_E,false); await key(KEY_SHIFT,false)
+	await key(KEY_SHIFT,false); await key(KEY_CTRL,false)
 	var found:=false
 	for i in range(80):
 		for node in game.region_root.get_children():
@@ -68,5 +75,5 @@ func run() -> void:
 	fixture=Fixture.new(self); game=await fixture.boot(true)
 	check(game.session.inventory.item(uid)!=null and game.session.inventory.coating(uid)==null,"Actual reentry restored a consumed enchantment or replaced weapon UID")
 	await fixture.close()
-	if failures.is_empty(): print("PASS enchantment input: real rag/LMB buildup and proc, latched Shift+E, normal-AI wave sample, actual MP/coating and consumed-UID save/reentry")
+	if failures.is_empty(): print("PASS enchantment input: real rag/LMB buildup and proc, latched Ctrl+Shift+LMB, normal-AI wave sample, actual MP/coating and consumed-UID save/reentry")
 	quit(0 if failures.is_empty() else 1)

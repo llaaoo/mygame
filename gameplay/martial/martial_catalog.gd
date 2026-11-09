@@ -23,9 +23,17 @@ func validate() -> Array[String]:
 		if not entry or not entry.valid() or seen.has(entry.id): errors.append("Invalid/duplicate martial technique"); continue
 		seen[entry.id]=true
 		for route in entry.art_routes:
-			var key:=entry.weapon_type+":"+"/".join(route.sequence)+":"+str(route.priority)
+			var key:=entry.id+":"+"/".join(route.sequence)+":"+str(route.form)
 			if routes.has(key): errors.append("Ambiguous shared martial route: "+entry.id)
 			routes[key]=entry.id
+	var windows: Dictionary={}
+	for entry in techniques:
+		if not entry: continue
+		for route in entry.art_routes:
+			if not route: continue
+			var group:=MartialArts.route_group(entry,route)
+			if windows.has(group) and not is_equal_approx(windows[group],route.window): errors.append("Inconsistent combo window: "+group)
+			windows[group]=route.window
 	for entry in techniques:
 		if entry: _visit(entry,[],{},errors)
 	return errors

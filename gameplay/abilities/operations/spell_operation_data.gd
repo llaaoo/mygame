@@ -40,3 +40,8 @@ func compose(entry: SpellPayloadData) -> SkillData:
 	result.aoe_color=entry.color
 	result.operation_id="" # This is an execution result, never another input request.
 	return result
+
+func modifier_result_id(payload: SpellPayloadData,resolved: SkillData) -> String:
+	# Input/basis IDs describe the operation; material compatibility uses its real effect.
+	var id:=resolved.get_id()
+	return payload.effect.get_id() if payload.effect and id in [action.get_id(),action.get_id()+"."+payload.id] else id

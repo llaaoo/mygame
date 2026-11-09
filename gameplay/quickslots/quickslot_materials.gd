@@ -16,12 +16,12 @@ static func source_for(manager: SkillManager,skill: SkillData,preferred := "") -
   var instance:=manager.get_instance(source)
   if instance and instance.data.get_id()==skill.get_id(): return source
  return ""
-static func modifier_ids(manager: SkillManager,skill: SkillData) -> Array[String]:
+static func modifier_ids(manager: SkillManager,skill: SkillData,basis: SkillData=null,result_id := "") -> Array[String]:
  var supplies:=manager.combinations.supplies
  var candidates: Array[String]=[""]
  for id: String in CastingSupplies.MATERIAL_IDS:
   var material:=supplies.catalog[id] as CastingMaterialData
-  var compatible:=material.supports(skill.get_id(),skill.get_id(),skill)
+  var compatible:=material.supports(skill.get_id(),result_id if not result_id.is_empty() else skill.get_id(),basis if basis else skill)
   for rule in manager.combinations.rules:
    if rule.trigger_action_id==skill.get_id() and manager.combinations.learned_rules.has(rule.id) and material.supports(skill.get_id(),rule.result_skill.get_id(),rule.result_skill): compatible=true
   if compatible: candidates.append(id)
@@ -64,7 +64,7 @@ static func options(actor: Player,source: String) -> Array[Dictionary]:
   var choice: Dictionary={"payload":payload.id,"modifier":str(current.get("modifier","")),"uid":""}
   var composed:=entry.compose(payload)
   var modifier:=manager.combinations.supplies.catalog.get(choice.modifier) as CastingMaterialData
-  if modifier and not modifier.supports(entry.action.get_id(),composed.get_id(),composed): choice.modifier=""
+  if modifier and not modifier.supports(entry.action.get_id(),entry.modifier_result_id(payload,composed),composed): choice.modifier=""
   var uids: Array[String]=[]
   if entry.action.operation_id=="disperse":
    for row in store.entries(actor.actor_context.id+".pocket"):
@@ -82,9 +82,53 @@ static func options(actor: Player,source: String) -> Array[Dictionary]:
    if payload.required_rule: detail+=" · "+payload.required_rule.condition_label()
    result.append({"variant_id":payload.id,"title":payload.title,"choice":selected,"cost":plan.cost,"ready":plan.ready,"reason":plan.reason,"detail":detail,"description":payload.describe(actor.actor_context.rules.timed_fields),"current":not automatic and current==selected})
  return result
-static func select(actor: Player,source: String,choice: Dictionary) -> bool:
+static func usable_options(actor: Player,source: String) -> Array[Dictionary]:
+ # Combat selection is a query of concrete executable forms, not a catalogue.
+ var result: Array[Dictionary]=[]
+ if not actor.actor_context or not available(actor.skill_manager,source): return result
+ var manager:=actor.skill_manager
+ var entry:=operation(manager,source)
+ var seen: Dictionary={}
+ for row in options(actor,source):
+  if row.choice.get("mode","")=="auto": continue
+  var choices: Array[Dictionary]=[]
+  if not entry: choices.append(row.choice.duplicate(true))
+  else:
+   var payload:=entry.payload(str(row.choice.payload))
+   var basis:=entry.compose(payload)
+   for modifier in modifier_ids(manager,entry.action,basis,entry.modifier_result_id(payload,basis)):
+    var candidate: Dictionary=row.choice.duplicate(true); candidate.modifier=modifier; choices.append(candidate)
+  for choice in choices:
+   var identity:=str(choice.get("payload",""))+"|"+str(choice.get("modifier",""))+"|"+str(choice.get("uid",""))
+   if seen.has(identity): continue
+   seen[identity]=true
+   var plan:=manager.combinations.preview(manager.get_instance(source).data,actor,Input.is_key_pressed(KEY_SHIFT),choice)
+   var modifier:=str(choice.get("modifier",""))
+   if not plan.ready or not modifier.is_empty() and (plan.modifier_id if entry else plan.material_id)!=modifier: continue
+   var option: Dictionary=row.duplicate(true)
+   option.choice=choice; option.ready=true; option.reason=""; option.cost=plan.cost
+   option.variant_id=str(choice.get("payload","basic"))+"|"+modifier
+   option.title=row.title if not entry else entry.payload(str(choice.payload)).title
+   if not modifier.is_empty() and entry: option.title+=" · "+manager.combinations.supplies.title(modifier)
+   option.detail=stock_text(actor,plan.material_costs)
+   if not plan.instance_costs.is_empty(): option.detail+=" · "+actor.actor_context.items.state_text(str(choice.get("uid","")))
+   if option.detail.is_empty(): option.detail="不消耗实物材料"
+   if entry:
+    var payload:=entry.payload(str(choice.payload))
+    if not payload.source_kind.is_empty(): option.detail+=" · "+_source_hint(payload)
+   option.current=manager.selection_for_source(source)==choice
+   result.append(option)
+ return result
+static func unavailable_summary(actor: Player,source: String) -> String:
+ if not available(actor.skill_manager,source): return "在K编组已掌握的法术动作。"
+ var reasons:=PackedStringArray()
+ for row in options(actor,source):
+  if not row.ready and not str(row.reason).is_empty() and str(row.reason) not in reasons: reasons.append(str(row.reason))
+ return "当前没有满足来源、材料与资源条件的形式。"+("\n"+"；".join(reasons.slice(0,3)) if not reasons.is_empty() else "")
+static func select(actor: Player,source: String,choice: Dictionary,ready_only := false) -> bool:
  if not actor.actor_context or actor.health_component.is_dead: return false
  if not available(actor.skill_manager,source): return false
+ if ready_only and not usable_options(actor,source).any(func(row): return row.choice==choice): return false
  var entry:=operation(actor.skill_manager,source)
  if choice=={"mode":"auto"}:
   return actor.skill_manager.spell_forms.supports(actor.skill_manager.get_instance(source).data) and actor.skill_manager.shortcuts.set_selection(source,choice)
@@ -102,7 +146,7 @@ static func select(actor: Player,source: String,choice: Dictionary) -> bool:
  return actor.skill_manager.shortcuts.set_selection(source,choice)
 
 static func cycle(actor: Player,source: String,step: int) -> bool:
- var entries:=options(actor,source)
+ var entries:=usable_options(actor,source)
  if entries.is_empty(): return false
  var actual:=actor.skill_manager.selection_for_source(source)
  var index:=-1
@@ -113,7 +157,7 @@ static func cycle(actor: Player,source: String,step: int) -> bool:
   var candidate: Dictionary=entries[posmod(index+step*offset,entries.size())]
   var candidate_actual: Dictionary=actor.skill_manager.spell_forms.resolve_automatic(actor.skill_manager.get_instance(source).data) if candidate.choice.get("mode","")=="auto" else candidate.choice
   if candidate_actual==actual: continue
-  if select(actor,source,candidate.choice):
+  if select(actor,source,candidate.choice,true):
    var message: String=InputBindings.label(InputBindings.action_for_source(source))+" · "+str(candidate.title)+" · "+str(candidate.detail)
    if not candidate.ready: message+="\n"+str(candidate.reason)
    actor.skill_manager.combinations.report_feedback(message)

@@ -41,7 +41,7 @@ func run() -> void:
  manager.combinations.reset_session(); actor.get_node("BuffManager").clear_temporary(); actor.mana_component.mp=60
  var fire:=manager.pool.get_skill("inscribe")
  manager.equip_source("slot_4",fire,{"payload":"ember","modifier":"","uid":""})
- store.receive("player","fire_stone",1)
+ store.receive("player","fire_stone",2); store.receive("player","resin",1)
  context=CastContext.simple(actor,Vector2.RIGHT,fire)
  check(manager.use_source("slot_4",actor,context),"Context-setting fire rune refused: "+manager.preview_source("slot_4").reason)
  manager.combinations.tick(1)
@@ -50,6 +50,7 @@ func run() -> void:
  check(store.snapshot()==stock and actor.mana_component.mp==mana and manager.get_instance("quick_e")==inst,"Form cycling mutated resource/skill state")
  var rows:=QuickslotMaterials.options(actor,"quick_e")
  check(rows.any(func(entry: Dictionary): return entry.variant_id=="cinder_volley" and entry.detail.contains("口袋") and entry.detail.contains("火阵")),"Source hint hid material count")
+ manager.combinations.cooldowns.clear()
  # Rebind through the real binding authority, then exercise an actual world wheel event.
  actor.input_controller.last_spell_source="quick_e"; actor.material_wheel.remember_source("slot_4")
  manager.shortcuts.bind_item("quick_e","clean_water")
@@ -59,7 +60,7 @@ func run() -> void:
  var event:=InputEventMouseButton.new(); event.position=motion.position; event.button_index=MOUSE_BUTTON_WHEEL_DOWN; event.pressed=true
  root.push_input(event,true); await frames()
  event=event.duplicate(); event.pressed=false; root.push_input(event,true); await frames()
- check(manager.selection_for_source("slot_4").get("payload")=="frost","Actual wheel failed after rebinding")
+ check(manager.selection_for_source("slot_4").get("payload")=="arcane","Actual wheel did not skip unavailable materials after rebinding")
  # Trade previews are read-only and report the actual shortfall, commit remains atomic.
  actor.position=TownServices.POINT+Vector2(0,35)
  var uid:=store.find_owned(TownServices.MERCHANT,"charcoal")

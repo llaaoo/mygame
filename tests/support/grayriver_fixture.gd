@@ -9,6 +9,9 @@ func boot(persist:=false, freeze_player_physics:=false) -> GrayriverGame:
 	if freeze_player_physics: game.get_node("Player").process_mode=Node.PROCESS_MODE_DISABLED
 	tree.root.add_child(game)
 	tree.current_scene=game
+	# These persistence fixtures drive status time explicitly. Do not let the
+	# engine spend their saved effect remainder while settling a slow import.
+	if freeze_player_physics: GameRuntime.instance.set_process(false)
 	for i in range(25):await tree.process_frame
 	game.ui.close_modal()
 	GameRuntime.instance.set_process(false)

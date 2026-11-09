@@ -69,6 +69,31 @@ func run() -> void:
 	check(store.exchange("e","f",{"river_sabre":1},{"river_spear":1}).accepted and store.locate(swap_uid)=="f.pack","Full inventories could not barter gear without replacing its identity")
 	var sequence:=session.facts.sequence
 	check(not store.exchange("e","f",{"ration":1000},{}).accepted and session.facts.sequence==sequence,"Rejected trade published a committed fact")
+	# Sale is a simultaneous exchange: both sides may need the outgoing slot.
+	for owner in ["seller","buyer"]:
+		store.ensure_container(owner+".pocket",owner,"pocket",1)
+		store.ensure_container(owner+".pack",owner,"pack",1)
+		store.ensure_actor(owner)
+	store.receive_into("seller.pocket","ration",1)
+	store.receive_into("seller.pack","river_sabre",1)
+	store.receive_into("buyer.pocket","charcoal",1)
+	store.receive_into("buyer.pack","coin",8)
+	var sale_uid:=store.find_owned("seller","river_sabre")
+	var sale_before:=store.snapshot()
+	check(store.preview_trade_instance("buyer","seller",sale_uid,1,8).accepted and store.snapshot()==sale_before,"Full-pack sale preview rejected a valid exchange or mutated stock")
+	check(store.trade_instance("buyer","seller",sale_uid,1,8).accepted and store.locate(sale_uid)=="buyer.pack" and store.count("seller","coin")==8 and store.count("buyer","coin")==0,"Full inventories could not sell an exact UID without a spare payment slot")
+	var paid:=store.snapshot()
+	check(not store.trade_instance("seller","buyer",sale_uid,1,9).accepted and store.snapshot()==paid,"Unaffordable sale did not roll back")
+	# A different copy of the same item must never substitute for the selected UID.
+	store.ensure_actor("copies"); store.ensure_actor("paying")
+	store.receive("copies","river_staff",2); store.receive("paying","coin",24)
+	var copies:=store.entries("copies.pack")
+	var exact_uid: String=copies[1].uid
+	check(store.trade_instance("paying","copies",exact_uid,1,8).accepted and store.locate(exact_uid)=="paying.pack" and store.locate(copies[0].uid)=="copies.pack","Sale substituted an earlier identical item")
+	check(store.drop_pack("paying","camp",Vector2(500,500)),"Could not drop the purchase destination pack")
+	var detached_before:=store.snapshot()
+	check(not store.preview_trade_instance("paying","copies",copies[0].uid,1,8).accepted and not store.trade_instance("paying","copies",copies[0].uid,1,8).accepted and store.snapshot()==detached_before,"Trade remotely inserted equipment into a dropped pack or took payment")
+	check(store.recover_pack("paying","paying.pack"),"Purchase fixture could not recover its own pack")
 	var saved:=store.snapshot()
 	check(InventoryService.valid_snapshot(saved),"Canonical inventory cannot save")
 	var invalid:=saved.duplicate(true)

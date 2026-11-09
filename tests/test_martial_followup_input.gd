@@ -21,7 +21,6 @@ func prime(weapon: String,id: String) -> void:
 		await frames(1)
 	check(actions.stamina.current>=95 and actor.actor_context.martial.reason(id,actor.actor_context).is_empty(),"Normal recovery/cooldown did not become ready")
 	actor.position=Vector2(-4000,800); actor.get_node("Camera2D").reset_smoothing()
-	actor.skill_manager.shortcuts.bind_technique("quick_e",id)
 	var data:=MartialArts.definition(id)
 	for stage in range(data.followup_after[0]+1):
 		# Prior strokes whiff; only the specified stage may confirm the branch.
@@ -58,13 +57,13 @@ func run() -> void:
 		for i in range(120):
 			if actions.remaining<=.2: break
 			await frames(1)
-		var preview:=QuickslotView.technique_state(actor,actor.skill_manager.shortcuts.binding("quick_e"))
-		check(preview.linked and preview.ready,"Quickslot preview failed to show the executable route")
+		var preview:=actions.weapon_art_view()
+		check(preview.form==MartialRoute.Form.FOLLOWUP and preview.reason.is_empty(),"Quickslot preview failed to show the executable route")
 		if pair[1]=="blade_breaker":
 			await key(KEY_SHIFT,true)
-			check(not QuickslotView.technique_state(actor,actor.skill_manager.shortcuts.binding("quick_e")).ready,"Shift preview promised a release without actual coating")
+			check(not actions.weapon_art_view(true).reason.is_empty(),"Shift preview promised a release without actual coating")
 			await key(KEY_SHIFT,false)
-		await key(KEY_E,true); await key(KEY_E,false)
+		await key(KEY_CTRL,true); await press(); await key(KEY_CTRL,false)
 		for i in range(100):
 			if not starts.is_empty() and starts.back().technique==pair[1]: break
 			await frames(1)
@@ -73,15 +72,8 @@ func run() -> void:
 		target.position=actor.position+Vector2(500,0)
 		await idle()
 		print("MARTIAL_INPUT ",JSON.stringify({"technique":pair[1],"action":starts.back(),"stamina":actions.stamina.current,"arrows":store.count("player","arrow"),"mp":actor.mana_component.mp}))
-	# Ctrl selects base even with a live opportunity; no new quickslot is needed.
-	await prime("river_sabre","blade_breaker")
-	await key(KEY_CTRL,true)
-	check(not QuickslotView.technique_state(actor,actor.skill_manager.shortcuts.binding("quick_e")).linked,"Ctrl preview retained the linked form")
-	await idle(); await key(KEY_E,true); await key(KEY_E,false); await key(KEY_CTRL,false)
-	check(starts.back().technique=="blade_breaker" and not starts.back().followup and actions.profile==MartialArts.definition("blade_breaker").profile,"Ctrl+E silently chose the linked form")
-	await idle(); target.position=actor.position+Vector2(500,0)
 	await key(KEY_F5,true); await key(KEY_F5,false); await key(KEY_F9,true); await key(KEY_F9,false)
 	check(actions.combo_snapshot().is_empty() and not actions.technique_view("blade_breaker").linked and not paused and actor.mana_component.mp==60,"Restore retained an opportunity, paused the world or physical inputs spent MP")
 	await fixture.close()
-	if failures.is_empty(): print("PASS martial followup input: real hit-confirmed LMB/E routes for four weapons, shared live preview/HUD, natural stamina/cooldown, Ctrl+E base, actual arrows and F5/F9 transient cleanup; stationary target fixture")
+	if failures.is_empty(): print("PASS martial followup input: real hit-confirmed LMB/Ctrl+LMB routes for four weapons, shared live preview/HUD, natural stamina/cooldown, actual arrows and F5/F9 transient cleanup; stationary target fixture")
 	quit(0 if failures.is_empty() else 1)

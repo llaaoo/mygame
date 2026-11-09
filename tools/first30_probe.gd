@@ -302,7 +302,7 @@ func execute(request: Dictionary) -> void:
 		"point_click": await click_point(Vector2(request.point[0],request.point[1]))
 		"wheel": error=await wheel_choice(str(request.get("key","5")),str(request.payload),str(request.get("uid","")))
 		"inventory": error=await inventory_command(request)
-		"technique_bind": error=await bind_technique(str(request.technique),str(request.get("source","quick_e")))
+		"technique_inspect": error=await inspect_technique(str(request.technique))
 		"click": error=await click(str(request.label))
 		"label_click": error=await label_click(str(request.label))
 		"walk_loot":
@@ -335,25 +335,13 @@ func execute(request: Dictionary) -> void:
 		for i in range(6): await process_frame
 		quit()
 
-func bind_technique(id: String,source: String) -> String:
+func inspect_technique(id: String) -> String:
 	var data:=MartialArts.definition(id)
 	if not data or not game.player.actor_context.martial.learned.has(id): return "technique_not_learned"
 	await tap(KEY_K); await settle(6)
 	var error:=await click("武技")
 	if not error.is_empty(): return error
-	error=await click(data.title+" · 已学")
-	if not error.is_empty(): return error
-	var pool:=game.player.skill_pool_ui
-	var index:=pool._equip_sources.find(source)
-	if index<0: return "unknown_shortcut"
-	var slot: Control=pool._equip_slots[index]
-	var ancestor:=slot.get_parent()
-	while ancestor:
-		if ancestor is ScrollContainer: ancestor.ensure_control_visible(slot)
-		ancestor=ancestor.get_parent()
-	await settle(3); await click_point(slot.get_global_rect().get_center())
-	await tap(KEY_ESCAPE)
-	return "" if game.player.skill_manager.shortcuts.binding(source).get("technique_id","")==id else "technique_not_bound"
+	return await click(data.title+" · 已学")
 
 func form_snapshot() -> Dictionary:
 	var forms: Dictionary={}

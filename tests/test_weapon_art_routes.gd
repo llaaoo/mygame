@@ -28,7 +28,9 @@ func prime(weapon: String,sequence: Array[String],hit_last := false,finish_last 
 		actions.advance(actions.profile.windup+.01)
 		if index==sequence.size()-1 and hit_last:
 			target.position=actor.position+Vector2(45,0); await frames()
-			check(actions.contact(target).damage_dealt>0,"Actual contact did not confirm the terminal stroke")
+			target.health_component.tick(1) # Isolate contact trials from earlier projectile immunity.
+			var contact:=actions.contact(target)
+			check(contact.damage_dealt>0,"Actual contact did not confirm the terminal stroke: "+contact.rejection)
 			target.position=actor.position+Vector2(1000,0)
 		if finish_last: actions.advance(actions.remaining)
 func run() -> void:
@@ -50,6 +52,26 @@ func run() -> void:
 		var request:=actions.capture_weapon_art(Vector2.RIGHT); var before:=actions.stamina.current
 		check(actions.try_action(request).accepted and actions.profile==MartialArts.definition(pair[1]).profile and is_equal_approx(before-actions.stamina.current,actions.profile.stamina_cost),"Shared art required a shortcut or used wrong form/cost")
 		check(actions.weapon_art_view().is_empty(),"An accepted art left a reusable opportunity")
+	await prime("river_sabre",["light","heavy"],true)
+	var choice:=actions.weapon_art_view()
+	check(choice.alternatives.size()==2 and choice.route=="power","Same combo did not offer exactly two arts with the base default")
+	var deadline: float=choice.remaining
+	actions.advance(.18)
+	var selection_stamina:=actions.stamina.current
+	check(actions.cycle_weapon_art().accepted and actions.weapon_art_view().route=="power_followup" and actions.weapon_art_view().remaining<deadline-.17 and actions.stamina.current==selection_stamina,"Ctrl selection changed costs, failed to switch or refreshed the deadline")
+	var locked:=actions.capture_weapon_art(Vector2.RIGHT)
+	check(actions.cycle_weapon_art().accepted and actions.weapon_art_view().route=="power","Second switch failed to return to the first art")
+	check(actions.try_action(locked).accepted and actions.profile==MartialArts.definition("blade_breaker").followup_profile,"Switching after capture changed the locked art")
+	var martial:=actor.actor_context.martial
+	var group:="blade:light/heavy"
+	var saved_routes:=martial.snapshot()
+	check(not martial.equip_route("blade_breaker/power",2),"A combo accepted a third equipped art")
+	var too_many:=saved_routes.duplicate(true); too_many.routes[group].append("blade_breaker/flow")
+	check(not MartialArts.valid(too_many),"Save accepted more than two arts for one sequence")
+	check(martial.remove_route(group,1),"Could not remove an equipped choice")
+	var one_route:=martial.snapshot(); martial.restore(one_route)
+	check(martial.route_slots(group).size()==1,"Save/restore silently refilled an intentionally removed art")
+	martial.restore(saved_routes)
 	await prime("river_sabre",["heavy","light"])
 	check(actions.weapon_art_view().is_empty(),"Wrong input order opened a route")
 	await prime("river_sabre",["light","light"])
@@ -110,7 +132,9 @@ func run() -> void:
 	check(not invalid.valid(),"Nonfinite route window accepted")
 	var catalog:=MartialCatalog.default_catalog().duplicate(true) as MartialCatalog
 	var duplicate:=catalog.techniques[0].duplicate(true) as MartialTechnique; duplicate.id="duplicate.route"; catalog.techniques.append(duplicate)
-	check(not catalog.validate().is_empty(),"Ambiguous same-priority shared routes were accepted")
+	check(catalog.validate().is_empty(),"Different techniques sharing a sequence must be authorable")
+	duplicate.art_routes.append(duplicate.art_routes[0])
+	check(not catalog.validate().is_empty(),"Duplicate route in one technique was accepted")
 	await fixture.close()
 	if failures.is_empty(): print("PASS weapon art routes: four real light-heavy windows without slots, hit-required flow, independent deadline, strict token/UID/order/interrupt/expiry, real cost, buffered commitment, modifier preview, restore and authoring validation")
 	quit(0 if failures.is_empty() else 1)

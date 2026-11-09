@@ -115,6 +115,7 @@ func weapon_art_view(release_enchantment := false) -> Dictionary:
 		var weapon:=context.items.equipment_definition(uid)
 		if not weapon or not weapon.moveset or data.weapon_type!=weapon.moveset.weapon_type: continue
 		for route in data.art_routes:
+			if not context.martial.route_equipped(id,route.id): continue
 			var match_result:=weapon_art.match_route(route,recovering)
 			if match_result.is_empty(): continue
 			var candidate:=data.profile if route.form==MartialRoute.Form.BASE else data.followup_profile
@@ -125,13 +126,29 @@ func weapon_art_view(release_enchantment := false) -> Dictionary:
 			if reason.is_empty() and release_enchantment:
 				var coating:=context.items.coating(uid)
 				if not coating or not coating.enchantment: reason="武器没有可释放的元素附魔"
-			choices.append({"technique":id,"route":route.id,"token":match_result.token,"remaining":match_result.remaining,"recovering":match_result.recovering,"title":data.title if route.form==MartialRoute.Form.BASE else candidate.title,"reason":reason,"cost":cost,"profile":candidate,"length":route.sequence.size(),"priority":route.priority})
+			choices.append({"technique":id,"route":route.id,"form":route.form,"token":match_result.token,"remaining":match_result.remaining,"recovering":match_result.recovering,"title":data.title if route.form==MartialRoute.Form.BASE else candidate.title,"reason":reason,"cost":cost,"profile":candidate,"length":route.sequence.size(),"priority":route.priority})
 	if choices.is_empty(): return {}
 	choices.sort_custom(func(a: Dictionary,b: Dictionary):
 		if a.length!=b.length: return a.length>b.length
 		if a.priority!=b.priority: return a.priority>b.priority
 		return str(a.technique)+str(a.route)<str(b.technique)+str(b.route))
-	return choices[0]
+	var group:=MartialArts.route_group(MartialArts.definition(choices[0].technique),MartialArts.definition(choices[0].technique).art_route(choices[0].route))
+	choices=choices.filter(func(choice): return MartialArts.route_group(MartialArts.definition(choice.technique),MartialArts.definition(choice.technique).art_route(choice.route))==group)
+	var order:=context.martial.route_slots(group)
+	choices.sort_custom(func(a,b): return order.find(str(a.technique)+"/"+str(a.route))<order.find(str(b.technique)+"/"+str(b.route)))
+	var references: Array=choices.map(func(choice): return str(choice.technique)+"/"+str(choice.route))
+	var selected:=weapon_art.selected(str(choices[0].token),references)
+	var result: Dictionary=choices[0]
+	for choice in choices:
+		if str(choice.technique)+"/"+str(choice.route)==selected: result=choice; break
+	result=result.duplicate(); result["alternatives"]=choices.map(func(choice): return {"ref":str(choice.technique)+"/"+str(choice.route),"title":choice.title}); result["group"]=group
+	return result
+func cycle_weapon_art() -> OperationResult:
+	if not _weapon_hold.is_empty(): return OperationResult.reject("正在准备武技")
+	var view:=weapon_art_view()
+	if view.is_empty(): return OperationResult.reject("没有可切换的连招窗口")
+	var refs: Array=view.alternatives.map(func(choice): return choice.ref)
+	return OperationResult.success() if weapon_art.cycle(view.token,refs) else OperationResult.reject("此连招仅装备一招")
 func capture_weapon_art(direction: Vector2,release_enchantment := false) -> Action:
 	var request:=Action.new(); request.action_type=Action.ActionType.TECHNIQUE; request.source=context.actor; request.direction=direction
 	request.params={"weapon_art":true,"release_enchantment":release_enchantment}
@@ -139,6 +156,7 @@ func capture_weapon_art(direction: Vector2,release_enchantment := false) -> Acti
 	if view.is_empty(): return request
 	request.skill_id=view.technique
 	request.params["art_route"]=view.route; request.params["art_token"]=view.token
+	request.params["art_revision"]=context.martial.loadout_revision
 	if release_enchantment:
 		request.params["enchantment_weapon_uid"]=weapon_art.weapon_uid
 		request.params["enchantment_state"]=context.items.coating_state(weapon_art.weapon_uid)
@@ -188,6 +206,7 @@ func try_action(action: Action) -> OperationResult:
 	var buffs:=actor.get_node_or_null("BuffManager") as BuffManager
 	if buffs and buffs.prevents_actions(): return OperationResult.reject("controlled")
 	if "ui_blocked" in actor and actor.ui_blocked: return OperationResult.reject("interface")
+	if action.params.get("cycle_weapon_art",false): return cycle_weapon_art()
 	if action.params.has("weapon_gesture"): return _weapon_gesture(action)
 	if action.action_type not in [Action.ActionType.MOVE,Action.ActionType.SPRINT,Action.ActionType.GUARD]: cancel_weapon_hold()
 	# Keep the input adapter lossless. Only execution discards an unmatched UI release.
@@ -266,6 +285,7 @@ func try_action(action: Action) -> OperationResult:
 				var requested_family:=str(action.params.get("followup_family",""))
 				if action.params.get("weapon_art",false):
 					var route:=data.art_route(str(action.params.get("art_route","")))
+					if not context.martial.route_equipped(action.skill_id,str(action.params.get("art_route",""))) or int(action.params.get("art_revision",-1))!=context.martial.loadout_revision: return OperationResult.reject("连招武技配置已改变")
 					var grace:=float(_weapon_reservation.get("grace",0)) if reserved else 0.0
 					var match_result:=weapon_art.match_route(route,false,grace) if route and weapon_art.weapon_uid==weapon_uid else {}
 					if match_result.is_empty() or str(match_result.token)!=str(action.params.get("art_token","")): return OperationResult.reject("武技窗口已失效")
