@@ -8,13 +8,13 @@ var slots: Array[InventoryItemTile]=[]
 var _visual: ActorEquipmentVisual
 var _body: Node2D
 func _ready() -> void:
- custom_minimum_size=Vector2(260,270)
+ custom_minimum_size=Vector2(210,260)
  _body=Node2D.new(); add_child(_body)
  _visual=ActorEquipmentVisual.new(); _visual.preview_body=true
  _body.add_child(_visual); _body.scale=Vector2(2.8,2.8)
  for slot in range(9):
   var button:=InventoryItemTile.new(); button.name="GearSlot_%d"%slot
-  button.custom_minimum_size=Vector2(92,46); button.expand_icon=true; button.add_theme_constant_override("icon_max_width",16)
+  button.custom_minimum_size=Vector2(76,46); button.expand_icon=true; button.add_theme_constant_override("icon_max_width",16)
   GameUIStyle.apply_button(button)
   button.add_theme_font_size_override("font_size",12)
   for state in ["normal","hover","pressed","focus","disabled"]:
@@ -32,11 +32,12 @@ func _ready() -> void:
 func _layout() -> void:
  if not _body: return
  _body.position=Vector2(size.x*.5,145)
+ _body.scale=Vector2.ONE*clampf((size.x-150)/24.0,2.2,3.2)
  for i in range(slots.size()):
-  var x:=0.0 if i<5 else size.x-92
+  var x:=0.0 if i<5 else size.x-76
   var row:=i if i<5 else i-5
   slots[i].position=Vector2(x,12+row*50)
-  slots[i].size=Vector2(92,46)
+  slots[i].size=Vector2(76,46)
 func refresh() -> void:
  if not is_instance_valid(actor) or not actor.actor_context: return
  var context:=actor.actor_context

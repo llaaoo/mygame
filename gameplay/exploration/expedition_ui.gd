@@ -27,6 +27,7 @@ var material_action: Callable
 var menu_action: Callable
 var journal_action: Callable
 var shortcut_action: Callable
+var navigation_request: Callable
 var _modal_extent := Vector2(960,570)
 var _heading_panel: PanelContainer
 var _notice: PanelContainer
@@ -235,22 +236,20 @@ func show_panel(title: String, text: String, buttons: Array[Dictionary], locked:
 	_modal_panel = panel
 	panel.name = "ContentPanel"
 	panel.add_theme_stylebox_override("panel", GameUIStyle.panel_style(0.99, 2,GameUIStyle.PANEL_BORDER))
+	GameUIStyle.decorate(panel)
 	backdrop.add_child(panel)
 	var margin := MarginContainer.new()
 	for side in ["left", "right", "top", "bottom"]:
 		margin.add_theme_constant_override("margin_" + side, 24)
 	panel.add_child(margin)
 	var box := VBoxContainer.new()
+	box.name="ModalBody"
 	box.add_theme_constant_override("separation", 12)
 	margin.add_child(box)
 	var title_row := HBoxContainer.new()
 	box.add_child(title_row)
-	var title_label := _label(title, 27)
-	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-	title_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	title_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	var title_label := GameUIStyle.folio_title(title_row,title)
 	title_label.tooltip_text = title
-	title_row.add_child(title_label)
 	if not locked:
 		var close := Button.new()
 		close.text = "关闭"
@@ -376,8 +375,12 @@ func show_journal() -> void:
 		text += "还没有发现记录。先阅读营地手记和外院入口的铭刻记录。"
 	show_panel("探索日志", text, [{"title": "继续探索", "callback": close_modal}])
 
-func show_view(title: String, content: Control) -> void:
+func show_view(title: String, content: Control, page := "") -> void:
 	show_panel(title,"",[],false,Vector2(1080,660))
+	var box:=_modal_panel.find_child("ModalBody",true,false) as VBoxContainer
+	if not page.is_empty():
+		var navigation:=GameUIStyle.navigation(box,page,navigation_request)
+		box.move_child(navigation,2)
 	var scroll := _modal_panel.find_child("BodyScroll",true,false) as ScrollContainer
 	var old := scroll.get_child(0)
 	scroll.remove_child(old)

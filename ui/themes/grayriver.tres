@@ -1,7 +1,7 @@
 [gd_resource type="Theme" load_steps=8 format=3]
 [ext_resource type="FontVariation" path="res://ui/themes/body_font.tres" id="font"]
 [sub_resource type="StyleBoxFlat" id="field"]
-bg_color = Color(0.055,0.075,0.078,1)
+bg_color = Color(0.09,0.13,0.14,1)
 border_width_bottom = 1
 border_color = Color(0.25,0.32,0.31,1)
 content_margin_left = 12.0
@@ -9,7 +9,7 @@ content_margin_right = 12.0
 content_margin_top = 9.0
 content_margin_bottom = 9.0
 [sub_resource type="StyleBoxFlat" id="focus"]
-bg_color = Color(0.07,0.10,0.105,1)
+bg_color = Color(0.14,0.19,0.20,1)
 border_width_bottom = 2
 border_color = Color(0.78,0.65,0.44,1)
 content_margin_left = 12.0
@@ -35,12 +35,12 @@ content_margin_top = 1.0
 [resource]
 default_font = ExtResource("font")
 default_font_size = 15
-Label/colors/font_color = Color(0.88,0.91,0.88,1)
+Label/colors/font_color = Color(0.93,0.92,0.86,1)
 RichTextLabel/colors/default_color = Color(0.86,0.90,0.87,1)
 LineEdit/styles/normal = SubResource("field")
 LineEdit/styles/focus = SubResource("focus")
-LineEdit/colors/font_color = Color(0.88,0.91,0.88,1)
-LineEdit/colors/font_placeholder_color = Color(0.46,0.56,0.53,1)
+LineEdit/colors/font_color = Color(0.93,0.92,0.86,1)
+LineEdit/colors/font_placeholder_color = Color(0.60,0.66,0.63,1)
 LineEdit/constants/caret_width = 2
 HSeparator/styles/separator = SubResource("rule")
 VSeparator/styles/separator = SubResource("rule")

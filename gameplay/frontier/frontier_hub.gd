@@ -19,7 +19,7 @@ var _contexts: Dictionary={}
 func remember_record(id: String) -> void:
 	journal_page="knowledge"
 	_contexts["knowledge"]={"query":"","selected":id,"filter":0}
-func _remember() -> void:
+func remember_context() -> void:
 	_contexts[page]={"query":query,"selected":selected,"filter":filter_index}
 
 func _init(owner_game: GrayriverGame) -> void: game=owner_game
@@ -29,32 +29,34 @@ func handle_shortcut(key: int) -> bool:
 	if target.is_empty(): return false
 	if key==KEY_TAB and is_instance_valid(game.ui.modal):
 		if game.ui.modal.get_meta("frontier_page","").is_empty(): return false
-		_remember(); game.ui.close_modal(); _open=false; return true
+		remember_context(); game.ui.close_modal(); _open=false; return true
 	if is_instance_valid(game.ui.modal) and game.ui.modal.get_meta("frontier_page","")==target:
-		_remember(); game.ui.close_modal()
+		remember_context(); game.ui.close_modal()
 		_open=false
 	else: open(target)
 	return true
 
-func open(tab := "quests", source := "") -> void:
+func open(tab := "quests", source := "", resume := false) -> void:
 	if game.ui.modal_locked: return
 	if tab in ["equipment","supplies","inventory"] and is_instance_valid(game.inventory_screen):
 		game.ui.close_modal()
 		game.inventory_screen.open("all" if tab=="inventory" else tab)
 		return
-	if _open and is_instance_valid(game.ui.modal) and game.ui.modal.get_meta("frontier_page","")==page: _remember()
+	if _open and is_instance_valid(game.ui.modal) and game.ui.modal.get_meta("frontier_page","")==page: remember_context()
 	page=tab
 	if page in ["quests","knowledge"]: journal_page=page
 	loot_id=source
 	var context: Dictionary=_contexts.get(page,{})
-	query="" # A fresh open must not hide entries behind an old text search.
+	query=str(context.get("query","")) if resume else ""
 	selected=str(context.get("selected",""))
 	filter_index=int(context.get("filter",0))
 	_open=true
 	var root:=preload("res://gameplay/foundation/ui/expedition_screen.tscn").instantiate() as ExpeditionScreen
 	var tabs:=root.tabs
-	for key in TABS:
-		var button := W.button(TABS[key],open.bind(key,""))
+	var sections: Array=["quests","knowledge"] if page in ["quests","knowledge"] else ["actions","settings"]
+	if page=="loot": root.get_node("Navigation").hide()
+	for key in sections:
+		var button := W.button({"actions":"准备清单","quests":"委托记录"}.get(key,TABS[key]),open.bind(key,""))
 		button.toggle_mode=true
 		button.button_pressed=page == key
 		button.alignment=HORIZONTAL_ALIGNMENT_LEFT
@@ -80,7 +82,7 @@ func open(tab := "quests", source := "") -> void:
 	_detail=root.detail
 	if page == "loot":
 		root.footer.add_child(W.button(InputBindings.label("loot_all")+"  尽量全部取走",take_all))
-	game.ui.show_view("灰河谷  /  "+("战利品" if page == "loot" else TABS.get(page,"旅程")),root)
+	game.ui.show_view("战利品" if page=="loot" else TABS.get(page,"旅程"),root,"quests" if page in ["quests","knowledge"] else "actions")
 	game.ui.modal.set_meta("frontier_page",page)
 	_refresh_rows()
 
@@ -135,7 +137,7 @@ func entries() -> Array[Dictionary]:
 				var done:=stage==ExplorationQuestData.Stage.REPORTED
 				var ready:=stage==ExplorationQuestData.Stage.READY
 				if filter_index == 0 and done or filter_index == 1 and not ready or filter_index == 2 and not done: continue
-				result.append({"id":quest.id,"title":quest.title,"text":quest.description,"subtitle":("已完成" if done else "可交付" if ready else "%d/%d项"%[quest.objective_count(game.progress),quest.required_claims.size()+quest.required_clears.size()])+(" · 正在追踪" if game.progress.tracked_quest==quest.id else "")})
+				result.append({"id":quest.id,"rank":0 if quest.id==game.progress.tracked_quest else 1 if ready else 2,"title":quest.title,"text":quest.description,"subtitle":("已完成" if done else "可交付" if ready else "%d/%d项"%[quest.objective_count(game.progress),quest.required_claims.size()+quest.required_clears.size()])+(" · 正在追踪" if game.progress.tracked_quest==quest.id else "")})
 		"knowledge":
 			result.append({"id":"overview","title":"旅程总览与施法资料","text":game.presenter.journal_text(),"subtitle":"地点 · 设施 · 未取战利品"})
 			for entry in game.progress.journal: result.append({"id":entry.id,"title":entry.title,"text":game.catalog.record_text(entry,game.progress),"subtitle":"亲历记录"})
@@ -150,7 +152,9 @@ func _refresh_rows() -> void:
 	if not is_instance_valid(_rows): return
 	W.clear(_rows)
 	var available:=entries().filter(func(entry: Dictionary): return query.is_empty() or query.to_lower() in (entry.title+entry.text).to_lower())
-	available.sort_custom(func(a: Dictionary,b: Dictionary): return a.title.naturalnocasecmp_to(b.title)<0)
+	available.sort_custom(func(a: Dictionary,b: Dictionary):
+		if page=="quests" and a.rank!=b.rank: return a.rank<b.rank
+		return a.title.naturalnocasecmp_to(b.title)<0)
 	_status.text="%d项 · 背包 %d/%d格 · 水囊 %d/%d"%[available.size(),game.player.inventory.capacity-game.player.inventory.empty_slot_count(),game.player.inventory.capacity,SurvivalCatalog.water_count(game.survival.supplies),SurvivalCatalog.WATER_CAPACITY]
 	if not available.any(func(entry: Dictionary): return entry.id==selected):
 		selected=available[0].id if not available.is_empty() else ""
@@ -174,7 +178,7 @@ func _refresh_rows() -> void:
 
 func _select(id: String) -> void:
 	selected=id
-	_remember()
+	remember_context()
 	for child in _rows.get_children():
 		if child is Button:
 			child.button_pressed=child.name=="Entry_"+id.replace(":","_")

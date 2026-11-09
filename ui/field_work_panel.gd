@@ -2,6 +2,7 @@ class_name FieldWorkPanel
 extends CanvasLayer
 ## Live controls stay inside the viewport; only the explanation scrolls.
 var text: Label
+var heading: Label
 var bar: ProgressBar
 var selector: OptionButton
 var start_button: Button
@@ -19,6 +20,8 @@ func _ready() -> void:
 	var box := VBoxContainer.new()
 	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_panel.add_child(box)
+	heading=FoundationWidgets.label("现场作业",18)
+	box.add_child(heading)
 	_scroll = ScrollContainer.new()
 	_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
@@ -45,6 +48,7 @@ func _ready() -> void:
 	box.add_child(row)
 	start_button=FrontierWidgets.button("开始作业",func(): pass)
 	cancel_button=FrontierWidgets.button("取消",func(): pass)
+	GameUIStyle.primary(start_button)
 	row.add_child(start_button)
 	row.add_child(cancel_button)
 	get_viewport().size_changed.connect(_layout)
@@ -60,7 +64,9 @@ func _layout() -> void:
 	_panel.offset_top=-height-bottom; _panel.offset_bottom=-bottom
 
 func display(message: String, progress: float = -1.0) -> void:
-	text.text = message
+	var split:=message.find("\n")
+	heading.text=message.left(split) if split>=0 else "现场作业"
+	text.text=message.substr(split+1) if split>=0 else message
 	bar.visible = progress >= 0
 	bar.value = maxf(0, progress)
 	start_button.text=InputBindings.label("interact")+"  开始作业"

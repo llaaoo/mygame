@@ -1,6 +1,6 @@
 class_name SkillBar
 extends HBoxContainer
-## 技能条 — 双手施法与六个快捷施法槽。
+## Combat shortcuts. Clicking opens explicit preparation; it never casts.
 
 class TooltipSlot extends PanelContainer:
 	func _make_custom_tooltip(for_text: String) -> Object:
@@ -266,7 +266,21 @@ func _add_item(source: String, label: String, size: Vector2) -> void:
 	bind_label.text = label
 	inner.add_child(bind_label)
 	_bind_labels.append(bind_label)
+	for child in panel.find_children("*","Control",true,false): child.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	panel.gui_input.connect(_slot_pointer.bind(source))
 
+
+func _slot_pointer(event: InputEvent, source: String) -> void:
+	if not event is InputEventMouseButton or not event.pressed or event.button_index not in [MOUSE_BUTTON_LEFT,MOUSE_BUTTON_RIGHT]: return
+	var actor:=_skill_manager.get_parent() as Player
+	if not actor or actor.ui_blocked or actor.health_component.is_dead: return
+	actor.input_controller.pointer_consumed()
+	accept_event()
+	if QuickslotMaterials.available(_skill_manager,source): actor.material_wheel.open_for_source(source,actor.actor_context.actions.facing)
+	else:
+		var instance:=_skill_manager.get_instance(source)
+		if instance: actor.skill_pool_ui.open_for(instance.data)
+		else: actor.skill_pool_ui.open()
 
 func _refresh_all() -> void:
 	for i in range(_sources.size()):
@@ -294,7 +308,7 @@ func _refresh_idx(idx: int) -> void:
 	_cost_labels[idx].tooltip_text = "本次法力费用"
 	_bind_labels[idx].visible = true
 	_bind_labels[idx].text=InputBindings.label(InputBindings.action_for_source(src))
-	_panels[idx].tooltip_text = "%s\n%s" % [skill.display_name, skill.description] if skill else "空槽"
+	_panels[idx].tooltip_text = ("%s\n%s" % [skill.display_name, skill.description] if skill else "空槽")+"\n点击配置 · 按快捷键施放"
 	_update_cooldown(idx)
 
 
