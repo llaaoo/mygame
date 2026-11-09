@@ -1,0 +1,11 @@
+{"wall": 1794196108.9096131, "commands": [["click", 576, 456], ["key", "d", 0.9], ["key", "s", 1.2], ["key", "f"]]}
+{"wall": 1794196164.7107384, "commands": [["shot", "/tmp/interface-native-root.png"]]}
+{"wall": 1794196197.5276384, "commands": [["click", 576, 456], ["wait", 0.6], ["key", "Return"], ["wait", 0.6]]}
+{"wall": 1794196225.7186017, "commands": [["click", 576, 456], ["wait", 0.5], ["key", "d", 0.9], ["key", "s", 1.2], ["key", "f"]]}
+{"wall": 1794196243.279805, "commands": [["key", "a", 0.25], ["key", "w", 0.28], ["key", "f"], ["wait", 0.5]]}
+{"wall": 1794196289.548383, "commands": [["key", "Escape"], ["key", "k"], ["click", 135, 260], ["key", "e"]]}
+{"wall": 1794196316.359909, "commands": [["key", "i"]]}
+{"wall": 1794196357.6422713, "commands": [["click", 755, 118], ["key", "Escape"]]}
+{"wall": 1794196382.9661877, "commands": [["click", 422, 605], ["wait", 0.4]]}
+{"wall": 1794196383.7450268, "commands": [["click", 281, 247]]}
+{"wall": 1794196471.967364, "commands": [["key", "Escape"], ["key", "F5"]]}

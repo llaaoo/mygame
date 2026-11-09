@@ -1,12 +1,17 @@
 class_name SkillPoolUI
 extends CanvasLayer
-## 技能池 — 左手/右手 + 6 快捷键槽位
+## Shared loadout editor; real independent action/item shortcuts.
 
 var _skill_pool: SkillPool = null
 var _skill_manager: SkillManager = null
 var _selected_skill: SkillData = null
 var _selected_item: Dictionary={}
 var _selected_choice: Dictionary={}
+var _navigation: ExpeditionNavigation
+var navigation_request: Callable:
+	set(value):
+		navigation_request=value
+		if is_instance_valid(_navigation): _navigation.navigate=value; _navigation.visible=value.is_valid()
 var _show_items := false
 var _show_techniques := false
 var _selected_technique := ""
@@ -31,6 +36,12 @@ func _ready() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed or event.echo:
 		return
+	if visible and not get_viewport().gui_get_focus_owner() is LineEdit:
+		for source in QuickslotLoadout.SOURCES:
+			if event.is_action_pressed(InputBindings.action_for_source(source)):
+				_bind_to_source(source)
+				get_viewport().set_input_as_handled()
+				return
 	if visible and event.keycode == KEY_ESCAPE:
 		close()
 		get_viewport().set_input_as_handled()
@@ -81,40 +92,41 @@ func _build_ui() -> void:
 	_background.color=GameUIStyle.modal_backdrop(.82)
 	add_child(_background)
 	_panel=Panel.new()
-	_panel.anchor_left=.045; _panel.anchor_right=.955
-	_panel.anchor_top=.05; _panel.anchor_bottom=.95
+	_panel.anchor_left=0; _panel.anchor_right=1; _panel.offset_left=16; _panel.offset_right=-16
+	_panel.anchor_top=0; _panel.anchor_bottom=1; _panel.offset_top=16; _panel.offset_bottom=-16
 	_panel.clip_contents=true
 	_panel.add_theme_stylebox_override("panel",_make_panel_bg())
 	add_child(_panel)
+	GameUIStyle.decorate(_panel)
 	var margin:=MarginContainer.new()
 	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	for side in ["left","right","top","bottom"]: margin.add_theme_constant_override("margin_"+side,22)
+	for side in ["left","right","top","bottom"]: margin.add_theme_constant_override("margin_"+side,16)
 	_panel.add_child(margin)
 	var root:=VBoxContainer.new(); root.add_theme_constant_override("separation",16); margin.add_child(root)
 	var header:=HBoxContainer.new(); root.add_child(header)
-	var title:=Label.new(); title.text="快捷栏编组"; title.size_flags_horizontal=Control.SIZE_EXPAND_FILL
-	GameUIStyle.apply_title(title,26); header.add_child(title)
+	GameUIStyle.folio_title(header,"技法与快捷编组")
 	var close_button:=FoundationWidgets.button("关闭",close); close_button.size_flags_horizontal=Control.SIZE_SHRINK_END; header.add_child(close_button)
-	root.add_child(HSeparator.new())
+	_navigation=GameUIStyle.navigation(root,"loadout",navigation_request)
 	var content:=HBoxContainer.new(); content.size_flags_vertical=Control.SIZE_EXPAND_FILL
-	content.add_theme_constant_override("separation",18); root.add_child(content)
-	var library:=VBoxContainer.new(); library.size_flags_horizontal=Control.SIZE_EXPAND_FILL; library.custom_minimum_size.x=310
+	content.add_theme_constant_override("separation",12); root.add_child(content)
+	var library:=VBoxContainer.new(); library.size_flags_horizontal=Control.SIZE_EXPAND_FILL; library.custom_minimum_size.x=250
 	content.add_child(library)
 	var tabs:=HBoxContainer.new(); library.add_child(tabs)
 	for pair in [["基础动作",0],["可用物品",1],["武技",2]]:
 		var button:=FoundationWidgets.button(pair[0],func(): _show_items=pair[1]==1; _show_techniques=pair[1]==2; _selected_technique=""; _selected_skill=null; _selected_item.clear(); _selected_choice.clear(); _refresh_all())
 		tabs.add_child(button)
 	var scroll:=ScrollContainer.new(); scroll.size_flags_vertical=Control.SIZE_EXPAND_FILL
+	scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED
 	library.add_child(scroll)
-	_skill_grid=GridContainer.new(); _skill_grid.columns=3
+	_skill_grid=GridContainer.new(); _skill_grid.columns=2; _skill_grid.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 	_skill_grid.add_theme_constant_override("h_separation",8); _skill_grid.add_theme_constant_override("v_separation",8)
 	scroll.add_child(_skill_grid)
-	var detail_scroll:=ScrollContainer.new(); detail_scroll.custom_minimum_size.x=270
+	var detail_scroll:=ScrollContainer.new(); detail_scroll.custom_minimum_size.x=230
 	detail_scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED; detail_scroll.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 	content.add_child(detail_scroll)
 	_detail_box=VBoxContainer.new(); _detail_box.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 	_detail_box.add_theme_constant_override("separation",12); detail_scroll.add_child(_detail_box)
-	var slots_scroll:=ScrollContainer.new(); slots_scroll.custom_minimum_size.x=248
+	var slots_scroll:=ScrollContainer.new(); slots_scroll.custom_minimum_size.x=210
 	slots_scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED
 	content.add_child(slots_scroll)
 	var slots:=VBoxContainer.new(); slots.size_flags_horizontal=Control.SIZE_EXPAND_FILL
@@ -124,7 +136,8 @@ func _build_ui() -> void:
 	slots.add_child(_make_section_label("同样可放动作或物品"))
 	for source in QuickslotLoadout.ITEM_SOURCES: _add_equip_slot(slots,source,InputBindings.label(InputBindings.action_for_source(source)))
 	_hint_label=Label.new(); GameUIStyle.apply_label(_hint_label,12,GameUIStyle.TEXT_MUTED)
-	_hint_label.text="选择内容 → 配置来源 → 点击快捷槽   /   右键清空   /   Esc返回"
+	_hint_label.text="选择内容 → 按快捷键或点击右侧槽位绑定   /   右键清空   /   Esc返回世界"
+	_hint_label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	root.add_child(_hint_label)
 
 
@@ -137,7 +150,7 @@ func _make_section_label(text: String) -> Label:
 
 func _add_equip_slot(parent: Control, source: String, label: String) -> void:
 	var panel := PanelContainer.new()
-	panel.custom_minimum_size = Vector2(236, 42)
+	panel.custom_minimum_size = Vector2(198, 48)
 	panel.add_theme_stylebox_override("panel", _make_slot_bg())
 	panel.set_meta("display_label", label)
 	parent.add_child(panel)
@@ -161,12 +174,14 @@ func _add_equip_slot(parent: Control, source: String, label: String) -> void:
 
 	var name_lbl := Label.new()
 	name_lbl.name = "Name"
-	GameUIStyle.apply_label(name_lbl, 12, GameUIStyle.TEXT_MAIN)
+	GameUIStyle.apply_label(name_lbl, 14, GameUIStyle.TEXT_MAIN)
+	name_lbl.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS
 	info.add_child(name_lbl)
 
 	var sub_lbl := Label.new()
 	sub_lbl.name = "Sub"
-	GameUIStyle.apply_label(sub_lbl, 9, GameUIStyle.TEXT_MUTED)
+	GameUIStyle.apply_label(sub_lbl, 12, GameUIStyle.TEXT_MUTED)
+	sub_lbl.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS
 	sub_lbl.text = label
 	info.add_child(sub_lbl)
 
@@ -179,19 +194,29 @@ func _on_slot_clicked(event: InputEvent, source: String) -> void:
 	if not event is InputEventMouseButton:
 		return
 	if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-		if not _selected_technique.is_empty() and _skill_manager:
-			_skill_manager.shortcuts.bind_technique(source,_selected_technique)
-			_selected_technique=""; _refresh_all()
-		elif not _selected_item.is_empty() and _skill_manager:
-			_skill_manager.shortcuts.bind_item(source,_selected_item.item_id,str(_selected_item.get("uid","")))
-			_selected_item.clear(); _refresh_all()
-		elif _selected_skill and _skill_manager:
-			if _equip(source, _selected_skill): _selected_skill = null
-			_refresh_all()
+		_bind_to_source(source)
 	elif event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
 		if _skill_manager:
 			_unequip(source)
 			_refresh_all()
+
+func _bind_to_source(source: String) -> void:
+	if not _skill_manager: return
+	var accepted:=false
+	if not _selected_technique.is_empty():
+		accepted=_skill_manager.shortcuts.bind_technique(source,_selected_technique)
+		if accepted: _selected_technique=""
+	elif not _selected_item.is_empty():
+		accepted=_skill_manager.shortcuts.bind_item(source,_selected_item.item_id,str(_selected_item.get("uid","")))
+		if accepted: _selected_item.clear()
+	elif _selected_skill:
+		accepted=_equip(source,_selected_skill)
+		if accepted: _selected_skill=null
+	else:
+		_hint_label.text="先在左侧选择要放入这个槽位的内容。"
+		return
+	_refresh_all()
+	if accepted: _hint_label.text="已绑定到 "+InputBindings.labels(InputBindings.action_for_source(source))+" · 世界仍在运行，Esc返回。"
 
 
 func _equip(source: String, skill: SkillData) -> bool:
@@ -256,7 +281,9 @@ func _refresh_detail() -> void:
 		return
 	if not _selected_skill:
 		var empty := Label.new()
-		empty.text = "选择基础动作、武技或物品，再点右侧快捷槽。E和1相互独立；右键清空。"
+		empty.text = "① 选择动作、武技或物品\n② 配置真实来源\n③ 按目标快捷键绑定\n\n也可点击右侧槽位。E与1独立。"
+		empty.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+		empty.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 		GameUIStyle.apply_label(empty, 10, GameUIStyle.TEXT_MUTED)
 		_detail_box.add_child(empty)
 		return
@@ -372,7 +399,7 @@ func _format_skill_stats(skill: SkillData) -> String:
 func _refresh_grid() -> void:
 	for child in _skill_grid.get_children():
 		child.queue_free()
-	_skill_grid.columns=2 if _show_items else 3
+	_skill_grid.columns=2
 	if _show_techniques:
 		_refresh_techniques(); return
 	if _show_items:
@@ -395,7 +422,8 @@ func _refresh_grid() -> void:
 func _make_skill_card(skill: SkillData) -> PanelContainer:
 	var unlocked := _is_skill_unlocked(skill)
 	var card := PanelContainer.new()
-	card.custom_minimum_size = Vector2(96, 106)
+	card.custom_minimum_size = Vector2(116, 112)
+	card.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 	card.add_theme_stylebox_override("panel", _make_card_bg(skill == _selected_skill))
 
 	var vbox := VBoxContainer.new()
@@ -414,18 +442,18 @@ func _make_skill_card(skill: SkillData) -> PanelContainer:
 
 	var nm := Label.new()
 	nm.text = skill.display_name
-	GameUIStyle.apply_label(nm, 11, GameUIStyle.TEXT_MAIN)
+	GameUIStyle.apply_label(nm, 14, GameUIStyle.TEXT_MAIN)
 	nm.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	vbox.add_child(nm)
 
 	var tp := Label.new()
 	tp.text = "%s · %s" % [_type_name(skill.skill_type), "%d 路" % skill.upgrades.size() if unlocked else "Lv.%d" % _unlock_level(skill)]
 	if not skill.operation_id.is_empty():
-		tp.text="基础操作 · M选来源"
+		tp.text="M 选材"
 	elif skill.combination_only:
 		tp.text = "组合结果"
-	tp.add_theme_font_size_override("font_size", 9)
-	tp.add_theme_color_override("font_color", _type_color(skill.skill_type))
+	tp.add_theme_font_size_override("font_size", 12)
+	tp.add_theme_color_override("font_color", GameUIStyle.TEXT_MUTED if unlocked else GameUIStyle.GOLD)
 	tp.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	vbox.add_child(tp)
 

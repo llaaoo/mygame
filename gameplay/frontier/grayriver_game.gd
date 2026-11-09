@@ -126,7 +126,7 @@ func show_map() -> void:
 	row.add_child(FrontierWidgets.button("定位当前位置",map.center_player))
 	row.add_child(FrontierWidgets.button("清除路标",func(): progress.waypoint.clear(); _queue_save(); map.queue_redraw()))
 	root.add_child(row)
-	ui.show_view("灰河谷 / 行路图",root)
+	ui.show_view("行路图",root,"map")
 
 func discovered_places() -> String:
 	var text:=""
@@ -138,7 +138,12 @@ func _bootstrap() -> void:
 	await super._bootstrap()
 	session.equipment_page=hub.open.bind("equipment","")
 	session.supply_page=hub.open.bind("supplies","")
-	if inventory_screen: inventory_screen.navigation_request=_inventory_navigation
+	if inventory_screen:
+		inventory_screen.navigation_request=_inventory_navigation
+		inventory_screen.page_request=open_interface
+		inventory_screen.configure_request=configure_inventory_action
+	player.skill_pool_ui.navigation_request=open_interface
+	ui.navigation_request=open_interface
 	session.sync_extra=stories.sync
 	if player.inventory_panel: player.inventory_panel.page_request=hub.handle_shortcut.bind(KEY_I)
 	ui.pause_provider = show_valley_pause
@@ -150,6 +155,22 @@ func _bootstrap() -> void:
 	frontier_hud=FrontierHUD.new()
 	frontier_hud.game=self
 	add_child(frontier_hud)
+func configure_inventory_action(action: SkillData) -> void:
+	if ui.modal_locked or player.health_component.is_dead: return
+	GameUIStyle.close_gameplay_views(player)
+	player.skill_pool_ui.open_for(action)
+
+func open_interface(page: String) -> void:
+	if not ready_for_play or ui.modal_locked or player.health_component.is_dead: return
+	if is_instance_valid(ui.modal) and not ui.modal.get_meta("frontier_page","").is_empty(): hub.remember_context()
+	GameUIStyle.close_gameplay_views(player)
+	match page:
+		"inventory": inventory_screen.resume()
+		"equipment","supplies": inventory_screen.open(page)
+		"loadout": player.skill_pool_ui.open()
+		"map": show_map()
+		_: hub.open(page,"",true)
+
 func _inventory_navigation(key: int) -> void:
 	match key:
 		KEY_TAB: hub.open("actions")

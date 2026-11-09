@@ -54,9 +54,9 @@ func _build_status_panel(root: Control) -> void:
 	panel.anchor_bottom = 1.0
 	panel.offset_left = 20
 	panel.offset_top = -178
-	panel.offset_right = 272
+	panel.offset_right = 220
 	panel.offset_bottom = -22
-	panel.custom_minimum_size = Vector2(252, 150)
+	panel.custom_minimum_size = Vector2(200, 150)
 	panel.add_theme_stylebox_override("panel", GameUIStyle.quiet_panel(.56))
 	root.add_child(panel)
 

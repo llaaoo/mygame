@@ -5,7 +5,7 @@ var zoom := 1.0
 var pan := Vector2.ZERO
 var dragging := false
 func _ready() -> void:
-	custom_minimum_size=Vector2(0,340)
+	custom_minimum_size=Vector2(0,160)
 	size_flags_horizontal=Control.SIZE_EXPAND_FILL
 	size_flags_vertical=Control.SIZE_EXPAND_FILL
 	resized.connect(queue_redraw)
@@ -13,7 +13,7 @@ func _ready() -> void:
 	clip_contents=true
 	resized.connect(_limit_pan)
 func _scale() -> Vector2:
-	return Vector2(maxf(200,size.x-40),maxf(180,size.y-55))/Vector2(9600,7200)*zoom
+	return Vector2(maxf(200,size.x-40),maxf(40,size.y-55))/Vector2(9600,7200)*zoom
 func project(point: Vector2) -> Vector2:
 	return size*.5+pan+point*_scale()
 func unproject(point: Vector2) -> Vector2:
@@ -38,8 +38,8 @@ func _gui_input(event: InputEvent) -> void:
 	elif event is InputEventMouseMotion and dragging:
 		pan+=event.relative; _limit_pan(); accept_event()
 func _draw() -> void:
-	draw_rect(Rect2(Vector2.ZERO,size),Color("1d2927"))
-	draw_rect(Rect2(project(Vector2(-4800,-3600)),Vector2(9600,7200)*_scale()),Color("3e493a"))
+	draw_rect(Rect2(Vector2.ZERO,size),Color("132226"))
+	draw_rect(Rect2(project(Vector2(-4800,-3600)),Vector2(9600,7200)*_scale()),Color("334138"))
 	draw_line(project(Vector2(300,-3600)),project(Vector2(300,3600)),Color("426875"),15)
 	var lake:=PackedVector2Array()
 	for i in range(32):lake.append(project(Vector2(650,-2800)+Vector2(cos(i*TAU/32),sin(i*TAU/32))*Vector2(700,420)))
@@ -47,13 +47,14 @@ func _draw() -> void:
 	for road in game.definition.roads:
 		var points:=PackedVector2Array()
 		for p in road: points.append(project(GrayriverDefinition.vector(p)))
-		draw_polyline(points,Color("998761"),3,true)
+		draw_polyline(points,Color("1e2c27"),6,true)
+		draw_polyline(points,Color("ae9b74"),2,true)
 	for x in range(-10,10):
 		for y in range(-8,8):
 			if game.progress.claims.has("fog.%d.%d"%[x,y]): continue
 			var a:=project(Vector2(x*512,y*512))
 			var b:=project(Vector2((x+1)*512,(y+1)*512))
-			var box:=Rect2(a,b-a).intersection(Rect2(Vector2(20,30),Vector2(maxf(200,size.x-40),maxf(180,size.y-55))))
+			var box:=Rect2(a,b-a).intersection(Rect2(Vector2(20,30),Vector2(maxf(200,size.x-40),maxf(40,size.y-55))))
 			if box.has_area():draw_rect(box,Color(0,0,0,.64))
 	var font:=get_theme_default_font()
 	var goal:=game.guidance.tracked()
@@ -79,4 +80,8 @@ func _draw() -> void:
 	var position:=game.player.position
 	if game.region_id!="camp": position=game.guidance.overworld_point(game.region_id)
 	draw_circle(project(position),5,Color("70deff"))
-	draw_string(font,Vector2(24,20),"北 ↑  蓝点：你/入口  橙叉：未取物资  暗处：未探索",HORIZONTAL_ALIGNMENT_LEFT,-1,13,GameUIStyle.TEXT_MAIN)
+	draw_string(font,Vector2(24,20),"蓝点：你 / 入口    橙叉：未取物资    暗处：未探索",HORIZONTAL_ALIGNMENT_LEFT,-1,12,GameUIStyle.TEXT_MAIN)
+	var north:=Vector2(size.x-42,55)
+	draw_arc(north,23,0,TAU,32,Color(GameUIStyle.GOLD,.55),1,true)
+	draw_colored_polygon(PackedVector2Array([north+Vector2(0,-20),north+Vector2(-6,11),north,north+Vector2(6,11)]),GameUIStyle.GOLD)
+	draw_string(font,north+Vector2(-7,-29),"北",HORIZONTAL_ALIGNMENT_LEFT,-1,12,GameUIStyle.TEXT_MAIN)

@@ -10,18 +10,18 @@ const LAYER_MODAL := 180
 const LAYER_CRITICAL := 200
 const LAYER_DEBUG := 240
 
-const PANEL_BG := Color(0.035, 0.052, 0.057, 0.96)
-const PANEL_BG_SOLID := Color(0.035, 0.052, 0.057, 0.99)
-const SURFACE := Color(0.055, 0.078, 0.080, 0.92)
-const SURFACE_RAISED := Color(0.085, 0.119, 0.118, 0.98)
-const PANEL_BORDER := Color(0.23, 0.31, 0.30, 0.60)
-const BORDER_STRONG := Color(0.39, 0.46, 0.41, 0.74)
+const PANEL_BG := Color(0.075, 0.105, 0.115, 0.97)
+const PANEL_BG_SOLID := Color(0.065, 0.095, 0.105, 0.99)
+const SURFACE := Color(0.11, 0.15, 0.16, 0.94)
+const SURFACE_RAISED := Color(0.16, 0.205, 0.21, 0.98)
+const PANEL_BORDER := Color(0.31, 0.36, 0.35, 0.52)
+const BORDER_STRONG := Color(0.58, 0.55, 0.43, 0.75)
 const SLOT_BG := Color(0.025, 0.042, 0.046, 0.80)
-const TEXT_MAIN := Color(0.88, 0.92, 0.88, 1.0)
-const TEXT_MUTED := Color(0.55, 0.65, 0.61, 1.0)
-const TEXT_DISABLED := Color(0.43, 0.50, 0.48, 1.0)
-const GOLD := Color(0.80, 0.67, 0.46, 1.0)
-const ACCENT := Color(0.42, 0.66, 0.62, 1.0)
+const TEXT_MAIN := Color(0.93, 0.92, 0.86, 1.0)
+const TEXT_MUTED := Color(0.65, 0.69, 0.66, 1.0)
+const TEXT_DISABLED := Color(0.45, 0.49, 0.48, 1.0)
+const GOLD := Color(0.82, 0.70, 0.47, 1.0)
+const ACCENT := Color(0.51, 0.71, 0.68, 1.0)
 const SUCCESS := Color(0.32, 0.74, 0.45, 1.0)
 const DANGER := Color(0.84, 0.27, 0.20, 1.0)
 const HEALTH := Color(0.71, 0.29, 0.25, 1.0)
@@ -39,7 +39,7 @@ static func panel_style(
 	sb.bg_color = Color(PANEL_BG.r, PANEL_BG.g, PANEL_BG.b, alpha)
 	sb.set_border_width_all(border_width)
 	sb.border_color = border_color
-	sb.set_corner_radius_all(mini(radius,3))
+	sb.set_corner_radius_all(mini(radius,4))
 	sb.shadow_color = Color(0, 0, 0, .32)
 	sb.shadow_size = 18
 	sb.shadow_offset = Vector2(0, 8)
@@ -55,7 +55,7 @@ static func surface_style(highlight: bool = false, radius: int = 5) -> StyleBoxF
 	sb.bg_color = SURFACE_RAISED if highlight else SURFACE
 	sb.set_border_width_all(1)
 	sb.border_color = Color(GOLD,.8) if highlight else Color(PANEL_BORDER,.35)
-	sb.set_corner_radius_all(mini(radius,3))
+	sb.set_corner_radius_all(mini(radius,4))
 	sb.content_margin_left = 8
 	sb.content_margin_right = 8
 	sb.content_margin_top = 7
@@ -84,9 +84,9 @@ static func button_style(state: String = "normal", accent: Color = ACCENT, selec
 	sb.set_border_width_all(1)
 	sb.border_color = Color(accent,.85) if selected or state == "hover" else Color(PANEL_BORDER,.25)
 	sb.border_width_left=2 if selected else 0
-	sb.border_width_top=0
+	sb.border_width_top=1 if selected else 0
 	sb.border_width_bottom=1
-	sb.border_width_right=0
+	sb.border_width_right=1 if selected else 0
 	sb.set_corner_radius_all(2)
 	sb.content_margin_left = 12
 	sb.content_margin_right = 12
@@ -110,6 +110,43 @@ static func apply_button(button: Button, accent: Color = ACCENT, selected: bool 
 		button.icon=icon("x"); button.expand_icon=true; button.add_theme_constant_override("icon_max_width",14)
 	button.custom_minimum_size.y = maxf(button.custom_minimum_size.y, 38.0)
 
+
+static func apply_tab(button: Button, selected := false) -> void:
+	apply_button(button,GOLD,selected)
+	for state in ["normal","hover","pressed","focus","disabled"]:
+		var style:=button.get_theme_stylebox(state).duplicate() as StyleBoxFlat
+		style.bg_color=Color(GOLD,.09) if selected else Color(SURFACE,.35) if state in ["hover","focus"] else Color.TRANSPARENT
+		style.set_border_width_all(0)
+		style.border_width_bottom=2 if selected else 1
+		style.border_color=GOLD if selected else Color(PANEL_BORDER,.25)
+		style.content_margin_left=10; style.content_margin_right=10
+		button.add_theme_stylebox_override(state,style)
+	button.add_theme_color_override("font_color",GOLD if selected else TEXT_MUTED)
+
+static func primary(button: Button) -> void:
+	apply_button(button,GOLD,true)
+	button.add_theme_font_size_override("font_size",15)
+
+static func decorate(panel: Control) -> void:
+	var background:=ExpeditionBackdrop.new()
+	panel.add_child(background); panel.move_child(background,0)
+
+static func navigation(host: Node, page: String, request: Callable) -> ExpeditionNavigation:
+	var bar:=ExpeditionNavigation.new(); bar.current_page=page; bar.navigate=request
+	host.add_child(bar)
+	bar.visible=request.is_valid()
+	return bar
+
+static func folio_title(host: Node, title: String) -> Label:
+	var box:=VBoxContainer.new(); box.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	box.add_theme_constant_override("separation",2); host.add_child(box)
+	var kicker:=Label.new(); kicker.text="灰 河 谷    /    行 路 者 手 册"
+	apply_label(kicker,12,GOLD); box.add_child(kicker)
+	var heading:=Label.new(); heading.text=title
+	heading.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS
+	heading.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	apply_label(heading,26,TEXT_MAIN); box.add_child(heading)
+	return heading
 
 static func bar_fill(color: Color) -> StyleBoxFlat:
 	var sb := StyleBoxFlat.new()
