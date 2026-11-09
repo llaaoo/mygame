@@ -60,6 +60,10 @@ func run() -> void:
 			await frames(1)
 		var preview:=QuickslotView.technique_state(actor,actor.skill_manager.shortcuts.binding("quick_e"))
 		check(preview.linked and preview.ready,"Quickslot preview failed to show the executable route")
+		if pair[1]=="blade_breaker":
+			await key(KEY_SHIFT,true)
+			check(not QuickslotView.technique_state(actor,actor.skill_manager.shortcuts.binding("quick_e")).ready,"Shift preview promised a release without actual coating")
+			await key(KEY_SHIFT,false)
 		await key(KEY_E,true); await key(KEY_E,false)
 		for i in range(100):
 			if not starts.is_empty() and starts.back().technique==pair[1]: break

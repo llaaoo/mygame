@@ -49,7 +49,7 @@ func _process(_delta: float) -> void:
 		for source in QuickslotLoadout.SOURCES:
 			var binding:=manager.shortcuts.binding(source)
 			if binding.get("kind","")!="technique": continue
-			var view:=context.actions.technique_view(str(binding.technique_id),Input.is_key_pressed(KEY_CTRL))
+			var view:=context.actions.technique_view(str(binding.technique_id),Input.is_key_pressed(KEY_CTRL),Input.is_key_pressed(KEY_SHIFT))
 			if not view.is_empty() and view.linked and str(view.reason).is_empty():
 				combo_label.text+="\n可接 %s · %s"%[InputBindings.label(InputBindings.action_for_source(source)),view.title]
 				break

@@ -72,7 +72,7 @@ func combo_snapshot() -> Dictionary:
 	return view
 func attack_stamina_cost(strike: AttackProfile) -> float:
 	return strike.stamina_cost*burden_cost()*activity_efficiency(SkillMastery.School.MELEE)
-func technique_view(id: String,force_base := false) -> Dictionary:
+func technique_view(id: String,force_base := false,release_enchantment := false) -> Dictionary:
 	var data:=MartialArts.definition(id)
 	if not data: return {}
 	var recovering:=mode=="attack" and profile and elapsed>=profile.windup+profile.active
@@ -83,10 +83,13 @@ func technique_view(id: String,force_base := false) -> Dictionary:
 	var reason:=context.martial.reason(id,context)
 	if reason.is_empty() and stamina.current<cost: reason="体力不足"
 	if reason.is_empty() and not candidate.ammo_id.is_empty() and context.items.ready_uid(context.id,candidate.ammo_id).is_empty(): reason="口袋缺箭"
+	if reason.is_empty() and release_enchantment:
+		var coating:=context.items.coating(uid)
+		if not coating or not coating.enchantment: reason="武器没有可释放的元素附魔"
 	return {"profile":candidate,"linked":linked,"family":combo.family if linked else "","reason":reason,"cost":cost,"title":candidate.title if linked else data.title}
 func capture_technique_intent(action: Action,force_base := false) -> Action:
 	var captured:=action.copy_intent()
-	var view:=technique_view(action.skill_id,force_base)
+	var view:=technique_view(action.skill_id,force_base,bool(action.params.get("release_enchantment",false)))
 	captured.params["followup_family"]=str(view.get("family",""))
 	return captured
 func confirm_weapon_hit(family: String,result: HitResult,target: Node2D) -> void:

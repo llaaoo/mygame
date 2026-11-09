@@ -37,7 +37,7 @@ static func technique_state(actor: Node2D,binding: Dictionary) -> Dictionary:
 	var data:=MartialArts.definition(id)
 	var context:=actor.get("actor_context") as ActorContext
 	if not data or not context: return {"title":"未学习武技","ready":false,"detail":"","remaining":0.0,"cost":0.0}
-	var view:=context.actions.technique_view(id,Input.is_key_pressed(KEY_CTRL))
+	var view:=context.actions.technique_view(id,Input.is_key_pressed(KEY_CTRL),Input.is_key_pressed(KEY_SHIFT))
 	var reason: String=view.reason
 	var uid:=str(context.items.equipped(context.id).get(str(EquipmentData.SlotType.RIGHT_HAND),""))
 	var coating:=context.items.coating(uid)
