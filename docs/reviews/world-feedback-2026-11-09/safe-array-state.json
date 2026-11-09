@@ -1,0 +1,1291 @@
+{
+  "request": {
+    "capture": "04-safe-array",
+    "id": 18.0,
+    "op": "inspect"
+  },
+  "state": {
+    "active_seconds": 80.4051856666668,
+    "buttons": [],
+    "campaign_clock": 222.675405555555,
+    "casts": [
+      {
+        "action": "inscribe",
+        "charge_power": 1.0,
+        "materials": {
+          "fire_stone": 1
+        },
+        "mp_after": 52,
+        "mp_cost": 8,
+        "position": [
+          -3313.1689453125,
+          -1132.52807617188
+        ],
+        "result": "inscribe",
+        "rule": "",
+        "t": 79.5500000000001
+      }
+    ],
+    "claims": [
+      "equipment.sources_v1",
+      "fog.-9.3",
+      "fog.-9.4",
+      "fog.-9.5",
+      "fog.-8.3",
+      "fog.-8.4",
+      "fog.-8.5",
+      "fog.-7.3",
+      "fog.-7.4",
+      "fog.-7.5",
+      "place.town",
+      "fog.-6.3",
+      "fog.-6.4",
+      "fog.-6.5",
+      "river.handbook",
+      "loot.cache.river.handbook",
+      "river.pack",
+      "loot.cache.river.pack",
+      "fog.-9.2",
+      "fog.-8.2",
+      "fog.-7.2",
+      "fog.-6.2",
+      "fog.-8.1",
+      "fog.-7.1",
+      "fog.-6.1",
+      "fog.-8.0",
+      "fog.-7.0",
+      "fog.-6.0",
+      "fog.-8.-1",
+      "fog.-7.-1",
+      "fog.-6.-1",
+      "fog.-8.-2",
+      "fog.-7.-2",
+      "fog.-6.-2",
+      "fog.-8.-3",
+      "fog.-7.-3",
+      "fog.-6.-3",
+      "fog.-8.-4",
+      "fog.-7.-4",
+      "fog.-6.-4",
+      "river.fire"
+    ],
+    "date": "第1天 11:42",
+    "defenses": [],
+    "display": "X11",
+    "effective_forms": {
+      "right": {
+
+      },
+      "slot_0": {
+
+      },
+      "slot_3": {
+
+      },
+      "slot_4": {
+        "modifier": "",
+        "payload": "ember",
+        "uid": ""
+      },
+      "slot_5": {
+
+      }
+    },
+    "enemies": [
+      {
+        "detect": 440.0,
+        "distance": 713.910339355469,
+        "hp": 60,
+        "id": "river.enemy.camp.forest.3",
+        "mode": "idle",
+        "mp": 39,
+        "position": [
+          -2600.0,
+          -1100.0
+        ],
+        "processing": true,
+        "state": "Idle",
+        "title": "守备兵"
+      },
+      {
+        "detect": 440.0,
+        "distance": 1172.25451660156,
+        "hp": 55,
+        "id": "river.enemy.camp.forest.4",
+        "mode": "idle",
+        "mp": 39,
+        "position": [
+          -2200.0,
+          -1500.0
+        ],
+        "processing": true,
+        "state": "Idle",
+        "title": "追猎者"
+      },
+      {
+        "detect": 440.0,
+        "distance": 2157.41772460938,
+        "hp": 55,
+        "id": "river.enemy.camp.road.1",
+        "mode": "idle",
+        "mp": 39,
+        "position": [
+          -1700.0,
+          300.0
+        ],
+        "processing": true,
+        "state": "Idle",
+        "title": "追猎者"
+      },
+      {
+        "detect": 440.0,
+        "distance": 2334.78515625,
+        "hp": 55,
+        "id": "river.enemy.camp.road.2",
+        "mode": "idle",
+        "mp": 48,
+        "position": [
+          -1300.0,
+          50.0
+        ],
+        "processing": true,
+        "state": "Idle",
+        "title": "守点术士"
+      },
+      {
+        "detect": 440.0,
+        "distance": 2404.10473632812,
+        "hp": 60,
+        "id": "river.enemy.camp.bridge_keeper",
+        "mode": "idle",
+        "mp": 39,
+        "position": [
+          -1700.0,
+          650.0
+        ],
+        "processing": true,
+        "state": "Idle",
+        "title": "守备兵"
+      },
+      {
+        "detect": 440.0,
+        "distance": 4564.98095703125,
+        "hp": 55,
+        "id": "river.enemy.camp.lake.5",
+        "mode": "idle",
+        "mp": 48,
+        "position": [
+          1100.0,
+          -2300.0
+        ],
+        "processing": true,
+        "state": "Idle",
+        "title": "守点术士"
+      },
+      {
+        "detect": 440.0,
+        "distance": 5592.11474609375,
+        "hp": 55,
+        "id": "river.enemy.camp.marsh.6",
+        "mode": "idle",
+        "mp": 39,
+        "position": [
+          1250.0,
+          2100.0
+        ],
+        "processing": true,
+        "state": "Idle",
+        "title": "追猎者"
+      },
+      {
+        "detect": 440.0,
+        "distance": 5704.900390625,
+        "hp": 55,
+        "id": "river.enemy.camp.marsh.7",
+        "mode": "idle",
+        "mp": 48,
+        "position": [
+          1550.0,
+          1850.0
+        ],
+        "processing": true,
+        "state": "Idle",
+        "title": "守点术士"
+      },
+      {
+        "detect": 440.0,
+        "distance": 6220.951171875,
+        "hp": 60,
+        "id": "river.enemy.camp.mill.8",
+        "mode": "idle",
+        "mp": 39,
+        "position": [
+          2600.0,
+          800.0
+        ],
+        "processing": true,
+        "state": "Idle",
+        "title": "守备兵"
+      },
+      {
+        "detect": 440.0,
+        "distance": 6315.39013671875,
+        "hp": 60,
+        "id": "river.enemy.camp.prison_road.10",
+        "mode": "idle",
+        "mp": 39,
+        "position": [
+          3000.0,
+          -1300.0
+        ],
+        "processing": true,
+        "state": "Idle",
+        "title": "守备兵"
+      },
+      {
+        "detect": 440.0,
+        "distance": 6727.54833984375,
+        "hp": 55,
+        "id": "river.enemy.camp.mill.9",
+        "mode": "idle",
+        "mp": 48,
+        "position": [
+          3100.0,
+          900.0
+        ],
+        "processing": true,
+        "state": "Idle",
+        "title": "守点术士"
+      },
+      {
+        "detect": 440.0,
+        "distance": 6863.24609375,
+        "hp": 55,
+        "id": "river.enemy.camp.prison_road.11",
+        "mode": "idle",
+        "mp": 39,
+        "position": [
+          3550.0,
+          -1100.0
+        ],
+        "processing": true,
+        "state": "Idle",
+        "title": "追猎者"
+      }
+    ],
+    "error": "",
+    "fields": [
+      {
+        "charges": 6,
+        "position": [
+          -3313.1689453125,
+          -1132.52807617188
+        ],
+        "remaining": 179.187701777778,
+        "type": "fire"
+      }
+    ],
+    "gear": [],
+    "hands": {
+      "q": "",
+      "r": "ignite"
+    },
+    "id": 18.0,
+    "items": [
+      {
+        "definition": "ash",
+        "properties": {
+
+        },
+        "quantity": 2,
+        "uid": "item.77"
+      },
+      {
+        "definition": "charcoal",
+        "properties": {
+
+        },
+        "quantity": 5,
+        "uid": "item.78"
+      },
+      {
+        "definition": "crystal",
+        "properties": {
+
+        },
+        "quantity": 8,
+        "uid": "item.79"
+      },
+      {
+        "definition": "frost_salt",
+        "properties": {
+
+        },
+        "quantity": 2,
+        "uid": "item.80"
+      },
+      {
+        "definition": "resin",
+        "properties": {
+
+        },
+        "quantity": 2,
+        "uid": "item.81"
+      },
+      {
+        "definition": "sap",
+        "properties": {
+
+        },
+        "quantity": 9,
+        "uid": "item.82"
+      },
+      {
+        "definition": "storm_dust",
+        "properties": {
+
+        },
+        "quantity": 3,
+        "uid": "item.83"
+      },
+      {
+        "definition": "ration",
+        "properties": {
+
+        },
+        "quantity": 2,
+        "uid": "item.84"
+      },
+      {
+        "definition": "grain",
+        "properties": {
+
+        },
+        "quantity": 3,
+        "uid": "item.85"
+      },
+      {
+        "definition": "herb",
+        "properties": {
+
+        },
+        "quantity": 2,
+        "uid": "item.86"
+      },
+      {
+        "definition": "clean_water",
+        "properties": {
+
+        },
+        "quantity": 4,
+        "uid": "item.87"
+      }
+    ],
+    "known_actions": {
+      "fire_sigil": true,
+      "ignite": true,
+      "oil_flask": true,
+      "project": true,
+      "water_call": true
+    },
+    "loot_records": {
+      "cache.river.handbook": {
+        "equipment": {
+
+        },
+        "materials": {
+
+        },
+        "position": [
+          -3500.0,
+          2472.0
+        ],
+        "region": "camp",
+        "title": "行路者的施法手册 · 留存物资"
+      },
+      "cache.river.pack": {
+        "equipment": {
+
+        },
+        "materials": {
+
+        },
+        "position": [
+          -3850.0,
+          2372.0
+        ],
+        "region": "camp",
+        "title": "离镇口粮袋 · 留存物资"
+      }
+    },
+    "martial": {
+      "learned": {
+
+      },
+      "ready_at": {
+
+      }
+    },
+    "materials": {
+      "ash": 2,
+      "charcoal": 5,
+      "clean_water": 4,
+      "crystal": 8,
+      "frost_salt": 2,
+      "grain": 3,
+      "herb": 2,
+      "ration": 2,
+      "resin": 2,
+      "sap": 9,
+      "storm_dust": 3
+    },
+    "melee_hits": [],
+    "modal_texts": [],
+    "notice": "",
+    "objective": "从河谷镇出发，沿道路、河岸与山口自由探索。G地图；J日志；N补给。",
+    "pack": [],
+    "paused": false,
+    "physical_actions": [],
+    "player": {
+      "attacks": 0,
+      "base": false,
+      "channel_source": "",
+      "charge_source": "",
+      "damage_taken": 0,
+      "dead": false,
+      "guarding": false,
+      "hp": 100,
+      "mode": "idle",
+      "mp": 52,
+      "position": [
+        -3313.1689453125,
+        -1132.52807617188
+      ],
+      "stamina": 100.0,
+      "ui_blocked": false
+    },
+    "runtime_scripts": [
+      "",
+      "res://core/command/command_bus.gd",
+      "res://core/debug/combat_debug_ui.gd",
+      "res://core/event/combat_event_bus.gd",
+      "res://core/game_runtime.gd",
+      "res://core/region_runtime.gd",
+      "res://core/save_manager.gd",
+      "res://core/state/state_machine.gd",
+      "res://entities/components/combat_component.gd",
+      "res://entities/components/health_component.gd",
+      "res://entities/components/mana_component.gd",
+      "res://entities/components/stats_component.gd",
+      "res://entities/enemy/enemy.gd",
+      "res://entities/enemy/enemy_attack_preparation.gd",
+      "res://entities/enemy/enemy_character_status.gd",
+      "res://entities/enemy/enemy_surface_awareness.gd",
+      "res://entities/player/components/player_casting_controller.gd",
+      "res://entities/player/components/player_combat_bindings.gd",
+      "res://entities/player/components/player_field_work.gd",
+      "res://entities/player/components/player_input_controller.gd",
+      "res://entities/player/player.gd",
+      "res://entities/player/states/attack.gd",
+      "res://entities/player/states/dodge.gd",
+      "res://entities/player/states/idle.gd",
+      "res://entities/player/states/move.gd",
+      "res://entities/player/states/skill.gd",
+      "res://entities/player/states/work.gd",
+      "res://gameplay/abilities/combinations/conditional_cast_controller.gd",
+      "res://gameplay/abilities/fields/field_placement_preview.gd",
+      "res://gameplay/abilities/fields/fire_sigil.gd",
+      "res://gameplay/abilities/fields/preparation_overlay.gd",
+      "res://gameplay/abilities/manager/skill_manager.gd",
+      "res://gameplay/abilities/manager/skill_mastery_manager.gd",
+      "res://gameplay/abilities/manager/summon_manager.gd",
+      "res://gameplay/abilities/runtime/skill_executor.gd",
+      "res://gameplay/abilities/runtime/skill_synergy_resolver.gd",
+      "res://gameplay/characters/actor_equipment_visual.gd",
+      "res://gameplay/combat/combat_executor.gd",
+      "res://gameplay/combat/on_hit/element_hit_bindings.gd",
+      "res://gameplay/exploration/element_knowledge.gd",
+      "res://gameplay/exploration/element_trial_recorder.gd",
+      "res://gameplay/exploration/expedition_ui.gd",
+      "res://gameplay/exploration/exploration_interactable.gd",
+      "res://gameplay/exploration/spell_world_object.gd",
+      "res://gameplay/exploration/surface_overlay.gd",
+      "res://gameplay/exploration/surface_valve.gd",
+      "res://gameplay/exploration/survival/survival_service.gd",
+      "res://gameplay/foundation/actor_action_controller.gd",
+      "res://gameplay/foundation/actor_components.gd",
+      "res://gameplay/foundation/campaign_session.gd",
+      "res://gameplay/foundation/interaction_provider.gd",
+      "res://gameplay/foundation/service_npc.gd",
+      "res://gameplay/foundation/stability_component.gd",
+      "res://gameplay/foundation/stamina_component.gd",
+      "res://gameplay/foundation/ui/actor_status_view.gd",
+      "res://gameplay/frontier/frontier_hud.gd",
+      "res://gameplay/frontier/frontier_scenery.gd",
+      "res://gameplay/frontier/grayriver_game.gd",
+      "res://gameplay/frontier/grayriver_loot_corpse.gd",
+      "res://gameplay/frontier/grayriver_terrain.gd",
+      "res://gameplay/interaction/propagation_scheduler.gd",
+      "res://gameplay/interaction/respawn_scheduler.gd",
+      "res://gameplay/interaction/simulation_runtime.gd",
+      "res://gameplay/interaction/surface_manager.gd",
+      "res://gameplay/interaction/surface_scheduler.gd",
+      "res://gameplay/inventory/equipment_manager.gd",
+      "res://gameplay/items/item_action_controller.gd",
+      "res://gameplay/items/spray_channel.gd",
+      "res://gameplay/status/buff_manager.gd",
+      "res://ui/actor_inventory_screen.gd",
+      "res://ui/boss_hp_bar.gd",
+      "res://ui/buff_status_ui.gd",
+      "res://ui/damage_number_spawner.gd",
+      "res://ui/field_work_panel.gd",
+      "res://ui/hud.gd",
+      "res://ui/inventory_item_tile.gd",
+      "res://ui/inventory_panel.gd",
+      "res://ui/material_wheel.gd",
+      "res://ui/paper_doll_view.gd",
+      "res://ui/skill_bar.gd",
+      "res://ui/skill_pool_ui.gd",
+      "res://ui/slot_button.gd",
+      "res://ui/summon_status_ui.gd",
+      "res://world/object/interactable.gd",
+      "res://world/object/map_object.gd",
+      "res://world/state/world_state_manager.gd",
+      "res://world/time/world_time.gd",
+      "res://world/world_runtime.gd"
+    ],
+    "save_path": "/tmp/grayriver-first30/coherent-combination/data/godot/app_userdata/Study/save_3.sav",
+    "selected": {
+
+    },
+    "shortcuts": {
+      "item_0": {
+        "item_id": "ration",
+        "kind": "item",
+        "uid": ""
+      },
+      "item_1": {
+        "item_id": "clean_water",
+        "kind": "item",
+        "uid": ""
+      },
+      "item_2": {
+        "item_id": "tea",
+        "kind": "item",
+        "uid": ""
+      },
+      "item_3": {
+        "item_id": "broth",
+        "kind": "item",
+        "uid": ""
+      },
+      "right": {
+        "kind": "skill",
+        "skill_id": "ignite",
+        "upgrades": {
+
+        }
+      },
+      "slot_0": {
+        "kind": "skill",
+        "skill_id": "disperse",
+        "upgrades": {
+
+        }
+      },
+      "slot_3": {
+        "kind": "skill",
+        "skill_id": "water_call",
+        "upgrades": {
+
+        }
+      },
+      "slot_4": {
+        "kind": "skill",
+        "selection": {
+          "modifier": "",
+          "payload": "ember",
+          "uid": ""
+        },
+        "skill_id": "inscribe",
+        "upgrades": {
+
+        }
+      },
+      "slot_5": {
+        "kind": "skill",
+        "skill_id": "ignite",
+        "upgrades": {
+
+        }
+      }
+    },
+    "simulation": true,
+    "slots": [
+      "disperse",
+      "",
+      "",
+      "water_call",
+      "inscribe",
+      "ignite"
+    ],
+    "spell_affinity": "fire",
+    "tracker": "旅程  /  J\n选择要追踪的委托",
+    "ui": {
+      "controls": [
+        {
+          "disabled": false,
+          "inside": false,
+          "kind": "Label",
+          "path": "/root/Game/Player/@Node2D@252/@Label@253",
+          "rect": [
+            -3388.1689453125,
+            -1194.52807617188,
+            150.0,
+            23.0
+          ],
+          "text": "",
+          "tooltip": ""
+        },
+        {
+          "disabled": false,
+          "inside": true,
+          "kind": "Label",
+          "path": "/root/Game/HUDLayer/MarginContainer/HUDRoot/StatusPanel/@VBoxContainer@26/@HBoxContainer@27/@Label@28",
+          "rect": [
+            48.0,
+            480.0,
+            186.0,
+            23.0
+          ],
+          "text": "行者",
+          "tooltip": ""
+        },
+        {
+          "disabled": false,
+          "inside": true,
+          "kind": "Label",
+          "path": "/root/Game/HUDLayer/MarginContainer/HUDRoot/StatusPanel/@VBoxContainer@26/@HBoxContainer@27/@Label@29",
+          "rect": [
+            242.0,
+            482.0,
+            34.0,
+            18.0
+          ],
+          "text": "等级 1",
+          "tooltip": "力量 10 · 智力 10 · 敏捷 10 · 耐力 10"
+        },
+        {
+          "disabled": false,
+          "inside": true,
+          "kind": "Label",
+          "path": "/root/Game/HUDLayer/MarginContainer/HUDRoot/StatusPanel/@VBoxContainer@26/@HBoxContainer@30/@Label@33",
+          "rect": [
+            222.0,
+            508.0,
+            54.0,
+            17.0
+          ],
+          "text": "100 / 100",
+          "tooltip": ""
+        },
+        {
+          "disabled": false,
+          "inside": true,
+          "kind": "Label",
+          "path": "/root/Game/HUDLayer/MarginContainer/HUDRoot/StatusPanel/@VBoxContainer@26/@HBoxContainer@34/@Label@37",
+          "rect": [
+            222.0,
+            531.0,
+            54.0,
+            17.0
+          ],
+          "text": "52 / 60",
+          "tooltip": ""
+        },
+        {
+          "disabled": false,
+          "inside": true,
+          "kind": "Label",
+          "path": "/root/Game/HUDLayer/MarginContainer/HUDRoot/StatusPanel/@VBoxContainer@26/@VBoxContainer@38/@HBoxContainer@39/@Label@40",
+          "rect": [
+            48.0,
+            554.0,
+            112.0,
+            18.0
+          ],
+          "text": "体力",
+          "tooltip": ""
+        },
+        {
+          "disabled": false,
+          "inside": true,
+          "kind": "Label",
+          "path": "/root/Game/HUDLayer/MarginContainer/HUDRoot/StatusPanel/@VBoxContainer@26/@VBoxContainer@38/@HBoxContainer@42/@Label@43",
+          "rect": [
+            48.0,
+            576.0,
+            112.0,
+            18.0
+          ],
+          "text": "稳定",
+          "tooltip": ""
+        },
+        {
+          "disabled": false,
+          "inside": true,
+          "kind": "Label",
+          "path": "/root/Game/HUDLayer/MarginContainer/HUDRoot/SkillBarPanel/SkillBar/@PanelContainer@74/@Control@75/@Label@78",
+          "rect": [
+            345.0,
+            586.0,
+            1.0,
+            17.0
+          ],
+          "text": "",
+          "tooltip": "本次法力费用"
+        },
+        {
+          "disabled": false,
+          "inside": true,
+          "kind": "Label",
+          "path": "/root/Game/HUDLayer/MarginContainer/HUDRoot/SkillBarPanel/SkillBar/@PanelContainer@74/@Control@75/@Label@79",
+          "rect": [
+            346.0,
+            612.0,
+            30.0,
+            23.0
+          ],
+          "text": "",
+          "tooltip": ""
+        },
+        {
+          "disabled": false,
+          "inside": true,
+          "kind": "Label",
+          "path": "/root/Game/HUDLayer/MarginContainer/HUDRoot/SkillBarPanel/SkillBar/@PanelContainer@74/@Control@75/@Label@82",
+          "rect": [
+            343.0,
+            583.0,
+            44.0,
+            44.0
+          ],
+          "text": "Q",
+          "tooltip": ""
+        },
+        {
+          "disabled": false,
+          "inside": true,
+          "kind": "Label",
+          "path": "/root/Game/HUDLayer/MarginContainer/HUDRoot/SkillBarPanel/SkillBar/@PanelContainer@83/@Control@84/@Label@87",
+          "rect": [
+            402.0,
+            586.0,
+            1.0,
+            17.0
+          ],
+          "text": "",
+          "tooltip": "本次法力费用"
+        },
+        {
+          "disabled": false,
+          "inside": true,
+          "kind": "Label",
+          "path": "/root/Game/HUDLayer/MarginContainer/HUDRoot/SkillBarPanel/SkillBar/@PanelContainer@83/@Control@84/@Label@88",
+          "rect": [
+            403.0,
+            612.0,
+            30.0,
+            23.0
+          ],
+          "text": "",
+          "tooltip": ""
+        },
+        {
+          "disabled": false,
+          "inside": true,
+          "kind": "Label",
+          "path": "/root/Game/HUDLayer/MarginContainer/HUDRoot/SkillBarPanel/SkillBar/@PanelContainer@83/@Control@84/@Label@91",
+          "rect": [
+            400.0,
+            583.0,
+            44.0,
+            44.0
+          ],
+          "text": "E",
+          "tooltip": ""
+        },
+        {
+          "disabled": false,
+          "inside": true,
+          "kind": "Label",
+          "path": "/root/Game/HUDLayer/MarginContainer/HUDRoot/SkillBarPanel/SkillBar/@PanelContainer@92/@Control@93/@Label@97",
+          "rect": [
+            460.0,
+            612.0,
+            30.0,
+            23.0
+          ],
+          "text": "",
+          "tooltip": ""
+        },
+        {
+          "disabled": false,
+          "inside": true,
+          "kind": "Label",
+          "path": "/root/Game/HUDLayer/MarginContainer/HUDRoot/SkillBarPanel/SkillBar/@PanelContainer@92/@Control@93/@Label@100",
+          "rect": [
+            457.0,
+            583.0,
+            44.0,
+            44.0
+          ],
+          "text": "R",
+          "tooltip": ""
+        },
+        {
+          "disabled": false,
+          "inside": true,
+          "kind": "Label",
+          "path": "/root/Game/HUDLayer/MarginContainer/HUDRoot/SkillBarPanel/SkillBar/@PanelContainer@101/@Control@102/@Label@105",
+          "rect": [
+            516.0,
+            586.0,
+            7.0,
+            17.0
+          ],
+          "text": "2",
+          "tooltip": "本次法力费用"
+        },
+        {
+          "disabled": false,
+          "inside": true,
+          "kind": "Label",
+          "path": "/root/Game/HUDLayer/MarginContainer/HUDRoot/SkillBarPanel/SkillBar/@PanelContainer@101/@Control@102/@Label@106",
+          "rect": [
+            517.0,
+            612.0,
+            30.0,
+            23.0
+          ],
+          "text": "",
+          "tooltip": ""
+        },
+        {
+          "disabled": false,
+          "inside": true,
+          "kind": "Label",
+          "path": "/root/Game/HUDLayer/MarginContainer/HUDRoot/SkillBarPanel/SkillBar/@PanelContainer@101/@Control@102/@Label@109",
+          "rect": [
+            514.0,
+            583.0,
+            44.0,
+            44.0
+          ],
+          "text": "1",
+          "tooltip": ""
+        },
+        {
+          "disabled": false,
+          "inside": true,
+          "kind": "Label",
+          "path": "/root/Game/HUDLayer/MarginContainer/HUDRoot/SkillBarPanel/SkillBar/@PanelContainer@110/@Control@111/@Label@114",
+          "rect": [
+            573.0,
+            586.0,
+            1.0,
+            17.0
+          ],
+          "text": "",
+          "tooltip": "本次法力费用"
+        },
+        {
+          "disabled": false,
+          "inside": true,
+          "kind": "Label",
+          "path": "/root/Game/HUDLayer/MarginContainer/HUDRoot/SkillBarPanel/SkillBar/@PanelContainer@110/@Control@111/@Label@115",
+          "rect": [
+            574.0,
+            612.0,
+            30.0,
+            23.0
+          ],
+          "text": "",
+          "tooltip": ""
+        },
+        {
+          "disabled": false,
+          "inside": true,
+          "kind": "Label",
+          "path": "/root/Game/HUDLayer/MarginContainer/HUDRoot/SkillBarPanel/SkillBar/@PanelContainer@110/@Control@111/@Label@118",
+          "rect": [
+            571.0,
+            583.0,
+            44.0,
+            44.0
+          ],
+          "text": "2",
+          "tooltip": ""
+        },
+        {
+          "disabled": false,
+          "inside": true,
+          "kind": "Label",
+          "path": "/root/Game/HUDLayer/MarginContainer/HUDRoot/SkillBarPanel/SkillBar/@PanelContainer@119/@Control@120/@Label@123",
+          "rect": [
+            630.0,
+            586.0,
+            1.0,
+            17.0
+          ],
+          "text": "",
+          "tooltip": "本次法力费用"
+        },
+        {
+          "disabled": false,
+          "inside": true,
+          "kind": "Label",
+          "path": "/root/Game/HUDLayer/MarginContainer/HUDRoot/SkillBarPanel/SkillBar/@PanelContainer@119/@Control@120/@Label@124",
+          "rect": [
+            631.0,
+            612.0,
+            30.0,
+            23.0
+          ],
+          "text": "",
+          "tooltip": ""
+        },
+        {
+          "disabled": false,
+          "inside": true,
+          "kind": "Label",
+          "path": "/root/Game/HUDLayer/MarginContainer/HUDRoot/SkillBarPanel/SkillBar/@PanelContainer@119/@Control@120/@Label@127",
+          "rect": [
+            628.0,
+            583.0,
+            44.0,
+            44.0
+          ],
+          "text": "3",
+          "tooltip": ""
+        },
+        {
+          "disabled": false,
+          "inside": true,
+          "kind": "Label",
+          "path": "/root/Game/HUDLayer/MarginContainer/HUDRoot/SkillBarPanel/SkillBar/@PanelContainer@128/@Control@129/@Label@133",
+          "rect": [
+            688.0,
+            612.0,
+            30.0,
+            23.0
+          ],
+          "text": "",
+          "tooltip": ""
+        },
+        {
+          "disabled": false,
+          "inside": true,
+          "kind": "Label",
+          "path": "/root/Game/HUDLayer/MarginContainer/HUDRoot/SkillBarPanel/SkillBar/@PanelContainer@128/@Control@129/@Label@136",
+          "rect": [
+            685.0,
+            583.0,
+            44.0,
+            44.0
+          ],
+          "text": "4",
+          "tooltip": ""
+        },
+        {
+          "disabled": false,
+          "inside": true,
+          "kind": "Label",
+          "path": "/root/Game/HUDLayer/MarginContainer/HUDRoot/SkillBarPanel/SkillBar/@PanelContainer@137/@Control@138/@Label@141",
+          "rect": [
+            744.0,
+            586.0,
+            7.0,
+            17.0
+          ],
+          "text": "8",
+          "tooltip": "本次法力费用"
+        },
+        {
+          "disabled": false,
+          "inside": true,
+          "kind": "Label",
+          "path": "/root/Game/HUDLayer/MarginContainer/HUDRoot/SkillBarPanel/SkillBar/@PanelContainer@137/@Control@138/@Label@142",
+          "rect": [
+            745.0,
+            612.0,
+            30.0,
+            23.0
+          ],
+          "text": "火石",
+          "tooltip": ""
+        },
+        {
+          "disabled": false,
+          "inside": true,
+          "kind": "Label",
+          "path": "/root/Game/HUDLayer/MarginContainer/HUDRoot/SkillBarPanel/SkillBar/@PanelContainer@137/@Control@138/@Label@144",
+          "rect": [
+            742.0,
+            583.0,
+            46.0,
+            46.0
+          ],
+          "text": "7.3",
+          "tooltip": ""
+        },
+        {
+          "disabled": false,
+          "inside": true,
+          "kind": "Label",
+          "path": "/root/Game/HUDLayer/MarginContainer/HUDRoot/SkillBarPanel/SkillBar/@PanelContainer@137/@Control@138/@Label@145",
+          "rect": [
+            742.0,
+            583.0,
+            44.0,
+            44.0
+          ],
+          "text": "5",
+          "tooltip": ""
+        },
+        {
+          "disabled": false,
+          "inside": true,
+          "kind": "Label",
+          "path": "/root/Game/HUDLayer/MarginContainer/HUDRoot/SkillBarPanel/SkillBar/@PanelContainer@146/@Control@147/@Label@151",
+          "rect": [
+            802.0,
+            612.0,
+            30.0,
+            23.0
+          ],
+          "text": "",
+          "tooltip": ""
+        },
+        {
+          "disabled": false,
+          "inside": true,
+          "kind": "Label",
+          "path": "/root/Game/HUDLayer/MarginContainer/HUDRoot/SkillBarPanel/SkillBar/@PanelContainer@146/@Control@147/@Label@154",
+          "rect": [
+            799.0,
+            583.0,
+            44.0,
+            44.0
+          ],
+          "text": "6",
+          "tooltip": ""
+        },
+        {
+          "disabled": false,
+          "inside": true,
+          "kind": "Label",
+          "path": "/root/Game/Interface/@CanvasLayer@254/@PanelContainer@255/@VBoxContainer@256/@Label@257",
+          "rect": [
+            378.0,
+            18.0,
+            396.0,
+            27.0
+          ],
+          "text": "灰河谷 · 野外",
+          "tooltip": ""
+        },
+        {
+          "disabled": false,
+          "inside": true,
+          "kind": "Label",
+          "path": "/root/Game/Interface/@CanvasLayer@254/@PanelContainer@255/@VBoxContainer@256/@Label@258",
+          "rect": [
+            378.0,
+            49.0,
+            396.0,
+            19.0
+          ],
+          "text": "从河谷镇出发，沿道路、河岸与山口自由探索。G地图；J日志；N补给。",
+          "tooltip": ""
+        },
+        {
+          "disabled": false,
+          "inside": true,
+          "kind": "Button",
+          "path": "/root/Game/Interface/@CanvasLayer@254/@PanelContainer@259/@Button@260",
+          "rect": [
+            950.0,
+            590.0,
+            172.0,
+            38.0
+          ],
+          "text": "Tab  远征菜单",
+          "tooltip": "鼠标进入装备、补给、技能和制作；Esc返回"
+        },
+        {
+          "disabled": false,
+          "inside": false,
+          "kind": "Label",
+          "path": "/root/Game/World/ExplorationRegion/@Node2D@657/@Label@658",
+          "rect": [
+            2292.0,
+            464.0,
+            280.0,
+            52.0
+          ],
+          "text": "[F] 工区水路分流阀 · 关闭\n关闭→路线A→路线B；旧水自然消退",
+          "tooltip": ""
+        },
+        {
+          "disabled": false,
+          "inside": false,
+          "kind": "Label",
+          "path": "/root/Game/World/ExplorationRegion/@Node2D@948/@Label@949",
+          "rect": [
+            -3413.1689453125,
+            -1253.52807617188,
+            200.0,
+            23.0
+          ],
+          "text": "火阵 · 179秒 · 每次-30秒",
+          "tooltip": ""
+        },
+        {
+          "disabled": false,
+          "inside": true,
+          "kind": "Button",
+          "path": "/root/Game/@CanvasLayer@800/@Control@801/@Button@802",
+          "rect": [
+            876.0,
+            24.0,
+            258.0,
+            92.0
+          ],
+          "text": "旅程  /  J\n选择要追踪的委托",
+          "tooltip": "选择要追踪的委托"
+        },
+        {
+          "disabled": false,
+          "inside": true,
+          "kind": "Label",
+          "path": "/root/Game/@CanvasLayer@800/@Control@801/@Label@803",
+          "rect": [
+            876.0,
+            4.0,
+            258.0,
+            20.0
+          ],
+          "text": "第1天 11:42",
+          "tooltip": ""
+        },
+        {
+          "disabled": false,
+          "inside": true,
+          "kind": "Button",
+          "path": "/root/Game/@CanvasLayer@800/@Control@801/@PanelContainer@804/@Button@805",
+          "rect": [
+            378.0,
+            470.0,
+            396.0,
+            38.0
+          ],
+          "text": "F  林间旧猎营：火阵（已记录）",
+          "tooltip": "点击与F交互相同；须在目标附近"
+        },
+        {
+          "disabled": false,
+          "inside": true,
+          "kind": "Button",
+          "path": "/root/Game/@CanvasLayer@800/@Control@801/@GridContainer@806/@Button@807",
+          "rect": [
+            1002.0,
+            486.0,
+            62.0,
+            44.0
+          ],
+          "text": "7  ×2",
+          "tooltip": "按键：7\n烤饼\n\n站定使用，移动或受伤中断；完成才消费。"
+        },
+        {
+          "disabled": false,
+          "inside": true,
+          "kind": "Button",
+          "path": "/root/Game/@CanvasLayer@800/@Control@801/@GridContainer@806/@Button@808",
+          "rect": [
+            1068.0,
+            486.0,
+            62.0,
+            44.0
+          ],
+          "text": "8  ×4",
+          "tooltip": "按键：8\n饮用水\n\n站定使用，移动或受伤中断；完成才消费。"
+        },
+        {
+          "disabled": true,
+          "inside": true,
+          "kind": "Button",
+          "path": "/root/Game/@CanvasLayer@800/@Control@801/@GridContainer@806/@Button@809",
+          "rect": [
+            1002.0,
+            534.0,
+            62.0,
+            44.0
+          ],
+          "text": "9  ×0",
+          "tooltip": "按键：9\n醒神茶\n\n口袋中没有可用物品；先整理或重新绑定。\n站定使用，移动或受伤中断；完成才消费。"
+        },
+        {
+          "disabled": true,
+          "inside": true,
+          "kind": "Button",
+          "path": "/root/Game/@CanvasLayer@800/@Control@801/@GridContainer@806/@Button@810",
+          "rect": [
+            1068.0,
+            534.0,
+            62.0,
+            44.0
+          ],
+          "text": "0  ×0",
+          "tooltip": "按键：0\n苦叶炖汤\n\n口袋中没有可用物品；先整理或重新绑定。\n站定使用，移动或受伤中断；完成才消费。"
+        }
+      ],
+      "fatigue": 4.49033183555555,
+      "hydration": 86.9137426694454,
+      "last_spell_source": "slot_4",
+      "merchant": {
+        "arrow": 24,
+        "book_spear_thrust": 1,
+        "charcoal": 6,
+        "clean_water": 4,
+        "clear_tonic": 2,
+        "cloth": 6,
+        "coin": 160,
+        "crystal": 4,
+        "guard_tonic": 2,
+        "metal_scrap": 12,
+        "ration": 6,
+        "sap": 6
+      },
+      "nutrition": 91.2758284462967,
+      "production": {
+        "jobs": {
+
+        },
+        "schema": 1
+      },
+      "selected_inventory": "",
+      "viewport": [
+        1152,
+        648
+      ],
+      "wheel_entries": [],
+      "wheel_last_source": "slot_4"
+    },
+    "wall_usec": 86103457,
+    "wheel": {
+      "source": "slot_4",
+      "visible": false
+    }
+  }
+}

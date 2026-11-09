@@ -15,4 +15,7 @@ extends Resource
 @export var requires_clear: bool = false
 @export var kind: String = "note"
 
+# Extra separation beyond initial detection and the full interaction radius.
+@export var reading_margin := 0.0
+@export var navigation_hints: Array[ExplorationNavigationHint] = []
 @export var element_clues: Array[String] = []

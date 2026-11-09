@@ -1,0 +1,59 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:364)
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+⏰ WorldTime 启动: 08:00
+🏛️ GameRuntime: 五大 Runtime 初始化完成
+   CommandBus       : ✅
+   CombatExecutor   : ✅
+   CombatEventBus   : ✅
+   WorldRuntime     : ✅
+   SimulationRuntime: ✅
+   WorldTime        : ✅
+⚡ 已注册触发效果: OnKillBonusExp
+📊 CombatDebugger: trace enabled
+⏰ 08:00 (☀️ 白天)
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+FIRST30 1.0 click  pos=(-3700.0, 2100.0) hp=100
+FIRST30 2.0 walk  pos=(-3505.542, 2376.958) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 3.0 key  pos=(-3505.542, 2376.958) hp=100
+FIRST30 4.0 key  pos=(-3505.542, 2376.958) hp=100
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+⏰ 09:00 (☀️ 白天)
+SaveManager: saved user://save_3.sav
+FIRST30 5.0 walk walk_timeout pos=(-3328.117, 2376.958) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 6.0 walk  pos=(-3385.871, 2282.439) hp=100
+FIRST30 7.0 walk  pos=(-3809.762, 2266.883) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 8.0 key  pos=(-3809.762, 2266.883) hp=100
+FIRST30 9.0 key  pos=(-3809.762, 2266.883) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 10.0 walk  pos=(-3494.74, 1738.7) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 11.0 walk  pos=(-3393.622, -1067.082) hp=100
+FIRST30 12.0 walk  pos=(-3324.952, -1135.75) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 13.0 key  pos=(-3324.952, -1135.75) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 14.0 wait  pos=(-3324.952, -1135.75) hp=100
+FRICTION 15.0 inspect pos=(-3324.952, -1135.75) hp=100
+SaveManager: saved user://save_3.sav
+⏰ 10:00 (☀️ 白天)
+SaveManager: saved user://save_3.sav
+FIRST30 16.0 key  pos=(-3324.952, -1135.75) hp=100
+FIRST30 17.0 wheel wheel_payload_missing pos=(-3324.952, -1135.75) hp=100
+SaveManager: saved user://save_3.sav
+FRICTION 18.0 inspect pos=(-3324.952, -1135.75) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 19.0 key  pos=(-3324.952, -1135.75) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 20.0 save  pos=(-3324.952, -1135.75) hp=100
+FIRST30 21.0 quit  pos=(-3324.952, -1135.75) hp=100

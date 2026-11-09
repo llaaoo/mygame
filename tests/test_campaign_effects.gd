@@ -12,7 +12,7 @@ func entry(state: Dictionary,id: String) -> Dictionary:
 	return {}
 func run() -> void:
 	var fixture:=Fixture.new(self)
-	var game:=await fixture.boot(true)
+	var game:=await fixture.boot(true,true)
 	var actor:=game.player
 	var buffs:=actor.get_node("BuffManager") as BuffManager
 	var foe:=game.active_enemies[0]
@@ -36,15 +36,17 @@ func run() -> void:
 	var original_magic:=float(entry(state,"burning").source_magic)
 	check(BuffManager.valid_campaign_state(state),"Live timed effects cannot be serialized")
 	game._save_progress(); await fixture.close()
-	fixture=Fixture.new(self); game=await fixture.boot(true)
+	fixture=Fixture.new(self); game=await fixture.boot(true,true)
 	actor=game.player; buffs=actor.get_node("BuffManager") as BuffManager; store=game.session.inventory
 	var restored:=buffs.campaign_state()
 	for id in ["burning","poison","meal_fortitude","guard_tonic"]:
 		var before:=entry(state,id); var after:=entry(restored,id)
 		check(not after.is_empty() and float(after.remaining)<=float(before.remaining)+.001 and float(after.remaining)>float(before.remaining)-1,"Save/reentry erased or renewed effect: "+id)
 	check(actor.health_component.hp==75 and actor.mana_component.mp==31,"Reload healed or refilled actual vitals")
-	var elapsed:=float(entry(state,"meal_fortitude").remaining)-float(entry(restored,"meal_fortitude").remaining)
-	check(store.coating_state(uid)==coating and actor.actor_context.actions.stamina.current<=40+elapsed*actor.actor_context.actions.stamina.regeneration+.1,"Reload changed coating UID/expiry or refilled stamina")
+	# Physics is explicitly frozen in this persistence fixture. Buffs still tick
+	# on the simulation clock; their elapsed time cannot bound physical recovery.
+	check(store.coating_state(uid)==coating,"Reload changed coating UID/expiry")
+	check(is_equal_approx(actor.actor_context.actions.stamina.current,40),"Reload changed saved stamina")
 	check(actor.skill_manager.combinations.cooldowns.get("ignite",0)>4 and actor.skill_manager._cooldowns.get("right",0)>3 and actor.actor_context.martial.reason("staff_sweep",actor.actor_context)=="武技尚在冷却","Reload cleared real cooldowns")
 	check(entry(restored,"burning").source_id==foe_id and float(entry(restored,"burning").source_magic)==original_magic,"Reload lost damage identity/strength")
 	foe=game.session.actor_for_id(foe_id) as Enemy
@@ -89,7 +91,7 @@ func run() -> void:
 	bad=state.duplicate(true); bad.entries[0].path="res://core/game_runtime.gd"
 	check(not BuffManager.valid_campaign_state(bad),"Non-Buff executable path accepted")
 	game._save_progress(); await fixture.close()
-	fixture=Fixture.new(self); game=await fixture.boot(true)
+	fixture=Fixture.new(self); game=await fixture.boot(true,true)
 	check(game.progress.claims.has(foe_id) and game.session.actor_for_id(foe_id)==null and game.progress.loot_records.has(foe_id),"Saved away-time death respawned or duplicated loot")
 	# A real previous-version campaign has provisions but no complete effect map.
 	buffs=game.player.get_node("BuffManager") as BuffManager
@@ -105,7 +107,7 @@ func run() -> void:
 	for record: Dictionary in legacy.extensions[section].foundation.actors.values():
 		record.erase("effects"); record.erase("cooldowns"); record.erase("provision_schema")
 	var file:=FileAccess.open("user://save_3.sav",FileAccess.WRITE); file.store_var(legacy); file.close()
-	fixture=Fixture.new(self); game=await fixture.boot(true)
+	fixture=Fixture.new(self); game=await fixture.boot(true,true)
 	buffs=game.player.get_node("BuffManager") as BuffManager
 	var migrated:=entry(buffs.campaign_state(),"meal_fortitude")
 	check(not migrated.is_empty() and float(migrated.remaining)<=legacy_remaining+.001 and float(migrated.remaining)>legacy_remaining-1,"V7 migration erased or refilled an actual food remainder")

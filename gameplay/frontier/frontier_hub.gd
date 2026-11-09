@@ -131,13 +131,14 @@ func entries() -> Array[Dictionary]:
 		"quests":
 			for quest in game.quests:
 				if not quest.available(game.progress): continue
-				var done:=game.progress.claims.has("quest."+quest.id)
-				var ready:=quest.is_complete(game.progress) and not done
+				var stage:=quest.stage(game.progress)
+				var done:=stage==ExplorationQuestData.Stage.REPORTED
+				var ready:=stage==ExplorationQuestData.Stage.READY
 				if filter_index == 0 and done or filter_index == 1 and not ready or filter_index == 2 and not done: continue
 				result.append({"id":quest.id,"title":quest.title,"text":quest.description,"subtitle":("已完成" if done else "可交付" if ready else "%d/%d项"%[quest.objective_count(game.progress),quest.required_claims.size()+quest.required_clears.size()])+(" · 正在追踪" if game.progress.tracked_quest==quest.id else "")})
 		"knowledge":
 			result.append({"id":"overview","title":"旅程总览与施法资料","text":game.presenter.journal_text(),"subtitle":"地点 · 设施 · 未取战利品"})
-			for entry in game.progress.journal: result.append({"id":entry.id,"title":entry.title,"text":entry.text,"subtitle":"亲历记录"})
+			for entry in game.progress.journal: result.append({"id":entry.id,"title":entry.title,"text":game.catalog.record_text(entry,game.progress),"subtitle":"亲历记录"})
 		"settings":
 			result.append({"id":"controls","title":"施法与快捷操作","text":"操作设置","subtitle":"键位 · 输入偏好"})
 			result.append({"id":"credits","title":"素材与许可","text":"Kenney Tiny Town · CC0\nLucide Icons · ISC / MIT\nNoto Sans SC · SIL Open Font License 1.1\n\n所有新增素材均可用于商业项目，保留对应许可与署名。","subtitle":"视觉素材来源"})
@@ -278,7 +279,7 @@ func _show_detail() -> void:
 			card.add_child(W.label("报告奖励：%d属性点"%quest.attribute_points,13,true))
 			if not game.progress.claims.has("quest."+quest.id):
 				_detail.add_child(W.button("追踪这个委托",_pin.bind(quest.id)))
-				_detail.add_child(W.button("在镇中报告",_report.bind(quest),not game.is_at_base() or not quest.is_complete(game.progress)))
+				_detail.add_child(W.button("在镇中报告",_report.bind(quest),not game.is_at_base() or not quest.can_claim(game.progress,game.player.stats_component)))
 		"knowledge":
 			_detail.add_child(W.button("查看元素关系与亲历验证",game.ui.elements_requested.emit))
 			_detail.add_child(W.button("查看实验路线记录",game.trial_recorder.show_page))

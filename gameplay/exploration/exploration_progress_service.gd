@@ -186,8 +186,7 @@ func claim_quest(quest: ExplorationQuestData, approach_id: String = "") -> bool:
 func choose_world_event(entry: ExplorationWorldEventData, choice: ExplorationWorldChoiceData) -> bool:
 	if entry not in game.current_data.events or choice not in entry.choices or game.has_hostiles_near(entry.pos):
 		return false
-	for id in entry.required_claims:
-		if not game.progress.claims.has(id): return false
+	if not game.progress.condition_query.claims_satisfied(entry.required_claims): return false
 	if entry.irreversible and game.progress.claims.has(entry.id): return false
 	game.progress.choices[entry.id] = choice.id
 	for id in choice.grants_claims:
@@ -201,9 +200,13 @@ func choose_world_event(entry: ExplorationWorldEventData, choice: ExplorationWor
 	changed.emit()
 	return true
 
+func discovery_reason(entry: ExplorationDiscoveryData) -> String:
+	if entry not in game.current_data.discoveries: return "记录已不在当前区域。"
+	if entry.requires_clear and game.has_hostiles_near(entry.pos): return "先清除附近守卫，再靠近这里调查。"
+	return ""
+
 func discover(entry: ExplorationDiscoveryData) -> bool:
-	if entry not in game.current_data.discoveries or (entry.requires_clear and game.has_hostiles_near(entry.pos)):
-		return false
+	if not discovery_reason(entry).is_empty(): return false
 	var reward := game.equipment_service.grant(entry)
 	if not game.progress.claim(entry.id, entry.title, entry.text, entry.actions, entry.spell_rules):
 		if reward:
@@ -222,8 +225,7 @@ func discover(entry: ExplorationDiscoveryData) -> bool:
 func solve_puzzle(spec: SpellPuzzleData, method_id: String = "") -> bool:
 	if spec not in game.current_data.spell_objects or game.progress.claims.has(spec.id):
 		return false
-	for claim in spec.required_claims:
-		if not game.progress.claims.has(claim): return false
+	if not game.progress.condition_query.claims_satisfied(spec.required_claims): return false
 	var costs: Dictionary = {}
 	var method_title := {"thermal_impact": "火→水→冲击", "frost_impact": "凝霜→冲击", "steam": "实际蒸汽保持0.5秒"}.get(method_id, method_id) as String
 	var accepted := method_id.is_empty() and spec.work_methods.is_empty()
@@ -251,3 +253,11 @@ func solve_puzzle(spec: SpellPuzzleData, method_id: String = "") -> bool:
 	if notify.is_valid(): notify.call()
 	changed.emit()
 	return true
+
+func quest_feedback(fact_id: String) -> String:
+	var ready: Array[String] = []
+	for quest in game.quests:
+		if fact_id not in quest.required_claims: continue
+		if quest.stage(game.progress) == ExplorationQuestData.Stage.READY:
+			ready.append(quest.title)
+	return "" if ready.is_empty() else "可回镇报告："+"、".join(ready)+"。"

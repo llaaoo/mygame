@@ -42,16 +42,31 @@ func split(uid: String,quantity: int) -> OperationResult:
  var reason:=str(management_reason.call())
  if not reason.is_empty(): return OperationResult.reject(reason)
  return _finish(session.inventory.split_stack(actor.actor_context.id,uid,quantity))
-func equip(uid: String) -> OperationResult:
- if not _available(): return OperationResult.reject("当前无法换装。")
+func equip_reason(uid: String) -> String:
+ if not _available(): return "当前无法换装。"
  var item:=session.inventory.item(uid)
- if not item: return OperationResult.reject("物品已经不在这里。")
- var reason:=str(management_reason.call())
+ if not item or not session.inventory.definitions.get(item.definition_id) is EquipmentData: return "物品已经不在这里，或不能穿戴。"
+ if session.inventory.locate(uid) not in session.inventory.actor_containers(actor.actor_context.id): return "请先把这件实物收回随身容器。"
+ return str(management_reason.call())
+func unequip_reason(slot: int) -> String:
+ if not _available(): return "当前无法换装。"
+ var reason:=str(removal_reason.call(slot))
+ if not reason.is_empty(): return reason
+ var store:=session.inventory
+ var uid: String=store.equipped(actor.actor_context.id).get(str(slot),"")
+ var item:=store.item(uid)
+ if not item: return "该部位没有穿戴装备。"
+ var pack:=actor.actor_context.id+".pack"
+ if not store.is_attached(pack): return "背包已放下，无法远程收起装备。"
+ if store.space(pack,item.definition_id,item.properties)<1: return "背包没有足够空间，装备仍在身上。"
+ return ""
+func equip(uid: String) -> OperationResult:
+ var reason:=equip_reason(uid)
  if not reason.is_empty(): return OperationResult.reject(reason)
+ var item:=session.inventory.item(uid)
  return _finish(OperationResult.success(1) if equip_request.call(item.definition_id,uid) else OperationResult.reject("无法换装：检查穿戴条件与容器空间。"))
 func unequip(slot: int) -> OperationResult:
- if not _available(): return OperationResult.reject("当前无法换装。")
- var reason:=str(removal_reason.call(slot))
+ var reason:=unequip_reason(slot)
  if not reason.is_empty(): return OperationResult.reject(reason)
  return _finish(OperationResult.success(1) if unequip_request.call(slot) else OperationResult.reject("背包没有足够空间，装备仍在身上。"))
 func take(container: String,uid: String,quantity: int) -> OperationResult:

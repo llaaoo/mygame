@@ -101,10 +101,10 @@ func _approach_evidence(approach: ExplorationQuestApproachData) -> String:
 	return "现场凭据齐备" if missing.is_empty() else "还需：" + "、".join(missing)
 
 func _show_world_event(entry: ExplorationWorldEventData) -> void:
-	for id in entry.required_claims:
-		if not game.progress.claims.has(id):
-			game.ui.notify("设备尚未接通：先处理附近的实际水路机关。")
-			return
+	var prerequisite := game.progress.condition_query.claims_reason(entry.required_claims)
+	if not prerequisite.is_empty():
+		game.ui.notify(prerequisite)
+		return
 	if game.has_hostiles_near(entry.pos):
 		game.ui.notify("附近守卫仍在巡逻，先确保设备周围安全。")
 		return
@@ -173,13 +173,14 @@ func journal_text() -> String:
 		_: text += "尚未重启。继续调查已发现的支路与设备。\n"
 	text += "\n发现记录\n"
 	for note in game.progress.journal:
-		text += "\n%s\n%s\n" % [note.title, note.text]
+		text += "\n%s\n%s\n" % [note.title, game.catalog.record_text(note,game.progress)]
 	return text
 
 
 func inspect_discovery(entry: ExplorationDiscoveryData, node: ExplorationInteractable, full: bool = false) -> void:
-	if entry.requires_clear and not game.active_enemies.is_empty():
-		game.ui.notify("先清除守卫，再靠近这里调查。")
+	var reason := game.progress_service.discovery_reason(entry)
+	if not reason.is_empty():
+		game.ui.notify(reason)
 		return
 	var first_read := not game.progress.claims.has(entry.id)
 	if game.progress_service.discover(entry):
@@ -190,7 +191,8 @@ func inspect_discovery(entry: ExplorationDiscoveryData, node: ExplorationInterac
 			node.queue_free()
 	if "hub" in game and game.hub: game.hub.remember_record(entry.id)
 	var brief := first_read and not full and not entry.intro_text.is_empty()
-	var text := entry.intro_text + "\n\n完整用法已记入J日志，可随时回看。" if brief else entry.text
+	var text := game.catalog.discovery_text(entry,game.progress,brief)
+	if brief: text += "\n\n完整用法已记入J日志，可随时回看。"
 	var buttons: Array[Dictionary] = [{"title": "记入日志，继续探索", "callback": game.ui.close_modal}]
 	if brief: buttons.append({"title": "查看完整记录", "callback": inspect_discovery.bind(entry, null, true)})
 	if not entry.equipment.is_empty(): text += "\n\n背包已满时，装备保留在原处，再次调查即可领取。"
@@ -198,7 +200,7 @@ func inspect_discovery(entry: ExplorationDiscoveryData, node: ExplorationInterac
 		var item := game.catalog.equipment.get(id) as EquipmentData
 		if item:
 			var received := game.progress.claims.has("equipment."+entry.id+"."+id)
-			text += "\n\n%s：%s\n%s\n按O查看装备与来源，返回镇中整备。" % ["已领取装备" if received else "装备留在此处（背包已满）", item.display_name, item.description]
+			text += "\n\n%s：%s\n%s\n按O查看实物与穿戴；安全时可整备。" % ["已领取装备" if received else "装备留在此处（背包已满）", item.display_name, item.description]
 			buttons.append({"title": "查看：" + item.display_name, "callback": game.equipment_service.show_detail.bind(id)})
 	game.ui.show_panel(entry.title, text, buttons)
 

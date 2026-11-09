@@ -2,9 +2,11 @@ extends RefCounted
 var tree: SceneTree
 var game: GrayriverGame
 func _init(owner_tree: SceneTree) -> void:tree=owner_tree
-func boot(persist:=false) -> GrayriverGame:
+func boot(persist:=false, freeze_player_physics:=false) -> GrayriverGame:
 	game=load("res://grayriver.tscn").instantiate()
 	game.persistence_enabled=persist
+	# Persistence assertions may isolate physics from the separately driven status clock.
+	if freeze_player_physics: game.get_node("Player").process_mode=Node.PROCESS_MODE_DISABLED
 	tree.root.add_child(game)
 	tree.current_scene=game
 	for i in range(25):await tree.process_frame

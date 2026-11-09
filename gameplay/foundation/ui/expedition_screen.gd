@@ -13,5 +13,5 @@ var rows: VBoxContainer:
 	get: return $Content/Columns/List/Rows
 var detail: VBoxContainer:
 	get: return $Content/Columns/Details/Detail
-var footer: HBoxContainer:
+var footer: VBoxContainer:
 	get: return $Content/Footer

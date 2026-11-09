@@ -165,6 +165,15 @@ func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 			completion_claims[note.id] = true
 			if note.title.is_empty() or note.text.is_empty():
 				_fail(note, "Missing discovery title/text")
+			if not is_finite(note.reading_margin) or note.reading_margin<0: _fail(note,"Invalid reading safety margin")
+			if note.reading_margin>0:
+				for encounter in region.encounters:
+					if note.pos.distance_to(encounter.pos)<encounter.detect_range+PlayerInputController.INTERACT_RANGE+note.reading_margin:
+						_fail(note,"Reading interaction overlaps initial detection: "+note.id)
+			for lead in note.navigation_hints:
+				if lead.target_claim.is_empty()==lead.target_region.is_empty(): _fail(note,"Navigation hint needs exactly one target: "+note.id)
+				elif not lead.target_region.is_empty() and not catalog.regions.has(lead.target_region): _fail(note,"Unknown navigation region: "+lead.target_region)
+				elif not lead.target_claim.is_empty() and catalog.fact(lead.target_claim).is_empty(): _fail(note,"Unknown navigation objective: "+lead.target_claim)
 			for element in note.element_clues:
 				if not ElementCatalog.definition(element): _fail(note, "Unknown clue element")
 			for action in note.actions:
@@ -218,6 +227,7 @@ func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 			if encounter.character:
 				for item in encounter.character.equipment:
 					if item and not catalog.equipment.has(item.id): _fail(encounter.character,"Unknown worn equipment: "+item.id)
+			if not is_finite(encounter.detect_range) or encounter.detect_range<=0: _fail(encounter,"Invalid detection range")
 			if encounter.hp <= 0 or encounter.speed <= 0 or encounter.role not in [0, 1, 2]:
 				_fail(encounter, "Invalid encounter")
 		for event in region.events:
@@ -310,6 +320,10 @@ func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 		if not SurvivalCatalog.TITLES.has(recipe.output): _fail(catalog.chapter, "Unknown cooking output")
 		_validate_materials(catalog.chapter, recipe.inputs, supplies)
 		if not str(recipe.unlock).is_empty() and not completion_claims.has(recipe.unlock): _fail(catalog.chapter, "Unknown cooking knowledge")
+	var dependency_states: Dictionary = {}
+	for region in catalog.chapter.regions:
+		for entries in [region.spell_objects,region.facilities,region.delivery_sites,region.events]:
+			for entry in entries: _validate_dependency(entry.id,catalog,dependency_states,entry)
 	var quest_ids: Dictionary = {}
 	for quest in catalog.chapter.quests:
 		if quest_ids.has(quest.id):
@@ -317,6 +331,8 @@ func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 		quest_ids[quest.id] = true
 		if quest.attribute_points <= 0 or quest.id.is_empty() or quest.required_claims.is_empty():
 			_fail(quest, "Invalid quest reward/objectives")
+		for id in quest.discovery_claims:
+			if not claims.has(id): _fail(quest, "Missing local quest clue: "+id)
 		for id in quest.unlock_claims:
 			if not claims.has(id): _fail(quest, "Missing quest availability clue: " + id)
 		for id in quest.required_claims:
@@ -513,3 +529,13 @@ func _validate_enemy_profile(encounter: ExplorationEncounterData, profiles: Dict
 	if profiles.has(profile.id) and profiles[profile.id] != profile:
 		_fail(profile, "Duplicate enemy profile id: " + profile.id)
 	profiles[profile.id] = profile
+
+func _validate_dependency(id: String, catalog: ExplorationContentCatalog, states: Dictionary, owner: Resource) -> void:
+	if states.get(id,0)==1:
+		_fail(owner,"Cyclic objective prerequisite: "+id)
+		return
+	if states.get(id,0)==2: return
+	states[id]=1
+	for prerequisite in catalog.fact(id).get("prerequisites",PackedStringArray()):
+		_validate_dependency(prerequisite,catalog,states,owner)
+	states[id]=2
