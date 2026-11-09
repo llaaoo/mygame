@@ -383,6 +383,7 @@ func heal(amount: int, source := "skill") -> void:
 	health_component.heal(maxi(0, int(round(amount * multiplier))), source)
 
 func cancel_active_input(reason: String) -> void:
+	if input_controller: input_controller.cancel_weapon_input()
 	if casting:
 		casting.cancel_all()
 	if skill_manager and skill_manager.combinations:

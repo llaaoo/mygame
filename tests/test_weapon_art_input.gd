@@ -3,9 +3,13 @@ extends "res://tests/support/input_scene_probe.gd"
 const Fixture=preload("res://tests/support/grayriver_fixture.gd")
 var starts: Array[Dictionary]=[]
 func click_attack(heavy := false) -> void:
-	if heavy: await key(KEY_CTRL,true)
-	await pointer_button(MOUSE_BUTTON_LEFT,true); await pointer_button(MOUSE_BUTTON_LEFT,false)
-	if heavy: await key(KEY_CTRL,false)
+
+	await pointer_button(MOUSE_BUTTON_LEFT,true)
+	if heavy:
+		var until:=game.player.actor_context.actions.weapon_art.clock+.36
+		while game.player.actor_context.actions.weapon_art.clock<until: await frames(1)
+	await pointer_button(MOUSE_BUTTON_LEFT,false)
+
 func idle() -> void:
 	for i in range(180):
 		if game.player.actor_context.actions.mode=="idle": return
@@ -43,7 +47,7 @@ func run() -> void:
 		await click_attack(); await idle()
 		await aim_world(actor.position+Vector2(150,0)); await click_attack(true); await idle()
 		var art:=actions.weapon_art_view()
-		check(not art.is_empty() and art.route=="power" and art.technique==pair[1] and art.remaining>.8,"Actual light/Ctrl-heavy did not open the shared-key window")
+		check(not art.is_empty() and art.route=="power" and art.technique==pair[1] and art.remaining>.8,"Actual light/hold-heavy did not open the shared-key window")
 		await capture("shared-art-"+MartialArts.definition(pair[1]).weapon_type)
 		await key(KEY_V,true)
 		check(starts.size()==before+3 and starts.back().weapon_art and starts.back().art_route=="power" and starts.back().technique==pair[1],"Real V did not select the current weapon's authored art")
@@ -80,5 +84,5 @@ func run() -> void:
 	await key(KEY_F5,true); await key(KEY_F5,false); await key(KEY_F9,true); await key(KEY_F9,false)
 	check(actions.weapon_art_view().is_empty() and actor.mana_component.mp==60,"Restore retained a window or physical arts spent MP")
 	await fixture.close()
-	if failures.is_empty(): print("PASS shared weapon art input: real light/Ctrl-heavy/V on four weapons, slot-free flow/H remap, natural budgets, exact arrows, no repeats/UI ghost and F5/F9 cleanup; one stationary hit target")
+	if failures.is_empty(): print("PASS shared weapon art input: real light/hold-heavy/V on four weapons, slot-free flow/H remap, natural budgets, exact arrows, no repeats/UI ghost and F5/F9 cleanup; one stationary hit target")
 	quit(0 if failures.is_empty() else 1)

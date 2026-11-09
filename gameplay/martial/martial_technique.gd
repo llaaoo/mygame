@@ -7,6 +7,8 @@ extends Resource
 @export var cooldown := 6.0
 @export var price := 8
 @export var profile: AttackProfile
+@export var charged_profile: AttackProfile
+@export var charged_followup_profile: AttackProfile
 ## An explicit input can take this route after a confirmed normal stroke.
 @export var followup_after: Array[int]=[]
 @export var followup_profile: AttackProfile
@@ -17,6 +19,9 @@ extends Resource
 @export var release_angle := 110.0
 @export var release_speed := 600.0
 func valid() -> bool:
+	for variant in [charged_profile,charged_followup_profile]:
+		if variant and (not variant.valid() or variant.title.is_empty() or (weapon_type=="bow")!=(variant.projectile_speed>0)): return false
+	if charged_followup_profile and not followup_profile: return false
 	var routes: Dictionary={}
 	for route in art_routes:
 		if not route or not route.valid() or routes.has(route.id) or route.form==MartialRoute.Form.FOLLOWUP and not followup_profile: return false
@@ -29,6 +34,11 @@ func valid() -> bool:
 		seen[stage]=true
 	return not id.is_empty() and not title.is_empty() and weapon_type in WeaponMoveset.TITLES and is_finite(cooldown) and cooldown>=0 and cooldown<=86400 and price>=0 and profile!=null and profile.valid() and is_finite(release_reach) and release_reach>0 and release_reach<=400 and is_finite(release_angle) and release_angle>0 and release_angle<=360 and is_finite(release_speed) and release_speed>0 and release_speed<=1200
 
+func attack_form(linked: bool,charged := false) -> AttackProfile:
+	if charged:
+		return charged_followup_profile if linked else charged_profile
+	return followup_profile if linked else profile
+
 func followup_description() -> String:
 	if not followup_profile: return ""
 	var stages:=PackedStringArray()
@@ -40,7 +50,7 @@ func art_route(route_id: String) -> MartialRoute:
 	return null
 func art_description(key_label: String) -> String:
 	if art_routes.is_empty(): return "此武技尚无连招路线，可选择独立快捷绑定。"
-	var text:="学习后无需占用快捷槽。共用武技键：%s；完成收招后开始窗口，Shift+该键显式释放附魔。"%key_label
+	var text:="学习后无需占用快捷槽。共用武技键：%s；完成收招后开始窗口，短按速发，长按蓄力重发；Shift+该键显式释放附魔。"%key_label
 	for route in art_routes:
 		text+="\n%s → %s · %.1f秒窗口"%[route.describe(),followup_profile.title if route.form==MartialRoute.Form.FOLLOWUP else title,route.window]
 	return text

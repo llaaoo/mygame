@@ -20,6 +20,11 @@ var sprinting := false
 const TIME_EPSILON := .000001
 const INPUT_BUFFER_SECONDS := .15
 const RECOVERY_INPUT_BUFFER_SECONDS := .35
+const WEAPON_HOLD_SECONDS := .32
+const WEAPON_HOLD_LIMIT := 2.0
+var _weapon_hold: Dictionary={}
+var _weapon_reservation: Dictionary={}
+var _gesture_serial := 0
 const PARRY_WINDOW := .18
 const PARRY_RETRY := .65
 var guard_age := 99.0
@@ -62,9 +67,11 @@ func next_attack_profile(heavy := false) -> AttackProfile:
 func inventory_changed() -> void:
 	if not context or not context.items: return
 	var uid:=str(context.items.equipped(context.id).get(str(EquipmentData.SlotType.RIGHT_HAND),""))
+	if not _weapon_hold.is_empty() and str(_weapon_hold.uid)!=uid: cancel_weapon_hold()
 	if mode=="attack" and attack_weapon_uid!=uid: cancel("weapon_changed")
 	elif not combo.weapon_uid.is_empty() and combo.weapon_uid!=uid or not weapon_art.weapon_uid.is_empty() and weapon_art.weapon_uid!=uid: _clear_sequences()
 func _clear_sequences() -> void:
+	cancel_weapon_hold(); _weapon_reservation.clear()
 	combo.reset(); weapon_art.reset()
 func combo_snapshot() -> Dictionary:
 	var view:=combo.snapshot()
@@ -181,6 +188,8 @@ func try_action(action: Action) -> OperationResult:
 	var buffs:=actor.get_node_or_null("BuffManager") as BuffManager
 	if buffs and buffs.prevents_actions(): return OperationResult.reject("controlled")
 	if "ui_blocked" in actor and actor.ui_blocked: return OperationResult.reject("interface")
+	if action.params.has("weapon_gesture"): return _weapon_gesture(action)
+	if action.action_type not in [Action.ActionType.MOVE,Action.ActionType.SPRINT,Action.ActionType.GUARD]: cancel_weapon_hold()
 	# Keep the input adapter lossless. Only execution discards an unmatched UI release.
 	if action.action_type==Action.ActionType.CAST and action.params.get("release",false) and "casting" in actor:
 		var casting: PlayerCastingController=actor.casting
@@ -197,6 +206,7 @@ func try_action(action: Action) -> OperationResult:
 			return OperationResult.success()
 		Action.ActionType.GUARD:
 			if bool(action.params.get("held",false)):
+				cancel_weapon_hold()
 				_cancel_work()
 				_cancel_cast()
 				if context.spray: context.spray.stop()
@@ -239,8 +249,12 @@ func try_action(action: Action) -> OperationResult:
 			if action.params.get("weapon_art",false) and action.skill_id.is_empty(): return OperationResult.reject("武技未发动：先完成对应连招，K查看条件")
 			if busy(): return _queue(action)
 			var weapon_uid:=str(context.items.equipped(context.id).get(str(EquipmentData.SlotType.RIGHT_HAND),""))
+			if action.params.has("gesture_weapon_uid") and str(action.params.gesture_weapon_uid)!=weapon_uid: return OperationResult.reject("所选武器已改变")
 			var weapon:=context.items.equipment_definition(weapon_uid)
+			var reserved:=int(action.params.get("gesture_id",-1))==int(_weapon_reservation.get("id",-2)) and weapon_art.clock<=float(_weapon_reservation.get("until",0)) and weapon_uid==str(_weapon_reservation.get("uid",""))
+			var reserved_stage:=int(_weapon_reservation.get("stage",-1)) if reserved and action.action_type==Action.ActionType.MELEE else -1
 			var candidate:=next_attack_profile(action.action_type==Action.ActionType.HEAVY_ATTACK)
+			if reserved_stage>=0 and weapon and weapon.moveset: candidate=weapon.moveset.attacks[reserved_stage]
 			var linked_technique:=false
 			if action.action_type==Action.ActionType.TECHNIQUE:
 				if not action.skill_source.is_empty():
@@ -252,15 +266,18 @@ func try_action(action: Action) -> OperationResult:
 				var requested_family:=str(action.params.get("followup_family",""))
 				if action.params.get("weapon_art",false):
 					var route:=data.art_route(str(action.params.get("art_route","")))
-					var match_result:=weapon_art.match_route(route) if route and weapon_art.weapon_uid==weapon_uid else {}
+					var grace:=float(_weapon_reservation.get("grace",0)) if reserved else 0.0
+					var match_result:=weapon_art.match_route(route,false,grace) if route and weapon_art.weapon_uid==weapon_uid else {}
 					if match_result.is_empty() or str(match_result.token)!=str(action.params.get("art_token","")): return OperationResult.reject("武技窗口已失效")
-					candidate=data.profile if route.form==MartialRoute.Form.BASE else data.followup_profile
 					linked_technique=route.form==MartialRoute.Form.FOLLOWUP
 				elif not requested_family.is_empty():
 					if requested_family!=combo.family or not combo.permits_followup(data,false,weapon_art.confirmed(combo.family)): return OperationResult.reject("接势窗口已失效")
-					candidate=data.followup_profile
 					linked_technique=true
-				else: candidate=data.profile
+				candidate=data.attack_form(linked_technique,bool(action.params.get("charged",false)))
+				if not candidate: return OperationResult.reject("此武技没有蓄力形式")
+			if reserved and bool(action.params.get("charged",false)) and float(action.params.get("charge_credit",0))>0:
+				candidate=candidate.duplicate(true) as AttackProfile
+				candidate.windup=maxf(.08,candidate.windup-minf(WEAPON_HOLD_SECONDS,float(action.params.charge_credit)))
 			var cost:=attack_stamina_cost(candidate)
 			if stamina.current<cost: return OperationResult.reject("stamina")
 			var ammo_uid:=context.items.ready_uid(context.id,candidate.ammo_id) if not candidate.ammo_id.is_empty() else ""
@@ -286,16 +303,17 @@ func try_action(action: Action) -> OperationResult:
 			_cancel_work(); _cancel_cast()
 			_attack_sequence+=1
 			_family="weapon.%s.%d"%[context.id,_attack_sequence]
-			if action.action_type==Action.ActionType.MELEE: combo.begin(weapon_uid,weapon.moveset if weapon else null,_family)
+			if action.action_type==Action.ActionType.MELEE: combo.begin(weapon_uid,weapon.moveset if weapon else null,_family,reserved_stage)
 			else: combo.reset()
-			if action.action_type in [Action.ActionType.MELEE,Action.ActionType.HEAVY_ATTACK]: weapon_art.begin(weapon_uid,"light" if action.action_type==Action.ActionType.MELEE else "heavy",_family,weapon.moveset.chain_window if weapon and weapon.moveset else .65)
+			if action.action_type in [Action.ActionType.MELEE,Action.ActionType.HEAVY_ATTACK]: weapon_art.begin(weapon_uid,"light" if action.action_type==Action.ActionType.MELEE else "heavy",_family,weapon.moveset.chain_window if weapon and weapon.moveset else .65,float(_weapon_reservation.get("grace",0)) if reserved and bool(_weapon_reservation.get("history",false)) else 0.0)
 			else: weapon_art.reset()
+			_weapon_reservation.clear()
 			needs.exert(.2,context.actor.get_node("StatsComponent").effective_stat("endurance"))
 			mode="attack"; elapsed=0; remaining=profile.windup+profile.active+profile.recovery
 			facing=action.direction.normalized() if action.direction.length_squared()>.01 else facing
 			_hit_targets={}
 			guarding=false
-			if context.facts: context.facts.publish("physical_action_started",context.id,{"family":_family,"technique":action.skill_id if action.action_type==Action.ActionType.TECHNIQUE else "","weapon_uid":attack_weapon_uid,"stamina":cost,"counter":counter_strike,"stroke_index":combo.current_index,"stroke_title":profile.title,"stroke_count":combo.moveset.attacks.size() if combo.active else 0,"followup":linked_technique,"art_route":str(action.params.get("art_route","")),"weapon_art":bool(action.params.get("weapon_art",false))})
+			if context.facts: context.facts.publish("physical_action_started",context.id,{"family":_family,"technique":action.skill_id if action.action_type==Action.ActionType.TECHNIQUE else "","weapon_uid":attack_weapon_uid,"stamina":cost,"counter":counter_strike,"stroke_index":combo.current_index,"stroke_title":profile.title,"stroke_count":combo.moveset.attacks.size() if combo.active else 0,"followup":linked_technique,"art_route":str(action.params.get("art_route","")),"weapon_art":bool(action.params.get("weapon_art",false)),"charged":bool(action.params.get("charged",false))})
 			return OperationResult.success()
 		Action.ActionType.DODGE:
 			if busy() and mode!="attack": return OperationResult.reject("busy")
@@ -314,6 +332,59 @@ func _queue(action: Action) -> OperationResult:
 	_buffer=action.copy_intent()
 	_buffer_time=RECOVERY_INPUT_BUFFER_SECONDS if mode=="attack" and profile and elapsed>=profile.windup+profile.active else INPUT_BUFFER_SECONDS
 	return OperationResult.reject("buffered")
+func cancel_weapon_hold() -> void:
+	_weapon_hold.clear()
+func _weapon_gesture(edge: Action) -> OperationResult:
+	var phase:=str(edge.params.weapon_gesture)
+	if phase=="cancel": cancel_weapon_hold(); return OperationResult.success()
+	if phase=="begin":
+		if mode=="spray": context.spray.stop()
+		if mode=="item": context.item_actions.cancel()
+		cancel_weapon_hold(); _weapon_reservation.clear(); _buffer=null; _buffer_time=0
+		var recovering:=mode=="attack" and profile and elapsed>=profile.windup+profile.active and remaining<=RECOVERY_INPUT_BUFFER_SECONDS+TIME_EPSILON
+		if busy() and not recovering: return OperationResult.reject("busy")
+		var request:=capture_weapon_art(edge.direction,bool(edge.params.get("release_enchantment",false))) if bool(edge.params.get("art",false)) else Action.melee(context.actor)
+		if request.params.get("weapon_art",false) and request.skill_id.is_empty(): return OperationResult.reject("武技未发动：先完成对应连招，K查看条件")
+		_gesture_serial+=1
+		var uid:=str(context.items.equipped(context.id).get(str(EquipmentData.SlotType.RIGHT_HAND),""))
+		request.params["gesture_weapon_uid"]=uid; request.params["gesture_id"]=_gesture_serial
+		var weapon:=context.items.equipment_definition(uid)
+		var stage:=combo.stage_for(uid,weapon.moveset) if weapon and weapon.moveset else -1
+		if recovering and combo.active: stage=(combo.current_index+1)%combo.moveset.attacks.size()
+		_weapon_hold={"request":request,"uid":uid,"age":0.0,"ready_age":0.0,"stage":stage,"history":weapon_art.can_continue(recovering)}
+		_cancel_work(); _cancel_cast(); guarding=false
+		return OperationResult.success()
+	if phase!="release" or _weapon_hold.is_empty(): return OperationResult.reject("unpaired_release")
+	var request: Action=_weapon_hold.request
+	var age:=float(_weapon_hold.age)
+	_weapon_reservation={"id":request.params.gesture_id,"uid":_weapon_hold.uid,"stage":_weapon_hold.stage,"history":_weapon_hold.history,"grace":age,"until":weapon_art.clock+RECOVERY_INPUT_BUFFER_SECONDS}
+	request.params["charge_credit"]=minf(WEAPON_HOLD_SECONDS,float(_weapon_hold.ready_age))
+	cancel_weapon_hold()
+	request.direction=edge.direction
+	request.params["charged"]=age+TIME_EPSILON>=WEAPON_HOLD_SECONDS
+	if request.action_type==Action.ActionType.MELEE and request.params.charged: request.action_type=Action.ActionType.HEAVY_ATTACK
+	return try_action(request)
+func weapon_hold_view() -> Dictionary:
+	if _weapon_hold.is_empty(): return {}
+	var request: Action=_weapon_hold.request
+	var charged:=float(_weapon_hold.age)+TIME_EPSILON>=WEAPON_HOLD_SECONDS
+	var candidate:=next_attack_profile(charged)
+	var weapon:=context.items.equipment_definition(str(_weapon_hold.uid))
+	if not charged and int(_weapon_hold.stage)>=0 and weapon and weapon.moveset: candidate=weapon.moveset.attacks[int(_weapon_hold.stage)]
+	if request.action_type==Action.ActionType.TECHNIQUE:
+		var data:=MartialArts.definition(request.skill_id)
+		var route:=data.art_route(str(request.params.get("art_route","")))
+		candidate=data.attack_form(route.form==MartialRoute.Form.FOLLOWUP,charged)
+	if not candidate: return {"title":"无法重发","charged":charged,"progress":1.0,"cost":0.0,"reason":"此武技没有蓄力形式","remaining":0.0,"release_enchantment":false}
+	var cost:=attack_stamina_cost(candidate)
+	var reason:=context.martial.reason(request.skill_id,context) if request.action_type==Action.ActionType.TECHNIQUE else ""
+	if reason.is_empty() and stamina.current<cost: reason="体力不足"
+	if reason.is_empty() and not candidate.ammo_id.is_empty() and context.items.ready_uid(context.id,candidate.ammo_id).is_empty(): reason="口袋缺箭"
+	if reason.is_empty() and request.params.get("release_enchantment",false) and context.items.coating_state(str(_weapon_hold.uid))!=request.params.get("enchantment_state",{}): reason="所选附魔已改变"
+	if reason.is_empty() and request.params.get("release_enchantment",false) and not context.items.coating(str(_weapon_hold.uid)): reason="武器没有可释放的元素附魔"
+	var title:=candidate.title
+	if title.is_empty(): title="武器重击" if charged else "武器轻击"
+	return {"title":title,"charged":charged,"progress":minf(1,float(_weapon_hold.age)/WEAPON_HOLD_SECONDS),"cost":cost,"reason":reason,"remaining":maxf(0,WEAPON_HOLD_LIMIT-float(_weapon_hold.age)),"release_enchantment":bool(request.params.get("release_enchantment",false))}
 func buffered_action_label() -> String:
 	if not _buffer or _buffer_time<=0: return ""
 	return {Action.ActionType.MELEE:"攻击已输入",Action.ActionType.HEAVY_ATTACK:"重击已输入",Action.ActionType.TECHNIQUE:"武技已输入",Action.ActionType.CAST:"施法已输入"}.get(_buffer.action_type,"")
@@ -322,6 +393,11 @@ func advance(delta: float) -> void:
 	var actor:=context.actor
 	if actor.get_node("HealthComponent").is_dead:
 		cancel("dead"); return
+	if not _weapon_hold.is_empty():
+		_weapon_hold.age=float(_weapon_hold.age)+delta
+		if not busy(): _weapon_hold.ready_age=float(_weapon_hold.ready_age)+delta
+		var uid:=str(context.items.equipped(context.id).get(str(EquipmentData.SlotType.RIGHT_HAND),""))
+		if float(_weapon_hold.age)>WEAPON_HOLD_LIMIT or uid!=str(_weapon_hold.uid) or not context.region.available(): cancel_weapon_hold()
 	guard_age=guard_age+delta if guarding else 99.0
 	parry_retry=maxf(0,parry_retry-delta)
 	counter_remaining=maxf(0,counter_remaining-delta)
@@ -382,6 +458,7 @@ func advance(delta: float) -> void:
 	if _buffer_time==0: _buffer=null
 	var speed:=float(actor.get("move_speed"))
 	var factor:=burden_speed()
+	if not _weapon_hold.is_empty(): factor*=.5
 	if guarding: factor*=.4
 	if mode=="attack": factor*=profile.movement_factor(elapsed)
 	if mode=="spray": factor*=.45
@@ -423,7 +500,7 @@ func attack_observation() -> Dictionary:
 	return {"serial":_attack_sequence,"windup":maxf(0,profile.windup-elapsed),"reach":maxf(profile.reach+profile.step_distance,_release_technique.release_reach if _release_technique else 0),"direction":facing,"angle":maxf(profile.angle_degrees,_release_technique.release_angle if _release_technique else 0),"heavy":profile.guard_pressure>1 or profile.windup>=.35 or _release_technique!=null}
 func is_preparing() -> bool:
 	var manager:=context.actor.get_node("SkillManager") as SkillManager
-	var preparing:=manager.combinations.is_busy() or mode in ["item","aim_item","spray"] or mode=="attack" and profile and profile.projectile_speed>0 and elapsed<profile.windup
+	var preparing:=not _weapon_hold.is_empty() or manager.combinations.is_busy() or mode in ["item","aim_item","spray"] or mode=="attack" and profile and profile.projectile_speed>0 and elapsed<profile.windup
 	if "casting" in context.actor and context.actor.casting:
 		var casting: PlayerCastingController=context.actor.casting
 		preparing=preparing or not casting._charging_source.is_empty() or not casting._channeling_source.is_empty()

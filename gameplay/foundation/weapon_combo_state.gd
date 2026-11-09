@@ -12,8 +12,8 @@ var family := ""
 func stage_for(uid: String,definition: WeaponMoveset) -> int:
 	return next_index if uid==weapon_uid and definition==moveset and remaining>0 else 0
 
-func begin(uid: String,definition: WeaponMoveset,action_family := "") -> void:
-	var index:=stage_for(uid,definition)
+func begin(uid: String,definition: WeaponMoveset,action_family := "",reserved_stage := -1) -> void:
+	var index:=reserved_stage if definition and reserved_stage>=0 and reserved_stage<definition.attacks.size() else stage_for(uid,definition)
 	reset()
 	if not definition or definition.attacks.is_empty(): return
 	weapon_uid=uid; moveset=definition; current_index=index; active=true

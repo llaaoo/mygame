@@ -33,6 +33,36 @@ stamina_cost = 25
 impact = 38
 damage_multiplier = 1.6
 title = "追身贯刺"
+[sub_resource type="Resource" id="Charged"]
+script = ExtResource("attack")
+title = "蓄势贯冲"
+step_distance = 38
+movement_multiplier = 0
+interrupts_preparation = true
+motion = "thrust"
+windup = 0.64
+active = 0.16
+recovery = 0.7
+reach = 170
+angle_degrees = 18
+stamina_cost = 33
+impact = 52
+damage_multiplier = 1.9
+[sub_resource type="Resource" id="ChargedFollowup"]
+script = ExtResource("attack")
+title = "蓄势追贯"
+step_distance = 32
+movement_multiplier = 0
+interrupts_preparation = true
+motion = "thrust"
+windup = 0.52
+active = 0.16
+recovery = 0.7
+reach = 155
+angle_degrees = 18
+stamina_cost = 33
+impact = 52
+damage_multiplier = 1.9
 [resource]
 script = ExtResource("tech")
 id = "spear_thrust"
@@ -49,3 +79,6 @@ followup_after = Array[int]([1])
 followup_profile = SubResource("Followup")
 
 art_routes = Array[ExtResource("route")]([ExtResource("power"), ExtResource("flow")])
+
+charged_profile = SubResource("Charged")
+charged_followup_profile = SubResource("ChargedFollowup")
