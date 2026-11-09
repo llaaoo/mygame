@@ -77,13 +77,13 @@ func run() -> void:
  await key(KEY_M,true); await key(KEY_M,false)
  await key(KEY_E,true); await key(KEY_E,false)
  var wheel:=game.player.material_wheel
- check(wheel.visible and not wheel.entries.is_empty(),"Learned operation missing from wheel")
+ check(wheel.visible,"Learned operation missing from wheel")
  await capture("07-payloads")
  var target:=-1
  for i in range(wheel.entries.size()):
-  if wheel.entries[i].choice.get("payload","")=="resin": target=i
- check(target>=0,"Learned resin payload missing from wheel")
- # An unavailable bottle stays visible and cannot silently bind a future replacement.
+  if wheel.entries[i].get("choice",{}).get("payload","")=="resin": target=i
+ check(target<0,"Unavailable resin bottle remained in the combat wheel")
+ # Unavailable bottles are omitted; K retains the learned catalogue.
  await key(KEY_ESCAPE,true); await key(KEY_ESCAPE,false)
  check(game.session.inventory.snapshot()==before,"Opening/cancelling payload consumed an item")
  await key(KEY_K,true); await key(KEY_K,false)

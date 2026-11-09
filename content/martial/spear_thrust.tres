@@ -4,6 +4,7 @@
 [ext_resource type="Script" path="res://gameplay/martial/martial_route.gd" id="route"]
 [ext_resource type="Resource" path="res://content/martial/routes/power.tres" id="power"]
 [ext_resource type="Resource" path="res://content/martial/routes/flow.tres" id="flow"]
+[ext_resource type="Resource" path="res://content/martial/routes/power_followup.tres" id="power_followup"]
 [sub_resource type="Resource" id="Attack"]
 script = ExtResource("attack")
 step_distance = 28.0
@@ -80,7 +81,7 @@ release_speed = 820.0
 followup_after = Array[int]([1])
 followup_profile = SubResource("Followup")
 
-art_routes = Array[ExtResource("route")]([ExtResource("power"), ExtResource("flow")])
+art_routes = Array[ExtResource("route")]([ExtResource("power"), ExtResource("flow"), ExtResource("power_followup")])
 
 charged_profile = SubResource("Charged")
 charged_followup_profile = SubResource("ChargedFollowup")

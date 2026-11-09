@@ -3,17 +3,16 @@ extends RefCounted
 ## Gameplay defaults and user overrides have one owner. Menu-only bindings can
 ## overlap world bindings; UI ownership prevents them firing in both contexts.
 const PATH := "user://actor_bindings.cfg"
-const LAYOUT_VERSION := 7
+const LAYOUT_VERSION := 8
 const KEYS := {
 	"move_left":KEY_A,"move_right":KEY_D,"move_up":KEY_W,"move_down":KEY_S,
 	"dodge":KEY_SPACE,"interact":KEY_F,"loot_all":KEY_T,"field_method":KEY_C,
-	"weapon_art":KEY_V,
 	"skill_1":KEY_1,"skill_2":KEY_2,"skill_3":KEY_3,
 	"skill_4":KEY_4,"skill_5":KEY_5,"skill_6":KEY_6,
 	"cast_left":KEY_Q,"cast_e":KEY_E,"skill":KEY_R,"sprint":KEY_ALT,"drop_pack":KEY_B,
 	"quick_item_1":KEY_7,"quick_item_2":KEY_8,"quick_item_3":KEY_9,"quick_item_4":KEY_0,
 }
-const MENU_KEYS := [KEY_TAB,KEY_ESCAPE,KEY_J,KEY_G,KEY_M,KEY_N,KEY_O,KEY_I,KEY_K,KEY_F5,KEY_F9]
+const MENU_KEYS := [KEY_TAB,KEY_ESCAPE,KEY_J,KEY_G,KEY_M,KEY_N,KEY_O,KEY_I,KEY_K,KEY_F5,KEY_F9,KEY_CTRL]
 static var loaded := false
 static func _key(code: Key) -> InputEventKey:
 	var event:=InputEventKey.new(); event.physical_keycode=code
@@ -28,13 +27,14 @@ static func defaults() -> Dictionary:
 		event.ctrl_pressed=false
 		result[action]=[event]
 	var art:=InputEventMouseButton.new(); art.button_index=MOUSE_BUTTON_LEFT; art.ctrl_pressed=true
-	result.weapon_art.push_front(art)
+	result["weapon_art"]=[art]
 	result["heavy_attack"]=[] # Optional legacy keyboard binding; mouse heavy is a gesture.
 	return result
 static func context(action: String) -> String:
 	return "loot" if action=="loot_all" else "world"
 static func _allowed(action: String,event: InputEvent) -> bool:
 	if action in ["attack","guard"]: return false
+	if action=="weapon_art": return event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_LEFT and event.ctrl_pressed and not event.shift_pressed and not event.alt_pressed
 	if event is InputEventMouseButton:
 		return event.button_index not in [MOUSE_BUTTON_LEFT,MOUSE_BUTTON_RIGHT] or action=="weapon_art" and event.button_index==MOUSE_BUTTON_LEFT and event.ctrl_pressed and not event.shift_pressed and not event.alt_pressed
 	return event is InputEventKey and event.physical_keycode not in MENU_KEYS and event.keycode not in MENU_KEYS
@@ -82,15 +82,6 @@ static func install() -> void:
 				if context(other)==context(action) and _same(event,overrides[other]): occupied=true
 			if not occupied: remaining.append(event)
 		bindings[action]=remaining
-	# A new core action must not steal an older customized shortcut.
-	if bindings.weapon_art.is_empty():
-		for code in [KEY_V,KEY_Z,KEY_X,KEY_H,KEY_Y,KEY_U,KEY_P,KEY_L]:
-			var event:=_key(code); var occupied:=false
-			for other in bindings:
-				if context(other)!="world": continue
-				for binding in bindings[other]:
-					if _same(event,binding): occupied=true
-			if not occupied: bindings.weapon_art=[event]; break
 	_apply(bindings)
 static func assign(action: String,event: InputEvent,save := true) -> OperationResult:
 	var owned:=defaults()

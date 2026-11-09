@@ -29,6 +29,7 @@ func run() -> void:
 	check(has_key("interact",KEY_F),"Legacy E interaction defeated F default")
 	var reserved:=InputEventMouseButton.new(); reserved.button_index=MOUSE_BUTTON_LEFT
 	check(not InputBindings.assign("skill_1",reserved).accepted,"Rebinding allowed a skill to steal left mouse")
+	check(not InputBindings.assign("skill_1",event(KEY_CTRL)).accepted,"Plain Ctrl was not reserved for art cycling")
 	check(not InputBindings.assign("skill_1",event(KEY_K)).accepted,"Remap stole a global menu shortcut")
 	check(not InputBindings.assign("skill_1",event(KEY_F)).accepted,"Remap duplicated world interaction")
 	var before:=InputMap.action_get_events("skill_5").size()
@@ -64,7 +65,7 @@ func run() -> void:
 	check(not InputBindings.assign("cast_e",art,false).accepted,"Shortcut stole the reserved mouse art gesture")
 	config.set_value("bindings","heavy_attack",{"key":KEY_H}); config.set_value("bindings","weapon_art",{"key":KEY_Z}); config.save(InputBindings.PATH)
 	InputBindings.loaded=false; InputBindings.install()
-	check(has_key("heavy_attack",KEY_H) and has_key("weapon_art",KEY_Z),"Mouse gesture migration discarded customized legacy keys")
+	check(has_key("heavy_attack",KEY_H) and not has_key("weapon_art",KEY_Z) and InputMap.action_has_event("weapon_art",art),"Migration failed to retire the direct art key or preserve custom heavy")
 	# A failed preference write must leave the usable runtime map intact.
 	config=ConfigFile.new(); config.set_value("layout","version",5)
 	config.set_value("bindings","skill_4",{"key":KEY_V}); config.save(InputBindings.PATH)

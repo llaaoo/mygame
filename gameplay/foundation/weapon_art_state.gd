@@ -5,6 +5,17 @@ var weapon_uid := ""
 var clock := 0.0
 var gap := 0.65
 var _steps: Array[Dictionary]=[]
+var _selected_ref := ""
+var _selection_token := ""
+func selected(token: String,references: Array) -> String:
+	if token!=_selection_token:
+		_selection_token=token; _selected_ref=str(references[0]) if not references.is_empty() else ""
+	return _selected_ref
+func cycle(token: String,references: Array) -> bool:
+	if references.size()<2: return false
+	var current:=selected(token,references)
+	_selected_ref=str(references[(references.find(current)+1)%references.size()])
+	return true
 func begin(uid: String,kind: String,family: String,chain_gap: float,hold_grace := 0.0) -> void:
 	if uid!=weapon_uid or not _steps.is_empty() and (not _steps.back().completed or clock-float(_steps.back().completed_at)>gap+hold_grace): reset()
 	weapon_uid=uid; gap=chain_gap
@@ -29,6 +40,7 @@ func advance(delta: float,uid: String) -> void:
 	if uid!=weapon_uid: reset()
 func reset() -> void:
 	weapon_uid=""; _steps.clear()
+	_selected_ref=""; _selection_token=""
 func match_route(route: MartialRoute,recovering := false,hold_grace := 0.0) -> Dictionary:
 	if _steps.size()<route.sequence.size(): return {}
 	var first:=_steps.size()-route.sequence.size()

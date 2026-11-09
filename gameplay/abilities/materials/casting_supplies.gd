@@ -244,7 +244,7 @@ func operation_plan(action: SkillData,manager: SkillManager,resolved: SkillData 
 		result.material_id=medium.material_id
 		result.costs={medium.material_id:medium.quantity}
 	var modifier:=catalog.get(str(selection.get("modifier",modifiers.get(action.get_id(),"")))) as CastingMaterialData
-	if apply_modifier and modifier and modifier.supports(action.get_id(),result.skill.get_id(),result.skill):
+	if apply_modifier and modifier and modifier.supports(action.get_id(),entry.modifier_result_id(medium,result.skill),result.skill):
 		result.skill=modifier.modify(result.skill)
 		result.costs[modifier.id]=int(result.costs.get(modifier.id,0))+1
 		result.extra_mana+=modifier.extra_mana

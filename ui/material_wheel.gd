@@ -12,15 +12,15 @@ class Ring extends Control:
    for j in range(13): polygon.append(center+Vector2.from_angle(angle+PI/8-.025-j*(PI/4-.05)/12)*74)
    var index:=wheel.page*8+i
    var color:=GameUIStyle.SURFACE_RAISED if i==wheel.hovered else GameUIStyle.PANEL_BG
-   if index>=wheel.entries.size(): color=Color(.04,.055,.055,.45)
+   if index>=wheel.entries.size() or wheel.entries[index].is_empty(): color=Color(.04,.055,.055,.45)
    draw_colored_polygon(polygon,color)
-   if i==wheel.hovered and index<wheel.entries.size(): draw_arc(center,166,angle-PI/8+.03,angle+PI/8-.03,16,GameUIStyle.GOLD,3,true)
+   if i==wheel.hovered and index<wheel.entries.size() and not wheel.entries[index].is_empty(): draw_arc(center,166,angle-PI/8+.03,angle+PI/8-.03,16,GameUIStyle.GOLD,3,true)
   draw_circle(center,70,GameUIStyle.PANEL_BG_SOLID)
   draw_arc(center,171,0,TAU,96,Color(GameUIStyle.GOLD,.35),1,true)
   draw_arc(center,70,0,TAU,64,Color(GameUIStyle.GOLD,.5),1,true)
   for i in range(8):
    var index:=wheel.page*8+i
-   if index<wheel.entries.size() and wheel.entries[index].current:
+   if index<wheel.entries.size() and wheel.entries[index].get("current",false):
     var angle: float=-PI/2+i*TAU/8
     draw_arc(center,162,angle-PI/8+.08,angle+PI/8-.08,16,GameUIStyle.ACCENT,2,true)
 var player: Player
@@ -43,6 +43,8 @@ var _detail_host: PanelContainer
 var _labels: Array[Label]=[]
 var _elapsed:=0.0
 var _entry_source := ""
+var _slot_ids: Array[String]=[]
+var _preview_choices: Dictionary={}
 var _opening_pointer:=Vector2.ZERO
 func _ready() -> void:
  layer=GameUIStyle.LAYER_MODAL+2
@@ -125,59 +127,64 @@ func close() -> void:
  player.input_controller.pointer_consumed()
  player.input_controller.suppress_held_shortcuts()
 func _refresh() -> void:
- var live:=QuickslotMaterials.options(player,source)
+ var live:=QuickslotMaterials.usable_options(player,source)
  if _entry_source!=source:
-  entries=[]
-  var groups: Dictionary={}
-  for row in live:
-   if not groups.has(row.variant_id): groups[row.variant_id]=[]
-   groups[row.variant_id].append(row)
-  for payload in groups:
-   var alternatives: Array=groups[payload]
-   var choice: Dictionary=alternatives[0]
-   for row in alternatives:
-    if row.current: choice=row; break
-   var grouped:=choice.duplicate(true); grouped["alternatives"]=alternatives
-   entries.append(grouped)
+  entries=[]; _slot_ids.clear(); _preview_choices.clear(); hovered=-1
   _entry_source=source
- else:
-  for index in range(entries.size()):
-   var old: Dictionary=entries[index]
-   var found:=false
-   for entry in live:
-    if entry.variant_id==old.variant_id and entry.choice.get("uid","")==old.choice.get("uid",""):
-     var updated: Dictionary=entry.duplicate(true); updated["alternatives"]=old.get("alternatives",[])
-     entries[index]=updated; found=true; break
-   if not found:
-    old.ready=false; old.reason="选定实物已不在口袋，请重新打开轮盘选择。"
+ var old_index:=page*8+hovered
+ var old_choice: Dictionary=entries[old_index].get("choice",{}) if hovered>=0 and old_index<entries.size() else {}
+ var groups: Dictionary={}
+ for row in live:
+  if not groups.has(row.variant_id): groups[row.variant_id]=[]
+  groups[row.variant_id].append(row)
+  if row.variant_id not in _slot_ids: _slot_ids.append(row.variant_id)
+ entries=[]
+ for id in _slot_ids:
+  if not groups.has(id): entries.append({}); continue
+  var alternatives: Array=groups[id]
+  var choice: Dictionary=alternatives[0]
+  for row in alternatives:
+   if row.choice==_preview_choices.get(id,{}) or not _preview_choices.has(id) and row.current: choice=row; break
+  var grouped: Dictionary=choice.duplicate(true); grouped["alternatives"]=alternatives
+  entries.append(grouped)
+ # Wedges keep their identity during this opening. Lost conditions leave an empty
+ # sector; they never slide a different form under a held pointer/release.
+ if hovered>=0 and (old_index>=entries.size() or entries[old_index].get("choice",{})!=old_choice): hovered=-1
  page=clampi(page,0,maxi(0,(entries.size()-1)/8))
+ if not entries.slice(page*8,(page+1)*8).any(func(row): return not row.is_empty()):
+  for index in range(entries.size()):
+   if not entries[index].is_empty():
+    page=index/8; hovered=-1; break
  var instance:=player.skill_manager.get_instance(source)
- _title.text="释放来源\n点击左侧动作或按快捷键切槽 · 滚轮翻页 / 同类切瓶 · 世界持续运行"
+ _title.text="可释放形式\n仅显示满足条件的形式 · 按快捷键切槽 · 滚轮翻页 / 同类切瓶 · 世界持续运行"
  _refresh_sources()
  _center.text=(InputBindings.label(InputBindings.action_for_source(source))+"\n"+instance.data.display_name) if instance else "尚无选材动作\nK编组已学动作"
  for i in range(8):
   var index:=page*8+i
   _labels[i].text=""
-  if index>=entries.size(): continue
+  if index>=entries.size() or entries[index].is_empty(): continue
   var entry: Dictionary=entries[index]
   _labels[i].text=("✓ " if entry.current else "")+entry.title+"\n%d MP"%entry.cost+((" · 瓶%s"%str(entry.choice.get("uid","")).trim_prefix("item.")) if not str(entry.choice.get("uid","")).is_empty() else "")
   _labels[i].add_theme_color_override("font_color",GameUIStyle.TEXT_MAIN if entry.ready else GameUIStyle.TEXT_MUTED)
  _update_detail(); _ring.queue_redraw()
 func _update_detail() -> void:
  var index:=page*8+hovered
- if hovered<0 or index>=entries.size():
-  _detail.text="选择只改变本槽来源，不施法、不消费材料。\n%s\n中键松开 / M模式点击确认 · 移回中心或Esc取消"%(("第%d/%d页"%[page+1,maxi(1,ceili(entries.size()/8.0))]) if not entries.is_empty() else "在K编组已掌握的材料操作；基础火花可直接使用。")
+ if hovered<0 or index>=entries.size() or entries[index].is_empty():
+  var has_choices:=entries.any(func(row): return not row.is_empty())
+  _detail.text="选择只改变本槽来源，不施法、不消费材料。\n%s\n中键松开 / M模式点击确认 · 移回中心或Esc取消"%(("第%d/%d页"%[page+1,maxi(1,ceili(entries.size()/8.0))]) if has_choices else QuickslotMaterials.unavailable_summary(player,source))
   return
  var entry: Dictionary=entries[index]
  _detail.text="%s · %d MP · %s\n%s\n第%d/%d页 · 中键松开 / M模式点击确认 · Esc取消"%[entry.title,entry.cost,entry.detail,entry.reason if not entry.ready else "可释放 · 确认后按原快捷键施放",page+1,maxi(1,ceili(entries.size()/8.0))]
 func _pick(point: Vector2) -> void:
  var offset:=point-(_ring.position+Vector2(180,180))
  hovered=-1 if offset.length()<74 or not _hold and offset.length()>192 else int(floor(fposmod(offset.angle()+PI/2+PI/8,TAU)/(TAU/8)))
+ var index:=page*8+hovered
+ if hovered>=0 and (index>=entries.size() or entries[index].is_empty()): hovered=-1
  _update_detail(); _ring.queue_redraw()
 func _confirm() -> void:
  var index:=page*8+hovered
- if hovered>=0 and index<entries.size():
-  if QuickslotMaterials.select(player,source,entries[index].choice):
+ if hovered>=0 and index<entries.size() and not entries[index].is_empty():
+  if QuickslotMaterials.select(player,source,entries[index].choice,true):
    last_source=source
    if save_request.is_valid(): save_request.call()
   else:
@@ -206,15 +213,18 @@ func _input(event: InputEvent) -> void:
   if event.pressed and event.button_index in [MOUSE_BUTTON_WHEEL_UP,MOUSE_BUTTON_WHEEL_DOWN]:
    var index:=page*8+hovered
    var step:=1 if event.button_index==MOUSE_BUTTON_WHEEL_DOWN else -1
-   var alternatives: Array=entries[index].get("alternatives",[]) if hovered>=0 and index<entries.size() else []
+   var alternatives: Array=entries[index].get("alternatives",[]) if hovered>=0 and index<entries.size() and not entries[index].is_empty() else []
    if alternatives.size()>1:
     var position:=0
     for i in range(alternatives.size()):
      if alternatives[i].choice.get("uid","")==entries[index].choice.get("uid",""): position=i; break
     var changed: Dictionary=alternatives[posmod(position+step,alternatives.size())].duplicate(true)
-    changed["alternatives"]=alternatives; entries[index]=changed
+    _preview_choices[str(changed.variant_id)]=changed.choice
    else: page=posmod(page+step,maxi(1,ceili(entries.size()/8.0)))
+   var sector:=hovered if alternatives.size()>1 else -1
    _refresh()
+   if sector>=0:
+    hovered=sector; _update_detail(); _ring.queue_redraw()
   elif event.button_index==MOUSE_BUTTON_LEFT:
    player.input_controller.pointer_consumed()
    if event.pressed and not _hold: _pick(event.position); _confirm()

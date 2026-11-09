@@ -54,6 +54,7 @@ func _process(_delta: float) -> void:
 		art_label.modulate=GameUIStyle.GOLD if str(hold.reason).is_empty() else GameUIStyle.TEXT_DISABLED; art_label.tooltip_text="右键/闪避/菜单取消；最多准备2秒。体力与冷却在松开接受后结算。"
 	elif not art.is_empty():
 		art_label.text="%s · %s · %s"%[InputBindings.label("weapon_art"),art.title,"收招后" if art.recovering else "%.1f秒"%art.remaining]
+		if art.get("alternatives",[]).size()>1: art_label.text+=" · Ctrl切换（%d/2）"%(art.alternatives.map(func(row): return row.title).find(art.title)+1)
 		if not str(art.reason).is_empty(): art_label.text+="\n"+str(art.reason)
 		art_label.modulate=GameUIStyle.GOLD if str(art.reason).is_empty() else GameUIStyle.TEXT_DISABLED
 		art_label.tooltip_text="手动发动武技 · 体力%.0f · Shift显式释放实际附魔"%art.cost

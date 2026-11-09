@@ -8,7 +8,7 @@ func choose(payload: String,uid := "") -> void:
  var wheel:=game.player.material_wheel
  var index:=-1
  for i in range(wheel.entries.size()):
-  if wheel.entries[i].choice.get("payload","")==payload: index=i; break
+  if wheel.entries[i].get("choice",{}).get("payload","")==payload: index=i; break
  check(index>=0,"Missing wheel payload: "+payload)
  if index<0: return
  while wheel.page!=index/8:
@@ -77,6 +77,11 @@ func run() -> void:
  await key(KEY_R,true); await key(KEY_R,false); await create_timer(.55).timeout
  check(commits.size()==2 and commits.back().cost==12 and "火球" in str(commits.back().label),"Fire field + R did not produce paid fireball feedback")
  await capture("01-fire-combination")
+ # K can prepare an unavailable form, but changing it never bypasses shared cooldown.
+ check(QuickslotMaterials.select(actor,"left",{"payload":"frost","modifier":"","uid":""}),"Preparation selection refused")
+ check(not sm.use_source("left",actor,CastContext.simple(actor,Vector2.RIGHT,sm.get_instance("left").data)),"Changing material bypassed the shared inscription cooldown")
+ QuickslotMaterials.select(actor,"left",{"payload":"ember","modifier":"","uid":""})
+ await create_timer(sm.get_cooldown("left")+.1).timeout
  # Middle-button hold mode can target a shortcut while guarding; its old release never casts.
  var center:=root.get_visible_rect().size*.5
  await mouse(MOUSE_BUTTON_RIGHT,true,Vector2(650,320))
@@ -85,7 +90,7 @@ func run() -> void:
  var wheel:=actor.material_wheel
  var index:=0
  for i in range(wheel.entries.size()):
-  if wheel.entries[i].choice.get("payload","")=="frost": index=i
+  if wheel.entries[i].get("choice",{}).get("payload","")=="frost": index=i
  var point:=wheel._ring.position+Vector2(180,180)+Vector2.from_angle(-PI/2+index*TAU/8)*125
  var move:=InputEventMouseMotion.new(); move.position=point; move.global_position=point; root.push_input(move,true); await frames()
  check(actor.actor_context.actions.guarding and actor.get_mouse_direction().is_equal_approx(wheel.opening_direction),"Opening selector dropped held guard or changed defense direction")
@@ -95,8 +100,6 @@ func run() -> void:
  await capture("02-material-wheel")
  await mouse(MOUSE_BUTTON_MIDDLE,false,point); await mouse(MOUSE_BUTTON_RIGHT,false,point)
  check(sm.shortcuts.selection("left").payload=="frost" and commits.size()==2 and sm.get_instance("left")==instance,"Hold-confirm recast, reset, or changed the wrong source")
- var refused:=sm.use_source("left",actor,CastContext.simple(actor,Vector2.RIGHT,sm.get_instance("left").data))
- check(not refused,"Changing material bypassed the shared inscription cooldown")
  # Confirming a selector and pressing its shortcut in one input frame is one new cast.
  if sm.get_cooldown("right")>0: await create_timer(sm.get_cooldown("right")+.05).timeout
  await key(KEY_M,true); await key(KEY_M,false); await key(KEY_R,true)

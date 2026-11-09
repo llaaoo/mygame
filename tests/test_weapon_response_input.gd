@@ -24,7 +24,7 @@ func run() -> void:
  var actor:=game.player; var actions:=actor.actor_context.actions
  var store:=game.session.inventory
  store.receive("player","river_staff",1); store.equip("player",store.find_owned("player","river_staff"))
- actor.actor_context.martial.learn("staff_sweep"); actor.skill_manager.shortcuts.bind_technique("quick_e","staff_sweep")
+ actor.actor_context.martial.learn("staff_sweep")
  actor.position=Vector2(-4000,800); actor.get_node("Camera2D").reset_smoothing(); await frames(12)
  game.session.facts.committed.connect(func(fact: Dictionary):
   if fact.kind=="physical_action_started" and fact.source=="player": starts.append({"frame":Engine.get_physics_frames(),"data":fact.data.duplicate(true)}))
@@ -48,9 +48,21 @@ func run() -> void:
   if actions.mode=="idle": break
   await frames(1)
  check(starts.size()==2,"Held/released mouse chained an unsolicited third stroke")
- steps.append({"input":"E","frame":Engine.get_physics_frames()})
- await key(KEY_E,true); await key(KEY_E,false)
- check(actions.mode=="attack" and starts.size()==3 and starts.back().data.technique=="staff_sweep","Independent martial key did not start the physical technique")
+ # Earn an art without shortcut bindings; allow ordinary resource recovery.
+ for i in range(300):
+  if actions.stamina.current>=95: break
+  await frames(1)
+ await attack()
+ for i in range(100):
+  if actions.mode=="idle": break
+  await frames(1)
+ await pointer_button(MOUSE_BUTTON_LEFT,true); await create_timer(.37).timeout; await pointer_button(MOUSE_BUTTON_LEFT,false)
+ for i in range(130):
+  if actions.mode=="idle": break
+  await frames(1)
+ steps.append({"input":"Ctrl+LMB","frame":Engine.get_physics_frames()})
+ await key(KEY_CTRL,true); await pointer_button(MOUSE_BUTTON_LEFT,true); await pointer_button(MOUSE_BUTTON_LEFT,false); await key(KEY_CTRL,false)
+ check(actions.mode=="attack" and starts.size()==5 and starts.back().data.technique=="staff_sweep","Combo gesture did not start the physical technique")
  await key(KEY_D,true)
  check(actor.velocity.is_zero_approx(),"Rooted technique moved during its windup")
  await wait_phase(.55+.22+.3)
@@ -61,8 +73,8 @@ func run() -> void:
  for i in range(100):
   if actions.mode=="idle": break
   await frames(1)
- check(starts.size()==3 and actor.mana_component.mp==mp and not paused,"Physical inputs spent mana, replayed an action or paused the world")
+ check(starts.size()==5 and actor.mana_component.mp==mp and not paused,"Physical inputs spent mana, replayed an action or paused the world")
  print("RESPONSE_INPUT ",JSON.stringify({"inputs":steps,"starts":starts,"recovery_speed":recovery_speed,"full_speed":actor.move_speed,"mp":actor.mana_component.mp,"stamina":actions.stamina.current,"normal_ai":game.active_enemies.all(func(e): return e.can_process())}))
  await fixture.close()
- if failures.is_empty(): print("PASS weapon response input: prompt LMB, manual buffered staff chain, 350ms pending feedback, separate E technique, committed rooting, smooth live recovery and no extra actions/MP")
+ if failures.is_empty(): print("PASS weapon response input: prompt LMB, manual buffered staff chain, 350ms pending feedback, earned combo technique, committed rooting, smooth live recovery and no extra actions/MP")
  quit(0 if failures.is_empty() else 1)

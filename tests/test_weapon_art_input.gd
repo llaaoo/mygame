@@ -10,6 +10,8 @@ func click_attack(heavy := false) -> void:
 		while game.player.actor_context.actions.weapon_art.clock<until: await frames(1)
 	await pointer_button(MOUSE_BUTTON_LEFT,false)
 
+func press_art() -> void:
+	await pointer_button(MOUSE_BUTTON_LEFT,true); await pointer_button(MOUSE_BUTTON_LEFT,false)
 func idle() -> void:
 	for i in range(180):
 		if game.player.actor_context.actions.mode=="idle": return
@@ -49,10 +51,10 @@ func run() -> void:
 		var art:=actions.weapon_art_view()
 		check(not art.is_empty() and art.route=="power" and art.technique==pair[1] and art.remaining>.8,"Actual light/hold-heavy did not open the shared-key window")
 		await capture("shared-art-"+MartialArts.definition(pair[1]).weapon_type)
-		await key(KEY_V,true)
-		check(starts.size()==before+3 and starts.back().weapon_art and starts.back().art_route=="power" and starts.back().technique==pair[1],"Real V did not select the current weapon's authored art")
+		await key(KEY_CTRL,true); await click_attack(); await key(KEY_CTRL,false)
+		check(starts.size()==before+3 and starts.back().weapon_art and starts.back().art_route=="power" and starts.back().technique==pair[1],"Ctrl+LMB did not select the current weapon's authored art")
 		check(actions.technique_status().contains(MartialArts.definition(pair[1]).title),"Shared art gave no executing-name feedback")
-		await idle(); await frames(8); await key(KEY_V,false)
+		await idle(); await frames(8)
 		check(starts.size()==before+3,"Held shared key repeated or triggered a combo macro")
 		check(actions.technique_status().contains("冷却"),"Slot-free art had no cooldown feedback")
 		check(store.count("player","arrow")==arrows-(3 if pair[0]=="river_bow" else 0),"Bow pattern/art did not spend exactly three actual arrows")
@@ -69,20 +71,43 @@ func run() -> void:
 	await capture("shared-art-flow")
 	# Remap through the same binding owner; actual H input executes the window.
 	var event:=InputEventKey.new(); event.keycode=KEY_H; event.physical_keycode=KEY_H
-	check(InputBindings.assign("weapon_art",event,false).accepted,"Shared art could not be rebound")
-	await key(KEY_H,true); await key(KEY_H,false)
-	check(starts.back().weapon_art and starts.back().art_route=="flow" and actions.profile.title=="截势斩","Remapped shared key lost the exact flow route")
+	check(not InputBindings.assign("weapon_art",event,false).accepted,"Retired direct art key could be rebound")
+	await key(KEY_CTRL,true); await press_art(); await key(KEY_CTRL,false)
+	check(starts.back().weapon_art and starts.back().art_route=="flow" and actions.profile.title=="截势斩","Ctrl+LMB lost the exact flow route")
 	target.position=actor.position+Vector2(1000,0); await idle()
 	check(QuickslotLoadout.SOURCES.all(func(source): return actor.skill_manager.shortcuts.binding(source).get("kind","")!="technique"),"Universal arts silently occupied shortcut slots")
 	await ready("blade_breaker")
 	await aim_world(actor.position+Vector2(150,0)); await click_attack(); await idle(); await click_attack(true); await idle()
 	check(not actions.weapon_art_view().is_empty(),"No window for interface cancellation test")
-	await key(KEY_I,true); await key(KEY_I,false); await key(KEY_H,true)
+	await key(KEY_I,true); await key(KEY_I,false); await key(KEY_CTRL,true)
 	await key(KEY_ESCAPE,true); await key(KEY_ESCAPE,false)
-	var count:=starts.size(); await frames(10); await key(KEY_H,false)
+	var count:=starts.size(); await frames(10); await key(KEY_CTRL,false)
 	check(actions.weapon_art_view().is_empty() and starts.size()==count and not paused,"Held art input escaped the live interface")
+	# Use another authored foe: the previous confirmed flow may have killed its target.
+	for foe in game.active_enemies:
+		if is_instance_valid(foe) and str(foe.get_meta("frontier_claim",""))=="river.enemy.camp.forest.3" and not foe.health_component.is_dead:
+			target=foe; break
+	target.set_process(false); target.set_physics_process(false)
+	target.state_chart.process_mode=Node.PROCESS_MODE_DISABLED; target.get_node("ActorComponents").process_mode=Node.PROCESS_MODE_DISABLED
+	# A real hit-earned second choice uses Ctrl alone; the execution chord must not cycle.
+	await ready("blade_breaker")
+	target.position=actor.position+Vector2(1000,0)
+	await aim_world(actor.position+Vector2(150,0)); await click_attack(); await idle()
+	target.health_component.hp=target.health_component.max_hp
+	target.position=actor.position+Vector2(45,0); await frames(3)
+	await click_attack(true); await idle()
+	var choices:=actions.weapon_art_view()
+	check(choices.alternatives.size()==2 and choices.route=="power","Actual heavy contact failed to offer two equipped arts")
+	var deadline: float=choices.remaining
+	await key(KEY_CTRL,true); await key(KEY_CTRL,false)
+	check(actions.weapon_art_view().route=="power_followup" and actions.weapon_art_view().remaining<deadline,"Ctrl tap failed to select the second art or refreshed the window")
+	await capture("same-combo-second-art")
+	await key(KEY_CTRL,true); await press_art(); await key(KEY_CTRL,false)
+	check(starts.back().art_route=="power_followup" and starts.back().followup,"Execution chord changed the Ctrl-selected art")
+	if is_instance_valid(target): target.position=actor.position+Vector2(1000,0)
+	await idle()
 	await key(KEY_F5,true); await key(KEY_F5,false); await key(KEY_F9,true); await key(KEY_F9,false)
 	check(actions.weapon_art_view().is_empty() and actor.mana_component.mp==60,"Restore retained a window or physical arts spent MP")
 	await fixture.close()
-	if failures.is_empty(): print("PASS shared weapon art input: real light/hold-heavy/V on four weapons, slot-free flow/H remap, natural budgets, exact arrows, no repeats/UI ghost and F5/F9 cleanup; one stationary hit target")
+	if failures.is_empty(): print("PASS shared weapon art input: real light/hold-heavy/Ctrl+LMB on four weapons, slot-free flow and retired direct keys, natural budgets, exact arrows, no repeats/UI ghost and F5/F9 cleanup; stationary authored hit targets")
 	quit(0 if failures.is_empty() else 1)

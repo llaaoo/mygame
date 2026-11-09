@@ -308,8 +308,11 @@ func commit(plan: TransferPlan) -> OperationResult:
 	end_batch()
 	_publish("item_transferred",source_owner,{"from":plan.source,"to":plan.destination,"definition":key,"quantity":accepted,"uids":result.item_uids})
 	return result
-func exchange(a: String,b: String,costs: Dictionary,returns: Dictionary) -> OperationResult:
+func exchange(a: String,b: String,costs: Dictionary,returns: Dictionary,return_uid := "") -> OperationResult:
 	if a==b or not can_pay(a,costs) or not can_pay(b,returns): return OperationResult.reject("insufficient_items")
+	if not return_uid.is_empty():
+		var exact:=item(return_uid)
+		if not exact or locate(return_uid) not in actor_containers(b) or returns.size()!=1 or not returns.has(exact.definition_id) or int(returns[exact.definition_id])<1 or int(returns[exact.definition_id])>exact.quantity: return OperationResult.reject("not_owned")
 	# Simulate both outgoing sides before receiving either side: full containers can swap.
 	var scratch:=InventoryService.new()
 	scratch.rules=rules; scratch.definitions=definitions
@@ -321,6 +324,7 @@ func exchange(a: String,b: String,costs: Dictionary,returns: Dictionary) -> Oper
 			for source in scratch.actor_containers(pair[0]):
 				for row in scratch.entries(source):
 					if row.definition!=key: continue
+					if pair[0]==b and not return_uid.is_empty() and row.uid!=return_uid: continue
 					var take:=mini(remaining,int(row.quantity))
 					if take<=0: continue
 					var entry:=scratch._instance(row.uid)
@@ -631,13 +635,8 @@ func _trade_instance(buyer: String,seller: String,uid: String,quantity: int,pric
 	if buyer==seller or not entry or quantity<=0 or quantity>entry.quantity or price<0 or locate(uid) not in actor_containers(seller): return OperationResult.reject("not_owned")
 	if count(buyer,"coin")<price: return OperationResult.reject("currency")
 	var scratch:=_scratch([buyer,seller])
-	if price>0 and not scratch.exchange(buyer,seller,{"coin":price},{}).accepted: return OperationResult.reject("payment_capacity")
-	var moved:=false
-	for destination in scratch.actor_containers(buyer):
-		if definitions[entry.definition_id] is EquipmentData and destination!=buyer+".pack": continue
-		if scratch.commit(scratch.preview(scratch.locate(uid),destination,uid,quantity)).accepted:
-			moved=true; break
-	if not moved: return OperationResult.reject("capacity")
+	var result:=scratch.exchange(buyer,seller,{"coin":price} if price>0 else {},{entry.definition_id:quantity},uid)
+	if not result.accepted: return result
 	if commit_result:
 		_adopt(scratch,[buyer,seller])
 		_publish("trade_committed",buyer,{"partner":seller,"uid":uid,"quantity":quantity,"price":price})

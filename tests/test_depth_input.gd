@@ -36,17 +36,21 @@ func run() -> void:
 	store.equip("player",uid)
 	await key(KEY_K,true); await key(KEY_K,false)
 	await click("武技"); await click("破势斩 · 已学")
-	var pool:=actor.skill_pool_ui
-	var index:=pool._equip_sources.find("quick_e")
-	await point_click(pool._equip_slots[index].get_global_rect().get_center())
-	check(actor.skill_manager.shortcuts.binding("quick_e").get("technique_id","")=="blade_breaker","Mouse binding did not use the independent E slot")
+	check(actor.actor_context.martial.route_slots("blade:light/heavy").size()==2,"Training did not equip the bounded combo loadout")
 	await capture("depth-martial-binder")
 	await key(KEY_ESCAPE,true); await key(KEY_ESCAPE,false)
-	await frames(5)
+	actor.position=Vector2(-4000,800); actor.get_node("Camera2D").reset_smoothing()
+	await frames(5); await aim_world(actor.position+Vector2(150,0))
 	var mp:=actor.mana_component.mp
 	var attacks:=actor.actor_context.actions._attack_sequence
-	await key(KEY_E,true); await key(KEY_E,false)
-	check(actor.actor_context.actions._attack_sequence==attacks+1 and actor.mana_component.mp==mp,"E did not execute exactly one physical technique without MP")
+	await pointer_button(MOUSE_BUTTON_LEFT,true); await pointer_button(MOUSE_BUTTON_LEFT,false)
+	await create_timer(1.0).timeout
+	await pointer_button(MOUSE_BUTTON_LEFT,true); await create_timer(.37).timeout; await pointer_button(MOUSE_BUTTON_LEFT,false)
+	for i in range(130):
+		if actor.actor_context.actions.mode=="idle": break
+		await frames(1)
+	await key(KEY_CTRL,true); await pointer_button(MOUSE_BUTTON_LEFT,true); await pointer_button(MOUSE_BUTTON_LEFT,false); await key(KEY_CTRL,false)
+	check(actor.actor_context.actions._attack_sequence==attacks+3 and actor.mana_component.mp==mp,"Combo did not execute exactly one earned physical technique without MP")
 	await create_timer(1.5).timeout
 	# Rest is selected by mouse and advances the persistent world clock on completion.
 	var rest: ExplorationInteractable
@@ -69,7 +73,7 @@ func run() -> void:
 	actor.skill_manager.shortcuts.bind_item("slot_0","guard_tonic")
 	await key(KEY_1,true); await key(KEY_1,false); await create_timer(1.3).timeout
 	check(actor.get_node("BuffManager").has_buff("guard_tonic") and store.count("player","guard_tonic")==0,"1 did not consume the real potion through normal timed input")
-	check(actor.skill_manager.shortcuts.binding("quick_e").get("kind","")=="technique","Potion shortcut replaced E")
+	check(actor.actor_context.martial.route_equipped("blade_breaker","power"),"Potion shortcut replaced combo equipment")
 	await capture("depth-provisions")
 	# A bow bought through the service uses LMB, actual arrows and no spell mana.
 	actor.position=TownServices.POINT+Vector2(0,35); actor.get_node("Camera2D").reset_smoothing(); await frames(8)
@@ -93,5 +97,5 @@ func run() -> void:
 	check(actor.actor_context.actions._attack_sequence==sequence+1 and store.count("player","arrow")==ammunition-1 and actor.mana_component.mp==mp,"Real LMB did not fire exactly one actual arrow without MP")
 	await capture("depth-bow")
 	await fixture.close()
-	if failures.is_empty(): print("PASS depth input: F workshop, mouse UID upgrade/sell/buy, trainer, K martial binding, independent E/1, hourly rest, potion and LMB bow; normal AI/simulation, controlled stock and positions")
+	if failures.is_empty(): print("PASS depth input: F workshop, mouse UID upgrade/sell/buy, trainer, K martial loadout, independent item slots, hourly rest, potion and LMB bow; normal AI/simulation, controlled stock and positions")
 	quit(0 if failures.is_empty() else 1)

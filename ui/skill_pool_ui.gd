@@ -204,8 +204,8 @@ func _bind_to_source(source: String) -> void:
 	if not _skill_manager: return
 	var accepted:=false
 	if not _selected_technique.is_empty():
-		accepted=_skill_manager.shortcuts.bind_technique(source,_selected_technique)
-		if accepted: _selected_technique=""
+		_hint_label.text="武技在连招栏装备，每个组合最多两招；法术和物品快捷槽不变。"
+		return
 	elif not _selected_item.is_empty():
 		accepted=_skill_manager.shortcuts.bind_item(source,_selected_item.item_id,str(_selected_item.get("uid","")))
 		if accepted: _selected_item.clear()
@@ -273,7 +273,20 @@ func _refresh_detail() -> void:
 		var data:=MartialArts.definition(_selected_technique)
 		_detail_box.add_child(FoundationWidgets.label(data.art_description(InputBindings.label("weapon_art")),12,true))
 		heading.text=data.title
-		_detail_box.add_child(FoundationWidgets.label(data.description+"\n体力 %.0f · 冷却 %.0f秒\n涂附后Shift+武技可消耗整层元素，释放距离%.0f / 扇面%.0f°；普通武技保留涂层。\n"%[data.profile.stamina_cost,data.cooldown,data.release_reach,data.release_angle]+data.followup_description()+"\n也可单独绑定；右键快捷槽可清除绑定。",12,true))
+		_detail_box.add_child(FoundationWidgets.label(data.description+"\n体力 %.0f · 冷却 %.0f秒。每个组合最多装备两招，轻点Ctrl切换；Ctrl+左键发动，长按重发，Shift显式释放附魔。"%[data.profile.stamina_cost,data.cooldown],12,true))
+		var actor:=_skill_manager.get_parent() as Player
+		for route in data.art_routes:
+			var reference:=data.id+"/"+route.id
+			var group:=MartialArts.route_group(data,route)
+			var slots:=actor.actor_context.martial.route_slots(group)
+			var title: String=data.title if route.form==MartialRoute.Form.BASE else data.followup_profile.title
+			_detail_box.add_child(FoundationWidgets.label(route.describe()+" → "+title,12,true))
+			var row:=HBoxContainer.new(); _detail_box.add_child(row)
+			if reference in slots:
+				row.add_child(FoundationWidgets.button("连招槽%d · 已装备"%(slots.find(reference)+1),Callable(),true))
+				row.add_child(FoundationWidgets.button("移除此招",_configure_route.bind(group,slots.find(reference),"")))
+			else:
+				for index in range(2): row.add_child(FoundationWidgets.button("装备到连招槽%d"%(index+1),_configure_route.bind(group,index,reference),index>slots.size()))
 		return
 	if not _selected_item.is_empty():
 		var view:=QuickslotView.item_state(_skill_manager.get_parent(),_selected_item)
@@ -282,7 +295,7 @@ func _refresh_detail() -> void:
 		return
 	if not _selected_skill:
 		var empty := Label.new()
-		empty.text = "① 选择动作、武技或物品\n② 配置真实来源\n③ 按目标快捷键绑定\n\n也可点击右侧槽位。E与1独立。"
+		empty.text = "动作与物品：选择真实来源，再点击右侧快捷槽。E与1独立。\n\n武技：按连招配置，每个组合最多两招；轻点Ctrl切换，Ctrl+左键发动。"
 		empty.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 		empty.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 		GameUIStyle.apply_label(empty, 10, GameUIStyle.TEXT_MUTED)
@@ -326,7 +339,7 @@ func _refresh_detail() -> void:
 			var modifier_ids: Array[String]=[""]
 			var composed:=operation.compose(payload)
 			for material: CastingMaterialData in _skill_manager.combinations.supplies.catalog.values():
-				if material.supports(_selected_skill.get_id(),composed.get_id(),composed):
+				if material.supports(_selected_skill.get_id(),operation.modifier_result_id(payload,composed),composed):
 					modifier_ids.append(material.id); modifiers.add_item("修饰："+material.title+" ×1")
 					if _selected_choice.get("modifier","")==material.id: modifiers.select(modifiers.item_count-1)
 			modifiers.item_selected.connect(func(index: int): _selected_choice["modifier"]=modifier_ids[index])
@@ -629,4 +642,11 @@ func _refresh_techniques() -> void:
 		_skill_grid.add_child(button)
 func _select_technique(id: String) -> void:
 	_selected_skill=null; _selected_item.clear(); _selected_choice.clear(); _selected_technique=id
+	_refresh_detail()
+func _configure_route(group: String,index: int,reference: String) -> void:
+	var actor:=_skill_manager.get_parent() as Player
+	var accepted:=actor.actor_context.martial.remove_route(group,index) if reference.is_empty() else actor.actor_context.martial.equip_route(reference,index)
+	_hint_label.text="连招配置已更新；同组合最多两招。" if accepted else "无法配置这条连招路线。"
+	if accepted:
+		_skill_manager.binding_changed.emit("martial_routes")
 	_refresh_detail()

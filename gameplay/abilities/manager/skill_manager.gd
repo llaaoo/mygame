@@ -245,7 +245,8 @@ func restore_skill_state(saved_state: Dictionary) -> void:
 		var entry: Variant=saved_state[source]
 		if not QuickslotLoadout.valid_entry(entry): continue
 		if entry.get("kind","")=="technique":
-			shortcuts.bind_technique(source,entry.technique_id); continue
+			shortcuts.clear(source)
+			continue # Knowledge is retained by MartialArts; obsolete hotkey slots are freed.
 		if entry.get("kind","")=="item":
 			shortcuts.bind_item(source,entry.item_id,str(entry.get("uid",""))); continue
 		var skill:=pool.get_skill(str(entry.get("skill_id","")))

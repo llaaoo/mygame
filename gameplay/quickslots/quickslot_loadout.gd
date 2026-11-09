@@ -39,9 +39,8 @@ func bind_item(source: String,id: String,uid := "") -> bool:
 	_bindings[source]={"kind":"item","item_id":id,"uid":uid}
 	_touch(source); return true
 func bind_technique(source: String,id: String) -> bool:
-	if source not in SOURCES or not MartialArts.definition(id): return false
-	_bindings[source]={"kind":"technique","technique_id":id}
-	_touch(source); return true
+	# Retired input API. Old serialized entries remain valid only for safe import.
+	return false
 func clear(source: String) -> bool:
 	if source not in SOURCES: return false
 	_bindings.erase(source); _touch(source); return true

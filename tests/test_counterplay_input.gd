@@ -25,7 +25,6 @@ func run() -> void:
 	check(QuickslotMaterials.select(actor,"left",{"payload":"resin","uid":bottle,"modifier":""}),"Fixed real resin bottle could not be selected")
 	manager.equip_source("slot_0",manager.pool.get_skill("ignite"))
 	actor.actor_context.martial.learn("staff_sweep")
-	manager.shortcuts.bind_technique("quick_e","staff_sweep")
 	# No fake damage, costs, surface creation, or direct skill calls in this sequence.
 	GameRuntime.instance.set_process(true)
 	await frames(6); aim_at(actor.position+Vector2(200,0))
@@ -37,6 +36,15 @@ func run() -> void:
 	await capture("counterplay-oil-preparation")
 	await key(KEY_1,true); await key(KEY_1,false); await create_timer(.4).timeout
 	check(actor.mana_component.mp==mp-6 and surfaces.surface_at(base+Vector2(128,0)).state=="burning","Real 1 did not turn the prepared oil into fire for 4 MP")
+	# Earn the sweep with real light/heavy strokes away from the delivery target.
+	actor.position=base; actor.get_node("Camera2D").reset_smoothing()
+	await aim_world(base+Vector2(0,-150))
+	await pointer_button(MOUSE_BUTTON_LEFT,true); await pointer_button(MOUSE_BUTTON_LEFT,false)
+	await create_timer(1.0).timeout
+	await pointer_button(MOUSE_BUTTON_LEFT,true); await create_timer(.37).timeout; await pointer_button(MOUSE_BUTTON_LEFT,false)
+	for i in range(130):
+		if actor.actor_context.actions.mode=="idle": break
+		await frames(1)
 	# Reposition the controlled fixture to demonstrate physical delivery into that
 	# same cell. Enemy decisions are disabled here; its physics/statuses remain live.
 	actor.position=base; actor.get_node("Camera2D").reset_smoothing()
@@ -49,10 +57,10 @@ func run() -> void:
 	CombatExecutor.instance.defense_resolved.connect(observer)
 	check(surfaces.surface_at(target.position).state=="dry","Delivery fixture did not start on safe ground")
 	await frames(5); aim_at(target.position)
-	await key(KEY_E,true); await key(KEY_E,false)
+	await key(KEY_CTRL,true); await pointer_button(MOUSE_BUTTON_LEFT,true); await pointer_button(MOUSE_BUTTON_LEFT,false); await key(KEY_CTRL,false)
 	await create_timer(.2).timeout; await capture("counterplay-heavy-warning")
 	await create_timer(.65).timeout
-	check(outcomes.any(func(outcome): return outcome.get("pushed",false)),"Real E sweep produced no qualified physical push")
+	check(outcomes.any(func(outcome): return outcome.get("pushed",false)),"Real combo sweep produced no qualified physical push")
 	check(target.position.x>base.x+90 and surfaces.surface_at(target.position).state=="burning","Sweep did not carry the target into the player-created fire")
 	var hp:=target.health_component.hp
 	await capture("counterplay-delivered-into-fire")
@@ -72,7 +80,7 @@ func run() -> void:
 	stock=game.session.inventory
 	check(stock.item(bottle)!=null and int(stock.item(bottle).properties.doses)==2,"Actual save/reentry refilled or replaced the selected bottle")
 	check(game.player.actor_context.actions.mode=="idle" and game.player.actor_context.actions.push_recovery==0,"Reentry restored transient combat control")
-	check(game.player.skill_manager.shortcuts.binding("quick_e").get("technique_id","")=="staff_sweep","Reentry lost the independent martial binding")
+	check(game.player.actor_context.martial.route_equipped("staff_sweep","power"),"Reentry lost the martial route loadout")
 	await fixture.close()
-	if failures.is_empty(): print("PASS counterplay input: real Q resin, 1 ignition, E sweep into created fire, real DOT, resource identity and save/reentry")
+	if failures.is_empty(): print("PASS counterplay input: real Q resin, 1 ignition, combo sweep into created fire, real DOT, resource identity and save/reentry")
 	quit(0 if failures.is_empty() else 1)
