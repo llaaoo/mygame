@@ -11,6 +11,8 @@
 
 ## 当前执行边界（2026-11-06）
 
+2026-11-09：[武器普攻连段](WEAPON_COMBOS.md)由每角色WeaponComboState持有瞬态进度，在实际挥出且完成收招后开放下一段。每段独立真实输入、费用和命中family；取消/主手UID变化/菜单清理进度，失败不推进，不保存到Resource或存档。AI/UI共用下一段与费用查询。
+
 物理动作新增共用 ActorActionController：体力在接受攻击/闪避时消费，前摇后命中，格挡/闪避资格在直接命中的 ON_HIT 前判定；稳定性和重击仍走同一 CombatExecutor。详见 [RPG 基座](./RPG_FOUNDATION.md)。
 
 2026-11-07 UTC：物理动作可在HitContext携带不可变AttackProfile；精准格挡、格挡压力、打断和位移规则见[武器纵深](COMBAT_DEPTH.md)。命中前采样准备状态，资格拒绝不产生额外物理效果；伤害成立后结算打断/击退，反馈读取最终HitResult。

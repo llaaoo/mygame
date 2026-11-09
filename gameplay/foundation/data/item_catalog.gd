@@ -28,9 +28,7 @@ func validation_errors() -> Array[String]:
 		if not is_finite(item.weight) or item.weight<0 or item.max_stack<1: errors.append("Invalid item capacity/weight: "+item.id)
 		if item is EquipmentData and item.attack_profile and not item.attack_profile.valid(): errors.append("Invalid attack profile: "+item.id)
 		if item is EquipmentData and item.moveset:
-			if item.moveset.attacks.is_empty() or not is_finite(item.moveset.chain_window) or item.moveset.chain_window<=0: errors.append("Invalid weapon moveset: "+item.id)
-			for attack in item.moveset.attacks:
-				if not attack or not attack.valid(): errors.append("Invalid moveset stroke: "+item.id)
+			if not item.moveset.valid(): errors.append("Invalid weapon moveset: "+item.id)
 		if item.use_profile:
 			var use:=item.use_profile
 			errors.append_array(use.validation_errors())

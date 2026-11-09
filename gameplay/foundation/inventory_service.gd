@@ -693,7 +693,9 @@ func equipment_definition(uid: String) -> EquipmentData:
 	if not definition: return null
 	var level:=clampi(int(entry.properties.get("upgrade_level",0)),0,3)
 	if level==0: return definition
-	var copy:=definition.duplicate(true) as EquipmentData
+	# Upgrades change instance-derived stats, never shared moveset/affix definitions.
+	var copy:=definition.duplicate() as EquipmentData
+	copy.stat_modifiers=definition.stat_modifiers.duplicate(true)
 	copy.display_name+=" +%d"%level
 	var key:="attack_damage" if copy.slot_type==EquipmentData.SlotType.RIGHT_HAND else "max_hp"
 	copy.stat_modifiers[key]=float(copy.stat_modifiers.get(key,0))+level*(1 if key=="attack_damage" else 4)

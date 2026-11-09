@@ -25,7 +25,7 @@ func run() -> void:
 	check(actions.try_action(request).accepted and actions.profile==load("res://content/weapons/blade.tres").attacks[0],"Blade did not use its own first stroke")
 	var first_damage:=actions.profile.damage_multiplier
 	actions.advance(.61)
-	check(actions.mode=="idle" and actions.combo_index==1,"A single press automatically chained another attack")
+	check(actions.mode=="idle" and actions.combo.next_index==1,"A single press automatically chained another attack")
 	check(actions.try_action(request).accepted and actions.profile.damage_multiplier>first_damage,"New attack press did not progress the chain")
 	actions.advance(2)
 	check(actions.try_action(request).accepted and actions.profile.damage_multiplier==first_damage,"Expired chain window did not reset stroke")
@@ -37,7 +37,7 @@ func run() -> void:
 	target.health_component.invincible=false
 	check(actions.contact(target).accepted,"Spear long reach did not produce real contact")
 	actions.interrupt(.5)
-	check(actions.combo_index==0 and actions.combo_remaining==0,"Stagger preserved a prepared chain finisher")
+	check(actions.combo.snapshot().is_empty(),"Stagger preserved a prepared chain finisher")
 	actions.cancel(); actions.stamina.current=100
 	context.martial.learn("spear_thrust")
 	var skill:=Action.new(); skill.action_type=Action.ActionType.TECHNIQUE; skill.skill_id="spear_thrust"; skill.direction=Vector2.RIGHT

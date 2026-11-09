@@ -1,5 +1,8 @@
 class_name AttackProfile
 extends Resource
+@export var title := ""
+## Presentation mirrors only the authored swing; hit qualification stays symmetric.
+@export_enum("Reverse:-1","Forward:1") var swing_direction := 1
 @export_range(1,4,.05) var guard_pressure := 1.0
 @export var interrupts_preparation := false
 @export_range(0,100,1) var push_distance := 0.0
@@ -30,6 +33,7 @@ func heavy() -> AttackProfile:
 	return value
 
 func valid() -> bool:
+	if swing_direction not in [-1,1]: return false
 	for key in ["guard_pressure","push_distance","step_distance","projectile_speed","windup","active","recovery","reach","angle_degrees","stamina_cost","impact","damage_multiplier","movement_multiplier","recovery_movement_multiplier"]:
 		if not is_finite(float(get(key))) or float(get(key))<0: return false
 	if guard_pressure<1 or guard_pressure>4 or push_distance>100 or step_distance>40 or motion not in ["slash","thrust","sweep","shot"]: return false

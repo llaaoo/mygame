@@ -76,10 +76,16 @@ func choose(target: Node2D) -> Array[Action]:
 				var drink:=Action.new(); drink.action_type=Action.ActionType.USE_ITEM; drink.skill_id="clean_water"; return [drink]
 			return [Action.move(-actor.get_target_direction()*.65,actor)]
 		var weapon:=store.equipment_definition(weapon_uid)
-		var reach:=weapon.moveset.attacks[0].reach if weapon and weapon.moveset and not weapon.moveset.attacks.is_empty() else actor.attack_range
+		var next_stroke:=actions.next_attack_profile()
+		var guard_break:=false
+		if weapon and weapon.world_shape in ["blade","spear","staff"] and target_context and target_context.actions.guarding and actions.stamina.current>40:
+			var heavy_stroke:=actions.next_attack_profile(true)
+			if actions.stamina.current>=actions.attack_stamina_cost(heavy_stroke):
+				guard_break=true; next_stroke=heavy_stroke
+		var reach:=next_stroke.reach if weapon else actor.attack_range
 		if weapon and weapon.moveset and weapon.moveset.weapon_type=="bow" and store.can_pay(owner_id,{"arrow":1},true):
 			if dist<140: return [Action.move(-actor.get_target_direction(),actor)]
-			if dist<=reach and _offense_cooldown<=0:
+			if dist<=reach and _offense_cooldown<=0 and actions.stamina.current>=actions.attack_stamina_cost(next_stroke):
 				if not shot_lane_clear(target): return _reposition_for_shot(target)
 				var shot:=Action.melee(actor); shot.direction=actor.get_target_direction(); return [shot]
 		if dist<=reach and (_offense_cooldown>0 or _ally_striking(target)):
@@ -87,9 +93,9 @@ func choose(target: Node2D) -> Array[Action]:
 			return [Action.move(actor.get_target_direction().orthogonal()*.35-actor.get_target_direction()*backstep,actor)]
 		if dist<=reach and weapon and weapon.world_shape in ["blade","spear","staff"]:
 			if _crowded(target): return _reposition_for_shot(target)
-			if target_context and target_context.actions.guarding and actions.stamina.current>40:
+			if guard_break:
 				var heavy:=Action.new(); heavy.action_type=Action.ActionType.HEAVY_ATTACK; heavy.direction=actor.get_target_direction(); return [heavy]
-			if actions.stamina.current>=16: return [Action.melee(actor)]
+			if actions.stamina.current>=actions.attack_stamina_cost(next_stroke): return [Action.melee(actor)]
 		# A visible preparation in striking distance invites pressure, not free setup.
 		if target_context and target_context.actor.get_node("SkillManager").combinations.is_busy() and dist<180 and actions.stamina.current>24:
 			return [Action.move(actor.get_target_direction(),actor)]
