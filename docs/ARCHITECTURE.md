@@ -8,7 +8,7 @@
 
 2026-11-09：[评审修复与验证](reviews/WORLD_FEEDBACK_REMEDIATION.md)统一内容引用与前置查询、派生任务阶段和装备详情入口。`ExplorationContentCatalog`只查询不可变定义；`ConditionQuery`读取当前事实；任务Resource派生阶段。`InventoryActions`提供穿戴/卸下原因查询与执行重验，所有持有装备详情进入同一`ActorInventoryScreen`，UID与库存权威仍为`InventoryService`。
 
-2026-11-09：[行路者手册界面](UI_AND_INTERACTION.md)共享`ExpeditionNavigation`与`GameUIStyle`外观组件；`GrayriverGame`注入现有页面路由，界面保存自己的浏览上下文。绑定继续进入`QuickslotLoadout`，选材继续进入`QuickslotMaterials`，库存变化继续进入`InventoryActions/InventoryService`，不增加第二套导航以外的领域权威。
+2026-11-09：[行路者手册界面](UI_AND_INTERACTION.md)共享`ExpeditionNavigation`与`GameUIStyle`外观组件；`GrayriverGame`注入现有页面路由，界面保存自己的浏览上下文。绑定继续进入`QuickslotLoadout`，选材继续进入`QuickslotMaterials`，库存变化继续进入`InventoryActions/InventoryService`，页面不成为新的库存、绑定或世界状态写入者。
 
 ## 请求、查询与事实
 
