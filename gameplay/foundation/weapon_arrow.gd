@@ -28,6 +28,7 @@ func _physics_process(delta: float) -> void:
 				skill.enchantment_buildup=enchantment.release_buildup if release_technique else enchantment.buildup
 			var result:=CombatExecutor.report_hit(context.actor,target,damage,hit.position,skill,skill.tags,family,profile.impact,profile,Vector2(hit.position)-direction*8)
 			if is_instance_valid(context.actions): context.actions.confirm_weapon_hit(family,result,target)
+			if result.damage_dealt>0 and context.reward_eligible and context.facts and (not "rewards_enabled" in target or target.rewards_enabled): context.facts.publish("melee_hit",context.id,{"target":str(target.get_instance_id()),"damage":result.damage_dealt,"family":family})
 		if release_technique:
 			var wave:=EnchantmentWave.new(); wave.context=context; wave.enchantment=enchantment; wave.technique=release_technique
 			wave.direction=direction; wave.family=family

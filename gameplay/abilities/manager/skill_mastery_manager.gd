@@ -7,12 +7,13 @@ signal character_leveled(new_level: int)
 signal perk_points_changed(school: int, points: int)
 signal perk_unlocked(school: int, perk_id: String)
 
-const LEVELS_PER_CHAR_LEVEL: int = 3
+const LEVELS_PER_CHAR_LEVEL: int = 3 # Legacy serialization only; StatsComponent owns level.
 const XP_DAMAGE_SCALE: float = 0.5
 const XP_BUFF_BASE: float = 10.0
 const XP_SUMMON_BASE: float = 15.0
 const XP_CHANNEL_TICK: float = 2.0
 const XP_KILL_BONUS: float = 5.0
+const MODIFIER_KEYS := ["buff.duration.all", "buff.ice_armor.duration", "carry.maximum", "combat.counter_damage", "combat.impact", "cooldown.dash", "craft.ammunition", "damage.all", "damage.fire", "damage.ice", "damage.lightning", "damage.shadow", "harvest.herbs", "mana_cost.all", "mana_cost.fire", "mana_cost.ice", "mana_cost.shadow", "rest.fatigue", "salvage.scrap", "stamina.art", "stamina.attack", "stamina.dodge", "stamina.guard", "stamina.guarding_regen", "stamina.maximum", "stamina.regeneration", "stamina.sprint", "status.burning_duration", "status.frozen_duration", "status.poison_duration", "summon.damage_multiplier", "summon.duration_multiplier", "summon.hp_multiplier", "summon.max_count", "survival.fed_regen", "survival.needs", "upgrade.coin_discount", "work.duration"]
 const ICE_ARMOR_NAME := "ice_armor"
 const TREE_RESOURCE_PATHS := {
 	SkillMastery.School.DESTRUCTION: "res://gameplay/abilities/data/trees/destruction_tree.tres",
@@ -20,29 +21,32 @@ const TREE_RESOURCE_PATHS := {
 	SkillMastery.School.RESTORATION: "res://gameplay/abilities/data/trees/restoration_tree.tres",
 	SkillMastery.School.ALTERATION: "res://gameplay/abilities/data/trees/alteration_tree.tres",
 	SkillMastery.School.ILLUSION: "res://gameplay/abilities/data/trees/illusion_tree.tres",
+	SkillMastery.School.MELEE: "res://gameplay/abilities/data/trees/melee_tree.tres",
+	SkillMastery.School.DEFENSE: "res://gameplay/abilities/data/trees/defense_tree.tres",
+	SkillMastery.School.CRAFTING: "res://gameplay/abilities/data/trees/crafting_tree.tres",
+	SkillMastery.School.SURVIVAL: "res://gameplay/abilities/data/trees/survival_tree.tres",
 }
 
 var _masteries: Dictionary = {}
 var _trees: Dictionary = {}
+var _perk_catalog: Dictionary = {}
 var _tree_resources: Dictionary = {}
 var _unlocked_perks: Dictionary = {}
-var _character_level: int = 1
+var _legacy_credit := 0
+var revision := 0
 var _total_mastery_levels: int = 0
 var _owner_entity: Node = null
 
 
 func setup(owner: Node = null) -> void:
 	_owner_entity = owner
-	for school in [
-		SkillMastery.School.DESTRUCTION,
-		SkillMastery.School.CONJURATION,
-		SkillMastery.School.ALTERATION,
-		SkillMastery.School.ILLUSION,
-		SkillMastery.School.RESTORATION,
-	]:
+	for school in TREE_RESOURCE_PATHS:
 		_ensure_mastery(school)
 		_trees[school] = _load_tree_for_school(school)
 		_unlocked_perks[school] = []
+	_perk_catalog=definitions()
+	var stats:=_stats()
+	if stats and not stats.leveled_up.is_connected(_on_character_level): stats.leveled_up.connect(_on_character_level)
 	_recompute_totals()
 
 
@@ -61,7 +65,7 @@ func get_mastery(school: SkillMastery.School) -> SkillMastery:
 
 
 func get_character_level() -> int:
-	return _character_level
+	return _stats().level if _stats() else 1
 
 
 func get_all_masteries() -> Array[SkillMastery]:
@@ -117,9 +121,36 @@ func get_unlocked_perks_for_school(school: SkillMastery.School) -> Array[String]
 	return result
 
 
-func get_available_perk_points(school: SkillMastery.School) -> int:
-	var mastery := get_mastery(school)
-	return mastery.perk_points if mastery else 0
+func get_available_perk_points(_school: int = -1) -> int:
+	var spent:=0
+	for ids in _unlocked_perks.values():
+		for id in ids:
+			var perk:=_find_perk(id)
+			if perk: spent+=perk.cost
+	return maxi(0,get_character_level()-1+_legacy_credit-spent)
+
+func _stats() -> StatsComponent:
+	return _owner_entity.get_node_or_null("StatsComponent") as StatsComponent if is_instance_valid(_owner_entity) else null
+
+func _on_character_level(level: int) -> void:
+	character_leveled.emit(level)
+	if is_instance_valid(_owner_entity) and "actor_context" in _owner_entity and _owner_entity.actor_context and _owner_entity.actor_context.facts: _owner_entity.actor_context.facts.publish("character_leveled",_owner_entity.actor_context.id,{"level":level})
+	perk_points_changed.emit(-1,get_available_perk_points())
+
+func unlock_reason(perk_id: String) -> String:
+	var perk:=_find_perk(perk_id)
+	if not perk: return "未知Perk"
+	if has_perk(perk_id): return "已学习"
+	if _owner_entity and _owner_entity.get_node("HealthComponent").is_dead: return "死亡时无法学习"
+	if get_character_level()<perk.required_character_level: return "需要角色等级%d"%perk.required_character_level
+	var mastery:=get_mastery(perk.school)
+	if not mastery or mastery.level<perk.required_level: return "需要分支熟练度%d"%perk.required_level
+	for key in perk.required_attributes:
+		if not _stats() or int(_stats().get(key))<int(perk.required_attributes[key]): return "需要基础%s%d"%[StatsComponent.primary_title(key),perk.required_attributes[key]]
+	for id in perk.prerequisite_ids:
+		if not has_perk(id): return "先学习："+_find_perk(id).display_name
+	if get_available_perk_points()<perk.cost: return "Perk点数不足"
+	return ""
 
 
 func has_perk(perk_id: String) -> bool:
@@ -135,49 +166,26 @@ func get_perk(perk_id: String) -> SkillPerkData:
 
 
 func unlock_perk(perk_id: String) -> bool:
-	var perk := _find_perk(perk_id)
-	if not perk:
-		return false
-	if has_perk(perk_id):
-		return false
-
-	var mastery := get_mastery(perk.school)
-	if not mastery or mastery.level < perk.required_level:
-		return false
-	if mastery.perk_points < perk.cost:
-		return false
-	for req: String in perk.prerequisite_ids:
-		if not has_perk(req):
-			return false
-
-	mastery.perk_points -= perk.cost
-	var unlocked: Array = _unlocked_perks.get(perk.school, [])
-	unlocked.append(perk.perk_id)
-	_unlocked_perks[perk.school] = unlocked
-	perk_points_changed.emit(perk.school, mastery.perk_points)
-	perk_unlocked.emit(perk.school, perk.perk_id)
+	if not unlock_reason(perk_id).is_empty(): return false
+	var perk:=_find_perk(perk_id)
+	var unlocked: Array=_unlocked_perks[perk.school]
+	unlocked.append(perk_id); revision+=1
+	if _owner_entity.has_method("_apply_stats"): _owner_entity._apply_stats()
+	perk_points_changed.emit(-1,get_available_perk_points())
+	perk_unlocked.emit(perk.school,perk_id)
+	if "actor_context" in _owner_entity and _owner_entity.actor_context and _owner_entity.actor_context.facts: _owner_entity.actor_context.facts.publish("perk_learned",_owner_entity.actor_context.id,{"perk":perk_id})
 	return true
-
 
 func can_unlock_perk(perk_id: String) -> bool:
-	var perk := _find_perk(perk_id)
-	if not perk or has_perk(perk_id):
-		return false
-	var mastery := get_mastery(perk.school)
-	if not mastery or mastery.level < perk.required_level or mastery.perk_points < perk.cost:
-		return false
-	for req: String in perk.prerequisite_ids:
-		if not has_perk(req):
-			return false
-	return true
+	return unlock_reason(perk_id).is_empty()
 
 
 func get_modifier_value(key: String, default_value: float = 0.0) -> float:
-	var value := default_value
-	for school in _trees.keys():
-		for perk in _trees[school]:
-			if has_perk(perk.perk_id):
-				value += float(perk.modifier_bonuses.get(key, 0.0))
+	var value:=default_value
+	for ids in _unlocked_perks.values():
+		for id in ids:
+			var perk:=_find_perk(id)
+			if perk: value+=float(perk.modifier_bonuses.get(key,0))
 	return value
 
 
@@ -232,7 +240,9 @@ func serialize_state() -> Dictionary:
 			perk_ids.append(str(perk_id))
 		unlocked[str(school)] = perk_ids
 	return {
-		"character_level": _character_level,
+		"schema": 2,
+		"legacy_credit": _legacy_credit,
+		"character_level": get_character_level(),
 		"total_mastery_levels": _total_mastery_levels,
 		"masteries": masteries,
 		"unlocked_perks": unlocked,
@@ -240,23 +250,23 @@ func serialize_state() -> Dictionary:
 
 
 func restore_state(data: Dictionary) -> void:
-	for school_key in data.get("masteries", {}).keys():
-		var school := int(school_key)
-		var mastery := _ensure_mastery(school)
-		var raw: Dictionary = data["masteries"][school_key]
-		mastery.level = raw.get("level", mastery.level)
-		mastery.xp = raw.get("xp", mastery.xp)
-		mastery.xp_to_next = raw.get("xp_to_next", mastery.xp_to_next)
-		mastery.perk_points = raw.get("perk_points", mastery.perk_points)
-
-	for school_key in data.get("unlocked_perks", {}).keys():
-		var school := int(school_key)
-		var perk_ids: Array[String] = []
-		for perk_id in data["unlocked_perks"][school_key]:
-			perk_ids.append(str(perk_id))
-		_unlocked_perks[school] = perk_ids
-
-	_recompute_totals()
+	if not valid_state(data,get_character_level()): return
+	# Full replacement, so in-place F9 cannot retain a later purchase or mastery.
+	_masteries.clear(); _unlocked_perks.clear()
+	for school in TREE_RESOURCE_PATHS:
+		var mastery:=_ensure_mastery(school)
+		var raw: Dictionary=data.get("masteries",{}).get(str(school),data.get("masteries",{}).get(school,{}))
+		mastery.level=int(raw.get("level",1)); mastery.xp=float(raw.get("xp",0)); mastery.xp_to_next=float(raw.get("xp_to_next",15))
+		_unlocked_perks[school]=data.get("unlocked_perks",{}).get(str(school),data.get("unlocked_perks",{}).get(school,[])).duplicate()
+	_legacy_credit=int(data.get("legacy_credit",0))
+	if int(data.get("schema",1))<2:
+		var old_budget:=0
+		for raw in data.get("masteries",{}).values(): old_budget+=int(raw.get("perk_points",0))
+		for ids in _unlocked_perks.values():
+			for id in ids: old_budget+=_find_perk(id).cost
+		_legacy_credit=maxi(0,old_budget-(get_character_level()-1))
+	revision+=1; _recompute_totals()
+	if _owner_entity.has_method("_apply_stats"): _owner_entity._apply_stats()
 
 
 func on_skill_cast(skill: SkillData) -> void:
@@ -299,29 +309,21 @@ func on_kill(school: SkillMastery.School) -> void:
 
 
 func _add_xp(mastery: SkillMastery, amount: float) -> void:
-	if amount <= 0:
-		return
-	var previous_points := mastery.perk_points
-	var leveled := mastery.add_xp(amount)
-	var progress := mastery.get_progress()
-	mastery_xp_gained.emit(mastery.skill_id, mastery.school, amount, mastery.level, progress)
-	if leveled:
-		mastery_leveled.emit(mastery.skill_id, mastery.school, mastery.level)
-		if mastery.perk_points != previous_points:
-			perk_points_changed.emit(mastery.school, mastery.perk_points)
-		_recompute_totals()
+	if amount <= 0 or not is_finite(amount): return
+	if is_instance_valid(_owner_entity) and "actor_context" in _owner_entity and _owner_entity.actor_context and not _owner_entity.actor_context.reward_eligible: return
+	var old_level:=mastery.level
+	var leveled:=mastery.add_xp(minf(amount,1000000))
+	mastery.perk_points=0 # Legacy local fields are never another spendable budget.
+	_recompute_totals()
+	if leveled and _stats(): _stats().add_experience((mastery.level-old_level)*25)
+	mastery_xp_gained.emit(mastery.skill_id,mastery.school,amount,mastery.level,mastery.get_progress())
+	if leveled: mastery_leveled.emit(mastery.skill_id,mastery.school,mastery.level)
 
 
 func _recompute_totals() -> void:
 	_total_mastery_levels = 0
 	for mastery in _masteries.values():
 		_total_mastery_levels += max(0, mastery.level - 1)
-	var new_level := 1 + _total_mastery_levels / LEVELS_PER_CHAR_LEVEL
-	if new_level > _character_level:
-		_character_level = new_level
-		character_leveled.emit(_character_level)
-	else:
-		_character_level = new_level
 
 
 func _guess_school(skill: SkillData) -> SkillMastery.School:
@@ -329,11 +331,7 @@ func _guess_school(skill: SkillData) -> SkillMastery.School:
 
 
 func _find_perk(perk_id: String) -> SkillPerkData:
-	for school in _trees.keys():
-		for perk in _trees[school]:
-			if perk.perk_id == perk_id:
-				return perk
-	return null
+	return _perk_catalog.get(perk_id) as SkillPerkData
 
 
 func _load_tree_for_school(school: SkillMastery.School) -> Array[SkillPerkData]:
@@ -348,92 +346,84 @@ func _load_tree_for_school(school: SkillMastery.School) -> Array[SkillPerkData]:
 				if perk_resource:
 					perks.append(perk_resource)
 			return perks
-	return _build_default_tree(school)
-
-
-func _build_default_tree(school: SkillMastery.School) -> Array[SkillPerkData]:
-	match school:
-		SkillMastery.School.DESTRUCTION:
-			return [
-				_make_perk("destruction_scorch", school, "余烬加深", "火焰系伤害提升 15%。", 5, {"damage.fire": 0.15}),
-				_make_trigger_perk("destruction_firestorm", school, "焚灭余烬", "火焰击杀后自动引爆烈焰风暴。", 10, "flame_storm", CombatEvent.Type.ON_KILL, "fire", "", ["destruction_scorch"]),
-				_make_perk("destruction_storm_web", school, "雷网", "闪电链额外弹射 2 次。", 20, {"chain.lightning_bounces": 2.0}, ["destruction_firestorm"]),
-				_make_perk("destruction_deepfreeze", school, "霜蚀", "冰系伤害提升 12%，冻结持续时间提升 50%。", 30, {"damage.ice": 0.12, "status.frozen_duration": 0.5}, ["destruction_storm_web"]),
-			]
-		SkillMastery.School.CONJURATION:
-			return [
-				_make_perk("conjuration_extra_slot", school, "并行契约", "召唤上限 +1。", 5, {"summon.max_count": 1.0}),
-				_make_perk("conjuration_iron_pact", school, "铁誓", "召唤物生命提升 25%。", 10, {"summon.hp_multiplier": 0.25}, ["conjuration_extra_slot"]),
-				_make_perk("conjuration_battle_drum", school, "战鼓", "召唤物伤害提升 25%。", 20, {"summon.damage_multiplier": 0.25}, ["conjuration_iron_pact"]),
-				_make_perk("conjuration_long_service", school, "长役", "召唤持续时间提升 50%。", 30, {"summon.duration_multiplier": 0.5}, ["conjuration_battle_drum"]),
-			]
-		SkillMastery.School.RESTORATION:
-			return [
-				_make_perk("restoration_stability", school, "稳态", "所有增益持续时间提升 20%。", 5, {"buff.duration.all": 0.2}),
-				_make_perk("restoration_mending", school, "复原", "恢复类技能冷却缩短 10%。", 10, {"cooldown.heal": -0.1}, ["restoration_stability"]),
-				_make_perk("restoration_cleanse", school, "净化", "燃烧与中毒的持续时间缩短 35%。", 20, {"status.burning_duration": -0.35, "status.poison_duration": -0.35}, ["restoration_mending"]),
-				_make_perk("restoration_reserve", school, "储备", "全局法术伤害与治疗效率提升 8%。", 30, {"damage.all": 0.08}, ["restoration_cleanse"]),
-			]
-		SkillMastery.School.ALTERATION:
-			return [
-				_make_perk("alteration_guarded_skin", school, "护体织层", "冰甲持续时间提升 50%。", 5, {"buff.ice_armor.duration": 0.5}),
-				_make_trigger_perk("alteration_shatter", school, "碎冰回响", "冰霜护盾结束时自动释放冰爆。", 10, "ice_explosion", CombatEvent.Type.ON_STATUS_REMOVED, "", ICE_ARMOR_NAME, ["alteration_guarded_skin"]),
-				_make_perk("alteration_stone_stride", school, "石肤步伐", "位移类技能冷却缩短 15%。", 20, {"cooldown.shadow_step": -0.15}, ["alteration_shatter"]),
-				_make_perk("alteration_frozen_edge", school, "凝锋", "冻结目标受到的冰系伤害额外提升 15%。", 30, {"damage.ice": 0.15}, ["alteration_stone_stride"]),
-			]
-		SkillMastery.School.ILLUSION:
-			return [
-				_make_perk("illusion_slipstream", school, "影流", "位移类技能冷却缩短 12%。", 5, {"cooldown.shadow_step": -0.12}),
-				_make_perk("illusion_predator", school, "捕猎者", "暗影技能伤害提升 18%。", 10, {"damage.shadow": 0.18}, ["illusion_slipstream"]),
-				_make_perk("illusion_misdirect", school, "误导", "敌人脱战前会更久地搜索你。", 20, {"status.illusion_pressure": 1.0}, ["illusion_predator"]),
-				_make_perk("illusion_afterimage", school, "残像", "闪避后下一次暗影技能额外提升 20% 伤害。", 30, {"damage.shadow": 0.2}, ["illusion_misdirect"]),
-			]
 	return []
 
 
-func _make_perk(
-	perk_id: String,
-	school: SkillMastery.School,
-	display_name: String,
-	description: String,
-	required_level: int,
-	modifiers: Dictionary,
-	prerequisites: Array[String] = []
-) -> SkillPerkData:
-	var perk := SkillPerkData.new()
-	perk.perk_id = perk_id
-	perk.school = school
-	perk.display_name = display_name
-	perk.description = description
-	perk.required_level = required_level
-	perk.modifier_bonuses = modifiers
-	perk.prerequisite_ids = prerequisites
-	return perk
-
-
-func _make_trigger_perk(
-	perk_id: String,
-	school: SkillMastery.School,
-	display_name: String,
-	description: String,
-	required_level: int,
-	skill_id: String,
-	event_type: CombatEvent.Type,
-	required_tag: String,
-	required_buff_name: String,
-	prerequisites: Array[String] = []
-) -> SkillPerkData:
-	var perk := _make_perk(perk_id, school, display_name, description, required_level, {}, prerequisites)
-	perk.trigger_skill_id = skill_id
-	perk.trigger_event = event_type
-	perk.trigger_required_tag = required_tag
-	perk.trigger_required_buff_name = required_buff_name
-	return perk
-
 func record_activity(kind: String,amount := 1.0) -> void:
-	var school: int={"melee_hit":SkillMastery.School.MELEE,"hit_blocked":SkillMastery.School.DEFENSE,"recipe_crafted":SkillMastery.School.CRAFTING}.get(kind,-1)
+	var school: int={"melee_hit":SkillMastery.School.MELEE,"hit_blocked":SkillMastery.School.DEFENSE,"recipe_crafted":SkillMastery.School.CRAFTING,"field_work":SkillMastery.School.CRAFTING,"resource_harvested":SkillMastery.School.SURVIVAL,"discovery":SkillMastery.School.SURVIVAL,"equipment_upgraded":SkillMastery.School.CRAFTING,"equipment_dismantled":SkillMastery.School.CRAFTING}.get(kind,-1)
 	if school<0 or amount<=0: return
 	_add_xp(_ensure_mastery(school),amount)
 func activity_efficiency(school: SkillMastery.School) -> float:
 	var mastery:=_masteries.get(school) as SkillMastery
 	return clampf(1.0-(mastery.level-1)*.005,.85,1.0) if mastery else 1.0
+
+func requirement_text(perk: SkillPerkData) -> String:
+	var parts:=PackedStringArray(["角色%d级"%perk.required_character_level,"分支熟练度%d"%perk.required_level,"花费%d点"%perk.cost])
+	for key in perk.required_attributes: parts.append("基础%s%d"%[StatsComponent.primary_title(key),perk.required_attributes[key]])
+	for id in perk.prerequisite_ids: parts.append("前置："+_find_perk(id).display_name)
+	return " · ".join(parts)
+
+static func definitions() -> Dictionary:
+	var result: Dictionary={}
+	for path in TREE_RESOURCE_PATHS.values():
+		var tree:=load(path) as SkillTreeData
+		if tree:
+			for perk: SkillPerkData in tree.perks: result[perk.perk_id]=perk
+	return result
+
+static func valid_state(data: Variant,character_level := 1000) -> bool:
+	if not data is Dictionary or not data.get("masteries",{}) is Dictionary or not data.get("unlocked_perks",{}) is Dictionary: return false
+	if not data.get("schema",1) is int or data.get("schema",1) not in [1,2] or not data.get("legacy_credit",0) is int or data.get("legacy_credit",0)<0 or data.get("legacy_credit",0)>180: return false
+	var schools_seen: Dictionary={}; var legacy_points:=0
+	for key in data.get("masteries",{}):
+		if not str(key).is_valid_int() or int(key) not in TREE_RESOURCE_PATHS or not data.masteries[key] is Dictionary: return false
+		if schools_seen.has(int(key)): return false
+		schools_seen[int(key)]=true
+		var raw: Dictionary=data.masteries[key]
+		for field in ["level","perk_points"]:
+			if not raw.get(field,1 if field=="level" else 0) is int: return false
+		if raw.get("level",1)<1 or raw.get("level",1)>100 or raw.get("perk_points",0)<0 or raw.get("perk_points",0)>10000: return false
+		for field in ["xp","xp_to_next"]:
+			var value: Variant=raw.get(field,0.0 if field=="xp" else 15.0)
+			if typeof(value) not in [TYPE_FLOAT,TYPE_INT] or not is_finite(float(value)) or value<0 or value>10000000: return false
+		if float(raw.get("xp_to_next",15))<=0: return false
+		legacy_points+=int(raw.get("perk_points",0))
+	var catalog:=definitions(); var known: Dictionary={}; var spent:=0
+	schools_seen.clear()
+	for key in data.get("unlocked_perks",{}):
+		if not str(key).is_valid_int() or int(key) not in TREE_RESOURCE_PATHS or not data.unlocked_perks[key] is Array: return false
+		if schools_seen.has(int(key)): return false
+		schools_seen[int(key)]=true
+		for id in data.unlocked_perks[key]:
+			if not id is String or not catalog.has(id) or catalog[id].school!=int(key) or known.has(id): return false
+			known[id]=true; spent+=catalog[id].cost
+	for id in known:
+		for required in catalog[id].prerequisite_ids:
+			if not known.has(required): return false
+	if data.get("schema",1)<2: return spent+legacy_points<=180
+	return spent<=maxi(0,character_level-1)+int(data.get("legacy_credit",0))
+
+static func validate_catalog() -> Array[String]:
+	var errors: Array[String]=[]; var catalog: Dictionary={}
+	for school in TREE_RESOURCE_PATHS:
+		var tree:=load(TREE_RESOURCE_PATHS[school]) as SkillTreeData
+		if not tree or tree.school!=school or tree.perks.is_empty(): errors.append("Invalid perk tree"); continue
+		for raw in tree.perks:
+			var perk:=raw as SkillPerkData
+			if not perk or perk.perk_id.is_empty() or catalog.has(perk.perk_id) or perk.school!=school: errors.append("Invalid/duplicate perk"); continue
+			catalog[perk.perk_id]=perk
+			if perk.display_name.is_empty() or perk.cost<1 or perk.cost>9 or perk.required_level<1 or perk.required_level>100 or perk.required_character_level<1 or perk.required_character_level>100 or not StatsComponent.valid_requirements(perk.required_attributes) or perk.row<0 or perk.row>20 or perk.column<0 or perk.column>6: errors.append("Invalid perk requirements: "+perk.perk_id)
+			if perk.grants_trigger() or perk.modifier_bonuses.is_empty(): errors.append("Perk requires an implemented, cost-respecting effect: "+perk.perk_id)
+			for key in perk.modifier_bonuses:
+				if key not in MODIFIER_KEYS: errors.append("Unsupported perk effect: "+str(key))
+				var value: Variant=perk.modifier_bonuses[key]
+				if typeof(value) not in [TYPE_FLOAT,TYPE_INT] or not is_finite(float(value)): errors.append("Invalid perk modifier")
+	for id in catalog: _visit_perk(id,catalog,[],errors)
+	return errors
+
+static func _visit_perk(id: String,catalog: Dictionary,path: Array[String],errors: Array[String]) -> void:
+	if id in path: errors.append("Cyclic perk prerequisites: "+id); return
+	var next: Array[String]=path.duplicate(); next.append(id)
+	for required in catalog[id].prerequisite_ids:
+		if not catalog.has(required): errors.append("Missing perk prerequisite: "+required)
+		else: _visit_perk(required,catalog,next,errors)

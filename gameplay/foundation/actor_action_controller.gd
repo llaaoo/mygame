@@ -81,8 +81,9 @@ func combo_snapshot() -> Dictionary:
 		var next:=next_attack_profile()
 		view["reason"]="体力不足" if stamina.current<attack_stamina_cost(next) else "口袋缺箭" if not next.ammo_id.is_empty() and context.items.ready_uid(context.id,next.ammo_id).is_empty() else ""
 	return view
-func attack_stamina_cost(strike: AttackProfile) -> float:
-	return strike.stamina_cost*burden_cost()*activity_efficiency(SkillMastery.School.MELEE)
+func attack_stamina_cost(strike: AttackProfile,is_art := false) -> float:
+	var art: bool=is_art or strike in _art_profiles()
+	return strike.stamina_cost*burden_cost()*activity_efficiency(SkillMastery.School.MELEE)*clampf(1+ActorProgression.modifier(context.actor,"stamina.art" if art else "stamina.attack"),.4,1.5)
 func technique_view(id: String,force_base := false,release_enchantment := false) -> Dictionary:
 	var data:=MartialArts.definition(id)
 	if not data: return {}
@@ -298,7 +299,9 @@ func try_action(action: Action) -> OperationResult:
 			if reserved and bool(action.params.get("charged",false)) and float(action.params.get("charge_credit",0))>0:
 				candidate=candidate.duplicate(true) as AttackProfile
 				candidate.windup=maxf(.08,candidate.windup-minf(WEAPON_HOLD_SECONDS,float(action.params.charge_credit)))
-			var cost:=attack_stamina_cost(candidate)
+			if not is_zero_approx(ActorProgression.modifier(context.actor,"combat.impact")):
+				candidate=candidate.duplicate(true) as AttackProfile; candidate.impact*=1+ActorProgression.modifier(context.actor,"combat.impact")
+			var cost:=attack_stamina_cost(candidate,action.action_type==Action.ActionType.TECHNIQUE)
 			if stamina.current<cost: return OperationResult.reject("stamina")
 			var ammo_uid:=context.items.ready_uid(context.id,candidate.ammo_id) if not candidate.ammo_id.is_empty() else ""
 			if not candidate.ammo_id.is_empty() and ammo_uid.is_empty(): return OperationResult.reject("ammunition")
@@ -310,7 +313,7 @@ func try_action(action: Action) -> OperationResult:
 			counter_strike=counter_remaining>0 and candidate.projectile_speed==0
 			if counter_strike:
 				candidate=candidate.duplicate(true) as AttackProfile
-				candidate.damage_multiplier*=1.25; candidate.impact*=1.4
+				candidate.damage_multiplier*=1.25+ActorProgression.modifier(context.actor,"combat.counter_damage"); candidate.impact*=1.4
 				counter_remaining=0
 			if not input_provider.is_valid(): movement=Vector2.ZERO
 			profile=candidate; attack_weapon_uid=weapon_uid; _launched=false; _ammo_uid=ammo_uid
@@ -338,7 +341,7 @@ func try_action(action: Action) -> OperationResult:
 		Action.ActionType.DODGE:
 			if busy() and mode!="attack": return OperationResult.reject("busy")
 			if mode=="attack" and elapsed<profile.windup+profile.active: return OperationResult.reject("committed_attack")
-			if not stamina.spend(20*burden_cost()*clampf(1+equipment_value("dodge_cost"),.6,1.5)): return OperationResult.reject("stamina")
+			if not stamina.spend(20*burden_cost()*clampf(1+equipment_value("dodge_cost"),.6,1.5)*float(ActorProgression.values(context.actor).dodge_multiplier)): return OperationResult.reject("stamina")
 			_clear_sequences(); _buffer=null; _buffer_time=0
 			_cancel_work(); _cancel_cast()
 			needs.exert(.5,context.actor.get_node("StatsComponent").effective_stat("endurance"))
@@ -439,10 +442,8 @@ func advance(delta: float) -> void:
 	if not ("survival" in actor and actor.survival):
 		needs.tick(delta,stats.effective_stat("endurance") if stats else 10,context.rules.is_base(context.region.id,actor.position))
 		NeedsRecovery.apply(actor,needs)
-	multiplier=(.35 if needs.hydration<=20 else 1.0)*(.5 if needs.fatigue>=85 else .75 if needs.fatigue>=60 else 1.0)
-	bonus=float(needs.recovery().stamina_bonus)+equipment_value("stamina_recovery")
-	stamina.configure(stats.effective_stat("endurance") if stats else 10,multiplier,bonus)
-	stamina.advance(delta,guarding)
+	ActorProgression.refresh_stamina(actor)
+	stamina.advance(delta,guarding,ActorProgression.modifier(actor,"stamina.guarding_regen"))
 	stability.advance(delta)
 	if _push_remaining>0:
 		var pushed:=minf(delta,_push_remaining)
@@ -491,7 +492,7 @@ func advance(delta: float) -> void:
 	var direction:=movement
 	if mode=="dodge": direction=facing; speed=600; factor=burden_speed()
 	elif sprinting and not busy() and not guarding and movement.length_squared()>.01:
-		if stamina.spend(8*delta*burden_cost()): factor*=1.35
+		if stamina.spend(8*delta*burden_cost()*clampf(1+ActorProgression.modifier(context.actor,"stamina.sprint"),.4,1.5)): factor*=1.35
 	if actor.get_node("SkillManager").combinations.is_busy(): factor=0
 	actor.velocity=direction*speed*factor
 	if direction.length_squared()>.01:
@@ -501,7 +502,7 @@ func advance(delta: float) -> void:
 	queue_redraw()
 func _launch_arrow() -> void:
 	var arrow:=WeaponArrow.new(); arrow.context=context; arrow.profile=profile; arrow.direction=facing; arrow.family=_family
-	arrow.damage=roundi(float(context.actor.get("attack_damage") if "attack_damage" in context.actor else context.actor.combat_component.attack_damage)*profile.damage_multiplier)
+	arrow.damage=ActorCombatModel.weapon_damage(context.actor,profile)
 	arrow.enchantment=_enchantment; arrow.release_technique=_release_technique
 	if _enchantment: arrow.tags.append_array(_enchantment.tags)
 	context.region.root.add_child(arrow); arrow.global_position=context.actor.global_position
@@ -591,7 +592,7 @@ func contact(target: Node2D) -> HitResult:
 		skill.enchantment_bonus=_enchantment.release_damage if _release_technique else _enchantment.bonus_damage
 		skill.enchantment_buildup=_enchantment.release_buildup if _release_technique else _enchantment.buildup
 	skill.tags=tags
-	var damage:=roundi(float(context.actor.get("attack_damage") if "attack_damage" in context.actor else context.actor.combat_component.attack_damage)*profile.damage_multiplier)
+	var damage:=ActorCombatModel.weapon_damage(context.actor,profile)
 	var result:=CombatExecutor.report_hit(context.actor,target,damage,target.global_position,skill,tags,_family,profile.impact,profile)
 	confirm_weapon_hit(_family,result,target)
 	if result.damage_dealt>0 and not result.blocked: ActorCombatModel.apply_melee_surface(target,tags)
@@ -609,7 +610,7 @@ func defend(hit: HitContext,result: HitResult,impact: float) -> void:
 		if direction.is_zero_approx() or facing.dot(direction.normalized())>=cos(deg_to_rad(60)):
 			var manager:=context.actor.get_node_or_null("EquipmentManager") as EquipmentManager
 			var shield:=manager and manager.get_all_equipped().any(func(item): return item.world_shape=="shield")
-			var cost:=maxf(1,impact)*(.4 if shield else .6)*activity_efficiency(SkillMastery.School.DEFENSE)*(hit.strike.guard_pressure if hit.strike else 1.0)
+			var cost:=maxf(1,impact)*(.4 if shield else .6)*activity_efficiency(SkillMastery.School.DEFENSE)*(hit.strike.guard_pressure if hit.strike else 1.0)*clampf(1+ActorProgression.modifier(context.actor,"stamina.guard"),.4,1.5)
 			if stamina.spend(cost):
 				result.blocked=true
 				result.parried=guard_age<=PARRY_WINDOW and not _parry_spent and (not hit.strike or hit.strike.guard_pressure<=1.0)
@@ -650,7 +651,7 @@ func clear_input() -> void:
 	movement=Vector2.ZERO; guarding=false; sprinting=false
 	_buffer=null; _buffer_time=0
 func burden_cost() -> float:
-	return maxf(1,context.items.weight(context.id)/context.rules.carry_limit) if context.items else 1.0
+	return maxf(1,context.items.weight(context.id)/maxf(1,context.rules.carry_limit+float(ActorProgression.values(context.actor).carry_bonus))) if context.items else 1.0
 func burden_speed() -> float:
 	return clampf(1.0/burden_cost(),.35,1)
 func _cancel_cast() -> void:
@@ -699,3 +700,12 @@ func rest_elapsed(seconds: float) -> void:
 	cancel("rest_time")
 	stamina.advance(seconds)
 	stability.advance(seconds)
+
+func _art_profiles() -> Array[AttackProfile]:
+	var result: Array[AttackProfile]=[]
+	for id in context.martial.learned:
+		var data:=MartialArts.definition(id)
+		if not data: continue
+		for strike in [data.profile,data.followup_profile,data.charged_profile,data.charged_followup_profile]:
+			if strike: result.append(strike)
+	return result

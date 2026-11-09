@@ -131,8 +131,8 @@ func _detail(uid: String) -> void:
 	if _selling and definition is EquipmentData:
 		var level:=clampi(int(item.properties.get("upgrade_level",0)),0,3)
 		_screen.detail.add_child(W.label("强化每级：主手攻击+1；其余装备生命上限+4。最高+3。",14,true))
-		_screen.detail.add_child(W.button("拆解 · 获得%d金属碎料（销毁这件装备）"%(2+level),_request.bind("dismantle",uid)))
-		_screen.detail.add_child(W.button("强化 · %d币 + %d金属碎料"%[5*(level+1),2*(level+1)],_request.bind("upgrade",uid),level>=3))
+		_screen.detail.add_child(W.button("拆解 · 获得%d金属碎料（销毁这件装备）"%store.dismantle_yield("player",uid),_request.bind("dismantle",uid)))
+		_screen.detail.add_child(W.button("强化 · %d币 + %d金属碎料"%[store.upgrade_cost("player",uid).coin,store.upgrade_cost("player",uid).metal_scrap],_request.bind("upgrade",uid),level>=3))
 	for button in _screen.detail.find_children("*","Button",true,false):
 		button.clip_text=true; button.tooltip_text=button.text
 func _request(method: String,uid: String) -> void:

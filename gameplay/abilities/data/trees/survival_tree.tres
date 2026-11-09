@@ -1,0 +1,82 @@
+[gd_resource type="Resource" script_class="SkillTreeData" format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_tree_data.gd" id="tree"]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_perk_data.gd" id="perk"]
+
+[sub_resource type="Resource" id="field_lore"]
+script = ExtResource("perk")
+perk_id = "field_lore"
+school = 8
+display_name = "野外素养"
+description = "饥饿、口渴与疲劳积累降低15%。"
+required_level = 1
+required_character_level = 2
+required_attributes = {}
+prerequisite_ids = Array[String]([])
+modifier_bonuses = {"survival.needs": -0.15}
+column = 1
+row = 0
+
+[sub_resource type="Resource" id="pack_habit"]
+script = ExtResource("perk")
+perk_id = "pack_habit"
+school = 8
+display_name = "行囊经验"
+description = "负重承受上限+10；不增加容器格数。"
+required_level = 3
+required_character_level = 3
+required_attributes = {"strength": 12}
+prerequisite_ids = Array[String](["field_lore"])
+modifier_bonuses = {"carry.maximum": 10}
+column = 0
+row = 1
+
+[sub_resource type="Resource" id="botanical_eye"]
+script = ExtResource("perk")
+perk_id = "botanical_eye"
+school = 8
+display_name = "识草"
+description = "每处草药采集额外得到1份实际产物；正常再生与空间检查保留。"
+required_level = 3
+required_character_level = 3
+required_attributes = {"intelligence": 12}
+prerequisite_ids = Array[String](["field_lore"])
+modifier_bonuses = {"harvest.herbs": 1}
+column = 2
+row = 1
+
+[sub_resource type="Resource" id="campcraft"]
+script = ExtResource("perk")
+perk_id = "campcraft"
+school = 8
+display_name = "营地调息"
+description = "每小时休息额外消除5点疲劳；仍花费对应时间和补给。"
+required_level = 6
+required_character_level = 5
+required_attributes = {"endurance": 13}
+prerequisite_ids = Array[String](["pack_habit"])
+modifier_bonuses = {"rest.fatigue": 5}
+column = 0
+row = 2
+
+[sub_resource type="Resource" id="provisioned_recovery"]
+script = ExtResource("perk")
+perk_id = "provisioned_recovery"
+school = 8
+display_name = "补给回气"
+description = "有有效食物增益时体力回复额外+2/秒；不延长食物时效。"
+required_level = 6
+required_character_level = 5
+required_attributes = {"endurance": 14}
+prerequisite_ids = Array[String](["botanical_eye"])
+modifier_bonuses = {"survival.fed_regen": 2}
+column = 2
+row = 2
+
+[resource]
+script = ExtResource("tree")
+tree_id = "survival"
+display_name = "野外与补给"
+description = "首次发现与真实资源采集提高熟练度；饮食与休息不能原地刷经验。"
+school = 8
+accent_color = Color(0.72,0.61,0.35,1)
+perks = [SubResource("field_lore"), SubResource("pack_habit"), SubResource("botanical_eye"), SubResource("campcraft"), SubResource("provisioned_recovery")]

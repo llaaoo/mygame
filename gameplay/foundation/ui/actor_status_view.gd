@@ -88,7 +88,7 @@ func _process(_delta: float) -> void:
 	var pack: bool=context.items and context.items.is_attached(context.id + ".pack")
 	var state: String={"idle":"就绪","attack":"攻击中","dodge":"闪避中","stagger":"失衡","item":"使用物品","aim_item":"瞄准 · 松开出手","spray":"喷洒中 · 松开即停","recovery":"动作恢复"}.get(context.actions.mode,"")
 	if context.spray and context.spray.active: state+=" · "+context.items.state_text(context.spray.uid)
-	detail.text="%.1f / %.0fkg · %s · %s"%[weight,context.rules.carry_limit,"背包随身" if pack else "背包已放下",state]
+	detail.text="%.1f / %.0fkg · %s · %s"%[weight,(context.rules.carry_limit+float(ActorProgression.values(context.actor).carry_bonus)),"背包随身" if pack else "背包已放下",state]
 	var partial: Dictionary=(context.actor.get_node("BuffManager") as BuffManager).buildup.snapshot()
 	for id in partial:
 		var definition:=WeaponEnchantment.definition(id)
@@ -97,7 +97,7 @@ func _process(_delta: float) -> void:
 	if compact:
 		var constrained:=context.actions.counter_remaining>0 or context.actions.mode in ["stagger","recovery","item","aim_item","spray"]
 		var queued:=context.actions.buffered_action_label()
-		detail.visible=constrained or not partial.is_empty() or not pack or weight>context.rules.carry_limit or not queued.is_empty()
+		detail.visible=constrained or not partial.is_empty() or not pack or weight>(context.rules.carry_limit+float(ActorProgression.values(context.actor).carry_bonus)) or not queued.is_empty()
 		if not queued.is_empty(): detail.text=queued+" · 收招后尝试"
 		if constrained:
 			detail.text="反击机会 · %.1f秒"%context.actions.counter_remaining if context.actions.counter_remaining>0 else state

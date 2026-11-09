@@ -10,6 +10,8 @@
 
 2026-11-09：[行路者手册界面](UI_AND_INTERACTION.md)共享`ExpeditionNavigation`与`GameUIStyle`外观组件；`GrayriverGame`注入现有页面路由，界面保存自己的浏览上下文。绑定继续进入`QuickslotLoadout`，选材继续进入`QuickslotMaterials`，库存变化继续进入`InventoryActions/InventoryService`，页面不成为新的库存、绑定或世界状态写入者。
 
+2026-11-10：[角色成长](RPG_PROGRESSION_SYSTEM.md)统一StatsComponent等级与SkillMasteryManager全局Perk预算，ActorProgression提供有效属性/Perk的共同只读投影，40个Resource节点进入实际动作、库存、施法、补给与作业。CharacterProgressionScreen提交领域请求，升级不强制打开界面。
+
 ## 请求、查询与事实
 
 公开方法接受同步请求并返回是否接受，查询只读状态，已提交事件广播事实。需要原子性的施法保留在同一事务中。延迟世界工作由带区域作用域的 `CommandBus` 排队；它不承担全部跨模块调用。

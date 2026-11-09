@@ -176,7 +176,7 @@ func _process(delta: float) -> void:
  _refresh_time+=delta; _message_time=maxf(0,_message_time-delta)
  if _dirty and _refresh_time>.1 and not get_viewport().gui_is_dragging() and not Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) and not _popup.visible: _refresh()
  var context:=actor.actor_context
- _summary.text="口袋 %d/%d格 · 背包 %d/%d格%s · 负重 %.1f / %.0fkg · 生命 %d/%d"%[session.inventory.entries(context.id+".pocket").size(),context.rules.pocket_capacity,session.inventory.entries(context.id+".pack").size(),context.rules.pack_capacity,"（已放下，不可远程整理）" if not session.inventory.is_attached(context.id+".pack") else "",session.inventory.weight(context.id),context.rules.carry_limit,actor.health_component.hp,actor.health_component.max_hp]
+ _summary.text="口袋 %d/%d格 · 背包 %d/%d格%s · 负重 %.1f / %.0fkg · 生命 %d/%d"%[session.inventory.entries(context.id+".pocket").size(),context.rules.pocket_capacity,session.inventory.entries(context.id+".pack").size(),context.rules.pack_capacity,"（已放下，不可远程整理）" if not session.inventory.is_attached(context.id+".pack") else "",session.inventory.weight(context.id),context.rules.carry_limit+float(ActorProgression.values(actor).carry_bonus),actor.health_component.hp,actor.health_component.max_hp]
  _alert.text=_message if _message_time>0 else ""
  _refresh_stats()
  _detail_clock+=delta

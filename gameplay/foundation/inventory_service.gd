@@ -11,6 +11,9 @@ var _locations: Dictionary={}
 var _pending_facts: Array[Dictionary]=[]
 var facts: GameplayFacts
 var rules: RulesetDefinition
+var perk_query: Callable
+func perk_value(actor: String,key: String) -> float:
+	return float(perk_query.call(actor,key)) if perk_query.is_valid() else 0.0
 var _batch_depth := 0
 var _dirty := false
 func register_definition(item: ItemData) -> void:
@@ -668,7 +671,7 @@ func dismantle_instance(actor: String,uid: String) -> OperationResult:
 	var source:=scratch.locate(uid)
 	var actual:=scratch._instance(uid)
 	scratch._containers[source].items.erase(actual); scratch._unindex(actual); scratch._touch(source)
-	var amount:=2+clampi(int(entry.properties.get("upgrade_level",0)),0,3)
+	var amount:=dismantle_yield(actor,uid)
 	if scratch.receive(actor,"metal_scrap",amount)!=amount: return OperationResult.reject("capacity")
 	_adopt(scratch,[actor])
 	_publish("equipment_dismantled",actor,{"uid":uid,"scrap":amount})
@@ -680,7 +683,7 @@ func upgrade_instance(actor: String,uid: String) -> OperationResult:
 	var level:=clampi(int(entry.properties.get("upgrade_level",0)),0,3)
 	if level>=3: return OperationResult.reject("maximum_level")
 	var scratch:=_scratch([actor])
-	if not scratch.pay(actor,{"coin":5*(level+1),"metal_scrap":2*(level+1)}): return OperationResult.reject("materials")
+	if not scratch.pay(actor,upgrade_cost(actor,uid)): return OperationResult.reject("materials")
 	var properties:=entry.properties.duplicate(true); properties.upgrade_level=level+1
 	scratch.set_properties(uid,properties)
 	_adopt(scratch,[actor])
@@ -714,3 +717,11 @@ func _adopt(scratch: InventoryService,owners: Array) -> void:
 	for owner_id: String in owners: restore_actor(owner_id,committed)
 	for container_id in committed.containers: _touch(container_id)
 	end_batch()
+
+func dismantle_yield(actor: String,uid: String) -> int:
+	var entry:=item(uid)
+	return 2+clampi(int(entry.properties.get("upgrade_level",0)),0,3)+clampi(int(perk_value(actor,"salvage.scrap")),0,2) if entry else 0
+func upgrade_cost(actor: String,uid: String) -> Dictionary:
+	var entry:=item(uid)
+	var level:=clampi(int(entry.properties.get("upgrade_level",0)),0,3) if entry else 0
+	return {"coin":maxi(1,5*(level+1)-clampi(int(perk_value(actor,"upgrade.coin_discount")),0,2)),"metal_scrap":2*(level+1)}

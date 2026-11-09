@@ -6,3 +6,4 @@ id = "arrows"
 inputs = {"charcoal": 1, "metal_scrap": 1}
 output_id = "arrow"
 output_count = 6
+ammunition = true

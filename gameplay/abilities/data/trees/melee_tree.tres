@@ -1,0 +1,82 @@
+[gd_resource type="Resource" script_class="SkillTreeData" format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_tree_data.gd" id="tree"]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_perk_data.gd" id="perk"]
+
+[sub_resource type="Resource" id="battle_conditioning"]
+script = ExtResource("perk")
+perk_id = "battle_conditioning"
+school = 5
+display_name = "战斗调息"
+description = "体力上限+15；加上限不会补满当前体力。"
+required_level = 1
+required_character_level = 2
+required_attributes = {}
+prerequisite_ids = Array[String]([])
+modifier_bonuses = {"stamina.maximum": 15}
+column = 1
+row = 0
+
+[sub_resource type="Resource" id="economical_strokes"]
+script = ExtResource("perk")
+perk_id = "economical_strokes"
+school = 5
+display_name = "连段节能"
+description = "轻击与重击体力消耗降低12%。"
+required_level = 3
+required_character_level = 3
+required_attributes = {"strength": 12}
+prerequisite_ids = Array[String](["battle_conditioning"])
+modifier_bonuses = {"stamina.attack": -0.12}
+column = 0
+row = 1
+
+[sub_resource type="Resource" id="art_focus"]
+script = ExtResource("perk")
+perk_id = "art_focus"
+school = 5
+display_name = "武技专注"
+description = "连招武技体力消耗降低15%；不省箭、不省附魔。"
+required_level = 3
+required_character_level = 3
+required_attributes = {"strength": 12}
+prerequisite_ids = Array[String](["battle_conditioning"])
+modifier_bonuses = {"stamina.art": -0.15}
+column = 2
+row = 1
+
+[sub_resource type="Resource" id="counter_mastery"]
+script = ExtResource("perk")
+perk_id = "counter_mastery"
+school = 5
+display_name = "反击研习"
+description = "精准格挡后的手动近战反击额外增加25%基础伤害。"
+required_level = 6
+required_character_level = 5
+required_attributes = {"agility": 13}
+prerequisite_ids = Array[String](["economical_strokes"])
+modifier_bonuses = {"combat.counter_damage": 0.25}
+column = 0
+row = 2
+
+[sub_resource type="Resource" id="forceful_impact"]
+script = ExtResource("perk")
+perk_id = "forceful_impact"
+school = 5
+display_name = "破势训练"
+description = "武器动作冲击提高15%，仍走共同稳定性与格挡规则。"
+required_level = 6
+required_character_level = 5
+required_attributes = {"strength": 14}
+prerequisite_ids = Array[String](["art_focus"])
+modifier_bonuses = {"combat.impact": 0.15}
+column = 2
+row = 2
+
+[resource]
+script = ExtResource("tree")
+tree_id = "melee"
+display_name = "武器与武技"
+description = "有效武器命中提升熟练度；附魔和材料依然需要真实来源。"
+school = 5
+accent_color = Color(0.72,0.61,0.35,1)
+perks = [SubResource("battle_conditioning"), SubResource("economical_strokes"), SubResource("art_focus"), SubResource("counter_mastery"), SubResource("forceful_impact")]

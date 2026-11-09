@@ -97,7 +97,7 @@ func start_selected() -> bool:
 	player.casting.cancel_all()
 	_last_hp = player.health_component.hp
 	var equipment := player.get_node("EquipmentManager") as EquipmentManager
-	pending = {"method": method, "fingerprint": method.fingerprint(), "remaining": method.duration * _efficiency(), "duration": method.duration * _efficiency(), "position": player.global_position, "attributes": player.stats_component.primary_values(), "equipment": equipment.loadout_revision}
+	pending = {"method": method, "fingerprint": method.fingerprint(), "remaining": method.duration * _efficiency(), "duration": method.duration * _efficiency(), "position": player.global_position, "attributes": player.stats_component.primary_values(), "equipment": equipment.loadout_revision,"progression":player.mastery_manager.revision}
 	player.state_machine.transition_to("work")
 	work_started.emit(method)
 	_refresh_panel()
@@ -115,7 +115,7 @@ func tick(delta: float) -> void:
 	if is_busy() and not pending.is_empty():
 		var method: FieldWorkMethod = pending.method
 		var equipment := player.get_node("EquipmentManager") as EquipmentManager
-		if method.fingerprint() != pending.fingerprint or player.stats_component.primary_values() != pending.attributes or equipment.loadout_revision != pending.equipment:
+		if method.fingerprint() != pending.fingerprint or player.stats_component.primary_values() != pending.attributes or equipment.loadout_revision != pending.equipment or player.mastery_manager.revision!=pending.progression:
 			cancel("属性、装备或操作条件改变，未扣材料")
 		elif player.global_position.distance_to(pending.position) > 12:
 			cancel("移动：作业取消")
@@ -137,7 +137,10 @@ func _commit() -> void:
 	_committing = false
 	_to_idle()
 	close_panel()
-	if accepted: work_committed.emit(method)
+	if accepted:
+		work_committed.emit(method)
+		if player.actor_context and not method.id.begins_with("sleep") and not method.id.begins_with("rest") and not method.id.begins_with("eat") and not method.id.begins_with("basic") and not method.id.begins_with("fill") and not method.id.begins_with("harvest") and not method.id.begins_with("cook"):
+			player.actor_context.facts.publish("field_work",player.actor_context.id,{"method":method.id})
 	else:
 		work_cancelled.emit(method, "操作条件失效")
 		feedback_requested.emit("操作条件已失效，未扣材料")
@@ -185,4 +188,5 @@ func _refresh_panel() -> void:
 	panel.display(text + _guide + "\n"+InputBindings.label("field_method")+"切换 · "+InputBindings.label("interact")+"开始 · Esc收起\n战斗继续进行")
 
 func _efficiency() -> float:
-	return player.mastery_manager.activity_efficiency(SkillMastery.School.CRAFTING) if player.mastery_manager else 1.0
+	if not methods.is_empty() and (methods[selected].id.begins_with("rest") or methods[selected].id.begins_with("sleep")): return 1.0
+	return (player.mastery_manager.activity_efficiency(SkillMastery.School.CRAFTING) if player.mastery_manager else 1.0)*float(ActorProgression.values(player).work_multiplier)

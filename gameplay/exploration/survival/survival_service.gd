@@ -32,7 +32,7 @@ func serialize() -> Dictionary:
 
 func tick(delta: float) -> void:
 	if not game.ready_for_play or game._switching or game.get_tree().paused or game.player.health_component.is_dead: return
-	needs.tick(delta, game.player.stats_component.effective_stat("endurance"), game.is_at_base())
+	needs.tick(delta, game.player.stats_component.effective_stat("endurance"), game.is_at_base(),1+ActorProgression.modifier(game.player,"survival.needs"))
 	apply_recovery()
 	_ui_time += delta
 	_save_time += delta
@@ -289,7 +289,9 @@ func _complete(option: FieldWorkMethod, node: Node2D, spec: SurvivalStationData)
 	var outputs: Dictionary={}
 	if parts[0]=="cook": outputs={SurvivalCatalog.RECIPES[parts[1]].output:1}
 	elif parts[0]=="fill": outputs={parts[1]:int(parts[2])}
-	elif parts[0]=="harvest": outputs=spec.harvest
+	elif parts[0]=="harvest":
+		outputs=spec.harvest.duplicate()
+		if outputs.has("herb"): outputs.herb+=clampi(int(ActorProgression.modifier(game.player,"harvest.herbs")),0,1)
 	var before: Dictionary={}
 	for key in outputs: before[key]=supplies.count(key)
 	supplies.grant(outputs)
@@ -320,7 +322,7 @@ func _complete(option: FieldWorkMethod, node: Node2D, spec: SurvivalStationData)
 			_advancing_rest=false
 			needs.nutrition=clampf(needs.nutrition+float(option.material_costs.get("ration",0))*30,0,100)
 			needs.hydration=clampf(needs.hydration+float(option.material_costs.get("clean_water",0))*30,0,100)
-			needs.fatigue=maxf(0,needs.fatigue-hours*15)
+			needs.fatigue=maxf(0,needs.fatigue-hours*(15+ActorProgression.modifier(game.player,"rest.fatigue")))
 			game.player.heal(roundi(game.player.health_component.max_hp*.2*hours),"rest")
 			game.player.restore_mp(roundi(game.player.mana_component.max_mp*.25*hours),"rest")
 			game.ui.notify("休息结束 · "+WorldTime.instance.stamp())
@@ -341,6 +343,7 @@ func _complete(option: FieldWorkMethod, node: Node2D, spec: SurvivalStationData)
 	var notify := supplies.finish_transaction(true)
 	apply_recovery()
 	if notify.is_valid(): notify.call()
+	if parts[0] in ["cook","harvest"]: game.session.facts.publish("resource_harvested" if parts[0]=="harvest" else "recipe_crafted","player",{"site":spec.id,"method":option.id})
 	game.session.facts.publish("field_work_completed","player",{"method":option.id,"kind":parts[0],"site":spec.id if spec else ""})
 	game._save_progress()
 	game.ui.set_survival_status(status_line() + ("\n" + timers_line() if not timers_line().is_empty() else ""))

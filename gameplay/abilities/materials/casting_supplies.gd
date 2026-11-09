@@ -81,17 +81,18 @@ func craft(id: String) -> bool:
 	var recipe := crafting_recipes.get(id) as CraftingRecipe
 	if not recipe or not knows_recipe(id) or not can_pay(recipe.inputs):
 		return false
+	var output:=craft_output(recipe)
 	begin_transaction()
 	pay(recipe.inputs)
 	var output_before:=count(recipe.output_id)
-	grant({recipe.output_id: recipe.output_count})
-	if count(recipe.output_id)-output_before!=recipe.output_count:
+	grant({recipe.output_id: output})
+	if count(recipe.output_id)-output_before!=output:
 		finish_transaction(false)
 		return false
 	var notify := finish_transaction(true)
 	if notify.is_valid():
 		notify.call()
-	if inventory_store and inventory_store.facts: inventory_store.facts.publish("recipe_crafted",actor_id,{"recipe":id,"quantity":recipe.output_count})
+	if inventory_store and inventory_store.facts: inventory_store.facts.publish("recipe_crafted",actor_id,{"recipe":id,"quantity":output})
 	return true
 
 func recycle_preview(id: String) -> Dictionary:
@@ -256,3 +257,7 @@ func configure_modifier(action: SkillData,id: String) -> bool:
 	var entry:=catalog.get(id) as CastingMaterialData
 	if not entry: return false
 	modifiers[action.get_id()]=id; _notify_changed(); return true
+
+func craft_output(recipe: CraftingRecipe) -> int:
+	var bonus:=inventory_store.perk_value(actor_id,"craft.ammunition") if inventory_store and recipe.ammunition else 0.0
+	return recipe.output_count+floori(recipe.output_count*clampf(bonus,0,.5))

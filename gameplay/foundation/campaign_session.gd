@@ -46,6 +46,7 @@ func configure(content: ExplorationContentCatalog,profile: RulesetDefinition) ->
 	rules=profile
 	inventory.rules=rules
 	inventory.facts=facts
+	inventory.perk_query=perk_value
 	relations.facts=facts
 	relations.factions["guards|traveler"]="hostile"
 	relations.factions["traveler|guards"]="hostile"
@@ -299,8 +300,8 @@ func _on_fact(fact: Dictionary) -> void:
 	if fact.source=="player":
 		var actor:=actor_for_id("player")
 		if actor and not actor.actor_context.reward_eligible: return
-	if fact.source=="player" and fact.kind in ["melee_hit","hit_blocked","recipe_crafted"]:
-		var school: String={"melee_hit":"melee","hit_blocked":"defense","recipe_crafted":"crafting"}[fact.kind]
+	if fact.source=="player" and fact.kind in ["melee_hit","hit_blocked","recipe_crafted","resource_harvested","field_work","discovery","equipment_upgraded","equipment_dismantled"]:
+		var school: String={"melee_hit":"melee","hit_blocked":"defense","recipe_crafted":"crafting","resource_harvested":"survival","field_work":"crafting","discovery":"survival","equipment_upgraded":"crafting","equipment_dismantled":"crafting"}[fact.kind]
 		var family: String=str(fact.data.get("family",""))
 		var receipt: String=str(fact.kind)+"."+family
 		if not family.is_empty() and _activity_families.has(receipt): return
@@ -310,7 +311,7 @@ func _on_fact(fact: Dictionary) -> void:
 		proficiency[school]=float(proficiency.get(school,0))+1
 		if actors.has("player"):
 			var player: Object=actors["player"].get_ref()
-			if is_instance_valid(player) and player.mastery_manager: player.mastery_manager.record_activity(fact.kind)
+			if is_instance_valid(player) and player.mastery_manager: player.mastery_manager.record_activity(fact.kind,4.0 if fact.kind in ["recipe_crafted","resource_harvested","discovery"] else 1.0)
 	if save_requested.is_valid(): save_requested.call()
 static func valid_snapshot(data: Variant) -> bool:
 	if not data is Dictionary: return false
@@ -480,3 +481,6 @@ func nearby_allies(radius: float,id: String) -> Array[Node2D]:
 		var other:=actor_for_id(other_id)
 		if is_instance_valid(other) and other.global_position.distance_to(actor.global_position)<=radius and not other.get_node("HealthComponent").is_dead: result.append(other)
 	return result
+
+func perk_value(actor_id: String,key: String) -> float:
+	return ActorProgression.modifier(actor_for_id(actor_id),key)

@@ -56,6 +56,14 @@ func _tick_effects(delta: float) -> void:
 func apply_buff(buff: Buff, source: Node2D = null, skill: SkillData = null) -> bool:
 	if not buff or is_immune(buff.status_id) or buff.prevents_actions and has_buff(buff.status_id):
 		return false
+	var duration_modifier:=0.0
+	if buff.status_id in ["burning","poison"]: duration_modifier+=ActorProgression.modifier(get_parent(),"status.%s_duration"%buff.status_id)
+	if buff.status_id=="frozen" and is_instance_valid(source): duration_modifier+=ActorProgression.modifier(source,"status.frozen_duration")
+	if buff.duration>0 and not is_zero_approx(duration_modifier):
+		var original:=buff
+		buff=buff.duplicate() as Buff
+		buff.set_meta("definition_path",original.get_meta("definition_path",original.resource_path))
+		buff.duration*=clampf(1+duration_modifier,.25,2)
 	for status in buff.cleanse_statuses:
 		remove_status(status, RemovalReason.DISPELLED)
 	_touch_status(buff.status_id)

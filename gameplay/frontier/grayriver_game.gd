@@ -169,6 +169,7 @@ func open_interface(page: String) -> void:
 		"equipment","supplies": inventory_screen.open(page)
 		"loadout": player.skill_pool_ui.open()
 		"map": show_map()
+		"progression": presenter._show_progression()
 		_: hub.open(page,"",true)
 
 func _inventory_navigation(key: int) -> void:
@@ -253,6 +254,9 @@ func _mount_trainer(point: Vector2,request: Callable) -> void:
 	if npc: session.relations.memberships[id]="civilian"
 
 func _service_feedback(fact: Dictionary) -> void:
+	if fact.kind=="character_leveled" and fact.source=="player":
+		ui.queue_notice("提升到Lv.%d · +3属性点、+1Perk点 · P查看角色成长"%fact.data.level)
+		return
 	if fact.kind!="production_completed": return
 	var definition:=session.production.catalog.definition(str(fact.data.get("id","")))
 	if not definition: return

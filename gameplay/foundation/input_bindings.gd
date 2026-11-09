@@ -12,7 +12,7 @@ const KEYS := {
 	"cast_left":KEY_Q,"cast_e":KEY_E,"skill":KEY_R,"sprint":KEY_ALT,"drop_pack":KEY_B,
 	"quick_item_1":KEY_7,"quick_item_2":KEY_8,"quick_item_3":KEY_9,"quick_item_4":KEY_0,
 }
-const MENU_KEYS := [KEY_TAB,KEY_ESCAPE,KEY_J,KEY_G,KEY_M,KEY_N,KEY_O,KEY_I,KEY_K,KEY_F5,KEY_F9,KEY_CTRL]
+const MENU_KEYS := [KEY_TAB,KEY_ESCAPE,KEY_J,KEY_G,KEY_M,KEY_N,KEY_O,KEY_I,KEY_K,KEY_F5,KEY_F9,KEY_CTRL,KEY_P]
 static var loaded := false
 static func _key(code: Key) -> InputEventKey:
 	var event:=InputEventKey.new(); event.physical_keycode=code

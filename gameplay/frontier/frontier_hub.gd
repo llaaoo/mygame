@@ -25,6 +25,10 @@ func remember_context() -> void:
 func _init(owner_game: GrayriverGame) -> void: game=owner_game
 func handle_shortcut(key: int) -> bool:
 	if game.ui.modal_locked: return false
+	if key==KEY_P:
+		if is_instance_valid(game.ui.modal) and game.ui.modal.get_meta("character_progression",false): game.ui.close_modal()
+		else: game.open_interface("progression")
+		return true
 	var target: String = {KEY_J:journal_page,KEY_O:"equipment",KEY_I:"inventory",KEY_N:"supplies",KEY_TAB:"actions"}.get(key,"")
 	if target.is_empty(): return false
 	if key==KEY_TAB and is_instance_valid(game.ui.modal):
@@ -96,6 +100,7 @@ func entries() -> Array[Dictionary]:
 			result.append({"id":"supplies","title":"饮食与背包","text":"用鼠标使用、换装和整理；Q/E/R与1—0均可绑定动作或物品；用鼠标编组后，按对应键使用。","subtitle":"生存整备"})
 			var target:=game.player.input_controller.interaction_target(true)
 			result.append({"id":"nearby","title":"附近交互","text":"点击与F使用同一交互请求，不远程开启设施。","subtitle":target.title if is_instance_valid(target) and "title" in target else "靠近设施、人物或遗骸"})
+			result.append({"id":"progression","title":"等级、属性与Perk","text":"升级获得属性点与Perk点；各分支由实际实践成长。P打开角色成长。","subtitle":"角色成长"})
 		"equipment":
 			for id in game.catalog.equipment:
 				var item: EquipmentData=game.catalog.equipment[id]
@@ -207,6 +212,7 @@ func _show_detail() -> void:
 	match page:
 		"actions":
 			match entry.id:
+				"progression": _detail.add_child(W.button("打开角色成长",game.open_interface.bind("progression")))
 				"loadout": _detail.add_child(W.button("打开快捷栏编组",_open_loadout))
 				"sources": _detail.add_child(W.button("选择释放来源",game.workshop.show_materials))
 				"supplies": _detail.add_child(W.button("打开物品与补给",open.bind("supplies","")))
