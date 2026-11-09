@@ -56,7 +56,11 @@ func run() -> void:
 	check(target.position.x>base.x+90 and surfaces.surface_at(target.position).state=="burning","Sweep did not carry the target into the player-created fire")
 	var hp:=target.health_component.hp
 	await capture("counterplay-delivered-into-fire")
-	await create_timer(1.1).timeout
+	# Surface exposure is sampled every .5s, then burning needs its own 1s tick.
+	# Observe the real outcome within 2s rather than assuming a favourable tick phase.
+	for i in range(120):
+		if target.health_component.hp<hp: break
+		await frames(1)
 	check(target.health_component.hp<hp,"Player-created ground hazard produced no real periodic damage after push")
 	check(stock.item(bottle)!=null and int(stock.item(bottle).properties.doses)==2 and not paused,"Physical delivery consumed an extra dose or paused the world")
 	CombatExecutor.instance.defense_resolved.disconnect(observer)
