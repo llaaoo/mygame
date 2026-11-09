@@ -159,6 +159,7 @@ func _refresh_rows() -> void:
 	_status.text="%d项 · 背包 %d/%d格 · 水囊 %d/%d"%[available.size(),game.player.inventory.capacity-game.player.inventory.empty_slot_count(),game.player.inventory.capacity,SurvivalCatalog.water_count(game.survival.supplies),SurvivalCatalog.WATER_CAPACITY]
 	if not available.any(func(entry: Dictionary): return entry.id==selected):
 		selected=available[0].id if not available.is_empty() else ""
+		if page=="settings" and available.any(func(entry: Dictionary): return entry.id=="controls"): selected="controls"
 		if page=="quests" and available.any(func(entry: Dictionary): return entry.id==game.progress.tracked_quest): selected=game.progress.tracked_quest
 	for entry in available:
 		var button:=W.button(entry.title+"\n"+entry.subtitle,_select.bind(entry.id))
