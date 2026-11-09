@@ -86,14 +86,6 @@ func _input(event: InputEvent) -> void:
 		elif event.is_action_released("weapon_art"): _art_suppressed=false
 	if event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_LEFT and event.pressed:
 		if not player.ui_blocked and not get_tree().paused and not (is_instance_valid(player.material_wheel) and player.material_wheel.visible): _attack_suppressed=false
-	if event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_LEFT and player.actor_context and player.actor_context.actions.active():
-		var allowed:=not player.ui_blocked and not get_tree().paused and not player.health_component.is_dead and not (is_instance_valid(player.material_wheel) and player.material_wheel.visible) and not _pointer_over_interface()
-		if allowed and not _attack_suppressed:
-			var edge:=Action.melee(player); edge.direction=player.get_mouse_direction()
-			edge.params={"weapon_gesture":"begin" if event.pressed else "release","art":event.is_action_pressed("weapon_art"),"release_enchantment":event.shift_pressed or Input.is_key_pressed(KEY_SHIFT)}
-			_weapon_edges.append(edge)
-		elif not event.pressed:
-			var edge:=Action.melee(player); edge.params["weapon_gesture"]="cancel"; _weapon_edges.append(edge)
 	# Global Input edges survive handled UI events. Preserve a genuinely new press
 	# after closing a selector, without replaying its earlier selection/release.
 	if event is InputEventKey or event is InputEventMouseButton:
@@ -311,7 +303,17 @@ func scroll_source() -> String:
 	return ""
 
 func _unhandled_input(event: InputEvent) -> void:
+	# UI and item aiming own their clicks before weapon gestures can see them.
 	if player.ui_blocked or get_tree().paused or player.health_component.is_dead: return
+	if event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_LEFT and player.actor_context and player.actor_context.actions.active():
+		var allowed:=not player.ui_blocked and not get_tree().paused and not player.health_component.is_dead and not (is_instance_valid(player.material_wheel) and player.material_wheel.visible) and not _pointer_over_interface()
+		if allowed and not _attack_suppressed:
+			var edge:=Action.melee(player); edge.direction=player.get_mouse_direction()
+			edge.params={"weapon_gesture":"begin" if event.pressed else "release","art":event.is_action_pressed("weapon_art"),"release_enchantment":event.shift_pressed or Input.is_key_pressed(KEY_SHIFT)}
+			_weapon_edges.append(edge)
+		elif not event.pressed:
+			var edge:=Action.melee(player); edge.params["weapon_gesture"]="cancel"; _weapon_edges.append(edge)
+		return
 	if not event is InputEventMouseButton or not event.pressed: return
 	if event.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
 		if player.material_wheel.visible or _pointer_over_interface(): return

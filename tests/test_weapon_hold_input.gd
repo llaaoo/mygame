@@ -2,6 +2,9 @@ extends "res://tests/support/input_scene_probe.gd"
 ## Actual mouse/key edges, live clocks, normal AI at a safe fixture position.
 const Fixture=preload("res://tests/support/grayriver_fixture.gd")
 var starts: Array[Dictionary]=[]
+func modifier(code: Key,held: bool) -> void:
+	var event:=InputEventKey.new(); event.keycode=code; event.physical_keycode=code; event.pressed=held
+	Input.parse_input_event(event); Input.flush_buffered_events()
 func idle() -> void:
 	for i in range(220):
 		if game.player.actor_context.actions.mode=="idle": return
@@ -55,7 +58,7 @@ func run() -> void:
 	await idle(); before=starts.size()
 	# Ctrl is an art request, not a fallback heavy or ordinary strike.
 	var unmatched_before:=starts.size()
-	await key(KEY_CTRL,true); await swing(); await key(KEY_CTRL,false)
+	modifier(KEY_CTRL,true); await swing(); modifier(KEY_CTRL,false)
 	check(starts.size()==unmatched_before,"Unmatched Ctrl+LMB fell back to a weapon attack")
 	for pair in [["river_sabre","blade_breaker"],["river_spear","spear_thrust"],["river_staff","staff_sweep"],["river_bow","bow_aim"]]:
 		store.equip("player",store.find_owned("player",pair[0])); await ready(pair[1]); await aim_world(actor.position+Vector2(150,0))
@@ -63,13 +66,13 @@ func run() -> void:
 		await power()
 		check(not actions.weapon_art_view().is_empty(),"Real tap/hold failed to open power route")
 		before=starts.size()
-		await key(KEY_CTRL,true); await swing(); await key(KEY_CTRL,false)
+		modifier(KEY_CTRL,true); await swing(); modifier(KEY_CTRL,false)
 		check(starts.size()==before+1 and starts.back().weapon_art and not starts.back().charged and actions.profile==MartialArts.definition(pair[1]).profile,"Ctrl tap did not dispatch the light art")
 		await idle(); await ready(pair[1]); await power()
 		# Begin late, deliberately release after the unreserved route would expire.
-		await seconds(.65); await key(KEY_CTRL,true); await pointer_button(MOUSE_BUTTON_LEFT,true)
+		await seconds(.65); modifier(KEY_CTRL,true); await pointer_button(MOUSE_BUTTON_LEFT,true)
 		before=starts.size(); var mp:=actor.mana_component.mp
-		await key(KEY_CTRL,false) # Modifier intent must stay latched at press.
+		modifier(KEY_CTRL,false) # Modifier intent must stay latched at press.
 		await seconds(.55)
 		check(starts.size()==before and actions.weapon_hold_view().get("charged",false),"Art hold auto-fired or lost its snapshot")
 		await capture("charged-art-"+MartialArts.definition(pair[1]).weapon_type)
@@ -86,8 +89,8 @@ func run() -> void:
 	await key(KEY_E,true); await key(KEY_E,false); await frames(90)
 	var uid:=str(store.equipped("player")[str(EquipmentData.SlotType.RIGHT_HAND)])
 	check(store.coating(uid)!=null,"Actual rag shortcut did not prepare a coating")
-	await power(); await key(KEY_CTRL,true); await key(KEY_SHIFT,true); await pointer_button(MOUSE_BUTTON_LEFT,true)
-	await key(KEY_CTRL,false); await key(KEY_SHIFT,false); await frames(22)
+	await power(); modifier(KEY_CTRL,true); modifier(KEY_SHIFT,true); await pointer_button(MOUSE_BUTTON_LEFT,true)
+	modifier(KEY_CTRL,false); modifier(KEY_SHIFT,false); await seconds(.36)
 	check(actions.weapon_hold_view().get("release_enchantment",false) and store.coating(uid)!=null,"Modifier/source snapshot changed or hold consumed coating early")
 	await pointer_button(MOUSE_BUTTON_LEFT,false)
 	check(actions.mode=="attack" and store.coating(uid)!=null,"Accepted element art consumed its layer before swing")
@@ -95,7 +98,7 @@ func run() -> void:
 	# Right-button defence, UI, expiry, weapon change and control interrupt cancel without ghost release.
 	for cause in ["guard","menu","timeout","weapon","interrupt","focus"]:
 		await ready(); before=starts.size()
-		await pointer_button(MOUSE_BUTTON_LEFT,true); await frames(22)
+		await pointer_button(MOUSE_BUTTON_LEFT,true); await seconds(.36)
 		match cause:
 			"guard": await pointer_button(MOUSE_BUTTON_RIGHT,true); await pointer_button(MOUSE_BUTTON_RIGHT,false)
 			"menu":
@@ -107,7 +110,7 @@ func run() -> void:
 		await pointer_button(MOUSE_BUTTON_LEFT,false); await frames(3)
 		check(starts.size()==before and actions.weapon_hold_view().is_empty() and not paused,"Cancelled hold escaped through release: "+cause)
 	# Saving a held gesture and restoring does not persist an input opportunity.
-	await pointer_button(MOUSE_BUTTON_LEFT,true); await frames(22)
+	await pointer_button(MOUSE_BUTTON_LEFT,true); await seconds(.36)
 	await key(KEY_F5,true); await key(KEY_F5,false); await key(KEY_F9,true); await key(KEY_F9,false)
 	before=starts.size(); await pointer_button(MOUSE_BUTTON_LEFT,false); await frames(3)
 	check(starts.size()==before and actions.weapon_hold_view().is_empty(),"Restore revived a held mouse gesture")

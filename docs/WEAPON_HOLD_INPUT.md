@@ -34,7 +34,7 @@
 
 ## 架构和接入
 
-- PlayerInputController只收集真实边沿并提出Action，保留同物理帧内完整短按；UI消费和生命周期取消会清理待处理边沿。
+- PlayerInputController在未被UI/投掷消费的输入阶段收集真实边沿并提出Action，保留同物理帧内完整短按；UI消费和生命周期取消会清理待处理边沿。
 - ActorActionController持有本角色瞬态准备、年龄、起手抵扣和一次性保留；WeaponArtState持有真实动作历史，WeaponComboState只持有普通段落。没有新的快捷槽、库存或伤害权威。
 - MartialTechnique的`charged_profile`和`charged_followup_profile`为只读AttackProfile。抵扣只修改运行时副本，不改变共享Resource；库存、体力和CombatExecutor继续走原链。
 - InputBindings布局v7移除旧默认Ctrl+左键重击，迁移到手势。旧独立重击键、武技自定义键和其他合法绑定保留。Ctrl+左键受鼠标动作保留规则约束，不可绑到法术槽。
@@ -42,3 +42,5 @@
 ## 验证范围
 
 `weapon_hold`用受控时钟与一个静止敌人验证八种重发分支、精确阈值、体力/箭矢、真实格挡压力、拒绝无费用和普通段落保留。`weapon_hold_input`用实际Godot鼠标/按键事件验证四武器的速发与重发、晚窗口按下、修饰键快照、真实抹布/涂层、无自动攻击，以及防御/菜单/超时/换装/控制/失焦通知和F5/F9取消。后者恢复正常模拟与所有敌人AI，装备、知识和安全测试位置由fixture提供；不作为自然开荒、真人手感或目标设备性能证明。
+
+`weapon_hold_handover_input`额外用真实按键验证：攻击取消未付费涂附、左键确认投掷不产生幽灵攻击、停止喷洒转入攻击保留已付剂量。物品/喷洒开始与停止继续由原控制器负责。

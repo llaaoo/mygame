@@ -338,6 +338,8 @@ func _weapon_gesture(edge: Action) -> OperationResult:
 	var phase:=str(edge.params.weapon_gesture)
 	if phase=="cancel": cancel_weapon_hold(); return OperationResult.success()
 	if phase=="begin":
+		if mode=="spray": context.spray.stop()
+		if mode=="item": context.item_actions.cancel()
 		cancel_weapon_hold(); _weapon_reservation.clear(); _buffer=null; _buffer_time=0
 		var recovering:=mode=="attack" and profile and elapsed>=profile.windup+profile.active and remaining<=RECOVERY_INPUT_BUFFER_SECONDS+TIME_EPSILON
 		if busy() and not recovering: return OperationResult.reject("busy")
