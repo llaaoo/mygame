@@ -45,8 +45,14 @@ func _process(_delta: float) -> void:
 	if not context or not context.actions: return
 	var art:=context.actions.weapon_art_view(Input.is_key_pressed(KEY_SHIFT))
 	var martial_state:=context.actions.technique_status(art.is_empty())
-	art_label.visible=not art.is_empty() or not martial_state.is_empty()
-	if not art.is_empty():
+	var hold:=context.actions.weapon_hold_view()
+	art_label.visible=not hold.is_empty() or not art.is_empty() or not martial_state.is_empty()
+	if not hold.is_empty():
+		art_label.text="%s · %s\n松开左键 · 体力%.0f"%[hold.title,"重发" if hold.charged else "蓄力%d%%"%roundi(hold.progress*100),hold.cost]
+		if hold.release_enchantment: art_label.text+=" · 消耗附魔"
+		if not str(hold.reason).is_empty(): art_label.text+="\n"+str(hold.reason)
+		art_label.modulate=GameUIStyle.GOLD if str(hold.reason).is_empty() else GameUIStyle.TEXT_DISABLED; art_label.tooltip_text="右键/闪避/菜单取消；最多准备2秒。体力与冷却在松开接受后结算。"
+	elif not art.is_empty():
 		art_label.text="%s · %s · %s"%[InputBindings.label("weapon_art"),art.title,"收招后" if art.recovering else "%.1f秒"%art.remaining]
 		if not str(art.reason).is_empty(): art_label.text+="\n"+str(art.reason)
 		art_label.modulate=GameUIStyle.GOLD if str(art.reason).is_empty() else GameUIStyle.TEXT_DISABLED

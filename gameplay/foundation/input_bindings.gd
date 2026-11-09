@@ -3,7 +3,7 @@ extends RefCounted
 ## Gameplay defaults and user overrides have one owner. Menu-only bindings can
 ## overlap world bindings; UI ownership prevents them firing in both contexts.
 const PATH := "user://actor_bindings.cfg"
-const LAYOUT_VERSION := 6
+const LAYOUT_VERSION := 7
 const KEYS := {
 	"move_left":KEY_A,"move_right":KEY_D,"move_up":KEY_W,"move_down":KEY_S,
 	"dodge":KEY_SPACE,"interact":KEY_F,"loot_all":KEY_T,"field_method":KEY_C,
@@ -22,18 +22,21 @@ static func defaults() -> Dictionary:
 	var result: Dictionary={}
 	for action in KEYS:
 		result[action]=[_key(KEYS[action])]
-	for action in ["attack","guard","heavy_attack","material_wheel"]:
+	for action in ["attack","guard","material_wheel"]:
 		var event:=InputEventMouseButton.new()
 		event.button_index=MOUSE_BUTTON_MIDDLE if action=="material_wheel" else MOUSE_BUTTON_RIGHT if action=="guard" else MOUSE_BUTTON_LEFT
-		event.ctrl_pressed=action=="heavy_attack"
+		event.ctrl_pressed=false
 		result[action]=[event]
+	var art:=InputEventMouseButton.new(); art.button_index=MOUSE_BUTTON_LEFT; art.ctrl_pressed=true
+	result.weapon_art.push_front(art)
+	result["heavy_attack"]=[] # Optional legacy keyboard binding; mouse heavy is a gesture.
 	return result
 static func context(action: String) -> String:
 	return "loot" if action=="loot_all" else "world"
 static func _allowed(action: String,event: InputEvent) -> bool:
 	if action in ["attack","guard"]: return false
 	if event is InputEventMouseButton:
-		return event.button_index not in [MOUSE_BUTTON_LEFT,MOUSE_BUTTON_RIGHT] or action=="heavy_attack" and event.button_index==MOUSE_BUTTON_LEFT and event.ctrl_pressed
+		return event.button_index not in [MOUSE_BUTTON_LEFT,MOUSE_BUTTON_RIGHT] or action=="weapon_art" and event.button_index==MOUSE_BUTTON_LEFT and event.ctrl_pressed and not event.shift_pressed and not event.alt_pressed
 	return event is InputEventKey and event.physical_keycode not in MENU_KEYS and event.keycode not in MENU_KEYS
 static func _same(first: InputEvent,second: InputEvent) -> bool:
 	# Captured keys contain both logical and physical codes; defaults only need
@@ -60,6 +63,7 @@ static func install() -> void:
 			var event:=decode(raw)
 			if not event or not _allowed(action,event): continue
 			var code: int=event.physical_keycode if event is InputEventKey else 0
+			if version<7 and action=="weapon_art" and code==KEY_V: continue
 			if version<2 and action=="interact" and code==KEY_E: continue
 			if version<3 and (action=="loot_all" and code==KEY_E or action=="skill_1" and code==KEY_1): continue
 			if version==3 and action=="skill_1" and code==KEY_E: continue

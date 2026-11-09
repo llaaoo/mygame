@@ -297,7 +297,7 @@ func _show_detail() -> void:
 				if not FrontierControls.set_quick_cast(value): game.ui.notify("本次设置已生效，但未保存到磁盘。"))
 			card.add_child(toggle)
 			card.add_child(preload("res://gameplay/foundation/ui/binding_editor.tscn").instantiate())
-			card.add_child(W.label("关闭时按住预览、松开施放。蓄力与引导仍需按住；Shift只表示显式消费恩赐。每次只执行一个基础动作，不自动组合。\n\nWASD 移动 · 空格闪避 · F交互\nQ/E/R与1—0 独立快捷槽 · K绑定动作或物品\nTab 远征面板 · J委托 · I行囊 · O穿戴 · N补给 · G地图\n右键按住格挡 · Alt冲刺 · Ctrl+左键重击 · B放下背包\n地图滚轮缩放、中键/右键拖动、左键放路标。",14))
+			card.add_child(W.label("关闭时按住预览、松开施放。蓄力与引导仍需按住；Shift只表示显式消费恩赐。每次只执行一个基础动作，不自动组合。\n\nWASD 移动 · 空格闪避 · F交互\nQ/E/R与1—0 独立快捷槽 · K绑定动作或物品\nTab 远征面板 · J委托 · I行囊 · O穿戴 · N补给 · G地图\n右键按住格挡 · Alt冲刺 · 左键短按轻击、长按重击 · Ctrl+左键武技（可长按） · Ctrl+Shift+左键释放附魔 · B放下背包\n地图滚轮缩放、中键/右键拖动、左键放路标。",14))
 
 func _open_loadout() -> void:
 	game.ui.close_modal()

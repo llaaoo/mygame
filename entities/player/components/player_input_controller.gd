@@ -7,6 +7,7 @@ var _mouse_shortcuts: Dictionary={}
 var _ui_click_pending := false
 var _attack_suppressed := false
 var _art_suppressed := false
+var _weapon_edges: Array[Action]=[]
 var _suppressed_sources: Dictionary={}
 var _fresh_after_ui: Dictionary={}
 var last_spell_source := ""
@@ -21,6 +22,7 @@ func _init(actor: Player) -> void:
 
 func poll_universal_actions() -> Array[Action]:
 	if player.ui_blocked or player.health_component.is_dead:
+		_weapon_edges.clear()
 		return []
 
 	var actions: Array[Action] = []
@@ -48,14 +50,19 @@ func poll_universal_actions() -> Array[Action]:
 		if selecting: player.material_wheel.close()
 		actions.append(Action.dodge(input_dir if input_dir.length() > 0.1 else player.facing_direction, player))
 
+	# Mouse edges preserve complete taps inside one physics tick. The executor owns hold time.
+	if tactical:
+		if not selecting and not _attack_suppressed: actions.append_array(_weapon_edges)
+		_weapon_edges.clear()
+	# Legacy non-tactical entry retains its press-driven attack.
 	# 左键始终提出武器攻击，法术使用独立键位。
-	if not selecting and not _attack_suppressed and Input.is_action_just_pressed("attack") and not _pointer_over_interface() and not heavy:
+	if not tactical and not selecting and not _attack_suppressed and Input.is_action_just_pressed("attack") and not _pointer_over_interface() and not heavy:
 		var hit:=Action.melee(player)
 		hit.direction=player.get_mouse_direction()
 		actions.append(hit)
 
 	# Every shortcut can carry a skill or an item. Input only proposes requests.
-	if tactical and not selecting and not _art_suppressed and Input.is_action_just_pressed("weapon_art"):
+	if tactical and not selecting and not _art_suppressed and Input.is_action_just_pressed("weapon_art") and not Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) and not Input.is_action_just_released("attack"):
 		actions.append(player.actor_context.actions.capture_weapon_art(player.get_mouse_direction(),Input.is_key_pressed(KEY_SHIFT)))
 	for source in QuickslotLoadout.SOURCES:
 		if selecting: continue
@@ -79,6 +86,14 @@ func _input(event: InputEvent) -> void:
 		elif event.is_action_released("weapon_art"): _art_suppressed=false
 	if event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_LEFT and event.pressed:
 		if not player.ui_blocked and not get_tree().paused and not (is_instance_valid(player.material_wheel) and player.material_wheel.visible): _attack_suppressed=false
+	if event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_LEFT and player.actor_context and player.actor_context.actions.active():
+		var allowed:=not player.ui_blocked and not get_tree().paused and not player.health_component.is_dead and not (is_instance_valid(player.material_wheel) and player.material_wheel.visible) and not _pointer_over_interface()
+		if allowed and not _attack_suppressed:
+			var edge:=Action.melee(player); edge.direction=player.get_mouse_direction()
+			edge.params={"weapon_gesture":"begin" if event.pressed else "release","art":event.is_action_pressed("weapon_art"),"release_enchantment":event.shift_pressed or Input.is_key_pressed(KEY_SHIFT)}
+			_weapon_edges.append(edge)
+		elif not event.pressed:
+			var edge:=Action.melee(player); edge.params["weapon_gesture"]="cancel"; _weapon_edges.append(edge)
 	# Global Input edges survive handled UI events. Preserve a genuinely new press
 	# after closing a selector, without replaying its earlier selection/release.
 	if event is InputEventKey or event is InputEventMouseButton:
@@ -346,6 +361,8 @@ func shortcut_changed(source: String) -> void:
 	if player.actor_context.item_actions.input_source==source: player.actor_context.item_actions.cancel()
 
 func _focus_lost() -> void:
+	_weapon_edges.clear()
+	if player.actor_context: player.actor_context.actions.clear_input()
 	_fresh_after_ui.clear()
 	for source in QuickslotLoadout.SOURCES: suppress_source(source)
 	# Lost pointer releases cancel, never confirm a prepared throw or charged spell.
@@ -389,7 +406,12 @@ func suppress_held_shortcuts() -> void:
 	_fresh_after_ui.clear()
 	for source in QuickslotLoadout.SOURCES:
 		if Input.is_action_pressed(action_for_source(source)): suppress_source(source)
+func cancel_weapon_input() -> void:
+	_weapon_edges.clear()
+	_attack_suppressed=true
 func pointer_consumed() -> void:
+	_weapon_edges.clear()
+	if player.actor_context: player.actor_context.actions.cancel_weapon_hold()
 	_ui_click_pending=true
 	# Handled GUI presses remain in global Input across physics frames. Keep
 	# this press suppressed until a genuinely new gameplay press arrives.

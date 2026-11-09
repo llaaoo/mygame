@@ -37,6 +37,40 @@ damage_multiplier = 1.5
 ammo_id = "arrow"
 projectile_speed = 820.0
 title = "追隙穿射"
+[sub_resource type="Resource" id="Charged"]
+script = ExtResource("attack")
+title = "满弦穿射"
+step_distance = 0
+movement_multiplier = 0
+interrupts_preparation = true
+motion = "shot"
+windup = 1.04
+active = 0.08
+recovery = 0.72
+reach = 820
+angle_degrees = 6
+stamina_cost = 32
+impact = 48
+damage_multiplier = 2.2
+ammo_id = "arrow"
+projectile_speed = 950
+[sub_resource type="Resource" id="ChargedFollowup"]
+script = ExtResource("attack")
+title = "满弦追隙"
+step_distance = 0
+movement_multiplier = 0
+interrupts_preparation = true
+motion = "shot"
+windup = 0.78
+active = 0.08
+recovery = 0.72
+reach = 740
+angle_degrees = 6
+stamina_cost = 32
+impact = 48
+damage_multiplier = 2.0
+ammo_id = "arrow"
+projectile_speed = 950
 [resource]
 script = ExtResource("tech")
 id = "bow_aim"
@@ -53,3 +87,6 @@ followup_after = Array[int]([0])
 followup_profile = SubResource("Followup")
 
 art_routes = Array[ExtResource("route")]([ExtResource("power"), ExtResource("flow")])
+
+charged_profile = SubResource("Charged")
+charged_followup_profile = SubResource("ChargedFollowup")

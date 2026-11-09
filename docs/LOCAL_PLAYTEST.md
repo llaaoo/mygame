@@ -1,5 +1,7 @@
 # 灰河谷 · 本地试玩
 
+此文的早期键表属于历史记录；当前操作以[操作方案](CONTROL_SCHEME.md)为准，短按左键轻击、长按重击、Ctrl+左键武技、F交互。
+
 Windows x86_64：解压后运行EmberPrison.exe。Linux x86_64：解压后运行`./EmberPrison.x86_64`（如缺执行位，先`chmod +x EmberPrison.x86_64`）。二进制与同目录PCK一起保留，不需要编辑器或联网。SOURCE.json标识源码版本；构建副本只关闭编辑器插件。
 
 默认进入灰河谷：一张连续野外，三个独立遗迹内部。WASD移动，左键近战，右键火花，空格闪避，E调查。G打开/关闭地图，J日志，N补给，M本次材料，K编组基础动作，O手动装备，Esc暂停。F5保存当前地点，F9读档。V按住格挡，Alt冲刺，Ctrl+左键重击，B放下背包、靠近后E拾回。体力、稳定性、负重与口袋规则见 [RPG基座](RPG_FOUNDATION.md)。

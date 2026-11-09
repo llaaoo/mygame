@@ -54,11 +54,22 @@ func run() -> void:
 	config.set_value("bindings","skill_1",{"key":KEY_E}); config.save(InputBindings.PATH)
 	InputBindings.loaded=false; InputBindings.install()
 	check(has_key("cast_e",KEY_E) and has_key("skill_1",KEY_1) and not has_key("skill_1",KEY_E),"v3 saved alias overrode independent E/1 defaults")
+	# v6 default Ctrl-heavy becomes a mouse gesture; intentional custom keys survive.
+	config=ConfigFile.new(); config.set_value("layout","version",6)
+	config.set_value("bindings","heavy_attack",{"mouse":MOUSE_BUTTON_LEFT,"ctrl":true})
+	config.set_value("bindings","weapon_art",{"key":KEY_V}); config.save(InputBindings.PATH)
+	InputBindings.loaded=false; InputBindings.install()
+	var art:=InputEventMouseButton.new(); art.button_index=MOUSE_BUTTON_LEFT; art.ctrl_pressed=true
+	check(InputMap.action_get_events("heavy_attack").is_empty() and InputMap.action_has_event("weapon_art",art),"v6 default Ctrl-heavy defeated new mouse arts")
+	check(not InputBindings.assign("cast_e",art,false).accepted,"Shortcut stole the reserved mouse art gesture")
+	config.set_value("bindings","heavy_attack",{"key":KEY_H}); config.set_value("bindings","weapon_art",{"key":KEY_Z}); config.save(InputBindings.PATH)
+	InputBindings.loaded=false; InputBindings.install()
+	check(has_key("heavy_attack",KEY_H) and has_key("weapon_art",KEY_Z),"Mouse gesture migration discarded customized legacy keys")
 	# A failed preference write must leave the usable runtime map intact.
 	config=ConfigFile.new(); config.set_value("layout","version",5)
 	config.set_value("bindings","skill_4",{"key":KEY_V}); config.save(InputBindings.PATH)
 	InputBindings.loaded=false; InputBindings.install()
-	check(has_key("skill_4",KEY_V) and has_key("weapon_art",KEY_Z),"New shared art stole an older V binding instead of choosing a free fallback")
+	check(has_key("skill_4",KEY_V) and InputMap.action_get_events("weapon_art")[0] is InputEventMouseButton,"New shared art stole an older V binding instead of retaining Ctrl+LMB")
 	InputBindings.reset_defaults()
 	DirAccess.make_dir_absolute(InputBindings.PATH+".tmp")
 	check(not InputBindings.assign("skill_5",event(KEY_H)).accepted and has_key("skill_5",KEY_5),"Failed disk write changed runtime binding")

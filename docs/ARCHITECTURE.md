@@ -86,3 +86,5 @@ UI可以调用领域服务请求训练、制造、交付或施法，由服务验
 实时首玩复测补强见[游玩循环审查](GRAYRIVER_LOOP_REVIEW.md)。`CombatExecutor.defense_resolved`在命中组与资源结算完成后广播只读防御结果，由注入执行器的伤害文字组件展示；不把表现事件用于扣款或伤害。空`ground.*`容器由库存事务回收，独立落地身份不会在当前会话重用。
 
 2026-11-08：[状态、生产与知识扩展](SYSTEM_EXTENSIBILITY.md)明确食品时钟与死亡策略、纯值排产状态、原子库存加工和武技/课程Resource目录；内容登记与失败边界见[接入指南](CONTENT_AUTHORING.md)。`TownServices`只装配商店/训练师配置与UI，排产、知识、库存仍各有唯一权威。
+
+2026-11-09：[按住式武器操作](WEAPON_HOLD_INPUT.md)由输入适配器无损提出鼠标边沿，ActorActionController独占短暂准备、计时和一次性段落/路线保留。速发/重发均复用原TECHNIQUE执行与真实库存提交；共享Resource不存蓄力进度，存档不存鼠标意图。
