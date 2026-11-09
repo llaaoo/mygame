@@ -343,7 +343,8 @@ func exchange(a: String,b: String,costs: Dictionary,returns: Dictionary,return_u
 				if remaining==0: break
 	for row in outgoing:
 		var destinations: Array[String]=[]
-		if definitions[row.key] is EquipmentData: destinations.append(str(row.actor)+".pack")
+		if definitions[row.key] is EquipmentData:
+			if str(row.actor)+".pack" in scratch.actor_containers(row.actor): destinations.append(str(row.actor)+".pack")
 		else: destinations=scratch.actor_containers(row.actor)
 		var remaining:=int(row.quantity)
 		var uid: String=row.uid

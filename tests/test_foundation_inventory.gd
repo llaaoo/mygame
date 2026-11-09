@@ -90,6 +90,10 @@ func run() -> void:
 	var copies:=store.entries("copies.pack")
 	var exact_uid: String=copies[1].uid
 	check(store.trade_instance("paying","copies",exact_uid,1,8).accepted and store.locate(exact_uid)=="paying.pack" and store.locate(copies[0].uid)=="copies.pack","Sale substituted an earlier identical item")
+	check(store.drop_pack("paying","camp",Vector2(500,500)),"Could not drop the purchase destination pack")
+	var detached_before:=store.snapshot()
+	check(not store.preview_trade_instance("paying","copies",copies[0].uid,1,8).accepted and not store.trade_instance("paying","copies",copies[0].uid,1,8).accepted and store.snapshot()==detached_before,"Trade remotely inserted equipment into a dropped pack or took payment")
+	check(store.recover_pack("paying","paying.pack"),"Purchase fixture could not recover its own pack")
 	var saved:=store.snapshot()
 	check(InventoryService.valid_snapshot(saved),"Canonical inventory cannot save")
 	var invalid:=saved.duplicate(true)
