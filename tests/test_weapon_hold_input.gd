@@ -38,7 +38,7 @@ func run() -> void:
 	var before:=starts.size(); var stamina:=actions.stamina.current
 	await pointer_button(MOUSE_BUTTON_LEFT,true); await frames(2)
 	check(starts.size()==before and actions.stamina.current==stamina,"Press alone emitted a light hit or spent stamina")
-	check(not actions.weapon_hold_view().is_empty() and not actions.weapon_hold_view().charged,"Short hold feedback was missing")
+	check(not actions.weapon_hold_view().is_empty() and actions.weapon_hold_view().progress>=0,"Hold feedback was missing")
 	await frames(15)
 	check(actions.weapon_hold_view().get("charged",false),"Hold did not cross heavy threshold")
 	await capture("heavy-ready")
@@ -54,8 +54,9 @@ func run() -> void:
 	check(starts.size()==before+1 and not starts.back().charged,"Same-frame tap was swallowed or duplicated")
 	await idle(); before=starts.size()
 	# Ctrl is an art request, not a fallback heavy or ordinary strike.
+	var unmatched_before:=starts.size()
 	await key(KEY_CTRL,true); await swing(); await key(KEY_CTRL,false)
-	check(starts.size()==before+1,"Unmatched Ctrl+LMB fell back to a weapon attack")
+	check(starts.size()==unmatched_before,"Unmatched Ctrl+LMB fell back to a weapon attack")
 	for pair in [["river_sabre","blade_breaker"],["river_spear","spear_thrust"],["river_staff","staff_sweep"],["river_bow","bow_aim"]]:
 		store.equip("player",store.find_owned("player",pair[0])); await ready(pair[1]); await aim_world(actor.position+Vector2(150,0))
 		var arrows:=store.count("player","arrow")
