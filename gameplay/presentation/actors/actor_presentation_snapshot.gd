@@ -24,5 +24,13 @@ static func capture(actor: CharacterBody2D) -> Dictionary:
 		if not cast.is_empty(): return cast
 	if context and context.preparation_query.is_valid() and context.preparation_query.call(): return {"state":"cast","phase":"loop","direction":direction,"token":"prepare"}
 	if context and context.actions and context.actions.guarding: return {"state":"guard","phase":"whole","progress":.5,"direction":direction,"token":"guard"}
+	if "field_work" in actor:
+		var work:=actor.get("field_work") as PlayerFieldWork
+		if work and not work.pending.is_empty():
+			var method: FieldWorkMethod=work.pending.method
+			var kind:=method.id.get_slice(":",0)
+			var state:=str(method.animation_id) if not method.animation_id.is_empty() else "work_gather" if kind in ["harvest","fill"] else "work_rest" if kind in ["sleep","rest","basic"] else "work_craft"
+			var elapsed:=float(work.pending.duration)-float(work.pending.remaining)
+			return {"state":state,"phase":"whole","progress":.5 if PresentationPreferences.value("reduced_motion") else fposmod(elapsed*1.3,1),"work_progress":1-float(work.pending.remaining)/maxf(.001,float(work.pending.duration)),"direction":actor.global_position.direction_to(work.target.global_position) if is_instance_valid(work.target) else direction,"token":"work:"+method.id}
 	if actor.velocity.length_squared()>1: return {"state":"sprint" if context and context.actions and context.actions.sprinting else "walk","phase":"loop","direction":actor.velocity.normalized(),"token":"walk"}
 	return {"state":"idle","phase":"loop","direction":direction,"token":"idle"}

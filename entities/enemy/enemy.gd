@@ -9,6 +9,7 @@ var mana_component: ManaComponent
 var character_brain: EnemyCharacterBrain
 var _combat_bus: CombatEventBus
 var _character_synergies: SkillSynergyResolver
+var _loot_rng := RandomNumberGenerator.new()
 var _player_search: Timer
 
 @export var max_hp: int = 30
@@ -646,7 +647,7 @@ func _on_died() -> void:
 
 func _spawn_drop() -> void:
 	if not drop_scene:
-		if randf() < 0.5:
+		if _loot_rng.randf() < 0.5:
 			drop_scene = load("res://entities/pickups/health_pickup.tscn")
 		else:
 			drop_scene = load("res://entities/pickups/mana_pickup.tscn")

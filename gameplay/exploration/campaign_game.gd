@@ -43,6 +43,8 @@ var alchemy: AlchemyRepairService
 var survival: SurvivalService
 var retreat: ExpeditionRetreat
 var _renderer := PrisonArena.new()
+var presentation: PresentationDirector
+@export var presentation_catalog: PresentationCatalog
 
 func _ready() -> void:
 	if not catalog:
@@ -167,6 +169,10 @@ func _bootstrap() -> void:
 		interface_root.add_child(inventory_screen)
 		session.ground_page=func(id: String): inventory_screen.open("all",id)
 	var start := start_location()
+	presentation=PresentationDirector.new(); presentation.name="Presentation"
+	presentation.catalog=presentation_catalog
+	add_child(presentation)
+	presentation.configure(player,session.facts,session.actor_for_id,WorldTime.instance.get_hour)
 	_change_region(start.region, start.position)
 	ready_for_play = true
 	player.skill_manager.hand_changed.connect(func(_source: String): _queue_save())
@@ -214,6 +220,7 @@ func request_travel(destination: String, arrival: Vector2 = Vector2.INF) -> void
 	call_deferred("_change_region", destination, arrival)
 
 func _clear_temporary() -> void:
+	if presentation: presentation.leave_region()
 	GameUIStyle.close_gameplay_views(player)
 	if is_instance_valid(player.material_wheel): player.material_wheel.close()
 	if session: session.leave_region()
@@ -299,6 +306,10 @@ func _change_region(destination: String, arrival: Vector2 = Vector2.INF) -> void
 	_switching = false
 	_update_objective()
 	session.finish_effect_restoration()
+	if presentation:
+		var environment:=current_data.presentation_environment
+		if not environment: environment=preload("res://content/presentation/outdoors.tres") if current_data.open_field else preload("res://content/presentation/interior.tres")
+		presentation.enter_region(region_root,environment)
 	region_changed.emit(destination)
 	_save_progress()
 

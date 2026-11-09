@@ -1,5 +1,4 @@
 shader_type canvas_item;
-render_mode unshaded;
 void fragment(){
  vec4 base=COLOR;
  float value=dot(base.rgb,vec3(.299,.587,.114));

@@ -35,6 +35,9 @@ def pose_library():
  'shot':[(0,-1),(0,-.03),[6,0],[16,0]],
  'shot_heavy':[(0,-2),(0,-.06),[3,0],[18,0]],
  'cast':[(0,-2),(0,.02),[18,-2],[-16,-2]],
+ 'work_gather':[(0,4),(0,.10),[15,6],[-9,4]],
+ 'work_craft':[(0,1),(0,-.05),[12,-6],[-12,2]],
+ 'work_rest':[(0,6),(0,.04),[9,5],[-9,5]],
  'guard':[(0,0),(0,-.04),[9,-7],[-12,0]],
  'charge':[(0,1),(0,-.07),[7,-5],[-10,2]],
  'dodge':[(0,-4),(0,.13),[8,0],[-8,0]],
@@ -62,6 +65,7 @@ def profile(name,title,frames_name,reference=False):
  mapping={k:(k,k) for k in REFERENCE} if reference else {'idle':('idle','idle'),'walk':('walk','walk'),'slash':('gesture','slash'),'slash_reverse':('gesture','slash_reverse'),'slash_heavy':('gesture','slash_heavy'),'thrust':('gesture','thrust'),'thrust_heavy':('gesture','thrust_heavy'),'sweep':('gesture','sweep'),'sweep_heavy':('gesture','sweep_heavy'),'shot':('gesture','shot'),'shot_heavy':('gesture','shot_heavy'),'cast':('gesture','cast'),'throw':('gesture','cast'),'use':('gesture','cast'),'guard':('gesture','guard'),'charge':('gesture','charge'),'dodge':('walk','dodge'),'hurt':('hurt','hurt'),'death':('death','death')}
  # Original reference throw uses the cast pose; source frames retain their original appearance.
  if reference:mapping['throw']=('throw','cast')
+ else:mapping.update({key:('gesture' if key!='work_rest' else 'idle',key) for key in ['work_gather','work_craft','work_rest']})
  t='[gd_resource type="Resource" script_class="ActorAnimationProfile" format=3]\n[ext_resource type="Script" path="res://gameplay/presentation/actors/actor_animation_profile.gd" id="profile"]\n[ext_resource type="Script" path="res://gameplay/presentation/actors/actor_animation_clip.gd" id="clip"]\n[ext_resource type="SpriteFrames" path="res://content/animations/'+frames_name+'.tres" id="frames"]\n[ext_resource type="AnimationLibrary" path="res://content/animations/actor_poses.tres" id="poses"]\n'
  for key,(frames_id,pose_id) in mapping.items():
   t+=f'[sub_resource type="Resource" id="{key}"]\nscript = ExtResource("clip")\nid = &"{key}"\nframes = &"{frames_id}"\npose = &"{pose_id}"\n'

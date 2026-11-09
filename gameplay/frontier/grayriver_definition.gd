@@ -25,6 +25,7 @@ static func build() -> ExplorationChapterData:
 		region.authored_size = vector(entry.size)
 		region.authored_entry = vector(entry.entry)
 		region.open_field = entry.get("open_field", false)
+		if entry.has("presentation_environment"): region.presentation_environment=load(entry.presentation_environment) as EnvironmentProfile
 		region.room_type = entry.get("room_type", "barracks")
 		for raw in entry.get("obstacles", []):
 			region.authored_obstacles.append({"position": vector(raw.position), "size": vector(raw.size), "kind": raw.kind})
@@ -99,6 +100,7 @@ static func build() -> ExplorationChapterData:
 			station.harvest = amounts(raw.get("harvest", {}))
 			station.regeneration_hours=float(raw.get("regeneration_hours",4))
 			station.required_claims = PackedStringArray(raw.get("required_claims", []))
+			if raw.has("presentation_profile"): station.presentation_profile=load(raw.presentation_profile) as WorldAnimationProfile
 			if raw.has("heat_offset"): station.heat_offset = vector(raw.heat_offset)
 			region.survival_stations.append(station)
 		for raw in entry.get("patches", []):
@@ -129,6 +131,7 @@ static func build() -> ExplorationChapterData:
 					puzzle.routes.append(route)
 				for work_data in raw.get("work", []): puzzle.work_methods.append(work_method(work_data))
 			puzzle.pos = vector(raw.pos)
+			if raw.has("presentation_profile"): puzzle.presentation_profile=load(raw.presentation_profile) as WorldAnimationProfile
 			region.spell_objects.append(puzzle)
 		for raw in entry.get("facilities", []):
 			var facility := RepairFacilityData.new()
@@ -206,6 +209,7 @@ static func build() -> ExplorationChapterData:
 
 static func work_method(raw: Dictionary) -> FieldWorkMethod:
 	var method := FieldWorkMethod.new()
+	method.animation_id=StringName(raw.get("animation_id",""))
 	method.id = raw.id
 	method.title = raw.title
 	method.duration = float(raw.duration)

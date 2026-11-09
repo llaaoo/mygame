@@ -16,6 +16,8 @@ extends Node
 ## key = DamageModifier.Stage (int), value = Array[DamageModifier] (已按 priority 排序)
 var _movement_tweens: Array[Tween] = []
 var _pending_nodes: Array[Dictionary] = []
+var _combat_rng := RandomNumberGenerator.new()
+var _summon_rng := RandomNumberGenerator.new()
 
 var modifiers_by_stage: Dictionary = {
 	DamageModifier.Stage.FLAT: [],
@@ -446,7 +448,7 @@ func _execute_summon(skill: SkillData, ctx: CastContext) -> bool:
 	# 在玩家身后生成
 	var spawn_pos := ctx.caster.global_position - ctx.direction * 50.0
 	# 加一点随机偏移，多个召唤物不重叠
-	spawn_pos += Vector2(randf_range(-30, 30), randf_range(-30, 30))
+	spawn_pos += Vector2(_summon_rng.randf_range(-30, 30), _summon_rng.randf_range(-30, 30))
 	instance.position = ctx.world.to_local(spawn_pos) if ctx.world is Node2D else spawn_pos
 
 	var configure := instance.setup.bind(_build_scaled_summon_data(skill.summon_data, player), player, manager)
@@ -538,7 +540,7 @@ func _apply_mastery_damage_bonuses(base_damage: int, skill: SkillData, caster: N
 		for tag in skill.tags:
 			multiplier += equipment.get_modifier_value("damage.%s" % tag)
 		var crit_chance := clampf(equipment.get_modifier_value("crit_chance"), 0.0, 1.0)
-		if crit_chance > 0.0 and randf() < crit_chance:
+		if crit_chance > 0.0 and _combat_rng.randf() < crit_chance:
 			multiplier *= 1.5 + equipment.get_modifier_value("crit_damage")
 	return maxi(1, int(round(base_damage * multiplier)))
 

@@ -90,3 +90,6 @@ UI可以调用领域服务请求训练、制造、交付或施法，由服务验
 2026-11-09：[按住式武器操作](WEAPON_HOLD_INPUT.md)由输入适配器无损提出鼠标边沿，ActorActionController独占短暂准备、计时和一次性段落/路线保留。速发/重发均复用原TECHNIQUE执行与真实库存提交；共享Resource不存蓄力进度，存档不存鼠标意图。
 
 2026-11-09：[角色动画基座](ACTOR_ANIMATION_SYSTEM.md)以只读动作快照、不可变Clip/Profile与原生SpriteFrames/AnimationLibrary分离玩法和表现。Avatar实例拥有播放/受击状态，武器绘制移出动作执行器；挥出提示来自真实提交事实。身体、纸娃娃与遗骸共用已登记的无武器身体配置，装备仍由实际UID提供。
+## 全游戏表现入口
+
+角色rig是[全游戏表现基座](GAME_PRESENTATION_SYSTEM.md)的一个分支。CampaignGame组合场景拥有的PresentationDirector、WorldObjectPresentation、EnvironmentPresentation、CameraFeedback与原生音效；事实、库存和时钟继续拥有玩法。UI用局部Tween；美术预制体禁止脚本、碰撞和外部方法轨道。玩法的随机流独立于原生粒子使用的引擎全局随机源。

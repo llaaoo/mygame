@@ -1,0 +1,18 @@
+[gd_scene format=3]
+[node name="EmberImpact" type="Node2D"]
+[node name="Particles" type="CPUParticles2D" parent="."]
+amount = 12
+lifetime = 0.3
+one_shot = true
+explosiveness = 1.0
+use_fixed_seed = true
+seed = 103
+direction = Vector2(0, -1)
+spread = 180.0
+gravity = Vector2(0, 20)
+initial_velocity_min = 24.0
+initial_velocity_max = 55.0
+scale_amount_min = 1.0
+scale_amount_max = 3.0
+color = Color(1, 0.75, 0.3, 0.8)
+

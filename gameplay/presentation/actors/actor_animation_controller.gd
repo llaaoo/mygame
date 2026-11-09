@@ -83,7 +83,7 @@ func _process(delta: float) -> void: render(delta)
 func render(delta: float) -> void:
 	if not is_node_ready() or not profile or not body.sprite_frames: return
 	_bind_facts()
-	_loop_clock+=maxf(0,delta); _cast_age+=maxf(0,delta)
+	_loop_clock+=maxf(0,delta)*PresentationPreferences.motion_scale(); _cast_age+=maxf(0,delta)
 	_reaction=maxf(0,_reaction-delta)
 	var snapshot: Dictionary=preview.duplicate() if not preview.is_empty() else ActorPresentationSnapshot.capture(actor) if is_instance_valid(actor) else {"state":"idle","phase":"loop","direction":Vector2.DOWN,"token":"idle"}
 	var state:=str(snapshot.get("state","idle"))
@@ -129,7 +129,7 @@ func render(delta: float) -> void:
 		poses.play(resolved_clip.pose); poses.advance(0); poses.pause()
 	poses.seek(normalized*poses.get_animation(resolved_clip.pose).length,true,true)
 	sockets.rotation=aim_direction.angle()-PI*.5
-	$Reaction.position=Vector2(sin(_reaction*95)*_reaction*6,0) if _reaction>0 else Vector2.ZERO
+	$Reaction.position=Vector2(sin(_reaction*95)*_reaction*6*PresentationPreferences.motion_scale(),0) if _reaction>0 else Vector2.ZERO
 	if is_instance_valid(actor) and state in ["walk","sprint"] and _last_state in ["walk","sprint"]:
 		var cycle:=_distance/profile.stride_distance
 		for marker in resolved_clip.footsteps:

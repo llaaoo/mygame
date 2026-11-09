@@ -70,3 +70,6 @@
 ## 身体动画与动作表现
 
 按[动画接入流程](ACTOR_ANIMATION_SYSTEM.md)添加SpriteFrames、ActorAnimationClip与原生姿态库，将真实角色配置登记到`content/animations/live_profiles.tres`并配置ActorCharacterData。AttackProfile.animation_id只选择表现；前摇/有效期/后摇、命中与消耗仍由物理动作决定。脚步接触点属于Clip，不能按精灵帧数推断声音次数。参考图若含绘制武器须保持equipment_free=false，不能进入真实角色目录；素材许可与散列须一并登记。
+## 视觉与声音扩充
+
+世界物体通过`presentation_profile`接入原生姿态和视觉预制体，区域通过`presentation_environment`接入环境配置，法术沿用`trail_scene / hit_effect / sound_cast / sound_hit`。水井与火球是已运行样本；目录、白名单、预算、真实状态和输入验证见[全游戏表现接入](GAME_PRESENTATION_SYSTEM.md)。表现不提交奖励，不储存第二套采集/机关进度，也不推进玩法随机流。

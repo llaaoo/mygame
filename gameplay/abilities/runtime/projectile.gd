@@ -40,6 +40,7 @@ func setup(skill: SkillData, caster_node: Node2D, dir: Vector2) -> void:
 		if skill.visual:
 			if skill.visual.texture:
 				spr.texture = skill.visual.texture
+			if skill.visual.trail_scene: PresentationScene.attach(self,skill.visual.trail_scene)
 			spr.modulate = skill.visual.color
 			spr.scale = Vector2(skill.visual.scale, skill.visual.scale)
 		else:
@@ -175,6 +176,7 @@ func _on_body_entered(body: Node2D) -> void:
 	else:
 		_has_hit = true
 		_apply_impact_surface()
+		SpellVisual.impact(self,get_meta("skill_data",null) as SkillData,true)
 		queue_free()
 
 

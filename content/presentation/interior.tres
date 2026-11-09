@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="EnvironmentProfile" load_steps=2 format=3]
+[ext_resource type="Script" path="res://gameplay/presentation/environment_profile.gd" id="script"]
+[resource]
+script = ExtResource("script")
+id = &"interior"
+daylight = Color(0.88, 0.89, 0.87, 1)
+night = Color(0.78, 0.81, 0.85, 1)
+ambient_color = Color(0.8, 0.75, 0.65, 0.13)
+motes = 8
+wind = false

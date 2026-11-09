@@ -1,0 +1,26 @@
+[
+  {
+    "path": "content/presentation/sounds/tick.wav",
+    "license": "CC0-1.0",
+    "source": "tools/build_presentation_assets.py; original deterministic synthesis, no sampled recordings",
+    "sha256": "bde6b0215767e4858132f024d1dc903638338d96ff3301b7ce63db63a13d45d6"
+  },
+  {
+    "path": "content/presentation/sounds/gather.wav",
+    "license": "CC0-1.0",
+    "source": "tools/build_presentation_assets.py; original deterministic synthesis, no sampled recordings",
+    "sha256": "a057b18778a5987f2388f6f8ed92eae4a4e9318b0bd168f05001df99c27c0c32"
+  },
+  {
+    "path": "content/presentation/sounds/chime.wav",
+    "license": "CC0-1.0",
+    "source": "tools/build_presentation_assets.py; original deterministic synthesis, no sampled recordings",
+    "sha256": "17cc31b84142ded90ebdc9a28f239380a309b177bcbd1f48b8cdc1a278bd7e59"
+  },
+  {
+    "path": "content/presentation/sounds/impact.wav",
+    "license": "CC0-1.0",
+    "source": "tools/build_presentation_assets.py; original deterministic synthesis, no sampled recordings",
+    "sha256": "29abe509dd01a9618e3810dc4b62b202067f0cfe99babea87565210b5ea4e4ce"
+  }
+]

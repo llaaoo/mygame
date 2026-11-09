@@ -1,0 +1,99 @@
+[gd_resource type="AnimationLibrary" load_steps=6 format=3]
+
+[sub_resource type="Animation" id="RESET"]
+resource_name = "RESET"
+length = 1.0
+
+tracks/0/type = "value"
+tracks/0/path = NodePath("Visual:position")
+tracks/0/interp = 1
+tracks/0/keys = {"times": PackedFloat32Array(0, 1), "transitions": PackedFloat32Array(1, 1), "update": 0, "values": [Vector2(0, 0), Vector2(0, 0)]}
+
+tracks/1/type = "value"
+tracks/1/path = NodePath("Visual:scale")
+tracks/1/interp = 1
+tracks/1/keys = {"times": PackedFloat32Array(0, 1), "transitions": PackedFloat32Array(1, 1), "update": 0, "values": [Vector2(1, 1), Vector2(1, 1)]}
+
+tracks/2/type = "value"
+tracks/2/path = NodePath("Visual:modulate")
+tracks/2/interp = 1
+tracks/2/keys = {"times": PackedFloat32Array(0, 1), "transitions": PackedFloat32Array(1, 1), "update": 0, "values": [Color(1, 1, 1, 1), Color(1, 1, 1, 1)]}
+
+[sub_resource type="Animation" id="idle"]
+resource_name = "idle"
+length = 1.0
+
+tracks/0/type = "value"
+tracks/0/path = NodePath("Visual:position")
+tracks/0/interp = 1
+tracks/0/keys = {"times": PackedFloat32Array(0, 0.5, 1), "transitions": PackedFloat32Array(1, 1, 1), "update": 0, "values": [Vector2(0, 0), Vector2(0, -1), Vector2(0, 0)]}
+
+tracks/1/type = "value"
+tracks/1/path = NodePath("Visual:scale")
+tracks/1/interp = 1
+tracks/1/keys = {"times": PackedFloat32Array(0, 0.5, 1), "transitions": PackedFloat32Array(1, 1, 1), "update": 0, "values": [Vector2(1, 1), Vector2(1, 1), Vector2(1, 1)]}
+
+tracks/2/type = "value"
+tracks/2/path = NodePath("Visual:modulate")
+tracks/2/interp = 1
+tracks/2/keys = {"times": PackedFloat32Array(0, 0.5, 1), "transitions": PackedFloat32Array(1, 1, 1), "update": 0, "values": [Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1)]}
+
+[sub_resource type="Animation" id="active"]
+resource_name = "active"
+length = 1.0
+
+tracks/0/type = "value"
+tracks/0/path = NodePath("Visual:position")
+tracks/0/interp = 1
+tracks/0/keys = {"times": PackedFloat32Array(0, 0.5, 1), "transitions": PackedFloat32Array(1, 1, 1), "update": 0, "values": [Vector2(0, 0), Vector2(0, -3), Vector2(0, 0)]}
+
+tracks/1/type = "value"
+tracks/1/path = NodePath("Visual:scale")
+tracks/1/interp = 1
+tracks/1/keys = {"times": PackedFloat32Array(0, 0.5, 1), "transitions": PackedFloat32Array(1, 1, 1), "update": 0, "values": [Vector2(1, 1), Vector2(1.05, 1.05), Vector2(1, 1)]}
+
+tracks/2/type = "value"
+tracks/2/path = NodePath("Visual:modulate")
+tracks/2/interp = 1
+tracks/2/keys = {"times": PackedFloat32Array(0, 0.5, 1), "transitions": PackedFloat32Array(1, 1, 1), "update": 0, "values": [Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1)]}
+
+[sub_resource type="Animation" id="depleted"]
+resource_name = "depleted"
+length = 1.0
+
+tracks/0/type = "value"
+tracks/0/path = NodePath("Visual:position")
+tracks/0/interp = 1
+tracks/0/keys = {"times": PackedFloat32Array(0, 1), "transitions": PackedFloat32Array(1, 1), "update": 0, "values": [Vector2(0, 0), Vector2(0, 1)]}
+
+tracks/1/type = "value"
+tracks/1/path = NodePath("Visual:scale")
+tracks/1/interp = 1
+tracks/1/keys = {"times": PackedFloat32Array(0, 1), "transitions": PackedFloat32Array(1, 1), "update": 0, "values": [Vector2(1, 1), Vector2(0.92, 0.92)]}
+
+tracks/2/type = "value"
+tracks/2/path = NodePath("Visual:modulate")
+tracks/2/interp = 1
+tracks/2/keys = {"times": PackedFloat32Array(0, 1), "transitions": PackedFloat32Array(1, 1), "update": 0, "values": [Color(1, 1, 1, 1), Color(0.75, 0.75, 0.75, 0.35)]}
+
+[sub_resource type="Animation" id="complete"]
+resource_name = "complete"
+length = 1.0
+
+tracks/0/type = "value"
+tracks/0/path = NodePath("Visual:position")
+tracks/0/interp = 1
+tracks/0/keys = {"times": PackedFloat32Array(0, 1), "transitions": PackedFloat32Array(1, 1), "update": 0, "values": [Vector2(0, 0), Vector2(0, -1)]}
+
+tracks/1/type = "value"
+tracks/1/path = NodePath("Visual:scale")
+tracks/1/interp = 1
+tracks/1/keys = {"times": PackedFloat32Array(0, 1), "transitions": PackedFloat32Array(1, 1), "update": 0, "values": [Vector2(1, 1), Vector2(1, 1)]}
+
+tracks/2/type = "value"
+tracks/2/path = NodePath("Visual:modulate")
+tracks/2/interp = 1
+tracks/2/keys = {"times": PackedFloat32Array(0, 1), "transitions": PackedFloat32Array(1, 1), "update": 0, "values": [Color(1, 1, 1, 1), Color(0.8, 1, 0.85, 1)]}
+
+[resource]
+_data = { &"RESET": SubResource("RESET"), &"idle": SubResource("idle"), &"active": SubResource("active"), &"depleted": SubResource("depleted"), &"complete": SubResource("complete") }

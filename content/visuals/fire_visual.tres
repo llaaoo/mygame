@@ -1,6 +1,14 @@
 [gd_resource type="Resource" script_class="ProjectileVisualData" format=3 uid="uid://c5mgkqieunj7x"]
 
 [ext_resource type="Script" path="res://gameplay/abilities/visuals/projectile_visual_data.gd" id="1_djddt"]
+[ext_resource type="PackedScene" path="res://content/presentation/ember_trail.tscn" id="trail"]
+[ext_resource type="PackedScene" path="res://content/presentation/ember_impact.tscn" id="impact"]
+[ext_resource type="AudioStream" path="res://content/presentation/sounds/chime.wav" id="cast"]
+[ext_resource type="AudioStream" path="res://content/presentation/sounds/impact.wav" id="hit"]
 
 [resource]
 script = ExtResource("1_djddt")
+trail_scene = ExtResource("trail")
+hit_effect = ExtResource("impact")
+sound_cast = ExtResource("cast")
+sound_hit = ExtResource("hit")
