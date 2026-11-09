@@ -55,6 +55,11 @@ func run() -> void:
 	InputBindings.loaded=false; InputBindings.install()
 	check(has_key("cast_e",KEY_E) and has_key("skill_1",KEY_1) and not has_key("skill_1",KEY_E),"v3 saved alias overrode independent E/1 defaults")
 	# A failed preference write must leave the usable runtime map intact.
+	config=ConfigFile.new(); config.set_value("layout","version",5)
+	config.set_value("bindings","skill_4",{"key":KEY_V}); config.save(InputBindings.PATH)
+	InputBindings.loaded=false; InputBindings.install()
+	check(has_key("skill_4",KEY_V) and has_key("weapon_art",KEY_Z),"New shared art stole an older V binding instead of choosing a free fallback")
+	InputBindings.reset_defaults()
 	DirAccess.make_dir_absolute(InputBindings.PATH+".tmp")
 	check(not InputBindings.assign("skill_5",event(KEY_H)).accepted and has_key("skill_5",KEY_5),"Failed disk write changed runtime binding")
 	DirAccess.remove_absolute(InputBindings.PATH+".tmp")

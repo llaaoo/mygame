@@ -244,6 +244,9 @@ func _reposition_for_shot(target: Node2D) -> Array[Action]:
 func _martial_action(target: Node2D,distance: float,target_context: ActorContext) -> Action:
 	var context:=actor.actor_context
 	if context.actions.stamina.current<context.actions.stamina.maximum*_tempo.retreat_fraction: return null
+	var art:=context.actions.weapon_art_view()
+	if not art.is_empty() and str(art.reason).is_empty() and distance<=(art.profile as AttackProfile).reach:
+		if (art.profile as AttackProfile).projectile_speed==0 or shot_lane_clear(target): return context.actions.capture_weapon_art((target.global_position-actor.global_position).normalized())
 	for id in context.martial.learned:
 		var view:=context.actions.technique_view(id)
 		if view.is_empty() or not str(view.reason).is_empty(): continue

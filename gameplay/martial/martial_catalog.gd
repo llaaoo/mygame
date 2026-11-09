@@ -18,9 +18,14 @@ func ids() -> Array[String]:
 	return result
 func validate() -> Array[String]:
 	var errors: Array[String]=[]; var seen: Dictionary={}
+	var routes: Dictionary={}
 	for entry in techniques:
 		if not entry or not entry.valid() or seen.has(entry.id): errors.append("Invalid/duplicate martial technique"); continue
 		seen[entry.id]=true
+		for route in entry.art_routes:
+			var key:=entry.weapon_type+":"+"/".join(route.sequence)+":"+str(route.priority)
+			if routes.has(key): errors.append("Ambiguous shared martial route: "+entry.id)
+			routes[key]=entry.id
 	for entry in techniques:
 		if entry: _visit(entry,[],{},errors)
 	return errors
