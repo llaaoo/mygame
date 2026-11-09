@@ -35,6 +35,7 @@ damage_multiplier = 1.35
 title = "截势斩"
 [sub_resource type="Resource" id="Charged"]
 script = ExtResource("attack")
+animation_id = &"slash_heavy"
 title = "蓄势破盾"
 step_distance = 10
 movement_multiplier = 0
@@ -50,6 +51,7 @@ impact = 90
 damage_multiplier = 1.6
 [sub_resource type="Resource" id="ChargedFollowup"]
 script = ExtResource("attack")
+animation_id = &"slash_heavy"
 title = "蓄势截断"
 step_distance = 8
 movement_multiplier = 0

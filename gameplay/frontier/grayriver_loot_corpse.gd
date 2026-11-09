@@ -3,6 +3,7 @@ extends ExplorationInteractable
 var loot_id: String
 var service: GrayriverLoot
 var gear: ActorEquipmentVisual
+var fresh_death := false
 
 func _ready() -> void:
 	kind = "loot"
@@ -10,7 +11,18 @@ func _ready() -> void:
 	super._ready()
 	gear = ActorEquipmentVisual.new()
 	gear.position = Vector2(0, 4)
-	gear.rotation = -PI / 2
+	if not loot_id.begins_with("cache."):
+		var record: Dictionary=service.game.progress.loot_records[loot_id]
+		gear.animator=(load("res://gameplay/presentation/actors/actor_animation_rig.tscn") as PackedScene).instantiate()
+		gear.animator.profile=ActorAnimationCatalog.default_catalog().definition(StringName(str(record.get("visual_profile","puny_body"))))
+		var direction:=Vector2.DOWN
+		var raw: Variant=record.get("visual_facing",[])
+		if raw is Array and raw.size()==2 and (raw[0] is int or raw[0] is float) and (raw[1] is int or raw[1] is float):
+			var candidate:=Vector2(float(raw[0]),float(raw[1]))
+			if candidate.is_finite() and not candidate.is_zero_approx(): direction=candidate.normalized()
+		gear.animator.preview={"state":"death","phase":"whole","direction":direction,"token":"corpse:"+loot_id}
+		if not fresh_death: gear.animator.preview["progress"]=1.0
+		gear.add_child(gear.animator)
 	add_child(gear)
 	refresh()
 
@@ -39,6 +51,7 @@ func _draw() -> void:
 		draw_rect(Rect2(-18,-10,36,28), Color("b69c67"), false, 2)
 		if _near: draw_arc(Vector2.ZERO,27,0,TAU,32,Color("d5b66c"),1,true)
 		return
-	draw_line(Vector2(-14,4),Vector2(10,4),Color("56544b"),12)
-	draw_circle(Vector2(-20,4),7,Color("8c8170"))
+	if not gear or not gear.animator:
+		draw_line(Vector2(-14,4),Vector2(10,4),Color("56544b"),12)
+		draw_circle(Vector2(-20,4),7,Color("8c8170"))
 	if _near: draw_arc(Vector2.ZERO,27,0,TAU,32,Color("d5b66c"),1,true)

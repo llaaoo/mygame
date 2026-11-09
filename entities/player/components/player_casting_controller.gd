@@ -22,6 +22,12 @@ var _aim_ring: Line2D
 var _ring_radius := -1.0
 var _aim_refresh := 0.0
 
+func presentation_snapshot() -> Dictionary:
+	if _charge_skill: return {"state":"cast","phase":"windup","progress":clampf(_charge_power,0,1),"direction":player.get_mouse_direction(),"token":"charge:"+_charging_source}
+	if _channel_skill: return {"state":"channel","phase":"loop","direction":player.get_mouse_direction(),"token":"channel:"+_channeling_source}
+	if not aiming_sources.is_empty(): return {"state":"aim","phase":"whole","progress":.35,"direction":player.get_mouse_direction(),"token":"aim:"+aimed_source()}
+	return {}
+
 func aimed_source() -> String:
 	# Dictionary insertion order follows the latest pressed source. Releasing one
 	# source falls back to any other source that is still being held.

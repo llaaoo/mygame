@@ -5,9 +5,8 @@ var items: Array[EquipmentData] = []
 var manager: EquipmentManager
 var inventory_store: InventoryService
 var display_uids: Array[String]=[]
-var _walk_phase := 0.0
-var preview_body := false
 var preview_pack := false
+var animator: ActorAnimationController
 
 static func install(actor: Node2D) -> ActorEquipmentVisual:
 	var existing := actor.get_node_or_null("EquipmentVisual") as ActorEquipmentVisual
@@ -20,6 +19,13 @@ static func install(actor: Node2D) -> ActorEquipmentVisual:
 	# unowned equipment is never depicted as if it could be recovered.
 	var sprite := actor.get_node_or_null("Sprite2D") as Sprite2D
 	if sprite: sprite.self_modulate = Color(1,1,1,0)
+	visual.animator=(load("res://gameplay/presentation/actors/actor_animation_rig.tscn") as PackedScene).instantiate()
+	visual.animator.actor=actor
+	var definition: ActorCharacterData=actor.get("character_definition") if "character_definition" in actor else null
+	if definition and definition.animation_profile: visual.animator.profile=definition.animation_profile
+	visual.add_child(visual.animator)
+	var weapon:=ActorWeaponVisual.new(); weapon.actor=actor; weapon.rig=visual.animator; weapon.z_index=1
+	visual.add_child(weapon)
 	actor.add_child(visual)
 	visual.manager.loadout_changed.connect(visual.refresh)
 	visual.refresh()
@@ -29,53 +35,27 @@ func refresh() -> void:
 	if manager: items = manager.get_all_equipped()
 	queue_redraw()
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if not manager:
 		if inventory_store: queue_redraw()
 		return
 	var actor := get_parent() as Node2D
 	var sprite := actor.get_node_or_null("Sprite2D") as Sprite2D
 	if sprite: modulate = sprite.modulate
-	if "velocity" in actor and actor.velocity.length_squared() > 1:
-		_walk_phase += delta * 10
-	else: _walk_phase = 0
 	queue_redraw()
 
 func _draw() -> void:
-	if manager or preview_body:
+	if is_instance_valid(animator) and animator.is_node_ready():
+		draw_set_transform(Vector2(1,19),0,Vector2(1,.38)); draw_circle(Vector2.ZERO,20,Color(0,0,0,.24))
+		draw_set_transform(animator.rig.position+animator.get_node("Reaction").position,animator.rig.rotation)
 		var wearer:=get_parent()
-		var context:=wearer.get("actor_context") as ActorContext if "actor_context" in wearer else null
-		if preview_pack or context and context.rules.physical_inventory and context.items.is_attached(context.id + ".pack"):
-			draw_rect(Rect2(-17,-12,9,23),Color("665238"))
-			draw_line(Vector2(-13,-10),Vector2(-13,10),Color("b39964"),2)
-		draw_set_transform(Vector2(0,sin(_walk_phase)))
-		var shirt := Color("546f79") if preview_body or get_parent().is_in_group("player") else Color("75685a")
-		draw_set_transform(Vector2(1,19),0,Vector2(1,.38))
-		draw_circle(Vector2.ZERO,20,Color(0,0,0,.24))
-		draw_set_transform(Vector2(0,sin(_walk_phase)))
-		var stride:=sin(_walk_phase)*2
-		draw_rect(Rect2(-8,7+stride,6,14),Color("303b3e"))
-		draw_rect(Rect2(2,7-stride,6,14),Color("3c4748"))
-		draw_rect(Rect2(-9,18+stride,7,4),Color("272e30"))
-		draw_rect(Rect2(2,18-stride,8,4),Color("272e30"))
-		var silhouette:=PackedVector2Array([Vector2(-9,-13),Vector2(-14,-8),Vector2(-16,3),Vector2(-11,6),Vector2(-8,1),Vector2(-9,11),Vector2(9,11),Vector2(8,1),Vector2(11,6),Vector2(16,3),Vector2(14,-8),Vector2(9,-13)])
-		draw_colored_polygon(silhouette,shirt.darkened(.3))
-		draw_colored_polygon(PackedVector2Array([Vector2(-7,-12),Vector2(7,-12),Vector2(8,7),Vector2(-8,7)]),shirt)
-		draw_rect(Rect2(-7,-10,5,16),shirt.lightened(.12))
-		draw_line(Vector2(-7,7),Vector2(8,7),Color("75654b"),3)
-		draw_rect(Rect2(-1,5,4,4),Color("c0a77b"))
-		draw_rect(Rect2(-16,2,5,5),Color("b99574"))
-		draw_rect(Rect2(11,2,5,5),Color("c6a17e"))
-		draw_colored_polygon(PackedVector2Array([Vector2(-7,-27),Vector2(6,-27),Vector2(7,-18),Vector2(4,-13),Vector2(-4,-13),Vector2(-7,-18)]),Color("b99574"))
-		draw_rect(Rect2(-4,-25,9,10),Color("cbaa88"))
-		draw_rect(Rect2(-8,-29,16,6),Color("393633"))
-		draw_rect(Rect2(-8,-24,3,7),Color("393633"))
-		draw_rect(Rect2(-4,-21,2,2),Color("26282b"))
-		draw_rect(Rect2(3,-21,2,2),Color("26282b"))
+		var context: ActorContext=wearer.get("actor_context") if "actor_context" in wearer else null
+		if preview_pack or context and context.rules.physical_inventory and context.items.is_attached(context.id+".pack"):
+			draw_rect(Rect2(-17,-12,9,23),Color("665238")); draw_line(Vector2(-13,-10),Vector2(-13,10),Color("b39964"),2)
 	for item in items:
-		if manager and item.slot_type==EquipmentData.SlotType.RIGHT_HAND:
+		if manager and (item.slot_type==EquipmentData.SlotType.RIGHT_HAND or animator and item.world_shape=="shield"):
 			var actor_context:=get_parent().get("actor_context") as ActorContext
-			if actor_context and actor_context.actions.active() and actor_context.actions.mode=="attack": continue
+			if actor_context and actor_context.actions.active() and (animator or actor_context.actions.mode=="attack"): continue
 		var c := item.world_color
 		var store:=manager.inventory_store if manager else inventory_store
 		if store and item.slot_type==EquipmentData.SlotType.RIGHT_HAND:

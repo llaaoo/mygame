@@ -337,6 +337,10 @@ func cancel_weapon_hold() -> void:
 func _weapon_gesture(edge: Action) -> OperationResult:
 	var phase:=str(edge.params.weapon_gesture)
 	if phase=="cancel": cancel_weapon_hold(); return OperationResult.success()
+	if phase=="aim":
+		if _weapon_hold.is_empty(): return OperationResult.reject("unpaired_release")
+		_weapon_hold.request.direction=edge.direction
+		return OperationResult.success()
 	if phase=="begin":
 		if mode=="spray": context.spray.stop()
 		if mode=="item": context.item_actions.cancel()
@@ -345,6 +349,7 @@ func _weapon_gesture(edge: Action) -> OperationResult:
 		if busy() and not recovering: return OperationResult.reject("busy")
 		var request:=capture_weapon_art(edge.direction,bool(edge.params.get("release_enchantment",false))) if bool(edge.params.get("art",false)) else Action.melee(context.actor)
 		if request.params.get("weapon_art",false) and request.skill_id.is_empty(): return OperationResult.reject("武技未发动：先完成对应连招，K查看条件")
+		request.direction=edge.direction
 		_gesture_serial+=1
 		var uid:=str(context.items.equipped(context.id).get(str(EquipmentData.SlotType.RIGHT_HAND),""))
 		request.params["gesture_weapon_uid"]=uid; request.params["gesture_id"]=_gesture_serial
@@ -486,6 +491,7 @@ func _commit_weapon_release() -> bool:
 	if not context.region.available() or not context.items.commit_weapon_release(context.id,attack_weapon_uid,_ammo_uid,_coating_state,_release_technique!=null,profile.ammo_id): return false
 	_release_committed=true; _ammo_uid=""
 	weapon_art.released(_family)
+	if context.facts: context.facts.publish("physical_action_released",context.id,{"family":_family,"weapon_uid":attack_weapon_uid,"motion":profile.motion})
 	if _release_technique and profile.projectile_speed==0:
 		var wave:=EnchantmentWave.new(); wave.context=context; wave.enchantment=_enchantment; wave.technique=_release_technique
 		wave.direction=facing; wave.family=_family
@@ -495,6 +501,16 @@ func _commit_weapon_release() -> bool:
 func equipment_value(key: String) -> float:
 	var equipment:=context.actor.get_node_or_null("EquipmentManager") as EquipmentManager
 	return equipment.get_modifier_value(key) if equipment else 0.0
+func presentation_snapshot() -> Dictionary:
+	# Animation observes the executor clock. No AnimationPlayer callback may commit gameplay.
+	if mode=="attack" and profile:
+		var phase:="windup" if elapsed<profile.windup else "active" if elapsed<profile.windup+profile.active else "recovery"
+		var progress:=elapsed/maxf(.001,profile.windup) if phase=="windup" else (elapsed-profile.windup)/profile.active if phase=="active" else (elapsed-profile.windup-profile.active)/maxf(.001,profile.recovery)
+		var key:=str(profile.animation_id) if not profile.animation_id.is_empty() else profile.motion+"_reverse" if profile.swing_direction<0 else profile.motion
+		return {"state":key,"phase":phase,"progress":clampf(progress,0,1),"direction":facing,"token":_family,"weapon_uid":attack_weapon_uid}
+	if mode in ["dodge","stagger"]: return {"state":mode,"phase":"whole","progress":elapsed/maxf(.001,elapsed+remaining),"direction":facing,"token":mode+":"+str(operation_id)}
+	if not _weapon_hold.is_empty(): return {"state":"charge","phase":"windup","progress":clampf(float(_weapon_hold.age)/WEAPON_HOLD_SECONDS,0,1),"direction":_weapon_hold.request.direction,"token":"hold:"+str(_gesture_serial)}
+	return {}
 func attack_observation() -> Dictionary:
 	if mode!="attack" or not profile: return {}
 	return {"serial":_attack_sequence,"windup":maxf(0,profile.windup-elapsed),"reach":maxf(profile.reach+profile.step_distance,_release_technique.release_reach if _release_technique else 0),"direction":facing,"angle":maxf(profile.angle_degrees,_release_technique.release_angle if _release_technique else 0),"heavy":profile.guard_pressure>1 or profile.windup>=.35 or _release_technique!=null}
@@ -642,7 +658,6 @@ func _draw() -> void:
 	if mode=="attack" and elapsed>=profile.windup+profile.active:
 		var fraction:=clampf(remaining/maxf(.001,profile.recovery),0,1)
 		draw_arc(Vector2.ZERO,26,-PI/2,-PI/2+TAU*fraction,20,Color(.75,.8,.9,.45),1.5,true)
-	if mode=="attack": _draw_weapon_motion()
 	if counter_remaining>0: draw_arc(Vector2.ZERO,34,0,TAU*counter_remaining/.85,24,Color("e0bf70"),2,true)
 	if guarding: draw_arc(Vector2.ZERO,30,facing.angle()-PI/3,facing.angle()+PI/3,16,Color(.5,.8,1),3,true)
 
@@ -664,42 +679,3 @@ func rest_elapsed(seconds: float) -> void:
 	cancel("rest_time")
 	stamina.advance(seconds)
 	stability.advance(seconds)
-
-func _draw_weapon_motion() -> void:
-	var manager:=context.actor.get_node_or_null("EquipmentManager") as EquipmentManager
-	var weapon:=manager.get_equipment(EquipmentData.SlotType.RIGHT_HAND) if manager else null
-	var color:=weapon.world_color if weapon else Color("c6a17e")
-	var coating:=context.items.coating(attack_weapon_uid)
-	if coating: color=color.lerp(coating.payload.color,.8)
-	if counter_strike: color=color.lerp(Color("f3d58a"),.55)
-	var before:=elapsed<profile.windup
-	var active_phase:=elapsed>=profile.windup and elapsed<profile.windup+profile.active
-	var progress:=clampf(elapsed/maxf(.001,profile.windup),0,1) if before else clampf((elapsed-profile.windup)/profile.active,0,1) if active_phase else 1-clampf((elapsed-profile.windup-profile.active)/maxf(.001,profile.recovery),0,1)
-	var angle:=facing.angle()
-	var length:=profile.reach*(.42+.2*progress if before else 1.0 if active_phase else .4+.6*progress)
-	if profile.motion in ["slash","sweep"]:
-		var span:=deg_to_rad(profile.angle_degrees*.5)
-		angle+=profile.swing_direction*((-span*(.4+.6*progress)) if before else lerpf(-span,span,progress) if active_phase else span*progress)
-	var direction:=Vector2.from_angle(angle)
-	if profile.motion=="shot":
-		draw_set_transform(Vector2.ZERO,facing.angle())
-		draw_arc(Vector2(12,0),18,-PI/2,PI/2,16,color,3,true)
-		var string_point:=Vector2(10-9*progress,0)
-		draw_polyline(PackedVector2Array([Vector2(12,-18),string_point,Vector2(12,18)]),Color("dacead"),1,true)
-		draw_line(string_point,string_point+Vector2(25,0),Color("ded1a7"),2,true)
-		draw_set_transform(Vector2.ZERO)
-		return
-	if active_phase:
-		draw_arc(Vector2.ZERO,profile.reach,facing.angle()-deg_to_rad(profile.angle_degrees*.5),facing.angle()+deg_to_rad(profile.angle_degrees*.5),24,Color(color,.13),2,true)
-		if profile.motion in ["slash","sweep"]:
-			var start_angle:=facing.angle()-profile.swing_direction*deg_to_rad(profile.angle_degrees*.5)
-			draw_arc(Vector2.ZERO,profile.reach,minf(start_angle,angle),maxf(start_angle,angle),18,Color(color,.24),5,true)
-		else: draw_line(direction*12,direction*profile.reach,Color(color,.25),7,true)
-	var start:=direction*10
-	var tip:=direction*length
-	if not weapon: draw_circle(tip,5,color); return
-	draw_line(start,tip,Color("302d27"),6,true)
-	draw_line(start,tip,color,3 if weapon.world_shape!="staff" else 5,true)
-	if weapon.world_shape=="staff": draw_circle(tip,5,color.lightened(.25))
-	elif weapon.world_shape=="spear": draw_colored_polygon(PackedVector2Array([tip+direction*2,tip-direction*10+direction.orthogonal()*4,tip-direction*10-direction.orthogonal()*4]),color.lightened(.25))
-	else: draw_line(start+direction*6-direction.orthogonal()*5,start+direction*6+direction.orthogonal()*5,Color("aa894b"),3,true)

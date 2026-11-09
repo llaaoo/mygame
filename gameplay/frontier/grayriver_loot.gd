@@ -36,18 +36,24 @@ func record_enemy(enemy: CharacterBody2D) -> void:
 	record.merge({"region":game.region_id, "position":[enemy.position.x,enemy.position.y], "title":enemy.enemy_name+"的遗骸"})
 	# Keep even empty records as tombstones: an encounter reset cannot mint equipment.
 	game.progress.loot_records[id] = record
-	_mount(id)
+	var visual:=enemy.get_node_or_null("EquipmentVisual") as ActorEquipmentVisual
+	if visual and visual.animator and visual.animator.profile:
+		record["visual_profile"]=str(visual.animator.profile.id)
+	var facing: Vector2=enemy.actor_context.actions.facing
+	record["visual_facing"]=[facing.x,facing.y]
+	_mount(id,true)
 
 func mount_region() -> void:
 	corpses.clear()
 	for id in game.progress.loot_records:
 		if game.progress.loot_records[id].region == game.region_id: _mount(id)
 
-func _mount(id: String) -> void:
+func _mount(id: String,fresh_death := false) -> void:
 	_ensure_source(id)
 	if corpses.has(id) and is_instance_valid(corpses[id]): return
 	var record: Dictionary = game.progress.loot_records[id]
 	var corpse := GrayriverLootCorpse.new()
+	corpse.fresh_death=fresh_death
 	corpse.service = self
 	corpse.loot_id = id
 	corpse.position = GrayriverDefinition.vector(record.position)

@@ -10,7 +10,12 @@ var _body: Node2D
 func _ready() -> void:
  custom_minimum_size=Vector2(210,260)
  _body=Node2D.new(); add_child(_body)
- _visual=ActorEquipmentVisual.new(); _visual.preview_body=true
+ _visual=ActorEquipmentVisual.new()
+ _visual.animator=(load("res://gameplay/presentation/actors/actor_animation_rig.tscn") as PackedScene).instantiate()
+ _visual.animator.preview={"state":"idle","phase":"loop","direction":Vector2.DOWN,"token":"paper-doll"}
+ var worn_visual:=actor.get_node_or_null("EquipmentVisual") as ActorEquipmentVisual
+ if worn_visual and worn_visual.animator: _visual.animator.profile=worn_visual.animator.profile
+ _visual.add_child(_visual.animator)
  _body.add_child(_visual); _body.scale=Vector2(2.8,2.8)
  for slot in range(9):
   var button:=InventoryItemTile.new(); button.name="GearSlot_%d"%slot

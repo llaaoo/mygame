@@ -1,6 +1,8 @@
 class_name AttackProfile
 extends Resource
 @export var title := ""
+## Optional presentation semantic; absent clips use an explicit visual fallback only.
+@export var animation_id: StringName
 ## Presentation mirrors only the authored swing; hit qualification stays symmetric.
 @export_enum("Reverse:-1","Forward:1") var swing_direction := 1
 @export_range(1,4,.05) var guard_pressure := 1.0
@@ -24,6 +26,7 @@ extends Resource
 @export_range(0,40,1) var step_distance := 0.0
 func heavy() -> AttackProfile:
 	var value:=duplicate(true) as AttackProfile
+	if value.animation_id.is_empty(): value.animation_id=StringName(motion+"_heavy")
 	value.windup*=2.5
 	value.recovery*=1.7
 	value.stamina_cost*=2

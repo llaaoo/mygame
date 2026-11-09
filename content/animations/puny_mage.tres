@@ -1,0 +1,55 @@
+[gd_resource type="Resource" script_class="ActorAnimationProfile" format=3]
+[ext_resource type="Script" path="res://gameplay/presentation/actors/actor_animation_profile.gd" id="profile"]
+[ext_resource type="Script" path="res://gameplay/presentation/actors/actor_animation_clip.gd" id="clip"]
+[ext_resource type="SpriteFrames" path="res://content/animations/puny_mage_frames.tres" id="frames"]
+[ext_resource type="AnimationLibrary" path="res://content/animations/actor_poses.tres" id="poses"]
+[sub_resource type="Resource" id="idle"]
+script = ExtResource("clip")
+id = &"idle"
+frames = &"idle"
+pose = &"idle"
+[sub_resource type="Resource" id="walk"]
+script = ExtResource("clip")
+id = &"walk"
+footsteps = PackedFloat32Array(0, 0.5)
+frames = &"walk"
+pose = &"walk"
+[sub_resource type="Resource" id="slash"]
+script = ExtResource("clip")
+id = &"slash"
+frames = &"slash"
+pose = &"slash"
+[sub_resource type="Resource" id="shot"]
+script = ExtResource("clip")
+id = &"shot"
+frames = &"shot"
+pose = &"shot"
+[sub_resource type="Resource" id="cast"]
+script = ExtResource("clip")
+id = &"cast"
+frames = &"cast"
+pose = &"cast"
+[sub_resource type="Resource" id="throw"]
+script = ExtResource("clip")
+id = &"throw"
+frames = &"throw"
+pose = &"cast"
+[sub_resource type="Resource" id="hurt"]
+script = ExtResource("clip")
+id = &"hurt"
+frames = &"hurt"
+pose = &"hurt"
+[sub_resource type="Resource" id="death"]
+script = ExtResource("clip")
+id = &"death"
+frames = &"death"
+pose = &"death"
+[resource]
+script = ExtResource("profile")
+id = &"puny_mage"
+title = "原素材 · 法师（含绘制服饰）"
+sprite_frames = ExtResource("frames")
+poses = ExtResource("poses")
+clips = Array[ExtResource("clip")]([SubResource("idle"), SubResource("walk"), SubResource("slash"), SubResource("shot"), SubResource("cast"), SubResource("throw"), SubResource("hurt"), SubResource("death")])
+fallback = {}
+equipment_free = false

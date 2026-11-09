@@ -8,6 +8,8 @@ func _fail(resource: Resource, message: String) -> void:
 
 func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 	failures.clear()
+	var animations:=ActorAnimationCatalog.default_catalog()
+	for error in animations.validation_errors(): _fail(animations,error)
 	for definitions in [ProvisionCatalog.default_catalog(),ProductionCatalog.default_catalog(),MartialCatalog.default_catalog(),TrainingCatalog.default_catalog()]:
 		for error in definitions.validate(): _fail(definitions,error)
 	var market:=load("res://content/frontier/town_market.tres") as MarketDefinition
