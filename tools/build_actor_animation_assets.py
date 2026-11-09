@@ -6,7 +6,7 @@ ROOT=Path(__file__).resolve().parents[1]
 OUT=ROOT/'content/animations'
 DIRECTIONS=['s','sw','w','nw','n','ne','e','se']
 # Only equipment-free columns are allowed in the live profile. The gallery also shows the original baked weapons.
-SAFE={'idle':[0,1],'walk':[2,3],'gesture':[15,16,17,0],'hurt':[18,20,18],'death':[21,22,23]}
+SAFE={'idle':[0,1],'walk':[2,3],'gesture':[16,17,0,1],'hurt':[18,20,18],'death':[21,22,23]}
 REFERENCE={'idle':[0,1],'walk':[2,3],'slash':[4,5,6,7],'shot':[8,9,10,11],'cast':[12,13,14,15],'throw':[15,16,17,0],'hurt':[18,20,18],'death':[21,22,23]}
 def frames(name,sheet,clips):
  text='[gd_resource type="SpriteFrames" format=3]\n[ext_resource type="Texture2D" path="res://content/art/third_party/puny/'+sheet+'" id="sheet"]\n'

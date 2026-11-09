@@ -12,9 +12,6 @@ region = Rect2(64, 0, 32, 32)
 [sub_resource type="AtlasTexture" id="f_0_3"]
 atlas = ExtResource("sheet")
 region = Rect2(96, 0, 32, 32)
-[sub_resource type="AtlasTexture" id="f_0_15"]
-atlas = ExtResource("sheet")
-region = Rect2(480, 0, 32, 32)
 [sub_resource type="AtlasTexture" id="f_0_16"]
 atlas = ExtResource("sheet")
 region = Rect2(512, 0, 32, 32)
@@ -48,9 +45,6 @@ region = Rect2(64, 32, 32, 32)
 [sub_resource type="AtlasTexture" id="f_1_3"]
 atlas = ExtResource("sheet")
 region = Rect2(96, 32, 32, 32)
-[sub_resource type="AtlasTexture" id="f_1_15"]
-atlas = ExtResource("sheet")
-region = Rect2(480, 32, 32, 32)
 [sub_resource type="AtlasTexture" id="f_1_16"]
 atlas = ExtResource("sheet")
 region = Rect2(512, 32, 32, 32)
@@ -84,9 +78,6 @@ region = Rect2(64, 64, 32, 32)
 [sub_resource type="AtlasTexture" id="f_2_3"]
 atlas = ExtResource("sheet")
 region = Rect2(96, 64, 32, 32)
-[sub_resource type="AtlasTexture" id="f_2_15"]
-atlas = ExtResource("sheet")
-region = Rect2(480, 64, 32, 32)
 [sub_resource type="AtlasTexture" id="f_2_16"]
 atlas = ExtResource("sheet")
 region = Rect2(512, 64, 32, 32)
@@ -120,9 +111,6 @@ region = Rect2(64, 96, 32, 32)
 [sub_resource type="AtlasTexture" id="f_3_3"]
 atlas = ExtResource("sheet")
 region = Rect2(96, 96, 32, 32)
-[sub_resource type="AtlasTexture" id="f_3_15"]
-atlas = ExtResource("sheet")
-region = Rect2(480, 96, 32, 32)
 [sub_resource type="AtlasTexture" id="f_3_16"]
 atlas = ExtResource("sheet")
 region = Rect2(512, 96, 32, 32)
@@ -156,9 +144,6 @@ region = Rect2(64, 128, 32, 32)
 [sub_resource type="AtlasTexture" id="f_4_3"]
 atlas = ExtResource("sheet")
 region = Rect2(96, 128, 32, 32)
-[sub_resource type="AtlasTexture" id="f_4_15"]
-atlas = ExtResource("sheet")
-region = Rect2(480, 128, 32, 32)
 [sub_resource type="AtlasTexture" id="f_4_16"]
 atlas = ExtResource("sheet")
 region = Rect2(512, 128, 32, 32)
@@ -192,9 +177,6 @@ region = Rect2(64, 160, 32, 32)
 [sub_resource type="AtlasTexture" id="f_5_3"]
 atlas = ExtResource("sheet")
 region = Rect2(96, 160, 32, 32)
-[sub_resource type="AtlasTexture" id="f_5_15"]
-atlas = ExtResource("sheet")
-region = Rect2(480, 160, 32, 32)
 [sub_resource type="AtlasTexture" id="f_5_16"]
 atlas = ExtResource("sheet")
 region = Rect2(512, 160, 32, 32)
@@ -228,9 +210,6 @@ region = Rect2(64, 192, 32, 32)
 [sub_resource type="AtlasTexture" id="f_6_3"]
 atlas = ExtResource("sheet")
 region = Rect2(96, 192, 32, 32)
-[sub_resource type="AtlasTexture" id="f_6_15"]
-atlas = ExtResource("sheet")
-region = Rect2(480, 192, 32, 32)
 [sub_resource type="AtlasTexture" id="f_6_16"]
 atlas = ExtResource("sheet")
 region = Rect2(512, 192, 32, 32)
@@ -264,9 +243,6 @@ region = Rect2(64, 224, 32, 32)
 [sub_resource type="AtlasTexture" id="f_7_3"]
 atlas = ExtResource("sheet")
 region = Rect2(96, 224, 32, 32)
-[sub_resource type="AtlasTexture" id="f_7_15"]
-atlas = ExtResource("sheet")
-region = Rect2(480, 224, 32, 32)
 [sub_resource type="AtlasTexture" id="f_7_16"]
 atlas = ExtResource("sheet")
 region = Rect2(512, 224, 32, 32)
@@ -305,14 +281,14 @@ animations = [{"name": &"idle_s", "speed": 4, "loop": true, "frames": [{"duratio
 {"name": &"walk_ne", "speed": 8, "loop": true, "frames": [{"duration": 1.0, "texture": SubResource("f_5_2")}, {"duration": 1.0, "texture": SubResource("f_5_3")}]},
 {"name": &"walk_e", "speed": 8, "loop": true, "frames": [{"duration": 1.0, "texture": SubResource("f_6_2")}, {"duration": 1.0, "texture": SubResource("f_6_3")}]},
 {"name": &"walk_se", "speed": 8, "loop": true, "frames": [{"duration": 1.0, "texture": SubResource("f_7_2")}, {"duration": 1.0, "texture": SubResource("f_7_3")}]},
-{"name": &"gesture_s", "speed": 8, "loop": false, "frames": [{"duration": 1.0, "texture": SubResource("f_0_15")}, {"duration": 1.0, "texture": SubResource("f_0_16")}, {"duration": 1.0, "texture": SubResource("f_0_17")}, {"duration": 1.0, "texture": SubResource("f_0_0")}]},
-{"name": &"gesture_sw", "speed": 8, "loop": false, "frames": [{"duration": 1.0, "texture": SubResource("f_1_15")}, {"duration": 1.0, "texture": SubResource("f_1_16")}, {"duration": 1.0, "texture": SubResource("f_1_17")}, {"duration": 1.0, "texture": SubResource("f_1_0")}]},
-{"name": &"gesture_w", "speed": 8, "loop": false, "frames": [{"duration": 1.0, "texture": SubResource("f_2_15")}, {"duration": 1.0, "texture": SubResource("f_2_16")}, {"duration": 1.0, "texture": SubResource("f_2_17")}, {"duration": 1.0, "texture": SubResource("f_2_0")}]},
-{"name": &"gesture_nw", "speed": 8, "loop": false, "frames": [{"duration": 1.0, "texture": SubResource("f_3_15")}, {"duration": 1.0, "texture": SubResource("f_3_16")}, {"duration": 1.0, "texture": SubResource("f_3_17")}, {"duration": 1.0, "texture": SubResource("f_3_0")}]},
-{"name": &"gesture_n", "speed": 8, "loop": false, "frames": [{"duration": 1.0, "texture": SubResource("f_4_15")}, {"duration": 1.0, "texture": SubResource("f_4_16")}, {"duration": 1.0, "texture": SubResource("f_4_17")}, {"duration": 1.0, "texture": SubResource("f_4_0")}]},
-{"name": &"gesture_ne", "speed": 8, "loop": false, "frames": [{"duration": 1.0, "texture": SubResource("f_5_15")}, {"duration": 1.0, "texture": SubResource("f_5_16")}, {"duration": 1.0, "texture": SubResource("f_5_17")}, {"duration": 1.0, "texture": SubResource("f_5_0")}]},
-{"name": &"gesture_e", "speed": 8, "loop": false, "frames": [{"duration": 1.0, "texture": SubResource("f_6_15")}, {"duration": 1.0, "texture": SubResource("f_6_16")}, {"duration": 1.0, "texture": SubResource("f_6_17")}, {"duration": 1.0, "texture": SubResource("f_6_0")}]},
-{"name": &"gesture_se", "speed": 8, "loop": false, "frames": [{"duration": 1.0, "texture": SubResource("f_7_15")}, {"duration": 1.0, "texture": SubResource("f_7_16")}, {"duration": 1.0, "texture": SubResource("f_7_17")}, {"duration": 1.0, "texture": SubResource("f_7_0")}]},
+{"name": &"gesture_s", "speed": 8, "loop": false, "frames": [{"duration": 1.0, "texture": SubResource("f_0_16")}, {"duration": 1.0, "texture": SubResource("f_0_17")}, {"duration": 1.0, "texture": SubResource("f_0_0")}, {"duration": 1.0, "texture": SubResource("f_0_1")}]},
+{"name": &"gesture_sw", "speed": 8, "loop": false, "frames": [{"duration": 1.0, "texture": SubResource("f_1_16")}, {"duration": 1.0, "texture": SubResource("f_1_17")}, {"duration": 1.0, "texture": SubResource("f_1_0")}, {"duration": 1.0, "texture": SubResource("f_1_1")}]},
+{"name": &"gesture_w", "speed": 8, "loop": false, "frames": [{"duration": 1.0, "texture": SubResource("f_2_16")}, {"duration": 1.0, "texture": SubResource("f_2_17")}, {"duration": 1.0, "texture": SubResource("f_2_0")}, {"duration": 1.0, "texture": SubResource("f_2_1")}]},
+{"name": &"gesture_nw", "speed": 8, "loop": false, "frames": [{"duration": 1.0, "texture": SubResource("f_3_16")}, {"duration": 1.0, "texture": SubResource("f_3_17")}, {"duration": 1.0, "texture": SubResource("f_3_0")}, {"duration": 1.0, "texture": SubResource("f_3_1")}]},
+{"name": &"gesture_n", "speed": 8, "loop": false, "frames": [{"duration": 1.0, "texture": SubResource("f_4_16")}, {"duration": 1.0, "texture": SubResource("f_4_17")}, {"duration": 1.0, "texture": SubResource("f_4_0")}, {"duration": 1.0, "texture": SubResource("f_4_1")}]},
+{"name": &"gesture_ne", "speed": 8, "loop": false, "frames": [{"duration": 1.0, "texture": SubResource("f_5_16")}, {"duration": 1.0, "texture": SubResource("f_5_17")}, {"duration": 1.0, "texture": SubResource("f_5_0")}, {"duration": 1.0, "texture": SubResource("f_5_1")}]},
+{"name": &"gesture_e", "speed": 8, "loop": false, "frames": [{"duration": 1.0, "texture": SubResource("f_6_16")}, {"duration": 1.0, "texture": SubResource("f_6_17")}, {"duration": 1.0, "texture": SubResource("f_6_0")}, {"duration": 1.0, "texture": SubResource("f_6_1")}]},
+{"name": &"gesture_se", "speed": 8, "loop": false, "frames": [{"duration": 1.0, "texture": SubResource("f_7_16")}, {"duration": 1.0, "texture": SubResource("f_7_17")}, {"duration": 1.0, "texture": SubResource("f_7_0")}, {"duration": 1.0, "texture": SubResource("f_7_1")}]},
 {"name": &"hurt_s", "speed": 8, "loop": false, "frames": [{"duration": 1.0, "texture": SubResource("f_0_18")}, {"duration": 1.0, "texture": SubResource("f_0_20")}, {"duration": 1.0, "texture": SubResource("f_0_18")}]},
 {"name": &"hurt_sw", "speed": 8, "loop": false, "frames": [{"duration": 1.0, "texture": SubResource("f_1_18")}, {"duration": 1.0, "texture": SubResource("f_1_20")}, {"duration": 1.0, "texture": SubResource("f_1_18")}]},
 {"name": &"hurt_w", "speed": 8, "loop": false, "frames": [{"duration": 1.0, "texture": SubResource("f_2_18")}, {"duration": 1.0, "texture": SubResource("f_2_20")}, {"duration": 1.0, "texture": SubResource("f_2_18")}]},
