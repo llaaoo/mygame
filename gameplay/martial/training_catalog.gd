@@ -5,7 +5,12 @@ extends Resource
 @export var rest_position := Vector2(-3960,2680)
 @export var schedule: NPCSchedule
 @export var offers: Array[LearningOffer]=[]
-static func default_catalog() -> TrainingCatalog: return load("res://content/training/catalog.tres") as TrainingCatalog
+# Keep immutable definitions alive; ResourceLoader's cache does not own them.
+static var _default: TrainingCatalog
+static func default_catalog() -> TrainingCatalog:
+	if not _default: _default=load("res://content/training/catalog.tres") as TrainingCatalog
+	return _default
+
 func offer(id: String) -> LearningOffer:
 	for entry in offers:
 		if entry and entry.id==id: return entry

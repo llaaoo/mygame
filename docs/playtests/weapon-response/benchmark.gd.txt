@@ -1,0 +1,38 @@
+extends SceneTree
+const Fixture=preload("res://tests/support/grayriver_fixture.gd")
+func _init() -> void: call_deferred("run")
+func sample(label: String,request: Callable,count:=50) -> void:
+ var times: Array[int]=[]
+ for i in range(count):
+  var start:=Time.get_ticks_usec(); request.call(); times.append(Time.get_ticks_usec()-start)
+ times.sort()
+ print("BENCH ",label," median_us=",times[count/2]," p95_us=",times[int(count*.95)]," max_us=",times.back())
+func run() -> void:
+ var fixture:=Fixture.new(self); var game: GrayriverGame=await fixture.boot(true)
+ var actor:=game.player; var controls:=actor.actor_context.actions; controls.set_physics_process(false)
+ var store:=game.session.inventory
+ store.receive("player","river_staff",1); store.equip("player",store.find_owned("player","river_staff"))
+ actor.actor_context.martial.learn("staff_sweep")
+ sample("technique_lookup",func(): MartialArts.definition("staff_sweep"))
+ sample("martial_reason",func(): actor.actor_context.martial.reason("staff_sweep",actor.actor_context))
+ var save:=SaveManager.instance
+ sample("before_save",func(): save.before_save.emit(),5)
+ sample("collect_player",save._collect_player,5)
+ sample("collect_world",save._collect_world,5)
+ sample("collect_extensions",save._collect_extensions,5)
+ var root_data:=SaveData.Root.new()
+ root_data.meta=save._collect_meta(); root_data.player=save._collect_player(); root_data.world=save._collect_world(); root_data.quest=save._collect_quests(); root_data.extensions=save._collect_extensions()
+ var data:=root_data.serialize()
+ sample("validation",func(): save.repository._valid_shape(data),5)
+ sample("read_existing",func(): save.repository.read(ProjectSettings.globalize_path("user://save_3.sav")),5)
+ sample("manual_save",game._save_progress,5)
+ var request:=Action.melee(actor); request.direction=Vector2.RIGHT
+ sample("attack_accept",func(): controls.cancel(); controls.stamina.current=100; controls.try_action(request))
+ sample("attack_tick",func(): controls.advance(1.0/60))
+ var technique:=Action.new(); technique.action_type=Action.ActionType.TECHNIQUE; technique.skill_id="staff_sweep"; technique.direction=Vector2.RIGHT
+ sample("technique_accept",func(): controls.cancel(); controls.stamina.current=100; actor.actor_context.martial.ready_at.clear(); controls.try_action(technique))
+ controls.cancel(); controls.stamina.current=100; controls.try_action(request); controls.advance(.55)
+ var serial:=controls._attack_sequence
+ controls.try_action(request); controls.advance(.34)
+ print("BUFFER ",JSON.stringify({"second_press_at":.55,"total":.88,"executed":controls._attack_sequence>serial,"mode":controls.mode}))
+ await fixture.close(); quit()

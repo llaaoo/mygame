@@ -1,7 +1,12 @@
 class_name MartialCatalog
 extends Resource
 @export var techniques: Array[MartialTechnique]=[]
-static func default_catalog() -> MartialCatalog: return load("res://content/martial/catalog.tres") as MartialCatalog
+# Keep immutable definitions alive; ResourceLoader's cache does not own them.
+static var _default: MartialCatalog
+static func default_catalog() -> MartialCatalog:
+	if not _default: _default=load("res://content/martial/catalog.tres") as MartialCatalog
+	return _default
+
 func definition(id: String) -> MartialTechnique:
 	for entry in techniques:
 		if entry and entry.id==id: return entry

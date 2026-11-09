@@ -17,6 +17,8 @@
 
 本文从属于[ARCHITECTURE](./ARCHITECTURE.md)。以下契约约束领域职责，已实现的公开同步请求/查询允许跨服务调用；延迟世界工作才使用带区域scope的CommandBus。
 
+2026-11-09：[武器操作响应](WEAPON_RESPONSE.md)保留物理动作承诺与提交时机，后摇按AttackProfile逐步恢复移动。输入缓存只复制一个真实意图；后摇350毫秒、其余150毫秒，先比较动作完成和输入到期，再重验来源/绑定/费用。拒绝有反馈，取消清理缓存；定义目录只持有不可变Resource，不缓存验证结论或角色状态。
+
 - CastContext保留输入意图，CastPlan/组件/状态条件表达确定计划；预览不消费资源，准备提交重读真实版本。
 - CastTransaction覆盖法力、材料、状态与效果。成功后才发布通知，失败不产生消费或施法事实；普通技能、条件技能和引导脉冲共用执行边界。
 - Buff为定义，StatusInstance为实例；ActorAttributes从基础值和贡献重算。移除原因明确区分expired、consumed、dispelled、replaced、region_cleanup、restored。触发器可筛选原因。

@@ -1,8 +1,12 @@
 class_name ProvisionCatalog
 extends Resource
 @export var provisions: Array[ProvisionDefinition]=[]
+# Keep immutable definitions alive; ResourceLoader's cache does not own them.
+static var _default: ProvisionCatalog
 static func default_catalog() -> ProvisionCatalog:
-	return load("res://content/provisions/catalog.tres") as ProvisionCatalog
+	if not _default: _default=load("res://content/provisions/catalog.tres") as ProvisionCatalog
+	return _default
+
 func definition(id: String) -> ProvisionDefinition:
 	for entry in provisions:
 		if entry and entry.id==id: return entry

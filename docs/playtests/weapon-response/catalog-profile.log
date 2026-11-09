@@ -1,0 +1,32 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+
+⏰ WorldTime 启动: 08:00
+🏛️ GameRuntime: 五大 Runtime 初始化完成
+   CommandBus       : ✅
+   CombatExecutor   : ✅
+   CombatEventBus   : ✅
+   WorldRuntime     : ✅
+   SimulationRuntime: ✅
+   WorldTime        : ✅
+⚡ 已注册触发效果: OnKillBonusExp
+📊 CombatDebugger: trace enabled
+⏰ 08:00 (☀️ 白天)
+SaveManager: saved user://save_3.sav
+BENCH technique_lookup median_us=1 p95_us=1 max_us=4
+BENCH martial_reason median_us=6 p95_us=9 max_us=52
+BENCH before_save median_us=739 p95_us=1746 max_us=1746
+BENCH collect_player median_us=94 p95_us=170 max_us=170
+BENCH collect_world median_us=4 p95_us=12 max_us=12
+BENCH collect_extensions median_us=192 p95_us=272 max_us=272
+BENCH validation median_us=1332 p95_us=1768 max_us=1768
+BENCH read_existing median_us=1978 p95_us=2367 max_us=2367
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+BENCH manual_save median_us=7834 p95_us=8646 max_us=8646
+BENCH attack_accept median_us=30 p95_us=99 max_us=208
+BENCH attack_tick median_us=12 p95_us=61 max_us=118
+BENCH technique_accept median_us=37 p95_us=116 max_us=136
+BUFFER {"executed":false,"mode":"idle","second_press_at":0.55,"total":0.88}

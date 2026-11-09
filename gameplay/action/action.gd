@@ -49,6 +49,14 @@ var params: Dictionary = {}
 var cast_context: CastContext # Explicit input snapshot shared by validation and execution.
 
 
+## Copy an input request for a short-lived buffer; never serialize Node references.
+func copy_intent() -> Action:
+	var copy:=Action.new()
+	copy.action_type=action_type; copy.source=source; copy.target=target
+	copy.direction=direction; copy.skill_id=skill_id; copy.skill_source=skill_source
+	copy.params=params.duplicate(true); copy.cast_context=cast_context
+	return copy
+
 ## ── 快捷构造 ──
 
 static func move(dir: Vector2, src: Node2D = null) -> Action:

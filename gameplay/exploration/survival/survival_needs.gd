@@ -105,10 +105,11 @@ static func valid(data: Variant) -> bool:
 		var value: Variant=data.get(key,100.0 if key in ["nutrition","hydration"] else 0.0)
 		if typeof(value) not in [TYPE_FLOAT,TYPE_INT] or not is_finite(float(value)) or float(value)<0: return false
 		if key in ["nutrition","hydration","fatigue"] and value>100: return false
-		var maximum:=0.0
-		for entry in ProvisionCatalog.default_catalog().provisions:
-			if entry.effect and entry.effect.provision_group=={"meal_remaining":"meal","water_remaining":"water","tea_remaining":"tea"}.get(key,""): maximum=maxf(maximum,entry.effect.duration)
-		if key in ["meal_remaining","water_remaining","tea_remaining"] and value>maximum: return false
+		if key in ["meal_remaining","water_remaining","tea_remaining"]:
+			var maximum:=0.0
+			for entry in ProvisionCatalog.default_catalog().provisions:
+				if entry.effect and entry.effect.provision_group=={"meal_remaining":"meal","water_remaining":"water","tea_remaining":"tea"}[key]: maximum=maxf(maximum,entry.effect.duration)
+			if value>maximum: return false
 	var food_id: Variant=data.get("meal","")
 	if not food_id is String or not data.get("harvests",{}) is Dictionary: return false
 	if not food_id.is_empty():

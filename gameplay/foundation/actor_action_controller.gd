@@ -17,6 +17,9 @@ var facing := Vector2.DOWN
 var movement := Vector2.ZERO
 var guarding := false
 var sprinting := false
+const TIME_EPSILON := .000001
+const INPUT_BUFFER_SECONDS := .15
+const RECOVERY_INPUT_BUFFER_SECONDS := .35
 const PARRY_WINDOW := .18
 const PARRY_RETRY := .65
 var guard_age := 99.0
@@ -63,10 +66,13 @@ func _physics_process(delta: float) -> void:
 		movement=Vector2.ZERO
 		for action: Action in input_provider.call():
 			var result:=try_action(action)
-			if not result.accepted and result.reason not in ["buffered","unpaired_release"] and action.action_type in [Action.ActionType.TECHNIQUE,Action.ActionType.MELEE,Action.ActionType.HEAVY_ATTACK] and _feedback_cooldown<=0:
-				_feedback_cooldown=.8
-				action_refused.emit({"stamina":"体力不足","ammunition":"口袋中缺少箭矢","busy":"当前动作尚未结束","stale_binding":"快捷绑定已改变","controlled":"控制状态中","stagger":"失衡中"}.get(result.reason,result.reason))
+			_report_refusal(action,result)
 	advance(delta)
+func _report_refusal(action: Action,result: OperationResult) -> void:
+	if result.accepted or result.reason in ["buffered","unpaired_release"] or _feedback_cooldown>0: return
+	if action.action_type not in [Action.ActionType.TECHNIQUE,Action.ActionType.MELEE,Action.ActionType.HEAVY_ATTACK]: return
+	_feedback_cooldown=.8
+	action_refused.emit({"stamina":"体力不足","ammunition":"口袋中缺少箭矢","busy":"当前动作尚未结束","stale_binding":"快捷绑定已改变","controlled":"控制状态中","stagger":"失衡中"}.get(result.reason,result.reason))
 func try_action(action: Action) -> OperationResult:
 	var actor:=context.actor if context else null
 	if not actor or actor.get_node("HealthComponent").is_dead: return OperationResult.reject("dead")
@@ -186,9 +192,12 @@ func try_action(action: Action) -> OperationResult:
 	return OperationResult.reject("unsupported_action")
 func _queue(action: Action) -> OperationResult:
 	if mode=="stagger": return OperationResult.reject("stagger")
-	_buffer=action
-	_buffer_time=.15
+	_buffer=action.copy_intent()
+	_buffer_time=RECOVERY_INPUT_BUFFER_SECONDS if mode=="attack" and profile and elapsed>=profile.windup+profile.active else INPUT_BUFFER_SECONDS
 	return OperationResult.reject("buffered")
+func buffered_action_label() -> String:
+	if not _buffer or _buffer_time<=0: return ""
+	return {Action.ActionType.MELEE:"攻击已输入",Action.ActionType.HEAVY_ATTACK:"重击已输入",Action.ActionType.TECHNIQUE:"武技已输入",Action.ActionType.CAST:"施法已输入"}.get(_buffer.action_type,"")
 func advance(delta: float) -> void:
 	if not active() or not is_instance_valid(context.actor): return
 	var actor:=context.actor
@@ -201,8 +210,6 @@ func advance(delta: float) -> void:
 	combo_remaining=maxf(0,combo_remaining-delta)
 	_move_age+=delta
 	if _move_age>.3 and not input_provider.is_valid(): movement=Vector2.ZERO
-	_buffer_time=maxf(0,_buffer_time-delta)
-	if _buffer_time==0: _buffer=null
 	var status:=actor.get_node_or_null("BuffManager") as BuffManager
 	if status and status.prevents_actions(): cancel("controlled")
 	var stats:=actor.get_node_or_null("StatsComponent") as StatsComponent
@@ -223,8 +230,10 @@ func advance(delta: float) -> void:
 	if mode=="attack" and str(context.items.equipped(context.id).get(str(EquipmentData.SlotType.RIGHT_HAND),""))!=attack_weapon_uid: cancel("weapon_changed")
 	var old_elapsed:=elapsed
 	if busy():
+		var completion_offset:=remaining
 		elapsed+=delta
 		remaining=maxf(0,remaining-delta)
+		if remaining<=TIME_EPSILON: remaining=0
 		if mode=="attack" and elapsed>=profile.windup and old_elapsed<profile.windup+profile.active:
 			if not _commit_weapon_release(): cancel("source_changed"); action_refused.emit("武器、附魔或箭矢来源已改变，攻击取消。"); return
 			var active_delta:=maxf(0,minf(elapsed,profile.windup+profile.active)-maxf(old_elapsed,profile.windup))
@@ -240,14 +249,18 @@ func advance(delta: float) -> void:
 		if remaining==0 and mode not in ["aim_item","spray"] and not (mode=="item" and context.item_actions.busy()):
 			if mode=="stagger": stability.recovered()
 			mode="idle"
-			if _buffer and _buffer_time>0:
+			# Compare the expiry with the completion inside this physics step,
+			# before aging it. Exact-boundary presses must not be discarded.
+			if _buffer and _buffer_time+TIME_EPSILON>=completion_offset:
 				var queued:=_buffer
-				_buffer=null
-				try_action(queued)
+				_buffer=null; _buffer_time=0
+				_report_refusal(queued,try_action(queued))
+	_buffer_time=maxf(0,_buffer_time-delta)
+	if _buffer_time==0: _buffer=null
 	var speed:=float(actor.get("move_speed"))
 	var factor:=burden_speed()
 	if guarding: factor*=.4
-	if mode=="attack": factor*=profile.movement_multiplier
+	if mode=="attack": factor*=profile.movement_factor(elapsed)
 	if mode=="spray": factor*=.45
 	if mode in ["stagger","item"]: factor=0
 	var direction:=movement

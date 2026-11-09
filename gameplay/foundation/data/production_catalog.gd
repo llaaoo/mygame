@@ -1,7 +1,12 @@
 class_name ProductionCatalog
 extends Resource
 @export var entries: Array[ProductionDefinition]=[]
-static func default_catalog() -> ProductionCatalog: return load("res://content/production/catalog.tres") as ProductionCatalog
+# Keep immutable definitions alive; ResourceLoader's cache does not own them.
+static var _default: ProductionCatalog
+static func default_catalog() -> ProductionCatalog:
+	if not _default: _default=load("res://content/production/catalog.tres") as ProductionCatalog
+	return _default
+
 func definition(id: String) -> ProductionDefinition:
 	for entry in entries:
 		if entry and entry.id==id: return entry

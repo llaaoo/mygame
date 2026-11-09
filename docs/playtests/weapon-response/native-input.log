@@ -1,0 +1,19 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:364)
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+⏰ WorldTime 启动: 08:00
+🏛️ GameRuntime: 五大 Runtime 初始化完成
+   CommandBus       : ✅
+   CombatExecutor   : ✅
+   CombatEventBus   : ✅
+   WorldRuntime     : ✅
+   SimulationRuntime: ✅
+   WorldTime        : ✅
+⚡ 已注册触发效果: OnKillBonusExp
+📊 CombatDebugger: trace enabled
+⏰ 08:00 (☀️ 白天)
+RESPONSE_CHAIN {"first_frame":145,"interval_seconds":0.866666666666667,"queued_input_frame":178,"second_frame":197}
+RESPONSE_INPUT {"full_speed":330.0,"inputs":[{"frame":144,"input":"LMB"},{"frame":178,"input":"LMB"},{"frame":266,"input":"E"}],"mp":60,"normal_ai":true,"recovery_speed":175.992752075195,"stamina":45.3333333333334,"starts":[{"data":{"counter":false,"family":"weapon.player.1","stamina":15.0,"technique":"","weapon_uid":"item.77"},"frame":145},{"data":{"counter":false,"family":"weapon.player.2","stamina":20.0,"technique":"","weapon_uid":"item.77"},"frame":197},{"data":{"counter":false,"family":"weapon.player.3","stamina":30.0,"technique":"staff_sweep","weapon_uid":"item.77"},"frame":267}]}
+PASS weapon response input: prompt LMB, manual buffered staff chain, 350ms pending feedback, separate E technique, committed rooting, smooth live recovery and no extra actions/MP
