@@ -16,10 +16,10 @@ OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Devi
 ⏰ 08:00 (☀️ 白天)
 SaveManager: saved user://save_3.sav
 SaveManager: saved user://save_3.sav
+MARTIAL_INPUT {"action":{"counter":false,"family":"weapon.player.3","followup":true,"stamina":26.0,"stroke_count":0,"stroke_index":-1,"stroke_title":"截势斩","technique":"blade_breaker","weapon_uid":"item.77"},"arrows":6,"mp":60,"stamina":52.5,"technique":"blade_breaker"}
 SaveManager: saved user://save_3.sav
-MARTIAL_INPUT {"action":{"counter":false,"family":"weapon.player.3","followup":true,"stamina":26.0,"stroke_count":0,"stroke_index":-1,"stroke_title":"截势斩","technique":"blade_breaker","weapon_uid":"item.77"},"arrows":6,"mp":60,"stamina":52.6666666666666,"technique":"blade_breaker"}
+MARTIAL_INPUT {"action":{"counter":false,"family":"weapon.player.6","followup":true,"stamina":25.0,"stroke_count":0,"stroke_index":-1,"stroke_title":"追身贯刺","technique":"spear_thrust","weapon_uid":"item.78"},"arrows":6,"mp":60,"stamina":42.6666666666675,"technique":"spear_thrust"}
 SaveManager: saved user://save_3.sav
-MARTIAL_INPUT {"action":{"counter":false,"family":"weapon.player.6","followup":true,"stamina":25.0,"stroke_count":0,"stroke_index":-1,"stroke_title":"追身贯刺","technique":"spear_thrust","weapon_uid":"item.78"},"arrows":6,"mp":60,"stamina":42.3333333333341,"technique":"spear_thrust"}
 SaveManager: saved user://save_3.sav
 MARTIAL_INPUT {"action":{"counter":false,"family":"weapon.player.9","followup":true,"stamina":30.0,"stroke_count":0,"stroke_index":-1,"stroke_title":"回旋压阵","technique":"staff_sweep","weapon_uid":"item.79"},"arrows":6,"mp":60,"stamina":44.1666666666681,"technique":"staff_sweep"}
 SaveManager: saved user://save_3.sav

@@ -53,4 +53,4 @@ ActorCharacterData新增`techniques`，声明角色首次生成时已掌握的�
 
 输入验证还修复了夹具坐标：无头实际窗口64×64、逻辑画布1152×648，旧测试直接把逻辑坐标送入窗口事件会把瞄准偏向约23°。现在共享夹具用`get_screen_transform`换算实际窗口像素，同时覆盖拉伸与黑边；新测试检查鼠标方向一致，原武器输入检查也复用该方法。没有为通过测试扩大刺击扇面或箭矢碰撞。
 
-完整干净归档回归结果在runner最终退出后追加。GitHub Actions保持停用。
+完整回归：最终执行代码提交 `be465c3a9f5eb03bfe244d924e65ec572d8bb32f` 经 `git archive` 导出至新目录，确认无 `.godot` 后执行 `python3 tools/run_tests.py --suite all`。首次导入通过，**108/108 checks passed**，runner最终退出码0；[完整runner日志](playtests/martial-followups/archive-all.log)。随后仅更新本文、日志和图形证据，不改已测执行代码。GitHub Actions保持停用。
