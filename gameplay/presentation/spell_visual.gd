@@ -16,11 +16,20 @@ static func attach(host: Node2D, skill: SkillData, mode: String, extent: float =
 	effect.radius = extent
 	effect.duration = maxf(.05, life)
 	host.add_child(effect)
+	if mode=="burst" and skill.aoe_visual and skill.aoe_visual.hit_effect:
+		PresentationScene.attach(effect,skill.aoe_visual.hit_effect)
 	return effect
 
-static func impact(host: Node2D, skill: SkillData) -> void:
+static func impact(host: Node2D, skill: SkillData,play_sound := false) -> void:
 	if not host.is_inside_tree() or not skill: return
-	if host.get_tree().get_nodes_in_group("spell_impact_visual").size() >= 48: return
+	var director:=PresentationDirector.for_node(host)
+	var authored:=skill.visual.hit_effect if skill.visual else null
+	if not authored and skill.aoe_visual: authored=skill.aoe_visual.hit_effect
+	if authored and director:
+		director.emit_cue(&"authored_impact",host.global_position,"",skill.visual.sound_hit if play_sound and skill.visual else null,authored)
+		return
+	if play_sound and director: director.emit_cue(&"spell_hit",host.global_position,"",skill.visual.sound_hit if skill.visual else null)
+	if host.get_tree().get_nodes_in_group("spell_impact_visual").size() >= PresentationPreferences.effect_limit(): return
 	var scope := host.get_parent() as Node2D
 	if not scope: return
 	var effect := attach(scope, skill, "impact", 23, .24)
@@ -60,9 +69,10 @@ func _draw() -> void:
 			draw_line(tail, point + Vector2.from_angle(angle + .3) * 4, Color(tint, alpha), 2, true)
 
 func _draw_projectile() -> void:
-	var pulse := .9 + .1 * sin(elapsed * 12)
+	var time:=elapsed*PresentationPreferences.motion_scale()
+	var pulse := .9 + .1 * sin(time * 12)
 	for i in range(7, 0, -1):
-		var point := Vector2(-i * 4, sin(elapsed * 12 - i) * 1.8)
+		var point := Vector2(-i * 4, sin(time * 12 - i) * 1.8)
 		draw_circle(point, maxf(1, radius * .5 - i * .35), Color(tint, (1 - i / 8.0) * .28))
 	draw_circle(Vector2.ZERO, radius * 1.3 * pulse, Color(tint, .1))
 	if "ice" in tags:

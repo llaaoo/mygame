@@ -9,6 +9,9 @@ var _water_cells: Array[Vector2i] = []
 var bridge_body: StaticBody2D
 var _view := Rect2()
 var _landmarks: Node2D
+var _visual_clock:=0.0
+var _visual_redraw:=0.0
+var _water_material: ShaderMaterial
 func _ready() -> void:
 	z_index = -115
 	texture_filter=CanvasItem.TEXTURE_FILTER_NEAREST
@@ -50,6 +53,7 @@ func _ready() -> void:
 	water.name="RiverWater"
 	var water_material:=ShaderMaterial.new()
 	water_material.shader=preload("res://gameplay/frontier/river_water.gdshader")
+	_water_material=water_material
 	water.material=water_material
 	add_child(water)
 	water.draw.connect(func():
@@ -77,6 +81,12 @@ func _body(point: Vector2, size: Vector2, title: String) -> StaticBody2D:
 	add_child(body)
 	return body
 func _process(delta: float) -> void:
+	_visual_clock+=delta*PresentationPreferences.motion_scale()
+	if _water_material: _water_material.set_shader_parameter("presentation_time",_visual_clock)
+	_visual_redraw+=delta
+	if _visual_redraw>=.1:
+		_visual_redraw=0
+		if _landmarks: _landmarks.queue_redraw()
 	_refresh_view()
 	if is_instance_valid(bridge_body) and game.progress.claims.has("river.bridge_fixed"):
 		bridge_body.queue_free()
@@ -157,7 +167,9 @@ func _draw_landmarks() -> void:
 			art.draw_set_transform(p+Vector2(8,10),0,Vector2(1,.4))
 			art.draw_circle(Vector2.ZERO,48,Color(0,0,0,.19))
 			art.draw_set_transform(Vector2.ZERO)
-			FrontierArt.region(art,Rect2(64,0,16,32),Rect2(p-Vector2(48,115),Vector2(96,144)),Color("a2ad94"))
+			art.draw_set_transform(p,sin(_visual_clock*1.4+p.x*.01)*.012)
+			FrontierArt.region(art,Rect2(64,0,16,32),Rect2(-48,-115,96,144),Color("a2ad94"))
+			art.draw_set_transform(Vector2.ZERO)
 		else:
 			art.draw_rect(Rect2(p-size*.5,size),Color("393f39"))
 			FrontierArt.tile(art,Vector2i(3,8),Rect2(p-size*.5-Vector2(0,12),size),Color("a3a597"))

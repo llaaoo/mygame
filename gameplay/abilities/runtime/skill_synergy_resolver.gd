@@ -7,6 +7,7 @@ signal reaction_recorded(details: Dictionary)
 var _owner_entity: Node2D = null
 var _bus: CombatEventBus
 var _cooldowns: Dictionary = {}
+var _reaction_rng := RandomNumberGenerator.new()
 
 
 func setup(owner_entity: Node2D, bus: CombatEventBus = null) -> void:
@@ -63,7 +64,7 @@ func _can_trigger(synergy: SkillSynergyData, event: CombatEvent) -> bool:
 		return false
 	if not synergy.required_caster_status.is_empty() and synergy.required_caster_status not in caster_statuses:
 		return false
-	return synergy.trigger_chance >= 1.0 or randf() < synergy.trigger_chance
+	return synergy.trigger_chance >= 1.0 or _reaction_rng.randf() < synergy.trigger_chance
 
 
 func _trigger(synergy: SkillSynergyData, event: CombatEvent) -> void:

@@ -3,6 +3,7 @@
   "regions": [
     {
       "id": "camp",
+      "presentation_environment": "res://content/presentation/outdoors.tres",
       "title": "灰河谷",
       "size": [
         9600,
@@ -353,6 +354,7 @@
       "stations": [
         {
           "id": "river.well",
+          "presentation_profile": "res://content/presentation/well_animation.tres",
           "title": "河谷镇水井",
           "pos": [
             -3700,

@@ -31,3 +31,6 @@ PY
 ## 动画样本
 
 新增Shade的Puny Characters三张原始PNG（合计75,088字节），CC0，可商业使用。实际下载源为固定提交的公开镜像，二次镜像对象散列一致；完整许可、镜像说明、修改边界及逐文件散列保存在[puny目录](third_party/puny/SOURCE_NOTICE.md)与[动画清单](third_party/puny/animation_assets.json)。正式身体只采样无武器列，原图刀/弓/法杖动作仅在参考预览展示。游戏内Tab → 操作设置 → 动画与素材演示可查看；详情见[动画基座](../../docs/ACTOR_ANIMATION_SYSTEM.md)。
+## 世界表现样本
+
+水井原生场景复用上述Kenney图集，角色复用上述Puny素材；没有新增来源不明的网络素材。营火、树摆、波纹与原生粒子由项目代码和Godot资源制作。4个原创合成WAV以CC0分发，完整来源/重建方法/散列见[声音说明](../presentation/sounds/SOURCE_NOTICE.md)；它们是集成样本，不是环境录音或完整拟音库。

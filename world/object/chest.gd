@@ -1,5 +1,7 @@
 class_name Chest
 extends MapObject
+var _loot_rng := RandomNumberGenerator.new()
+var _scatter_rng := RandomNumberGenerator.new()
 ## 宝箱 — MapObject + Interactable + LootTable
 ##
 ## 玩家按 E 交互时：
@@ -45,7 +47,7 @@ func _on_interact_chest(_actor: Node2D) -> void:
 
 	var drops: Array[Dictionary] = []
 	if loot_table:
-		drops = loot_table.roll()
+		drops = loot_table.roll(_loot_rng)
 
 	# 没有专属掉落表时，从全局装备目录生成一件战利品。
 	if drops.is_empty():
@@ -90,8 +92,8 @@ func _spawn_item(item_path: String, count: int) -> void:
 		var pickup := pickup_scene.instantiate() as ItemPickup
 		pickup.setup(item_resource as ItemData, count)
 		pickup.global_position = global_position + Vector2(
-			randf_range(-20, 20),
-			randf_range(-20, 20)
+			_scatter_rng.randf_range(-20, 20),
+			_scatter_rng.randf_range(-20, 20)
 		)
 		get_parent().add_child(pickup)
 		return
@@ -101,7 +103,7 @@ func _spawn_item(item_path: String, count: int) -> void:
 			var pickup := (item_resource as PackedScene).instantiate() as Node2D
 			if not pickup:
 				continue
-			pickup.global_position = global_position + Vector2(randf_range(-20, 20), randf_range(-20, 20))
+			pickup.global_position = global_position + Vector2(_scatter_rng.randf_range(-20, 20), _scatter_rng.randf_range(-20, 20))
 			get_parent().add_child(pickup)
 
 

@@ -14,7 +14,9 @@ extends Resource
 
 
 ## 执行一次随机掉落，返回 [{item_path, count}, ...]
-func roll() -> Array[Dictionary]:
+func roll(rng: RandomNumberGenerator = null) -> Array[Dictionary]:
+	# The caller owns runtime randomness; this shared definition never stores a stream.
+	if not rng: rng=RandomNumberGenerator.new()
 	if entries.is_empty():
 		return []
 
@@ -26,9 +28,9 @@ func roll() -> Array[Dictionary]:
 		return []
 
 	var result: Array[Dictionary] = []
-	var roll_count := randi_range(mini(min_rolls, max_rolls), maxi(min_rolls, max_rolls))
+	var roll_count := rng.randi_range(mini(min_rolls, max_rolls), maxi(min_rolls, max_rolls))
 	for _roll in range(roll_count):
-		var ticket := randi_range(1, total_weight)
+		var ticket := rng.randi_range(1, total_weight)
 		var selected: LootEntry
 		for entry in entries:
 			if entry.weight <= 0:
@@ -38,7 +40,7 @@ func roll() -> Array[Dictionary]:
 				selected = entry
 				break
 		if selected:
-			var count := randi_range(selected.min_count, selected.max_count)
+			var count := rng.randi_range(selected.min_count, selected.max_count)
 			if count > 0:
 				result.append({"item_path": selected.item_path, "count": count})
 

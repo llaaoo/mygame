@@ -94,6 +94,7 @@ func open(held := false) -> void:
    if QuickslotMaterials.available(player.skill_manager,candidate): source=candidate; break
  player.input_controller.suppress_held_shortcuts()
  _refresh(); show(); _layout()
+ UIMotion.enter(_ring); UIMotion.enter(_detail_host)
 func open_for_source(value: String, aim_direction := Vector2.ZERO) -> void:
  if not QuickslotMaterials.available(player.skill_manager,value): return
  last_source=value

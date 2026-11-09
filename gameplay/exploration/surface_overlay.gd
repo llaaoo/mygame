@@ -4,7 +4,7 @@ var _elapsed := 0.0
 var _phase := 0.0
 func _ready() -> void: z_index = -100
 func _process(delta: float) -> void:
-	_phase += delta
+	_phase += delta*PresentationPreferences.motion_scale()
 	_elapsed += delta
 	if _elapsed >= .1:
 		_elapsed = 0

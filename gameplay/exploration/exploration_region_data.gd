@@ -6,6 +6,7 @@ extends Resource
 @export_multiline var description: String
 @export var room_type: String = "barracks"
 @export var open_field := false
+@export var presentation_environment: EnvironmentProfile
 @export var authored_size := Vector2.ZERO
 @export var authored_entry := Vector2.ZERO
 @export var authored_obstacles: Array[Dictionary] = []

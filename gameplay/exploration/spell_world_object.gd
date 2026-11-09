@@ -13,6 +13,7 @@ var _steps: Array[int] = []
 var _held: Array[float] = []
 var _label: Label
 var _bus: CombatEventBus
+var presentation: WorldObjectPresentation
 
 func _ready() -> void:
 	collision_layer = 0 if completed else 8
@@ -43,6 +44,14 @@ func _ready() -> void:
 	interaction.name = "Interactable"
 	interaction.set_callback(func(_actor: Node2D): inspected.emit(spec, completed))
 	add_child(interaction)
+	presentation=WorldObjectPresentation.new(); presentation.name="WorldPresentation"; presentation.query=presentation_snapshot
+	add_child(presentation)
+
+func presentation_snapshot() -> Dictionary:
+	var active:=false
+	for step in _steps:
+		if step>0: active=true
+	return {"kind":"mechanism","state":"complete" if completed else "active" if active else "idle","color":GameUIStyle.SUCCESS if completed else GameUIStyle.GOLD,"profile":spec.presentation_profile}
 
 func _exit_tree() -> void:
 	if is_instance_valid(_bus):
@@ -99,6 +108,8 @@ func finish(method_id: String) -> bool:
 	set_deferred("collision_layer", 0)
 	_refresh()
 	solved.emit(spec)
+	var director:=PresentationDirector.for_node(self)
+	if director: director.emit_cue(&"puzzle",global_position,"puzzle:"+spec.id)
 	return true
 
 func _refresh() -> void:
@@ -128,6 +139,7 @@ func _draw() -> void:
 			draw_rect(Rect2(corner, Vector2(64,64)), Color(.5,.8,.9,.2))
 			draw_rect(Rect2(corner, Vector2(64,64)), Color(.5,.8,.9,.7), false, 2)
 	if world_art:
+		if presentation and presentation.has_body_art(): return
 		var tint:=GameUIStyle.SUCCESS if completed else GameUIStyle.GOLD
 		if spec.id=="river.north_beacon":
 			if _label.visible: draw_arc(Vector2.ZERO,38,0,TAU,32,tint,1,true)

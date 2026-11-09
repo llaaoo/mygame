@@ -64,6 +64,7 @@ func _layout() -> void:
 	_panel.offset_top=-height-bottom; _panel.offset_bottom=-bottom
 
 func display(message: String, progress: float = -1.0) -> void:
+	if not visible: UIMotion.enter(_panel)
 	var split:=message.find("\n")
 	heading.text=message.left(split) if split>=0 else "现场作业"
 	text.text=message.substr(split+1) if split>=0 else message

@@ -1,5 +1,6 @@
 class_name FieldWorkMethod
 extends Resource
+@export var animation_id: StringName
 ## A mundane, interruptible operation. Spell costs/boons do not modify it.
 @export var id: String
 @export var title: String

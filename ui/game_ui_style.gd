@@ -96,6 +96,7 @@ static func button_style(state: String = "normal", accent: Color = ACCENT, selec
 
 
 static func apply_button(button: Button, accent: Color = ACCENT, selected: bool = false) -> void:
+	ButtonMotion.install(button)
 	button.add_theme_stylebox_override("normal", button_style("normal", accent, selected))
 	button.add_theme_stylebox_override("hover", button_style("hover", accent, selected))
 	button.add_theme_stylebox_override("pressed", button_style("pressed", accent, selected))
@@ -192,6 +193,10 @@ static func modal_backdrop(alpha: float = 0.72) -> Color:
 static func begin_modal(owner: CanvasLayer) -> void:
 	owner.process_mode = Node.PROCESS_MODE_ALWAYS
 	owner.add_to_group("modal_ui")
+	var panels:=owner.find_children("*","PanelContainer",true,false)
+	if not panels.is_empty(): UIMotion.enter(panels[0] as Control)
+	var presentation:=PresentationDirector.for_node(owner)
+	if presentation: presentation.emit_cue(&"ui_open",Vector2.ZERO)
 	for other in owner.get_tree().get_nodes_in_group("modal_ui"):
 		if other != owner and other is CanvasLayer and other.visible:
 			if other.has_method("close"): other.close()

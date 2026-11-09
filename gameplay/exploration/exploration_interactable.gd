@@ -13,6 +13,8 @@ var _label_time := 0.0
 var _near := false
 var provider: InteractionProvider
 var _visitor: Node2D
+var presentation: WorldObjectPresentation
+@export var presentation_profile: WorldAnimationProfile
 
 func _ready() -> void:
 	match kind:
@@ -48,7 +50,24 @@ func _ready() -> void:
 	set_title(title)
 	_player = get_tree().get_first_node_in_group("player") as Node2D
 	_update_proximity()
+	presentation=WorldObjectPresentation.new(); presentation.name="WorldPresentation"; presentation.query=presentation_snapshot
+	add_child(presentation)
 	queue_redraw()
+
+func presentation_snapshot() -> Dictionary:
+	var station:=get_meta("survival_station") as SurvivalStationData if has_meta("survival_station") else null
+	var form:=kind
+	var state:="active" if _near else "idle"
+	var offset:=Vector2.ZERO
+	if get_meta("survival_rest",false): form="hearth"; state="active"
+	elif station:
+		form=station.kind
+		if form=="cook":
+			form="hearth"; offset=station.heat_offset
+			var burning: bool=station.lit or is_instance_valid(SurfaceManager.instance) and SurfaceManager.instance.surface_at(global_position+offset).get("state","dry")=="burning"
+			state="active" if burning else "idle"
+		elif form=="forage" and harvest_ready_query.is_valid(): state="idle" if harvest_ready_query.call() else "depleted"
+	return {"kind":form,"state":state,"offset":offset,"focused":_near,"color":tint,"profile":station.presentation_profile if station and station.presentation_profile else presentation_profile}
 
 func set_title(value: String) -> void:
 	title = value
@@ -76,6 +95,7 @@ func _update_proximity() -> void:
 	if world_art and has_meta("survival_station"): queue_redraw()
 
 func _draw() -> void:
+	if presentation and presentation.has_body_art(): return
 	if world_art:
 		_draw_frontier()
 		return

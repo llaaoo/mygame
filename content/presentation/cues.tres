@@ -1,0 +1,297 @@
+[gd_resource type="Resource" script_class="PresentationCatalog" load_steps=21 format=3]
+
+[ext_resource type="Script" path="res://gameplay/presentation/presentation_catalog.gd" id="catalog"]
+
+[ext_resource type="Script" path="res://gameplay/presentation/presentation_cue.gd" id="cue"]
+
+[ext_resource type="AudioStream" path="res://content/presentation/sounds/tick.wav" id="tick"]
+
+[ext_resource type="AudioStream" path="res://content/presentation/sounds/gather.wav" id="gather"]
+
+[ext_resource type="AudioStream" path="res://content/presentation/sounds/chime.wav" id="chime"]
+
+[ext_resource type="AudioStream" path="res://content/presentation/sounds/impact.wav" id="impact"]
+
+[sub_resource type="Resource" id="craft"]
+
+script = ExtResource("cue")
+
+id = &"craft"
+
+channel = "world"
+
+tint = Color(0.92, 0.73, 0.35, 1)
+
+duration = 0.5
+
+radius = 30.0
+
+priority = 1
+
+volume_db = -12.0
+
+sound = ExtResource("chime")
+
+[sub_resource type="Resource" id="harvest"]
+
+script = ExtResource("cue")
+
+id = &"harvest"
+
+channel = "world"
+
+tint = Color(0.60, 0.80, 0.45, 1)
+
+duration = 0.5
+
+radius = 24.0
+
+priority = 1
+
+volume_db = -14.0
+
+sound = ExtResource("gather")
+
+[sub_resource type="Resource" id="puzzle"]
+
+script = ExtResource("cue")
+
+id = &"puzzle"
+
+channel = "world"
+
+tint = Color(0.45, 0.85, 0.73, 1)
+
+duration = 0.5
+
+radius = 38.0
+
+priority = 2
+
+volume_db = -12.0
+
+sound = ExtResource("chime")
+
+[sub_resource type="Resource" id="discovery"]
+
+script = ExtResource("cue")
+
+id = &"discovery"
+
+channel = "world"
+
+tint = Color(0.85, 0.77, 0.45, 1)
+
+duration = 0.5
+
+radius = 30.0
+
+priority = 1
+
+volume_db = -14.0
+
+sound = ExtResource("chime")
+
+[sub_resource type="Resource" id="item"]
+
+script = ExtResource("cue")
+
+id = &"item"
+
+channel = "world"
+
+tint = Color(0.74, 0.76, 0.69, 1)
+
+duration = 0.5
+
+radius = 18.0
+
+priority = 0
+
+volume_db = -18.0
+
+sound = ExtResource("tick")
+
+[sub_resource type="Resource" id="weapon"]
+
+script = ExtResource("cue")
+
+id = &"weapon"
+
+channel = "world"
+
+tint = Color(0.84, 0.76, 0.60, 1)
+
+duration = 0.5
+
+radius = 0.0
+
+priority = 0
+
+volume_db = -23.0
+
+sound = ExtResource("tick")
+
+[sub_resource type="Resource" id="cast"]
+
+script = ExtResource("cue")
+
+id = &"cast"
+
+channel = "world"
+
+tint = Color(0.57, 0.76, 0.85, 1)
+
+duration = 0.5
+
+radius = 24.0
+
+priority = 0
+
+volume_db = -21.0
+
+sound = ExtResource("chime")
+
+[sub_resource type="Resource" id="impact"]
+
+script = ExtResource("cue")
+
+id = &"impact"
+
+channel = "world"
+
+tint = Color(0.94, 0.65, 0.43, 1)
+
+duration = 0.5
+
+radius = 18.0
+
+priority = 1
+
+volume_db = -17.0
+
+sound = ExtResource("impact")
+
+[sub_resource type="Resource" id="defense"]
+
+script = ExtResource("cue")
+
+id = &"defense"
+
+channel = "world"
+
+tint = Color(0.6, 0.8, 0.85, 1)
+
+duration = 0.5
+
+radius = 20.0
+
+priority = 1
+
+volume_db = -18.0
+
+sound = ExtResource("impact")
+
+[sub_resource type="Resource" id="spell_hit"]
+
+script = ExtResource("cue")
+
+id = &"spell_hit"
+
+channel = "world"
+
+tint = Color(0.94, 0.65, 0.43, 1)
+
+duration = 0.5
+
+radius = 0.0
+
+priority = 1
+
+volume_db = -17.0
+
+sound = ExtResource("impact")
+
+[sub_resource type="Resource" id="authored_impact"]
+
+script = ExtResource("cue")
+
+id = &"authored_impact"
+
+channel = "world"
+
+tint = Color(1, 1, 1, 1)
+
+duration = 0.5
+
+radius = 0.0
+
+priority = 1
+
+volume_db = -17.0
+
+[sub_resource type="Resource" id="footstep"]
+
+script = ExtResource("cue")
+
+id = &"footstep"
+
+channel = "world"
+
+tint = Color(0.8, 0.8, 0.8, 1)
+
+duration = 0.5
+
+radius = 0.0
+
+priority = 0
+
+volume_db = -29.0
+
+sound = ExtResource("impact")
+
+[sub_resource type="Resource" id="ui_open"]
+
+script = ExtResource("cue")
+
+id = &"ui_open"
+
+channel = "ui"
+
+tint = Color(1, 1, 1, 1)
+
+duration = 0.5
+
+radius = 0.0
+
+priority = 0
+
+volume_db = -22.0
+
+sound = ExtResource("tick")
+
+[sub_resource type="Resource" id="ui_confirm"]
+
+script = ExtResource("cue")
+
+id = &"ui_confirm"
+
+channel = "ui"
+
+tint = Color(1, 1, 1, 1)
+
+duration = 0.5
+
+radius = 0.0
+
+priority = 0
+
+volume_db = -23.0
+
+sound = ExtResource("gather")
+
+[resource]
+
+script = ExtResource("catalog")
+
+cues = Array[ExtResource("cue")]([SubResource("craft"), SubResource("harvest"), SubResource("puzzle"), SubResource("discovery"), SubResource("item"), SubResource("weapon"), SubResource("cast"), SubResource("impact"), SubResource("defense"), SubResource("spell_hit"), SubResource("authored_impact"), SubResource("footstep"), SubResource("ui_open"), SubResource("ui_confirm")])

@@ -10,6 +10,12 @@ func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 	failures.clear()
 	var animations:=ActorAnimationCatalog.default_catalog()
 	for error in animations.validation_errors(): _fail(animations,error)
+	var cues:=PresentationCatalog.defaults()
+	for error in cues.validation_errors(): _fail(cues,error)
+	var world_animations:=WorldAnimationProfile.defaults()
+	for error in world_animations.validation_errors(): _fail(world_animations,error)
+	for profile: EnvironmentProfile in [preload("res://content/presentation/outdoors.tres"),preload("res://content/presentation/interior.tres")]:
+		if not profile.valid(): _fail(profile,"Invalid environment presentation profile")
 	for definitions in [ProvisionCatalog.default_catalog(),ProductionCatalog.default_catalog(),MartialCatalog.default_catalog(),TrainingCatalog.default_catalog()]:
 		for error in definitions.validate(): _fail(definitions,error)
 	var market:=load("res://content/frontier/town_market.tres") as MarketDefinition
@@ -42,6 +48,11 @@ func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 	for rule in catalog.chapter.spell_rules:
 		if rule and rule.result_skill and rule.result_skill not in skills: skills.append(rule.result_skill)
 	for skill in skills:
+		if skill.visual:
+			for visual_scene in [skill.visual.trail_scene,skill.visual.hit_effect]:
+				for error in PresentationScene.validation_errors(visual_scene): _fail(skill,error)
+		if skill.aoe_visual:
+			for error in PresentationScene.validation_errors(skill.aoe_visual.hit_effect): _fail(skill,error)
 		for tag in skill.tags: tags[tag] = true
 		var buff := skill.buff_resource
 		if buff and not buff.status_id.is_empty():
@@ -154,6 +165,7 @@ func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 		if not region or region.id.is_empty() or region.title.is_empty():
 			_fail(catalog.chapter, "Invalid region")
 			continue
+		if region.presentation_environment and not region.presentation_environment.valid(): _fail(region,"Invalid region environment presentation")
 		var layout := region.make_layout()
 		region.reserve_interaction_space(layout)
 		for point in region.interaction_points():
@@ -189,6 +201,8 @@ func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 					_fail(note, "Unknown equipment reward: " + id)
 			_validate_materials(note, note.materials, supplies)
 		for station in region.survival_stations:
+			if station.presentation_profile:
+				for error in station.presentation_profile.validation_errors(): _fail(station,error)
 			if station.id.is_empty() or station_ids.has(station.id) or station.title.is_empty() or station.kind not in ["water", "cook", "forage"]: _fail(station, "Invalid/duplicate survival station")
 			station_ids[station.id] = true
 			if not is_finite(station.regeneration_hours) or station.regeneration_hours<=0 or station.regeneration_hours>24: _fail(station,"Invalid resource regeneration hours")
@@ -247,6 +261,8 @@ func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 					_claim(claims, id, choice)
 					completion_claims[id] = true
 		for puzzle in region.spell_objects:
+			if puzzle.presentation_profile:
+				for error in puzzle.presentation_profile.validation_errors(): _fail(puzzle,error)
 			_claim(claims, puzzle.id, puzzle)
 			completion_claims[puzzle.id] = true
 			if not puzzle.pickup_claim.is_empty():

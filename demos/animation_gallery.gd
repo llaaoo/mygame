@@ -44,6 +44,7 @@ func _ready() -> void:
 	var grid:=GridContainer.new(); grid.name="AnimationActions"; grid.columns=6; grid.add_theme_constant_override("h_separation",6); grid.add_theme_constant_override("v_separation",4); page.add_child(grid)
 	var keys: Array[String]=["idle","walk","slash","slash_reverse","slash_heavy","thrust","sweep","shot","shot_heavy","cast","throw","use","guard","charge","dodge","hurt","death"]
 	var titles: Array[String]=["待机","移动","轻斩","返刃","重斩","突刺","横扫","射击","重射","施法","投掷","物品准备","格挡","蓄力","闪避","受击","死亡"]
+	keys.append_array(["work_gather","work_craft","work_rest"]); titles.append_array(["采集作业","制作作业","休息姿态"])
 	var group:=ButtonGroup.new()
 	for index in keys.size():
 		var button:=FoundationWidgets.button(titles[index],func(): state=keys[index]; progress=0); button.toggle_mode=true; button.button_group=group; button.button_pressed=index==0; grid.add_child(button)
@@ -57,6 +58,7 @@ func _ready() -> void:
 	page.add_child(scrub)
 	diagnostic=FoundationWidgets.label("",12,true); page.add_child(diagnostic)
 	var routes:=HBoxContainer.new(); page.add_child(routes)
+	routes.add_child(FoundationWidgets.button("04 整体游戏表现",func(): get_tree().change_scene_to_file("res://demos/presentation_lab.tscn")))
 	routes.add_child(FoundationWidgets.button("02 武器与连招实战",func(): get_tree().change_scene_to_file("res://demos/animation_combat.tscn")))
 	routes.add_child(FoundationWidgets.button("03 施法与取消实战",func(): get_tree().change_scene_to_file("res://demos/animation_casting.tscn")))
 	routes.add_child(FoundationWidgets.button("返回灰河谷",func(): get_tree().change_scene_to_file("res://grayriver.tscn")))

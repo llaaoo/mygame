@@ -23,7 +23,7 @@ func run() -> void:
 	for name in profile.sprite_frames.get_animation_names():
 		for index in profile.sprite_frames.get_frame_count(name):
 			var texture:=profile.sprite_frames.get_frame_texture(name,index) as AtlasTexture
-			check(texture!=null and int(texture.region.position.x/32) in [0,1,2,3,15,16,17,18,20,21,22,23],"Baked weapon entered the live body profile")
+			check(texture!=null and int(texture.region.position.x/32) in [0,1,2,3,16,17,18,20,21,22,23],"Baked weapon entered the live body profile")
 	var invalid:=profile.duplicate(true) as ActorAnimationProfile
 	invalid.fallback={"a":"b","b":"a"}
 	check(not invalid.validation_errors().is_empty(),"Cyclic visual fallback accepted")

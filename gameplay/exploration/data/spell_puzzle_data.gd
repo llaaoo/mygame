@@ -2,6 +2,7 @@ class_name SpellPuzzleData
 extends Resource
 
 @export var id: String
+@export var presentation_profile: WorldAnimationProfile
 @export var title: String
 @export var pos: Vector2 = Vector2.ZERO
 @export var routes: Array[SpellPuzzleRoute] = []
