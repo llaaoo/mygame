@@ -82,6 +82,8 @@ func run() -> void:
 	check(actions.weapon_art_view().is_empty(),"Heavy acceptance alone opened a window")
 	actions.interrupt(.2); check(actions.weapon_art_view().is_empty(),"Interrupted sequence retained progress")
 	await prime("river_sabre",["light","heavy"],false,false)
+	actions.advance(actions.profile.active)
+	check(actions.remaining>.35 and actions.weapon_art_view().is_empty(),"Early recovery advertised a shared input that would expire before completion")
 	actions.advance(maxf(0,actions.remaining-.2)); captured=actions.capture_weapon_art(Vector2.RIGHT)
 	check(actions.try_action(captured).reason=="buffered","Shared key bypassed commitment instead of buffering")
 	actions.advance(actions.remaining)

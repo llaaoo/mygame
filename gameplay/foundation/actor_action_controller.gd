@@ -97,7 +97,8 @@ func capture_technique_intent(action: Action,force_base := false) -> Action:
 	captured.params["followup_family"]=str(view.get("family",""))
 	return captured
 func weapon_art_view(release_enchantment := false) -> Dictionary:
-	var recovering:=mode=="attack" and profile and elapsed>=profile.windup+profile.active
+	var recovering:=mode=="attack" and profile and elapsed>=profile.windup+profile.active and remaining<=RECOVERY_INPUT_BUFFER_SECONDS+TIME_EPSILON
+	if busy() and not recovering: return {}
 	var uid:=str(context.items.equipped(context.id).get(str(EquipmentData.SlotType.RIGHT_HAND),""))
 	if uid.is_empty() or uid!=weapon_art.weapon_uid: return {}
 	var choices: Array[Dictionary]=[]
