@@ -6,8 +6,12 @@ var steps: Array[Dictionary]=[]
 func aim(point: Vector2) -> void:
  await aim_world(point)
 func attack() -> void:
- steps.append({"input":"LMB","frame":Engine.get_physics_frames()})
- await pointer_button(MOUSE_BUTTON_LEFT,true); await pointer_button(MOUSE_BUTTON_LEFT,false)
+ var edge: Dictionary={"input":"LMB","frame":Engine.get_physics_frames()}
+ steps.append(edge)
+ await pointer_button(MOUSE_BUTTON_LEFT,true)
+ # Tap/hold controls commit on release; helper awaits can span several physics ticks.
+ edge["release_frame"]=Engine.get_physics_frames()
+ await pointer_button(MOUSE_BUTTON_LEFT,false)
 func wait_phase(phase: float) -> void:
  for i in range(140):
   if game.player.actor_context.actions.elapsed>=phase: return
@@ -27,7 +31,7 @@ func run() -> void:
  await aim(actor.position+Vector2(150,0))
  var mp:=actor.mana_component.mp
  await attack()
- check(starts.size()==1 and int(starts[0].frame)-int(steps[0].frame)<=2,"Idle LMB was delayed or dropped")
+ check(starts.size()==1 and int(starts[0].frame)-int(steps[0].release_frame)<=2,"Idle LMB release was delayed or dropped")
  await wait_phase(.55)
  await attack()
  check(not actions.buffered_action_label().is_empty(),"330ms recovery press gave no pending feedback")
