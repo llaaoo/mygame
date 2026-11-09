@@ -56,7 +56,9 @@ func _process(_delta: float) -> void:
 	tooltip_text=detail.text
 	if compact:
 		var constrained:=context.actions.counter_remaining>0 or context.actions.mode in ["stagger","recovery","item","aim_item","spray"]
-		detail.visible=constrained or not partial.is_empty() or not pack or weight>context.rules.carry_limit
+		var queued:=context.actions.buffered_action_label()
+		detail.visible=constrained or not partial.is_empty() or not pack or weight>context.rules.carry_limit or not queued.is_empty()
+		if not queued.is_empty(): detail.text=queued+" · 收招后尝试"
 		if constrained:
 			detail.text="反击机会 · %.1f秒"%context.actions.counter_remaining if context.actions.counter_remaining>0 else state
 			if context.actions.mode in ["stagger","recovery"]: detail.text+=" · %.1f秒"%context.actions.remaining
