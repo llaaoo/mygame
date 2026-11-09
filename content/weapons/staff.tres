@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://gameplay/foundation/data/attack_profile.gd" id="attack"]
 [sub_resource type="Resource" id="stroke0"]
 script = ExtResource("attack")
+title = "开门扫"
 step_distance = 0.0
 movement_multiplier = 0.1
 motion = "sweep"
@@ -16,6 +17,23 @@ impact = 32
 damage_multiplier = 0.9
 [sub_resource type="Resource" id="stroke1"]
 script = ExtResource("attack")
+title = "杖尾顶"
+step_distance = 4.0
+movement_multiplier = 0.2
+motion = "thrust"
+windup = 0.2
+active = 0.12
+recovery = 0.34
+reach = 58
+angle_degrees = 60
+stamina_cost = 14
+impact = 28
+damage_multiplier = 0.85
+[sub_resource type="Resource" id="stroke2"]
+script = ExtResource("attack")
+title = "回身推扫"
+swing_direction = -1
+push_distance = 18.0
 step_distance = 0.0
 movement_multiplier = 0.1
 motion = "sweep"
@@ -30,4 +48,6 @@ damage_multiplier = 1.1
 [resource]
 script = ExtResource("moves")
 weapon_type = "staff"
-attacks = [SubResource("stroke0"), SubResource("stroke1")]
+description = "近身控场：宽扫起手、短距杖尾顶衔接，末段反向推扫可把敌人送进地面介质。中段必须贴近；末段仍会被格挡或闪避。"
+chain_window = 0.7
+attacks = [SubResource("stroke0"), SubResource("stroke1"), SubResource("stroke2")]

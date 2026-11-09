@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://gameplay/foundation/data/attack_profile.gd" id="attack"]
 [sub_resource type="Resource" id="stroke0"]
 script = ExtResource("attack")
+title = "稳弦射"
 step_distance = 0.0
 movement_multiplier = 0.1
 motion = "shot"
@@ -16,7 +17,24 @@ impact = 12
 damage_multiplier = 1.0
 ammo_id = "arrow"
 projectile_speed = 640.0
+[sub_resource type="Resource" id="stroke1"]
+script = ExtResource("attack")
+title = "续弦快射"
+movement_multiplier = 0.15
+motion = "shot"
+windup = 0.32
+active = 0.08
+recovery = 0.48
+reach = 440
+angle_degrees = 12
+stamina_cost = 16
+impact = 9
+damage_multiplier = 0.85
+ammo_id = "arrow"
+projectile_speed = 640.0
 [resource]
 script = ExtResource("moves")
 weapon_type = "bow"
-attacks = [SubResource("stroke0")]
+description = "续弦节奏：完整拉弦后可在短窗口手动续射，第二箭起手更快、威力与射程较低。每箭各耗一支口袋箭矢，不能格挡。"
+chain_window = 0.45
+attacks = [SubResource("stroke0"), SubResource("stroke1")]

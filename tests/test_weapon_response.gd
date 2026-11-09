@@ -37,7 +37,7 @@ func run() -> void:
  queued.direction=Vector2.LEFT; queued.params.sample.value=2
  check(actions._buffer.direction==Vector2.RIGHT and actions._buffer.params.sample.value==1,"Queued intent retained a mutable caller request")
  actions.advance(.33)
- check(actions.mode=="attack" and actions._attack_sequence==serial+1 and actions.combo_index==0 and actions.facing==Vector2.RIGHT,"Recovery press was lost or resampled")
+ check(actions.mode=="attack" and actions._attack_sequence==serial+1 and actions.combo.current_index==1 and actions.facing==Vector2.RIGHT,"Recovery press was lost or resampled")
  actions.advance(1.2)
  check(actions.mode=="idle" and actions._attack_sequence==serial+1,"One buffered press executed more than once")
  # Exact expiry/completion boundary and a larger tick must use event order.

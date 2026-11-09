@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://gameplay/foundation/data/attack_profile.gd" id="attack"]
 [sub_resource type="Resource" id="stroke0"]
 script = ExtResource("attack")
+title = "探距刺"
 step_distance = 10.0
 movement_multiplier = 0.15
 motion = "thrust"
@@ -16,6 +17,7 @@ impact = 23
 damage_multiplier = 1.1
 [sub_resource type="Resource" id="stroke1"]
 script = ExtResource("attack")
+title = "递进刺"
 step_distance = 16.0
 movement_multiplier = 0.15
 motion = "thrust"
@@ -27,7 +29,23 @@ angle_degrees = 32
 stamina_cost = 18
 impact = 30
 damage_multiplier = 1.3
+[sub_resource type="Resource" id="stroke2"]
+script = ExtResource("attack")
+title = "贯身长刺"
+motion = "thrust"
+step_distance = 20.0
+movement_multiplier = 0.1
+windup = 0.4
+active = 0.14
+recovery = 0.5
+reach = 128
+angle_degrees = 24
+stamina_cost = 22
+impact = 38
+damage_multiplier = 1.5
 [resource]
 script = ExtResource("moves")
 weapon_type = "spear"
-attacks = [SubResource("stroke0"), SubResource("stroke1")]
+description = "距离压制：三次锁向突刺逐段增加距离与前踏，末段更窄、收招更长。需要守住刺击线，不会追踪绕侧的目标。"
+chain_window = 0.55
+attacks = [SubResource("stroke0"), SubResource("stroke1"), SubResource("stroke2")]

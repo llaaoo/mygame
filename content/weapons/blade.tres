@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://gameplay/foundation/data/attack_profile.gd" id="attack"]
 [sub_resource type="Resource" id="stroke0"]
 script = ExtResource("attack")
+title = "横斩"
 step_distance = 4.0
 movement_multiplier = 0.4
 windup = 0.16
@@ -15,6 +16,8 @@ impact = 16
 damage_multiplier = 1
 [sub_resource type="Resource" id="stroke1"]
 script = ExtResource("attack")
+title = "返刃"
+swing_direction = -1
 step_distance = 6.0
 movement_multiplier = 0.4
 windup = 0.2
@@ -27,17 +30,20 @@ impact = 23
 damage_multiplier = 1.12
 [sub_resource type="Resource" id="stroke2"]
 script = ExtResource("attack")
+title = "进步直刺"
+motion = "thrust"
 step_distance = 8.0
 movement_multiplier = 0.4
 windup = 0.32
 active = 0.14
 recovery = 0.4
 reach = 66
-angle_degrees = 85
+angle_degrees = 48
 stamina_cost = 17
 impact = 34
 damage_multiplier = 1.4
 [resource]
 script = ExtResource("moves")
 weapon_type = "blade"
+description = "短兵连斩：横斩接反向返刃，最后直刺集中伤害。末段扇面较窄，需要重新瞄准；可在任何收招停手防守。"
 attacks = [SubResource("stroke0"), SubResource("stroke1"), SubResource("stroke2")]

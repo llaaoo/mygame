@@ -1,0 +1,31 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:364)
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+⏰ WorldTime 启动: 08:00
+🏛️ GameRuntime: 五大 Runtime 初始化完成
+   CommandBus       : ✅
+   CombatExecutor   : ✅
+   CombatEventBus   : ✅
+   WorldRuntime     : ✅
+   SimulationRuntime: ✅
+   WorldTime        : ✅
+⚡ 已注册触发效果: OnKillBonusExp
+📊 CombatDebugger: trace enabled
+⏰ 08:00 (☀️ 白天)
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+COMBO_INPUT {"arrows":4,"mp":60,"stamina":62.0,"strokes":[{"counter":false,"family":"weapon.player.1","stamina":11.0,"stroke_count":3,"stroke_index":0,"stroke_title":"横斩","technique":"","weapon_uid":"item.78"},{"counter":false,"family":"weapon.player.2","stamina":13.0,"stroke_count":3,"stroke_index":1,"stroke_title":"返刃","technique":"","weapon_uid":"item.78"},{"counter":false,"family":"weapon.player.3","stamina":17.0,"stroke_count":3,"stroke_index":2,"stroke_title":"进步直刺","technique":"","weapon_uid":"item.78"}],"weapon":"blade"}
+SaveManager: saved user://save_3.sav
+COMBO_INPUT {"arrows":4,"mp":60,"stamina":46.8333333333341,"strokes":[{"counter":false,"family":"weapon.player.4","stamina":15.0,"stroke_count":3,"stroke_index":0,"stroke_title":"探距刺","technique":"","weapon_uid":"item.79"},{"counter":false,"family":"weapon.player.5","stamina":18.0,"stroke_count":3,"stroke_index":1,"stroke_title":"递进刺","technique":"","weapon_uid":"item.79"},{"counter":false,"family":"weapon.player.6","stamina":22.0,"stroke_count":3,"stroke_index":2,"stroke_title":"贯身长刺","technique":"","weapon_uid":"item.79"}],"weapon":"spear"}
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+COMBO_INPUT {"arrows":4,"mp":60,"stamina":53.5000000000014,"strokes":[{"counter":false,"family":"weapon.player.7","stamina":15.0,"stroke_count":3,"stroke_index":0,"stroke_title":"开门扫","technique":"","weapon_uid":"item.80"},{"counter":false,"family":"weapon.player.8","stamina":14.0,"stroke_count":3,"stroke_index":1,"stroke_title":"杖尾顶","technique":"","weapon_uid":"item.80"},{"counter":false,"family":"weapon.player.9","stamina":20.0,"stroke_count":3,"stroke_index":2,"stroke_title":"回身推扫","technique":"","weapon_uid":"item.80"}],"weapon":"staff"}
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+COMBO_INPUT {"arrows":2,"mp":60,"stamina":73.166666666669,"strokes":[{"counter":false,"family":"weapon.player.10","stamina":13.0,"stroke_count":2,"stroke_index":0,"stroke_title":"稳弦射","technique":"","weapon_uid":"item.81"},{"counter":false,"family":"weapon.player.11","stamina":16.0,"stroke_count":2,"stroke_index":1,"stroke_title":"续弦快射","technique":"","weapon_uid":"item.81"}],"weapon":"bow"}
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+PASS weapon combo input: four full real-mouse buffered chains, per-stroke HUD/facts, natural stamina recovery, real arrows, live menu cancellation and F5/F9 UID/ammo persistence without chain

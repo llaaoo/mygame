@@ -6,6 +6,7 @@ var stamina_bar: ProgressBar
 var stability_bar: ProgressBar
 var detail: Label
 var enchantment_label: Label
+var combo_label: Label
 func _ready() -> void:
 	mouse_filter=Control.MOUSE_FILTER_IGNORE
 	for title in ["体力","稳定"]:
@@ -32,9 +33,18 @@ func _ready() -> void:
 	enchantment_label=FoundationWidgets.label("",11,true)
 	enchantment_label.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	add_child(enchantment_label)
+	combo_label=FoundationWidgets.label("",11,true)
+	combo_label.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	add_child(combo_label)
 func _process(_delta: float) -> void:
 	visible=context!=null
 	if not context or not context.actions: return
+	var chain:=context.actions.combo_snapshot()
+	combo_label.visible=not chain.is_empty()
+	if not chain.is_empty():
+		combo_label.text=("%s · %d/%d %s · %s"%[chain.weapon,int(chain.index)+1,chain.count,chain.title,chain.phase]) if chain.active else ("左键接续 · %d/%d %s · %.1f秒"%[int(chain.index)+1,chain.count,chain.title,chain.remaining])
+		if not chain.active and not str(chain.reason).is_empty(): combo_label.text+=" · "+str(chain.reason)
+		combo_label.modulate=Color("dacb93") if chain.active else Color("abc8b7")
 	var uid:=str(context.items.equipped(context.id).get(str(EquipmentData.SlotType.RIGHT_HAND),""))
 	var coating:=context.items.coating(uid)
 	enchantment_label.visible=coating!=null and coating.enchantment!=null
