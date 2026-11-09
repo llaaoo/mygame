@@ -212,6 +212,7 @@ func discover(entry: ExplorationDiscoveryData) -> bool:
 		if reward:
 			_save_progress()
 		return reward
+	if game.session: game.session.facts.publish("discovery","player",{"id":entry.id})
 	if game.knowledge: game.knowledge.read_clues(entry)
 	game.grant_material_reward(entry.id, entry.title, entry.pos, entry.materials)
 	_apply_knowledge()

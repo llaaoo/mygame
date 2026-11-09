@@ -285,7 +285,11 @@ func _on_skill_used_for_mastery(_source: String, skill: SkillData) -> void:
 		player.mastery_manager.on_skill_cast(skill)
 
 func _on_player_hit_for_mastery(ev: CombatEvent) -> void:
+	if is_instance_valid(ev.target) and "rewards_enabled" in ev.target and not ev.target.rewards_enabled: return
+	var hit:=ev.data.get("hit_result") as HitResult
+	if hit and hit.blocked: return
 	if player.actor_context and not player.actor_context.reward_eligible: return
+	if "physical" in ev.data.get("tags",[]) or "melee" in ev.data.get("tags",[]): return # Confirmed physical families use CampaignSession facts.
 	if "dot" in ev.data.get("tags", []):
 		return
 	if ev.source != player:
@@ -306,6 +310,7 @@ func _on_player_hit_for_mastery(ev: CombatEvent) -> void:
 		player.mastery_manager.on_deal_damage(school, damage)
 
 func _on_player_kill_for_mastery(ev: CombatEvent) -> void:
+	if not ev.data.get("reward_eligible",true): return
 	if player.actor_context and not player.actor_context.reward_eligible: return
 	if ev.source != player:
 		return
@@ -320,6 +325,7 @@ func _on_player_kill_for_mastery(ev: CombatEvent) -> void:
 			school = SkillMastery.School.CONJURATION
 		elif "shadow" in tags:
 			school = SkillMastery.School.ILLUSION
+	if "physical" in ev.data.get("tags",[]) or "melee" in ev.data.get("tags",[]): school=SkillMastery.School.MELEE
 	player.mastery_manager.on_kill(school)
 
 func _guess_school_from_skill(skill: SkillData) -> SkillMastery.School:

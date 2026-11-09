@@ -98,7 +98,7 @@ func _build_ui() -> void:
 	vbox.add_child(header)
 
 	var title := Label.new()
-	title.text = "法术精通树"
+	title.text = "角色Perk树"
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	GameUIStyle.apply_label(title, 22, GameUIStyle.GOLD)
 	header.add_child(title)
@@ -106,6 +106,7 @@ func _build_ui() -> void:
 	_level_label = Label.new()
 	GameUIStyle.apply_label(_level_label, 13, GameUIStyle.TEXT_MAIN)
 	header.add_child(_level_label)
+	header.add_child(FoundationWidgets.button("分配属性点",_open_attributes))
 
 	var close_button := Button.new()
 	close_button.text = "×"
@@ -116,7 +117,7 @@ func _build_ui() -> void:
 	header.add_child(close_button)
 
 	var hint := Label.new()
-	hint.text = "每个学派每 5 级获得 1 点 perk。触发型连锁效果已转入对应学派树。"
+	hint.text = "角色每升一级获得1点Perk；熟练度决定学习条件。"
 	GameUIStyle.apply_label(hint, 11, GameUIStyle.TEXT_MUTED)
 	vbox.add_child(hint)
 
@@ -157,7 +158,7 @@ func _make_school_column(mastery: SkillMastery) -> Control:
 	vbox.add_child(title)
 
 	var info := Label.new()
-	info.text = "Lv.%d  |  节点点数 %d" % [mastery.level, mastery.perk_points]
+	info.text = "Lv.%d  |  节点点数 %d" % [mastery.level, _mastery_manager.get_available_perk_points()]
 	info.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	GameUIStyle.apply_label(info, 12, GameUIStyle.TEXT_MAIN)
 	vbox.add_child(info)
@@ -330,3 +331,8 @@ func _on_perk_points_changed(_school: int, _points: int) -> void:
 func _on_perk_unlocked(_school: int, _perk_id: String) -> void:
 	if visible:
 		_refresh()
+
+func _open_attributes() -> void:
+	close()
+	var hud:=get_parent()
+	if hud and "level_up_ui" in hud and hud.level_up_ui: hud.level_up_ui._on_level_up(_player.stats_component.level)

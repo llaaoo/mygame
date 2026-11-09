@@ -122,7 +122,7 @@ func run() -> void:
 	stats.modify_stat("intelligence", 4)
 	game.presenter._show_training()
 	var text := ""
-	for label in game.ui.modal.find_children("*", "RichTextLabel", true, false): text += label.text
+	for label in game.ui.modal.find_children("*", "Label", true, false): text += label.text
 	check("下一点基础派生变化" in text and "属性准备" in text and "%d" not in text, "Training UI omitted consequences or failed formatting")
 	game.ui.close_modal()
 	check(SaveManager.instance.save_game(MVPGame.SAVE_SLOT), "Attribute task save failed")

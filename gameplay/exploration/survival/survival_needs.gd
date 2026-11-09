@@ -44,8 +44,8 @@ func bind_effects(manager: BuffManager,import_legacy: bool) -> void:
 		if existing.id==row[1] and float(existing.remaining)>0: remainder=minf(remainder,float(existing.remaining))
 		manager.set_provision(row[0],row[1],remainder,true)
 
-func tick(delta: float,endurance: int,sheltered := false) -> void:
-	var resilience:=clampf(1-maxf(0,endurance-10)*.02,.7,1)
+func tick(delta: float,endurance: int,sheltered := false,loss_multiplier := 1.0) -> void:
+	var resilience:=clampf(1-maxf(0,endurance-10)*.02,.7,1)*clampf(loss_multiplier,.5,1.5)
 	var exposure:=.25 if sheltered else 1.0
 	nutrition=maxf(0,nutrition-delta/15.0*resilience*exposure)
 	hydration=maxf(0,hydration-delta/10.0*resilience*exposure)

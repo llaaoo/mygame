@@ -102,6 +102,8 @@ func build_plan(skill: SkillData, actor: Node2D, empower: bool = false,selection
 		result.explanation.append(CastExplanationStep.new("source",medium.id,medium.title+"：只读取已存在的来源"))
 	var stats := actor.get_node_or_null("StatsComponent") as StatsComponent
 	if stats: result.signature.append(["attributes", stats.primary_values()])
+	var mastery:=actor.get_node_or_null("MasteryManager") as SkillMasteryManager
+	if mastery: result.signature.append(["perks",mastery.revision])
 	var survival: SurvivalService = actor.survival if "survival" in actor else null
 	var fatigue_factor: float = survival.needs.preparation_multiplier() if survival else actor.actor_context.actions.needs.preparation_multiplier() if "actor_context" in actor and actor.actor_context and actor.actor_context.actions else 1.0
 	result.signature.append(["fatigue", fatigue_factor])

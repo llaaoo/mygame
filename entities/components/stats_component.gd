@@ -48,7 +48,7 @@ func _recalculate_all() -> void:
 ## Overrides are base primary values; current Buff contributions still apply.
 func derived_values(overrides: Dictionary = {}) -> Dictionary:
 	var primary := primary_values(overrides)
-	return {"primary": primary, "max_hp_bonus": primary.endurance * 5, "max_mana": 30 + primary.intelligence * 3, "physical_damage": primary.strength * 2, "magic_damage": primary.intelligence * 2, "move_speed_bonus": primary.agility * 3.0, "preparation_multiplier": clampf(1 - maxf(0, primary.agility - 10) * .015, .7, 1.0), "hazard_damage_multiplier": clampf(1 - maxf(0, primary.endurance - 10) * .02, .6, 1.0)}
+	return {"primary": primary, "max_hp_bonus": primary.endurance * 5, "max_mana": 30 + primary.intelligence * 3, "physical_damage": primary.strength * 2, "magic_damage": primary.intelligence * 2, "move_speed_bonus": primary.agility * 3.0, "preparation_multiplier": clampf(1 - maxf(0, primary.agility - 10) * .015, .7, 1.0), "max_stamina": 80.0 + primary.endurance * 2.0, "stamina_regeneration": maxf(2,10+(primary.endurance-10)*.2), "carry_bonus": (primary.strength-10)*2.0, "ranged_damage": primary.agility*2, "dodge_multiplier": clampf(1-maxf(0,primary.agility-10)*.01,.75,1), "work_multiplier": clampf(1-maxf(0,primary.intelligence-10)*.01,.8,1), "hazard_damage_multiplier": clampf(1 - maxf(0, primary.endurance - 10) * .02, .6, 1.0)}
 
 func primary_values(overrides: Dictionary = {}) -> Dictionary:
 	var values: Dictionary = {}
@@ -102,11 +102,11 @@ func modify_stat(stat_name: String, amount: int) -> bool:
 ## 添加经验值（自动检测升级）
 func add_experience(amount: int) -> void:
 	if amount <= 0: return
-	experience += amount
-	while experience >= exp_to_next:
-		experience -= exp_to_next
+	experience = mini(2000000000,experience + mini(amount,2000000000))
+	while level<100 and experience >= maxi(1,exp_to_next):
+		experience -= maxi(1,exp_to_next)
 		level += 1
-		exp_to_next = int(exp_to_next * 1.5)
+		exp_to_next = mini(2000000000,int(maxi(1,exp_to_next) * 1.5))
 		attribute_points += 3  # 每级 3 属性点
 		leveled_up.emit(level)
 
@@ -122,3 +122,13 @@ func spend_attribute_point(stat_name: String) -> bool:
 ## 获取格式化的属性摘要
 func get_summary() -> String:
 	return "Lv.%d  💪%d 🧠%d 🏃%d 🛡️%d" % [level, effective_stat("strength"), effective_stat("intelligence"), effective_stat("agility"), effective_stat("endurance")]
+
+static func valid_progression(data: Dictionary) -> bool:
+	for key in ["level","experience","exp_to_next","attribute_points"]+Buff.PRIMARY_STATS:
+		if not data.has(key): continue
+		var value: Variant=data[key]
+		if not value is int: return false
+		var lower:=0 if key in ["experience","attribute_points"] else 1
+		var upper:=100 if key=="level" else 10000 if key=="attribute_points" else 1000 if key in Buff.PRIMARY_STATS else 2000000000
+		if value<lower or value>upper: return false
+	return true

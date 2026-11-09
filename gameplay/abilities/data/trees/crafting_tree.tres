@@ -1,0 +1,82 @@
+[gd_resource type="Resource" script_class="SkillTreeData" format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_tree_data.gd" id="tree"]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_perk_data.gd" id="perk"]
+
+[sub_resource type="Resource" id="tool_familiarity"]
+script = ExtResource("perk")
+perk_id = "tool_familiarity"
+school = 7
+display_name = "工具熟习"
+description = "非休息现场作业耗时降低15%，不加速游戏时钟或跳过材料。"
+required_level = 1
+required_character_level = 2
+required_attributes = {}
+prerequisite_ids = Array[String]([])
+modifier_bonuses = {"work.duration": -0.15}
+column = 1
+row = 0
+
+[sub_resource type="Resource" id="arrow_fletcher"]
+script = ExtResource("perk")
+perk_id = "arrow_fletcher"
+school = 7
+display_name = "箭簇整备"
+description = "弹药配方产出增加25%（向下取整），仍消费完整原料。"
+required_level = 3
+required_character_level = 3
+required_attributes = {"agility": 12}
+prerequisite_ids = Array[String](["tool_familiarity"])
+modifier_bonuses = {"craft.ammunition": 0.25}
+column = 0
+row = 1
+
+[sub_resource type="Resource" id="salvage_eye"]
+script = ExtResource("perk")
+perk_id = "salvage_eye"
+school = 7
+display_name = "拆解辨材"
+description = "拆解真实装备额外得到1份金属碎料；不复制装备。"
+required_level = 3
+required_character_level = 3
+required_attributes = {"intelligence": 12}
+prerequisite_ids = Array[String](["tool_familiarity"])
+modifier_bonuses = {"salvage.scrap": 1}
+column = 2
+row = 1
+
+[sub_resource type="Resource" id="careful_smith"]
+script = ExtResource("perk")
+perk_id = "careful_smith"
+school = 7
+display_name = "整修熟手"
+description = "每次强化费用降低2币，金属碎料和强化等级限制保留。"
+required_level = 6
+required_character_level = 5
+required_attributes = {"strength": 12}
+prerequisite_ids = Array[String](["arrow_fletcher"])
+modifier_bonuses = {"upgrade.coin_discount": 2}
+column = 0
+row = 2
+
+[sub_resource type="Resource" id="workshop_rhythm"]
+script = ExtResource("perk")
+perk_id = "workshop_rhythm"
+school = 7
+display_name = "工序节律"
+description = "非休息现场作业再缩短10%，可与属性及工具熟习组合。"
+required_level = 6
+required_character_level = 5
+required_attributes = {"intelligence": 14}
+prerequisite_ids = Array[String](["salvage_eye"])
+modifier_bonuses = {"work.duration": -0.1}
+column = 2
+row = 2
+
+[resource]
+script = ExtResource("tree")
+tree_id = "crafting"
+display_name = "制造与整修"
+description = "成功制造、烹饪及现场作业提高熟练度；失败与取消不奖励。"
+school = 7
+accent_color = Color(0.72,0.61,0.35,1)
+perks = [SubResource("tool_familiarity"), SubResource("arrow_fletcher"), SubResource("salvage_eye"), SubResource("careful_smith"), SubResource("workshop_rhythm")]

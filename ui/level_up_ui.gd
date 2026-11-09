@@ -264,6 +264,10 @@ func _refresh_derived_preview() -> void:
 		lines.append("生命加成  %d → %s" % [cur_hp, _colored(hp_bonus, cur_hp)])
 	else:
 		lines.append("生命加成  %d" % hp_bonus)
+	var current:=stats_component.derived_values()
+	var preview:=stats_component.derived_values({"strength":s,"intelligence":i,"agility":a,"endurance":e})
+	lines.append("体力上限 %.0f → %.0f；回复 %.1f → %.1f/秒"%[current.max_stamina,preview.max_stamina,current.stamina_regeneration,preview.stamina_regeneration])
+	lines.append("负重承受加成 %.0f → %.0f"%[current.carry_bonus,preview.carry_bonus])
 
 	if phys_dmg != cur_phys:
 		lines.append("物理伤害  %d → %s" % [cur_phys, _colored(phys_dmg, cur_phys)])

@@ -6,6 +6,8 @@ extends Resource
 @export var display_name: String = ""
 @export_multiline var description: String = ""
 @export var required_level: int = 1
+@export var required_character_level := 1
+@export var required_attributes: Dictionary = {}
 @export var cost: int = 1
 @export var column: int = 0
 @export var row: int = 0

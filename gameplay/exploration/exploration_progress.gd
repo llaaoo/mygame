@@ -134,6 +134,8 @@ func validate_save_data(value: Variant) -> bool:
 	var character: Dictionary = value.get("character_state", {})
 	if not supplies.get("amounts", {}) is Dictionary or not supplies.get("selected", {}) is Dictionary or not character.get("stats", {}) is Dictionary or not character.get("mastery", {}) is Dictionary:
 		return false
+	if not StatsComponent.valid_progression(character.get("stats",{})): return false
+	if not SkillMasteryManager.valid_state(character.get("mastery",{}),int(character.get("stats",{}).get("level",1))): return false
 	for numbers: Dictionary in [supplies.get("amounts", {}), character.get("stats", {})]:
 		for number in numbers.values():
 			if typeof(number) not in [TYPE_INT, TYPE_FLOAT]:

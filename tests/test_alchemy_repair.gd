@@ -162,8 +162,10 @@ func run() -> void:
 	game.field_sites.inspect(regulator)
 	player.stats_component.modify_stat("intelligence", 4)
 	check(work.start_selected(), "Intelligence14 could not calibrate")
-	work.tick(2.49)
-	check(not regulator.completed, "Calibration completed before fixed2.5sec")
+	var calibration: float=work.pending.duration
+	check(calibration<2.5,"Intelligence did not improve calibration work efficiency")
+	work.tick(calibration-.01)
+	check(not regulator.completed, "Calibration completed before its projected deadline")
 	work.tick(.01)
 	check(regulator.completed and game.progress.choices[AlchemyRepairService.REGULATOR] == "calibrate", "Calibration completion failed")
 	game.progress.claims.erase(AlchemyRepairService.REGULATOR)

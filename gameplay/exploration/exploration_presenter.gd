@@ -26,38 +26,18 @@ func show_arrival() -> void:
 	game.ui.show_panel(title, text, [{"title": "开始探索" if first_visit else "继续旅程", "callback": game.ui.close_modal}, {"title": "查看探索日志", "callback": game.ui.show_journal}])
 
 func _show_training() -> void:
-	var stats := game.player.stats_component
-	var values := stats.derived_values()
-	var primary: Dictionary = values.primary
-	var text := "可用属性点：%d\n基础：力量%d · 智力%d · 敏捷%d · 耐力%d\n当前有效：力量%d · 智力%d · 敏捷%d · 耐力%d\n\n当前战斗与生存\n近战%d · 魔法加成%d · 生命上限%d · 法力上限%d\n移速%.0f · 属性准备时间×%.2f · 持续／陷阱伤害降低%.0f%%\n\n" % [stats.attribute_points, stats.strength, stats.intelligence, stats.agility, stats.endurance, primary.strength, primary.intelligence, primary.agility, primary.endurance, game.player.combat_component.attack_damage, stats.magic_damage, game.player.health_component.max_hp, game.player.mana_component.max_mp, game.player.move_speed, stats.preparation_multiplier, (1 - stats.hazard_damage_multiplier) * 100]
-	text += "力量：增强近战，可承担需要力量的任务处理方式。\n智力：增强魔法与法力，可通过记录推演解决任务。\n敏捷：增强移动，超过10后每点缩短1.5%准备，最多30%。\n耐力：增加生命，超过10后每点减免2%持续、环境与陷阱伤害，最多40%；不会免疫状态。\n\n下一点基础派生变化（已计入主属性增益，其他修正另计）\n"
-	var buttons: Array[Dictionary] = []
-	for pair in [["strength", "力量"], ["intelligence", "智力"], ["agility", "敏捷"], ["endurance", "耐力"]]:
-		var next := stats.derived_values({pair[0]: int(stats.get(pair[0])) + 1})
-		var change := ""
-		var benefit := ""
-		match pair[0]:
-			"strength":
-				change = "基础近战%d→%d" % [roundi((10 + values.physical_damage) * game.player.melee_damage_multiplier), roundi((10 + next.physical_damage) * game.player.melee_damage_multiplier)]
-				benefit = change
-			"intelligence":
-				change = "魔法加成%d→%d，基础法力%d→%d" % [values.magic_damage, next.magic_damage, values.max_mana, next.max_mana]
-				benefit = "法力%d→%d" % [values.max_mana, next.max_mana]
-			"agility":
-				change = "基础移速%.0f→%.0f，属性准备×%.3f→×%.3f" % [game.player.base_move_speed + values.move_speed_bonus, game.player.base_move_speed + next.move_speed_bonus, values.preparation_multiplier, next.preparation_multiplier]
-				benefit = "准备缩短%.1f%%→%.1f%%" % [(1 - values.preparation_multiplier) * 100, (1 - next.preparation_multiplier) * 100]
-			"endurance":
-				change = "基础生命%d→%d，危险伤害减免%.0f%%→%.0f%%" % [50 + values.max_hp_bonus, 50 + next.max_hp_bonus, (1 - values.hazard_damage_multiplier) * 100, (1 - next.hazard_damage_multiplier) * 100]
-				benefit = "生命%d→%d" % [50 + values.max_hp_bonus, 50 + next.max_hp_bonus]
-		text += pair[1] + " +1：" + change + "\n"
-		buttons.append({"title": pair[1] + " +1 · " + benefit, "tooltip": change, "disabled": stats.attribute_points <= 0, "callback": _train.bind(pair[0])})
-	text += "\n升级获得属性点。任务按提交时的有效属性检查，可借助临时增益；原有常规交付方式保留。训练结果自动保存。"
-	buttons.append({"title": "完成训练", "callback": game.ui.close_modal})
-	game.ui.show_panel("营地训练", text, buttons)
+	_show_progression(true)
 
 func _train(stat: String) -> void:
 	game.progress_service.train(stat)
 	_show_training()
+
+func _show_progression(attributes := false) -> void:
+	if game.player.health_component.is_dead: return
+	var screen:=CharacterProgressionScreen.new()
+	screen.setup(game.player,game._save_progress,game.progress_service.train,attributes)
+	game.ui.show_view("角色成长",screen,"progression")
+	game.ui.modal.set_meta("character_progression",true)
 
 func _update_objective() -> void:
 	game.ui.heading.text = game.current_data.title + (" · 已清理" if game.progress.cleared.has(game.region_id) else "")

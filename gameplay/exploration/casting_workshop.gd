@@ -144,7 +144,7 @@ func _craft_detail(screen: ExpeditionScreen,id: String) -> void:
 		screen.detail.add_child(FoundationWidgets.label("寻找探索记录，学习第一份配方。",16,true))
 		return
 	var recipe: CraftingRecipe=supplies.crafting_recipes[id]
-	var card:=FoundationWidgets.card(screen.detail,supplies.title(recipe.output_id),"产出 ×%d · 持有 %d"%[recipe.output_count,supplies.count(recipe.output_id)])
+	var card:=FoundationWidgets.card(screen.detail,supplies.title(recipe.output_id),"产出 ×%d · 持有 %d"%[supplies.craft_output(recipe),supplies.count(recipe.output_id)])
 	var definition:=ItemCatalog.default_catalog().definition(recipe.output_id)
 	if definition: card.add_child(FoundationWidgets.label(definition.description,14))
 	card.add_child(HSeparator.new())
@@ -175,7 +175,7 @@ func _craft_selected(screen: ExpeditionScreen,id: String) -> void:
 	if game.is_at_base() and recipe and supplies.craft(id):
 		game._save_progress()
 		var pocket:=supplies.inventory_store.count(supplies.actor_id,recipe.output_id,false,true) if supplies.inventory_store else supplies.count(recipe.output_id)
-		message="制成%s ×%d · 当前口袋%d / 背包%d"%[supplies.title(recipe.output_id),recipe.output_count,pocket,supplies.count(recipe.output_id)-pocket]
+		message="制成%s ×%d · 当前口袋%d / 背包%d"%[supplies.title(recipe.output_id),supplies.craft_output(recipe),pocket,supplies.count(recipe.output_id)-pocket]
 		if pocket==0: message+=" · 先点整理，移入口袋后才能用于战斗。"
 	game.ui.notify(message)
 	screen.status.text=message

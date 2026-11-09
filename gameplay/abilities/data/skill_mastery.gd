@@ -10,6 +10,7 @@ enum School {
 	MELEE,
 	DEFENSE,
 	CRAFTING,
+	SURVIVAL,
 }
 
 @export var skill_id: String = ""
@@ -21,6 +22,7 @@ enum School {
 
 
 func add_xp(amount: float) -> bool:
+	if amount<=0 or not is_finite(amount) or level>=100: return false
 	xp += amount
 	if xp >= xp_to_next and level < 100:
 		return _level_up()
@@ -35,6 +37,7 @@ func _level_up() -> bool:
 		perk_points += 1
 	if xp >= xp_to_next and level < 100:
 		_level_up()
+	if level>=100: xp=minf(xp,xp_to_next)
 	return true
 
 

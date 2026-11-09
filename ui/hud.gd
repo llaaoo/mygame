@@ -283,8 +283,7 @@ func _on_stat_changed(_stat_name: String, _new_value: int) -> void:
 
 func _on_level_up(new_level: int) -> void:
 	_update_stats_display()
-	if level_up_ui:
-		level_up_ui._on_level_up(new_level)
+	# Level-up never takes combat input. Allocation is an explicit menu request.
 
 
 func _setup_level_up_ui() -> void:

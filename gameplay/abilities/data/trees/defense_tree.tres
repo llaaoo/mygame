@@ -1,0 +1,82 @@
+[gd_resource type="Resource" script_class="SkillTreeData" format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_tree_data.gd" id="tree"]
+[ext_resource type="Script" path="res://gameplay/abilities/data/skill_perk_data.gd" id="perk"]
+
+[sub_resource type="Resource" id="steadfast_guard"]
+script = ExtResource("perk")
+perk_id = "steadfast_guard"
+school = 6
+display_name = "稳健架势"
+description = "格挡体力消耗降低12%。"
+required_level = 1
+required_character_level = 2
+required_attributes = {}
+prerequisite_ids = Array[String]([])
+modifier_bonuses = {"stamina.guard": -0.12}
+column = 1
+row = 0
+
+[sub_resource type="Resource" id="light_step"]
+script = ExtResource("perk")
+perk_id = "light_step"
+school = 6
+display_name = "轻足"
+description = "闪避体力消耗降低15%。"
+required_level = 3
+required_character_level = 3
+required_attributes = {"agility": 12}
+prerequisite_ids = Array[String](["steadfast_guard"])
+modifier_bonuses = {"stamina.dodge": -0.15}
+column = 0
+row = 1
+
+[sub_resource type="Resource" id="guarded_breath"]
+script = ExtResource("perk")
+perk_id = "guarded_breath"
+school = 6
+display_name = "守中回气"
+description = "持续格挡时可按正常回复的20%恢复体力，仍有消耗后延迟。"
+required_level = 3
+required_character_level = 3
+required_attributes = {"endurance": 12}
+prerequisite_ids = Array[String](["steadfast_guard"])
+modifier_bonuses = {"stamina.guarding_regen": 0.2}
+column = 2
+row = 1
+
+[sub_resource type="Resource" id="road_runner"]
+script = ExtResource("perk")
+perk_id = "road_runner"
+school = 6
+display_name = "长途步法"
+description = "冲刺体力消耗降低20%。"
+required_level = 6
+required_character_level = 5
+required_attributes = {"endurance": 13}
+prerequisite_ids = Array[String](["light_step"])
+modifier_bonuses = {"stamina.sprint": -0.2}
+column = 0
+row = 2
+
+[sub_resource type="Resource" id="deep_reserve"]
+script = ExtResource("perk")
+perk_id = "deep_reserve"
+school = 6
+display_name = "深厚储备"
+description = "额外体力上限+20，正常体力回复+2/秒。"
+required_level = 6
+required_character_level = 5
+required_attributes = {"endurance": 14}
+prerequisite_ids = Array[String](["guarded_breath"])
+modifier_bonuses = {"stamina.maximum": 20, "stamina.regeneration": 2}
+column = 2
+row = 2
+
+[resource]
+script = ExtResource("tree")
+tree_id = "defense"
+display_name = "防御与机动"
+description = "有效防御积累经验；闪避和防御仍保留动作承诺。"
+school = 6
+accent_color = Color(0.72,0.61,0.35,1)
+perks = [SubResource("steadfast_guard"), SubResource("light_step"), SubResource("guarded_breath"), SubResource("road_runner"), SubResource("deep_reserve")]

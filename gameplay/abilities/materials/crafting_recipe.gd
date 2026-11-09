@@ -5,3 +5,5 @@ extends Resource
 @export var inputs: Dictionary = {}
 @export var output_id: String
 @export var output_count := 1
+
+@export var ammunition := false

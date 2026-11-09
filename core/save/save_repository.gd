@@ -212,25 +212,11 @@ func _valid_player(player: Dictionary) -> bool:
 			"source_magic": TYPE_FLOAT,
 		}):
 			return false
-	return _valid_mastery(player.get("mastery_state", {}))
+	return StatsComponent.valid_progression(player) and _valid_mastery(player.get("mastery_state", {}),int(player.get("level",1)))
 
 
-func _valid_mastery(data: Dictionary) -> bool:
-	if not _valid_fields(data, {"masteries": TYPE_DICTIONARY, "unlocked_perks": TYPE_DICTIONARY}):
-		return false
-	var masteries: Dictionary = data.get("masteries", {})
-	for school in masteries:
-		if not _valid_school_key(school) or not masteries[school] is Dictionary:
-			return false
-		if not _valid_fields(masteries[school], {
-			"level": TYPE_INT, "xp": TYPE_FLOAT, "xp_to_next": TYPE_FLOAT, "perk_points": TYPE_INT,
-		}):
-			return false
-	var perks: Dictionary = data.get("unlocked_perks", {})
-	for school in perks:
-		if not _valid_school_key(school) or not _valid_array(perks[school], TYPE_STRING):
-			return false
-	return true
+func _valid_mastery(data: Dictionary,level := 1000) -> bool:
+	return SkillMasteryManager.valid_state(data,level)
 
 
 func _valid_school_key(value: Variant) -> bool:

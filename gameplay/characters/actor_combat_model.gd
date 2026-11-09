@@ -13,6 +13,7 @@ static func rebuild(actor: Node2D) -> void:
 	var mana:=actor.get_node("ManaComponent") as ManaComponent
 	health.hp=clampi(health.hp,0 if health.is_dead else 1,health.max_hp)
 	mana.mp=clampi(mana.mp,0,mana.max_mp)
+	ActorProgression.refresh_stamina(actor)
 
 static func initialize_body(actor: Node2D, definition: ActorCharacterData) -> void:
 	var stats := actor.get_node("StatsComponent") as StatsComponent
@@ -80,3 +81,11 @@ static func incoming_damage(actor: Node2D, amount: int) -> int:
 	var equipment := actor.get_node_or_null("EquipmentManager") as EquipmentManager
 	var reduction := clampf(equipment.get_modifier_value("damage_reduction"),0.0,0.75) if equipment else 0.0
 	return maxi(1,roundi(amount*(1.0-reduction)))
+
+static func weapon_damage(actor: Node,profile: AttackProfile) -> int:
+	var base: float=float(actor.get("attack_damage") if "attack_damage" in actor else actor.combat_component.attack_damage)
+	var stats:=actor.get_node_or_null("StatsComponent") as StatsComponent
+	if stats and profile.projectile_speed>0:
+		var data:=stats.derived_values()
+		base+=(data.ranged_damage-data.physical_damage)*float(actor.melee_damage_multiplier)
+	return maxi(0,roundi(base*profile.damage_multiplier))

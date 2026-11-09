@@ -2,6 +2,7 @@ extends SceneTree
 func _init() -> void:
 	var catalog := ExplorationContentCatalog.new()
 	var failures := ExplorationContentValidator.new().validate(catalog)
+	failures.append_array(SkillMasteryManager.validate_catalog())
 	failures.append_array(ItemCatalog.default_catalog().validation_errors())
 	failures.append_array(SpellOperationCatalog.default_catalog().validation_errors())
 	var frontier_failures := GrayriverValidator.validate(GrayriverDefinition.data())

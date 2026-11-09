@@ -6,6 +6,7 @@ const PAGES := [
  {"id":"inventory","title":"行囊","key":KEY_I,"caption":"I","icon":"backpack"},
  {"id":"loadout","title":"技法","key":KEY_K,"caption":"K","icon":"sparkles"},
  {"id":"quests","title":"委托与旅程","key":KEY_J,"caption":"J","icon":"book-open"},
+ {"id":"progression","title":"角色成长","key":KEY_P,"caption":"P","icon":"sparkles"},
  {"id":"map","title":"行路图","key":KEY_G,"caption":"G","icon":"compass"},
 ]
 var current_page := ""
