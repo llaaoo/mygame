@@ -26,7 +26,8 @@ func _physics_process(delta: float) -> void:
 				skill.weapon_enchantment=enchantment
 				skill.enchantment_bonus=enchantment.release_damage if release_technique else enchantment.bonus_damage
 				skill.enchantment_buildup=enchantment.release_buildup if release_technique else enchantment.buildup
-			CombatExecutor.report_hit(context.actor,target,damage,hit.position,skill,skill.tags,family,profile.impact,profile,Vector2(hit.position)-direction*8)
+			var result:=CombatExecutor.report_hit(context.actor,target,damage,hit.position,skill,skill.tags,family,profile.impact,profile,Vector2(hit.position)-direction*8)
+			if is_instance_valid(context.actions): context.actions.confirm_weapon_hit(family,result,target)
 		if release_technique:
 			var wave:=EnchantmentWave.new(); wave.context=context; wave.enchantment=enchantment; wave.technique=release_technique
 			wave.direction=direction; wave.family=family

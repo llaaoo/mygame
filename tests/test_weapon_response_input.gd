@@ -4,14 +4,10 @@ const Fixture=preload("res://tests/support/grayriver_fixture.gd")
 var starts: Array[Dictionary]=[]
 var steps: Array[Dictionary]=[]
 func aim(point: Vector2) -> void:
- var event:=InputEventMouseMotion.new(); event.position=root.get_canvas_transform()*point; event.global_position=event.position
- if DisplayServer.get_name()!="headless": Input.warp_mouse(event.position)
- Input.parse_input_event(event); Input.flush_buffered_events(); await frames(1)
+ await aim_world(point)
 func attack() -> void:
  steps.append({"input":"LMB","frame":Engine.get_physics_frames()})
- var event:=InputEventMouseButton.new(); event.position=root.get_mouse_position(); event.global_position=event.position; event.button_index=MOUSE_BUTTON_LEFT; event.pressed=true
- Input.parse_input_event(event); Input.flush_buffered_events(); await frames(1)
- event=event.duplicate(); event.pressed=false; Input.parse_input_event(event); Input.flush_buffered_events(); await frames(1)
+ await pointer_button(MOUSE_BUTTON_LEFT,true); await pointer_button(MOUSE_BUTTON_LEFT,false)
 func wait_phase(phase: float) -> void:
  for i in range(140):
   if game.player.actor_context.actions.elapsed>=phase: return

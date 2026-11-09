@@ -27,6 +27,7 @@
 ## 学习与专精示例
 
 - 新武技加入武技目录后，K页、知识快照、快捷绑定和原动作执行会查询目录，不再追加硬编码ID列表。
+- 已有武技可配`followup_after`（从0起的普通攻击下标）及`followup_profile`，在非末段有效命中后开放接势；仍共用原知识和冷却，不能隐式释放附魔。输入、AI、预览共用同一查询与快照。角色`ActorCharacterData.techniques`声明首次生成的知识（按前置顺序），已有存档记录不由模板补写。见[接势武技](MARTIAL_FOLLOWUPS.md)。
 - 普攻段落在`WeaponMoveset.attacks`有序登记，配置每段`AttackProfile.title/motion/swing_direction`及真实范围/费用；`chain_window`从完成收招后计时。末段结束不会自动出招。状态在角色自己的`WeaponComboState`，不写Resource或存档；弓段必须配置真实箭矢投送。详见[武器连段](WEAPON_COMBOS.md)。
 - `AttackProfile.movement_multiplier`控制前摇/有效阶段，`recovery_movement_multiplier`控制后摇末端，默认1，后摇使用平滑插值。若新动作需要收招仍减速，显式配置末端倍率；不要通过延长有效阶段制造锁步。总时长、伤害、命中与费用仍取原定义，见[武器操作响应](WEAPON_RESPONSE.md)。
 - `prerequisites`引用武技ID；`exclusive_group`表示学习后互斥的专精。验证器拒绝未知前置、循环及自相矛盾的互斥前置链。已保存的旧知识不因新前置追溯删除。

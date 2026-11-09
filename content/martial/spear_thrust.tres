@@ -15,6 +15,21 @@ angle_degrees = 26
 stamina_cost = 25
 impact = 38
 damage_multiplier = 1.6
+[sub_resource type="Resource" id="Followup"]
+script = ExtResource("attack")
+step_distance = 20.0
+movement_multiplier = 0.0
+interrupts_preparation = true
+motion = "thrust"
+windup = 0.24
+active = 0.14
+recovery = 0.56
+reach = 132
+angle_degrees = 22
+stamina_cost = 25
+impact = 38
+damage_multiplier = 1.6
+title = "追身贯刺"
 [resource]
 script = ExtResource("tech")
 id = "spear_thrust"
@@ -26,3 +41,6 @@ profile = SubResource("Attack")
 release_reach = 320.0
 release_angle = 14.0
 release_speed = 820.0
+
+followup_after = Array[int]([1])
+followup_profile = SubResource("Followup")

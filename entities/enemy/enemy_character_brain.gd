@@ -71,6 +71,8 @@ func choose(target: Node2D) -> Array[Action]:
 				_guard_remaining=_tempo.guard_duration
 				return [_guard(target)]
 		actions.guarding=false
+		var technique:=_martial_action(target,dist,target_context)
+		if technique: return [technique]
 		if actions.stamina.current<actions.stamina.maximum*_tempo.retreat_fraction:
 			if dist>actor.attack_range*2 and actions.needs.water_remaining<=0 and store.can_pay(owner_id,{"clean_water":1},true):
 				var drink:=Action.new(); drink.action_type=Action.ActionType.USE_ITEM; drink.skill_id="clean_water"; return [drink]
@@ -238,6 +240,25 @@ func _reposition_for_shot(target: Node2D) -> Array[Action]:
 	var side:=_safe_side(target,true)
 	var result: Array[Action]=[Action.move(side*.65,actor)]
 	return result
+
+func _martial_action(target: Node2D,distance: float,target_context: ActorContext) -> Action:
+	var context:=actor.actor_context
+	if context.actions.stamina.current<context.actions.stamina.maximum*_tempo.retreat_fraction: return null
+	for id in context.martial.learned:
+		var view:=context.actions.technique_view(id)
+		if view.is_empty() or not str(view.reason).is_empty(): continue
+		if _offense_cooldown>0 and not view.linked: continue
+		var strike:=view.profile as AttackProfile
+		if distance>strike.reach: continue
+		var preparing:=target_context and target_context.actions.is_preparing()
+		var guarding_target:=target_context and target_context.actions.guarding
+		var retreating:=context.actions.stamina.current<context.actions.stamina.maximum*_tempo.retreat_fraction*2
+		if not view.linked and not (strike.interrupts_preparation and preparing or strike.guard_pressure>1 and guarding_target or strike.push_distance>0 and retreating): continue
+		if strike.projectile_speed>0 and not shot_lane_clear(target): continue
+		var request:=Action.new(); request.action_type=Action.ActionType.TECHNIQUE; request.source=actor
+		request.skill_id=id; request.direction=(target.global_position-actor.global_position).normalized()
+		return context.actions.capture_technique_intent(request)
+	return null
 
 func _crowded(target: Node2D) -> bool:
 	var context:=actor.actor_context
