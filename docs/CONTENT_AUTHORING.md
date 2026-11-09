@@ -66,3 +66,7 @@
 `required_claims` 是真正的前置；现场作业、设施、交付与事件通过 `ConditionQuery` 显示对应发现/设备/实物部件名称，并在提交时重新核验。任务 `unlock_claims` 是既有引入线索，`discovery_claims` 是当地入口线索；获得任一当地线索或目标证据可使任务可见。真正报告条件只放 `required_claims / required_clears / conditions`，不得把建议顺序作为隐形交付门槛。任务的未发现、进行中、可报告、已报告阶段从实际进度推导，不保存另一份状态。
 
 关键初教笔记可设置正数 `reading_margin`。校验器要求其中心到每个初始敌岗的距离至少为 `detect_range + 80交互半径 + reading_margin`；默认敌人侦测仍为440。它只约束初始布局，不提供无敌、不暂停、不保证被追击后安全。新增机关/设施/交付/事件的事实依赖会检查循环；导航引用和任务当地线索必须存在。
+
+## 身体动画与动作表现
+
+按[动画接入流程](ACTOR_ANIMATION_SYSTEM.md)添加SpriteFrames、ActorAnimationClip与原生姿态库，将真实角色配置登记到`content/animations/live_profiles.tres`并配置ActorCharacterData。AttackProfile.animation_id只选择表现；前摇/有效期/后摇、命中与消耗仍由物理动作决定。脚步接触点属于Clip，不能按精灵帧数推断声音次数。参考图若含绘制武器须保持equipment_free=false，不能进入真实角色目录；素材许可与散列须一并登记。

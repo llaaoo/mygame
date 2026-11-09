@@ -1,0 +1,55 @@
+[
+  {
+    "path": "content/art/third_party/puny/Character-Base.png",
+    "author": "Shade",
+    "license": "CC0-1.0",
+    "original_page": "https://opengameart.org/content/puny-characters",
+    "author_page": "https://merchant-shade.itch.io/16x16-puny-characters",
+    "download_url": "https://raw.githubusercontent.com/ult0/robo-game/ff919255acbe5ce74f2127a18fd637f95aeb1e52/src/assets/sprites/Puny-Characters/Character-Base.png",
+    "independent_mirror": "https://github.com/series-ai/jam-ready-assets/blob/ab1b21fe61bc3adeb759c286e770033563f18a97/puny-characters/2D/top-down-rpg/Character-Base.png",
+    "bytes": 19255,
+    "download_sha256": "a542332ff1ed66ce28e7eea489f2e1e304d90671aa531fc9ccf0b00b9f2857ff",
+    "vendored_sha256": "a542332ff1ed66ce28e7eea489f2e1e304d90671aa531fc9ccf0b00b9f2857ff",
+    "modification": "PNG unchanged; AtlasTexture slices and runtime transforms only"
+  },
+  {
+    "path": "content/art/third_party/puny/Human-Worker-Cyan.png",
+    "author": "Shade",
+    "license": "CC0-1.0",
+    "original_page": "https://opengameart.org/content/puny-characters",
+    "author_page": "https://merchant-shade.itch.io/16x16-puny-characters",
+    "download_url": "https://raw.githubusercontent.com/ult0/robo-game/ff919255acbe5ce74f2127a18fd637f95aeb1e52/src/assets/sprites/Puny-Characters/Human-Worker-Cyan.png",
+    "independent_mirror": "https://github.com/series-ai/jam-ready-assets/blob/ab1b21fe61bc3adeb759c286e770033563f18a97/puny-characters/2D/top-down-rpg/Human-Worker-Cyan.png",
+    "bytes": 32022,
+    "download_sha256": "d0496bf14c07577f039a6388e39f777ecf6dcadfa92dc893c2684cba4ed6610f",
+    "vendored_sha256": "d0496bf14c07577f039a6388e39f777ecf6dcadfa92dc893c2684cba4ed6610f",
+    "modification": "PNG unchanged; AtlasTexture slices and runtime transforms only"
+  },
+  {
+    "path": "content/art/third_party/puny/Mage-Cyan.png",
+    "author": "Shade",
+    "license": "CC0-1.0",
+    "original_page": "https://opengameart.org/content/puny-characters",
+    "author_page": "https://merchant-shade.itch.io/16x16-puny-characters",
+    "download_url": "https://raw.githubusercontent.com/ult0/robo-game/ff919255acbe5ce74f2127a18fd637f95aeb1e52/src/assets/sprites/Puny-Characters/Mage-Cyan.png",
+    "independent_mirror": "https://github.com/series-ai/jam-ready-assets/blob/ab1b21fe61bc3adeb759c286e770033563f18a97/puny-characters/2D/top-down-rpg/Mage-Cyan.png",
+    "bytes": 23811,
+    "download_sha256": "bd43df96cef751f76252723bfa5a6095d68e982cba59260aec7f4fbfedf7ec3f",
+    "vendored_sha256": "bd43df96cef751f76252723bfa5a6095d68e982cba59260aec7f4fbfedf7ec3f",
+    "modification": "PNG unchanged; AtlasTexture slices and runtime transforms only"
+  },
+  {
+    "path": "content/art/third_party/puny/CC0-1.0.txt",
+    "download_url": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/CC0-1.0.txt",
+    "bytes": 7048,
+    "vendored_sha256": "a2010f343487d3f7618affe54f789f5487602331c0a8d03f49e9a7c547cf0499",
+    "modification": "SPDX copy of full CC0 legal text, unchanged"
+  },
+  {
+    "path": "content/art/third_party/puny/MIRROR_LICENSE.txt",
+    "download_url": "https://raw.githubusercontent.com/series-ai/jam-ready-assets/ab1b21fe61bc3adeb759c286e770033563f18a97/puny-characters/2D/top-down-rpg/License.txt",
+    "bytes": 581,
+    "vendored_sha256": "b08f2cfc99eeb0b3041225da44b1b35c41ad4fd7e9c5cac6e2ec7c21a0ea0303",
+    "modification": "Unchanged mirror maintainer notice; not an original artist notice"
+  }
+]

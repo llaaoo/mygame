@@ -1,0 +1,17 @@
+[gd_scene format=3]
+[ext_resource type="Script" path="res://gameplay/presentation/actors/actor_animation_controller.gd" id="script"]
+[node name="AnimationRig" type="Node2D"]
+show_behind_parent = true
+script = ExtResource("script")
+[node name="Reaction" type="Node2D" parent="."]
+[node name="Rig" type="Node2D" parent="Reaction"]
+[node name="Body" type="AnimatedSprite2D" parent="Reaction/Rig"]
+texture_filter = 1
+[node name="Sockets" type="Node2D" parent="Reaction/Rig"]
+[node name="MainHand" type="Marker2D" parent="Reaction/Rig/Sockets"]
+position = Vector2(12,0)
+[node name="OffHand" type="Marker2D" parent="Reaction/Rig/Sockets"]
+position = Vector2(-12,0)
+[node name="PosePlayer" type="AnimationPlayer" parent="."]
+root_node = NodePath("../Reaction")
+callback_mode_process = 2

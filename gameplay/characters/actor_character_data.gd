@@ -1,6 +1,7 @@
 class_name ActorCharacterData
 extends Resource
 ## Shared by human actors; input, AI, rewards and persistence belong to controllers.
+@export var animation_profile: ActorAnimationProfile
 @export var temperament: CombatTemperament
 @export var id: String
 @export var title: String
@@ -22,6 +23,9 @@ extends Resource
 
 func validation_errors(available_rules: Variant = null) -> Array[String]:
 	var errors: Array[String] = []
+	if animation_profile:
+		errors.append_array(animation_profile.validation_errors())
+		if not animation_profile.equipment_free or animation_profile not in ActorAnimationCatalog.default_catalog().profiles: errors.append("Unregistered/live profile with baked equipment")
 	if temperament and not temperament.valid(): errors.append("Invalid combat temperament")
 	if level<1 or level>100: errors.append("Invalid character level")
 	if id.is_empty() or title.is_empty(): errors.append("Missing character id/title")

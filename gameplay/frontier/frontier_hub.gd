@@ -143,7 +143,8 @@ func entries() -> Array[Dictionary]:
 			for entry in game.progress.journal: result.append({"id":entry.id,"title":entry.title,"text":game.catalog.record_text(entry,game.progress),"subtitle":"亲历记录"})
 		"settings":
 			result.append({"id":"controls","title":"施法与快捷操作","text":"操作设置","subtitle":"键位 · 输入偏好"})
-			result.append({"id":"credits","title":"素材与许可","text":"Kenney Tiny Town · CC0\nLucide Icons · ISC / MIT\nNoto Sans SC · SIL Open Font License 1.1\n\n所有新增素材均可用于商业项目，保留对应许可与署名。","subtitle":"视觉素材来源"})
+			result.append({"id":"animation_demo","title":"动画与素材演示","text":"八方向预览 · 连招实战 · 法阵施法","subtitle":"独立沙盒，不改变正式旅程"})
+			result.append({"id":"credits","title":"素材与许可","text":"Puny Characters · Shade · CC0\nKenney Tiny Town · CC0\nLucide Icons · ISC / MIT\nNoto Sans SC · SIL Open Font License 1.1\n\n所有新增素材均可用于商业项目，保留对应许可与署名。","subtitle":"视觉素材来源"})
 		"loot":
 			if game.progress.loot_records.has(loot_id): result=game.loot.instance_entries(loot_id)
 	return result
@@ -290,6 +291,10 @@ func _show_detail() -> void:
 			_detail.add_child(W.button("查看已学制造配方",game.workshop.show_crafts))
 		"settings":
 			if entry.id=="credits": return
+			if entry.id=="animation_demo":
+				card.add_child(W.label("原素材八方向与逐帧预览；两组真实规则实战演示。进入前保存正式旅程，演示中的装备、学习和F5/F9仅属于内存沙盒。返回时恢复正式存档。",14))
+				card.add_child(W.button("打开动画试验室",_open_animation_demo))
+				return
 			var toggle:=CheckButton.new()
 			toggle.text="按下即施放普通基础动作"
 			toggle.button_pressed=FrontierControls.quick_cast
@@ -366,3 +371,11 @@ func _binding_picker(id: String,uid: String) -> void:
 
 func _prepare_sprayer(id: String,uid: String) -> void:
 	if game.session.prepare_sprayer("player",id,uid): game.ui.notify("已选择这瓶喷剂；可编组喷洒，或在K直接把这瓶绑定到快捷槽，按住使用。")
+
+func _open_animation_demo() -> void:
+	if game._switching or not game.ready_for_play: return
+	game.player.cancel_active_input("打开动画试验室")
+	if game.persistence_enabled and not SaveManager.instance.save_game(game.save_slot):
+		game.ui.notify("正式旅程未能保存，保留当前游戏。")
+		return
+	game.get_tree().call_deferred("change_scene_to_file","res://demos/animation_gallery.tscn")

@@ -305,6 +305,10 @@ func scroll_source() -> String:
 func _unhandled_input(event: InputEvent) -> void:
 	# UI and item aiming own their clicks before weapon gestures can see them.
 	if player.ui_blocked or get_tree().paused or player.health_component.is_dead: return
+	if event is InputEventMouseMotion and player.actor_context and player.actor_context.actions.active():
+		if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) and not _attack_suppressed and not _pointer_over_interface() and not (is_instance_valid(player.material_wheel) and player.material_wheel.visible):
+			var aim:=Action.melee(player); aim.direction=player.get_mouse_direction(); aim.params["weapon_gesture"]="aim"; _weapon_edges.append(aim)
+		return
 	if event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_LEFT and player.actor_context and player.actor_context.actions.active():
 		var allowed:=not player.ui_blocked and not get_tree().paused and not player.health_component.is_dead and not (is_instance_valid(player.material_wheel) and player.material_wheel.visible) and not _pointer_over_interface()
 		if allowed and not _attack_suppressed:

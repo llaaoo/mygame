@@ -39,6 +39,7 @@ projectile_speed = 820.0
 title = "追隙穿射"
 [sub_resource type="Resource" id="Charged"]
 script = ExtResource("attack")
+animation_id = &"shot_heavy"
 title = "满弦穿射"
 step_distance = 0
 movement_multiplier = 0
@@ -56,6 +57,7 @@ ammo_id = "arrow"
 projectile_speed = 950
 [sub_resource type="Resource" id="ChargedFollowup"]
 script = ExtResource("attack")
+animation_id = &"shot_heavy"
 title = "满弦追隙"
 step_distance = 0
 movement_multiplier = 0

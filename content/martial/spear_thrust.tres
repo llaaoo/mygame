@@ -35,6 +35,7 @@ damage_multiplier = 1.6
 title = "追身贯刺"
 [sub_resource type="Resource" id="Charged"]
 script = ExtResource("attack")
+animation_id = &"thrust_heavy"
 title = "蓄势贯冲"
 step_distance = 38
 movement_multiplier = 0
@@ -50,6 +51,7 @@ impact = 52
 damage_multiplier = 1.9
 [sub_resource type="Resource" id="ChargedFollowup"]
 script = ExtResource("attack")
+animation_id = &"thrust_heavy"
 title = "蓄势追贯"
 step_distance = 32
 movement_multiplier = 0

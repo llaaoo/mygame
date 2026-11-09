@@ -1,0 +1,109 @@
+[gd_resource type="Resource" script_class="ActorAnimationProfile" format=3]
+[ext_resource type="Script" path="res://gameplay/presentation/actors/actor_animation_profile.gd" id="profile"]
+[ext_resource type="Script" path="res://gameplay/presentation/actors/actor_animation_clip.gd" id="clip"]
+[ext_resource type="SpriteFrames" path="res://content/animations/puny_body_frames.tres" id="frames"]
+[ext_resource type="AnimationLibrary" path="res://content/animations/actor_poses.tres" id="poses"]
+[sub_resource type="Resource" id="idle"]
+script = ExtResource("clip")
+id = &"idle"
+frames = &"idle"
+pose = &"idle"
+[sub_resource type="Resource" id="walk"]
+script = ExtResource("clip")
+id = &"walk"
+footsteps = PackedFloat32Array(0, 0.5)
+frames = &"walk"
+pose = &"walk"
+[sub_resource type="Resource" id="slash"]
+script = ExtResource("clip")
+id = &"slash"
+frames = &"gesture"
+pose = &"slash"
+[sub_resource type="Resource" id="slash_reverse"]
+script = ExtResource("clip")
+id = &"slash_reverse"
+frames = &"gesture"
+pose = &"slash_reverse"
+[sub_resource type="Resource" id="slash_heavy"]
+script = ExtResource("clip")
+id = &"slash_heavy"
+frames = &"gesture"
+pose = &"slash_heavy"
+[sub_resource type="Resource" id="thrust"]
+script = ExtResource("clip")
+id = &"thrust"
+frames = &"gesture"
+pose = &"thrust"
+[sub_resource type="Resource" id="thrust_heavy"]
+script = ExtResource("clip")
+id = &"thrust_heavy"
+frames = &"gesture"
+pose = &"thrust_heavy"
+[sub_resource type="Resource" id="sweep"]
+script = ExtResource("clip")
+id = &"sweep"
+frames = &"gesture"
+pose = &"sweep"
+[sub_resource type="Resource" id="sweep_heavy"]
+script = ExtResource("clip")
+id = &"sweep_heavy"
+frames = &"gesture"
+pose = &"sweep_heavy"
+[sub_resource type="Resource" id="shot"]
+script = ExtResource("clip")
+id = &"shot"
+frames = &"gesture"
+pose = &"shot"
+[sub_resource type="Resource" id="shot_heavy"]
+script = ExtResource("clip")
+id = &"shot_heavy"
+frames = &"gesture"
+pose = &"shot_heavy"
+[sub_resource type="Resource" id="cast"]
+script = ExtResource("clip")
+id = &"cast"
+frames = &"gesture"
+pose = &"cast"
+[sub_resource type="Resource" id="throw"]
+script = ExtResource("clip")
+id = &"throw"
+frames = &"gesture"
+pose = &"cast"
+[sub_resource type="Resource" id="use"]
+script = ExtResource("clip")
+id = &"use"
+frames = &"gesture"
+pose = &"cast"
+[sub_resource type="Resource" id="guard"]
+script = ExtResource("clip")
+id = &"guard"
+frames = &"gesture"
+pose = &"guard"
+[sub_resource type="Resource" id="charge"]
+script = ExtResource("clip")
+id = &"charge"
+frames = &"gesture"
+pose = &"charge"
+[sub_resource type="Resource" id="dodge"]
+script = ExtResource("clip")
+id = &"dodge"
+frames = &"walk"
+pose = &"dodge"
+[sub_resource type="Resource" id="hurt"]
+script = ExtResource("clip")
+id = &"hurt"
+frames = &"hurt"
+pose = &"hurt"
+[sub_resource type="Resource" id="death"]
+script = ExtResource("clip")
+id = &"death"
+frames = &"death"
+pose = &"death"
+[resource]
+script = ExtResource("profile")
+id = &"puny_body"
+title = "行路者 · 分层实物装备"
+sprite_frames = ExtResource("frames")
+poses = ExtResource("poses")
+clips = Array[ExtResource("clip")]([SubResource("idle"), SubResource("walk"), SubResource("slash"), SubResource("slash_reverse"), SubResource("slash_heavy"), SubResource("thrust"), SubResource("thrust_heavy"), SubResource("sweep"), SubResource("sweep_heavy"), SubResource("shot"), SubResource("shot_heavy"), SubResource("cast"), SubResource("throw"), SubResource("use"), SubResource("guard"), SubResource("charge"), SubResource("dodge"), SubResource("hurt"), SubResource("death")])
+fallback = {"spray": "cast", "channel": "cast", "aim": "charge", "item": "use", "stagger": "hurt", "sprint": "walk"}
