@@ -1,0 +1,38 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:364)
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+⏰ WorldTime 启动: 08:00
+🏛️ GameRuntime: 五大 Runtime 初始化完成
+   CommandBus       : ✅
+   CombatExecutor   : ✅
+   CombatEventBus   : ✅
+   WorldRuntime     : ✅
+   SimulationRuntime: ✅
+   WorldTime        : ✅
+⚡ 已注册触发效果: OnKillBonusExp
+📊 CombatDebugger: trace enabled
+⏰ 08:00 (☀️ 白天)
+SaveManager: saved user://save_3.sav
+⏰ 21:00 (🌙 夜晚)
+SaveManager: saved user://save_3.sav
+FRICTION 1.0 inspect pos=(-3397.5, 1786.5) hp=85
+SaveManager: saved user://save_3.sav
+⏰ 22:00 (🌙 夜晚)
+FRICTION 2.0 inspect pos=(-3397.5, 1786.5) hp=85
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+FRICTION 3.0 inspect pos=(-3397.5, 1786.5) hp=85
+FRICTION 4.0 inspect pos=(-3397.5, 1786.5) hp=85
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+⏰ 23:00 (🌙 夜晚)
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+FRICTION 5.0 inspect pos=(-3397.5, 1786.5) hp=85
+SaveManager: saved user://save_3.sav
+FIRST30 6.0 save  pos=(-3397.5, 1786.5) hp=85
+FIRST30 7.0 quit  pos=(-3397.5, 1786.5) hp=85

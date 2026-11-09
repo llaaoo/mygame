@@ -37,9 +37,7 @@ func _reason(method: FieldWorkMethod, node: ExplorationInteractable, spec: Repai
 	if spec.requires_clear:
 		if not game.is_area_cleared(spec.pos): return "先清理本区，再建设前哨"
 		if game.has_hostiles_near(spec.pos): return "现场仍有敌人，无法建设"
-	for id in spec.required_claims:
-		if not game.progress.claims.has(id): return "还需：" + claim_title(id)
-	return ""
+	return game.progress.condition_query.claims_reason(spec.required_claims)
 
 func _assemble(method: FieldWorkMethod, node: ExplorationInteractable, spec: RepairFacilityData) -> bool:
 	if not _reason(method, node, spec).is_empty(): return false

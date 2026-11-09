@@ -84,7 +84,7 @@ func _spawn_enemy(spec: ExplorationEncounterData, layout: RefCounted, index: int
 		enemy.max_hp = hp
 		enemy.health_component.max_hp = hp
 		enemy.health_component.hp = hp
-	enemy.detect_range = 440
+	enemy.detect_range = spec.detect_range
 	if not enemy.character_definition:
 		enemy.move_speed = float(spec.speed)
 		enemy.attack_damage = 9 if not boss else 15

@@ -6,11 +6,9 @@ func objective(id: String) -> Dictionary:
 	if game.stories:
 		var story := game.stories.objective(id)
 		if not story.is_empty(): return story
-	for region: ExplorationRegionData in game.catalog.regions.values():
-		for entries in [region.discoveries,region.spell_objects,region.facilities,region.delivery_sites,region.events]:
-			for entry in entries:
-				if entry.id == id:
-					return {"title":entry.title,"region":region.id,"position":entry.pos,"known":known(region.id,entry.pos)}
+	var target := game.catalog.fact(id)
+	if not target.is_empty():
+		return {"title":target.title,"region":target.region,"position":target.position,"known":known(target.region,target.position)}
 	return {"title":"继续调查相关线索","region":"","position":Vector2.ZERO,"known":false}
 func known(region: String, point: Vector2) -> bool:
 	if region != "camp": return game.progress.visited.has(region)
@@ -19,7 +17,7 @@ func known(region: String, point: Vector2) -> bool:
 func next_step(quest: ExplorationQuestData) -> Dictionary:
 	if game.progress.claims.has("quest."+quest.id): return {}
 	for id in quest.required_claims:
-		if not game.progress.claims.has(id): return objective(id)
+		if not game.progress.claims.has(id): return prerequisite_objective(id)
 	for id in quest.required_clears:
 		if not game.progress.cleared.has(id): return {"title":"处理"+game.catalog.regions[id].title+"的威胁","region":id,"position":game.catalog.regions[id].authored_entry,"known":game.progress.visited.has(id)}
 	return {"title":"回镇向艾妲报告","region":"camp","position":Vector2(-2900,2200),"known":true}
@@ -33,28 +31,24 @@ func tracked() -> Dictionary:
 func town_orientation() -> Dictionary:
 	if not game.is_at_base(): return {}
 	for id in ["river.handbook", "river.pack"]:
-		if not game.progress.claims.has(id): return objective(id)
+		if not game.progress.claims.has(id): return prerequisite_objective(id)
 	return {}
 
 func route_target(goal: Dictionary) -> Vector2:
 	if goal.is_empty() or str(goal.region).is_empty(): return Vector2.INF
 	if game.region_id == goal.region: return goal.position if goal.known else Vector2.INF
-	# Search the actual exit graph: lower floors need their parent stair, not
-	# a nonexistent direct camp exit. Only already-open gates are traversable.
-	var queue: Array[Dictionary] = [{"region":game.region_id,"first":Vector2.INF}]
-	var seen: Dictionary = {game.region_id:true}
-	while not queue.is_empty():
-		var step: Dictionary = queue.pop_front()
-		var exits: Array[ExplorationExitData] = []
-		exits.assign(game.catalog.regions[step.region].exits)
-		exits.sort_custom(func(a: ExplorationExitData,b: ExplorationExitData): return a.pos.distance_squared_to(game.player.position)<b.pos.distance_squared_to(game.player.position))
-		for passage in exits:
-			if not passage.claims_satisfied(game.progress) or seen.has(passage.target): continue
-			var first: Vector2 = passage.pos if step.region == game.region_id else step.first
-			if passage.target == goal.region: return first
-			seen[passage.target] = true
-			queue.append({"region":passage.target,"first":first})
-	return Vector2.INF
+	var passage := game.catalog.passage_toward(game.region_id,goal.region,game.progress,game.player.position)
+	return passage.pos if passage else Vector2.INF
+
+func prerequisite_objective(id: String, visited: Dictionary = {}) -> Dictionary:
+	if visited.has(id): return objective(id)
+	var next_visited := visited.duplicate()
+	next_visited[id] = true
+	var target := game.catalog.fact(id)
+	for prerequisite in target.get("prerequisites",PackedStringArray()):
+		if not game.progress.claims.has(prerequisite): return prerequisite_objective(prerequisite,next_visited)
+	return objective(id)
+
 func overworld_point(region: String) -> Vector2:
 	# Follow the authored return chain, including parents of deeper floors.
 	var seen: Dictionary = {}

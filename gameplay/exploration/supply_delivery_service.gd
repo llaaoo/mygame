@@ -16,9 +16,7 @@ func _valid(node: Node2D, spec: DeliverySiteData) -> bool:
 func _reason(method: FieldWorkMethod,node: Node2D,spec: DeliverySiteData) -> String:
 	if not _valid(node,spec) or method not in spec.methods:return "交付对象已不可用"
 	if game.progress.claims.has(spec.id):return "这份委托已经交付"
-	for id in spec.required_claims:
-		if not game.progress.claims.has(id):return "还需先调查相关线索"
-	return ""
+	return game.progress.condition_query.claims_reason(spec.required_claims)
 func _complete(method: FieldWorkMethod,node: Node2D,spec: DeliverySiteData) -> bool:
 	if not _reason(method,node,spec).is_empty():return false
 	var supplies:=game.player.skill_manager.combinations.supplies

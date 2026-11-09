@@ -44,11 +44,17 @@ static func build() -> ExplorationChapterData:
 			note.pos = vector(raw.pos)
 			note.requires_clear = raw.get("requires_clear", false)
 			note.heal = raw.get("heal", false)
+			note.reading_margin = float(raw.get("reading_margin", 0))
 			note.kind = raw.get("kind",note.kind)
 			if raw.has("materials"): note.materials = amounts(raw.materials)
 			for id in raw.get("actions",[]):
 				if id not in note.actions: note.actions.append(id)
 			if raw.has("equipment"): note.equipment.assign(raw.equipment)
+			for lead in raw.get("leads", []):
+				var hint := ExplorationNavigationHint.new()
+				hint.target_region = lead.get("region", "")
+				hint.target_claim = lead.get("claim", "")
+				note.navigation_hints.append(hint)
 			note.set_meta("crafting_recipes", raw.get("crafts", []))
 			region.discoveries.append(note)
 		for raw in entry.get("deliveries", []):
@@ -69,6 +75,7 @@ static func build() -> ExplorationChapterData:
 			encounter.hp = int(raw.get("hp",1))
 			if raw.has("character"): encounter.character=load("res://content/characters/river_%s.tres"%raw.character)
 			encounter.speed = float(raw.get("speed", 105))
+			encounter.detect_range = float(raw.get("detect_range", 440))
 			encounter.boss = raw.get("boss", false)
 			encounter.optional_encounter = raw.get("optional", false)
 			if raw.has("profile"): encounter.profile = load("res://content/exploration/enemies/%s.tres" % raw.profile)
@@ -189,6 +196,7 @@ static func build() -> ExplorationChapterData:
 		quest.id = raw.id
 		quest.title = raw.title
 		quest.description = raw.description
+		quest.discovery_claims = PackedStringArray(raw.get("discovery_claims", []))
 		quest.unlock_claims = PackedStringArray(raw.get("unlock_claims", []))
 		quest.required_claims = PackedStringArray(raw.required_claims)
 		quest.required_clears = PackedStringArray(raw.get("required_clears", []))

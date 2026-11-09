@@ -130,7 +130,7 @@ func show_equipment() -> void:
 	var buttons: Array[Dictionary] = []
 	for id in game.catalog.equipment:
 		var item: EquipmentData = game.catalog.equipment[id]
-		var owned: bool = game.progress.equipment_owned.get(id, false)
+		var owned := count(id)>0
 		var active := _manager().get_equipment(item.slot_type) == item
 		text += "\n%s · %s · %s\n%s\n" % [item.display_name, EquipmentManager.slot_name(item.slot_type), "已装备" if active else ("持有%d件" % count(id) if owned else "未发现"), item.description]
 		if not owned:
@@ -151,11 +151,17 @@ func show_detail(id: String) -> void:
 	var item := game.catalog.equipment.get(id) as EquipmentData
 	if not item:
 		return
+	if is_instance_valid(game.inventory_screen) and count(id)>0:
+		game.ui.close_modal()
+		game.inventory_screen.open_item(id)
+		return
 	var current := _manager().get_equipment(item.slot_type)
 	var text := "%s · %s\n%s\n\n当前同槽：%s\n%s" % [item.display_name, EquipmentManager.slot_name(item.slot_type), item.description, current.display_name if current else "空", build_summary()]
 	text += "\n装备后预计\n" + build_summary(item)
-	var active := current == item
-	var buttons: Array[Dictionary] = [{"title": "卸下" if active else "装备", "disabled": not game.is_at_base() or not game.progress.equipment_owned.get(id, false), "callback": _change.bind(id, active)}, {"title": "返回装备总览", "callback": show_equipment}]
+	var active := current != null and current.id == id
+	var reason := change_reason() if count(id)>0 else "尚未持有这件实物，请先领取。"
+	if not reason.is_empty(): text += "\n"+reason
+	var buttons: Array[Dictionary] = [{"title": "卸下" if active else "装备", "disabled": not reason.is_empty(), "callback": _change.bind(id, active)}, {"title": "返回装备总览", "callback": show_equipment}]
 	game.ui.show_panel(item.display_name, text, buttons)
 
 func _change(id: String, active: bool) -> void:

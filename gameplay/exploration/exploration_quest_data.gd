@@ -4,6 +4,10 @@ extends Resource
 @export var id: String
 @export var title: String
 @export_multiline var description: String
+enum Stage { UNDISCOVERED, ACTIVE, READY, REPORTED }
+
+# Introduction clues control discovery, never the right to report earned evidence.
+@export var discovery_claims: PackedStringArray = []
 @export var unlock_claims: PackedStringArray = []
 @export var required_claims: PackedStringArray
 @export var required_clears: PackedStringArray
@@ -16,13 +20,24 @@ func find_approach(approach_id: String) -> ExplorationQuestApproachData:
 		if approach.id == approach_id: return approach
 	return null
 
-func available(progress: ExplorationProgress) -> bool:
+func stage(progress: ExplorationProgress) -> Stage:
+	if progress.claims.has("quest."+id): return Stage.REPORTED
+	if is_complete(progress): return Stage.READY
+	var introduced := true
 	for key in unlock_claims:
-		if not progress.claims.has(key): return false
-	return true
+		if not progress.claims.has(key): introduced = false
+	if introduced: return Stage.ACTIVE
+	for key in discovery_claims + required_claims:
+		if progress.claims.has(key): return Stage.ACTIVE
+	for key in required_clears:
+		if progress.cleared.has(key): return Stage.ACTIVE
+	return Stage.UNDISCOVERED
+
+func available(progress: ExplorationProgress) -> bool:
+	return stage(progress) != Stage.UNDISCOVERED
 
 func can_claim(progress: ExplorationProgress, stats: StatsComponent, approach_id: String = "") -> bool:
-	if not available(progress) or progress.claims.has("quest." + id): return false
+	if progress.claims.has("quest." + id): return false
 	if approach_id.is_empty(): return is_complete(progress)
 	var approach := find_approach(approach_id)
 	return approach != null and approach.available(progress, stats)

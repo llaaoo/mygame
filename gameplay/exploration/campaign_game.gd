@@ -72,6 +72,7 @@ func _bootstrap() -> void:
 	progress.condition_query.items=session.inventory
 	progress.condition_query.relations=session.relations
 	progress.condition_query.regions=catalog.regions
+	progress.condition_query.catalog=catalog
 	session.condition_query=progress.condition_query
 	session.save_requested=_queue_save
 	session.inspect_actor=inspect_actor
@@ -387,7 +388,11 @@ func _on_spell_object_solved(spec: SpellPuzzleData) -> void:
 			if spec.id in exit.required_claims and exit.claims_satisfied(progress):
 				unlocked.append(exit.title)
 				if not exit.camp_return_title.is_empty(): camp_direct = true
-		ui.notify((spec.completion_text if not spec.completion_text.is_empty() else "解开：" + spec.title + " · 材料已收入行囊，按M查看。") + ("\n捷径已开启：" + "、".join(unlocked) + ("；营地可直达此处。" if camp_direct else "；使用现场出口通行。") if not unlocked.is_empty() else ""))
+		var message := spec.completion_text if not spec.completion_text.is_empty() else "机关已解开，物资已保留在现场或收入行囊。"
+		if not unlocked.is_empty(): message += "\n捷径已开启："+"、".join(unlocked)+("；营地可直达此处。" if camp_direct else "；使用现场出口通行。")
+		var reports := progress_service.quest_feedback(spec.id)
+		if not reports.is_empty(): message += "\n"+reports
+		ui.notify(message)
 
 func can_practice() -> bool:
 	return ready_for_play and not _switching and not _defeated and not player.health_component.is_dead and not practice_active and progress.cleared.has(region_id) and not current_data.encounters.is_empty() and active_enemies.is_empty()

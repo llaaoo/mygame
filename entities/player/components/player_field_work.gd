@@ -173,15 +173,14 @@ func _refresh_panel() -> void:
 	panel.choices(methods,selected,is_busy(),reason_for(methods[selected]) if not methods.is_empty() else "")
 	var text := _title + "\n"
 	if not pending.is_empty():
-		panel.display(text + pending.method.title + " · %.1fs\n保持站定 · E或Esc取消\n移动、施法和受伤会打断" % maxf(0, pending.remaining), 1 - pending.remaining / pending.duration)
+		panel.display(text + pending.method.title + " · %.1fs\n保持站定 · Esc取消\n移动、施法和受伤会打断" % maxf(0, pending.remaining), 1 - pending.remaining / pending.duration)
 		return
-	for i in range(methods.size()):
-		var method := methods[i]
-		text += ("▶ " if selected == i else "  ") + method.title + " · %.1fs" % method.duration
+	if not methods.is_empty():
+		var method := methods[selected]
+		text += method.title+" · %.1fs\n" % method.duration
 		var reason := reason_for(method)
-		if selected == i:
-			text += "\n" + (reason if not reason.is_empty() else "可操作")
-			if not method.material_costs.is_empty(): text += " · " + player.skill_manager.combinations.supplies.describe_cost(method.material_costs)
+		text += reason if not reason.is_empty() else "可操作"
+		if not method.material_costs.is_empty(): text += " · " + player.skill_manager.combinations.supplies.describe_cost(method.material_costs)
 		text += "\n"
 	panel.display(text + _guide + "\n"+InputBindings.label("field_method")+"切换 · "+InputBindings.label("interact")+"开始 · Esc收起\n战斗继续进行")
 

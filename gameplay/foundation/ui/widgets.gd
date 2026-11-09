@@ -4,6 +4,7 @@ static func label(text: String, size := 14, muted := false) -> Label:
 	var node := Label.new()
 	node.text = text
 	node.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	node.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	node.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	GameUIStyle.apply_label(node,size,GameUIStyle.TEXT_MUTED if muted else GameUIStyle.TEXT_MAIN)
 	return node

@@ -6,6 +6,8 @@
 
 2026-11-07 UTC的[系统深化](SYSTEM_DEPTH.md)沿用这些边界：WeaponMoveset/MartialTechnique为Resource，MartialArts为角色持有的RefCounted状态，ActorActionController执行物理动作，TownServices为灰河谷服务适配器，InventoryService提交UID交易/拆解/强化，WorldTime投影持久时钟。
 
+2026-11-09：[评审修复与验证](reviews/WORLD_FEEDBACK_REMEDIATION.md)统一内容引用与前置查询、派生任务阶段和装备详情入口。`ExplorationContentCatalog`只查询不可变定义；`ConditionQuery`读取当前事实；任务Resource派生阶段。`InventoryActions`提供穿戴/卸下原因查询与执行重验，所有持有装备详情进入同一`ActorInventoryScreen`，UID与库存权威仍为`InventoryService`。
+
 ## 请求、查询与事实
 
 公开方法接受同步请求并返回是否接受，查询只读状态，已提交事件广播事实。需要原子性的施法保留在同一事务中。延迟世界工作由带区域作用域的 `CommandBus` 排队；它不承担全部跨模块调用。

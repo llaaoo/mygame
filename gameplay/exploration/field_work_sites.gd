@@ -7,9 +7,7 @@ func _init(owner_game: CampaignGame) -> void: game = owner_game
 func reason(site: SpellWorldObject) -> String:
 	if game._switching or not is_instance_valid(site) or not site.is_inside_tree() or site.get_parent() != game.region_root or site.spec not in game.current_data.spell_objects: return "设备已不可用"
 	if site.completed or game.progress.claims.has(site.spec.id): return "设备已解封"
-	for claim in site.spec.required_claims:
-		if not game.progress.claims.has(claim): return "尚未掌握检修步骤，先寻找图纸"
-	return ""
+	return game.progress.condition_query.claims_reason(site.spec.required_claims)
 
 func inspect(site: SpellWorldObject) -> void:
 	if site.completed:

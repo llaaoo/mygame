@@ -1,0 +1,1093 @@
+{
+  "active_seconds": 6.84202366666667,
+  "buttons": [
+    "关闭",
+    "开始河谷旅程",
+    "查看日志",
+    "重新开始灰河谷"
+  ],
+  "campaign_clock": 3788.66932000026,
+  "casts": [],
+  "claims": [
+    "equipment.sources_v1",
+    "fog.-9.3",
+    "fog.-9.4",
+    "fog.-9.5",
+    "fog.-8.3",
+    "fog.-8.4",
+    "fog.-8.5",
+    "fog.-7.3",
+    "fog.-7.4",
+    "fog.-7.5",
+    "place.town",
+    "fog.-6.3",
+    "fog.-6.4",
+    "fog.-6.5",
+    "river.handbook",
+    "loot.cache.river.handbook",
+    "river.pack",
+    "loot.cache.river.pack",
+    "fog.-8.2",
+    "fog.-7.2",
+    "fog.-6.2",
+    "fog.-9.2",
+    "fog.-9.1",
+    "fog.-8.1",
+    "fog.-7.1",
+    "fog.-6.1",
+    "river.sign_town",
+    "fog.-9.0",
+    "fog.-8.0",
+    "fog.-7.0",
+    "fog.-9.-1",
+    "fog.-8.-1",
+    "fog.-7.-1",
+    "fog.-9.-2",
+    "fog.-8.-2",
+    "fog.-7.-2",
+    "fog.-9.-3",
+    "fog.-8.-3",
+    "fog.-7.-3",
+    "fog.-6.-3",
+    "fog.-6.-2",
+    "fog.-6.-1",
+    "place.river_bell",
+    "demo.sign_bell",
+    "fog.-8.-4",
+    "fog.-7.-4",
+    "fog.-6.-4",
+    "fog.-8.-5",
+    "fog.-7.-5",
+    "fog.-6.-5",
+    "seen.river.spring",
+    "fog.-5.-5",
+    "fog.-5.-4",
+    "fog.-5.-3",
+    "place.forest",
+    "fog.-7.-6",
+    "fog.-6.-6",
+    "fog.-5.-6",
+    "fog.-4.-6",
+    "fog.-4.-5",
+    "fog.-4.-4",
+    "fog.-4.-3",
+    "equipment.river.focus.soul_amulet",
+    "river.focus",
+    "fog.-3.-6",
+    "fog.-3.-5",
+    "fog.-3.-4",
+    "seen.resource.crystal_outcrop",
+    "fog.-2.-6",
+    "fog.-2.-5",
+    "fog.-2.-4",
+    "place.mine",
+    "fog.-4.-7",
+    "fog.-3.-7",
+    "fog.-2.-7",
+    "river.quartermaster_note",
+    "fog.-5.2",
+    "fog.-5.3",
+    "fog.-5.4",
+    "fog.-5.1",
+    "fog.-6.0",
+    "fog.-5.0",
+    "fog.-5.-1",
+    "fog.-5.-2",
+    "river.fire",
+    "river.enemy.camp.forest.3",
+    "loot.river.enemy.camp.forest.3",
+    "fog.-9.-4",
+    "fog.-10.-3",
+    "fog.-10.-2",
+    "fog.-10.-1",
+    "demo.bell.entry",
+    "demo.bell.supply",
+    "loot.cache.demo.bell.supply",
+    "fog.-10.0",
+    "river.enemy.river_bell.1",
+    "loot.river.enemy.river_bell.1",
+    "river.enemy.river_bell.3",
+    "loot.river.enemy.river_bell.3",
+    "river.enemy.river_bell.2",
+    "loot.river.enemy.river_bell.2",
+    "fog.-9.-5",
+    "fog.-10.-5",
+    "fog.-10.-4",
+    "fog.-10.-6",
+    "fog.-9.-6",
+    "fog.-8.-6",
+    "fog.-10.-7",
+    "fog.-9.-7",
+    "fog.-8.-7",
+    "fog.-10.-8",
+    "fog.-9.-8",
+    "fog.-8.-8",
+    "fog.-7.-8",
+    "fog.-7.-7",
+    "fog.-6.-8",
+    "fog.-6.-7",
+    "fog.-5.-8",
+    "fog.-5.-7",
+    "fog.-4.-8",
+    "fog.-3.-8",
+    "fog.-2.-8",
+    "fog.-1.-8",
+    "fog.-1.-7",
+    "fog.-1.-6",
+    "fog.-1.-5",
+    "fog.0.-7",
+    "fog.0.-6",
+    "fog.0.-5",
+    "fog.0.-8",
+    "fog.1.-8",
+    "fog.1.-7",
+    "fog.1.-6",
+    "fog.-1.-4",
+    "fog.-3.-3",
+    "fog.-2.-3",
+    "fog.-1.-3",
+    "fog.-3.-2",
+    "fog.-2.-2",
+    "fog.-1.-2",
+    "fog.0.-4",
+    "fog.0.-3",
+    "fog.0.-2",
+    "fog.1.-4",
+    "fog.1.-3",
+    "fog.1.-2",
+    "fog.2.-4",
+    "fog.2.-3",
+    "fog.2.-2",
+    "fog.3.-4",
+    "fog.3.-3",
+    "fog.3.-2",
+    "fog.1.-5",
+    "fog.2.-5",
+    "fog.3.-5",
+    "fog.2.-6",
+    "fog.3.-6",
+    "fog.2.-7",
+    "fog.3.-7",
+    "place.river_watch",
+    "fog.4.-7",
+    "fog.4.-6",
+    "fog.4.-5",
+    "fog.2.-8",
+    "fog.3.-8",
+    "fog.4.-8",
+    "fog.-10.3",
+    "fog.-10.4",
+    "fog.-10.5",
+    "fog.-11.3",
+    "fog.-11.4",
+    "fog.-11.5",
+    "fog.-11.2",
+    "fog.-10.2",
+    "fog.-11.1",
+    "fog.-10.1",
+    "fog.-11.0",
+    "fog.-11.-1",
+    "fog.-11.-2",
+    "fog.-11.-3",
+    "fog.-11.-4",
+    "river.enemy.river_bell.4",
+    "loot.river.enemy.river_bell.4",
+    "demo.bell.cleanser",
+    "demo.bell.seal",
+    "demo.bell.receipt",
+    "loot.cache.demo.bell.receipt",
+    "demo.bell.names",
+    "loot.cache.demo.bell.names",
+    "river.enemy.river_bell_depths.3",
+    "loot.river.enemy.river_bell_depths.3",
+    "demo.bell.core",
+    "loot.cache.demo.bell.core",
+    "quest.river_bell_names",
+    "seen.river.stove",
+    "quest.river_bell_inquiry"
+  ],
+  "date": "第3天 23:08",
+  "defenses": [],
+  "display": "X11",
+  "effective_forms": {
+    "right": {
+
+    },
+    "slot_0": {
+
+    },
+    "slot_1": {
+      "modifier": "",
+      "payload": "basic",
+      "uid": ""
+    },
+    "slot_3": {
+
+    },
+    "slot_4": {
+      "modifier": "",
+      "payload": "ember",
+      "uid": ""
+    },
+    "slot_5": {
+
+    }
+  },
+  "enemies": [
+    {
+      "detect": 440.0,
+      "distance": 2042.82604980469,
+      "hp": 60,
+      "id": "river.enemy.camp.bridge_keeper",
+      "mode": "idle",
+      "mp": 39,
+      "position": [
+        -1700.0,
+        650.0
+      ],
+      "processing": true,
+      "state": "Idle",
+      "title": "守备兵"
+    },
+    {
+      "detect": 440.0,
+      "distance": 2256.3662109375,
+      "hp": 55,
+      "id": "river.enemy.camp.road.1",
+      "mode": "idle",
+      "mp": 39,
+      "position": [
+        -1700.0,
+        300.0
+      ],
+      "processing": true,
+      "state": "Idle",
+      "title": "追猎者"
+    },
+    {
+      "detect": 440.0,
+      "distance": 2723.03833007812,
+      "hp": 55,
+      "id": "river.enemy.camp.road.2",
+      "mode": "idle",
+      "mp": 48,
+      "position": [
+        -1300.0,
+        50.0
+      ],
+      "processing": true,
+      "state": "Idle",
+      "title": "守点术士"
+    },
+    {
+      "detect": 440.0,
+      "distance": 3497.869140625,
+      "hp": 55,
+      "id": "river.enemy.camp.forest.4",
+      "mode": "idle",
+      "mp": 39,
+      "position": [
+        -2200.0,
+        -1500.0
+      ],
+      "processing": true,
+      "state": "Idle",
+      "title": "追猎者"
+    },
+    {
+      "detect": 440.0,
+      "distance": 4658.0615234375,
+      "hp": 55,
+      "id": "river.enemy.camp.marsh.6",
+      "mode": "idle",
+      "mp": 39,
+      "position": [
+        1250.0,
+        2100.0
+      ],
+      "processing": true,
+      "state": "Idle",
+      "title": "追猎者"
+    },
+    {
+      "detect": 440.0,
+      "distance": 4947.9072265625,
+      "hp": 55,
+      "id": "river.enemy.camp.marsh.7",
+      "mode": "idle",
+      "mp": 48,
+      "position": [
+        1550.0,
+        1850.0
+      ],
+      "processing": true,
+      "state": "Idle",
+      "title": "守点术士"
+    },
+    {
+      "detect": 440.0,
+      "distance": 6078.09130859375,
+      "hp": 60,
+      "id": "river.enemy.camp.mill.8",
+      "mode": "idle",
+      "mp": 39,
+      "position": [
+        2600.0,
+        800.0
+      ],
+      "processing": true,
+      "state": "Idle",
+      "title": "守备兵"
+    },
+    {
+      "detect": 440.0,
+      "distance": 6085.62109375,
+      "hp": 55,
+      "id": "river.enemy.camp.lake.5",
+      "mode": "idle",
+      "mp": 48,
+      "position": [
+        1110.73962402344,
+        -2301.35522460938
+      ],
+      "processing": true,
+      "state": "Idle",
+      "title": "守点术士"
+    },
+    {
+      "detect": 440.0,
+      "distance": 6557.697265625,
+      "hp": 55,
+      "id": "river.enemy.camp.mill.9",
+      "mode": "idle",
+      "mp": 48,
+      "position": [
+        3100.0,
+        900.0
+      ],
+      "processing": true,
+      "state": "Idle",
+      "title": "守点术士"
+    },
+    {
+      "detect": 440.0,
+      "distance": 7103.13232421875,
+      "hp": 60,
+      "id": "river.enemy.camp.prison_road.10",
+      "mode": "idle",
+      "mp": 39,
+      "position": [
+        3000.0,
+        -1300.0
+      ],
+      "processing": true,
+      "state": "Idle",
+      "title": "守备兵"
+    },
+    {
+      "detect": 440.0,
+      "distance": 7523.2734375,
+      "hp": 55,
+      "id": "river.enemy.camp.prison_road.11",
+      "mode": "idle",
+      "mp": 39,
+      "position": [
+        3550.0,
+        -1100.0
+      ],
+      "processing": true,
+      "state": "Idle",
+      "title": "追猎者"
+    }
+  ],
+  "error": "",
+  "fields": [],
+  "gear": [
+    {
+      "definition": "soul_amulet",
+      "properties": {
+
+      },
+      "quantity": 1,
+      "uid": "item.92"
+    },
+    {
+      "definition": "river_sabre",
+      "properties": {
+
+      },
+      "quantity": 1,
+      "uid": "item.9"
+    },
+    {
+      "definition": "river_coat",
+      "properties": {
+
+      },
+      "quantity": 1,
+      "uid": "item.31"
+    }
+  ],
+  "hands": {
+    "q": "",
+    "r": "ignite"
+  },
+  "id": 2.0,
+  "items": [
+    {
+      "definition": "ash",
+      "properties": {
+
+      },
+      "quantity": 2,
+      "uid": "item.77"
+    },
+    {
+      "definition": "charcoal",
+      "properties": {
+
+      },
+      "quantity": 1,
+      "uid": "item.78"
+    },
+    {
+      "definition": "frost_salt",
+      "properties": {
+
+      },
+      "quantity": 2,
+      "uid": "item.80"
+    },
+    {
+      "definition": "resin",
+      "properties": {
+
+      },
+      "quantity": 2,
+      "uid": "item.81"
+    },
+    {
+      "definition": "sap",
+      "properties": {
+
+      },
+      "quantity": 1,
+      "uid": "item.82"
+    },
+    {
+      "definition": "storm_dust",
+      "properties": {
+
+      },
+      "quantity": 3,
+      "uid": "item.83"
+    },
+    {
+      "definition": "grain",
+      "properties": {
+
+      },
+      "quantity": 2,
+      "uid": "item.85"
+    },
+    {
+      "definition": "herb",
+      "properties": {
+
+      },
+      "quantity": 6,
+      "uid": "item.86"
+    },
+    {
+      "definition": "clean_water",
+      "properties": {
+
+      },
+      "quantity": 1,
+      "uid": "item.87"
+    },
+    {
+      "definition": "fire_stone",
+      "properties": {
+
+      },
+      "quantity": 1,
+      "uid": "item.111"
+    },
+    {
+      "definition": "cloth",
+      "properties": {
+
+      },
+      "quantity": 3,
+      "uid": "item.27"
+    },
+    {
+      "definition": "ration",
+      "properties": {
+
+      },
+      "quantity": 2,
+      "uid": "item.29"
+    }
+  ],
+  "known_actions": {
+    "fire_sigil": true,
+    "focus": true,
+    "ignite": true,
+    "oil_flask": true,
+    "project": true,
+    "shape": true,
+    "water_call": true
+  },
+  "loot_records": {
+    "cache.demo.bell.core": {
+      "equipment": {
+
+      },
+      "materials": {
+
+      },
+      "position": [
+        1248.0,
+        424.0
+      ],
+      "region": "river_bell_depths",
+      "title": "失调的遗钟 · 留存物资"
+    },
+    "cache.demo.bell.names": {
+      "equipment": {
+
+      },
+      "materials": {
+
+      },
+      "position": [
+        1120.0,
+        802.0
+      ],
+      "region": "river_bell",
+      "title": "石壁上的无名者 · 留存物资"
+    },
+    "cache.demo.bell.receipt": {
+      "equipment": {
+
+      },
+      "materials": {
+
+      },
+      "position": [
+        -1080.0,
+        672.0
+      ],
+      "region": "river_bell_depths",
+      "title": "泵工最后的回执 · 留存物资"
+    },
+    "cache.demo.bell.supply": {
+      "equipment": {
+
+      },
+      "materials": {
+
+      },
+      "position": [
+        -1250.0,
+        372.0
+      ],
+      "region": "river_bell",
+      "title": "守墓人遗下的药包 · 留存物资"
+    },
+    "cache.river.handbook": {
+      "equipment": {
+
+      },
+      "materials": {
+
+      },
+      "position": [
+        -3500.0,
+        2472.0
+      ],
+      "region": "camp",
+      "title": "行路者的施法手册 · 留存物资"
+    },
+    "cache.river.pack": {
+      "equipment": {
+
+      },
+      "materials": {
+
+      },
+      "position": [
+        -3850.0,
+        2372.0
+      ],
+      "region": "camp",
+      "title": "离镇口粮袋 · 留存物资"
+    },
+    "river.enemy.camp.forest.3": {
+      "equipment": {
+
+      },
+      "materials": {
+
+      },
+      "position": [
+        -2822.42993164062,
+        -1223.75476074219
+      ],
+      "region": "camp",
+      "title": "流亡守备兵的遗骸"
+    },
+    "river.enemy.river_bell.1": {
+      "equipment": {
+
+      },
+      "materials": {
+
+      },
+      "position": [
+        -693.212341308594,
+        339.861053466797
+      ],
+      "region": "river_bell",
+      "title": "遗钟守槛人的遗骸"
+    },
+    "river.enemy.river_bell.2": {
+      "equipment": {
+
+      },
+      "materials": {
+
+      },
+      "position": [
+        387.264953613281,
+        -433.106811523438
+      ],
+      "region": "river_bell",
+      "title": "驿路追猎者的遗骸"
+    },
+    "river.enemy.river_bell.3": {
+      "equipment": {
+
+      },
+      "materials": {
+
+      },
+      "position": [
+        664.511474609375,
+        292.306304931641
+      ],
+      "region": "river_bell",
+      "title": "泵站刻阵工的遗骸"
+    },
+    "river.enemy.river_bell.4": {
+      "equipment": {
+
+      },
+      "materials": {
+
+      },
+      "position": [
+        822.131530761719,
+        691.1767578125
+      ],
+      "region": "river_bell",
+      "title": "流亡守备兵的遗骸"
+    },
+    "river.enemy.river_bell_depths.3": {
+      "equipment": {
+
+      },
+      "materials": {
+
+      },
+      "position": [
+        855.915771484375,
+        148.39094543457
+      ],
+      "region": "river_bell_depths",
+      "title": "遗钟守槛人的遗骸"
+    }
+  },
+  "martial": {
+    "learned": {
+
+    },
+    "ready_at": {
+
+    }
+  },
+  "materials": {
+    "ash": 2,
+    "charcoal": 1,
+    "clean_water": 1,
+    "clear_tonic": 2,
+    "cloth": 3,
+    "coin": 20,
+    "crystal": 1,
+    "echo_ink": 3,
+    "fire_stone": 1,
+    "frost_salt": 2,
+    "grain": 2,
+    "herb": 6,
+    "metal_scrap": 1,
+    "ration": 2,
+    "resin": 2,
+    "sap": 1,
+    "storm_dust": 3,
+    "ward_powder": 2
+  },
+  "melee_hits": [],
+  "modal_texts": [
+    "灰河谷 · 自由远征",
+    "旅程已恢复：灰河谷。生命、补给与世界成果沿用存档。\n\n林地、矿道、湖岸、工区和湿地互相连通，旧监狱在东北。北桥和南侧浅滩始终开放，修复木桥可缩短往返。镇中艾妲记录你的发现与世界成果。\n\nF观察敌人或搜刮遗骸，物品取自真实穿戴和剩余行囊；取不下的留在原地，F打开战利品面板，T尽量取走全部。\n\nTab远征面板 · J委托 · I行囊 · O穿戴 · N补给 · G地图\n7烤饼、8清水、9茶、0炖汤（默认，可在K改放动作或物品）；仍需站定使用，受伤会打断。\n普通基础动作默认按下即施放；可在操作设置切回按住预览、松开施放。\nQ/E/R与1—0独立快捷槽 · F交互 · M/按住中键选材 · K编组\n界面不会暂停世界；背包可右键丢弃，地面物资用F拾取。轮盘打开时按动作快捷键选槽，再选介质；同种喷剂可滚轮切瓶。\n地图只记录亲自到过的地点。动作、材料和恩赐需要亲手组合，系统不会自动准备。F5存档，F9读档；独立旅程不覆盖监狱验证场。"
+  ],
+  "notice": "",
+  "objective": "河谷镇 · 可以整备、烹饪、训练和交付",
+  "pack": [
+    {
+      "definition": "metal_scrap",
+      "properties": {
+
+      },
+      "quantity": 1,
+      "uid": "item.93"
+    },
+    {
+      "definition": "river_sabre",
+      "properties": {
+        "coating": {
+          "expires_at": 832.105664000012,
+          "id": "poison_rag"
+        }
+      },
+      "quantity": 1,
+      "uid": "item.30"
+    },
+    {
+      "definition": "clear_tonic",
+      "properties": {
+
+      },
+      "quantity": 2,
+      "uid": "item.137"
+    },
+    {
+      "definition": "echo_ink",
+      "properties": {
+
+      },
+      "quantity": 3,
+      "uid": "item.113"
+    },
+    {
+      "definition": "coin",
+      "properties": {
+
+      },
+      "quantity": 20,
+      "uid": "item.114"
+    },
+    {
+      "definition": "river_staff",
+      "properties": {
+
+      },
+      "quantity": 1,
+      "uid": "item.116"
+    },
+    {
+      "definition": "river_boots",
+      "properties": {
+
+      },
+      "quantity": 1,
+      "uid": "item.117"
+    },
+    {
+      "definition": "ward_powder",
+      "properties": {
+
+      },
+      "quantity": 2,
+      "uid": "item.123"
+    },
+    {
+      "definition": "cadence_gloves",
+      "properties": {
+
+      },
+      "quantity": 1,
+      "uid": "item.127"
+    },
+    {
+      "definition": "river_staff",
+      "properties": {
+
+      },
+      "quantity": 1,
+      "uid": "item.128"
+    },
+    {
+      "definition": "river_spear",
+      "properties": {
+
+      },
+      "quantity": 1,
+      "uid": "item.121"
+    },
+    {
+      "definition": "river_boots",
+      "properties": {
+
+      },
+      "quantity": 1,
+      "uid": "item.122"
+    },
+    {
+      "definition": "river_sabre",
+      "properties": {
+        "coating": {
+          "expires_at": 2304.01044700003,
+          "id": "poison_rag"
+        }
+      },
+      "quantity": 1,
+      "uid": "item.132"
+    },
+    {
+      "definition": "river_coat",
+      "properties": {
+
+      },
+      "quantity": 1,
+      "uid": "item.133"
+    },
+    {
+      "definition": "crystal",
+      "properties": {
+
+      },
+      "quantity": 1,
+      "uid": "item.172"
+    },
+    {
+      "definition": "river_staff",
+      "properties": {
+
+      },
+      "quantity": 1,
+      "uid": "item.170"
+    },
+    {
+      "definition": "river_boots",
+      "properties": {
+
+      },
+      "quantity": 1,
+      "uid": "item.171"
+    }
+  ],
+  "paused": false,
+  "physical_actions": [],
+  "player": {
+    "attacks": 0,
+    "base": true,
+    "channel_source": "",
+    "charge_source": "",
+    "damage_taken": 0,
+    "dead": false,
+    "guarding": false,
+    "hp": 85,
+    "mode": "idle",
+    "mp": 60,
+    "position": [
+      -3397.5,
+      1786.5
+    ],
+    "stamina": 100.0,
+    "ui_blocked": true
+  },
+  "runtime_scripts": [
+    "",
+    "res://core/command/command_bus.gd",
+    "res://core/debug/combat_debug_ui.gd",
+    "res://core/event/combat_event_bus.gd",
+    "res://core/game_runtime.gd",
+    "res://core/region_runtime.gd",
+    "res://core/save_manager.gd",
+    "res://core/state/state_machine.gd",
+    "res://entities/components/combat_component.gd",
+    "res://entities/components/health_component.gd",
+    "res://entities/components/mana_component.gd",
+    "res://entities/components/stats_component.gd",
+    "res://entities/enemy/enemy.gd",
+    "res://entities/enemy/enemy_attack_preparation.gd",
+    "res://entities/enemy/enemy_character_status.gd",
+    "res://entities/enemy/enemy_surface_awareness.gd",
+    "res://entities/player/components/player_casting_controller.gd",
+    "res://entities/player/components/player_combat_bindings.gd",
+    "res://entities/player/components/player_field_work.gd",
+    "res://entities/player/components/player_input_controller.gd",
+    "res://entities/player/player.gd",
+    "res://entities/player/states/attack.gd",
+    "res://entities/player/states/dodge.gd",
+    "res://entities/player/states/idle.gd",
+    "res://entities/player/states/move.gd",
+    "res://entities/player/states/skill.gd",
+    "res://entities/player/states/work.gd",
+    "res://gameplay/abilities/combinations/conditional_cast_controller.gd",
+    "res://gameplay/abilities/fields/field_placement_preview.gd",
+    "res://gameplay/abilities/fields/preparation_overlay.gd",
+    "res://gameplay/abilities/manager/skill_manager.gd",
+    "res://gameplay/abilities/manager/skill_mastery_manager.gd",
+    "res://gameplay/abilities/manager/summon_manager.gd",
+    "res://gameplay/abilities/runtime/skill_executor.gd",
+    "res://gameplay/abilities/runtime/skill_synergy_resolver.gd",
+    "res://gameplay/characters/actor_equipment_visual.gd",
+    "res://gameplay/combat/combat_executor.gd",
+    "res://gameplay/combat/on_hit/element_hit_bindings.gd",
+    "res://gameplay/exploration/element_knowledge.gd",
+    "res://gameplay/exploration/element_trial_recorder.gd",
+    "res://gameplay/exploration/expedition_ui.gd",
+    "res://gameplay/exploration/exploration_interactable.gd",
+    "res://gameplay/exploration/spell_world_object.gd",
+    "res://gameplay/exploration/surface_overlay.gd",
+    "res://gameplay/exploration/surface_valve.gd",
+    "res://gameplay/exploration/survival/survival_service.gd",
+    "res://gameplay/foundation/actor_action_controller.gd",
+    "res://gameplay/foundation/actor_components.gd",
+    "res://gameplay/foundation/campaign_session.gd",
+    "res://gameplay/foundation/interaction_provider.gd",
+    "res://gameplay/foundation/service_npc.gd",
+    "res://gameplay/foundation/stability_component.gd",
+    "res://gameplay/foundation/stamina_component.gd",
+    "res://gameplay/foundation/ui/actor_status_view.gd",
+    "res://gameplay/frontier/frontier_hud.gd",
+    "res://gameplay/frontier/frontier_scenery.gd",
+    "res://gameplay/frontier/grayriver_game.gd",
+    "res://gameplay/frontier/grayriver_loot_corpse.gd",
+    "res://gameplay/frontier/grayriver_terrain.gd",
+    "res://gameplay/interaction/propagation_scheduler.gd",
+    "res://gameplay/interaction/respawn_scheduler.gd",
+    "res://gameplay/interaction/simulation_runtime.gd",
+    "res://gameplay/interaction/surface_manager.gd",
+    "res://gameplay/interaction/surface_scheduler.gd",
+    "res://gameplay/inventory/equipment_manager.gd",
+    "res://gameplay/items/item_action_controller.gd",
+    "res://gameplay/items/spray_channel.gd",
+    "res://gameplay/status/buff_manager.gd",
+    "res://ui/actor_inventory_screen.gd",
+    "res://ui/boss_hp_bar.gd",
+    "res://ui/buff_status_ui.gd",
+    "res://ui/damage_number_spawner.gd",
+    "res://ui/field_work_panel.gd",
+    "res://ui/hud.gd",
+    "res://ui/inventory_item_tile.gd",
+    "res://ui/inventory_panel.gd",
+    "res://ui/material_wheel.gd",
+    "res://ui/paper_doll_view.gd",
+    "res://ui/skill_bar.gd",
+    "res://ui/skill_pool_ui.gd",
+    "res://ui/slot_button.gd",
+    "res://ui/summon_status_ui.gd",
+    "res://world/object/interactable.gd",
+    "res://world/object/map_object.gd",
+    "res://world/state/world_state_manager.gd",
+    "res://world/time/world_time.gd",
+    "res://world/world_runtime.gd"
+  ],
+  "save_path": "/tmp/grayriver-first30/coherent-reentry/data/godot/app_userdata/Study/save_3.sav",
+  "selected": {
+
+  },
+  "shortcuts": {
+    "item_0": {
+      "item_id": "ration",
+      "kind": "item",
+      "uid": ""
+    },
+    "item_1": {
+      "item_id": "clean_water",
+      "kind": "item",
+      "uid": ""
+    },
+    "item_2": {
+      "item_id": "tea",
+      "kind": "item",
+      "uid": ""
+    },
+    "item_3": {
+      "item_id": "broth",
+      "kind": "item",
+      "uid": ""
+    },
+    "right": {
+      "kind": "skill",
+      "skill_id": "ignite",
+      "upgrades": {
+
+      }
+    },
+    "slot_0": {
+      "kind": "skill",
+      "skill_id": "disperse",
+      "upgrades": {
+
+      }
+    },
+    "slot_1": {
+      "kind": "skill",
+      "selection": {
+        "mode": "auto"
+      },
+      "skill_id": "focus",
+      "upgrades": {
+
+      }
+    },
+    "slot_3": {
+      "kind": "skill",
+      "skill_id": "water_call",
+      "upgrades": {
+
+      }
+    },
+    "slot_4": {
+      "kind": "skill",
+      "selection": {
+        "modifier": "",
+        "payload": "ember",
+        "uid": ""
+      },
+      "skill_id": "inscribe",
+      "upgrades": {
+
+      }
+    },
+    "slot_5": {
+      "kind": "skill",
+      "skill_id": "ignite",
+      "upgrades": {
+
+      }
+    }
+  },
+  "simulation": true,
+  "slots": [
+    "disperse",
+    "focus",
+    "",
+    "water_call",
+    "inscribe",
+    "ignite"
+  ],
+  "spell_affinity": "",
+  "tracker": "追踪委托\n自定路标\n↑ 89步",
+  "wall_usec": 11686771,
+  "wheel": {
+    "source": "",
+    "visible": false
+  }
+}

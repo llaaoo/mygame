@@ -27,6 +27,7 @@ var _quantity: SpinBox
 var _popup: PopupMenu
 var _dirty := true
 var _refresh_time:=0.0
+var _detail_clock:=0.0
 var _last_health:=100
 var _alert: Label
 var _message := ""
@@ -49,19 +50,22 @@ func open(focus := "all",ground := "") -> void:
  mode=focus; ground_id=ground; selected=""; selected_slot=-1; container_filter="all"
  _search.text=""; _last_health=actor.health_component.hp
  _dirty=true; show(); GameUIStyle.begin_modal(self); _refresh()
-func open_item(definition_id: String) -> void:
- open()
- for container in session.inventory.actor_containers(actor.actor_context.id):
+func open_item(definition_id: String, preferred_uid := "") -> void:
+ open("equipment" if session.inventory.definitions.get(definition_id) is EquipmentData else "all")
+ var sources:=session.inventory.actor_containers(actor.actor_context.id)
+ sources.push_front(actor.actor_context.id+".gear")
+ for container in sources:
   for row in session.inventory.entries(container):
-   if row.definition==definition_id:
-    _select(row.uid)
-    var tile: Control=_tiles.get(row.uid)
-    if tile:
-     var parent:=tile.get_parent()
-     while parent:
-      if parent is ScrollContainer: parent.ensure_control_visible(tile)
-      parent=parent.get_parent()
-    return
+   if row.definition!=definition_id or not preferred_uid.is_empty() and row.uid!=preferred_uid: continue
+   _select(row.uid)
+   var tile: Control=_tiles.get(row.uid)
+   if tile:
+    var parent:=tile.get_parent()
+    while parent:
+     if parent is ScrollContainer: parent.ensure_control_visible(tile)
+     parent=parent.get_parent()
+   return
+ _message="这件实物已不在随身容器。"; _message_time=3
 func close() -> void:
  _popup.hide(); hide(); GameUIStyle.end_modal(self)
 func _input(event: InputEvent) -> void:
@@ -149,6 +153,10 @@ func _process(delta: float) -> void:
  _summary.text="口袋 %d/%d格 · 背包 %d/%d格%s · 负重 %.1f / %.0fkg · 生命 %d/%d"%[session.inventory.entries(context.id+".pocket").size(),context.rules.pocket_capacity,session.inventory.entries(context.id+".pack").size(),context.rules.pack_capacity,"（已放下，不可远程整理）" if not session.inventory.is_attached(context.id+".pack") else "",session.inventory.weight(context.id),context.rules.carry_limit,actor.health_component.hp,actor.health_component.max_hp]
  _alert.text=_message if _message_time>0 else ""
  _refresh_stats()
+ _detail_clock+=delta
+ if _detail_clock>=.15:
+  _detail_clock=0
+  _show_detail()
  if is_instance_valid(_state_label) and _state_label.is_inside_tree():
   var item:=_selected_item()
   if item:
@@ -207,7 +215,7 @@ func _refresh() -> void:
    _grid.remove_child(tile); tile.queue_free()
  var placeholder:=_grid.get_node_or_null("EmptyInventory") as Label
  if rows.is_empty() and not placeholder:
-  placeholder=FoundationWidgets.label("这里没有符合条件的实物。",14,true); placeholder.name="EmptyInventory"; _grid.add_child(placeholder)
+  placeholder=FoundationWidgets.label("这里没有符合条件的实物。",14,true); placeholder.name="EmptyInventory"; placeholder.custom_minimum_size.x=220; _grid.add_child(placeholder)
  elif not rows.is_empty() and placeholder:
   _grid.remove_child(placeholder); placeholder.queue_free()
  _show_detail()
@@ -221,9 +229,17 @@ func _select_slot(slot: int) -> void:
  selected_slot=slot; mode="equipment"; container_filter="all"
  selected=str(session.inventory.equipped(actor.actor_context.id).get(str(slot),"")); _invalidate()
 func _selected_item() -> ItemInstance: return session.inventory.item(selected)
+func _equipment_permission(item: ItemInstance) -> String:
+ if not item: return ""
+ var definition:=session.inventory.definitions.get(item.definition_id) as EquipmentData
+ if not definition: return ""
+ if session.inventory.locate(item.uid).ends_with(".gear"):
+  return actions.unequip_reason(definition.slot_type)
+ return actions.equip_reason(item.uid)
 func _show_detail() -> void:
  var item:=_selected_item()
- var signature: Dictionary={"uid":selected,"item":item.snapshot() if item else {},"location":session.inventory.locate(selected),"gear":session.inventory.entries(actor.actor_context.id+".gear"),"accessible":session.inventory.actor_containers(actor.actor_context.id),"ground":ground_id}
+ var permission:=_equipment_permission(item)
+ var signature: Dictionary={"permission":permission,"uid":selected,"item":item.snapshot() if item else {},"location":session.inventory.locate(selected),"gear":session.inventory.entries(actor.actor_context.id+".gear"),"accessible":session.inventory.actor_containers(actor.actor_context.id),"ground":ground_id}
  if signature==_detail_signature: return
  _detail_signature=signature.duplicate(true)
  var old_quantity:=int(_quantity.value) if is_instance_valid(_quantity) else 1
@@ -248,10 +264,9 @@ func _show_detail() -> void:
   FoundationWidgets.disclosure(_details,"属性与当前装备比较",FoundationWidgets.comparison(current,definition))
   if definition.moveset: FoundationWidgets.disclosure(_details,"武器动作",definition.moveset.describe())
   if location.ends_with(".gear"):
-   _details.add_child(FoundationWidgets.button("卸下装备",func(): _result(actions.unequip(definition.slot_type))))
-  else: _details.add_child(FoundationWidgets.button("装备这件",_equip.bind(item.uid)))
-  var reason:=str(actions.management_reason.call())
-  if not reason.is_empty(): _details.add_child(FoundationWidgets.label(reason,13,true))
+   _details.add_child(FoundationWidgets.button("卸下装备",func(): _result(actions.unequip(definition.slot_type)),not permission.is_empty()))
+  else: _details.add_child(FoundationWidgets.button("装备这件",_equip.bind(item.uid),not permission.is_empty()))
+  if not permission.is_empty(): _details.add_child(FoundationWidgets.label(permission,13,true))
  elif definition.use_profile or SurvivalCatalog.FOODS.has(definition.id):
   _details.add_child(FoundationWidgets.button("选择这瓶喷剂" if definition.use_profile and definition.use_profile.kind==ItemUseDefinition.Kind.SPRAY else "使用一份",_use.bind(item.uid)))
  if not location.ends_with(".gear"):
