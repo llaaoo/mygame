@@ -13,7 +13,7 @@ import time
 ROOT = Path(__file__).resolve().parents[1]
 QUICK = ["save_system", "save_recovery", "skill_catalog", "skill_upgrades", "room_generation"]
 INTEGRATION = [
-    "town_cells", "town_cells_input", "presentation_system", "presentation_input",
+    "save_sections", "save_sections_game", "town_cells", "town_cells_input", "presentation_system", "presentation_input",
     "actor_animation", "animation_demo_input", "weapon_hold", "weapon_hold_input", "weapon_hold_handover_input", "weapon_art_routes", "weapon_art_input", "martial_followups", "martial_followup_input", "weapon_combos", "weapon_combo_contacts", "weapon_combo_input", "weapon_response", "weapon_response_input", "interface_navigation", "world_feedback", "world_feedback_input", "followup_fixes", "grayriver_demo",
     "spell_form_assist", "contextual_choices", "combat_choices_input", "flow_input",
     "provision_lifecycle", "production_learning", "extensibility_input",

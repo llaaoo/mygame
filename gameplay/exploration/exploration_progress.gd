@@ -1,33 +1,34 @@
 class_name ExplorationProgress
-extends RefCounted
+extends SaveRecord
 
 var condition_query: ConditionQuery
-var foundation: Dictionary={}
-var tracked_quest := ""
-var waypoint: Dictionary = {}
-var story_actors: Dictionary = {}
-var journey: Dictionary = {}
-var trial_runs: Array[Dictionary] = []
-var element_clues: Dictionary = {}
-var verified_reactions: Dictionary = {}
-var equipment_owned: Dictionary = {}
-var equipment_counts: Dictionary = {}
-var loot_records: Dictionary = {}
-var equipment_loadout: Dictionary = {}
-var actions: Dictionary = {"ignite": true}
-var spell_rules: Dictionary = {}
-var claims: Dictionary = {}
-var cleared: Dictionary = {}
-var journal: Array[Dictionary] = []
-var completed := false
-var deaths := 0
-var world_states: Dictionary = {}
-var loadout: Dictionary = {}
-var character_state: Dictionary = {}
-var visited: Dictionary = {}
-var choices: Dictionary = {}
-var casting_supplies: Dictionary = {}
-var survival_state: Dictionary = {}
+var foundation_status: Callable
+@export_storage var foundation: Dictionary={}
+@export_storage var tracked_quest := ""
+@export_storage var waypoint: Dictionary = {}
+@export_storage var story_actors: Dictionary = {}
+@export_storage var journey: Dictionary = {}
+@export_storage var trial_runs: Array[Dictionary] = []
+@export_storage var element_clues: Dictionary = {}
+@export_storage var verified_reactions: Dictionary = {}
+@export_storage var equipment_owned: Dictionary = {}
+@export_storage var equipment_counts: Dictionary = {}
+@export_storage var loot_records: Dictionary = {}
+@export_storage var equipment_loadout: Dictionary = {}
+@export_storage var actions: Dictionary = {"ignite": true}
+@export_storage var spell_rules: Dictionary = {}
+@export_storage var claims: Dictionary = {}
+@export_storage var cleared: Dictionary = {}
+@export_storage var journal: Array[Dictionary] = []
+@export_storage var completed := false
+@export_storage var deaths := 0
+@export_storage var world_states: Dictionary = {}
+@export_storage var loadout: Dictionary = {}
+@export_storage var character_state: Dictionary = {}
+@export_storage var visited: Dictionary = {}
+@export_storage var choices: Dictionary = {}
+@export_storage var casting_supplies: Dictionary = {}
+@export_storage var survival_state: Dictionary = {}
 
 func claim(id: String, title: String, text: String, new_actions: Array, new_spell_rules: Array) -> bool:
 	if claims.has(id):
@@ -40,11 +41,11 @@ func claim(id: String, title: String, text: String, new_actions: Array, new_spel
 	journal.append({"id": id, "title": title, "text": text})
 	return true
 
-func serialize_save_data() -> Dictionary:
-	return {"foundation":foundation.duplicate(true),"tracked_quest": tracked_quest, "waypoint": waypoint.duplicate(true), "story_actors": story_actors.duplicate(true), "equipment_counts": equipment_counts.duplicate(), "loot_records": loot_records.duplicate(true), "journey": journey.duplicate(true), "survival_state": survival_state.duplicate(true), "trial_runs": trial_runs.duplicate(true), "element_clues": element_clues.duplicate(), "verified_reactions": verified_reactions.duplicate(), "equipment_owned": equipment_owned.duplicate(), "equipment_loadout": equipment_loadout.duplicate(), "actions": actions.duplicate(), "spell_rules": spell_rules.duplicate(), "claims": claims.duplicate(), "cleared": cleared.duplicate(), "journal": journal.duplicate(true), "completed": completed, "deaths": deaths, "world_states": world_states.duplicate(true), "loadout": loadout.duplicate(true), "character_state": character_state.duplicate(true), "visited": visited.duplicate(), "choices": choices.duplicate(), "casting_supplies": casting_supplies.duplicate(true)}
+func save_read_status(value: Dictionary) -> int:
+	return int(foundation_status.call(value.get("foundation",{}))) if foundation_status.is_valid() else SaveSections.Status.VALID
 
 func validate_save_data(value: Variant) -> bool:
-	if not value is Dictionary:
+	if not super.validate_save_data(value):
 		return false
 	if not CampaignSession.valid_snapshot(value.get("foundation",{})): return false
 	if condition_query and condition_query.items:
@@ -160,41 +161,17 @@ func validate_save_data(value: Variant) -> bool:
 	return true
 
 func deserialize_save_data(data: Dictionary) -> void:
-	foundation=data.get("foundation",{}).duplicate(true)
-	tracked_quest = data.get("tracked_quest", "")
-	waypoint = data.get("waypoint", {}).duplicate(true)
-	story_actors = data.get("story_actors", {}).duplicate(true)
-	journey = data.get("journey", {}).duplicate(true)
-	survival_state = data.get("survival_state", {}).duplicate(true)
-	trial_runs.assign(data.get("trial_runs", []))
-	while trial_runs.size() > 10: trial_runs.pop_front()
-	element_clues = data.get("element_clues", {}).duplicate()
-	# Old frost knowledge belongs to water; learned actions/reactions keep their IDs.
-	if element_clues.get("ice", false): element_clues["water"] = true
+	var migrated:=data.duplicate(true)
+	if not migrated.has("spell_rules") and migrated.has("recipes"): migrated["spell_rules"]=migrated.recipes
+	migrated.erase("recipes")
+	if not SaveFields.valid(self,migrated): return
+	super.deserialize_save_data(migrated)
+	while trial_runs.size()>10: trial_runs.pop_front()
+	# Semantic compatibility belongs here, not in the file-format migration ladder.
+	if element_clues.get("ice",false): element_clues["water"]=true
 	element_clues.erase("ice")
-	verified_reactions = data.get("verified_reactions", {}).duplicate()
-	loot_records = data.get("loot_records", {}).duplicate(true)
-	equipment_counts = data.get("equipment_counts", {}).duplicate()
-	equipment_owned = data.get("equipment_owned", {}).duplicate()
 	for id in equipment_owned:
-		if equipment_owned[id] and not equipment_counts.has(id): equipment_counts[id] = 1
-	equipment_loadout = data.get("equipment_loadout", {}).duplicate()
-	actions = data.get("actions", {"ignite": true}).duplicate()
-	actions["ignite"] = true
-	spell_rules = data.get("spell_rules", data.get("recipes", {})).duplicate()
-	claims = data.get("claims", {}).duplicate()
-	cleared = data.get("cleared", {}).duplicate()
-	journal.clear()
-	for entry in data.get("journal", []):
-		if entry is Dictionary:
-			journal.append(entry.duplicate(true))
-	completed = bool(data.get("completed", false))
-	deaths = maxi(0, int(data.get("deaths", 0)))
-	world_states = data.get("world_states", {}).duplicate(true)
-	loadout = data.get("loadout", {}).duplicate(true)
-	character_state = data.get("character_state", {}).duplicate(true)
-	visited = data.get("visited", {}).duplicate()
-	for id in cleared:
-		visited[id] = true
-	choices = data.get("choices", {}).duplicate()
-	casting_supplies = data.get("casting_supplies", {}).duplicate(true)
+		if equipment_owned[id] and not equipment_counts.has(id): equipment_counts[id]=1
+	actions["ignite"]=true
+	deaths=maxi(0,deaths)
+	for id in cleared: visited[id]=true

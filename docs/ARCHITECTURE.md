@@ -1,5 +1,7 @@
 # 项目架构与维护边界
 
+2026-11-10：[存档扩展](SAVE_SYSTEM.md)将文件封装版本与模块版本分离。SaveRepository只负责文件、备份与封装迁移，SaveSections负责显式模块登记、局部迁移与恢复顺序，SaveRecord从`@export_storage`字段生成纯值记录；SaveAdapter适配已有领域快照。CampaignSession仍拥有战役状态，库存、角色与计时语义仍由原领域校验与恢复，未知模块往返保留，未来已知版本阻止覆盖。
+
 2026-11-10：[镇中地图单元](TOWN_MAP_CELLS.md)将场景编辑的空间定义编译到现有ExplorationRegionData；AuthoredMapCell负责空间/表现，RegionSession仍负责生命周期，WorldStorageService只重验空间并提交InventoryService事务。室内不得通过自动删墙修复错放交互点；玩家落点几何检查与生成物避让分离。
 
 2026-11-08：[操作闭环与智能施法](PLAYER_FLOW_AND_SPELL_ASSIST.md)加入由SkillManager持有的瞬态SpellFormAssist；QuickslotLoadout仍独占绑定，形式解析继续进入同一CastPlan和事务。生产事实由适配器请求日志与排队通知，UI不增加库存或施法权威。

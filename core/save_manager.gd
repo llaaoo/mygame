@@ -9,7 +9,6 @@ var last_read: REPOSITORY.ReadResult
 static var instance: SaveManager
 
 var active_slot: int = 1
-var _sections: Dictionary = {}
 var _loading := false
 var progress_only := false
 var last_journey_archive := ""
@@ -27,19 +26,12 @@ func _exit_tree() -> void:
 		instance = null
 
 
-func register_section(section_id: String, provider: Variant) -> void:
-	if section_id.is_empty() or provider == null:
-		return
-	if not provider.has_method("serialize_save_data") or not provider.has_method("deserialize_save_data"):
-		push_warning("SaveManager: section '%s' is missing persistence methods." % section_id)
-		return
-	_sections[section_id] = provider
-	if provider.has_method("validate_save_data"):
-		repository.section_validators[section_id] = Callable(provider, "validate_save_data")
+func register_section(section_id: String, provider: Variant) -> bool:
+	return repository.sections.register(section_id,provider) if provider is Object else false
 
 
 func unregister_section(section_id: String) -> void:
-	_sections.erase(section_id)
+	repository.sections.unregister(section_id)
 	repository.section_validators.erase(section_id)
 
 
@@ -58,6 +50,8 @@ func _input(event: InputEvent) -> void:
 func save_game(slot: int) -> bool:
 	if _loading:
 		return false
+	var retained:=repository.read(_path(slot))
+	if not retained.usable() and retained.status!=REPOSITORY.Status.MISSING: return false
 	before_save.emit()
 	active_slot = slot
 	var root := SaveData.Root.new()
@@ -65,7 +59,7 @@ func save_game(slot: int) -> bool:
 	root.player = _collect_player()
 	root.world = _collect_world()
 	root.quest = _collect_quests()
-	root.extensions = _collect_extensions()
+	root.extensions = _collect_extensions(retained.data.get("extensions",{}))
 
 	var saved := repository.write(_path(slot), root.serialize())
 	if saved:
@@ -81,10 +75,13 @@ func start_new_campaign(slot: int,section: String,fresh_progress: Dictionary) ->
 	_loading=true
 	before_save.emit()
 	var current:=SaveData.Root.new()
-	current.meta=_collect_meta(); current.player=_collect_player(); current.world=_collect_world(); current.quest=_collect_quests(); current.extensions=_collect_extensions()
+	var retained:=repository.read(_path(slot))
+	if retained.status==REPOSITORY.Status.UNSUPPORTED_VERSION: _loading=false; return false
+	current.meta=_collect_meta(); current.player=_collect_player(); current.world=_collect_world(); current.quest=_collect_quests(); current.extensions=_collect_extensions(retained.data.get("extensions",{}))
 	var fresh:=SaveData.Root.new()
 	fresh.meta=SaveData.MetaData.new(); fresh.player=SaveData.PlayerData.new(); fresh.world=SaveData.WorldData.new(); fresh.quest=SaveData.QuestSave.new()
-	fresh.extensions={section:fresh_progress.duplicate(true)}
+	# Fresh data is already in the current provider format, never legacy revision 0.
+	fresh.extensions={section:fresh_progress.duplicate(true),SaveSections.VERSIONS:{section:repository.sections.revision(section)}}
 	last_journey_archive=repository.start_new(_path(slot),fresh.serialize(),current.serialize())
 	if last_journey_archive.is_empty(): _loading=false; return false
 	# The outgoing runtime cannot autosave old progress over the new slot.
@@ -245,23 +242,12 @@ func _collect_quests() -> SaveData.QuestSave:
 	return q
 
 
-func _collect_extensions() -> Dictionary:
-	var data: Dictionary = {}
-	for section_id: String in _sections:
-		var provider: Variant = _sections[section_id]
-		if is_instance_valid(provider) or provider is RefCounted:
-			var section_data: Variant = provider.call("serialize_save_data")
-			if section_data is Dictionary:
-				data[section_id] = section_data
-	return data
+func _collect_extensions(base: Dictionary={}) -> Dictionary:
+	return repository.sections.capture(base)
 
 
 func _restore_extensions(data: Dictionary) -> void:
-	for section_id: String in _sections:
-		var provider: Variant = _sections[section_id]
-		if not (is_instance_valid(provider) or provider is RefCounted):
-			continue
-		provider.call("deserialize_save_data", data.get(section_id, {}))
+	repository.sections.restore(data)
 
 
 func _migrate(raw: Dictionary) -> Dictionary:

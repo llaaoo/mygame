@@ -77,6 +77,7 @@ func _bootstrap() -> void:
 	progress.condition_query.regions=catalog.regions
 	progress.condition_query.catalog=catalog
 	session.condition_query=progress.condition_query
+	progress.foundation_status=session.snapshot_read_status
 	session.save_requested=_queue_save
 	session.inspect_actor=inspect_actor
 	session.hostility_changed=actor_became_hostile

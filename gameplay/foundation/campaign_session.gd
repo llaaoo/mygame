@@ -42,6 +42,7 @@ var _ground_nodes: Dictionary={}
 var _activity_families: Dictionary={}
 var _pending_effect_time: Dictionary={}
 var restoring_effects := false
+var save_sections:=SaveSections.new()
 func configure(content: ExplorationContentCatalog,profile: RulesetDefinition) -> void:
 	catalog=content
 	rules=profile
@@ -53,22 +54,29 @@ func configure(content: ExplorationContentCatalog,profile: RulesetDefinition) ->
 	production.producer_reason=producer_reason
 	relations.factions["guards|traveler"]="hostile"
 	relations.factions["traveler|guards"]="hostile"
+	save_sections.register("production",SaveAdapter.new(production.snapshot,production.restore,ProductionService.valid_snapshot))
+	save_sections.register("relations",SaveAdapter.new(relations.snapshot,relations.restore,_valid_relation_state))
+	save_sections.register("conversations",SaveAdapter.new(conversations.snapshot,conversations.restore,NpcConversationService.valid_state))
 	for item in ItemCatalog.default_catalog().items: inventory.register_definition(item)
 	for item: EquipmentData in catalog.equipment.values(): inventory.register_definition(item)
 	facts.committed.connect(_on_fact)
 func restore(data: Dictionary) -> bool:
 	if not valid_snapshot(data): return false
+	if snapshot_read_status(data)!=SaveSections.Status.VALID: return false
 	if data.has("inventory") and not inventory.valid_definitions(data.inventory): return false
 	_pending_effect_time.clear()
 	state=data.duplicate(true)
 	inventory.clock_seconds=float(data.get("clock_seconds",0))
 	if data.has("inventory"): inventory.restore(data.inventory)
 	actor_records=data.get("actors",{}).duplicate(true)
-	production.restore(data.get("production",{}))
 	proficiency=data.get("proficiency",{}).duplicate(true)
-	if data.has("relations"): relations.restore(data.relations)
-	conversations.restore(data.get("conversations",{}))
-	return true
+	return save_sections.restore(data)
+func snapshot_read_status(data: Variant) -> int:
+	return int(save_sections.prepare(data).status)
+static func _valid_relation_state(data: Variant) -> bool:
+	return data is Dictionary and RelationService.valid_dispositions(data.get("dispositions",{}))
+func _exit_tree() -> void:
+	save_sections.clear()
 func bind_actor(actor: CharacterBody2D,id: String,legacy_counts: Dictionary = {},legacy_loadout: Dictionary = {}, persistent := true) -> ActorContext:
 	var context:=ActorContext.new()
 	if not persistent: id="trial.%d.%s"%[region.generation,id]
@@ -198,7 +206,10 @@ func _actor_record(actor: CharacterBody2D) -> Dictionary:
 func snapshot() -> Dictionary:
 	capture_actors()
 	if sync_extra.is_valid(): sync_extra.call()
-	return {"schema":1,"clock_seconds":inventory.clock_seconds,"shortcut_schema":1,"production":production.snapshot(),"inventory":persistent_inventory(),"actors":actor_records.duplicate(true),"relations":relations.snapshot(),"conversations":conversations.snapshot(),"proficiency":proficiency.duplicate(true)}
+	var result:=state.duplicate(true)
+	result.merge({"schema":1,"clock_seconds":inventory.clock_seconds,"shortcut_schema":1,"inventory":persistent_inventory(),"actors":actor_records.duplicate(true),"proficiency":proficiency.duplicate(true)},true)
+	result.erase("belt")
+	return save_sections.capture(result)
 func leave_region() -> void:
 	conversations.invalidate()
 	capture_actors()
