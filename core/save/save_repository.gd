@@ -300,10 +300,14 @@ func _valid_array(data: Variant, element_type: int) -> bool:
 
 
 func _write_file(path: String, data: Dictionary) -> Error:
+	# Enforce the same envelope budget on writes, before touching any file.
+	var bytes:=var_to_bytes(data)
+	if bytes.size()+4>MAX_FILE_BYTES: return ERR_INVALID_DATA
 	var file := FileAccess.open(path, FileAccess.WRITE)
 	if not file:
 		return FileAccess.get_open_error()
-	file.store_var(data, false)
+	file.store_32(bytes.size())
+	file.store_buffer(bytes)
 	file.flush()
 	var error := file.get_error()
 	file.close()

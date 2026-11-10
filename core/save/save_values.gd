@@ -23,7 +23,8 @@ static func _check(value: Variant,depth: int,budget: Array) -> bool:
 		TYPE_VECTOR2,TYPE_VECTOR3,TYPE_VECTOR4,TYPE_QUATERNION,TYPE_BASIS,TYPE_TRANSFORM2D,TYPE_TRANSFORM3D: return value.is_finite()
 		TYPE_RECT2,TYPE_AABB: return value.position.is_finite() and value.size.is_finite()
 		TYPE_COLOR: return is_finite(value.r) and is_finite(value.g) and is_finite(value.b) and is_finite(value.a)
-		TYPE_PACKED_FLOAT32_ARRAY,TYPE_PACKED_FLOAT64_ARRAY,TYPE_PACKED_VECTOR2_ARRAY,TYPE_PACKED_VECTOR3_ARRAY,TYPE_PACKED_VECTOR4_ARRAY:
+		TYPE_PROJECTION: return value.x.is_finite() and value.y.is_finite() and value.z.is_finite() and value.w.is_finite()
+		TYPE_PACKED_FLOAT32_ARRAY,TYPE_PACKED_FLOAT64_ARRAY,TYPE_PACKED_VECTOR2_ARRAY,TYPE_PACKED_VECTOR3_ARRAY,TYPE_PACKED_VECTOR4_ARRAY,TYPE_PACKED_COLOR_ARRAY,TYPE_PACKED_STRING_ARRAY:
 			for item in value:
 				if not _check(item,depth+1,budget): return false
 	return true

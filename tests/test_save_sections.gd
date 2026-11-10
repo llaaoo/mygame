@@ -62,6 +62,7 @@ func run() -> void:
 	node.free()
 	var nodes: Array[Node]=[]
 	check(not SaveValues.valid(nodes),"An empty runtime-object typed container entered a snapshot")
+	check(not SaveValues.valid(PackedColorArray([Color(INF,0,0)])),"A nonfinite packed color entered a snapshot")
 	var registry:=SaveSections.new();registry.register("account",fresh)
 	check(not registry.register("account",Earlier.new()) and not registry.register(SaveSections.VERSIONS,fresh),"Duplicate/reserved module identity was accepted")
 	check(registry.prepare({SaveSections.VERSIONS:{"absent":1}}).status==SaveSections.Status.INVALID,"A revision without its module payload was accepted")
@@ -107,6 +108,10 @@ func run() -> void:
 	var fresh_data: Dictionary=manager.read_slot(93).data.extensions
 	check(fresh_data.__versions["test.account"]==2 and fresh_data["test.account"].purse==21,"Current new-game data was incorrectly migrated as a legacy payload")
 	manager.unregister_section("test.account")
+	var oversized:=root_payload();oversized.extensions["large"]={}
+	var chunk:="x".repeat(4000000)
+	for i in 17: oversized.extensions.large[str(i)]=chunk
+	check(not manager.repository.write("user://oversized.sav",oversized) and not FileAccess.file_exists("user://oversized.sav") and not FileAccess.file_exists("user://oversized.sav.tmp"),"Writer produced a file larger than its own read budget")
 	manager.free()
 	if failures.is_empty():print("PASS save sections: opt-in fields/defaults, additive revisions, opaque round-trip/slot isolation, local migration, no implicit breaking reset, ordered all-validated restore, runtime value rejection and future module write/restart protection")
 	quit(0 if failures.is_empty() else 1)
