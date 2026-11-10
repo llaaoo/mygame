@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="EquipmentRefit" format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/refits/equipment_refit.gd" id="refit"]
+[resource]
+script = ExtResource("refit")
+id = "control"
+title = "控势整修"
+description = "每级冲击+6，武器动作体力费+4%；使用兽牙和金属整修，取舍伤害与控势。"
+category = "weapon"
+extra_costs = {"beast_fang": 1}
+stat_per_level = {}
+combat_per_level = {"impact_bonus": 6, "weapon_stamina_cost": 0.04}

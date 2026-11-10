@@ -16,11 +16,15 @@ func known(region: String, point: Vector2) -> bool:
 	return game.region_id == region and game.player.position.distance_to(point)<420
 func next_step(quest: ExplorationQuestData) -> Dictionary:
 	if game.progress.claims.has("quest."+quest.id): return {}
+	var report: Dictionary={"title":"回镇向艾妲报告","region":"camp","position":Vector2(-2900,2200),"known":true}
+	if quest.is_complete(game.progress):return report
 	for id in quest.required_claims:
 		if not game.progress.claims.has(id): return prerequisite_objective(id)
 	for id in quest.required_clears:
 		if not game.progress.cleared.has(id): return {"title":"处理"+game.catalog.regions[id].title+"的威胁","region":id,"position":game.catalog.regions[id].authored_entry,"known":game.progress.visited.has(id)}
-	return {"title":"回镇向艾妲报告","region":"camp","position":Vector2(-2900,2200),"known":true}
+	for condition in quest.conditions:
+		if not condition.satisfied(game.progress.condition_query):return {"title":condition.hint+" · J查看其他完成途径","region":"","position":Vector2.ZERO,"known":false}
+	return report
 func tracked() -> Dictionary:
 	if not game.progress.waypoint.is_empty():
 		return {"title":"自定路标","region":str(game.progress.waypoint.get("region","camp")),"position":GrayriverDefinition.vector(game.progress.waypoint.position),"known":true}

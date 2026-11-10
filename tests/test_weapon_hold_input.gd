@@ -42,7 +42,7 @@ func run() -> void:
 	await pointer_button(MOUSE_BUTTON_LEFT,true); await frames(2)
 	check(starts.size()==before and actions.stamina.current==stamina,"Press alone emitted a light hit or spent stamina")
 	check(not actions.weapon_hold_view().is_empty() and actions.weapon_hold_view().progress>=0,"Hold feedback was missing")
-	await frames(15)
+	await seconds(.36)
 	check(actions.weapon_hold_view().get("charged",false),"Hold did not cross heavy threshold")
 	await capture("heavy-ready")
 	await pointer_button(MOUSE_BUTTON_LEFT,false)

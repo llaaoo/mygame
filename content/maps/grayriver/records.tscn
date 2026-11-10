@@ -20,6 +20,12 @@
 
 [ext_resource type="PackedScene" path="res://gameplay/maps/arrival.tscn" id="arrival_marker"]
 
+[ext_resource type="Script" path="res://gameplay/maps/map_amenity_data.gd" id="amenity"]
+[sub_resource type="Resource" id="mediation"]
+script = ExtResource("amenity")
+id = "town.records.mediation"
+title = "公署调解台：归还与赔偿"
+service = "mediation"
 [sub_resource type="Resource" id="definition"]
 script = ExtResource("region")
 id = "river_records"
@@ -132,3 +138,7 @@ definition = SubResource("feature4")
 position = Vector2(0, 280)
 id = "entry"
 default_entry = true
+
+[node name="公署调解台：归还与赔偿" parent="." instance=ExtResource("feature")]
+position = Vector2(230, -60)
+definition = SubResource("mediation")

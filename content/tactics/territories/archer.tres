@@ -1,0 +1,6 @@
+[gd_resource type="Resource" script_class="EncounterTactics" format=3]
+[ext_resource type="Script" path="res://gameplay/encounters/encounter_tactics.gd" id="rules"]
+[resource]
+script = ExtResource("rules")
+role = 3
+observation = "保持射距，箭袋有限；利用掩体接近，破坏与前排的保护距离。"

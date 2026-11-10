@@ -178,6 +178,10 @@ func claim_quest(quest: ExplorationQuestData, approach_id: String = "") -> bool:
 	if not game.progress.claim("quest." + quest.id, "委托完成：" + quest.title, report, [], []):
 		return false
 	game.progress.choices["quest." + quest.id] = approach_id if approach else "standard"
+	if approach:
+		for key in approach.grants_claims:game.progress.claims[key]=true
+		for npc in approach.relation_changes:game.session.relations.adjust_disposition(npc,"player",int(approach.relation_changes[npc]))
+	game.session.facts.publish("quest_reported","player",{"quest":quest.id,"approach":approach_id})
 	game.player.stats_component.attribute_points += quest.attribute_points
 	_save_progress()
 	changed.emit()

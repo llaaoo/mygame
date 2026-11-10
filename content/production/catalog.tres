@@ -4,6 +4,9 @@
 [ext_resource type="Resource" path="res://content/production/arrows.tres" id="arrows"]
 [ext_resource type="Resource" path="res://content/production/fire_stone.tres" id="fire_stone"]
 [ext_resource type="Resource" path="res://content/production/guard_tonic.tres" id="guard_tonic"]
+[ext_resource type="Resource" path="res://content/production/hide_bindings.tres" id="hide_bindings"]
+[ext_resource type="Resource" path="res://content/production/fang_ward.tres" id="fang_ward"]
+[ext_resource type="Resource" path="res://content/production/gland_venom.tres" id="gland_venom"]
 [resource]
 script = ExtResource("catalog")
-entries = Array[ExtResource("def")]([ExtResource("arrows"), ExtResource("fire_stone"), ExtResource("guard_tonic")])
+entries = Array[ExtResource("def")]([ExtResource("hide_bindings"), ExtResource("fang_ward"), ExtResource("gland_venom"), ExtResource("arrows"), ExtResource("fire_stone"), ExtResource("guard_tonic")])

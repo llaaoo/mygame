@@ -102,11 +102,12 @@ func _update_favor() -> void:
 	if not is_instance_valid(_favor_button): return
 	var entry:=conversation.catalog.profile(npc_id).topic(_selected)
 	var state:=conversation.favor_state(npc_id,entry.id)
-	_favor_status.text="已交付" if state=="completed" else "已接受 · 需当面交付" if state=="accepted" else "尚未接受"
-	_stock_label.text="交付："+_items(entry.requested_items,"player")+"\n报酬："+_items(entry.payment,npc_id)+"\n信任 +%d；仅结算一次。"%entry.trust_reward
+	_favor_status.text="已交付" if state=="completed" else "已交一批 · 等待下批" if state=="waiting" else "已接受 · 需当面交付" if state=="accepted" else "尚未接受"
+	_stock_label.text="交付："+_items(entry.requested_items,"player")+"\n报酬："+_items(entry.payment,npc_id)+"\n信任 +%d；每批仅结算一次。"%entry.trust_reward
 	var refused:=conversation.handle_reason(token,true)
 	if refused.is_empty(): refused=conversation.topic_reason(npc_id,entry)
-	if refused.is_empty() and state=="accepted": refused=conversation.favor_reason(npc_id,entry)
+	if refused.is_empty() and state in ["accepted","waiting"]: refused=conversation.favor_reason(npc_id,entry)
+	if entry.repeat_hours>0:_stock_label.text+="\n最多%d批，每批间隔%.1f游戏小时；报酬取自对方实有钱袋。"%[entry.maximum_deliveries,entry.repeat_hours]
 	_reason_label.text=refused; _reason_label.visible=not refused.is_empty()
 	_favor_button.text="接受委托" if state.is_empty() else "交付物资并领取报酬"
 	_favor_button.visible=state!="completed"

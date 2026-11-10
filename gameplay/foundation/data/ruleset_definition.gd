@@ -1,6 +1,7 @@
 class_name RulesetDefinition
 extends Resource
 ## Mode differences are data. Actors and services never identify a game scene.
+@export var expedition: ExpeditionRules
 @export var material_operations := false
 @export var physical_inventory := false
 @export var timed_fields := false

@@ -38,7 +38,7 @@ func available(progress: ExplorationProgress) -> bool:
 
 func can_claim(progress: ExplorationProgress, stats: StatsComponent, approach_id: String = "") -> bool:
 	if progress.claims.has("quest." + id): return false
-	if approach_id.is_empty(): return is_complete(progress)
+	if approach_id.is_empty(): return default_complete(progress)
 	var approach := find_approach(approach_id)
 	return approach != null and approach.available(progress, stats)
 
@@ -48,6 +48,11 @@ func has_available_approach(progress: ExplorationProgress, stats: StatsComponent
 	return false
 
 func is_complete(progress: ExplorationProgress) -> bool:
+	if default_complete(progress):return true
+	var stats:=progress.condition_query.stats() if progress.condition_query else null
+	return approaches.any(func(approach: ExplorationQuestApproachData):return approach.available(progress,stats))
+
+func default_complete(progress: ExplorationProgress) -> bool:
 	for condition in conditions:
 		if not condition.satisfied(progress.condition_query): return false
 	for key in required_claims:
@@ -60,8 +65,11 @@ func is_complete(progress: ExplorationProgress) -> bool:
 
 func objective_count(progress: ExplorationProgress) -> int:
 	var count := 0
+	for condition in conditions:count+=int(condition.satisfied(progress.condition_query))
 	for key in required_claims:
 		count += int(progress.claims.has(key))
 	for key in required_clears:
 		count += int(progress.cleared.has(key))
 	return count
+
+func objective_total() -> int:return required_claims.size()+required_clears.size()+conditions.size()

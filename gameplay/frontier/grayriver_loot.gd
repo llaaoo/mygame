@@ -8,6 +8,11 @@ var harvesting: CorpseHarvesting
 func _init(owner_game: GrayriverGame) -> void:
 	game=owner_game;harvesting=CorpseHarvesting.new(game)
 
+func refresh_remainder(id: String) -> void:
+	if not game.progress.loot_records.has(id):return
+	_refresh_record(id)
+	if is_instance_valid(corpses.get(id)):corpses[id].refresh()
+
 func available(id: String) -> bool: return _available(id)
 func pending(id: String) -> bool:
 	var record: Dictionary=game.progress.loot_records.get(id,{})
@@ -135,6 +140,8 @@ func inspect_actor(enemy: Enemy) -> void:
 	if game.stories.inspect(enemy): return
 	var carried := snapshot(enemy)
 	var text := "穿戴与行囊读取当前实物，击败后回收这些装备及尚未用掉的物资。\n\n" if enemy.rewards_enabled else "这是无奖励试战：穿戴仍产生战斗效果，击败后不生成新的战利品。\n\n"
+	if enemy.character_definition and enemy.character_definition.encounter_tactics:
+		text+="观察习性："+enemy.character_definition.encounter_tactics.observation+"\n\n"
 	for id in carried.equipment:
 		var item := game.catalog.equipment.get(id) as EquipmentData
 		if item: text += item.display_name+"\n"+item.description+"\n\n"

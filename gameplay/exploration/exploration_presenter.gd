@@ -55,7 +55,7 @@ func _show_quests() -> void:
 		var complete := quest.is_complete(game.progress)
 		var alternate := quest.has_available_approach(game.progress, game.player.stats_component)
 		var status := "已交付" if claimed else ("可交付" if complete else "可选交付" if alternate else "进行中")
-		text += "%s [%s] %d/%d\n%s\n奖励：%d 属性点\n\n" % [quest.title, status, quest.objective_count(game.progress), quest.required_claims.size() + quest.required_clears.size(), quest.description, quest.attribute_points]
+		text += "%s [%s] %d/%d\n%s\n奖励：%d 属性点\n\n" % [quest.title, status, quest.objective_count(game.progress), quest.objective_total(), quest.description, quest.attribute_points]
 		buttons.append({"title": ("已交付：" if claimed else "交付：") + quest.title, "disabled": claimed or not complete, "callback": _claim_quest.bind(quest)})
 		for approach in quest.approaches:
 			var available := approach.available(game.progress, game.player.stats_component)
@@ -138,7 +138,7 @@ func journal_text() -> String:
 	text += "\n营地委托（回营地交付）\n"
 	for quest in game.quests:
 		if not quest.available(game.progress): continue
-		text += "%s · %s · %d/%d\n%s\n" % [quest.title, "已交付" if game.progress.claims.has("quest." + quest.id) else ("可交付" if quest.is_complete(game.progress) else "进行中"), quest.objective_count(game.progress), quest.required_claims.size() + quest.required_clears.size(), quest.description]
+		text += "%s · %s · %d/%d\n%s\n" % [quest.title, "已交付" if game.progress.claims.has("quest." + quest.id) else ("可交付" if quest.is_complete(game.progress) else "进行中"), quest.objective_count(game.progress), quest.objective_total(), quest.description]
 	text += "\n魂术与装备\n战死守卫留下60秒残魂，汲魂转为45秒蕴魂。普通施法保留，Shift用火花/震荡/凝神/水引各兑现1层；回响和护盾爆破保持更高优先级。O查看固定装备、来源与取舍，营地可换装。\n"
 	text += "\n已学组合\n"
 	for rule in game.player.skill_manager.combinations.rules:

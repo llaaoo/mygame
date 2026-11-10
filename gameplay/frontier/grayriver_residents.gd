@@ -48,3 +48,5 @@ func service(kind: String,id: String) -> void:
 		"training": adapter.show_training()
 		"quests": game._show_quests()
 		"progression": game.presenter._show_progression()
+		"charters": game.community.show_charters(id)
+		"mediation": game.community.show_mediation(id)

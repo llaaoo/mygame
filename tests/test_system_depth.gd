@@ -140,10 +140,12 @@ func run() -> void:
 	var clock:=store.clock_seconds
 	game._save_progress()
 	await fixture.close()
+	var boot_started:=Time.get_ticks_msec()
 	fixture=Fixture.new(self); game=await fixture.boot(true)
+	var boot_seconds:=(Time.get_ticks_msec()-boot_started)/1000.0
 	store=game.session.inventory; actor=game.player
 	check(store.item(uid)!=null and store.item(uid).properties.upgrade_level==1 and actor.actor_context.martial.learned.has("spear_thrust"),"Save/reentry lost gear or knowledge")
-	check(store.clock_seconds>=clock and store.clock_seconds<clock+2 and WorldTime.instance.day()==2,"Save/reentry reset persistent time")
+	check(store.clock_seconds>=clock and store.clock_seconds<clock+boot_seconds+1 and WorldTime.instance.day()==2,"Save/reentry reset persistent time or advanced beyond real boot time")
 	var restored: Array=actor.get_node("BuffManager").provision_state()
 	var tonic: Array=restored.filter(func(entry): return entry.id=="guard_tonic")
 	check(restored.size()==2 and tonic.size()==1 and tonic[0].remaining<=76 and tonic[0].remaining>73,"Save/reentry refilled potion duration")

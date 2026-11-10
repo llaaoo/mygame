@@ -2,6 +2,13 @@ class_name FieldcraftKnowledge
 extends SaveRecord
 ## Session-owned knowledge, indexed by actor identity. No extra skill-point currency.
 @export_storage var learned: Dictionary={}
+@export_storage var harvested: Dictionary={}
+func record_harvest(actor_id: String,uid: String,skill_id: String) -> bool:
+	if uid.is_empty() or harvested.has(uid) or not knows(actor_id,skill_id): return false
+	harvested[uid]={"actor":actor_id,"skill":skill_id}
+	return true
+func harvest_count(actor_id: String,skill_id: String) -> int:
+	return harvested.values().filter(func(entry: Dictionary):return entry.actor==actor_id and entry.skill==skill_id).size()
 func knows(actor_id: String,skill_id: String) -> bool:
 	return bool(learned.get(actor_id,{}).get(skill_id,false))
 func reason(actor_id: String,skill_id: String) -> String:
@@ -26,4 +33,9 @@ func validate_save_data(value: Variant) -> bool:
 			if not key is String or not FieldcraftCatalog.default_catalog().skill(key) or not records[actor_id][key] is bool or not records[actor_id][key]: return false
 			for required in FieldcraftCatalog.default_catalog().skill(key).prerequisites:
 				if not records[actor_id].get(required,false): return false
+	var receipts: Dictionary=value.get("harvested",{})
+	if receipts.size()>4096: return false
+	for uid in receipts:
+		var entry: Variant=receipts[uid]
+		if not uid is String or not uid.begins_with("item.") or not entry is Dictionary or not entry.get("actor") is String or not entry.get("skill") is String or not records.get(entry.actor,{}).get(entry.skill,false): return false
 	return true

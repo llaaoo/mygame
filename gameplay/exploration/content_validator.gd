@@ -176,8 +176,10 @@ func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 		for entry in region.storage+region.amenities:
 			if entry.id.is_empty() or map_ids.has(entry.id) or entry.title.is_empty(): _fail(entry,"Invalid/duplicate map feature identity")
 			map_ids[entry.id]=true
-			if entry is MapAmenityData and entry.service not in ["rest","craft","equipment"]: _fail(entry,"Unknown map service")
+			if entry is MapAmenityData and entry.service not in ["rest","craft","equipment","mediation"]: _fail(entry,"Unknown map service")
 			if entry is WorldStorageData:
+				if entry.allow_theft and (entry.access_actor_id.is_empty() or not NpcCatalog.default_catalog().profile(entry.access_actor_id)): _fail(entry,"Theft source requires a real legal owner")
+				if not entry.affiliation_id.is_empty() and not CharterCatalog.default_catalog().definition(entry.affiliation_id): _fail(entry,"Unknown storage affiliation")
 				if not entry.id.begins_with("storage.") or entry.capacity<1 or entry.capacity>100: _fail(entry,"Invalid storage definition")
 				_validate_materials(entry,entry.initial_items,supplies)
 				var slots:=0
@@ -251,11 +253,14 @@ func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 				else:
 					method_ids[method.id]=true
 		for encounter in region.encounters:
+			if encounter.tactics and not encounter.tactics.valid():_fail(encounter,"Invalid encounter territory tactics")
 			if encounter.has_meta("persistent_id"):
 				var corpse_claim := "loot.river.enemy."+str(encounter.get_meta("persistent_id"))
 				_claim(claims,corpse_claim,encounter)
 				completion_claims[corpse_claim] = true
 				var actor_id: String="river.enemy."+str(encounter.get_meta("persistent_id"))
+				_claim(claims,actor_id,encounter)
+				completion_claims[actor_id]=true
 				if GrayriverStories.PEOPLE.has(actor_id):
 					var outcome: String=GrayriverStories.PEOPLE[actor_id].claim
 					_claim(claims,outcome,encounter)
@@ -379,6 +384,7 @@ func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 		if quest_ids.has(quest.id):
 			_fail(quest, "Duplicate quest ID")
 		quest_ids[quest.id] = true
+		_validate_conditions(quest,quest.conditions,catalog,completion_claims)
 		if quest.attribute_points <= 0 or quest.id.is_empty() or quest.required_claims.is_empty():
 			_fail(quest, "Invalid quest reward/objectives")
 		for id in quest.discovery_claims:
@@ -395,7 +401,10 @@ func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 		for approach in quest.approaches:
 			if approach.id.is_empty() or approach_ids.has(approach.id) or approach.title.is_empty(): _fail(quest, "Invalid/duplicate quest approach")
 			approach_ids[approach.id] = true
-			if approach.required_attributes.is_empty() or not StatsComponent.valid_requirements(approach.required_attributes): _fail(quest, "Invalid quest attribute requirements")
+			_validate_conditions(approach,approach.conditions,catalog,completion_claims)
+			for npc in approach.relation_changes:
+				if not NpcCatalog.default_catalog().profile(str(npc)) or not approach.relation_changes[npc] is int or absi(approach.relation_changes[npc])>25:_fail(approach,"Invalid quest relationship outcome")
+			if approach.required_attributes.is_empty() and approach.conditions.is_empty() or not StatsComponent.valid_requirements(approach.required_attributes): _fail(quest, "Invalid quest attribute requirements")
 			if approach.required_claims.is_empty() and approach.required_clears.is_empty(): _fail(quest, "Quest approach needs exploration evidence")
 			for id in approach.required_claims:
 				if not claims.has(id): _fail(quest, "Missing approach discovery: " + id)
@@ -589,3 +598,16 @@ func _validate_dependency(id: String, catalog: ExplorationContentCatalog, states
 	for prerequisite in catalog.fact(id).get("prerequisites",PackedStringArray()):
 		_validate_dependency(prerequisite,catalog,states,owner)
 	states[id]=2
+
+func _validate_conditions(owner: Resource,conditions: Array[WorldCondition],catalog: ExplorationContentCatalog,claims: Dictionary) -> void:
+	for condition in conditions:
+		if not condition or not condition.valid():_fail(owner,"Invalid world condition");continue
+		match condition.kind:
+			WorldCondition.Kind.CLAIM:
+				if not claims.has(condition.key):_fail(owner,"Unknown condition claim: "+condition.key)
+			WorldCondition.Kind.CLEAR:
+				if not catalog.regions.has(condition.key):_fail(owner,"Unknown condition region: "+condition.key)
+			WorldCondition.Kind.KNOWLEDGE:
+				var operations:=SpellOperationCatalog.default_catalog()
+				if condition.knowledge_kind==WorldCondition.Knowledge.ACTION and not catalog.actions.has(condition.key) and not operations.operations.any(func(entry: SpellOperationData):return entry.action.get_id()==condition.key):_fail(owner,"Unknown condition action: "+condition.key)
+				if condition.knowledge_kind==WorldCondition.Knowledge.COMBINATION and not catalog.spell_rules.has(condition.key) and not operations.rules.any(func(entry: SpellCombinationRule):return entry.id==condition.key):_fail(owner,"Unknown condition combination: "+condition.key)

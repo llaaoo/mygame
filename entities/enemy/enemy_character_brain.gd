@@ -80,6 +80,11 @@ func choose(target: Node2D) -> Array[Action]:
 			return [Action.move(-toward*.65,actor)]
 		var weapon:=store.equipment_definition(weapon_uid)
 		var next_stroke:=actions.next_attack_profile()
+		if actor.actor_context.awareness and dist>next_stroke.reach*1.15:
+			var cover:=actor.actor_context.awareness.coordinator.cover_position(actor.actor_context,target)
+			if cover.is_finite() and actor.position.distance_to(cover)>30 and actor.actor_context.region.navigation:
+				return [Action.move(actor.actor_context.region.navigation.direction(actor.position,cover),actor)]
+			if cover.is_finite() and actor.position.distance_to(cover)<=30 and actions.can_guard():return [_guard(target)]
 		var guard_break:=false
 		var close_combat: bool=weapon!=null and weapon.world_shape in ["blade","spear","staff"] or not weapon and actions.attack_moveset()!=null
 		var opening: bool=target_context!=null and (target_context.actions.guarding or _tempo.heavy_when_open and target_context.actions.is_preparing())

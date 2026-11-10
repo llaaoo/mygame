@@ -148,7 +148,7 @@ func entries() -> Array[Dictionary]:
 				var done:=stage==ExplorationQuestData.Stage.REPORTED
 				var ready:=stage==ExplorationQuestData.Stage.READY
 				if filter_index == 0 and done or filter_index == 1 and not ready or filter_index == 2 and not done: continue
-				result.append({"id":quest.id,"rank":0 if quest.id==game.progress.tracked_quest else 1 if ready else 2,"title":quest.title,"text":quest.description,"subtitle":("已完成" if done else "可交付" if ready else "%d/%d项"%[quest.objective_count(game.progress),quest.required_claims.size()+quest.required_clears.size()])+(" · 正在追踪" if game.progress.tracked_quest==quest.id else "")})
+				result.append({"id":quest.id,"rank":0 if quest.id==game.progress.tracked_quest else 1 if ready else 2,"title":quest.title,"text":quest.description,"subtitle":("已完成" if done else "可交付" if ready else "%d/%d项"%[quest.objective_count(game.progress),quest.objective_total()])+(" · 正在追踪" if game.progress.tracked_quest==quest.id else "")})
 		"knowledge":
 			result.append({"id":"overview","title":"旅程总览与施法资料","text":game.presenter.journal_text(),"subtitle":"地点 · 设施 · 未取战利品"})
 			for skill in FieldcraftCatalog.default_catalog().skills:
@@ -310,10 +310,15 @@ func _show_detail() -> void:
 				var goal:=game.guidance.objective(id)
 				card.add_child(W.label(("✓ " if game.progress.claims.has(id) else "○ ")+goal.title,14,game.progress.claims.has(id)))
 			for id in quest.required_clears: card.add_child(W.label(("✓ " if game.progress.cleared.has(id) else "○ ")+"处理"+game.catalog.regions[id].title+"的威胁",14))
+			for condition in quest.conditions:card.add_child(W.label(("✓ " if condition.satisfied(game.progress.condition_query) else "□ ")+condition.hint,14,true))
 			card.add_child(W.label("报告奖励：%d属性点"%quest.attribute_points,13,true))
 			if not game.progress.claims.has("quest."+quest.id):
 				_detail.add_child(W.button("追踪这个委托",_pin.bind(quest.id)))
 				_detail.add_child(W.button("在镇中报告",_report.bind(quest),not game.is_at_base() or not quest.can_claim(game.progress,game.player.stats_component)))
+				for approach in quest.approaches:
+					card.add_child(W.label(approach.title+"："+approach.description,14,true))
+					for condition in approach.conditions:card.add_child(W.label(("✓ " if condition.satisfied(game.progress.condition_query) else "□ ")+condition.hint,13,true))
+					_detail.add_child(W.button("报告："+approach.title,_report_approach.bind(quest,approach.id),not game.is_at_base() or not quest.can_claim(game.progress,game.player.stats_component,approach.id)))
 		"knowledge":
 			_detail.add_child(W.button("查看元素关系与亲历验证",game.ui.elements_requested.emit))
 			_detail.add_child(W.button("查看实验路线记录",game.trial_recorder.show_page))
@@ -350,6 +355,8 @@ func _interact(reference: WeakRef) -> void:
 func _pin(id: String) -> void:
 	game.guidance.pin(id)
 	_refresh_rows()
+func _report_approach(quest: ExplorationQuestData,id: String) -> void:
+	if game.progress_service.claim_quest(quest,id):_refresh_rows()
 func _report(quest: ExplorationQuestData) -> void:
 	if game.progress_service.claim_quest(quest): _refresh_rows()
 func _change_equipment(id: String, active: bool,uid := "") -> void:

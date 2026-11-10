@@ -1,0 +1,54 @@
+[gd_resource type="Resource" script_class="ExplorationQuestData" format=3]
+[ext_resource type="Script" path="res://gameplay/exploration/exploration_quest_data.gd" id="quest"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/quest_approach_data.gd" id="approach"]
+[ext_resource type="Script" path="res://gameplay/foundation/data/world_condition.gd" id="condition"]
+[sub_resource type="Resource" id="hides"]
+script = ExtResource("condition")
+kind = 5
+key = "skinning"
+quantity = 2
+hint = "亲手剥取两处兽皮"
+[sub_resource type="Resource" id="glands"]
+script = ExtResource("condition")
+kind = 5
+key = "gland_work"
+quantity = 2
+hint = "亲手摘取两处毒腺"
+[sub_resource type="Resource" id="archer"]
+script = ExtResource("condition")
+kind = 0
+key = "river.enemy.camp.depth.ridge_archer.v1"
+quantity = 1
+hint = "处理高地营地弓手"
+[sub_resource type="Resource" id="mauler"]
+script = ExtResource("condition")
+kind = 0
+key = "river.enemy.camp.depth.ridge_mauler.v1"
+quantity = 1
+hint = "处理高地营地重杖手"
+[sub_resource type="Resource" id="route_poison"]
+script = ExtResource("approach")
+id = "poison"
+title = "腺液调查"
+description = "用两次真实摘腺实践报告污染生物的利用方法，不要求清除高地营地。"
+required_claims = PackedStringArray("river.hunting.route")
+conditions = Array[ExtResource("condition")]([SubResource("glands")])
+relation_changes = {"river.aida":10}
+[sub_resource type="Resource" id="route_camp"]
+script = ExtResource("approach")
+id = "camp"
+title = "营地清除"
+description = "凭两名营地成员的处理事实报告，不要求学会专业剥取。"
+required_claims = PackedStringArray("river.hunting.route")
+conditions = Array[ExtResource("condition")]([SubResource("archer"), SubResource("mauler")])
+relation_changes = {"river.merchant":10}
+[resource]
+script = ExtResource("quest")
+id = "river.hunting_evidence"
+title = "巡林取证：知识与威胁"
+description = "读镇中猎队告示，观察西北猎群与高地营地。可用两次剥皮实践报告，也可选择腺液调查或营地清除。三种方案共享一次奖励，替代方案会获得对应人物认可。"
+unlock_claims = PackedStringArray("river.hunting.route")
+required_claims = PackedStringArray("river.hunting.route")
+conditions = Array[ExtResource("condition")]([SubResource("hides")])
+approaches = Array[ExtResource("approach")]([SubResource("route_poison"), SubResource("route_camp")])
+attribute_points = 1

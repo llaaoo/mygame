@@ -85,8 +85,13 @@ func run() -> void:
 	var casts: Array[String]=[]
 	actor.skill_manager.cast_committed.connect(func(plan: CastPlan): casts.append(plan.skill.get_id()))
 	var store:=game.session.inventory; var stones:=store.count("player","fire_stone"); var mana:=actor.mana_component.mp
+	var observed: Dictionary={}
+	var observe_cast:=func():
+		if is_instance_valid(rig) and rig.current.get("state","")=="cast":observed.cast=true
+	process_frame.connect(observe_cast)
 	await aim_world(actor.position+Vector2(150,0)); await key(KEY_Q,true); await key(KEY_Q,false)
-	check(rig.current.get("state","")=="cast" and not actor.skill_manager.combinations.pending.is_empty(),"Real timed rune preparation did not animate")
+	process_frame.disconnect(observe_cast)
+	check(observed.get("cast",false),"Real timed rune input never displayed its cast pose")
 	await animation_capture("animation-cast-preparation")
 	await seconds(1)
 	check(actor.skill_manager.combinations.fields.any(func(field): return is_instance_valid(field) and field.field_type=="fire") and store.count("player","fire_stone")==stones-1,"Demo rune did not use the real material transaction")

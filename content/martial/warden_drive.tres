@@ -1,0 +1,95 @@
+[gd_resource type="Resource" script_class="MartialTechnique" format=3]
+[ext_resource type="Script" path="res://gameplay/martial/martial_technique.gd" id="tech"]
+[ext_resource type="Script" path="res://gameplay/foundation/data/attack_profile.gd" id="attack"]
+[ext_resource type="Script" path="res://gameplay/martial/martial_route.gd" id="route"]
+[ext_resource type="Resource" path="res://content/martial/routes/power.tres" id="power"]
+[ext_resource type="Resource" path="res://content/martial/routes/flow.tres" id="flow"]
+[ext_resource type="Resource" path="res://content/martial/routes/power_followup.tres" id="power_followup"]
+[sub_resource type="Resource" id="Attack"]
+script = ExtResource("attack")
+push_distance = 48
+interrupts_preparation = true
+step_distance = 8.0
+movement_multiplier = 0.0
+guard_pressure = 2.1
+motion = "slash"
+windup = 0.46
+active = 0.15
+recovery = 0.6
+reach = 66
+angle_degrees = 90
+stamina_cost = 26
+impact = 70
+damage_multiplier = 1.35
+[sub_resource type="Resource" id="Followup"]
+script = ExtResource("attack")
+push_distance = 48
+interrupts_preparation = true
+step_distance = 6.0
+movement_multiplier = 0.0
+guard_pressure = 2.1
+motion = "slash"
+windup = 0.28
+active = 0.15
+recovery = 0.62
+reach = 62
+angle_degrees = 65
+stamina_cost = 26
+impact = 70
+damage_multiplier = 1.35
+title = "守路驱逐斩"
+[sub_resource type="Resource" id="Charged"]
+script = ExtResource("attack")
+push_distance = 48
+interrupts_preparation = true
+animation_id = &"slash_heavy"
+title = "守路驱逐斩"
+step_distance = 10
+movement_multiplier = 0
+guard_pressure = 3.0
+motion = "slash"
+windup = 0.66
+active = 0.17
+recovery = 0.78
+reach = 72
+angle_degrees = 65
+stamina_cost = 34
+impact = 90
+damage_multiplier = 1.6
+[sub_resource type="Resource" id="ChargedFollowup"]
+script = ExtResource("attack")
+push_distance = 48
+interrupts_preparation = true
+animation_id = &"slash_heavy"
+title = "守路驱逐斩"
+step_distance = 8
+movement_multiplier = 0
+guard_pressure = 3.0
+motion = "slash"
+windup = 0.54
+active = 0.17
+recovery = 0.78
+reach = 68
+angle_degrees = 55
+stamina_cost = 34
+impact = 90
+damage_multiplier = 1.6
+[resource]
+script = ExtResource("tech")
+id = "warden_drive"
+title = "守路驱逐斩"
+weapon_type = "blade"
+description = "连招后用推退斩迫使敌人离开阵地，正面格挡仍可阻止位移；重发破势更强，收招承诺更长。"
+profile = SubResource("Attack")
+
+release_reach = 140.0
+release_angle = 110.0
+release_speed = 600.0
+
+followup_after = Array[int]([1])
+followup_profile = SubResource("Followup")
+
+art_routes = Array[ExtResource("route")]([ExtResource("power"), ExtResource("flow"), ExtResource("power_followup")])
+
+charged_profile = SubResource("Charged")
+charged_followup_profile = SubResource("ChargedFollowup")

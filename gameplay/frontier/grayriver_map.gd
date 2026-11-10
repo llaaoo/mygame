@@ -93,6 +93,12 @@ func _draw() -> void:
 		var at := project(GrayriverDefinition.vector(record.position))
 		draw_line(at-Vector2(3,3),at+Vector2(3,3),Color("e2ab66"),2)
 		draw_line(at+Vector2(-3,3),at+Vector2(3,-3),Color("e2ab66"),2)
+	var pack_region:=game.session.inventory.dropped_pack_region("player.pack")
+	if not game.session.inventory.is_attached("player.pack") and not pack_region.is_empty():
+		var pack_point:=game.session.inventory.dropped_pack_position("player.pack") if pack_region=="camp" else game.guidance.overworld_point(pack_region)
+		var pack_at:=project(pack_point)
+		draw_rect(Rect2(pack_at-Vector2(5,5),Vector2(10,10)),GameUIStyle.GOLD,false,2)
+		draw_string(font,pack_at+Vector2(8,-7),"待回收背包",HORIZONTAL_ALIGNMENT_LEFT,-1,12,GameUIStyle.TEXT_MAIN)
 	var position:=game.player.position
 	if game.region_id!="camp": position=game.guidance.overworld_point(game.region_id)
 	draw_circle(project(position),5,Color("70deff"))

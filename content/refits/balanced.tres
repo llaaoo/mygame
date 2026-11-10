@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="EquipmentRefit" format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/refits/equipment_refit.gd" id="refit"]
+[resource]
+script = ExtResource("refit")
+id = "balanced"
+title = "常规强化"
+description = "保持原强化：主手每级攻击+1，其余槽每级生命+4。"
+category = "all"
+extra_costs = {}
+stat_per_level = {}
+combat_per_level = {}

@@ -13,6 +13,16 @@
 
 [ext_resource type="PackedScene" path="res://gameplay/maps/arrival.tscn" id="arrival_marker"]
 
+[ext_resource type="Script" path="res://gameplay/maps/world_storage_data.gd" id="property"]
+[sub_resource type="Resource" id="private_stock"]
+script = ExtResource("property")
+id = "storage.town.merchant.sealed"
+title = "萨芙封存货箱：他人私产"
+access_actor_id = "river.merchant"
+allow_theft = true
+allow_deposit = false
+capacity = 4
+initial_items = {"metal_scrap":2,"cloth":2}
 [sub_resource type="Resource" id="definition"]
 script = ExtResource("region")
 id = "camp"
@@ -147,3 +157,14 @@ id = "archive_return"
 [node name="进入林下档案窖" parent="." instance=ExtResource("feature")]
 position = Vector2(-2600, -1800)
 definition = SubResource("archive_door")
+
+[node name="萨芙封存货箱：他人私产" parent="." instance=ExtResource("feature")]
+position = Vector2(-3150, 2310)
+definition = SubResource("private_stock")
+
+[node name="萨芙封存货箱实体" parent="." instance=ExtResource("furniture")]
+position = Vector2(-3150, 2405)
+footprint = Vector2(62, 40)
+form = "chest"
+solid = true
+caption = "萨芙私产 · 擅取可被目击"

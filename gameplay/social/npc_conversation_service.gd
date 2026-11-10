@@ -5,6 +5,7 @@ var session: CampaignSession
 var catalog: NpcCatalog
 var record: Callable
 var _known: Dictionary={}
+var _cycles: Dictionary={}
 var _favors: Dictionary={}
 var _handles: Dictionary={}
 var _serial := 0
@@ -45,6 +46,8 @@ func handle_reason(token: int,services := false) -> String:
 	return reason(_handles[token].id,services)
 func topic_reason(id: String,entry: NpcTopic) -> String:
 	if not entry: return "未知话题。"
+	for condition in entry.conditions:
+		if not condition.satisfied(session.condition_query): return condition.hint
 	if not session.condition_query or not session.condition_query.claims_satisfied(entry.required_claims): return "还没有亲自取得这件事的线索或成果。"
 	var visitor:=session.actor_for_id("player") as Player
 	if not visitor or not visitor.stats_component.meets_requirements(entry.required_attributes): return "尚需"+visitor.stats_component.describe_requirements(entry.required_attributes) if visitor else "交谈者已离开。"
@@ -53,7 +56,13 @@ func topic_reason(id: String,entry: NpcTopic) -> String:
 func seen(id: String,topic_id: String) -> bool:
 	return topic_id in _known.get(id,[])
 func favor_state(id: String,topic_id: String) -> String:
-	return str(_favors.get(id+"/"+topic_id,""))
+	var key:=id+"/"+topic_id
+	var state:=str(_favors.get(key,""));var profile:=catalog.profile(id)
+	var topic:=profile.topic(topic_id) if profile else null
+	if not topic:return state
+	if state=="completed" and topic.repeat_hours>0 and int(_cycles.get(key,{}).get("deliveries",1))<topic.maximum_deliveries:
+		return "waiting" if float(_cycles.get(key,{}).get("ready_at",0))>session.inventory.clock_seconds else "accepted"
+	return state
 func choose(token: int,topic_id: String,operation := "read") -> Dictionary:
 	if operation not in ["read","accept","deliver"]: return {"accepted":false,"reason":"不支持的交谈操作。"}
 	var refused:=handle_reason(token)
@@ -90,7 +99,10 @@ func record_text(record: Dictionary) -> String:
 			if str(record.id)=="npc.topic."+profile.actor_id+"."+entry.id and seen(profile.actor_id,entry.id): return response_for(profile.actor_id,entry)+"\n交谈线索；地图仍只记录亲自踏足的地点。"
 	return ""
 func favor_reason(id: String,entry: NpcTopic) -> String:
+	var property_reason:=session.law.service_reason(id)
+	if not property_reason.is_empty():return property_reason
 	if favor_state(id,entry.id)=="completed": return "已经交付，不会重复领取报酬。"
+	if favor_state(id,entry.id)=="waiting":return "下一批还需%.1f游戏小时"%((float(_cycles[id+"/"+entry.id].ready_at)-session.inventory.clock_seconds)/session.production.seconds_per_hour)
 	if favor_state(id,entry.id)!="accepted": return "先明确接受委托。"
 	if session.actor_records.get(id,{}).get("dead",false): return "委托人已死亡，无法继续交付。"
 	var refused:=topic_reason(id,entry)
@@ -108,7 +120,7 @@ func favor_details(tracked_id: String) -> Dictionary:
 	var key:=tracked_id.trim_prefix("npc.favor.")
 	if not _favors.has(key): return {}
 	var parts:=key.split("/"); var profile:=catalog.profile(parts[0]); var entry:=profile.topic(parts[1])
-	return {"profile":profile,"topic":entry,"state":_favors[key],"dead":bool(session.actor_records.get(profile.actor_id,{}).get("dead",false)),"reason":favor_reason(profile.actor_id,entry)}
+	return {"profile":profile,"topic":entry,"state":favor_state(profile.actor_id,entry.id),"dead":bool(session.actor_records.get(profile.actor_id,{}).get("dead",false)),"reason":favor_reason(profile.actor_id,entry)}
 func _favor(token: int,id: String,entry: NpcTopic,operation: String) -> Dictionary:
 	var refused:=handle_reason(token,true)
 	if not refused.is_empty(): return {"accepted":false,"reason":refused}
@@ -124,33 +136,37 @@ func _favor(token: int,id: String,entry: NpcTopic,operation: String) -> Dictiona
 	if operation!="deliver": return {"accepted":false,"reason":"未知委托操作。"}
 	refused=favor_reason(id,entry)
 	if not refused.is_empty(): return {"accepted":false,"reason":refused}
+	return _deliver(id,entry,id)
+func _deliver(id: String,entry: NpcTopic,receiver: String) -> Dictionary:
+	var key:=id+"/"+entry.id
 	session.inventory.begin_batch()
 	var exchanged:=session.inventory.exchange("player",id,entry.requested_items,entry.payment)
 	if not exchanged.accepted:
 		session.inventory.end_batch(false)
 		return {"accepted":false,"reason":"库存空间不足，双方物资和报酬均未转移。"}
 	_favors[key]="completed"
-	_write("npc.favor."+key,entry.title,"已当面交付给"+catalog.profile(id).character.title+"。报酬取自对方真实行囊，信任提高%d。"%entry.trust_reward)
-	session.relations.adjust_disposition(id,"player",entry.trust_reward)
+	if entry.repeat_hours>0:_cycles[key]={"deliveries":int(_cycles.get(key,{}).get("deliveries",0))+1,"ready_at":session.inventory.clock_seconds+entry.repeat_hours*session.production.seconds_per_hour}
+	_write("npc.favor."+key,entry.title,"已当面交付给"+catalog.profile(receiver).character.title+"。报酬取自"+catalog.profile(id).character.title+"的真实行囊，信任提高%d。"%entry.trust_reward)
+	session.relations.adjust_disposition(receiver,"player",entry.trust_reward)
 	session.inventory.end_batch()
 	session.facts.publish("npc_favor_completed","player",{"npc":id,"favor":entry.id})
 	return {"accepted":true,"response":"物资收到了，这是说好的报酬。我会记得你的帮忙。"}
 func _write(id: String,title: String,text: String) -> void:
 	if record.is_valid(): record.call(id,title,text)
 func snapshot() -> Dictionary:
-	return {"schema":1,"known":_known.duplicate(true),"favors":_favors.duplicate()}
+	return {"schema":1,"known":_known.duplicate(true),"favors":_favors.duplicate(),"cycles":_cycles.duplicate(true)}
 func restore(data: Dictionary) -> bool:
 	if not valid_state(data): return false
-	invalidate(); _known=data.get("known",{}).duplicate(true); _favors=data.get("favors",{}).duplicate()
+	invalidate(); _known=data.get("known",{}).duplicate(true); _favors=data.get("favors",{}).duplicate();_cycles=data.get("cycles",{}).duplicate(true)
 	return true
 func favor_entries() -> Array[Dictionary]:
 	var result: Array[Dictionary]=[]
 	for key: String in _favors:
 		var parts:=key.split("/"); var profile:=catalog.profile(parts[0]); var entry:=profile.topic(parts[1])
-		var done: bool=_favors[key]=="completed"
+		var done: bool=favor_state(profile.actor_id,entry.id)=="completed"
 		var dead: bool=session.actor_records.get(profile.actor_id,{}).get("dead",false)
 		var ready:=not done and not dead and favor_reason(profile.actor_id,entry).is_empty()
-		result.append({"id":"npc.favor."+key,"rank":1 if ready else 2,"title":entry.title,"text":"委托人："+profile.character.title+"\n"+entry.response+"\n"+("对方已经死亡；不会转移给另一人。" if dead and not done else "已当面交付，报酬和关系已结算。" if done else "物资齐备时，回到委托人身边，在当值时交付。"),"subtitle":"已完成" if done else "委托人已死亡" if dead else "可当面交付" if ready else "进行中","npc_favor":true,"done":done,"ready":ready})
+		result.append({"id":"npc.favor."+key,"rank":1 if ready else 2,"title":entry.title,"text":"委托人："+profile.character.title+"\n"+entry.response+"\n"+(("公署可依据登记代理交付，报酬仍取自原遗产。" if not entry.successor_actor_id.is_empty() else "对方已经死亡；不会转移给另一人。") if dead and not done else "已当面交付，报酬和关系已结算。" if done else "物资齐备时，回到委托人身边，在当值时交付。"),"subtitle":"已完成" if done else "委托人已死亡" if dead else "可当面交付" if ready else "进行中","npc_favor":true,"done":done,"ready":ready})
 	return result
 static func valid_state(data: Variant) -> bool:
 	if not data is Dictionary: return false
@@ -168,4 +184,27 @@ static func valid_state(data: Variant) -> bool:
 		if not key is String or key.count("/")!=1 or data.favors[key] not in ["accepted","completed"]: return false
 		var parts: PackedStringArray=key.split("/"); var profile:=definitions.profile(parts[0]); var topic:=profile.topic(parts[1]) if profile else null
 		if not topic or topic.kind!=NpcTopic.Kind.FAVOR: return false
+	var cycles: Variant=data.get("cycles",{})
+	if not cycles is Dictionary or cycles.size()>1024:return false
+	for key in cycles:
+		if not data.favors.has(key) or not cycles[key] is Dictionary:return false
+		var parts: PackedStringArray=str(key).split("/");var topic:=definitions.profile(parts[0]).topic(parts[1]);var entry: Dictionary=cycles[key]
+		if topic.repeat_hours<=0 or not entry.get("deliveries") is int or entry.deliveries<1 or entry.deliveries>topic.maximum_deliveries:return false
+		if typeof(entry.get("ready_at")) not in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(entry.ready_at)) or entry.ready_at<0 or entry.ready_at>1000000000:return false
 	return true
+
+func estate_reason(id: String,topic_id: String,delegate: String) -> String:
+	var profile:=catalog.profile(id);var entry:=profile.topic(topic_id) if profile else null
+	if not entry or entry.successor_actor_id!=delegate or not session.actor_records.get(id,{}).get("dead",false):return "没有可代理的遗产委托"
+	var property_reason:=session.law.service_reason(id)
+	if not property_reason.is_empty():return property_reason
+	var refused:=reason(delegate,true)
+	if not refused.is_empty():return refused
+	if favor_state(id,topic_id)!="accepted":return "委托尚未接受、未到下一批时刻或已经结清"
+	refused=topic_reason(id,entry)
+	if not refused.is_empty():return refused
+	if not session.inventory.can_pay("player",entry.requested_items) or not session.inventory.can_pay(id,entry.payment):return "交付物或原遗产中的实有报酬不足"
+	return ""
+func deliver_estate(id: String,topic_id: String,delegate: String) -> Dictionary:
+	var refused:=estate_reason(id,topic_id,delegate)
+	return {"accepted":false,"reason":refused} if not refused.is_empty() else _deliver(id,catalog.profile(id).topic(topic_id),delegate)

@@ -21,7 +21,7 @@ func run() -> void:
 		fixture=Fixture.new(self);game=await fixture.boot(true)
 		var foe: Enemy
 		for candidate in game.active_enemies:
-			if candidate.character_definition and candidate.character_definition.id=="river_"+type:foe=candidate
+			if candidate.actor_context.id=="river.enemy.camp.fieldcraft."+type+".v1":foe=candidate
 		check(foe!=null,"Missing live encounter "+type)
 		if not foe:await fixture.close();continue
 		foe.position=game.player.position+Vector2(240 if type=="archer" else 95,0);foe._home_position=foe.position

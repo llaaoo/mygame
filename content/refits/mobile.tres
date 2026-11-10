@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="EquipmentRefit" format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/refits/equipment_refit.gd" id="refit"]
+[resource]
+script = ExtResource("refit")
+id = "mobile"
+title = "轻装整修"
+description = "每级闪避体力费-4%，生命上限-2；用布带重新配置承重点。"
+category = "armor"
+extra_costs = {"cloth": 1}
+stat_per_level = {"max_hp": -2}
+combat_per_level = {"dodge_cost": -0.04}

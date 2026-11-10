@@ -14,7 +14,7 @@ func run() -> void:
 	actor.position=Vector2(-4000,800)
 	var enemies: Dictionary={}
 	for foe in game.active_enemies:
-		if foe.character_definition and foe.character_definition.id in ["river_hound","river_crawler","river_archer","river_mauler"]:enemies[foe.character_definition.id]=foe
+		if foe.actor_context.id.begins_with("river.enemy.camp.fieldcraft.") and foe.character_definition and foe.character_definition.id in ["river_hound","river_crawler","river_archer","river_mauler"]:enemies[foe.character_definition.id]=foe
 	check(enemies.size()==4,"Missing authored enemy archetype")
 	if enemies.size()!=4:quit(1);return
 	for foe: Enemy in enemies.values():

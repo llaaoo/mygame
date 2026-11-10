@@ -52,6 +52,9 @@ func dropped_pack_ids(region: String) -> Array[String]:
 	return result
 
 
+func dropped_pack_region(id: String) -> String:
+	return str(_containers.get(id,{}).get("region",""))
+
 func dropped_pack_position(id: String) -> Vector2:
 	var position: Array = _containers.get(id, {}).get("position", [])
 	return Vector2(position[0], position[1]) if position.size() == 2 else Vector2.ZERO
@@ -254,9 +257,21 @@ func _insert(id: String,key: String,amount: int,uid := "",properties: Dictionary
 		uid=""
 	_touch(id)
 	return uids
+func with_property(key: String,value: Variant) -> Array[Dictionary]:
+	var result: Array[Dictionary]=[]
+	for container in _containers:
+		for row in entries(container):
+			if row.properties.get(key)==value:result.append(row)
+	return result
+func clean_count(actor: String,key: String,pocket_only := false) -> int:
+	var total:=0
+	for id in actor_containers(actor,pocket_only):
+		for entry: ItemInstance in _containers.get(id,{}).get("items",[]):
+			if entry.definition_id==key and not entry.properties.has("stolen_from"):total+=entry.quantity
+	return total
 func can_pay(actor: String,costs: Dictionary,pocket_only := false) -> bool:
 	for key in costs:
-		if int(costs[key])<0 or count(actor,key,false,pocket_only)<int(costs[key]): return false
+		if int(costs[key])<0 or clean_count(actor,key,pocket_only)<int(costs[key]): return false
 	return true
 func pay(actor: String,costs: Dictionary,pocket_only := false) -> bool:
 	if not can_pay(actor,costs,pocket_only): return false
@@ -265,7 +280,7 @@ func pay(actor: String,costs: Dictionary,pocket_only := false) -> bool:
 		var remaining:=int(costs[key])
 		for id in actor_containers(actor,pocket_only):
 			for entry: ItemInstance in _containers[id].items.duplicate():
-				if entry.definition_id!=key: continue
+				if entry.definition_id!=key or entry.properties.has("stolen_from"): continue
 				var amount:=mini(remaining,entry.quantity)
 				entry.quantity-=amount
 				remaining-=amount
@@ -283,19 +298,19 @@ func preview(source: String,destination: String,uid: String,quantity: int,partia
 	plan.source_revision=int(_containers.get(source,{}).get("revision",-1))
 	plan.destination_revision=int(_containers.get(destination,{}).get("revision",-1))
 	return plan
-func commit(plan: TransferPlan) -> OperationResult:
+func commit(plan: TransferPlan,received_annotations: Dictionary={}) -> OperationResult:
 	if not plan or plan.source==plan.destination or not _containers.has(plan.source) or not _containers.has(plan.destination): return OperationResult.reject("invalid_container")
 	if _containers[plan.source].revision!=plan.source_revision or _containers[plan.destination].revision!=plan.destination_revision: return OperationResult.reject("stale_plan")
 	var entry:=_instance(plan.item_uid)
 	if not entry or locate(entry.uid)!=plan.source or plan.quantity<=0 or plan.quantity>entry.quantity: return OperationResult.reject("invalid_quantity")
-	var accepted:=mini(plan.quantity,space(plan.destination,entry.definition_id,entry.properties))
+	var properties:=entry.properties.duplicate(true);properties.merge(received_annotations,true)
+	var accepted:=mini(plan.quantity,space(plan.destination,entry.definition_id,properties))
 	if entry.definition_id in ["clean_water","dirty_water"] and _containers[plan.source].owner!=_containers[plan.destination].owner:
 		var owner: String=_containers[plan.destination].owner
 		accepted=mini(accepted,maxi(0,(rules.maximum_water if rules else 4)-count(owner,"clean_water")-count(owner,"dirty_water")))
 	if accepted<=0 or not plan.partial and accepted!=plan.quantity: return OperationResult.reject("capacity")
 	var key:=entry.definition_id
 	var source_owner: String=_containers[plan.source].owner
-	var properties:=entry.properties.duplicate(true)
 	var uid:=entry.uid if accepted==entry.quantity else ""
 	begin_batch()
 	entry.quantity-=accepted
@@ -326,7 +341,7 @@ func exchange(a: String,b: String,costs: Dictionary,returns: Dictionary,return_u
 			var remaining:=int(pair[2][key])
 			for source in scratch.actor_containers(pair[0]):
 				for row in scratch.entries(source):
-					if row.definition!=key: continue
+					if row.definition!=key or row.properties.has("stolen_from"): continue
 					if pair[0]==b and not return_uid.is_empty() and row.uid!=return_uid: continue
 					var take:=mini(remaining,int(row.quantity))
 					if take<=0: continue
@@ -497,6 +512,7 @@ static func valid_snapshot(data: Variant) -> bool:
 			var instance_properties: Dictionary=raw.get("properties",{})
 			if instance_properties.has("harvest"):
 				if id!=c.owner+".anatomy" or c.kind!="cache" or raw.quantity!=1 or not HarvestPart.valid(instance_properties.harvest) or instance_properties.harvest.raw_item!=raw.definition: return false
+			if instance_properties.has("upgrade_path") and (not instance_properties.upgrade_path is String or not EquipmentRefit.definition(instance_properties.upgrade_path)):return false
 			if instance_properties.has("upgrade_level") and (not instance_properties.upgrade_level is int or instance_properties.upgrade_level<0 or instance_properties.upgrade_level>3): return false
 			var number:=int(raw.uid.trim_prefix("item."))
 			if number<1: return false
@@ -550,6 +566,7 @@ func valid_definitions(data: Dictionary) -> bool:
 			if not definition or row.quantity>_stack_limit(row.definition): return false
 			var props: Dictionary=row.get("properties",{})
 			if props.has("upgrade_level") and not definition is EquipmentData: return false
+			if props.has("upgrade_path") and (not definition is EquipmentData or not EquipmentRefit.definition(props.upgrade_path).supports(definition)):return false
 			if definition.use_profile and definition.use_profile.kind==ItemUseDefinition.Kind.SPRAY:
 				if not props.get("doses") is int or props.doses<1 or props.doses>definition.use_profile.capacity: return false
 			if props.has("coating"):
@@ -620,10 +637,12 @@ func commit_weapon_release(actor: String,uid: String,ammo_uid: String,expected: 
 	end_batch()
 	return true
 func state_text(uid: String) -> String:
+	var owned:=item(uid)
+	var legal:="他人财物 · 先归还/赔偿 · " if owned and owned.properties.has("stolen_from") else ""
 	var entry:=_instance(uid)
 	if not entry: return ""
-	if entry.properties.has("doses"): return "剩余%d剂"%int(entry.properties.doses)
-	var upgrade:="强化 +%d"%int(entry.properties.upgrade_level) if entry.properties.has("upgrade_level") else ""
+	if entry.properties.has("doses"): return legal+"剩余%d剂"%int(entry.properties.doses)
+	var upgrade:=legal+"强化 +%d"%int(entry.properties.upgrade_level) if entry.properties.has("upgrade_level") else legal
 	var active:=coating(uid)
 	if active:
 		var definition:=definitions.get(active.id) as ItemData
@@ -638,6 +657,7 @@ func trade_instance(buyer: String,seller: String,uid: String,quantity: int,price
 	return _trade_instance(buyer,seller,uid,quantity,price,true)
 func _trade_instance(buyer: String,seller: String,uid: String,quantity: int,price: int,commit_result: bool) -> OperationResult:
 	var entry:=item(uid)
+	if entry and entry.properties.has("stolen_from"):return OperationResult.reject("赃物不可交易，先归还或赔偿")
 	if buyer==seller or not entry or quantity<=0 or quantity>entry.quantity or price<0 or locate(uid) not in actor_containers(seller): return OperationResult.reject("not_owned")
 	if count(buyer,"coin")<price: return OperationResult.reject("currency")
 	var scratch:=_scratch([buyer,seller])
@@ -668,6 +688,7 @@ func _craft(actor: String,costs: Dictionary,outputs: Dictionary,commit_result: b
 
 func dismantle_instance(actor: String,uid: String) -> OperationResult:
 	var entry:=item(uid)
+	if entry and entry.properties.has("stolen_from"):return OperationResult.reject("先解决物品归属")
 	if not entry or not definitions.get(entry.definition_id) is EquipmentData or locate(uid) not in actor_containers(actor): return OperationResult.reject("unequip_first")
 	var scratch:=_scratch([actor])
 	var source:=scratch.locate(uid)
@@ -694,17 +715,22 @@ func process_anatomy(actor: String,owner_id: String,uid: String,commit_result :=
 		amount+=int(part.outputs[key])
 	if commit_result:
 		_adopt(scratch,[actor,owner_id])
-		_publish("corpse_harvested",actor,{"corpse":owner_id,"part":part.id,"raw_uid":uid,"outputs":part.outputs.duplicate(true)})
+		_publish("corpse_harvested",actor,{"corpse":owner_id,"part":part.id,"skill":part.skill,"raw_uid":uid,"family":uid,"outputs":part.outputs.duplicate(true)})
 	return OperationResult.success(amount)
 
-func upgrade_instance(actor: String,uid: String) -> OperationResult:
+func upgrade_instance(actor: String,uid: String,path := "") -> OperationResult:
 	var entry:=item(uid)
+	if entry and entry.properties.has("stolen_from"):return OperationResult.reject("先解决物品归属")
 	if not entry or not definitions.get(entry.definition_id) is EquipmentData or locate(uid) not in actor_containers(actor): return OperationResult.reject("unequip_first")
 	var level:=clampi(int(entry.properties.get("upgrade_level",0)),0,3)
+	var chosen:=path if not path.is_empty() else str(entry.properties.get("upgrade_path","balanced"))
+	var refit:=EquipmentRefit.definition(chosen)
+	if not refit or not refit.supports(definitions[entry.definition_id] as EquipmentData):return OperationResult.reject("此装备不适用该整修方向")
+	if level>0 and chosen!=str(entry.properties.get("upgrade_path","balanced")):return OperationResult.reject("整修方向已固定")
 	if level>=3: return OperationResult.reject("maximum_level")
 	var scratch:=_scratch([actor])
-	if not scratch.pay(actor,upgrade_cost(actor,uid)): return OperationResult.reject("materials")
-	var properties:=entry.properties.duplicate(true); properties.upgrade_level=level+1
+	if not scratch.pay(actor,upgrade_cost(actor,uid,chosen)): return OperationResult.reject("materials")
+	var properties:=entry.properties.duplicate(true); properties.upgrade_level=level+1;properties.upgrade_path=chosen
 	scratch.set_properties(uid,properties)
 	_adopt(scratch,[actor])
 	_publish("equipment_upgraded",actor,{"uid":uid,"level":level+1})
@@ -719,9 +745,16 @@ func equipment_definition(uid: String) -> EquipmentData:
 	# Upgrades change instance-derived stats, never shared moveset/affix definitions.
 	var copy:=definition.duplicate() as EquipmentData
 	copy.stat_modifiers=definition.stat_modifiers.duplicate(true)
+	copy.combat_modifiers=definition.combat_modifiers.duplicate(true)
 	copy.display_name+=" +%d"%level
-	var key:="attack_damage" if copy.slot_type==EquipmentData.SlotType.RIGHT_HAND else "max_hp"
-	copy.stat_modifiers[key]=float(copy.stat_modifiers.get(key,0))+level*(1 if key=="attack_damage" else 4)
+	var path:=EquipmentRefit.definition(str(entry.properties.get("upgrade_path","balanced")))
+	if path and path.id!="balanced":
+		copy.display_name+=" · "+path.title
+		for key in path.stat_per_level:copy.stat_modifiers[key]=float(copy.stat_modifiers.get(key,0))+level*float(path.stat_per_level[key])
+		for key in path.combat_per_level:copy.combat_modifiers[key]=float(copy.combat_modifiers.get(key,0))+level*float(path.combat_per_level[key])
+	else:
+		var key:="attack_damage" if copy.slot_type==EquipmentData.SlotType.RIGHT_HAND else "max_hp"
+		copy.stat_modifiers[key]=float(copy.stat_modifiers.get(key,0))+level*(1 if key=="attack_damage" else 4)
 	return copy
 
 func _scratch(owners: Array) -> InventoryService:
@@ -741,7 +774,11 @@ func _adopt(scratch: InventoryService,owners: Array) -> void:
 func dismantle_yield(actor: String,uid: String) -> int:
 	var entry:=item(uid)
 	return 2+clampi(int(entry.properties.get("upgrade_level",0)),0,3)+clampi(int(perk_value(actor,"salvage.scrap")),0,2) if entry else 0
-func upgrade_cost(actor: String,uid: String) -> Dictionary:
+func upgrade_cost(actor: String,uid: String,path := "") -> Dictionary:
 	var entry:=item(uid)
 	var level:=clampi(int(entry.properties.get("upgrade_level",0)),0,3) if entry else 0
-	return {"coin":maxi(1,5*(level+1)-clampi(int(perk_value(actor,"upgrade.coin_discount")),0,2)),"metal_scrap":2*(level+1)}
+	var result: Dictionary={"coin":maxi(1,5*(level+1)-clampi(int(perk_value(actor,"upgrade.coin_discount")),0,2)),"metal_scrap":2*(level+1)}
+	var refit:=EquipmentRefit.definition(path if not path.is_empty() else str(entry.properties.get("upgrade_path","balanced")) if entry else "balanced")
+	if refit:
+		for key in refit.extra_costs:result[key]=int(result.get(key,0))+int(refit.extra_costs[key])
+	return result

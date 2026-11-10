@@ -5,6 +5,7 @@
 [ext_resource type="Resource" path="res://content/social/merchant_character.tres" id="character"]
 [ext_resource type="Resource" path="res://content/foundation/trainer_schedule.tres" id="schedule"]
 
+[ext_resource type="Script" path="res://gameplay/foundation/data/world_condition.gd" id="condition"]
 [sub_resource type="Resource" id="about"]
 script = ExtResource("topic")
 id = "about"
@@ -61,6 +62,55 @@ response = "强化是在同一件实物上投入币和碎料；拆解会销毁�
 category = "能力见解"
 required_attributes = {"intelligence": 12}
 
+[sub_resource type="Resource" id="mediation"]
+script = ExtResource("topic")
+id = "mediation"
+title = "处理私产纠纷与遗产委托"
+response = "核对实际条件、本人日程与库存后办理。"
+kind = 1
+category = "服务"
+service = "mediation"
+
+[sub_resource type="Resource" id="knows_hides"]
+script = ExtResource("condition")
+kind = 4
+knowledge_kind = 4
+key = "skinning"
+hint = "先学会对应专业技艺，亲手处理遗骸。"
+[sub_resource type="Resource" id="hides"]
+script = ExtResource("topic")
+id = "hides"
+title = "差事：完整兽皮供给"
+response = "每批收1份，支付6币。共收三批，两批间隔6游戏小时，钱和原料都来自真实库存。所得原料可安排后续加工；若我遭遇不测，已接受的委托可由艾妲依据遗产代办。"
+kind = 2
+category = "专业供给"
+requested_items = {"beast_hide":1}
+payment = {"coin":6}
+trust_reward = 3
+repeat_hours = 6.0
+maximum_deliveries = 3
+successor_actor_id = "river.aida"
+conditions = Array[ExtResource("condition")]([SubResource("knows_hides")])
+[sub_resource type="Resource" id="knows_glands"]
+script = ExtResource("condition")
+kind = 4
+knowledge_kind = 4
+key = "gland_work"
+hint = "先学会对应专业技艺，亲手处理遗骸。"
+[sub_resource type="Resource" id="glands"]
+script = ExtResource("topic")
+id = "glands"
+title = "差事：毒腺液供给"
+response = "每批收1份，支付8币。共收三批，两批间隔6游戏小时，钱和原料都来自真实库存。所得原料可安排后续加工；若我遭遇不测，已接受的委托可由艾妲依据遗产代办。"
+kind = 2
+category = "专业供给"
+requested_items = {"gland_sample":1}
+payment = {"coin":8}
+trust_reward = 3
+repeat_hours = 6.0
+maximum_deliveries = 3
+successor_actor_id = "river.aida"
+conditions = Array[ExtResource("condition")]([SubResource("knows_glands")])
 [resource]
 script = ExtResource("profile")
 actor_id = "river.merchant"
@@ -72,4 +122,4 @@ work_position = Vector2(-3280, 2200)
 rest_position = Vector2(-4090, 2670)
 greeting = "先看看要修的是哪件。柜台里的货都是我实有的；你卖来的材料，也会成为排产的原料。"
 familiar_greeting = "是你啊，之前那批木炭已经收好。熟客买货少收一些，店里的余钱和货物仍然有限。"
-topics = [SubResource("assessment"), SubResource("about"), SubResource("trade"), SubResource("production"), SubResource("supply"), SubResource("charcoal"), SubResource("trusted")]
+topics = [SubResource("hides"), SubResource("glands"), SubResource("mediation"), SubResource("assessment"), SubResource("about"), SubResource("trade"), SubResource("production"), SubResource("supply"), SubResource("charcoal"), SubResource("trusted")]
