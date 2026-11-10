@@ -1,0 +1,9 @@
+{
+  "content": [
+    {
+      "text": "{\"diagnostics\":[{\"file\":\"gdscript://-9223368740416955825.gd\",\"function\":\"execute\",\"line\":21,\"message\":\"Invalid call. Nonexistent function 'intentional_missing_method_for_diagnostic_proof (via call)' in base 'RefCounted'.\",\"type\":2}],\"error\":\"Script execution reported an engine or script error.\",\"output\":[],\"success\":false}",
+      "type": "text"
+    }
+  ],
+  "isError": true
+}

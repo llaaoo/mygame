@@ -37,7 +37,7 @@
 | **Grayriver Map Authoring 1.0** | 编辑器地图校验、命名落点、隔离试玩 | 自有插件继续使用，见[工作流](MAP_AUTHORING.md) |
 | Phantom Camera 0.11 | 已随库保存，但未启用或接入当前游戏镜头 | 适合后续镜头/过场；当前已有镜头表现服务，不为安装而替换瞄准链 |
 | Importality 0.3.0 | 已保存，当前未启用 | 有Aseprite/Krita导入需求且工具链/许可核实后再接；不声称已导入新动画 |
-| Godot MCP Native 1.0.0 | 已启用的编辑器桥 | 保持原配置；当前ChatGPT工具列表没有Godot桥工具，不能声称通过MCP编辑过场景 |
+| Godot MCP Native 1.0.0 | 已启用的编辑器桥 | 已通过项目CLI实际连通；支持隔离运行检查、输入和截图，见[MCP工作流](GODOT_MCP_WORKFLOW.md)。当前ChatGPT工具列表仍没有直接注册的Godot工具 |
 | Godot AI / Gamedev AI | 已保存、未启用 | 本轮不接付费提供商或引入运行时网络依赖 |
 
 参考上游：[GUT版本矩阵](https://github.com/bitwes/Gut/blob/v9.6.1/README.md)、[GUT 9.6.1文档](https://gut.readthedocs.io/en/v9.6.1/)、[State Charts](https://github.com/derkork/godot-statecharts)、[Dialogue Manager](https://github.com/nathanhoad/godot_dialogue_manager)、[Phantom Camera](https://phantom-camera.dev/)。注意上游最新版和本地已安装版本不同，不能拿最新版文档直接宣称本地拥有全部能力。

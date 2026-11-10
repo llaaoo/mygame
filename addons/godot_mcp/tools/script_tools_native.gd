@@ -1962,73 +1962,12 @@ func _tool_validate_script(params: Dictionary) -> Dictionary:
 		content = file.get_as_text()
 		file.close()
 
-	var validation_content: String = _strip_class_names(content)
-	var test_script: GDScript = GDScript.new()
-	test_script.source_code = validation_content
-	var reload_err: Error = test_script.reload()
-
-	var errors: Array = []
-	var warnings: Array = []
-
-	if reload_err != OK:
-		var error_msg: String = test_script.get_meta("_error_text", "") if test_script.has_meta("_error_text") else ""
-		if error_msg.is_empty():
-			var err_lines: PackedStringArray = content.split("\n")
-			for i in range(err_lines.size()):
-				var line: String = err_lines[i].strip_edges()
-				if line.is_empty():
-					continue
-				if _is_syntax_error_line(line):
-					errors.append({
-						"line": i + 1,
-						"column": 0,
-						"message": "Syntax error near: " + line
-					})
-					break
-			if errors.is_empty():
-				errors.append({
-					"line": 0,
-					"column": 0,
-					"message": "Script has syntax errors"
-				})
-
-	if check_warnings and reload_err == OK:
-		var source_lines: PackedStringArray = content.split("\n")
-		for i in range(source_lines.size()):
-			var line: String = source_lines[i].strip_edges()
-			if line.begins_with("var ") and not ":" in line and not "=" in line:
-				warnings.append({
-					"line": i + 1,
-					"column": 0,
-					"message": "Variable lacks type hint"
-				})
-
-	return {
-		"valid": errors.is_empty(),
-		"errors": errors,
-		"warnings": warnings,
-		"error_count": errors.size(),
-		"warning_count": warnings.size()
-	}
-
-func _is_syntax_error_line(line: String) -> bool:
-	var error_keywords: Array = ["unexpected", "expected", "indent", "mismatched"]
-	var line_lower: String = line.to_lower()
-	for keyword in error_keywords:
-		if keyword in line_lower:
-			return true
-	return false
-
-func _strip_class_names(source: String) -> String:
-	var lines: PackedStringArray = source.split("\n")
-	var result: PackedStringArray = []
-	for line in lines:
-		var stripped: String = line.strip_edges()
-		if stripped.begins_with("class_name "):
-			result.append("")
-		else:
-			result.append(line)
-	return "\n".join(result)
+	var validator:=preload("res://addons/godot_mcp/utils/script_validation.gd")
+	if not script_path.is_empty() and FileAccess.file_exists(script_path) and FileAccess.get_file_as_string(script_path)==content:
+		var batch: Dictionary=validator.files([script_path],check_warnings)
+		if batch.has("error") or batch.get("status")=="pending":return batch
+		return batch.results[script_path]
+	return validator.diagnose(script_path,content,check_warnings)
 
 func _spaces_to_tabs(code: String) -> String:
 	var lines: PackedStringArray = code.split("\n")

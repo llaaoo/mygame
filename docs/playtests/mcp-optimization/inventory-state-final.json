@@ -1,0 +1,25 @@
+{
+  "content": [
+    {
+      "text": "{\"expression\":\"{\\\"inventory\\\":inventory_screen.visible,\\\"paused\\\":get_tree().paused,\\\"slots\\\":session.inventory.occupied_slots(\\\"player.pack\\\"),\\\"clock\\\":session.inventory.clock_seconds,\\\"summary\\\":inventory_screen._summary.text}\",\"node_path\":\"/root/MCPInspection\",\"refresh_result\":{\"sessions_updated\":1,\"status\":\"success\"},\"status\":\"success\",\"value\":{\"clock\":193.734608333334,\"inventory\":true,\"paused\":false,\"slots\":0,\"summary\":\"\u53e3\u888b 0/12\u683c \u00b7 \u80cc\u5305 0/30\u683c \u00b7 \u8d1f\u91cd 0.0 / 40kg \u00b7 \u751f\u547d 100/100\"}}",
+      "type": "text"
+    }
+  ],
+  "isError": false,
+  "structuredContent": {
+    "expression": "{\"inventory\":inventory_screen.visible,\"paused\":get_tree().paused,\"slots\":session.inventory.occupied_slots(\"player.pack\"),\"clock\":session.inventory.clock_seconds,\"summary\":inventory_screen._summary.text}",
+    "node_path": "/root/MCPInspection",
+    "refresh_result": {
+      "sessions_updated": 1,
+      "status": "success"
+    },
+    "status": "success",
+    "value": {
+      "clock": 193.734608333334,
+      "inventory": true,
+      "paused": false,
+      "slots": 0,
+      "summary": "\u53e3\u888b 0/12\u683c \u00b7 \u80cc\u5305 0/30\u683c \u00b7 \u8d1f\u91cd 0.0 / 40kg \u00b7 \u751f\u547d 100/100"
+    }
+  }
+}

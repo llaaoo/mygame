@@ -1866,7 +1866,7 @@ func _tool_call_runtime_node_method(params: Dictionary) -> Dictionary:
 	var method_name: String = params.get("method_name", "")
 	if node_path.is_empty() or method_name.is_empty():
 		return {"error": "node_path and method_name are required"}
-	return _request_runtime_probe("call_node_method", [node_path, method_name, params.get("arguments", [])], ["mcp:node_method_result"], params, {"node_path": node_path, "method_name": method_name})
+	return _request_runtime_probe("call_node_method", [node_path, method_name, params.get("arguments", [])], ["mcp:node_method_result"], params, {"node_path": node_path, "method_name": method_name, "arguments":params.get("arguments",[])})
 
 func _register_evaluate_runtime_expression(server_core: RefCounted) -> void:
 	server_core.register_tool(
@@ -1893,7 +1893,9 @@ func _tool_evaluate_runtime_expression(params: Dictionary) -> Dictionary:
 	if expression.is_empty():
 		return {"error": "Missing required parameter: expression"}
 	var payload: Array = [expression, params.get("node_path", "")]
-	return _request_runtime_probe("evaluate_expression", payload, ["mcp:expression_result"], params, {"expression": expression})
+	var matching: Dictionary={"expression":expression}
+	if not str(params.get("node_path","")).is_empty():matching["node_path"]=params.node_path
+	return _request_runtime_probe("evaluate_expression", payload, ["mcp:expression_result"], params, matching)
 
 func _register_simulate_runtime_input_event(server_core: RefCounted) -> void:
 	server_core.register_tool(
@@ -2769,14 +2771,8 @@ func _extract_pending_runtime_probe_response(bridge: RefCounted, pending_entry: 
 		if runtime_payload != null:
 			return {"status": "success", "value": runtime_payload}
 
-	for message_name in response_messages:
-		var runtime_payload: Variant = bridge.get_latest_message_payload(message_name, match_fields)
-		if runtime_payload is Dictionary:
-			var response: Dictionary = runtime_payload.duplicate(true)
-			response["status"] = "success"
-			return response
-		if runtime_payload != null:
-			return {"status": "success", "value": runtime_payload}
+	# Only a message after this request's sequence can complete it. The caller
+	# may expose older snapshots as `stale`, but never label them fresh success.
 	return {}
 
 func _is_truthy_runtime_value(value: Variant) -> bool:
@@ -3141,14 +3137,14 @@ func _tool_debug_print(params: Dictionary) -> Dictionary:
 
 func _register_execute_editor_script(server_core: RefCounted) -> void:
 	var tool_name: String = "execute_editor_script"
-	var description: String = "Execute a full GDScript in the editor context. Unlike execute_script which only evaluates expressions, this tool can run multi-line scripts with loops, conditionals, and await. Output is captured via print()."
+	var description: String = "Execute synchronous multi-line GDScript in the editor context, including loops and conditionals. Captures print output and reports engine/script errors. Asynchronous await execution is unsupported; use runtime probe requests for asynchronous inspection."
 
 	var input_schema: Dictionary = {
 		"type": "object",
 		"properties": {
 			"code": {
 				"type": "string",
-				"description": "Full GDScript code to execute. Can contain multiple statements, loops, conditionals, and await."
+				"description": "Synchronous GDScript statements, loops and conditionals. Await execution is unsupported."
 			}
 		},
 		"required": ["code"]
@@ -3225,13 +3221,15 @@ func _tool_execute_editor_script(params: Dictionary) -> Dictionary:
 
 	script.set_source_code(wrapped_code)
 
+	var capture:=preload("res://addons/godot_mcp/utils/diagnostic_capture.gd").new()
+	capture.begin()
 	var reload_ok: Error = script.reload()
 	if reload_ok != OK:
-		return {"success": false, "error": "Script compilation failed. Check syntax.", "output": []}
+		return capture.finish({"success": false, "error": "Script compilation failed. Check syntax.", "output": []})
 
 	var instance: RefCounted = script.new()
 	if not instance:
-		return {"success": false, "error": "Failed to create script instance", "output": []}
+		return capture.finish({"success": false, "error": "Failed to create script instance", "output": []})
 
 	instance.set("_output", [])
 	var edited_scene: Node = editor_interface.get_edited_scene_root()
@@ -3255,10 +3253,10 @@ func _tool_execute_editor_script(params: Dictionary) -> Dictionary:
 	if instance is RefCounted:
 		pass
 
-	return {
+	return capture.finish({
 		"success": true,
 		"output": output
-	}
+	})
 
 func _count_indent(line: String) -> int:
 	var count: int = 0

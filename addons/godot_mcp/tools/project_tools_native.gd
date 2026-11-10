@@ -104,7 +104,7 @@ func _tool_get_project_info(params: Dictionary) -> Dictionary:
 	
 	var project_path: String = ProjectSettings.globalize_path("res://")
 	var godot_version: Dictionary = Engine.get_version_info()
-	var version_str: String = "%d.%d.%s" % [godot_version.get("major", 0), godot_version.get("minor", 0), godot_version.get("status", "")]
+	var version_str: String = str(godot_version.get("string", "unknown"))
 	
 	return {
 		"project_name": project_name,
@@ -2351,13 +2351,15 @@ func _tool_detect_broken_scripts(params: Dictionary) -> Dictionary:
 	var scripts: Array[String] = []
 	_collect_resources(search_path, [".gd"], scripts)
 	scripts.sort()
+	var batch: Dictionary=preload("res://addons/godot_mcp/utils/script_validation.gd").files(scripts,include_warnings)
+	if batch.has("error") or batch.get("status")=="pending":return batch
 
 	var issues: Array = []
 	var broken_count: int = 0
 	var warning_count: int = 0
 
 	for script_path in scripts:
-		var diagnostics: Dictionary = _analyze_script_diagnostics(script_path, include_warnings)
+		var diagnostics: Dictionary = batch.results[script_path]
 		if diagnostics.has("error"):
 			issues.append({
 				"script_path": script_path,
@@ -2456,6 +2458,7 @@ func _tool_audit_project_health(params: Dictionary) -> Dictionary:
 		"include_warnings": include_warnings,
 		"max_results": max_results
 	})
+	if broken_scripts_result.get("status")=="pending":return broken_scripts_result
 	if broken_scripts_result.has("error"):
 		return broken_scripts_result
 
@@ -2497,79 +2500,6 @@ func _tool_audit_project_health(params: Dictionary) -> Dictionary:
 		"cyclic_dependencies": cyclic_dependencies_result.get("issues", []),
 		"truncated": bool(broken_scripts_result.get("truncated", false)) or bool(missing_dependencies_result.get("truncated", false)) or bool(cyclic_dependencies_result.get("truncated", false))
 	}
-
-func _analyze_script_diagnostics(script_path: String, include_warnings: bool) -> Dictionary:
-	var file: FileAccess = FileAccess.open(script_path, FileAccess.READ)
-	if not file:
-		return {"error": "Failed to open file"}
-	var content: String = file.get_as_text()
-	file.close()
-
-	var validation_content: String = _strip_class_names(content)
-	var test_script: GDScript = GDScript.new()
-	test_script.source_code = validation_content
-	var reload_error: Error = test_script.reload()
-
-	var errors: Array = []
-	var warnings: Array = []
-
-	if reload_error != OK:
-		var source_lines: PackedStringArray = content.split("\n")
-		for i in range(source_lines.size()):
-			var line: String = source_lines[i].strip_edges()
-			if line.is_empty():
-				continue
-			if _is_likely_script_error_line(line):
-				errors.append({
-					"line": i + 1,
-					"column": 0,
-					"message": "Syntax error near: " + line
-				})
-				break
-		if errors.is_empty():
-			errors.append({
-				"line": 0,
-				"column": 0,
-				"message": "Script has syntax errors"
-			})
-
-	if include_warnings and reload_error == OK:
-		var source_lines_for_warning: PackedStringArray = content.split("\n")
-		for i in range(source_lines_for_warning.size()):
-			var warning_line: String = source_lines_for_warning[i].strip_edges()
-			if warning_line.begins_with("var ") and not ":" in warning_line and not "=" in warning_line:
-				warnings.append({
-					"line": i + 1,
-					"column": 0,
-					"message": "Variable lacks type hint"
-				})
-
-	return {
-		"valid": errors.is_empty(),
-		"errors": errors,
-		"warnings": warnings,
-		"error_count": errors.size(),
-		"warning_count": warnings.size()
-	}
-
-func _strip_class_names(source: String) -> String:
-	var lines: PackedStringArray = source.split("\n")
-	var result: PackedStringArray = []
-	for line in lines:
-		var stripped: String = line.strip_edges()
-		if stripped.begins_with("class_name "):
-			result.append("")
-		else:
-			result.append(line)
-	return "\n".join(result)
-
-func _is_likely_script_error_line(line: String) -> bool:
-	var line_lower: String = line.to_lower()
-	if line_lower.contains("unexpected") or line_lower.contains("expected") or line_lower.contains("indent"):
-		return true
-	if line.ends_with("(") or line.ends_with(",") or line.count("\"") % 2 == 1:
-		return true
-	return false
 
 func _collect_project_autoloads_from_properties(properties: Array, values_by_name: Dictionary, orders_by_name: Dictionary) -> Array:
 	var autoloads: Array = []

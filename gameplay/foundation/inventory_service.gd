@@ -156,6 +156,8 @@ func entries(id: String) -> Array[Dictionary]:
 	var result: Array[Dictionary]=[]
 	for item: ItemInstance in _containers.get(id,{}).get("items",[]): result.append(item.snapshot())
 	return result
+func occupied_slots(id: String) -> int:
+	return _containers[id].items.size() if _containers.has(id) else 0
 func item(uid: String) -> ItemInstance:
 	var value:=_instance(uid)
 	return ItemInstance.from_snapshot(value.snapshot()) if value else null

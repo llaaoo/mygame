@@ -207,6 +207,7 @@ func _enter_tree() -> void:
 
 func _exit_tree() -> void:
 	_log_info("Godot Native MCP Plugin exiting tree...")
+	preload("res://addons/godot_mcp/utils/script_validation.gd").cancel_jobs()
 	
 	if _native_server and _native_server.is_running():
 		_native_server.stop()

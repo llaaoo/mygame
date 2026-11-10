@@ -1,0 +1,26 @@
+{
+  "content": [
+    {
+      "text": "{\"current_scene\":\"/root/MCPInspection\",\"fps\":6.0,\"frame_time_sec\":0.147333,\"memory_static_bytes\":243970637,\"memory_static_mb\":232.668530464172,\"node_count\":2486,\"object_count\":8987,\"physics_frame_time_sec\":0.005814,\"refresh_result\":{\"sessions_updated\":1,\"status\":\"success\"},\"rendered_objects_in_frame\":6729,\"resource_count\":1612,\"status\":\"success\"}",
+      "type": "text"
+    }
+  ],
+  "isError": false,
+  "structuredContent": {
+    "current_scene": "/root/MCPInspection",
+    "fps": 6.0,
+    "frame_time_sec": 0.147333,
+    "memory_static_bytes": 243970637,
+    "memory_static_mb": 232.668530464172,
+    "node_count": 2486,
+    "object_count": 8987,
+    "physics_frame_time_sec": 0.005814,
+    "refresh_result": {
+      "sessions_updated": 1,
+      "status": "success"
+    },
+    "rendered_objects_in_frame": 6729,
+    "resource_count": 1612,
+    "status": "success"
+  }
+}

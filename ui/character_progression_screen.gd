@@ -44,7 +44,7 @@ func setup(player: Player,save: Callable,train: Callable,attributes := false) ->
  _detail=VBoxContainer.new(); _detail.size_flags_horizontal=Control.SIZE_EXPAND_FILL; _detail.add_theme_constant_override("separation",10); details.add_child(_detail)
  _refresh()
 func _process(delta: float) -> void:
- if not is_instance_valid(actor): return
+ if not is_visible_in_tree() or not is_instance_valid(actor): return
  _elapsed+=delta
  if _elapsed<.2: return
  _elapsed=0
