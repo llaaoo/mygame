@@ -40,7 +40,7 @@ INTEGRATION = [
     "survival_rest",
     "alchemy_repair",
     "material_recycling",
-    "rpg_attributes", "rpg_progression", "rpg_progression_input", "npc_interactions", "npc_interaction_input",
+    "rpg_attributes", "rpg_progression", "rpg_progression_input", "npc_interactions", "npc_interaction_input", "world_coherence", "coherence_input",
     "playtest_iteration", "tactical_balance",
     "normal_budget_tactics", "content_expansion", "environment_attunement", "five_element_rules",
     "partial_boons",

@@ -15,6 +15,7 @@ enum Kind { INFORMATION, SERVICE, FAVOR }
 @export var requested_items: Dictionary={}
 @export var payment: Dictionary={}
 @export var trust_reward := 10
+@export var navigation_hints: Array[ExplorationNavigationHint]=[]
 
 func validation_errors() -> Array[String]:
 	var errors: Array[String]=[]

@@ -1,0 +1,3 @@
+coherence-archive-journey-v4 passed
+coherence-archive-reentry-v4 passed
+DEFAULT_JOURNEY_REENTRY_PASS {"compared": ["items", "pack", "gear", "shortcuts", "loot_records", "npc_accounts", "social", "growth", "tracked_id", "martial", "claims"], "level": 2, "materials": {"ash": 2, "charcoal": 3, "clean_water": 4, "cloth": 1, "coin": 3, "crystal": 8, "frost_salt": 2, "grain": 3, "herb": 2, "poison_rag": 1, "ration": 2, "resin": 2, "sap": 9, "storm_dust": 3}, "npc_coins": {"river.aida": 24, "river.enemy.service.trainer": 5, "river.merchant": 152}}

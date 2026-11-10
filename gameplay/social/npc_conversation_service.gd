@@ -76,15 +76,39 @@ func choose(token: int,topic_id: String,operation := "read") -> Dictionary:
 		_known[id].append(entry.id)
 		if entry.kind==NpcTopic.Kind.INFORMATION:
 			if entry.recognition>0: session.relations.adjust_disposition(id,"player",entry.recognition)
-			_write("npc.topic."+id+"."+entry.id,catalog.profile(id).character.title+"："+entry.title,entry.response+"\n交谈线索；地图仍只记录亲自踏足的地点。")
+			_write("npc.topic."+id+"."+entry.id,catalog.profile(id).character.title+"："+entry.title,response_for(id,entry)+"\n交谈线索；地图仍只记录亲自踏足的地点。")
 		session.facts.publish("npc_topic_read","player",{"npc":id,"topic":entry.id})
-	return {"accepted":true,"response":entry.response}
+	return {"accepted":true,"response":response_for(id,entry)}
+func response_for(id: String,entry: NpcTopic) -> String:
+	var profile:=catalog.profile(id)
+	var world:=session.condition_query.catalog if session.condition_query else null
+	return entry.response+world.navigation_text(entry.navigation_hints,profile.region_id,profile.work_location(),profile.character.title+"的工作点",session.condition_query.progress) if world else entry.response
+func record_text(record: Dictionary) -> String:
+	if not str(record.get("id","")).begins_with("npc.topic."): return ""
+	for profile in catalog.profiles:
+		for entry in profile.topics:
+			if str(record.id)=="npc.topic."+profile.actor_id+"."+entry.id and seen(profile.actor_id,entry.id): return response_for(profile.actor_id,entry)+"\n交谈线索；地图仍只记录亲自踏足的地点。"
+	return ""
 func favor_reason(id: String,entry: NpcTopic) -> String:
 	if favor_state(id,entry.id)=="completed": return "已经交付，不会重复领取报酬。"
 	if favor_state(id,entry.id)!="accepted": return "先明确接受委托。"
+	if session.actor_records.get(id,{}).get("dead",false): return "委托人已死亡，无法继续交付。"
+	var refused:=topic_reason(id,entry)
+	if not refused.is_empty(): return refused
+	if session.relations.attitude(id,"player")=="hostile": return "委托人与你敌对，暂时无法交付。"
+	var npc:=session.actor_for_id(id) as ServiceNPC
+	var profile:=catalog.profile(id)
+	var routine:=profile.daily_schedule().get_entry_for_hour(float(session.hour_query.call())) if session.hour_query.is_valid() else null
+	if npc and not npc.on_duty() or not npc and routine and routine.target_marker!="work": return "委托人未当值，准备好物资后在当值时返回。"
 	if not session.inventory.can_pay("player",entry.requested_items): return "随身交付物不足，放下的背包不算在内。"
 	if not session.inventory.can_pay(id,entry.payment): return "对方实有报酬不足，不能凭空付款。"
 	return ""
+func favor_details(tracked_id: String) -> Dictionary:
+	if not tracked_id.begins_with("npc.favor."): return {}
+	var key:=tracked_id.trim_prefix("npc.favor.")
+	if not _favors.has(key): return {}
+	var parts:=key.split("/"); var profile:=catalog.profile(parts[0]); var entry:=profile.topic(parts[1])
+	return {"profile":profile,"topic":entry,"state":_favors[key],"dead":bool(session.actor_records.get(profile.actor_id,{}).get("dead",false)),"reason":favor_reason(profile.actor_id,entry)}
 func _favor(token: int,id: String,entry: NpcTopic,operation: String) -> Dictionary:
 	var refused:=handle_reason(token,true)
 	if not refused.is_empty(): return {"accepted":false,"reason":refused}

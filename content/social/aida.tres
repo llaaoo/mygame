@@ -1,8 +1,21 @@
 [gd_resource type="Resource" script_class="NpcProfile" format=3]
 [ext_resource type="Script" path="res://gameplay/social/npc_profile.gd" id="profile"]
 [ext_resource type="Script" path="res://gameplay/social/npc_topic.gd" id="topic"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/navigation_hint.gd" id="hint"]
 [ext_resource type="Resource" path="res://content/social/aida_character.tres" id="character"]
 [ext_resource type="Resource" path="res://content/foundation/trainer_schedule.tres" id="schedule"]
+
+[sub_resource type="Resource" id="hunter_lead"]
+script = ExtResource("hint")
+target_claim = "river.fire"
+
+[sub_resource type="Resource" id="archive_lead"]
+script = ExtResource("hint")
+target_claim = "river.dossier"
+
+[sub_resource type="Resource" id="outpost_lead"]
+script = ExtResource("hint")
+target_claim = "river.outpost"
 
 [sub_resource type="Resource" id="about"]
 script = ExtResource("topic")
@@ -23,7 +36,8 @@ service = "quests"
 script = ExtResource("topic")
 id = "routes"
 title = "北路和东路各有什么？"
-response = "从镇北沿路到旧猎营，能读到火石阵准备的说明。东路朝旧驿站延伸，再通矿道与湖岸。先在安全处读笔记和整理材料，发现敌人就退回开阔处。"
+response = "猎营有火石阵准备的说明，旧驿站能成为行路的前哨。先在安全处读笔记和整理材料，发现敌人就退回开阔处。"
+navigation_hints = [SubResource("hunter_lead"), SubResource("outpost_lead")]
 
 [sub_resource type="Resource" id="herbs"]
 script = ExtResource("topic")
@@ -39,7 +53,8 @@ payment = {"coin": 6}
 script = ExtResource("topic")
 id = "archives"
 title = "能告诉我更远的档案线索吗？"
-response = "东北旧监狱的档案窖里有一份名册。它可能改变仍在执行旧令的老兵的态度。这里只给线索，不算你已经调查了档案窖。"
+response = "档案窖里有一份名册，可能改变仍在执行旧令的老兵的态度。这里只给线索，不算你已经调查了那里。"
+navigation_hints = [SubResource("archive_lead")]
 category = "信任"
 minimum_disposition = 10
 

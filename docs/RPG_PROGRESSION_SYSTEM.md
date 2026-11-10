@@ -54,3 +54,5 @@
 精通快照升级为schema2；旧角色等级、经验、属性点、知识、UID与物资保留。旧学派未花点与已花成本，和角色等级应得预算取较大者，一次性迁为历史信用；再次保存/读档不重发。重复ID、未知节点、缺前置、非法分支、超预算或非法数值会在加载前拒绝。旧主/备份恢复与新旅程归档流程沿用原实现。瞬时准备、连招与现场法阵不保存。
 
 本次沿用Godot 4.6官方[场景组织与依赖注入建议](https://github.com/godotengine/godot-docs/blob/4.6/tutorials/best_practices/scene_organization.rst)：组合根提供依赖，定义与角色运行状态分开，UI不成为跨系统权威。验证结果见[RPG成长验证](RPG_PROGRESSION_VALIDATION.md)。
+
+2026-11-10续：成长页并列显示基础与当前有效体力回复，需求、食品和装备同执行投影；经验和条件变化原位更新控件。见[世界衔接](WORLD_SYSTEM_COHERENCE.md)。

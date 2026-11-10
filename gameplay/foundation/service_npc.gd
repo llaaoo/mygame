@@ -13,6 +13,8 @@ var title: String:
 	get: return enemy_name+" · 交谈"
 var _visitor: WeakRef
 var _destination:=Vector2.ZERO
+var threat_response: NpcProfile.ThreatResponse=NpcProfile.ThreatResponse.RETREAT
+var _threat_announced := false
 func _ready() -> void:
 	super._ready()
 	add_to_group("interactable")
@@ -69,12 +71,21 @@ func _physics_process(delta: float) -> void:
 	var target: Node2D=lookup_actor.call("player") if lookup_actor.is_valid() else null
 	if target and actor_context.relations.attitude(actor_context.id,"player")=="hostile":
 		working=false
+		if not _threat_announced:
+			_threat_announced=true
+			actor_context.facts.publish("npc_threat_response",actor_context.id,{"response":"retreat" if threat_response==NpcProfile.ThreatResponse.RETREAT else "defend"})
+		if threat_response==NpcProfile.ThreatResponse.RETREAT:
+			var away:=retreat_direction(target)
+			actor_context.actions.try_action(Action.move(away,self))
+			return
 		if target.position.distance_to(position)<56:
 			var hit:=Action.melee(self); hit.direction=(target.position-position).normalized()
 			actor_context.actions.try_action(hit)
 		elif target.position.distance_to(position)<400:
 			actor_context.actions.try_action(Action.move(actor_context.region.navigation.direction(position,target.position),self))
+		else: actor_context.actions.try_action(Action.move(Vector2.ZERO,self))
 		return
+	_threat_announced=false
 	var visitor: Node2D=_visitor.get_ref() as Node2D if _visitor else null
 	if visitor and can_talk(visitor):
 		actor_context.actions.try_action(Action.move(Vector2.ZERO,self))
@@ -83,6 +94,16 @@ func _physics_process(delta: float) -> void:
 	if _destination.distance_to(position)>30 and actor_context.region.navigation:
 		actor_context.actions.try_action(Action.move(actor_context.region.navigation.direction(position,_destination),self))
 	else: actor_context.actions.try_action(Action.move(Vector2.ZERO,self))
+func retreat_direction(threat: Node2D) -> Vector2:
+	if position.distance_to(threat.position)>=400 or not actor_context.region.navigation: return Vector2.ZERO
+	var away: Vector2=(position-threat.position).normalized()
+	if away.is_zero_approx(): away=Vector2.UP
+	for angle in [0.0,PI/4,-PI/4,PI/2,-PI/2]:
+		var goal:=position+away.rotated(angle)*160
+		if actor_context.region.navigation.path(position,goal).is_empty(): continue
+		var direction:=actor_context.region.navigation.direction(position,goal)
+		if direction.dot(away)>.1: return direction
+	return Vector2.ZERO
 
 func resume_schedule() -> void:
 	if actor_context and actor_context.relations.attitude(actor_context.id,"player")=="hostile": working=false; return

@@ -73,3 +73,7 @@
 ## 视觉与声音扩充
 
 世界物体通过`presentation_profile`接入原生姿态和视觉预制体，区域通过`presentation_environment`接入环境配置，法术沿用`trail_scene / hit_effect / sound_cast / sound_hit`。水井与火球是已运行样本；目录、白名单、预算、真实状态和输入验证见[全游戏表现接入](GAME_PRESENTATION_SYSTEM.md)。表现不提交奖励，不储存第二套采集/机关进度，也不推进玩法随机流。
+
+## NPC服务与任务线索（2026-11-10）
+
+人物的交易/排产话题必须有同actor_id的NpcProfile.market，课程话题必须有同actor_id的training；绑定自己的MarketDefinition/TrainingCatalog，不能借主商店默认配置。地区、前置事实、导航引用与日程须通过跨目录校验；独立派生的交涉事实由章节显式登记。NPC导航用navigation_hints引用地点，不再在response复制坐标与方位。J人情追踪由真实物资、已知采集点与人物生命/日程派生，新增世界条件仍由原进度服务持有。规则与验证见[世界衔接](WORLD_SYSTEM_COHERENCE.md)。

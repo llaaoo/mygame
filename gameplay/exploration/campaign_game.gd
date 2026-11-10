@@ -212,6 +212,9 @@ func use_inventory_item(uid: String) -> void:
 
 func get_active_region() -> Node2D:
 	return region_root
+func record_text(record: Dictionary) -> String:
+	var social:=session.conversations.record_text(record) if session else ""
+	return social if not social.is_empty() else catalog.record_text(record,progress)
 
 func request_travel(destination: String, arrival: Vector2 = Vector2.INF) -> void:
 	if _switching or not catalog.regions.has(destination):

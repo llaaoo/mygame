@@ -15,11 +15,15 @@ var _selling := true
 var _selected_uid := ""
 var _trade_quantity: SpinBox
 var _quantity_value := 1
-func _init(owner_game: GrayriverGame,market_profile: MarketDefinition=null,training_profile: TrainingCatalog=null) -> void:
+func service_title(owner_id: String,fallback: String) -> String:
+	var profile:=game.session.conversations.catalog.profile(owner_id)
+	return profile.character.title if profile else fallback
+func _init(owner_game: GrayriverGame,market_profile: MarketDefinition=null,training_profile: TrainingCatalog=null,use_defaults := true) -> void:
 	game=owner_game
-	market=market_profile if market_profile else load("res://content/frontier/town_market.tres") as MarketDefinition
-	training=training_profile if training_profile else TrainingCatalog.default_catalog()
+	market=market_profile if market_profile else (load("res://content/frontier/town_market.tres") as MarketDefinition) if use_defaults else null
+	training=training_profile if training_profile else TrainingCatalog.default_catalog() if use_defaults else null
 func ensure_stock() -> void:
+	if not market: return
 	var store:=game.session.inventory
 	if game.session.actor_records.get(market.actor_id,{}).get("dead",false): return
 	if store.has_container(market.actor_id+".pack"): return
@@ -29,12 +33,14 @@ func ensure_stock() -> void:
 		store.receive(market.actor_id,id,int(market.initial_stock[id]),true)
 	store.end_batch()
 func reason() -> String:
+	if not market: return "此人不提供交易与整修。"
 	if game.region_id!=market.region_id or game.player.global_position.distance_to(market.position)>market.service_range: return "请靠近镇中整修铺。"
 	var social_reason:=game.session.conversations.reason(market.actor_id,true,180)
 	if not social_reason.is_empty(): return social_reason
 	if game.has_hostiles_near(game.player.global_position) or game.player.actor_context.actions.busy(): return "先结束战斗与动作。"
 	return ""
 func price(uid: String,buying: bool) -> int:
+	if not market: return 0
 	var store:=game.session.inventory
 	var item:=store.item(uid)
 	if not item: return 0
@@ -61,7 +67,7 @@ func show(selling := true) -> void:
 	_selected_uid=""; _quantity_value=1
 	ensure_stock()
 	_screen=preload("res://gameplay/foundation/ui/expedition_screen.tscn").instantiate() as ExpeditionScreen
-	_screen.get_node("Navigation/Caption").text="整修铺"
+	_screen.get_node("Navigation/Caption").text=service_title(market.actor_id,"整修铺")
 	_screen.tabs.add_child(W.button("出售 / 拆解 / 强化",show.bind(true)))
 	_screen.tabs.add_child(W.button("购买实物",show.bind(false)))
 	_screen.tabs.add_child(W.button("店内排产",show_production))
@@ -69,7 +75,7 @@ func show(selling := true) -> void:
 	var hint:=W.label("交易库存有限；装备先卸下再整修。整修保留同一件实物，涂层不会重置。"+(" 熟客购买减价10%，出售原价。" if game.session.relations.disposition(market.actor_id,"player")>=10 else " 与店主交谈、履行委托可获得熟客买价。"),12,true)
 	hint.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 	_screen.footer.add_child(hint)
-	game.ui.show_view("灰河谷 · 整修铺",_screen)
+	game.ui.show_view(service_title(market.actor_id,"整修铺"),_screen)
 	_rows("")
 func _rows(query: String) -> void:
 	W.clear(_screen.rows); W.clear(_screen.detail)
@@ -157,6 +163,7 @@ func _request(method: String,uid: String) -> void:
 		if not focus_text.is_empty() and button.text==focus_text: button.grab_focus(); break
 
 func show_training() -> void:
+	if not training: return
 	var npc:=game.session.actor_for_id(training.actor_id)
 	if not is_instance_valid(npc) or not game.session.conversations.reason(training.actor_id,true,150).is_empty(): game.ui.notify("请靠近当值的训练师。"); return
 	var options: Array[Dictionary]=[]
@@ -169,7 +176,7 @@ func show_training() -> void:
 		options.append({"title":data.title+(" · 已学会" if known else " · "+price_text)+(_requirements_hint(offer) if not known else ""),"disabled":not refused.is_empty(),"callback":_teach.bind(offer.id)})
 	options.append({"title":"查看武技与连招","callback":_open_techniques})
 	options.append({"title":"分配已有属性点","callback":game.presenter._show_training})
-	game.ui.show_panel("武技训练师","武技消耗体力与对应武器资源，不消耗MP。购买只解锁知识；到K的武技页查看连招与配置，每个组合最多装备两招，轻点Ctrl切换。刀破势、矛控距、杖压制、弓蓄射各有起手与恢复风险。",options)
+	game.ui.show_panel(service_title(training.actor_id,"武技训练师"),"武技消耗体力与对应武器资源，不消耗MP。购买只解锁知识；到K的武技页查看连招与配置，每个组合最多装备两招，轻点Ctrl切换。刀破势、矛控距、杖压制、弓蓄射各有起手与恢复风险。",options)
 func _teach(id: String) -> void:
 	var npc:=game.session.actor_for_id(training.actor_id)
 	var context:=game.player.actor_context
@@ -213,7 +220,7 @@ func show_production() -> void:
 	timer.timeout.connect(func():
 		for row in live_rows: _refresh_production_row(row))
 	screen.detail.add_child(W.label("排产不预扣原料、不预留货品。工期完成时检查店家真实库存并加工；缺料或满库会等候，恢复后重新计工期。停止不会扣原料；已完成成品留在店内。休息推进工期，离线不推进，不会补满货物或生成河谷币。",14,true))
-	game.ui.show_view("整修铺 · 店内排产",screen)
+	game.ui.show_view(service_title(market.actor_id,"整修铺")+" · 店内排产",screen)
 func _refresh_production_row(row: Dictionary) -> void:
 	var state:=game.session.production.status(row.id)
 	var definition:=game.session.production.catalog.definition(row.id)
@@ -224,10 +231,11 @@ func _refresh_production_row(row: Dictionary) -> void:
 	var detail: String="未排产"
 	if state.scheduled:
 		detail="等候原料/库容；恢复后重新计工期" if state.blocked else "剩余%.1f游戏小时 · %d批"%[state.remaining*WorldTime.instance.time_scale/3600.0,state.batches]
-	if not str(state.reason).is_empty(): detail+=" · "+str({"materials":"缺少配方原料","capacity":"成品库容不足"}.get(state.reason,state.reason))
+	if not str(state.reason).is_empty(): detail+=" · "+str({"materials":"缺少配方原料","capacity":"成品库容不足","producer_dead":"生产者已死亡，排产终止"}.get(state.reason,state.reason))
 	row.label.text="店存%d · "%state.stock+detail
 	row.button.text="停止排产" if state.scheduled else "安排一批 · "+str(row.title)
 	row.button.set_meta("cancel_order",state.scheduled)
+	row.button.disabled=state.reason=="producer_dead"
 func _production_request(id: String,cancel_order: bool) -> void:
 	if not reason().is_empty(): game.ui.notify(reason()); return
 	if cancel_order: game.session.production.cancel(id)

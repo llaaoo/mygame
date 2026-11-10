@@ -97,3 +97,5 @@ UI可以调用领域服务请求训练、制造、交付或施法，由服务验
 角色rig是[全游戏表现基座](GAME_PRESENTATION_SYSTEM.md)的一个分支。CampaignGame组合场景拥有的PresentationDirector、WorldObjectPresentation、EnvironmentPresentation、CameraFeedback与原生音效；事实、库存和时钟继续拥有玩法。UI用局部Tween；美术预制体禁止脚本、碰撞和外部方法轨道。玩法的随机流独立于原生粒子使用的引擎全局随机源。
 
 2026-11-10：镇民由`GrayriverResidents`装配为共同`ServiceNPC`，`CampaignSession.conversations`持有交谈/人情记忆，`RelationService`持有信任；UI不提交库存或世界事实，临时token由区域生命周期清理。定义、事务和扩展边界见[NPC交互](NPC_INTERACTIONS.md)。
+
+2026-11-10：生产资格由Session注入，人物死亡取消订单；市场/课程按人物配置装配；人物与笔记线索共同查询真实地点，个人任务复用原追踪字段；成长与执行共用有效体力投影。职责、兼容与运行验证见[世界衔接](WORLD_SYSTEM_COHERENCE.md)。
