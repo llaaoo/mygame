@@ -5,6 +5,8 @@ extends Resource
 @export var position := Vector2(-3210,2200)
 @export var service_range := 150.0
 @export var initial_stock: Dictionary={}
+@export var equipment_services := true
+@export var production_services := true
 func valid() -> bool:
 	if actor_id.is_empty() or region_id.is_empty() or not position.is_finite() or not is_finite(service_range) or service_range<=0 or initial_stock.is_empty(): return false
 	for key in initial_stock:

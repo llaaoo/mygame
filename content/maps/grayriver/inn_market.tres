@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="MarketDefinition" format=3]
+[ext_resource type="Script" path="res://gameplay/frontier/market_definition.gd" id="def"]
+[resource]
+script = ExtResource("def")
+actor_id = "river.innkeeper"
+region_id = "river_inn"
+position = Vector2(160, -80)
+service_range = 150.0
+equipment_services = false
+production_services = false
+initial_stock = {"coin":16,"ration":6,"clean_water":4,"tea":2,"grain":4}

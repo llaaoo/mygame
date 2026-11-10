@@ -337,6 +337,7 @@ func interaction_target(refresh := false) -> Node2D:
 		if not node is Node2D or node.is_queued_for_deletion(): continue
 		var distance:=player.global_position.distance_to(node.global_position)
 		if distance<nearest:
+			if node is ExplorationInteractable and not node.visible_from(player): continue
 			nearest=distance
 			_focus=node
 	return _focus

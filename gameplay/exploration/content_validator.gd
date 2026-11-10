@@ -161,11 +161,27 @@ func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 	var completion_claims: Dictionary = {}
 	var profiles: Dictionary = {}
 	var station_ids: Dictionary = {}
+	var map_ids: Dictionary = {}
 	for region in catalog.chapter.regions:
 		if not region or region.id.is_empty() or region.title.is_empty():
 			_fail(catalog.chapter, "Invalid region")
 			continue
 		if region.presentation_environment and not region.presentation_environment.valid(): _fail(region,"Invalid region environment presentation")
+		for error in region.map_errors: _fail(region,error)
+		for entry in region.storage+region.amenities:
+			if entry.id.is_empty() or map_ids.has(entry.id) or entry.title.is_empty(): _fail(entry,"Invalid/duplicate map feature identity")
+			map_ids[entry.id]=true
+			if entry is MapAmenityData and entry.service not in ["rest","craft","equipment"]: _fail(entry,"Unknown map service")
+			if entry is WorldStorageData:
+				if not entry.id.begins_with("storage.") or entry.capacity<1 or entry.capacity>100: _fail(entry,"Invalid storage definition")
+				_validate_materials(entry,entry.initial_items,supplies)
+				var slots:=0
+				for id in entry.initial_items:
+					var item:=ItemCatalog.default_catalog().definition(id)
+					if item and entry.initial_items[id] is int:
+						var limit:=1 if item is EquipmentData else maxi(1,item.max_stack) if item.stackable else 1
+						slots+=ceili(float(entry.initial_items[id])/limit)
+				if slots>entry.capacity: _fail(entry,"Initial storage contents exceed capacity")
 		var layout := region.make_layout()
 		region.reserve_interaction_space(layout)
 		for point in region.interaction_points():
@@ -173,7 +189,7 @@ func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 				_fail(region, "Interaction outside arena")
 			for obstacle in layout.obstacles:
 				if Rect2(obstacle.position - obstacle.size * 0.5, obstacle.size).grow(40).has_point(point.pos):
-					_fail(region, "Interaction blocked by geometry")
+					_fail(region, "Interaction blocked by geometry: %s at %s"%[region.id,point.pos])
 		for note in region.discoveries:
 			_claim(claims, note.id, note)
 			completion_claims[note.id] = true
@@ -301,6 +317,13 @@ func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 		for exit in region.exits:
 			if not catalog.regions.has(exit.target) or (not exit.required_action.is_empty() and not catalog.actions.has(exit.required_action)):
 				_fail(region, "Dangling exit/knowledge requirement")
+			elif region.map_scene and not region.open_field or catalog.regions.has(exit.target) and catalog.regions[exit.target].map_scene and not catalog.regions[exit.target].open_field:
+				var target:=catalog.regions[exit.target] as ExplorationRegionData
+				var destination:=target.make_layout();target.reserve_interaction_space(destination)
+				var landing: Vector2=exit.arrival if exit.arrival.is_finite() else destination.entry_offset
+				if not destination.contains_offset(landing,30): _fail(exit,"Door arrival outside cell: "+target.id)
+				for obstacle in destination.obstacles:
+					if Rect2(obstacle.position-obstacle.size*.5,obstacle.size).grow(20).has_point(landing): _fail(exit,"Door arrival blocked by furniture: "+target.id)
 	# All claims must be collected before checking cross-region exit references.
 	var return_points: Array[Vector2] = []
 	for region in catalog.chapter.regions:

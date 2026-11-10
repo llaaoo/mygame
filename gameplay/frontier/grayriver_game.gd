@@ -39,6 +39,7 @@ func render_terrain(layout: RunRoomLayout) -> void:
 	terrain.game = self
 	terrain.layout = layout
 	region_root.add_child(terrain)
+	if current_data.map_scene: region_root.add_child(current_data.map_scene.instantiate())
 func _build_camp() -> void:
 	_add_interaction("镇中篝火：休整与粗食",Vector2(-3500,2100),Callable(),"mechanism")
 	var rest := region_root.get_child(region_root.get_child_count()-1) as ExplorationInteractable
@@ -129,6 +130,9 @@ func show_map() -> void:
 	root.add_child(map)
 	var row:=HBoxContainer.new()
 	row.add_child(FrontierWidgets.button("定位当前位置",map.center_player))
+	if current_data.map_scene and not current_data.open_field:
+		row.add_child(FrontierWidgets.button("当前室内",map.set_local.bind(true)))
+		row.add_child(FrontierWidgets.button("河谷全图",map.set_local.bind(false)))
 	row.add_child(FrontierWidgets.button("清除路标",func(): progress.waypoint.clear(); _queue_save(); map.queue_redraw()))
 	root.add_child(row)
 	ui.show_view("行路图",root,"map")
@@ -137,6 +141,8 @@ func discovered_places() -> String:
 	var text:=""
 	for point in definition.landmarks:
 		if progress.claims.has("place."+point.id): text+=point.title+" · "+point.description+"\n"
+	for region: ExplorationRegionData in catalog.regions.values():
+		if region.map_scene and not region.open_field and progress.visited.has(region.id): text+=region.title+" · 镇中室内地点\n"
 	return text
 
 func _bootstrap() -> void:
@@ -216,6 +222,7 @@ func _change_region(destination: String, arrival: Vector2 = Vector2.INF) -> void
 			var person: Dictionary=GrayriverStories.PEOPLE[id]
 			progress.claim(person.claim,person.title,"先前旅程已以战斗结束这段纠纷。",[],[])
 	super._change_region(destination,arrival)
+	if destination!="camp": residents.mount()
 	# New optional encounters remain available in regions cleared by older saves.
 	if destination != "camp" and progress.cleared.has(destination):
 		var layout := current_data.make_layout()
@@ -223,9 +230,10 @@ func _change_region(destination: String, arrival: Vector2 = Vector2.INF) -> void
 		for i in range(current_data.encounters.size()):
 			if current_data.encounters[i].optional_encounter: _spawn_enemy(current_data.encounters[i],layout,i)
 	loot.mount_region()
-	var scenery:=FrontierScenery.new()
-	scenery.game=self
-	region_root.add_child(scenery)
+	if not current_data.map_scene or destination=="camp":
+		var scenery:=FrontierScenery.new()
+		scenery.game=self
+		region_root.add_child(scenery)
 
 func _show_quests() -> void:
 	hub.open("quests")

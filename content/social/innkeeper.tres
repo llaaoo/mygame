@@ -1,0 +1,45 @@
+[gd_resource type="Resource" script_class="NpcProfile" format=3]
+[ext_resource type="Script" path="res://gameplay/social/npc_profile.gd" id="profile"]
+[ext_resource type="Script" path="res://gameplay/social/npc_topic.gd" id="topic"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/navigation_hint.gd" id="nav"]
+[ext_resource type="Resource" path="res://content/social/innkeeper_character.tres" id="character"]
+[ext_resource type="Resource" path="res://content/foundation/trainer_schedule.tres" id="schedule"]
+[ext_resource type="Resource" path="res://content/maps/grayriver/inn_market.tres" id="market"]
+[sub_resource type="Resource" id="about"]
+script = ExtResource("topic")
+id = "about"
+title = "这里能做什么？"
+response = "西间留有客床和旅人寄存箱，炉灶在大厅东侧。休息要消耗你带来的烤饼和清水，按实际小时推进；寄存的东西不会凭空变多，药效和涂层也照常计时。公用补给柜里的少量原料可以取用，用完不补。"
+[sub_resource type="Resource" id="trade"]
+script = ExtResource("topic")
+id = "trade"
+title = "买卖食物与补给"
+response = "这些是我实际留在店里的吃喝，钱袋和库存都有限。"
+kind = 1
+category = "服务"
+service = "trade"
+[sub_resource type="Resource" id="workshop"]
+script = ExtResource("nav")
+target_region = "river_workshop"
+[sub_resource type="Resource" id="records"]
+script = ExtResource("nav")
+target_region = "river_records"
+[sub_resource type="Resource" id="directions"]
+script = ExtResource("topic")
+id = "directions"
+title = "镇里还有哪些能进去的地方？"
+response = "西北作坊有制造台和装备整备架，东侧公署可读文书。先离开客栈，再按门牌走；萨芙和艾妲白天仍在集市当值。"
+navigation_hints = [SubResource("workshop"), SubResource("records")]
+[resource]
+script = ExtResource("profile")
+actor_id = "river.innkeeper"
+region_id = "river_inn"
+role = "客栈接待、实物补给与镇中指路"
+character = ExtResource("character")
+schedule = ExtResource("schedule")
+market = ExtResource("market")
+work_position = Vector2(160, -80)
+rest_position = Vector2(440, 30)
+greeting = "进来歇歇脚。想买些吃喝，还是问问客床和寄存箱？"
+familiar_greeting = "又回来了。你的寄存物还在原处，先看看要补些什么。"
+topics = [SubResource("about"), SubResource("trade"), SubResource("directions")]

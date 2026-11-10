@@ -1,0 +1,419 @@
+[
+  {
+    "op": "click",
+    "label": "开始河谷旅程"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3500,
+      2350
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F"
+  },
+  {
+    "op": "click",
+    "label": "记入日志，继续探索"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3850,
+      2300
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F"
+  },
+  {
+    "op": "click",
+    "label": "记入日志，继续探索"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3760,
+      2510
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F",
+    "capture": "01-town-directions"
+  },
+  {
+    "op": "click",
+    "label": "记入日志，继续探索"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3850,
+      3000
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -4100,
+      2960
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F",
+    "capture": "02-inn-entry"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -100,
+      100
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -400,
+      100
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -400,
+      200
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -520,
+      200
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F"
+  },
+  {
+    "op": "click",
+    "label": "存入物品"
+  },
+  {
+    "op": "click",
+    "label": "炭屑 ×7"
+  },
+  {
+    "op": "click",
+    "label": "存入整组"
+  },
+  {
+    "op": "click",
+    "label": "取出物品"
+  },
+  {
+    "op": "click",
+    "label": "炭屑 ×7"
+  },
+  {
+    "op": "click",
+    "label": "取1件到口袋"
+  },
+  {
+    "op": "click",
+    "label": "取1件到口袋"
+  },
+  {
+    "op": "capture",
+    "capture": "03-real-storage-remainder"
+  },
+  {
+    "op": "key",
+    "key": "Escape"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -350,
+      200
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -350,
+      -100
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -450,
+      -100
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F",
+    "capture": "04-hourly-bed"
+  },
+  {
+    "op": "key",
+    "key": "F"
+  },
+  {
+    "op": "wait",
+    "seconds": 3.4
+  },
+  {
+    "op": "walk",
+    "point": [
+      -350,
+      100
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -150,
+      100
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -150,
+      -80
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      160,
+      -20
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F"
+  },
+  {
+    "op": "click",
+    "label": "这里能做什么？"
+  },
+  {
+    "op": "click",
+    "label": "买卖食物与补给"
+  },
+  {
+    "op": "click",
+    "label": "谷粮 ×3 · 1币"
+  },
+  {
+    "op": "click",
+    "label": "出售一件 · 1币"
+  },
+  {
+    "op": "click",
+    "label": "出售一件 · 1币"
+  },
+  {
+    "op": "click",
+    "label": "购买实物"
+  },
+  {
+    "op": "click",
+    "label": "烤饼 ×6 · 2币"
+  },
+  {
+    "op": "click",
+    "label": "购买一件 · 2币"
+  },
+  {
+    "op": "capture",
+    "capture": "05-real-inn-trade"
+  },
+  {
+    "op": "key",
+    "key": "Escape"
+  },
+  {
+    "op": "walk",
+    "point": [
+      300,
+      -20
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      300,
+      300
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      0,
+      350
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3850,
+      3000
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3850,
+      1750
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -4250,
+      1610
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -310,
+      -85
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F"
+  },
+  {
+    "op": "click",
+    "label": "火石"
+  },
+  {
+    "op": "click",
+    "label": "加工：火石"
+  },
+  {
+    "op": "capture",
+    "capture": "06-workshop-crafting"
+  },
+  {
+    "op": "key",
+    "key": "Escape"
+  },
+  {
+    "op": "walk",
+    "point": [
+      0,
+      330
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -2900,
+      3000
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -2550,
+      2810
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -190,
+      -60
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F",
+    "capture": "07-records-readable"
+  },
+  {
+    "op": "click",
+    "label": "记入日志，继续探索"
+  },
+  {
+    "op": "key",
+    "key": "G",
+    "capture": "08-records-local-map"
+  },
+  {
+    "op": "click",
+    "label": "河谷全图"
+  },
+  {
+    "op": "click",
+    "label": "当前室内"
+  },
+  {
+    "op": "key",
+    "key": "Escape"
+  },
+  {
+    "op": "save",
+    "label": "town-cells-returned",
+    "capture": "09-town-cells-saved"
+  },
+  {
+    "op": "quit"
+  }
+]

@@ -75,6 +75,22 @@ response = "观察文书的签发时间和守岗的实际理由，再去核对�
 category = "能力见解"
 required_attributes = {"intelligence": 12}
 
+[sub_resource type="Resource" id="inn_lead"]
+script = ExtResource("hint")
+target_region = "river_inn"
+[sub_resource type="Resource" id="workshop_lead"]
+script = ExtResource("hint")
+target_region = "river_workshop"
+[sub_resource type="Resource" id="records_lead"]
+script = ExtResource("hint")
+target_region = "river_records"
+[sub_resource type="Resource" id="town_rooms"]
+script = ExtResource("topic")
+id = "town_rooms"
+title = "镇里有哪些能进去的屋子？"
+response = "门牌下按F就能进去。灰苇客栈有客床、个人寄存箱和柴灶，作坊可以制造和整备，公署有公开文书。萨芙和训练师白天仍在集市当值；进屋不会补货、跳时或恢复伤势。"
+navigation_hints = [SubResource("inn_lead"), SubResource("workshop_lead"), SubResource("records_lead")]
+
 [resource]
 script = ExtResource("profile")
 actor_id = "river.aida"
@@ -85,4 +101,4 @@ work_position = Vector2(-2840, 2260)
 rest_position = Vector2(-3820, 2680)
 greeting = "我记下的是行路人亲手做成的事。你想找活干，还是问问这片河谷？"
 familiar_greeting = "又见面了。你为河谷做的事我记着，我愿意把更远处的消息也告诉你，但传闻终究得自己去验证。"
-topics = [SubResource("analysis"), SubResource("about"), SubResource("quests"), SubResource("routes"), SubResource("herbs"), SubResource("archives"), SubResource("bridge_deed")]
+topics = [SubResource("analysis"), SubResource("about"), SubResource("quests"), SubResource("routes"), SubResource("town_rooms"), SubResource("herbs"), SubResource("archives"), SubResource("bridge_deed")]

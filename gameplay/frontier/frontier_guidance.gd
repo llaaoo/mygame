@@ -23,7 +23,7 @@ func next_step(quest: ExplorationQuestData) -> Dictionary:
 	return {"title":"回镇向艾妲报告","region":"camp","position":Vector2(-2900,2200),"known":true}
 func tracked() -> Dictionary:
 	if not game.progress.waypoint.is_empty():
-		return {"title":"自定路标","region":"camp","position":GrayriverDefinition.vector(game.progress.waypoint.position),"known":true}
+		return {"title":"自定路标","region":str(game.progress.waypoint.get("region","camp")),"position":GrayriverDefinition.vector(game.progress.waypoint.position),"known":true}
 	return goal_for(game.progress.tracked_quest)
 func goal_for(id: String) -> Dictionary:
 	for quest in game.quests:
@@ -93,8 +93,10 @@ func pin(id: String) -> void:
 	game.progress.tracked_quest = id
 	game.progress.waypoint.clear()
 	game._queue_save()
-func set_waypoint(point: Vector2) -> void:
-	if not point.is_finite(): return
-	point = point.clamp(Vector2(-4750,-3550),Vector2(4750,3550))
-	game.progress.waypoint = {"position":[point.x,point.y]}
+func set_waypoint(point: Vector2,region := "camp") -> void:
+	if not point.is_finite() or not game.catalog.regions.has(region): return
+	if region!="camp" and region!=game.region_id: return
+	var half: Vector2=game.catalog.regions[region].authored_size*.5-Vector2.ONE*50
+	point = point.clamp(-half,half)
+	game.progress.waypoint = {"position":[point.x,point.y],"region":region}
 	game._queue_save()

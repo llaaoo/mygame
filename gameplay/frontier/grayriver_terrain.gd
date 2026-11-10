@@ -173,8 +173,6 @@ func _draw_landmarks() -> void:
 		else:
 			art.draw_rect(Rect2(p-size*.5,size),Color("393f39"))
 			FrontierArt.tile(art,Vector2i(3,8),Rect2(p-size*.5-Vector2(0,12),size),Color("a3a597"))
-	for house in [Vector2(-4250,1450),Vector2(-4100,2800),Vector2(-2550,2650)]:
-		if _view.grow(260).has_point(house): FrontierArt.house(art,house)
 
 func _lake(point: Vector2, size: Vector2, color: Color) -> void:
 	var points:=PackedVector2Array()

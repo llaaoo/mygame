@@ -10,3 +10,4 @@ field_equipment = true
 tactical_combat = true
 world_interaction_art = true
 base_areas = [Rect2(-4600,1100,2400,2200)]
+additional_base_regions = PackedStringArray("river_inn", "river_workshop", "river_records")

@@ -177,8 +177,6 @@ static func build() -> ExplorationChapterData:
 				valve.paths.append(path)
 			region.valves.append(valve)
 		if region.open_field:
-			for house in [Vector2(-4250,1450),Vector2(-4100,2800),Vector2(-2550,2650)]:
-				region.authored_obstacles.append({"position":house,"size":Vector2(230,150),"kind":"house"})
 			var rng:=RandomNumberGenerator.new()
 			rng.seed=162103
 			for x in range(-4200,-1600,280):
@@ -194,6 +192,7 @@ static func build() -> ExplorationChapterData:
 							if Geometry2D.get_closest_point_to_segment(point,vector(road[i]),vector(road[i+1])).distance_to(point)<140:clear=false
 					if clear:region.authored_obstacles.append({"position":point,"size":Vector2(38,34),"kind":"tree"})
 		chapter.regions.append(region)
+	(load("res://content/maps/grayriver/catalog.tres") as MapCellCatalog).append_to(chapter)
 	for raw in definition.quests:
 		var quest := ExplorationQuestData.new()
 		quest.id = raw.id

@@ -1,0 +1,135 @@
+[gd_scene format=3]
+[ext_resource type="Script" path="res://gameplay/maps/authored_map_cell.gd" id="cell"]
+[ext_resource type="Script" path="res://gameplay/exploration/exploration_region_data.gd" id="region"]
+[ext_resource type="PackedScene" path="res://gameplay/maps/furniture.tscn" id="furniture"]
+[ext_resource type="PackedScene" path="res://gameplay/maps/feature.tscn" id="feature"]
+[ext_resource type="Resource" path="res://content/presentation/interior.tres" id="environment"]
+[ext_resource type="Script" path="res://gameplay/maps/map_amenity_data.gd" id="script1"]
+[ext_resource type="Script" path="res://gameplay/maps/map_amenity_data.gd" id="script2"]
+[ext_resource type="Script" path="res://gameplay/maps/world_storage_data.gd" id="script3"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/navigation_hint.gd" id="nav3"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/discovery_data.gd" id="script4"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/exit_data.gd" id="script5"]
+
+[ext_resource type="Texture2D" path="res://content/art/prison/prison_sucai/15_wood_table_large.png" id="art_table"]
+[ext_resource type="Texture2D" path="res://content/art/prison/prison_sucai/14_prison_bed.png" id="art_bed"]
+[ext_resource type="Texture2D" path="res://content/art/prison/prison_sucai/40_bookshelf_tall.png" id="art_shelf"]
+[ext_resource type="Texture2D" path="res://content/art/prison/prison_sucai/25_treasure_chest.png" id="art_chest"]
+[ext_resource type="Texture2D" path="res://content/art/prison/prison_sucai/42_wall_window_lit.png" id="art_window"]
+[ext_resource type="Texture2D" path="res://content/art/prison/prison_sucai/45_rug_blue_gold.png" id="art_rug"]
+
+[sub_resource type="Resource" id="definition"]
+script = ExtResource("region")
+id = "river_workshop"
+title = "萨芙整修作坊"
+description = "可进入的镇中地点；F与实物交互，G查看室内地图。"
+authored_size = Vector2(1152, 832)
+authored_entry = Vector2(0, 280)
+presentation_environment = ExtResource("environment")
+[sub_resource type="Resource" id="feature1"]
+script = ExtResource("script1")
+id = "town.workshop.craft"
+title = "炼制作业台：制造与炼制"
+service = "craft"
+[sub_resource type="Resource" id="feature2"]
+script = ExtResource("script2")
+id = "town.workshop.equipment"
+title = "装备整备架"
+service = "equipment"
+[sub_resource type="Resource" id="feature3"]
+script = ExtResource("script3")
+id = "storage.town.workshop.common"
+title = "作坊公共材料箱"
+capacity = 12
+access_actor_id = ""
+initial_items = {"charcoal": 1, "sap": 1}
+[sub_resource type="Resource" id="nav3_0"]
+script = ExtResource("nav3")
+target_region = "river_inn"
+[sub_resource type="Resource" id="nav3_1"]
+script = ExtResource("nav3")
+target_region = "river_records"
+[sub_resource type="Resource" id="feature4"]
+script = ExtResource("script4")
+id = "town.workshop.ledger"
+title = "作坊作业记录"
+text = "制造从随身的真实物资扣料；寄存箱里的东西要先取出。这里只提供作业台和整备位置。萨芙白天在镇中摊位交易、拆解、强化和接排产；店里的原料与成品归她本人，不会因你进出屋子重新出现。客栈可以寄存物资，公署记录河谷来往。"
+requires_clear = false
+navigation_hints = [SubResource("nav3_0"), SubResource("nav3_1")]
+[sub_resource type="Resource" id="feature5"]
+script = ExtResource("script5")
+title = "离开整修作坊"
+target = "camp"
+arrival = Vector2(-4250, 1610)
+
+[node name="river_workshop" type="Node2D"]
+script = ExtResource("cell")
+region_definition = SubResource("definition")
+floor_style = "stone"
+floor_tint = Color(0.37,0.39,0.36,1)
+
+[node name="工作地垫" parent="." instance=ExtResource("furniture")]
+position = Vector2(-270, 10)
+footprint = Vector2(330, 300)
+form = "rug"
+solid = false
+tint = Color(0.36,0.32,0.26,1)
+texture = ExtResource("art_rug")
+[node name="炼制作业台" parent="." instance=ExtResource("furniture")]
+position = Vector2(-310, -200)
+footprint = Vector2(240, 70)
+form = "table"
+solid = true
+texture = ExtResource("art_table")
+[node name="炼制作业台：制造与炼制" parent="." instance=ExtResource("feature")]
+position = Vector2(-310, -85)
+definition = SubResource("feature1")
+[node name="装备整备架外观" parent="." instance=ExtResource("furniture")]
+position = Vector2(380, -210)
+footprint = Vector2(160, 70)
+form = "shelf"
+solid = true
+texture = ExtResource("art_shelf")
+visual_size = Vector2(160.0, 110)
+visual_offset = Vector2(0, -28)
+[node name="装备整备架" parent="." instance=ExtResource("feature")]
+position = Vector2(380, -95)
+definition = SubResource("feature2")
+[node name="铁砧" parent="." instance=ExtResource("furniture")]
+position = Vector2(210, 80)
+footprint = Vector2(100, 64)
+form = "anvil"
+solid = true
+[node name="炉火" parent="." instance=ExtResource("furniture")]
+position = Vector2(430, 210)
+footprint = Vector2(100, 76)
+form = "hearth"
+solid = true
+[node name="备用料箱" parent="." instance=ExtResource("furniture")]
+position = Vector2(-430, 160)
+footprint = Vector2(110, 60)
+form = "chest"
+solid = true
+texture = ExtResource("art_chest")
+[node name="作坊公共材料箱" parent="." instance=ExtResource("feature")]
+position = Vector2(-430, 260)
+definition = SubResource("feature3")
+[node name="作业记录架" parent="." instance=ExtResource("furniture")]
+position = Vector2(40, -350)
+footprint = Vector2(180, 42)
+form = "shelf"
+solid = true
+texture = ExtResource("art_shelf")
+visual_size = Vector2(180.0, 110)
+visual_offset = Vector2(0, -28)
+[node name="作坊作业记录" parent="." instance=ExtResource("feature")]
+position = Vector2(40, -260)
+definition = SubResource("feature4")
+[node name="作坊出口" parent="." instance=ExtResource("furniture")]
+position = Vector2(0, 392)
+footprint = Vector2(110, 22)
+form = "door"
+solid = false
+[node name="离开整修作坊" parent="." instance=ExtResource("feature")]
+position = Vector2(0, 330)
+definition = SubResource("feature5")

@@ -1,0 +1,126 @@
+[gd_scene format=3]
+[ext_resource type="Script" path="res://gameplay/maps/authored_map_cell.gd" id="cell"]
+[ext_resource type="Script" path="res://gameplay/exploration/exploration_region_data.gd" id="region"]
+[ext_resource type="PackedScene" path="res://gameplay/maps/furniture.tscn" id="furniture"]
+[ext_resource type="PackedScene" path="res://gameplay/maps/feature.tscn" id="feature"]
+[ext_resource type="Resource" path="res://content/presentation/interior.tres" id="environment"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/navigation_hint.gd" id="nav0"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/discovery_data.gd" id="script1"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/navigation_hint.gd" id="nav1"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/discovery_data.gd" id="script2"]
+[ext_resource type="Script" path="res://gameplay/maps/world_storage_data.gd" id="script3"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/exit_data.gd" id="script4"]
+
+[ext_resource type="Texture2D" path="res://content/art/prison/prison_sucai/15_wood_table_large.png" id="art_table"]
+[ext_resource type="Texture2D" path="res://content/art/prison/prison_sucai/14_prison_bed.png" id="art_bed"]
+[ext_resource type="Texture2D" path="res://content/art/prison/prison_sucai/40_bookshelf_tall.png" id="art_shelf"]
+[ext_resource type="Texture2D" path="res://content/art/prison/prison_sucai/25_treasure_chest.png" id="art_chest"]
+[ext_resource type="Texture2D" path="res://content/art/prison/prison_sucai/42_wall_window_lit.png" id="art_window"]
+[ext_resource type="Texture2D" path="res://content/art/prison/prison_sucai/45_rug_blue_gold.png" id="art_rug"]
+
+[sub_resource type="Resource" id="definition"]
+script = ExtResource("region")
+id = "river_records"
+title = "河谷公署"
+description = "可进入的镇中地点；F与实物交互，G查看室内地图。"
+authored_size = Vector2(1152, 832)
+authored_entry = Vector2(0, 280)
+presentation_environment = ExtResource("environment")
+[sub_resource type="Resource" id="nav0_0"]
+script = ExtResource("nav0")
+target_region = "river_inn"
+[sub_resource type="Resource" id="nav0_1"]
+script = ExtResource("nav0")
+target_region = "river_workshop"
+[sub_resource type="Resource" id="feature1"]
+script = ExtResource("script1")
+id = "town.records.directory"
+title = "河谷门址与行路图"
+text = "河谷镇仍沿集市和公共篝火生活。西北是萨芙的整修作坊，西南是灰苇客栈；镇民白天在原来的摊位和委托板旁当值。进入建筑不会替你恢复生命、补货或跳过时间，离开后仍回到同一扇门。"
+requires_clear = false
+navigation_hints = [SubResource("nav0_0"), SubResource("nav0_1")]
+[sub_resource type="Resource" id="nav1_0"]
+script = ExtResource("nav1")
+target_region = "river_archive"
+[sub_resource type="Resource" id="feature2"]
+script = ExtResource("script2")
+id = "town.records.river"
+title = "巡河档案索引"
+text = "这里是公开索引，不是旧档案原件。北路猎营的笔记提及林下档案窖，驿路留下运料单，真正的名册仍需亲自带回并出示给守岗者。读过索引不会替你发现遗迹、取得名册或完成委托。"
+requires_clear = false
+navigation_hints = [SubResource("nav1_0")]
+[sub_resource type="Resource" id="feature3"]
+script = ExtResource("script3")
+id = "storage.town.records.common"
+title = "公署公用寄存箱"
+capacity = 24
+access_actor_id = ""
+initial_items = {}
+[sub_resource type="Resource" id="feature4"]
+script = ExtResource("script4")
+title = "离开河谷公署"
+target = "camp"
+arrival = Vector2(-2550, 2810)
+
+[node name="river_records" type="Node2D"]
+script = ExtResource("cell")
+region_definition = SubResource("definition")
+floor_style = "stone"
+floor_tint = Color(0.40,0.41,0.37,1)
+
+[node name="中央阅览地毯" parent="." instance=ExtResource("furniture")]
+position = Vector2(0, -80)
+footprint = Vector2(540, 340)
+form = "rug"
+solid = false
+tint = Color(0.32,0.39,0.37,1)
+texture = ExtResource("art_rug")
+[node name="阅览桌" parent="." instance=ExtResource("furniture")]
+position = Vector2(-190, -170)
+footprint = Vector2(210, 72)
+form = "table"
+solid = true
+texture = ExtResource("art_table")
+[node name="河谷门址与行路图" parent="." instance=ExtResource("feature")]
+position = Vector2(-190, -60)
+definition = SubResource("feature1")
+[node name="北档案架" parent="." instance=ExtResource("furniture")]
+position = Vector2(-270, -355)
+footprint = Vector2(320, 46)
+form = "shelf"
+solid = true
+texture = ExtResource("art_shelf")
+visual_size = Vector2(320.0, 110)
+visual_offset = Vector2(0, -28)
+[node name="巡河档案索引" parent="." instance=ExtResource("feature")]
+position = Vector2(-270, -260)
+definition = SubResource("feature2")
+[node name="东档案架" parent="." instance=ExtResource("furniture")]
+position = Vector2(460, -130)
+footprint = Vector2(72, 280)
+form = "shelf"
+solid = true
+texture = ExtResource("art_shelf")
+[node name="文书长桌" parent="." instance=ExtResource("furniture")]
+position = Vector2(190, 80)
+footprint = Vector2(160, 70)
+form = "table"
+solid = true
+texture = ExtResource("art_table")
+[node name="归档箱" parent="." instance=ExtResource("furniture")]
+position = Vector2(-420, 150)
+footprint = Vector2(96, 58)
+form = "chest"
+solid = true
+texture = ExtResource("art_chest")
+[node name="公署公用寄存箱" parent="." instance=ExtResource("feature")]
+position = Vector2(-420, 245)
+definition = SubResource("feature3")
+[node name="公署出口" parent="." instance=ExtResource("furniture")]
+position = Vector2(0, 392)
+footprint = Vector2(110, 22)
+form = "door"
+solid = false
+[node name="离开河谷公署" parent="." instance=ExtResource("feature")]
+position = Vector2(0, 330)
+definition = SubResource("feature4")

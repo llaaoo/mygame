@@ -9,8 +9,8 @@ Q/E/R与1—0独立快捷槽 · F交互 · M/按住中键选材 · K编组\n界�
 func _update_objective() -> void:
 	if not game.current_data: return
 	game.ui.heading.text = game.current_data.title + (" · 河谷镇" if game.is_at_base() else " · 野外" if game.region_id=="camp" else "")
-	game.ui.objective.text = ("河谷镇 · 可以整备、烹饪、训练和交付" if game.is_at_base() else game.current_data.description)
-	if game.is_at_base() and game.progress.claims.has("river.handbook") and game.progress.claims.has("river.pack") and not game.progress.claims.has("river.fire"):
+	game.ui.objective.text = ("镇中门牌可F进入 · 客栈寄存休息 / 作坊制造 / 公署阅读" if game.region_id=="camp" and game.is_at_base() else game.current_data.description)
+	if game.region_id=="camp" and game.is_at_base() and game.progress.claims.has("river.handbook") and game.progress.claims.has("river.pack") and not game.progress.claims.has("river.fire"):
 		game.ui.objective.text = "北路通林地 · 东路通旧驿站 · G 行路图"
 func journal_text() -> String:
 	var text := "灰河谷旅程\nWASD移动，左键近战，右键格挡，R键火花，F调查；G地图、N补给、M/中键按槽选材、K编组、I行囊、O穿戴。知识通过现场阅读学习；组合由当前地面、法阵、恩赐和素材产生。\n\n已发现地点\n"

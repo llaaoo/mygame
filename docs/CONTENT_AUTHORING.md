@@ -1,5 +1,7 @@
 # 内容接入与系统扩展
 
+2026-11-10：[地图场景编辑](TOWN_MAP_CELLS.md)通过MapCellCatalog登记可视化房屋/室内场景，Node2D位置为唯一空间来源，类型化Resource提供门、站点、文书、服务和固定容器。碰撞、寻路和室内地图共用footprint；公共库存只初始化一次，空箱保留。
+
 2026-11-08，北京时间。本指南描述已接入灰河谷的内容入口；系统契约见[SYSTEM_EXTENSIBILITY](SYSTEM_EXTENSIBILITY.md)。沿用Godot4.6的Resource定义、场景装配和显式依赖注入，不增加规则脚本语言。
 
 ## 增加内容应改哪里

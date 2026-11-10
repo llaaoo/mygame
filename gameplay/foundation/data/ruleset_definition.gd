@@ -15,7 +15,9 @@ extends Resource
 
 @export var base_region := "camp"
 @export var base_areas: Array[Rect2]=[]
+@export var additional_base_regions: PackedStringArray=[]
 func is_base(region: String,point: Vector2) -> bool:
+	if region in additional_base_regions: return true
 	if region!=base_region: return false
 	if base_areas.is_empty(): return true
 	return base_areas.any(func(area: Rect2): return area.has_point(point))

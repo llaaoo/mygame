@@ -3,6 +3,7 @@ extends Node2D
 var harvest_ready_query: Callable
 
 var world_art := false
+var marker_art := true
 var title := "交互"
 var tint := Color(0.95, 0.7, 0.25)
 var callback: Callable
@@ -26,7 +27,7 @@ func _ready() -> void:
 	interaction.name = "Interactable"
 	provider=InteractionProvider.new()
 	provider.available=func(_id: String):
-		return is_instance_valid(_visitor) and is_inside_tree() and _visitor.global_position.distance_to(global_position)<80
+		return is_instance_valid(_visitor) and is_inside_tree() and _visitor.global_position.distance_to(global_position)<80 and visible_from(_visitor)
 	provider.options=func(_id: String):
 		var option:=InteractionOption.new()
 		option.id="interact"; option.title=title
@@ -54,12 +55,17 @@ func _ready() -> void:
 	add_child(presentation)
 	queue_redraw()
 
+func visible_from(actor: Node2D) -> bool:
+	if not is_inside_tree() or not is_instance_valid(actor): return false
+	var ray:=PhysicsRayQueryParameters2D.create(actor.global_position,global_position,1)
+	return get_world_2d().direct_space_state.intersect_ray(ray).is_empty()
+
 func presentation_snapshot() -> Dictionary:
 	var station:=get_meta("survival_station") as SurvivalStationData if has_meta("survival_station") else null
 	var form:=kind
 	var state:="active" if _near else "idle"
 	var offset:=Vector2.ZERO
-	if get_meta("survival_rest",false): form="hearth"; state="active"
+	if get_meta("survival_rest",false): form="hearth" if marker_art else "bed"; state="active"
 	elif station:
 		form=station.kind
 		if form=="cook":
@@ -95,6 +101,9 @@ func _update_proximity() -> void:
 	if world_art and has_meta("survival_station"): queue_redraw()
 
 func _draw() -> void:
+	if not marker_art:
+		if _near: draw_arc(Vector2.ZERO,22,0,TAU,32,Color(tint,.6),1,true)
+		return
 	if presentation and presentation.has_body_art(): return
 	if world_art:
 		_draw_frontier()

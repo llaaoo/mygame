@@ -25,6 +25,7 @@ var practice_active := false # Regional rehearsal only; never serialized as prog
 var progress_service: ExplorationProgressService
 var presenter: ExplorationPresenter
 var builder: ExplorationRegionBuilder
+var world_storage: WorldStorageService
 var _save_dirty: bool:
 	get: return progress_service._save_dirty if progress_service else false
 var persistence_enabled := true
@@ -252,7 +253,7 @@ func _change_region(destination: String, arrival: Vector2 = Vector2.INF) -> void
 	render_terrain(layout)
 	region_root.add_child(preload("res://gameplay/exploration/surface_overlay.gd").new())
 	player.global_position = layout.entry_offset
-	if arrival.is_finite() and layout.is_point_clear(arrival, 20):
+	if arrival.is_finite() and layout.is_walkable(arrival, 20):
 		player.global_position = arrival
 	var camera := player.get_node_or_null("Camera2D") as Camera2D
 	if camera:
@@ -500,6 +501,11 @@ func _process(delta: float) -> void:
 		progress_service.tick(delta)
 
 func render_terrain(layout: RunRoomLayout) -> void:
+	if current_data.map_scene:
+		var map:=current_data.map_scene.instantiate() as AuthoredMapCell
+		region_root.add_child(map)
+		map.mount_collision(layout)
+		return
 	_renderer.build(region_root, layout)
 
 func is_at_base() -> bool: return region_id == "camp"
