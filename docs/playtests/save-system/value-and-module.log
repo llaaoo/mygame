@@ -1,0 +1,6 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+
+SaveManager: saved user://save_91.sav
+SaveManager: saved user://save_91.sav
+SaveManager: saved user://save_92.sav
+PASS save sections: opt-in fields/defaults, additive revisions, opaque round-trip/slot isolation, local migration, no implicit breaking reset, ordered all-validated restore, runtime value rejection and future module write/restart protection

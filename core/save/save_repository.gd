@@ -2,9 +2,12 @@ class_name SaveRepository
 extends RefCounted
 ## Owns file validation, migration and replacement. Never restores gameplay state.
 
-const VERSION := 9
+## This is the file envelope revision, not the gameplay/content release number.
+const VERSION := 10
+const MAX_FILE_BYTES := 64*1024*1024
 enum Status { MISSING, VALID, RECOVERED, INVALID, UNSUPPORTED_VERSION, IO_ERROR }
 var section_validators: Dictionary = {}
+var sections:=SaveSections.new()
 
 class ReadResult extends RefCounted:
 	var status: Status
@@ -49,6 +52,7 @@ func write(path: String, data: Dictionary) -> bool:
 ## primary AND backup. A later recovery cannot resurrect the previous journey.
 func start_new(path: String,fresh: Dictionary,current: Dictionary) -> String:
 	if not _valid_shape(fresh) or not _valid_shape(current) or int(fresh.get("version",0))!=VERSION: return ""
+	if _read_file(path).status==Status.UNSUPPORTED_VERSION or _read_file(path+".bak").status==Status.UNSUPPORTED_VERSION: return ""
 	var archive:=path.get_base_dir().path_join("journey_archive").path_join(path.get_file().get_basename()+"_%d_%d"%[Time.get_unix_time_from_system(),Time.get_ticks_usec()])
 	if DirAccess.make_dir_recursive_absolute(archive)!=OK: return ""
 	for suffix in ["",".bak",".tmp"]:
@@ -99,6 +103,9 @@ func migrate(raw: Dictionary) -> Dictionary:
 			8:
 				# Bound provision clocks and production orders require the v9 reader.
 				data["extensions"]=data.get("extensions",{})
+			9:
+				# Independent section revisions; missing metadata means legacy revision 0.
+				data["extensions"]=data.get("extensions",{})
 		version += 1
 		data["version"] = version
 	return data
@@ -110,7 +117,7 @@ func _read_file(path: String) -> ReadResult:
 	if not file:
 		return ReadResult.new(Status.IO_ERROR)
 	# store_var writes a 32-bit length prefix. Reject truncated envelopes before decoding.
-	if file.get_length() < 4:
+	if file.get_length() < 4 or file.get_length()>MAX_FILE_BYTES:
 		return ReadResult.new(Status.INVALID)
 	var size := file.get_32()
 	if size < 4 or size != file.get_length() - 4:
@@ -124,12 +131,19 @@ func _read_file(path: String) -> ReadResult:
 		return ReadResult.new(Status.INVALID)
 	if int(raw.get("version", 1)) > VERSION:
 		return ReadResult.new(Status.UNSUPPORTED_VERSION)
-	if not _valid_shape(raw):
+	if not _valid_shape(raw,false):
 		return ReadResult.new(Status.INVALID)
 	var data := migrate(raw)
-	return ReadResult.new(Status.VALID, data) if not data.is_empty() else ReadResult.new(Status.INVALID)
+	if data.is_empty(): return ReadResult.new(Status.INVALID)
+	var prepared:=sections.prepare(data.get("extensions",{}))
+	if prepared.status==SaveSections.Status.UNSUPPORTED: return ReadResult.new(Status.UNSUPPORTED_VERSION)
+	if prepared.status!=SaveSections.Status.VALID: return ReadResult.new(Status.INVALID)
+	data["extensions"]=prepared.data
+	if not _valid_external_sections(prepared.data): return ReadResult.new(Status.INVALID)
+	return ReadResult.new(Status.VALID,data)
 
-func _valid_shape(data: Dictionary) -> bool:
+func _valid_shape(data: Dictionary,validate_sections := true) -> bool:
+	if not SaveValues.valid(data): return false
 	if not data.get("version", 1) is int:
 		return false
 	for key in ["meta", "player", "world", "quest", "extensions"]:
@@ -140,8 +154,9 @@ func _valid_shape(data: Dictionary) -> bool:
 	for section in extensions:
 		if not section is String or not extensions[section] is Dictionary:
 			return false
-		if section_validators.has(section) and not section_validators[section].call(extensions[section]):
-			return false
+	if validate_sections:
+		var prepared:=sections.prepare(extensions)
+		if prepared.status!=SaveSections.Status.VALID or not _valid_external_sections(prepared.data): return false
 
 	return (
 		_valid_fields(data.meta, {
@@ -152,6 +167,12 @@ func _valid_shape(data: Dictionary) -> bool:
 		and _valid_world(data.world)
 		and _valid_quests(data.quest)
 	)
+
+func _valid_external_sections(extensions: Dictionary) -> bool:
+	# Compatibility for existing repository consumers; new providers use sections.
+	for id in section_validators:
+		if extensions.has(id) and not section_validators[id].call(extensions[id]): return false
+	return true
 
 
 func _valid_player(player: Dictionary) -> bool:
@@ -279,10 +300,14 @@ func _valid_array(data: Variant, element_type: int) -> bool:
 
 
 func _write_file(path: String, data: Dictionary) -> Error:
+	# Enforce the same envelope budget on writes, before touching any file.
+	var bytes:=var_to_bytes(data)
+	if bytes.size()+4>MAX_FILE_BYTES: return ERR_INVALID_DATA
 	var file := FileAccess.open(path, FileAccess.WRITE)
 	if not file:
 		return FileAccess.get_open_error()
-	file.store_var(data, false)
+	file.store_32(bytes.size())
+	file.store_buffer(bytes)
 	file.flush()
 	var error := file.get_error()
 	file.close()
