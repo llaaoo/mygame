@@ -113,7 +113,7 @@
   {
     "op": "walk",
     "point": [
-      -3060,
+      -3350,
       -1200
     ],
     "tolerance": 6.0
@@ -130,6 +130,14 @@
   {
     "label": "记入日志，继续探索",
     "op": "click"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3060,
+      -1200
+    ],
+    "tolerance": 6.0
   },
   {
     "op": "wheel",
@@ -253,6 +261,10 @@
   {
     "op": "key",
     "key": "J"
+  },
+  {
+    "op": "click",
+    "label": "委托记录"
   },
   {
     "op": "click",
