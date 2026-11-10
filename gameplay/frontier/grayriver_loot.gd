@@ -3,8 +3,15 @@ extends RefCounted
 ## Persistent remainder ledger. No loot rolls and no refills from a character template.
 var game: GrayriverGame
 var corpses: Dictionary = {}
+var harvesting: CorpseHarvesting
 
-func _init(owner_game: GrayriverGame) -> void: game = owner_game
+func _init(owner_game: GrayriverGame) -> void:
+	game=owner_game;harvesting=CorpseHarvesting.new(game)
+
+func available(id: String) -> bool: return _available(id)
+func pending(id: String) -> bool:
+	var record: Dictionary=game.progress.loot_records.get(id,{})
+	return not record.is_empty() and (not record.equipment.is_empty() or not record.materials.is_empty() or not game.session.inventory.entries(id+".anatomy").is_empty())
 
 static func snapshot(enemy: CharacterBody2D) -> Dictionary:
 	var equipment := {}
@@ -201,6 +208,7 @@ func instance_entries(id: String) -> Array[Dictionary]:
 			var definition:=store.definitions.get(row.definition) as ItemData
 			if not definition: continue
 			result.append({"id":"uid:"+row.uid,"uid":row.uid,"kind":"equipment" if definition is EquipmentData else "materials","item":row.definition,"title":definition.display_name,"text":definition.description,"subtitle":"×%d · %s"%[row.quantity,store.state_text(row.uid)],"icon":definition.get_icon_texture() if definition is EquipmentData else definition.icon})
+	result.append_array(harvesting.entries(id))
 	return result
 
 func grant_cache(source_id: String, title: String, point: Vector2, materials: Dictionary) -> void:

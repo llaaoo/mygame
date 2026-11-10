@@ -22,7 +22,9 @@ func journal_text() -> String:
 	text += "\n已学制造配方\n"
 	var supplies:=game.player.skill_manager.combinations.supplies
 	for id in supplies.crafting_recipes:
-		if supplies.knows_recipe(id):text+=supplies.title(id)+"\n"
+		if supplies.knows_recipe(id):
+			var recipe:=supplies.crafting_recipes[id] as CraftingRecipe
+			text+=(recipe.title if not recipe.title.is_empty() else supplies.title(recipe.output_id))+"\n"
 	text += "\n永久成果\n"
 	for pair in [["river.bridge_fixed","中部木桥"],["alchemy.pump_open","工区排污泵与湿地清水"],["river.outpost","驿站前哨"],["alchemy.repaired","镇中调和台"]]:
 		text += ("✓ " if game.progress.claims.has(pair[0]) else "□ ")+pair[1]+"\n"
@@ -30,9 +32,10 @@ func journal_text() -> String:
 	for pair in [["alchemy.pump_open","alchemy.pump_taken","工区泵芯"],["alchemy.regulator_open","alchemy.regulator_taken","矿道调压器"]]:
 		if game.progress.claims.has(pair[0]) and not game.progress.claims.has(pair[1]): text += pair[2]+"：已解封，靠近F取件\n"
 	text += "\n未取战利品\n"
-	for record: Dictionary in game.progress.loot_records.values():
-		if record.equipment.is_empty() and record.materials.is_empty(): continue
-		text += game.catalog.regions[record.region].title+" · "+record.title+"：装备%d种，物资%d种，靠近F搜刮。\n" % [record.equipment.size(),record.materials.size()]
+	for id in game.progress.loot_records:
+		if not game.loot.pending(id): continue
+		var record: Dictionary=game.progress.loot_records[id]
+		text += game.catalog.regions[record.region].title+" · "+record.title+"：装备%d种，物资%d种，专业部位%d处，靠近F查看。\n" % [record.equipment.size(),record.materials.size(),game.session.inventory.entries(id+".anatomy").size()]
 	text += "\n发现记录\n"
 	for note in game.progress.journal: text += "\n"+note.title+"\n"+game.record_text(note)+"\n"
 	return text

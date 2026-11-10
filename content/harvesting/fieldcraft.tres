@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="FieldcraftCatalog" format=3]
+[ext_resource type="Script" path="res://gameplay/harvesting/fieldcraft_catalog.gd" id="catalog"]
+[ext_resource type="Script" path="res://gameplay/harvesting/fieldcraft_skill.gd" id="skill"]
+[sub_resource type="Resource" id="skinning"]
+script = ExtResource("skill")
+id = "skinning"
+title = "剥皮"
+description = "保留完整兽皮，可制成缚带与抹布。"
+prerequisites = PackedStringArray()
+costs = {"coin":6}
+[sub_resource type="Resource" id="fang_work"]
+script = ExtResource("skill")
+id = "fang_work"
+title = "取牙"
+description = "辨认齿根，取下可研磨的兽牙。"
+prerequisites = PackedStringArray("skinning")
+costs = {"coin":6}
+[sub_resource type="Resource" id="gland_work"]
+script = ExtResource("skill")
+id = "gland_work"
+title = "摘腺"
+description = "辨认污染腺囊，提取用于毒剂的腺液。"
+prerequisites = PackedStringArray("skinning")
+costs = {"coin":8}
+[resource]
+script = ExtResource("catalog")
+skills = Array[ExtResource("skill")]([SubResource("skinning"), SubResource("fang_work"), SubResource("gland_work")])

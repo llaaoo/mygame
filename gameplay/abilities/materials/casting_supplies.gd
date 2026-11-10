@@ -7,6 +7,7 @@ const MATERIAL_IDS := ["ash", "resin", "frost_salt", "storm_dust", "echo_ink", "
 const RAW_TITLES := {"charcoal": "炭屑", "sap": "树液", "crystal": "晶砂"}
 var inventory_store: InventoryService
 var actor_id := ""
+var fieldcraft: FieldcraftKnowledge
 var _amounts: Dictionary={}
 var amounts: Dictionary:
 	get: return inventory_store.material_amounts(actor_id) if inventory_store else _amounts
@@ -30,7 +31,7 @@ func _init() -> void:
 	for id in MATERIAL_IDS:
 		catalog[id] = load("res://content/casting_materials/%s.tres" % id)
 		crafting_recipes[id] = load("res://content/crafting/%s.tres" % id)
-	for id in ["arrows","guard_tonic","clear_tonic"]: crafting_recipes[id]=load("res://content/crafting/%s.tres"%id)
+	for id in ["arrows","guard_tonic","clear_tonic","hide_bindings","gland_venom","fang_ward"]: crafting_recipes[id]=load("res://content/crafting/%s.tres"%id)
 	for recipe in SpellOperationCatalog.default_catalog().recipes: crafting_recipes[recipe.id]=recipe
 
 func count(id: String) -> int:
@@ -194,6 +195,8 @@ func finish_transaction(commit: bool) -> Callable:
 	return changed.emit if notify else Callable()
 
 func knows_recipe(id: String) -> bool:
+	var recipe:=crafting_recipes.get(id) as CraftingRecipe
+	if recipe and not recipe.fieldcraft_skill.is_empty(): return fieldcraft!=null and fieldcraft.knows(actor_id,recipe.fieldcraft_skill)
 	return crafting_recipes.has(id) and (not restrict_crafting or known_recipes.has(id))
 
 func bind_inventory(store: InventoryService, owner_id: String) -> void:

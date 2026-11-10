@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="HarvestProfile" format=3]
+[ext_resource type="Script" path="res://gameplay/harvesting/harvest_profile.gd" id="profile"]
+[ext_resource type="Script" path="res://gameplay/harvesting/harvest_part.gd" id="part"]
+[sub_resource type="Resource" id="gland"]
+script = ExtResource("part")
+id = "gland"
+title = "毒腺"
+raw_item = "raw_gland"
+skill_id = "gland_work"
+outputs = {"gland_sample": 1}
+duration = 4
+[resource]
+script = ExtResource("profile")
+parts = Array[ExtResource("part")]([SubResource("gland")])

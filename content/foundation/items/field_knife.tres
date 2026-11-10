@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/item_data.gd" id="item"]
+[resource]
+script = ExtResource("item")
+id = "field_knife"
+display_name = "剥取小刀"
+description = "随身专业工具，不因处理遗骸而消耗；仍须先学会对应野外技艺。"
+weight = 0.4
+stackable = false
+max_stack = 1
+sell_price = 3

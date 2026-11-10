@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/item_data.gd" id="item"]
+[resource]
+script = ExtResource("item")
+id = "beast_hide"
+display_name = "完整兽皮"
+description = "可在作业台与灰烬一起加工为皮革缚带/抹布，或出售。"
+weight = 0.6
+stackable = true
+max_stack = 99
+sell_price = 3

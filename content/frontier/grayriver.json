@@ -349,6 +349,16 @@
             1530
           ],
           "text": "沉水总闸恢复供水后，这里开放清水口和常明柴灶；如果封存压力，则维护储备箱可以取用，井下竖井也成为捷径。这里不会同时提供两种后果。"
+        },
+        {
+          "id": "river.fieldcraft.warning",
+          "title": "猎人告示：辨敌与剥取",
+          "pos": [
+            -3450,
+            2180
+          ],
+          "requires_clear": false,
+          "text": "整修作坊有留赠的小刀和剥皮入门书；书要移入口袋后使用。镇中训练师还教授取牙与摘腺。普通武器、衣物和随身物资仍直接搜刮；兽皮、兽牙和毒腺要学会对应技艺，携刀在遗骸详情开始专业处理。未学会的部位会保留，之后可回来。处理时世界继续运转，先确认安全。\n\n西林深处有芦苇猎犬：扑咬锁向，绕侧反打。南湿地深处有沼甲伏兽：撞击慢而宽，不宜连续硬挡。旧监狱西侧的断路弓手会保持射距，利用掩体接近；箭是有限的。工区东侧的破阵手重杖起手明显，等落空再还击。\n\n学会的剥取技艺也解锁作业台配方：兽皮＋灰烬制抹布，兽牙＋晶砂研磨护阵粉，毒腺液＋草药精炼浓缩毒剂。"
         }
       ],
       "stations": [
@@ -1011,6 +1021,54 @@
           "group": "road",
           "id": "camp.bridge_keeper",
           "character": "bridge_keeper",
+          "optional": true
+        },
+        {
+          "id": "camp.fieldcraft.hound.v1",
+          "pos": [
+            -3900,
+            -2150
+          ],
+          "character": "hound",
+          "profile": "hound",
+          "detect_range": 300,
+          "group": "fieldcraft.hound",
+          "optional": true
+        },
+        {
+          "id": "camp.fieldcraft.crawler.v1",
+          "pos": [
+            2200,
+            2800
+          ],
+          "character": "crawler",
+          "profile": "crawler",
+          "detect_range": 300,
+          "group": "fieldcraft.crawler",
+          "optional": true
+        },
+        {
+          "id": "camp.fieldcraft.archer.v1",
+          "pos": [
+            2200,
+            -1700
+          ],
+          "character": "archer",
+          "profile": "archer",
+          "detect_range": 300,
+          "group": "fieldcraft.archer",
+          "optional": true
+        },
+        {
+          "id": "camp.fieldcraft.mauler.v1",
+          "pos": [
+            3800,
+            600
+          ],
+          "character": "mauler",
+          "profile": "mauler",
+          "detect_range": 300,
+          "group": "fieldcraft.mauler",
           "optional": true
         }
       ],

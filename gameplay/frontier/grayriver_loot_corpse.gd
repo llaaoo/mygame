@@ -29,10 +29,11 @@ func _ready() -> void:
 func refresh() -> void:
 	var record: Dictionary = service.game.progress.loot_records[loot_id]
 	var empty: bool = record.equipment.is_empty() and record.materials.is_empty()
+	var anatomical:=not service.game.session.inventory.entries(loot_id+".anatomy").is_empty()
 	if loot_id.begins_with("cache."):
 		visible = not empty
 		if empty: remove_from_group("interactable")
-	set_title(record.title + (" · 已搜空" if empty else " · 搜刮"))
+	set_title(record.title + (" · 待专业处理" if empty and anatomical else " · 已搜空" if empty else " · 搜刮"))
 	gear.items.clear()
 	gear.inventory_store=service.game.session.inventory
 	gear.display_uids.clear()

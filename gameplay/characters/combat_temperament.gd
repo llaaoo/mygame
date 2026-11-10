@@ -7,6 +7,7 @@ extends Resource
 @export var attack_pause := .35
 @export var retreat_fraction := .28
 @export var preferred_reach := .85
+@export var heavy_when_open := false
 func valid() -> bool:
 	for key in ["reaction_delay","defense_interval","guard_duration","attack_pause","retreat_fraction","preferred_reach"]:
 		if not is_finite(float(get(key))) or float(get(key))<0: return false

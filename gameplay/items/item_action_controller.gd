@@ -26,7 +26,7 @@ func begin(id: String,aim := false,requested_direction:=Vector2.ZERO,shortcut_so
 	var definition:=context.items.definitions.get(source.definition_id) as ItemData
 	if not definition or not definition.use_profile or definition.use_profile.kind==ItemUseDefinition.Kind.SPRAY: return false
 	profile=definition.use_profile
-	if profile.kind==ItemUseDefinition.Kind.BOOK and not context.martial.learn_reason(profile.technique_id).is_empty(): return false
+	if profile.kind==ItemUseDefinition.Kind.BOOK and not _book_reason().is_empty(): return false
 	weapon_uid=str(context.items.equipped(context.id).get(str(EquipmentData.SlotType.RIGHT_HAND),""))
 	if profile.kind==ItemUseDefinition.Kind.COATING and weapon_uid.is_empty(): return false
 	if context.actions.stamina.current<profile.stamina: return false
@@ -74,7 +74,7 @@ func advance(delta: float) -> void:
 func commit() -> bool:
 	if not busy() or not available() or not context.region.available(generation) or context.actions.operation_id!=operation_id or context.actor.get_node("HealthComponent").hp<hp or context.items.locate(uid)!=context.id+".pocket": cancel(); return false
 	if profile.kind==ItemUseDefinition.Kind.COATING and str(context.items.equipped(context.id).get(str(EquipmentData.SlotType.RIGHT_HAND),""))!=weapon_uid: cancel(); return false
-	if profile.kind==ItemUseDefinition.Kind.BOOK and not context.martial.learn_reason(profile.technique_id).is_empty(): cancel(); return false
+	if profile.kind==ItemUseDefinition.Kind.BOOK and not _book_reason().is_empty(): cancel(); return false
 	var plan:=CastPlan.new(); plan.actor=context.actor; plan.action=SkillData.new(); plan.action.operation_id="item_use"; plan.stamina_cost=profile.stamina
 	plan.instance_costs=[{"uid":uid,"property":"quantity","amount":1}]
 	var supplies: CastingSupplies=context.actor.get_node("SkillManager").combinations.supplies
@@ -89,7 +89,8 @@ func commit() -> bool:
 		var buffs:=context.actor.get_node("BuffManager") as BuffManager
 		for status in profile.payload.statuses: buffs.apply_buff(status,context.actor)
 	elif profile.kind==ItemUseDefinition.Kind.BOOK:
-		context.martial.learn(profile.technique_id)
+		var learned: bool=context.fieldcraft.learn(context.id,profile.fieldcraft_skill) if not profile.fieldcraft_skill.is_empty() else context.martial.learn(profile.technique_id)
+		if not learned: transaction.rollback(); cancel(); return false
 	else:
 		var projectile: ThrownDose=projectile_factory.call() if projectile_factory.is_valid() else ThrownDose.new()
 		if not is_instance_valid(projectile): transaction.rollback(); cancel(); return false
@@ -100,6 +101,9 @@ func commit() -> bool:
 	cancel()
 	if profile.kind==ItemUseDefinition.Kind.THROWABLE: context.actions.mode="recovery"; context.actions.remaining=.4
 	return true
+func _book_reason() -> String:
+	if not profile.fieldcraft_skill.is_empty(): return context.fieldcraft.reason(context.id,profile.fieldcraft_skill) if context.fieldcraft else "野外技艺不可用"
+	return context.martial.learn_reason(profile.technique_id)
 func _draw() -> void:
 	if not aiming or not context: return
 	var endpoint:=direction*profile.reach

@@ -1,0 +1,67 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:364)
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+⏰ WorldTime 启动: 08:00
+🏛️ GameRuntime: 五大 Runtime 初始化完成
+   CommandBus       : ✅
+   CombatExecutor   : ✅
+   CombatEventBus   : ✅
+   WorldRuntime     : ✅
+   SimulationRuntime: ✅
+   WorldTime        : ✅
+⚡ 已注册触发效果: OnKillBonusExp
+📊 CombatDebugger: trace enabled
+⏰ 08:00 (☀️ 白天)
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+⏰ WorldTime 启动: 08:00
+🏛️ GameRuntime: 五大 Runtime 初始化完成
+   CommandBus       : ✅
+   CombatExecutor   : ✅
+   CombatEventBus   : ✅
+   WorldRuntime     : ✅
+   SimulationRuntime: ✅
+   WorldTime        : ✅
+⚡ 已注册触发效果: OnKillBonusExp
+📊 CombatDebugger: trace enabled
+⏰ 08:00 (☀️ 白天)
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+⚡ [OnKillBonusExp] +15 额外经验 (target=Encounter_13)
+SaveManager: saved user://save_3.sav
+ENEMY_LIVE type=crawler seconds=6.64 enemy_harm=75 player_harm=13 enemy_actions=2 dodges=1 arrows_spent=0 mp=60
+⏰ WorldTime 启动: 08:00
+🏛️ GameRuntime: 五大 Runtime 初始化完成
+   CommandBus       : ✅
+   CombatExecutor   : ✅
+   CombatEventBus   : ✅
+   WorldRuntime     : ✅
+   SimulationRuntime: ✅
+   WorldTime        : ✅
+⚡ 已注册触发效果: OnKillBonusExp
+📊 CombatDebugger: trace enabled
+⏰ 08:00 (☀️ 白天)
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+ENEMY_LIVE type=archer seconds=10.15 enemy_harm=50 player_harm=54 enemy_actions=4 dodges=0 arrows_spent=4 mp=60
+⏰ WorldTime 启动: 08:00
+🏛️ GameRuntime: 五大 Runtime 初始化完成
+   CommandBus       : ✅
+   CombatExecutor   : ✅
+   CombatEventBus   : ✅
+   WorldRuntime     : ✅
+   SimulationRuntime: ✅
+   WorldTime        : ✅
+⚡ 已注册触发效果: OnKillBonusExp
+📊 CombatDebugger: trace enabled
+⏰ 08:00 (☀️ 白天)
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+⚡ [OnKillBonusExp] +15 额外经验 (target=Encounter_15)
+SaveManager: saved user://save_3.sav
+ENEMY_LIVE type=mauler seconds=6.12 enemy_harm=70 player_harm=30 enemy_actions=2 dodges=1 arrows_spent=0 mp=60
+PASS live enemy inputs: independent game-save crawler/archer/mauler encounters, normal AI, mouse attacks, real dodge/approach, finite arrows and shared damage; controlled arena/spear, not a balance benchmark

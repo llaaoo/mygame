@@ -124,8 +124,9 @@ func _craft_rows(screen: ExpeditionScreen, selected: String, query: String) -> v
 		var recipe: CraftingRecipe=supplies.crafting_recipes[id]
 		if not query.is_empty() and not (supplies.title(recipe.output_id)+supplies.describe_cost(recipe.inputs)).to_lower().contains(query.to_lower()): continue
 		var learned:=supplies.knows_recipe(id)
-		var button:=FoundationWidgets.button(supplies.title(recipe.output_id)+"
-"+("原料齐备" if supplies.can_pay(recipe.inputs) else "缺少原料") if learned else supplies.title(recipe.output_id)+"
+		var title:=recipe.title if not recipe.title.is_empty() else supplies.title(recipe.output_id)
+		var button:=FoundationWidgets.button(title+"
+"+("原料齐备" if supplies.can_pay(recipe.inputs) else "缺少原料") if learned else title+"
 尚未学会",_craft_select.bind(screen,id))
 		button.alignment=HORIZONTAL_ALIGNMENT_LEFT
 		button.clip_text=true
@@ -154,7 +155,7 @@ func _craft_detail(screen: ExpeditionScreen,id: String) -> void:
 		var line:=FoundationWidgets.label("%s    %d / %d"%[supplies.title(material),count,recipe.inputs[material]],14)
 		if count<int(recipe.inputs[material]): line.add_theme_color_override("font_color",GameUIStyle.GOLD)
 		card.add_child(line)
-	if not supplies.knows_recipe(id): card.add_child(FoundationWidgets.label("尚未学会 · 探索记录可解锁",14,true))
+	if not supplies.knows_recipe(id): card.add_child(FoundationWidgets.label("尚未学会 · "+("学习野外技艺："+FieldcraftCatalog.default_catalog().skill(recipe.fieldcraft_skill).title if not recipe.fieldcraft_skill.is_empty() else "探索记录可解锁"),14,true))
 	var action:=FoundationWidgets.button("加工："+supplies.title(recipe.output_id),_craft_selected.bind(screen,id),not supplies.knows_recipe(id) or not supplies.can_pay(recipe.inputs))
 	action.icon=GameUIStyle.icon("anvil"); action.expand_icon=true; action.add_theme_constant_override("icon_max_width",20)
 	screen.detail.add_child(action)

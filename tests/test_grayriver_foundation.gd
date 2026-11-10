@@ -19,7 +19,7 @@ func run() -> void:
 	for enemy in game.active_enemies: enemy.process_mode=Node.PROCESS_MODE_DISABLED
 	check(game.ready_for_play and game.save_slot==3 and game.save_section=="grayriver_frontier", "Frontier failed bootstrap or shares prototype save")
 	check(game.current_data.authored_size==Vector2(9600,7200) and game.is_at_base(),"World footprint/town spawn wrong")
-	check(game.active_enemies.size()==12 and not game.is_area_cleared(Vector2(-1500,350)),"Outdoor encounters or local clearing missing")
+	check(game.active_enemies.size()==game.current_data.encounters.size() and not game.is_area_cleared(Vector2(-1500,350)),"Outdoor encounters or local clearing missing")
 	var hp:=game.player.health_component.hp
 	game.player.position=Vector2(-1600,350)
 	check(not game.is_at_base(),"Wilderness counted as safe camp")

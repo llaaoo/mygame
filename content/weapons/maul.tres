@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="WeaponMoveset" format=3]
+[ext_resource type="Script" path="res://gameplay/foundation/data/weapon_moveset.gd" id="moves"]
+[ext_resource type="Script" path="res://gameplay/foundation/data/attack_profile.gd" id="attack"]
+[sub_resource type="Resource" id="stroke0"]
+script = ExtResource("attack")
+title = "探身横砸"
+motion = "thrust"
+windup = 0.45
+active = 0.16
+recovery = 0.62
+reach = 85
+angle_degrees = 110
+stamina_cost = 20
+impact = 32
+guard_pressure = 1.5
+step_distance = 8
+movement_multiplier = 0.1
+[sub_resource type="Resource" id="stroke1"]
+script = ExtResource("attack")
+title = "回身重砸"
+motion = "thrust"
+windup = 0.65
+active = 0.18
+recovery = 0.8
+reach = 95
+angle_degrees = 135
+stamina_cost = 26
+impact = 46
+guard_pressure = 1.8
+step_distance = 12
+movement_multiplier = 0.1
+[resource]
+script = ExtResource("moves")
+weapon_type = "staff"
+description = "重武器：起手明显、破防压力高，落空后恢复较长。"
+chain_window = 1.0
+attacks = [SubResource("stroke0"), SubResource("stroke1")]

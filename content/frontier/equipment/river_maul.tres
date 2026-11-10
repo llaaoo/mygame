@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="EquipmentData" format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/equipment_data.gd" id="item"]
+[ext_resource type="Resource" path="res://content/weapons/maul.tres" id="moves"]
+[ext_resource type="Script" path="res://gameplay/inventory/data/casting_equipment_profile.gd" id="cast"]
+[sub_resource type="Resource" id="Cast"]
+script = ExtResource("cast")
+[resource]
+script = ExtResource("item")
+id = "river_maul"
+display_name = "工区铁头重杖"
+description = "钝头长柄武器，砸击具有较高格挡压力，起手和收招较慢。兼容战杖武技与真实武器涂层。"
+weight = 3.5
+sell_price = 12
+slot_type = 6
+item_type = 3
+world_shape = "staff"
+world_color = Color(0.48,0.52,0.54,1)
+moveset = ExtResource("moves")
+casting_profile = SubResource("Cast")
+stat_modifiers = {"attack_damage": 2}
+icon_atlas_index = 23

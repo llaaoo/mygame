@@ -1,8 +1,11 @@
 class_name ActorCharacterData
 extends Resource
-## Shared by human actors; input, AI, rewards and persistence belong to controllers.
+## Shared body/loadout definitions; input, AI, rewards and persistence belong to controllers.
 @export var animation_profile: ActorAnimationProfile
 @export var temperament: CombatTemperament
+@export var body_moveset: WeaponMoveset
+@export var can_guard := true
+@export var harvest_profile: HarvestProfile
 @export var id: String
 @export var title: String
 @export var level := 1
@@ -27,6 +30,8 @@ func validation_errors(available_rules: Variant = null) -> Array[String]:
 		errors.append_array(animation_profile.validation_errors())
 		if not animation_profile.equipment_free or animation_profile not in ActorAnimationCatalog.default_catalog().profiles: errors.append("Unregistered/live profile with baked equipment")
 	if temperament and not temperament.valid(): errors.append("Invalid combat temperament")
+	if body_moveset and not body_moveset.valid(): errors.append("Invalid natural attack moveset")
+	if harvest_profile: errors.append_array(harvest_profile.validation_errors())
 	if level<1 or level>100: errors.append("Invalid character level")
 	if id.is_empty() or title.is_empty(): errors.append("Missing character id/title")
 	for key in Buff.PRIMARY_STATS:

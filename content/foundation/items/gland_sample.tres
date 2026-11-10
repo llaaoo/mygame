@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/item_data.gd" id="item"]
+[resource]
+script = ExtResource("item")
+id = "gland_sample"
+display_name = "毒腺液"
+description = "可与草药精炼浓缩毒剂，再装瓶或喷剂。"
+weight = 0.2
+stackable = true
+max_stack = 99
+sell_price = 3

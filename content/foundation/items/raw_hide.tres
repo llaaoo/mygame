@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/item_data.gd" id="item"]
+[resource]
+script = ExtResource("item")
+id = "raw_hide"
+display_name = "未剥取兽皮"
+description = "遗骸上的有限部位；先学剥皮再携刀处理。"
+weight = 0
+stackable = false
+max_stack = 1
+sell_price = 0

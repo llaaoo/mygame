@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="CraftingRecipe" format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/materials/crafting_recipe.gd" id="recipe"]
+[resource]
+script = ExtResource("recipe")
+id = "hide_bindings"
+inputs = {"beast_hide": 1, "ash": 1}
+output_id = "cloth"
+output_count = 2
+fieldcraft_skill = "skinning"
+title = "鞣制兽皮抹布"
