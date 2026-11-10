@@ -55,7 +55,8 @@ func _spawn_enemy(spec: ExplorationEncounterData, layout: RefCounted, index: int
 	enemy.health_drop_amount = 8
 	enemy.mana_drop_amount = 12
 	var point: Vector2 = spec.pos
-	if not layout.is_point_clear(point, 28):
+	var clear: bool=layout.is_walkable(point,28) if spec.has_meta("map_source") else layout.is_point_clear(point,28)
+	if not clear:
 		for candidate in layout.enemy_offsets:
 			var occupied := false
 			for other in game.active_enemies:

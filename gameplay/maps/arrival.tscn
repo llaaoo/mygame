@@ -1,0 +1,4 @@
+[gd_scene format=3]
+[ext_resource type="Script" path="res://gameplay/maps/map_arrival.gd" id="script"]
+[node name="Arrival" type="Marker2D"]
+script = ExtResource("script")

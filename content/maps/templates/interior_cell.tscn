@@ -1,0 +1,34 @@
+[gd_scene format=3]
+[ext_resource type="Script" path="res://gameplay/maps/authored_map_cell.gd" id="cell"]
+[ext_resource type="Script" path="res://gameplay/exploration/exploration_region_data.gd" id="region"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/exit_data.gd" id="exit"]
+[ext_resource type="PackedScene" path="res://gameplay/maps/arrival.tscn" id="arrival"]
+[ext_resource type="PackedScene" path="res://gameplay/maps/feature.tscn" id="feature"]
+[ext_resource type="PackedScene" path="res://gameplay/maps/furniture.tscn" id="furniture"]
+[sub_resource type="Resource" id="definition"]
+script = ExtResource("region")
+id = "change_me"
+title = "新地图"
+description = "复制模板后独立Resource、填写稳定ID并登记目录。"
+authored_size = Vector2(1280, 896)
+[sub_resource type="Resource" id="return"]
+script = ExtResource("exit")
+id = "change_me.return"
+title = "返回河谷镇"
+target = "camp"
+target_anchor = "entry"
+[node name="新地图" type="Node2D"]
+script = ExtResource("cell")
+region_definition = SubResource("definition")
+floor_style = "stone"
+[node name="默认入口落点" parent="." instance=ExtResource("arrival")]
+position = Vector2(0, 280)
+id = "entry"
+default_entry = true
+[node name="返回河谷镇" parent="." instance=ExtResource("feature")]
+position = Vector2(0, 350)
+definition = SubResource("return")
+[node name="可编辑家具" parent="." instance=ExtResource("furniture")]
+position = Vector2(160, -160)
+footprint = Vector2(120, 64)
+form = "table"

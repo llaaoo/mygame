@@ -1,0 +1,5 @@
+EDITOR_ERROR_NODE_SELECTION_PASS
+EDITOR_EXIT 0
+EDITOR_VALIDATE_AND_PLAY_PASS
+EDITOR_EXIT 0
+EDITOR_AUTHORING_INPUT_PASS: native mouse clicks, blocked spawn diagnostic selects actual node, saved catalog validation and isolated playable scene launch

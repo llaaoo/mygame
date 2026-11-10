@@ -3,34 +3,57 @@ class_name AuthoredMapCell
 extends Node2D
 ## A Godot scene is the spatial authority. Existing typed Resources own rules.
 @export var region_definition: ExplorationRegionData
-@export_enum("wood", "stone", "overlay") var floor_style := "wood":
+@export_enum("wood", "stone", "ground", "overlay") var floor_style := "wood":
 	set(value): floor_style=value; queue_redraw()
 @export var floor_tint := Color("706555"):
 	set(value): floor_tint=value; queue_redraw()
 var _preview_extent := Vector2.ZERO
 
+func _get_configuration_warnings() -> PackedStringArray:
+	return PackedStringArray(validation_errors())
+
 static func compile(scene: PackedScene, overlay: ExplorationRegionData=null) -> ExplorationRegionData:
+	if not scene or not scene.can_instantiate(): return null
 	var instance:=scene.instantiate()
 	var map:=instance as AuthoredMapCell
 	if not map or not map.region_definition:
 		instance.free()
 		return null
-	var result:=overlay if overlay else map.region_definition.duplicate(true) as ExplorationRegionData
+	var result:=map.compile_definition(overlay)
 	result.map_scene=scene
-	result.map_errors=PackedStringArray(map.validation_errors())
-	for child in map.find_children("*","",true,false):
-		if child is MapFurniture and child.solid:
-			result.authored_obstacles.append({"position":map.point_for(child),"size":child.footprint,"kind":"map_furniture"})
-		elif child is MapFeature and child.definition:
-			var copy: Resource=child.definition.duplicate(true)
-			copy.pos=map.point_for(child)
-			if copy is ExplorationExitData: result.exits.append(copy)
-			elif copy is ExplorationDiscoveryData: result.discoveries.append(copy)
-			elif copy is SurvivalStationData: result.survival_stations.append(copy)
-			elif copy is MapAmenityData: result.amenities.append(copy)
-			elif copy is WorldStorageData: result.storage.append(copy)
 	map.free()
 	return result
+
+func compile_definition(overlay: ExplorationRegionData=null) -> ExplorationRegionData:
+	# Repeated builds never append into the source definition or a previous result.
+	var result:=overlay.duplicate(true) as ExplorationRegionData if overlay else region_definition.duplicate(true) as ExplorationRegionData
+	result.map_errors=PackedStringArray(validation_errors())
+	for child in find_children("*","",true,false):
+		if child is MapFurniture and child.solid:
+			result.authored_obstacles.append({"position":point_for(child),"size":child.footprint,"kind":"map_furniture","map_source":source_for(child)})
+		elif child is MapArrival:
+			result.arrival_points[child.id]=point_for(child)
+			result.map_arrival_rules[child.id]={"minimum_enemy_distance":child.minimum_enemy_distance,"map_source":source_for(child),"default_entry":child.default_entry}
+			if child.default_entry: result.authored_entry=point_for(child)
+		elif child is MapFeature and child.definition:
+			var collection:=MapFeature.collection_for(child.definition)
+			if collection.is_empty(): continue
+			var copy: Resource=child.definition.duplicate(true)
+			copy.pos=point_for(child)
+			copy.set_meta("map_source",source_for(child))
+			if copy is ExplorationEncounterData:
+				copy.set_meta("persistent_id",copy.persistent_id)
+				copy.set_meta("group",copy.group if not copy.group.is_empty() else result.id)
+			if copy is SurfaceValveData:
+				for path in copy.paths:
+					if path:
+						for i in path.points.size(): path.points[i]+=copy.pos
+			var entries: Array=result.get(collection)
+			entries.append(copy)
+	return result
+
+func source_for(node: Node) -> String:
+	return "%s::%s"%[scene_file_path,get_path_to(node)]
 
 func point_for(node: Node2D) -> Vector2:
 	var point:=Vector2.ZERO
@@ -42,14 +65,31 @@ func point_for(node: Node2D) -> Vector2:
 
 func validation_errors() -> Array[String]:
 	var errors: Array[String]=[]
-	if not region_definition: errors.append("Map cell requires a region definition")
-	elif not region_definition.authored_size.is_finite() or region_definition.authored_size.x<320 or region_definition.authored_size.y<320: errors.append("Map cell requires finite authored bounds")
-	if position!=Vector2.ZERO or rotation!=0 or scale!=Vector2.ONE: errors.append("Map root transform must be identity")
+	if not region_definition: errors.append(source_for(self)+": Map cell requires a region definition")
+	elif region_definition.id.is_empty() or region_definition.id.begins_with("change_me"): errors.append(source_for(self)+": Replace the template region identity before registration")
+	elif not region_definition.authored_size.is_finite() or region_definition.authored_size.x<320 or region_definition.authored_size.y<320 or region_definition.authored_size.x>24000 or region_definition.authored_size.y>24000: errors.append(source_for(self)+": Map cell bounds must be finite, between 320 and 24000")
+	elif region_definition.authored_entry!=Vector2.ZERO: errors.append(source_for(self)+": Set default entry on a MapArrival node, not Resource.authored_entry")
+	if position!=Vector2.ZERO or rotation!=0 or scale!=Vector2.ONE: errors.append(source_for(self)+": Map root transform must be identity")
+	var anchors: Dictionary={};var default_count:=0
 	for child in find_children("*","",true,false):
-		if child is Node2D and (not child.position.is_finite() or child.rotation!=0 or child.scale!=Vector2.ONE): errors.append("Map transforms support translation only: "+str(child.name))
-		if child is MapFurniture and (not child.footprint.is_finite() or child.footprint.x<=0 or child.footprint.y<=0): errors.append("Invalid furniture footprint: "+str(child.name))
-		if child is MapFeature and not (child.definition is ExplorationExitData or child.definition is ExplorationDiscoveryData or child.definition is SurvivalStationData or child.definition is MapAmenityData or child.definition is WorldStorageData): errors.append("Unsupported map feature: "+str(child.name))
-		if child is MapFeature and child.definition and "pos" in child.definition and child.definition.pos!=Vector2.ZERO: errors.append("Set feature position on the Node2D, not Resource.pos: "+str(child.name))
+		var at:=source_for(child)+": "
+		if child is AuthoredMapCell: errors.append(at+"Use Node2D prefab groups; connect separate map cells with passages")
+		if child is Node2D and (not child.position.is_finite() or child.rotation!=0 or child.scale!=Vector2.ONE): errors.append(at+"Map transforms support translation only")
+		if child is MapFurniture and (not child.footprint.is_finite() or child.footprint.x<=0 or child.footprint.y<=0): errors.append(at+"Invalid furniture footprint")
+		if child is MapArrival:
+			if child.id.is_empty() or anchors.has(child.id): errors.append(at+"Missing/duplicate arrival identity: "+child.id)
+			anchors[child.id]=true
+			if child.default_entry: default_count+=1
+			if not is_finite(child.minimum_enemy_distance) or child.minimum_enemy_distance<0 or child.minimum_enemy_distance>2000: errors.append(at+"Invalid enemy clearance")
+		if child is MapFeature:
+			if MapFeature.collection_for(child.definition).is_empty(): errors.append(at+"Unsupported map feature")
+			elif child.definition.pos!=Vector2.ZERO: errors.append(at+"Set feature position on the Node2D, not Resource.pos")
+			if child.definition is ExplorationExitData:
+				if child.definition.id.is_empty(): errors.append(at+"Authored passage requires a stable id")
+				if not child.definition.target_anchor.is_empty() and child.definition.arrival!=Vector2.INF: errors.append(at+"Use target_anchor or arrival coordinates, not both")
+			if child.definition is ExplorationEncounterData and child.definition.persistent_id.is_empty(): errors.append(at+"Authored encounter requires a persistent_id")
+			if child.definition is SurfacePatchData and (not is_finite(child.definition.radius) or child.definition.radius<=0 or child.definition.radius>1024): errors.append(at+"Authored surface radius must be finite, within 0–1024")
+	if default_count!=1: errors.append(source_for(self)+": Map requires exactly one default entry marker")
 	return errors
 
 func mount_collision(layout: RunRoomLayout) -> void:

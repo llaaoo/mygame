@@ -1,0 +1,220 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://gameplay/maps/authored_map_cell.gd" id="1_h84yp"]
+[ext_resource type="Script" path="res://gameplay/maps/map_amenity_data.gd" id="2_1myrj"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/delivery_site_data.gd" id="3_yj2av"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/discovery_data.gd" id="4_wq16e"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/encounter_data.gd" id="5_u6mfr"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/world_event_data.gd" id="6_7ykeo"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/exit_data.gd" id="7_85p1h"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/repair_facility_data.gd" id="8_cck4c"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/exploration_prop_data.gd" id="9_44ggs"]
+[ext_resource type="Script" path="res://gameplay/exploration/exploration_region_data.gd" id="10_0poi7"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/spell_puzzle_data.gd" id="11_xj8ao"]
+[ext_resource type="Script" path="res://gameplay/maps/world_storage_data.gd" id="12_utyk3"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/surface_patch_data.gd" id="13_dtyvr"]
+[ext_resource type="Script" path="res://gameplay/exploration/survival/survival_station_data.gd" id="14_hie17"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/surface_valve_data.gd" id="15_nv7oa"]
+[ext_resource type="Script" path="res://gameplay/maps/map_feature.gd" id="16_xi24o"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/navigation_hint.gd" id="17_ku1q8"]
+[ext_resource type="Resource" path="res://content/characters/river_guard.tres" id="18_hvc1c"]
+[ext_resource type="Resource" path="res://content/exploration/enemies/guard.tres" id="19_8ffge"]
+[ext_resource type="Resource" path="res://content/characters/river_caster.tres" id="20_g8ajj"]
+[ext_resource type="Resource" path="res://content/exploration/enemies/sentry.tres" id="21_y5pwm"]
+[ext_resource type="Script" path="res://gameplay/maps/map_furniture.gd" id="22_ihkoh"]
+[ext_resource type="Script" path="res://gameplay/maps/map_arrival.gd" id="23_3du8q"]
+
+[sub_resource type="Resource" id="Resource_3k8nr"]
+script = ExtResource("10_0poi7")
+id = "river_archive"
+title = "林下档案窖"
+description = "沿旧档案寻找水工图纸、回响与食品记录；出口始终开放。"
+authored_size = Vector2(2000, 1400)
+
+[sub_resource type="Resource" id="Resource_2xfy3"]
+script = ExtResource("4_wq16e")
+id = "river.pulse"
+title = "搬运工的震荡记录"
+text = "震荡（1）可以破冰。先观察目标已有状态，普通近战可以保留冻结控制。"
+intro_text = "震荡（1）可以破冰。先观察目标已有状态，普通近战可以保留冻结控制。"
+actions = Array[String](["pulse"])
+spell_rules = Array[String](["fire_sigil_pulse"])
+equipment = Array[String](["keeper_ring"])
+metadata/crafting_recipes = []
+
+[sub_resource type="Resource" id="Resource_axxya"]
+script = ExtResource("4_wq16e")
+id = "alchemy.schematic"
+title = "水工与调和台图纸"
+text = "读懂泵与调压器的检修。外部工区取泵芯、矿道取调压器，再回镇组装；法术、属性和材料途径都可实际尝试。"
+intro_text = "读懂泵与调压器的检修。外部工区取泵芯、矿道取调压器，再回镇组装；法术、属性和材料途径都可实际尝试。"
+metadata/crafting_recipes = []
+
+[sub_resource type="Resource" id="Resource_heojv"]
+script = ExtResource("4_wq16e")
+id = "river.echo"
+title = "封存回响刻板"
+text = "学会回响铭印，在后续基本动作上亲手触发不同结果。回响墨制造也记在这里。"
+intro_text = "学会回响铭印，在后续基本动作上亲手触发不同结果。回响墨制造也记在这里。"
+actions = Array[String](["echo_mark"])
+spell_rules = Array[String](["echo_spark", "echo_pulse", "echo_focus", "echo_water", "guard_pulse"])
+materials = {
+"crystal": 4,
+"echo_ink": 5,
+"sap": 4,
+"ward_powder": 2
+}
+metadata/crafting_recipes = ["echo_ink"]
+
+[sub_resource type="Resource" id="Resource_hrjs5"]
+script = ExtResource("4_wq16e")
+id = "survival.archive_recipe"
+title = "伙房旧谱：醒神茶"
+text = "苦叶1、饮用水1在锅边煮茶，可处理疲劳和当前中毒。野外火源失效不会继续免费烹饪。"
+intro_text = "苦叶1、饮用水1在锅边煮茶，可处理疲劳和当前中毒。野外火源失效不会继续免费烹饪。"
+materials = {
+"herb": 2
+}
+metadata/crafting_recipes = []
+
+[sub_resource type="Resource" id="Resource_d6663"]
+script = ExtResource("4_wq16e")
+id = "river.dossier"
+title = "监狱封锁名册"
+text = "水工守卫仍听命于旧监狱的火焰领主。查明工区污染后，可沿北岸或东侧驿道深入。"
+intro_text = "水工守卫仍听命于旧监狱的火焰领主。查明工区污染后，可沿北岸或东侧驿道深入。"
+requires_clear = true
+metadata/crafting_recipes = []
+
+[sub_resource type="Resource" id="Resource_1fh55"]
+script = ExtResource("17_ku1q8")
+target_region = "river_watch"
+
+[sub_resource type="Resource" id="Resource_3gdhe"]
+script = ExtResource("4_wq16e")
+id = "demo.dispatch"
+title = "巡河调度令"
+text = "失联队长把北岸烽堡的风井关闭了。先在上层修好风门，再下风井找信号台。返回镇中可分段交付记录，不必带满背包继续深入。遗钟墓的回执提到下游水闸；三份记录共同说明河谷污染的源头。"
+intro_text = "失联队长把北岸烽堡的风井关闭了。先在上层修好风门，再下风井找信号台。返回镇中可分段交付记录，不必带满背包继续深入。遗钟墓的回执提到下游水闸；三份记录共同说明河谷污染的源头。"
+navigation_hints = Array[ExtResource("17_ku1q8")]([SubResource("Resource_1fh55")])
+metadata/crafting_recipes = []
+
+[sub_resource type="Resource" id="Resource_fk0kw"]
+script = ExtResource("5_u6mfr")
+persistent_id = "river_archive.river_archive.1"
+group = "river_archive"
+profile = ExtResource("19_8ffge")
+character = ExtResource("18_hvc1c")
+metadata/persistent_id = "river_archive.river_archive.1"
+metadata/group = "river_archive"
+
+[sub_resource type="Resource" id="Resource_wfnf8"]
+script = ExtResource("5_u6mfr")
+persistent_id = "river_archive.river_archive.2"
+group = "river_archive"
+profile = ExtResource("19_8ffge")
+character = ExtResource("18_hvc1c")
+metadata/persistent_id = "river_archive.river_archive.2"
+metadata/group = "river_archive"
+
+[sub_resource type="Resource" id="Resource_j4f1i"]
+script = ExtResource("5_u6mfr")
+persistent_id = "river_archive.river_archive.3"
+group = "river_archive"
+profile = ExtResource("21_y5pwm")
+character = ExtResource("20_g8ajj")
+metadata/persistent_id = "river_archive.river_archive.3"
+metadata/group = "river_archive"
+
+[sub_resource type="Resource" id="Resource_wlct3"]
+script = ExtResource("7_85p1h")
+id = "archive.leave"
+target_anchor = "archive_return"
+return_exit = "archive.enter"
+target = "camp"
+title = "返回林地"
+required_claims = PackedStringArray()
+
+[sub_resource type="Resource" id="Resource_2tu3p"]
+script = ExtResource("13_dtyvr")
+radius = 64.0
+duration = 600.0
+
+[node name="林下档案窖" type="Node2D" unique_id=1101146285]
+script = ExtResource("1_h84yp")
+region_definition = SubResource("Resource_3k8nr")
+floor_style = "stone"
+floor_tint = Color(0.38431373, 0.39215687, 0.35686275, 1)
+
+[node name="discoveries_1" type="Node2D" parent="." unique_id=823059850]
+position = Vector2(-780, 400)
+script = ExtResource("16_xi24o")
+definition = SubResource("Resource_2xfy3")
+
+[node name="discoveries_2" type="Node2D" parent="." unique_id=1192202946]
+position = Vector2(600, -420)
+script = ExtResource("16_xi24o")
+definition = SubResource("Resource_axxya")
+
+[node name="discoveries_3" type="Node2D" parent="." unique_id=1654744011]
+position = Vector2(600, 400)
+script = ExtResource("16_xi24o")
+definition = SubResource("Resource_heojv")
+
+[node name="discoveries_4" type="Node2D" parent="." unique_id=1815965003]
+position = Vector2(-500, -450)
+script = ExtResource("16_xi24o")
+definition = SubResource("Resource_hrjs5")
+
+[node name="discoveries_5" type="Node2D" parent="." unique_id=1619488141]
+position = Vector2(800, 100)
+script = ExtResource("16_xi24o")
+definition = SubResource("Resource_d6663")
+
+[node name="discoveries_6" type="Node2D" parent="." unique_id=437056393]
+position = Vector2(-550, 420)
+script = ExtResource("16_xi24o")
+definition = SubResource("Resource_3gdhe")
+
+[node name="encounters_1" type="Node2D" parent="." unique_id=801176659]
+position = Vector2(-100, 100)
+script = ExtResource("16_xi24o")
+definition = SubResource("Resource_fk0kw")
+
+[node name="encounters_2" type="Node2D" parent="." unique_id=1624220100]
+position = Vector2(300, -250)
+script = ExtResource("16_xi24o")
+definition = SubResource("Resource_wfnf8")
+
+[node name="encounters_3" type="Node2D" parent="." unique_id=1884563247]
+position = Vector2(600, 160)
+script = ExtResource("16_xi24o")
+definition = SubResource("Resource_j4f1i")
+
+[node name="exits_1" type="Node2D" parent="." unique_id=2072934060]
+position = Vector2(-850, 0)
+script = ExtResource("16_xi24o")
+definition = SubResource("Resource_wlct3")
+
+[node name="surface_patches_1" type="Node2D" parent="." unique_id=1482259658]
+position = Vector2(64, 128)
+script = ExtResource("16_xi24o")
+definition = SubResource("Resource_2tu3p")
+
+[node name="障碍_1" type="Node2D" parent="." unique_id=477495461]
+position = Vector2(0, -440)
+script = ExtResource("22_ihkoh")
+form = "shelf"
+footprint = Vector2(500, 90)
+
+[node name="障碍_2" type="Node2D" parent="." unique_id=1771813622]
+position = Vector2(300, 420)
+script = ExtResource("22_ihkoh")
+form = "bench"
+footprint = Vector2(320, 80)
+
+[node name="默认入口落点" type="Marker2D" parent="." unique_id=2145886204]
+position = Vector2(-820, 0)
+script = ExtResource("23_3du8q")
+default_entry = true
+minimum_enemy_distance = 600.0

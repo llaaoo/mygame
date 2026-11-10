@@ -59,6 +59,7 @@
 - 新内容优先使用现有类型化Resource、配方、角色与规则目录。新语义才增加代码扩展；新增物品、动作、来源与规则要登记、校验，并接入实际流程。
 
 - 可编辑室内通过MapCellCatalog登记Godot场景，节点位置是唯一空间来源，Resource.pos保持零；家具footprint共用于碰撞、寻路和室内地图。室内不靠自动删墙迁就错放交互点。固定容器由InventoryService持久化，空箱不补货；存取重验区域generation、距离、视线与实际UID。见[地图编辑](docs/TOWN_MAP_CELLS.md)。
+- 地图制作使用[地图工作流](docs/MAP_AUTHORING.md)：每个AuthoredMapCell有一个默认MapArrival，门引用target_anchor并在全部地图编译后解析；已声明的返门须互指，首条返程链无门槛且最终到camp。MapFeature登记类型化内容，编译不污染源Resource/叠加基底，场景敌人保留persistent_id；复制模板/预制组须独立ID。编辑器异步调用真实校验并检查子进程结束状态，试玩使用MemorySaveRepository，不读写正式档。
 
 - 角色动画只读取实际动作阶段和实物装备。SpriteFrames/AnimationLibrary为只读定义，播放、受击与提示去重属于本角色rig；动画回调不得提交伤害、消费或移动角色根。缺片段只作明确视觉回退，不更换实际动作；身体、纸娃娃与遗骸保持同一登记配置。挥出提示读已提交事实，脚步按接触点/实际步距而非帧数。扩充见[动画基座](docs/ACTOR_ANIMATION_SYSTEM.md)。
 - 动画涵盖全游戏表现，角色动作只是一个分支；世界物体、环境、镜头、UI、粒子与声音遵守[整体表现基座](docs/GAME_PRESENTATION_SYSTEM.md)的所有权、预算和离区清理。减少动态效果不改变模拟或危险提示，UI动效不改变点击区域及即时关闭。玩法随机数由领域执行器/容器拥有，不依赖原生粒子也可能使用的引擎全局随机源。

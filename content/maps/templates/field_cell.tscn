@@ -1,0 +1,14 @@
+[gd_scene format=3]
+[ext_resource type="PackedScene" path="res://content/maps/templates/interior_cell.tscn" id="template"]
+[ext_resource type="Script" path="res://gameplay/exploration/exploration_region_data.gd" id="region"]
+[sub_resource type="Resource" id="definition"]
+script = ExtResource("region")
+id = "change_me_field"
+title = "新室外区域"
+description = "复制后独立Resource与稳定ID，连接命名落点，再登记目录。"
+open_field = true
+authored_size = Vector2(2560, 1920)
+[node name="新室外区域" instance=ExtResource("template")]
+region_definition = SubResource("definition")
+floor_style = "ground"
+floor_tint = Color(0.32, 0.39, 0.29, 1)

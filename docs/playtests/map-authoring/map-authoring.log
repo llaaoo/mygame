@@ -1,0 +1,3 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+
+PASS map authoring: real outdoor/interior/dungeon catalog, pre-migration archive budget/IDs, live named-entry propagation, immutable sources, exact missing-anchor/return diagnostics, duplicate arrivals, sealed-wall reachability and translated valve prefabs

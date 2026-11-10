@@ -30,11 +30,12 @@ func run() -> void:
 	game.progress.journey=saved
 	check(game.progress.validate_save_data(game.progress.serialize_save_data()),"New journey cannot serialize")
 	check(not game.progress.validate_save_data({"journey":{"region":"camp","position":[NAN,0]}}),"Invalid journey coordinates accepted")
-	var entrance: ExplorationExitData=game.current_data.exits[0]
+	# Authored node order is editable; a geographic route has a stable identity.
+	var entrance: ExplorationExitData=game.current_data.exits.filter(func(entry: ExplorationExitData):return entry.id=="archive.enter")[0]
 	game._use_exit(entrance)
 	for i in range(6): await process_frame
 	check(game.region_id=="river_archive" and game.player.health_component.hp==hp,"Dungeon transition healed or failed")
-	game._use_exit(game.current_data.exits[0])
+	game._use_exit(game.current_data.exits.filter(func(entry: ExplorationExitData):return entry.id=="archive.leave")[0])
 	for i in range(6): await process_frame
 	check(game.region_id=="camp" and game.player.position.distance_to(Vector2(-2600,-1660))<2,"Dungeon did not return to its geographic entrance")
 	game.ui.close_modal()

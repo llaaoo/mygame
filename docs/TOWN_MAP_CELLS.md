@@ -1,5 +1,7 @@
 # 河谷镇：地图编辑与可进入地点
 
+制作入口已升级为[地图制作工作流](MAP_AUTHORING.md)：编辑器检查/试玩、命名落点与配对返门、完整内容点以及室外/室内模板。下文保留镇中地点与库存规则；房门使用target_anchor引用MapArrival，代替手填另一张地图的arrival。
+
 2026-11-10（上海）。参考开放世界RPG的独立室内单元、门址与持续实物，沿用2D移动、F交互、正常时间和既有领域服务。
 
 ## 当前地点
@@ -20,11 +22,11 @@
 
 [地图目录](../content/maps/grayriver/catalog.tres)登记[镇中门址](../content/maps/grayriver/town_sites.tscn)、[客栈](../content/maps/grayriver/inn.tscn)、[作坊](../content/maps/grayriver/workshop.tscn)和[公署](../content/maps/grayriver/records.tscn)。直接双击场景进入Godot 2D编辑器，选节点并按编辑器F聚焦，平移Node2D。无需在JSON里另填室内坐标，不需要自制插件。
 
-1. 根节点`AuthoredMapCell.region_definition`填写稳定区域ID、名称、描述、边界`authored_size`和默认落点`authored_entry`。`floor_style/floor_tint`负责地面表现。新增场景加入目录；要使用镇中需求规则，再登记到规则Resource的`additional_base_regions`。
+1. 根节点`AuthoredMapCell.region_definition`填写稳定区域ID、名称、描述、边界`authored_size`；默认落点由唯一的`default_entry` MapArrival节点提供。`floor_style/floor_tint`负责地面表现。新增场景加入目录；要使用镇中需求规则，再登记到规则Resource的`additional_base_regions`。
 2. 复制家具，或实例化[furniture.tscn](../gameplay/maps/furniture.tscn)。调整`form`、`texture`、`footprint`和`solid`。同一footprint供碰撞、寻路和室内地图使用；`visual_size/visual_offset`只控制贴图。窗、地毯和门槛通常不阻挡，墙、床和桌体阻挡。
 3. 复制交互点，或实例化[feature.tscn](../gameplay/maps/feature.tscn)。复制后对`definition`执行Inspector的“Make Unique”，为新内容填写独立稳定ID；新房屋同样先独立其region_definition并更换区域ID。`definition`使用类型化Resource：`ExplorationExitData`房门、`ExplorationDiscoveryData`文书、`SurvivalStationData`取水/烹饪/采集、`MapAmenityData`休息/制造/整备、`WorldStorageData`持续容器。编辑器显示位置和80单位交互圈。
 4. 坐标只编辑节点位置。Resource的`pos`保持零，由装配时复制并赋值。允许平移父组，不支持旋转或缩放；家具改大小用footprint。未经支持的变换与Resource.pos会报错，避免编辑预览和运行不同。
-5. 房门填写目标区域和实际arrival，目标场景提供返门。交互点应放在家具前可站立的位置，门落点须在边界内且没有家具阻挡。生成避让区只约束生成物，不再将合法的门边玩家落点/存档移回默认入口。
+5. 房门填写目标区域和target_anchor，目标场景提供对应MapArrival与返门；default_entry节点代替Resource.authored_entry。交互点应放在家具前可站立的位置，门落点须在边界内且没有家具阻挡。生成避让区只约束生成物，不再将合法的门边玩家落点/存档移回默认入口。
 6. 运行`python3 tools/run_tests.py --tests content grayriver_routes town_cells town_cells_input`，校验门引用、落点、稳定ID、材料、容器预算、几何和通路。室内不会为迁就错放的交互点自动删除墙体。
 
 已有图片取自项目现有prison_sucai家具及原Kenney城镇素材，没有新增外部下载。更换texture仍须遵守项目素材许可约定。

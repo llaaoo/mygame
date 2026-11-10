@@ -11,6 +11,8 @@ extends Resource
 @export var storage: Array[WorldStorageData] = []
 @export var amenities: Array[MapAmenityData] = []
 var map_errors: PackedStringArray = []
+var arrival_points: Dictionary = {}
+var map_arrival_rules: Dictionary = {}
 @export var authored_size := Vector2.ZERO
 @export var authored_entry := Vector2.ZERO
 @export var authored_obstacles: Array[Dictionary] = []

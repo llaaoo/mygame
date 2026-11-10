@@ -1,0 +1,9 @@
+EDITOR_EXIT -6
+Traceback (most recent call last):
+  File "/tmp/map-authoring-editor-baseline.py", line 47, in <module>
+    time.sleep(1);stop()
+                  ^^^^^^
+  File "/tmp/map-authoring-editor-baseline.py", line 39, in stop
+    code=editor.returncode;print('EDITOR_EXIT',code,flush=True);assert code==0,code
+                                                                       ^^^^^^^
+AssertionError: -6

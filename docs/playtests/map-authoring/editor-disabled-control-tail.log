@@ -1,0 +1,45 @@
+Loading resource: res://addons/godot_ai/handlers/control_draw_recipe_handler.gd
+Loading resource: res://addons/godot_ai/handlers/curve_handler.gd
+Loading resource: res://addons/godot_ai/handlers/editor_handler.gd
+Loading resource: res://addons/godot_ai/handlers/environment_handler.gd
+Loading resource: res://addons/godot_ai/handlers/filesystem_handler.gd
+Loading resource: res://addons/godot_ai/handlers/input_handler.gd
+Loading resource: res://addons/godot_ai/handlers/material_handler.gd
+Loading resource: res://addons/godot_ai/handlers/particle_handler.gd
+Loading resource: res://addons/godot_ai/handlers/physics_shape_handler.gd
+Loading resource: res://addons/godot_ai/handlers/project_handler.gd
+Loading resource: res://addons/godot_ai/handlers/scene_handler.gd
+Loading resource: res://addons/godot_ai/handlers/script_handler.gd
+XInput: Refreshing devices.
+XInput: No touch devices found.
+Loading resource: res://addons/godot_ai/handlers/signal_handler.gd
+Unloading addon: res://addons/editor_probe/plugin.cfg
+Loading resource: res://addons/godot_ai/handlers/test_handler.gd
+Loading resource: res://addons/godot_ai/handlers/texture_handler.gd
+Loading resource: res://addons/godot_ai/handlers/theme_handler.gd
+Loading resource: res://addons/godot_ai/runtime/editor_logger.gd
+Loading resource: res://addons/godot_ai/runtime/game_helper.gd
+Loading resource: res://addons/godot_ai/runtime/game_logger.gd
+Loading resource: res://addons/godot_ai/testing/stub_backtrace.gd
+Loading resource: res://addons/godot_ai/utils/mcp_adoption_label.gd
+Loading resource: res://addons/godot_ai/utils/mcp_startup_path.gd
+Loading resource: res://addons/godot_ai/utils/port_resolver.gd
+Loading resource: res://addons/godot_ai/utils/server_lifecycle.gd
+Loading resource: res://addons/godot_ai/plugin.gd
+Script docs haven't been properly loaded or regenerated, so don't save them to disk.
+
+================================================================
+handle_crash: Program crashed with signal 11
+Engine version: Godot Engine v4.6.3.stable.official (7d41c59c457bd5a245092b4e7eb2d833e3b3f8c3)
+Dumping the backtrace. Please include this when reporting the bug on: https://github.com/godotengine/godot/issues
+[1] /lib/x86_64-linux-gnu/libc.so.6(+0x3fd70) [0x7f9068445d70] (??:0)
+[2] godot() [0x1a1e3d4] (??:0)
+[3] godot() [0x1a1e36c] (??:0)
+[4] godot() [0x1a1e36c] (??:0)
+[5] godot() [0x1a1ed36] (??:0)
+[6] godot() [0x430b2b5] (??:0)
+[7] godot() [0x51c25a3] (??:0)
+[8] /lib/x86_64-linux-gnu/libc.so.6(+0x928bb) [0x7f90684988bb] (??:0)
+[9] /lib/x86_64-linux-gnu/libc.so.6(__clone+0x40) [0x7f9068516370] (??:0)
+-- END OF C++ BACKTRACE --
+================================================================
