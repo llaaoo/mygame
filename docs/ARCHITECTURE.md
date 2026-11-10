@@ -1,5 +1,7 @@
 # 项目架构与维护边界
 
+2026-11-10：[地图制作工作流](MAP_AUTHORING.md)扩充类型化空间编译、MapArrival与MapConnections；源Resource与叠加基底保持不可变，位置由节点提供。MapGeometry复用实际布局与RegionNavigation，不再以合法的坐标代替可达性。编辑器只编排保存/子进程检查/独立试玩，游戏服务在正常运行进程校验；MemorySaveRepository供地图与既有动画沙盒复用，正式存档权威不变。
+
 2026-11-10：[存档扩展](SAVE_SYSTEM.md)将文件封装版本与模块版本分离。SaveRepository只负责文件、备份与封装迁移，SaveSections负责显式模块登记、局部迁移与恢复顺序，SaveRecord从`@export_storage`字段生成纯值记录；SaveAdapter适配已有领域快照。CampaignSession仍拥有战役状态，库存、角色与计时语义仍由原领域校验与恢复，未知模块往返保留，未来已知版本阻止覆盖。
 
 2026-11-10：[镇中地图单元](TOWN_MAP_CELLS.md)将场景编辑的空间定义编译到现有ExplorationRegionData；AuthoredMapCell负责空间/表现，RegionSession仍负责生命周期，WorldStorageService只重验空间并提交InventoryService事务。室内不得通过自动删墙修复错放交互点；玩家落点几何检查与生成物避让分离。

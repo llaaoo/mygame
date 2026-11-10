@@ -4,10 +4,12 @@ extends RefCounted
 var failures: Array[String] = []
 
 func _fail(resource: Resource, message: String) -> void:
-	failures.append("%s: %s" % [resource.resource_path if resource and not resource.resource_path.is_empty() else "<unsaved content>", message])
+	var source: String=str(resource.get_meta("map_source",resource.resource_path)) if resource else ""
+	failures.append("%s: %s" % [source if not source.is_empty() else "<unsaved content>", message])
 
 func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 	failures.clear()
+	for message in catalog.chapter.get_meta("map_catalog_errors",PackedStringArray()): _fail(catalog.chapter,str(message))
 	var animations:=ActorAnimationCatalog.default_catalog()
 	for error in animations.validation_errors(): _fail(animations,error)
 	var cues:=PresentationCatalog.defaults()
@@ -168,6 +170,8 @@ func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 			continue
 		if region.presentation_environment and not region.presentation_environment.valid(): _fail(region,"Invalid region environment presentation")
 		for error in region.map_errors: _fail(region,error)
+		if region.map_scene:
+			for error in MapGeometry.errors(region): _fail(region,error)
 		for entry in region.storage+region.amenities:
 			if entry.id.is_empty() or map_ids.has(entry.id) or entry.title.is_empty(): _fail(entry,"Invalid/duplicate map feature identity")
 			map_ids[entry.id]=true
@@ -313,7 +317,11 @@ func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 		for patch in region.surface_patches:
 			if patch.state not in SurfaceCatalog.STATE_IDS or patch.duration <= 0 or patch.radius < 0: _fail(patch, "Invalid authored surface")
 		for prop in region.fixed_props:
-			if prop.id.is_empty() or not prop.scene: _fail(prop, "Invalid authored prop")
+			if prop.id.is_empty() or not prop.scene or not prop.scene.can_instantiate(): _fail(prop, "Invalid authored prop")
+			elif region.map_scene:
+				var instance:=prop.scene.instantiate()
+				if not instance is MapObject: _fail(prop,"Placed prop scene root must inherit MapObject")
+				instance.free()
 		for exit in region.exits:
 			if not catalog.regions.has(exit.target) or (not exit.required_action.is_empty() and not catalog.actions.has(exit.required_action)):
 				_fail(region, "Dangling exit/knowledge requirement")

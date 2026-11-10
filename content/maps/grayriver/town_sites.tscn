@@ -11,29 +11,36 @@
 [ext_resource type="Script" path="res://gameplay/exploration/data/discovery_data.gd" id="sign"]
 [ext_resource type="Script" path="res://gameplay/exploration/data/navigation_hint.gd" id="hint"]
 
+[ext_resource type="PackedScene" path="res://gameplay/maps/arrival.tscn" id="arrival_marker"]
+
 [sub_resource type="Resource" id="definition"]
 script = ExtResource("region")
 id = "camp"
 title = "河谷镇门址"
 description = "可进入的镇中地点；F与实物交互，M查看室内地图。"
 authored_size = Vector2(9600, 7200)
-authored_entry = Vector2(-3700, 2100)
 presentation_environment = ExtResource("environment")
 [sub_resource type="Resource" id="feature1"]
 script = ExtResource("script1")
 title = "进入萨芙整修作坊"
 target = "river_workshop"
-arrival = Vector2(0, 280)
+id = "town.workshop.enter"
+target_anchor = "entry"
+return_exit = "town.workshop.leave"
 [sub_resource type="Resource" id="feature2"]
 script = ExtResource("script2")
 title = "进入灰苇客栈"
 target = "river_inn"
-arrival = Vector2(0, 280)
+id = "town.inn.enter"
+target_anchor = "entry"
+return_exit = "town.inn.leave"
 [sub_resource type="Resource" id="feature3"]
 script = ExtResource("script3")
 title = "进入河谷公署"
 target = "river_records"
-arrival = Vector2(0, 280)
+id = "town.records.enter"
+target_anchor = "entry"
+return_exit = "town.records.leave"
 
 [sub_resource type="Resource" id="river_inn_hint"]
 script = ExtResource("hint")
@@ -51,6 +58,14 @@ title = "河谷镇门牌"
 text = "门牌下按F进入房屋，出来仍回同一扇门。灰苇客栈提供客床、寄存箱、柴灶和实物补给；整修作坊可制造、整备；公署可阅读公开文书。店主、训练师和艾妲白天仍在集市当值。进屋不补货、不自动休息。"
 requires_clear = false
 navigation_hints = [SubResource("river_inn_hint"), SubResource("river_workshop_hint"), SubResource("river_records_hint")]
+
+[sub_resource type="Resource" id="archive_door"]
+script = ExtResource("script1")
+id = "archive.enter"
+title = "进入林下档案窖"
+target = "river_archive"
+target_anchor = "entry"
+return_exit = "archive.leave"
 
 [node name="camp" type="Node2D"]
 script = ExtResource("cell")
@@ -107,3 +122,28 @@ definition = SubResource("feature3")
 [node name="河谷镇门牌" parent="." instance=ExtResource("feature")]
 position = Vector2(-3760, 2540)
 definition = SubResource("town_sign")
+
+[node name="默认入口落点" parent="." instance=ExtResource("arrival_marker")]
+position = Vector2(-3700, 2100)
+id = "entry"
+default_entry = true
+
+[node name="返回作坊落点" parent="." instance=ExtResource("arrival_marker")]
+position = Vector2(-4250, 1610)
+id = "workshop_return"
+
+[node name="返回客栈落点" parent="." instance=ExtResource("arrival_marker")]
+position = Vector2(-4100, 2960)
+id = "inn_return"
+
+[node name="返回公署落点" parent="." instance=ExtResource("arrival_marker")]
+position = Vector2(-2550, 2810)
+id = "records_return"
+
+[node name="返回林地落点" parent="." instance=ExtResource("arrival_marker")]
+position = Vector2(-2600, -1660)
+id = "archive_return"
+
+[node name="进入林下档案窖" parent="." instance=ExtResource("feature")]
+position = Vector2(-2600, -1800)
+definition = SubResource("archive_door")

@@ -1,0 +1,207 @@
+{
+  "bounds": [
+    2000.0,
+    1400.0
+  ],
+  "enemies": [
+    {
+      "character": "res://content/characters/river_guard.tres",
+      "detection": 440.0,
+      "hp": 1.0,
+      "id": "river_archive.river_archive.1",
+      "position": [
+        -100.0,
+        100.0
+      ],
+      "profile": "res://content/exploration/enemies/guard.tres",
+      "speed": 105.0
+    },
+    {
+      "character": "res://content/characters/river_guard.tres",
+      "detection": 440.0,
+      "hp": 1.0,
+      "id": "river_archive.river_archive.2",
+      "position": [
+        300.0,
+        -250.0
+      ],
+      "profile": "res://content/exploration/enemies/guard.tres",
+      "speed": 105.0
+    },
+    {
+      "character": "res://content/characters/river_caster.tres",
+      "detection": 440.0,
+      "hp": 1.0,
+      "id": "river_archive.river_archive.3",
+      "position": [
+        600.0,
+        160.0
+      ],
+      "profile": "res://content/exploration/enemies/sentry.tres",
+      "speed": 105.0
+    }
+  ],
+  "exits": [
+    {
+      "arrival": [
+        -2600.0,
+        -1660.0
+      ],
+      "position": [
+        -850.0,
+        0.0
+      ],
+      "target": "camp"
+    }
+  ],
+  "notes": [
+    {
+      "actions": [
+        "pulse"
+      ],
+      "crafts": [],
+      "equipment": [
+        "keeper_ring"
+      ],
+      "heal": false,
+      "id": "river.pulse",
+      "materials": {
+
+      },
+      "position": [
+        -780.0,
+        400.0
+      ],
+      "requires_clear": false,
+      "rules": [
+        "fire_sigil_pulse"
+      ]
+    },
+    {
+      "actions": [],
+      "crafts": [],
+      "equipment": [],
+      "heal": false,
+      "id": "alchemy.schematic",
+      "materials": {
+
+      },
+      "position": [
+        600.0,
+        -420.0
+      ],
+      "requires_clear": false,
+      "rules": []
+    },
+    {
+      "actions": [
+        "echo_mark"
+      ],
+      "crafts": [
+        "echo_ink"
+      ],
+      "equipment": [],
+      "heal": false,
+      "id": "river.echo",
+      "materials": {
+        "crystal": 4.0,
+        "echo_ink": 5.0,
+        "sap": 4.0,
+        "ward_powder": 2.0
+      },
+      "position": [
+        600.0,
+        400.0
+      ],
+      "requires_clear": false,
+      "rules": [
+        "echo_spark",
+        "echo_pulse",
+        "echo_focus",
+        "echo_water",
+        "guard_pulse"
+      ]
+    },
+    {
+      "actions": [],
+      "crafts": [],
+      "equipment": [],
+      "heal": false,
+      "id": "survival.archive_recipe",
+      "materials": {
+        "herb": 2.0
+      },
+      "position": [
+        -500.0,
+        -450.0
+      ],
+      "requires_clear": false,
+      "rules": []
+    },
+    {
+      "actions": [],
+      "crafts": [],
+      "equipment": [],
+      "heal": false,
+      "id": "river.dossier",
+      "materials": {
+
+      },
+      "position": [
+        800.0,
+        100.0
+      ],
+      "requires_clear": true,
+      "rules": []
+    },
+    {
+      "actions": [],
+      "crafts": [],
+      "equipment": [],
+      "heal": false,
+      "id": "demo.dispatch",
+      "materials": {
+
+      },
+      "position": [
+        -550.0,
+        420.0
+      ],
+      "requires_clear": false,
+      "rules": []
+    }
+  ],
+  "obstacles": [
+    {
+      "position": [
+        0.0,
+        -440.0
+      ],
+      "size": [
+        500.0,
+        90.0
+      ]
+    },
+    {
+      "position": [
+        300.0,
+        420.0
+      ],
+      "size": [
+        320.0,
+        80.0
+      ]
+    }
+  ],
+  "surfaces": [
+    {
+      "duration": 600.0,
+      "position": [
+        64.0,
+        128.0
+      ],
+      "radius": 64.0,
+      "state": "wet"
+    }
+  ]
+}

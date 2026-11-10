@@ -7,7 +7,7 @@ static func amounts(value: Dictionary) -> Dictionary:
 	for id in value: result[id] = int(value[id])
 	return result
 static func data() -> Dictionary: return JSON.parse_string(FileAccess.get_file_as_string(PATH))
-static func build() -> ExplorationChapterData:
+static func build(map_catalog: MapCellCatalog=null,resolve_connections := true) -> ExplorationChapterData:
 	var source := ExplorationContentCatalog.new()
 	var chapter := ExplorationChapterData.new()
 	chapter.actions.assign(source.chapter.actions)
@@ -80,8 +80,10 @@ static func build() -> ExplorationChapterData:
 			encounter.boss = raw.get("boss", false)
 			encounter.optional_encounter = raw.get("optional", false)
 			if raw.has("profile"): encounter.profile = load("res://content/exploration/enemies/%s.tres" % raw.profile)
-			encounter.set_meta("persistent_id", str(raw.id))
-			encounter.set_meta("group", str(raw.get("group", region.id)))
+			encounter.persistent_id=str(raw.id)
+			encounter.group=str(raw.get("group",region.id))
+			encounter.set_meta("persistent_id",encounter.persistent_id)
+			encounter.set_meta("group",encounter.group)
 			region.encounters.append(encounter)
 		for raw in entry.get("exits", []):
 			var exit := ExplorationExitData.new()
@@ -192,7 +194,8 @@ static func build() -> ExplorationChapterData:
 							if Geometry2D.get_closest_point_to_segment(point,vector(road[i]),vector(road[i+1])).distance_to(point)<140:clear=false
 					if clear:region.authored_obstacles.append({"position":point,"size":Vector2(38,34),"kind":"tree"})
 		chapter.regions.append(region)
-	(load("res://content/maps/grayriver/catalog.tres") as MapCellCatalog).append_to(chapter)
+	var maps:=map_catalog if map_catalog else load("res://content/maps/grayriver/catalog.tres") as MapCellCatalog
+	maps.append_to(chapter,resolve_connections)
 	for raw in definition.quests:
 		var quest := ExplorationQuestData.new()
 		quest.id = raw.id

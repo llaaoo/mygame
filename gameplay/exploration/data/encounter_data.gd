@@ -1,6 +1,8 @@
 class_name ExplorationEncounterData
 extends Resource
 
+@export var persistent_id := ""
+@export var group := ""
 @export var pos: Vector2 = Vector2.ZERO
 @export var hp: int = 1
 @export var role: int = 0

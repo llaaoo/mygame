@@ -1,0 +1,5 @@
+[gd_scene format=3]
+[ext_resource type="PackedScene" path="res://grayriver.tscn" id="game"]
+[ext_resource type="Script" path="res://demos/map_preview.gd" id="script"]
+[node name="MapPreview" instance=ExtResource("game")]
+script = ExtResource("script")

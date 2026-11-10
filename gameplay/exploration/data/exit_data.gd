@@ -1,6 +1,10 @@
 class_name ExplorationExitData
 extends Resource
 
+@export var id := ""
+@export var target_anchor := ""
+## Optional explicit counterpart; leave empty for intentionally one-way passages.
+@export var return_exit := ""
 @export var arrival := Vector2.INF
 @export var target: String
 @export var title: String

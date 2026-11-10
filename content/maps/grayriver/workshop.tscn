@@ -18,13 +18,14 @@
 [ext_resource type="Texture2D" path="res://content/art/prison/prison_sucai/42_wall_window_lit.png" id="art_window"]
 [ext_resource type="Texture2D" path="res://content/art/prison/prison_sucai/45_rug_blue_gold.png" id="art_rug"]
 
+[ext_resource type="PackedScene" path="res://gameplay/maps/arrival.tscn" id="arrival_marker"]
+
 [sub_resource type="Resource" id="definition"]
 script = ExtResource("region")
 id = "river_workshop"
 title = "萨芙整修作坊"
 description = "可进入的镇中地点；F与实物交互，M查看室内地图。"
 authored_size = Vector2(1152, 832)
-authored_entry = Vector2(0, 280)
 presentation_environment = ExtResource("environment")
 [sub_resource type="Resource" id="feature1"]
 script = ExtResource("script1")
@@ -60,7 +61,9 @@ navigation_hints = [SubResource("nav3_0"), SubResource("nav3_1")]
 script = ExtResource("script5")
 title = "离开整修作坊"
 target = "camp"
-arrival = Vector2(-4250, 1610)
+id = "town.workshop.leave"
+target_anchor = "workshop_return"
+return_exit = "town.workshop.enter"
 
 [node name="river_workshop" type="Node2D"]
 script = ExtResource("cell")
@@ -133,3 +136,8 @@ solid = false
 [node name="离开整修作坊" parent="." instance=ExtResource("feature")]
 position = Vector2(0, 330)
 definition = SubResource("feature5")
+
+[node name="默认入口落点" parent="." instance=ExtResource("arrival_marker")]
+position = Vector2(0, 280)
+id = "entry"
+default_entry = true

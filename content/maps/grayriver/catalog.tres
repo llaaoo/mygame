@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" path="res://content/maps/grayriver/inn.tscn" id="map1"]
 [ext_resource type="PackedScene" path="res://content/maps/grayriver/workshop.tscn" id="map2"]
 [ext_resource type="PackedScene" path="res://content/maps/grayriver/records.tscn" id="map3"]
+[ext_resource type="PackedScene" path="res://content/maps/grayriver/archive.tscn" id="map4"]
 [resource]
 script = ExtResource("catalog")
-maps = [ExtResource("map0"), ExtResource("map1"), ExtResource("map2"), ExtResource("map3")]
+maps = [ExtResource("map0"), ExtResource("map1"), ExtResource("map2"), ExtResource("map3"), ExtResource("map4")]

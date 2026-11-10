@@ -26,7 +26,7 @@ func _ready() -> void:
 	town_services=TownServices.new(self,merchant_profile.market,trainer_profile.training,false)
 	residents=GrayriverResidents.new(self)
 	definition = GrayriverDefinition.data()
-	catalog = ExplorationContentCatalog.new(GrayriverDefinition.build())
+	if not catalog: catalog = ExplorationContentCatalog.new(GrayriverDefinition.build())
 	save_slot = 3
 	save_section = "grayriver_frontier"
 	super._ready()

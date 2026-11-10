@@ -6,14 +6,8 @@ var demo_ready := false
 var _demo_panel: PanelContainer
 var _view: Label
 var _duel_started := false
-class MemoryRepository extends SaveRepository:
-	var snapshots: Dictionary={}
-	func read(path: String) -> SaveRepository.ReadResult:
-		return SaveRepository.ReadResult.new(Status.VALID,snapshots[path].duplicate(true)) if snapshots.has(path) else SaveRepository.ReadResult.new(Status.MISSING)
-	func write(path: String,data: Dictionary) -> bool:
-		snapshots[path]=data.duplicate(true); return true
-	func start_new(path: String,fresh: Dictionary,_current: Dictionary) -> String:
-		snapshots[path]=fresh.duplicate(true); return "memory://previous-animation-demo"
+class MemoryRepository extends MemorySaveRepository:
+	pass # Historical class name retained for existing demo callers.
 func _ready() -> void:
 	persistence_enabled=false
 	SaveManager.instance.repository=MemoryRepository.new()

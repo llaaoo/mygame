@@ -19,13 +19,14 @@
 [ext_resource type="Texture2D" path="res://content/art/prison/prison_sucai/42_wall_window_lit.png" id="art_window"]
 [ext_resource type="Texture2D" path="res://content/art/prison/prison_sucai/45_rug_blue_gold.png" id="art_rug"]
 
+[ext_resource type="PackedScene" path="res://gameplay/maps/arrival.tscn" id="arrival_marker"]
+
 [sub_resource type="Resource" id="definition"]
 script = ExtResource("region")
 id = "river_inn"
 title = "灰苇客栈"
 description = "可进入的镇中地点；F与实物交互，M查看室内地图。"
 authored_size = Vector2(1280, 896)
-authored_entry = Vector2(0, 280)
 presentation_environment = ExtResource("environment")
 [sub_resource type="Resource" id="feature1"]
 script = ExtResource("script1")
@@ -70,7 +71,9 @@ navigation_hints = [SubResource("nav4_0"), SubResource("nav4_1")]
 script = ExtResource("script6")
 title = "离开灰苇客栈"
 target = "camp"
-arrival = Vector2(-4100, 2960)
+id = "town.inn.leave"
+target_anchor = "inn_return"
+return_exit = "town.inn.enter"
 
 [node name="river_inn" type="Node2D"]
 script = ExtResource("cell")
@@ -180,3 +183,8 @@ solid = false
 [node name="离开灰苇客栈" parent="." instance=ExtResource("feature")]
 position = Vector2(0, 350)
 definition = SubResource("feature6")
+
+[node name="默认入口落点" parent="." instance=ExtResource("arrival_marker")]
+position = Vector2(0, 280)
+id = "entry"
+default_entry = true
