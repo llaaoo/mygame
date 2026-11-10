@@ -20,8 +20,8 @@
 ```text
 version: 10
 extensions:
-  __versions: {grayriver: 1}
-  grayriver:
+  __versions: {grayriver_frontier: 1}
+  grayriver_frontier:
     ...探索进度字段...
     foundation:
       ...inventory / actors / clock_seconds...
@@ -31,7 +31,7 @@ extensions:
       conversations: {...}
 ```
 
-上面的grayriver是示意模块ID，实际使用CampaignGame.save_section。缺少版本元数据的旧模块按局部版本0处理。不存在的新模块按当前默认值初始化，不假装有一份历史数据来迁移。
+模块ID应与组合根的CampaignGame.save_section一致。缺少版本元数据的旧模块按局部版本0处理。不存在的新模块按当前默认值初始化，不假装有一份历史数据来迁移。
 
 ## 新增可选字段
 

@@ -1,0 +1,400 @@
+{
+  "scope": "Fresh default budget, real guided WASD/F/mouse input, normal simulation/AI, no grants/teleports; not blind or performance acceptance",
+  "compared": [
+    "items",
+    "pack",
+    "gear",
+    "shortcuts",
+    "loot_records",
+    "npc_accounts",
+    "social",
+    "growth",
+    "tracked_id",
+    "martial",
+    "world_storage",
+    "visited",
+    "claims"
+  ],
+  "player": {
+    "attacks": 0,
+    "base": true,
+    "channel_source": "",
+    "charge_source": "",
+    "damage_taken": 0,
+    "dead": false,
+    "guarding": false,
+    "hp": 100,
+    "mode": "idle",
+    "mp": 60,
+    "position": [
+      -190.565292358398,
+      -55.4526023864746
+    ],
+    "stamina": 100.0,
+    "ui_blocked": false
+  },
+  "materials": {
+    "ash": 2,
+    "clean_water": 3,
+    "crystal": 8,
+    "fire_stone": 1,
+    "frost_salt": 2,
+    "grain": 1,
+    "herb": 2,
+    "ration": 2,
+    "resin": 2,
+    "sap": 9,
+    "storm_dust": 3
+  },
+  "world_storage": {
+    "storage.town.inn.common": [
+      {
+        "definition": "grain",
+        "properties": {},
+        "quantity": 2,
+        "uid": "item.92"
+      },
+      {
+        "definition": "cloth",
+        "properties": {},
+        "quantity": 1,
+        "uid": "item.93"
+      }
+    ],
+    "storage.town.inn.player": [
+      {
+        "definition": "charcoal",
+        "properties": {},
+        "quantity": 5,
+        "uid": "item.79"
+      }
+    ],
+    "storage.town.records.common": [],
+    "storage.town.workshop.common": [
+      {
+        "definition": "charcoal",
+        "properties": {},
+        "quantity": 1,
+        "uid": "item.105"
+      },
+      {
+        "definition": "sap",
+        "properties": {},
+        "quantity": 1,
+        "uid": "item.106"
+      }
+    ]
+  },
+  "npc_accounts": {
+    "river.aida": {
+      "coin": 24,
+      "dead": false,
+      "items": [
+        {
+          "container": "river.aida.pocket",
+          "definition": "coin",
+          "properties": {},
+          "quantity": 24,
+          "uid": "item.17"
+        }
+      ],
+      "trust": 0
+    },
+    "river.enemy.service.trainer": {
+      "coin": 0,
+      "dead": false,
+      "items": [],
+      "trust": 0
+    },
+    "river.innkeeper": {
+      "coin": 16,
+      "dead": false,
+      "items": [
+        {
+          "container": "river.innkeeper.pocket",
+          "definition": "coin",
+          "properties": {},
+          "quantity": 16,
+          "uid": "item.94"
+        },
+        {
+          "container": "river.innkeeper.pocket",
+          "definition": "ration",
+          "properties": {},
+          "quantity": 5,
+          "uid": "item.95"
+        },
+        {
+          "container": "river.innkeeper.pocket",
+          "definition": "clean_water",
+          "properties": {},
+          "quantity": 4,
+          "uid": "item.96"
+        },
+        {
+          "container": "river.innkeeper.pocket",
+          "definition": "tea",
+          "properties": {},
+          "quantity": 2,
+          "uid": "item.97"
+        },
+        {
+          "container": "river.innkeeper.pocket",
+          "definition": "grain",
+          "properties": {},
+          "quantity": 6,
+          "uid": "item.98"
+        }
+      ],
+      "trust": 0
+    },
+    "river.merchant": {
+      "coin": 160,
+      "dead": false,
+      "items": [
+        {
+          "container": "river.merchant.pocket",
+          "definition": "coin",
+          "properties": {},
+          "quantity": 160,
+          "uid": "item.1"
+        },
+        {
+          "container": "river.merchant.pocket",
+          "definition": "metal_scrap",
+          "properties": {},
+          "quantity": 12,
+          "uid": "item.2"
+        },
+        {
+          "container": "river.merchant.pocket",
+          "definition": "charcoal",
+          "properties": {},
+          "quantity": 6,
+          "uid": "item.3"
+        },
+        {
+          "container": "river.merchant.pocket",
+          "definition": "sap",
+          "properties": {},
+          "quantity": 6,
+          "uid": "item.4"
+        },
+        {
+          "container": "river.merchant.pocket",
+          "definition": "crystal",
+          "properties": {},
+          "quantity": 4,
+          "uid": "item.5"
+        },
+        {
+          "container": "river.merchant.pocket",
+          "definition": "cloth",
+          "properties": {},
+          "quantity": 6,
+          "uid": "item.6"
+        },
+        {
+          "container": "river.merchant.pocket",
+          "definition": "ration",
+          "properties": {},
+          "quantity": 6,
+          "uid": "item.7"
+        },
+        {
+          "container": "river.merchant.pocket",
+          "definition": "clean_water",
+          "properties": {},
+          "quantity": 4,
+          "uid": "item.8"
+        },
+        {
+          "container": "river.merchant.pocket",
+          "definition": "arrow",
+          "properties": {},
+          "quantity": 24,
+          "uid": "item.13"
+        },
+        {
+          "container": "river.merchant.pocket",
+          "definition": "guard_tonic",
+          "properties": {},
+          "quantity": 2,
+          "uid": "item.14"
+        },
+        {
+          "container": "river.merchant.pocket",
+          "definition": "clear_tonic",
+          "properties": {},
+          "quantity": 2,
+          "uid": "item.15"
+        },
+        {
+          "container": "river.merchant.pocket",
+          "definition": "book_spear_thrust",
+          "properties": {},
+          "quantity": 1,
+          "uid": "item.16"
+        },
+        {
+          "container": "river.merchant.pack",
+          "definition": "river_sabre",
+          "properties": {},
+          "quantity": 1,
+          "uid": "item.9"
+        },
+        {
+          "container": "river.merchant.pack",
+          "definition": "river_spear",
+          "properties": {},
+          "quantity": 1,
+          "uid": "item.10"
+        },
+        {
+          "container": "river.merchant.pack",
+          "definition": "river_staff",
+          "properties": {},
+          "quantity": 1,
+          "uid": "item.11"
+        },
+        {
+          "container": "river.merchant.pack",
+          "definition": "river_bow",
+          "properties": {},
+          "quantity": 1,
+          "uid": "item.12"
+        }
+      ],
+      "trust": 0
+    }
+  },
+  "growth": {
+    "attribute_points": 0,
+    "attributes": [
+      10,
+      10,
+      10,
+      10
+    ],
+    "experience": 25,
+    "level": 1,
+    "mastery": {
+      "character_level": 1,
+      "legacy_credit": 0,
+      "masteries": {
+        "0": {
+          "level": 1,
+          "perk_points": 0,
+          "xp": 0.0,
+          "xp_to_next": 15.0
+        },
+        "1": {
+          "level": 1,
+          "perk_points": 0,
+          "xp": 0.0,
+          "xp_to_next": 15.0
+        },
+        "2": {
+          "level": 1,
+          "perk_points": 0,
+          "xp": 0.0,
+          "xp_to_next": 15.0
+        },
+        "3": {
+          "level": 1,
+          "perk_points": 0,
+          "xp": 0.0,
+          "xp_to_next": 15.0
+        },
+        "4": {
+          "level": 1,
+          "perk_points": 0,
+          "xp": 0.0,
+          "xp_to_next": 15.0
+        },
+        "5": {
+          "level": 1,
+          "perk_points": 0,
+          "xp": 0.0,
+          "xp_to_next": 15.0
+        },
+        "6": {
+          "level": 1,
+          "perk_points": 0,
+          "xp": 0.0,
+          "xp_to_next": 15.0
+        },
+        "7": {
+          "level": 1,
+          "perk_points": 0,
+          "xp": 4.0,
+          "xp_to_next": 15.0
+        },
+        "8": {
+          "level": 2,
+          "perk_points": 0,
+          "xp": 1.0,
+          "xp_to_next": 19.2
+        }
+      },
+      "schema": 2,
+      "total_mastery_levels": 1,
+      "unlocked_perks": {
+        "0": [],
+        "1": [],
+        "2": [],
+        "3": [],
+        "4": [],
+        "5": [],
+        "6": [],
+        "7": [],
+        "8": []
+      }
+    }
+  },
+  "visited": [
+    "camp",
+    "river_inn",
+    "river_workshop",
+    "river_records"
+  ],
+  "claims": [
+    "equipment.sources_v1",
+    "fog.-9.3",
+    "fog.-9.4",
+    "fog.-9.5",
+    "fog.-8.3",
+    "fog.-8.4",
+    "fog.-8.5",
+    "fog.-7.3",
+    "fog.-7.4",
+    "fog.-7.5",
+    "place.town",
+    "fog.-6.3",
+    "fog.-6.4",
+    "fog.-6.5",
+    "river.handbook",
+    "loot.cache.river.handbook",
+    "river.pack",
+    "loot.cache.river.pack",
+    "town.sign.rooms",
+    "fog.-9.6",
+    "fog.-8.6",
+    "fog.-7.6",
+    "fog.-10.4",
+    "fog.-10.5",
+    "fog.-10.6",
+    "fog.-9.2",
+    "fog.-8.2",
+    "fog.-7.2",
+    "fog.-10.2",
+    "fog.-10.3",
+    "fog.-6.6",
+    "fog.-5.4",
+    "fog.-5.5",
+    "fog.-5.6",
+    "town.records.directory"
+  ],
+  "date": "第1天 10:14",
+  "campaign_clock": 134.865826666667
+}
