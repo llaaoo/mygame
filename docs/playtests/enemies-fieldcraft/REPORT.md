@@ -27,7 +27,8 @@
 - `enemy_diversity`：天生连段、无伪造装备、有限8支箭离弦消费/空袋撤退、死亡余量、重杖UID回收/玩家共同规则。
 - `fieldcraft_input`、`enemy_diversity_input`：实际键鼠与正常AI，覆盖上述图形流程。场地、位置、初始长矛、加工灰烬和学费为受控设置；不是全程徒步新档通关。
 - `save_sections_game`：仓库中的实际历史旧档可迁移，未凭空学会专业技艺。
-- 完整回归从提交的 `git archive` 导出且不带 `.godot` 缓存的副本执行，结果在完成后记录于此。
+- 完整回归 **136/136 全部通过**。从提交 `af10c44` 的 `git archive` 导出无 `.godot` 缓存副本，首次导入无诊断；执行 `taskset -c 0,1,2,3 python3 tools/run_tests.py --suite all --jobs 3 --timeout 240`。见[完整回归日志](cloud-full-suite.log)。最终补记仅更新验收文档与日志，生产代码不变。
+- 旧原型的配方预算测试继续约束原有基础配方，专业配方另验未学习不可制作；没有为新增内容放宽旧关卡、动作、敌人和机关预算。
 - GitHub Actions 保持停用，云端运行测试。
 
 ## 证据
