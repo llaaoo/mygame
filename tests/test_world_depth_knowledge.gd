@@ -17,8 +17,24 @@ func run() -> void:
 	check(query.knows(intrinsic.id,WorldCondition.Knowledge.COMBINATION),"Default learned operation reaction was absent from unified knowledge")
 	var untrained:=session.actor_for_id("river.enemy.camp.fieldcraft.hound.v1") as Enemy
 	check(not untrained.actor_context.learning_query.knows("inscribe",WorldCondition.Knowledge.ACTION),"Player operation knowledge leaked into an untrained actor")
+	var gate:=WorldCondition.new();gate.kind=WorldCondition.Kind.KNOWLEDGE;gate.knowledge_kind=WorldCondition.Knowledge.ACTION;gate.key="inscribe";gate.hint="先掌握刻阵基础操作"
+	var reaction_gate:=gate.duplicate() as WorldCondition;reaction_gate.knowledge_kind=WorldCondition.Knowledge.COMBINATION;reaction_gate.key=intrinsic.id
+	var chapter:=game.catalog.chapter.duplicate() as ExplorationChapterData;chapter.quests=game.catalog.chapter.quests.duplicate()
+	var authored:=chapter.quests[0].duplicate() as ExplorationQuestData;authored.conditions=[gate,reaction_gate];chapter.quests[0]=authored
+	check(ExplorationContentValidator.new().validate(ExplorationContentCatalog.new(chapter)).is_empty(),"Authored canonical knowledge gates rejected registered operations/default reactions")
+	gate.key="unknown_operation"
+	check(not ExplorationContentValidator.new().validate(ExplorationContentCatalog.new(chapter)).is_empty(),"Unknown authored operation gate accepted")
+	var quest: ExplorationQuestData
+	for entry in game.quests:
+		if entry.id=="river.hunting_evidence":quest=entry
+	check(quest!=null,"Evidence quest absent")
+	game.progress.claims["river.hunting.route"]=true
+	check(not quest.is_complete(game.progress) and not game.guidance.next_step(quest).title.contains("报告"),"Guidance promised a report before actual practice or alternate evidence")
+	for id in ["river.enemy.camp.depth.ridge_archer.v1","river.enemy.camp.depth.ridge_mauler.v1"]:
+		var body:=session.actor_for_id(id) as Enemy;body.take_damage(10000);await process_frame
+	check(not quest.default_complete(game.progress) and quest.is_complete(game.progress) and game.guidance.next_step(quest).title.contains("报告"),"Real alternate encounter evidence still directed player through unmet default practice")
 	store.receive("player","field_knife",1)
-	var before: float=session.proficiency.get("survival",0);var xp:=game.player.stats_component.experience
+	var before: float=session.proficiency.get("survival",0);var xp:=game.player.stats_component.experience;var level:=game.player.stats_component.level
 	var receipts: Array[String]=[]
 	for id in ["river.enemy.camp.fieldcraft.hound.v1","river.enemy.camp.depth.ridge_hound.1.v1"]:
 		var body:=session.actor_for_id(id) as Enemy
@@ -28,19 +44,16 @@ func run() -> void:
 		var rows:=store.entries(id+".anatomy").filter(func(row):return row.definition=="raw_hide")
 		var raw: Dictionary=rows[0];receipts.append(raw.uid)
 		check(game.loot.harvesting.complete(id,raw.uid,raw.properties.harvest,store.find_owned("player","field_knife")),"Actual professional extraction failed")
-	check(session.fieldcraft.harvest_count("player","skinning")==2 and float(session.proficiency.get("survival",0))>before and game.player.stats_component.experience>xp,"Harvest practice did not feed shared growth/proof")
+	check(session.fieldcraft.harvest_count("player","skinning")==2 and float(session.proficiency.get("survival",0))>before and (game.player.stats_component.level>level or game.player.stats_component.experience>xp),"Harvest practice did not feed shared growth/proof")
 	before=float(session.proficiency.get("survival",0));xp=game.player.stats_component.experience
 	session.facts.publish("corpse_harvested","player",{"raw_uid":receipts[0],"skill":"skinning","family":receipts[0]})
 	check(float(session.proficiency.get("survival",0))==before and game.player.stats_component.experience==xp,"Duplicate harvested UID farmed growth")
-	var quest: ExplorationQuestData
-	for entry in game.quests:
-		if entry.id=="river.hunting_evidence":quest=entry
-	check(quest!=null,"Evidence quest absent")
-	game.progress.claims["river.hunting.route"]=true
-	check(quest.is_complete(game.progress),"Two independent processed bodies did not qualify the evidence quest")
+	check(quest.default_complete(game.progress),"Two independent processed bodies did not qualify the default evidence route")
 	game.player.position=Vector2(-3500,2100)
 	var points:=game.player.stats_component.attribute_points
-	check(game.progress_service.claim_quest(quest) and not game.progress_service.claim_quest(quest) and game.player.stats_component.attribute_points==points+1,"Evidence report did not award exactly once")
+	var reputation:=session.relations.disposition(TownServices.MERCHANT,"player")
+	var route:=quest.approaches.filter(func(entry):return entry.relation_changes.has(TownServices.MERCHANT))[0] as ExplorationQuestApproachData
+	check(game.progress_service.claim_quest(quest,route.id) and not game.progress_service.claim_quest(quest) and not game.progress_service.claim_quest(quest,route.id) and game.player.stats_component.attribute_points==points+1 and session.relations.disposition(TownServices.MERCHANT,"player")==reputation+10,"Alternative report did not award actual relationship/points exactly once")
 	var charter:=CharterCatalog.default_catalog().definition("hunters")
 	var team: String=session.relations.memberships.player
 	check(charter.enroll(context) and context.martial.learned.has("hunter_pin") and not charter.enroll(context) and not CharterCatalog.default_catalog().definition("wardens").enroll(context),"Affiliation prerequisites/exclusive knowledge failed")

@@ -20,6 +20,12 @@ func run() -> void:
 	await tap(KEY_I);await click("猎人入门：剥皮 ×1");await click("移至口袋");await click("使用一份");await create_timer(2.4).timeout
 	check(game.session.fieldcraft.knows("player","skinning"),"Real finite book did not teach actual hunting knowledge")
 	await at(Vector2(0,330));await tap(KEY_F)
+	await at(Vector2(-3500,2550));await tap(KEY_F)
+	check(game.progress.claims.has("river.hunting.route"),"Actual hunting-route note failed to introduce evidence quest")
+	if is_instance_valid(game.ui.modal):await tap(KEY_ESCAPE)
+	await tap(KEY_J);await click("委托记录");await click("巡林取证：知识与威胁");await click("追踪这个委托")
+	check(game.progress.tracked_quest=="river.hunting_evidence" and not game.guidance.tracked().title.contains("报告"),"Actual J tracking promised a report before earned practice")
+	await capture("00-unfinished-evidence-guidance");await tap(KEY_ESCAPE)
 	var store:=game.session.inventory;store.receive("player","river_spear",1);store.equip("player",store.find_owned("player","river_spear"))
 	var hound:=game.session.actor_for_id(HOUND) as Enemy
 	check(hound!=null,"Territorial hound absent")

@@ -608,5 +608,6 @@ func _validate_conditions(owner: Resource,conditions: Array[WorldCondition],cata
 			WorldCondition.Kind.CLEAR:
 				if not catalog.regions.has(condition.key):_fail(owner,"Unknown condition region: "+condition.key)
 			WorldCondition.Kind.KNOWLEDGE:
-				if condition.knowledge_kind==WorldCondition.Knowledge.ACTION and not catalog.actions.has(condition.key):_fail(owner,"Unknown condition action: "+condition.key)
-				if condition.knowledge_kind==WorldCondition.Knowledge.COMBINATION and not catalog.spell_rules.has(condition.key):_fail(owner,"Unknown condition combination: "+condition.key)
+				var operations:=SpellOperationCatalog.default_catalog()
+				if condition.knowledge_kind==WorldCondition.Knowledge.ACTION and not catalog.actions.has(condition.key) and not operations.operations.any(func(entry: SpellOperationData):return entry.action.get_id()==condition.key):_fail(owner,"Unknown condition action: "+condition.key)
+				if condition.knowledge_kind==WorldCondition.Knowledge.COMBINATION and not catalog.spell_rules.has(condition.key) and not operations.rules.any(func(entry: SpellCombinationRule):return entry.id==condition.key):_fail(owner,"Unknown condition combination: "+condition.key)
