@@ -14,7 +14,7 @@ func run() -> void:
 	var prototype:=FileAccess.get_file_as_bytes("user://save_2.sav")
 	await legacy.close()
 	var fixture:=Fixture.new(self)
-	var game:=await fixture.boot(true)
+	var game:=await fixture.boot(true,true)
 	var p:=game.player
 	p.position=Vector2(-1800,1000)
 	p.health_component.hp=67
@@ -30,7 +30,7 @@ func run() -> void:
 	enemy.take_damage(1000)
 	game._save_progress()
 	await fixture.close()
-	game=await fixture.boot(true)
+	game=await fixture.boot(true,true)
 	check(game.player.position.distance_to(Vector2(-1800,1000))<2 and game.player.health_component.hp==67 and game.player.mana_component.mp==29,"Bootstrap teleported or refilled saved traveler")
 	check(game.active_enemies.size()==game.current_data.encounters.size()-1 and game.progress.claims.has(id),"Defeated outdoor actor respawned on load")
 	game.show_map()
@@ -49,8 +49,10 @@ func run() -> void:
 	game.player.take_damage(1000)
 	for i in range(3):await process_frame
 	check(game.player.health_component.is_dead and game.progress.claims.has("river.bridge_fixed"),"Death erased permanent construction")
+	var defeat_time:=game.session.inventory.clock_seconds
 	await fixture.close()
-	game=await fixture.boot(true)
+	game=await fixture.boot(true,true)
+	check(game.session.inventory.clock_seconds>=defeat_time+120 and not game.session.expedition.pending_rescue,"Cold defeat resume skipped the outstanding two-hour journey")
 	check(game.is_at_base() and not game.player.health_component.is_dead and game.player.health_component.hp==50 and game.player.mana_component.mp==30,"Dead saved traveler did not recover half vitals in town")
 	check(game.player.skill_manager.combinations.supplies.serialize()==inventory and game.progress.claims.has("river.bridge_fixed"),"Death resume refilled materials or lost world facts")
 	await fixture.close()

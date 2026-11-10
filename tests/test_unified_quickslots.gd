@@ -83,7 +83,12 @@ func run() -> void:
 	var fire_cost:=manager.preview_source("left").cost
 	var frost_cost:=manager.preview_source("quick_e").cost
 	check(manager.preview_source("left").skill.field_type=="fire" and manager.preview_source("quick_e").skill.field_type=="frost","Source previews ignore per-slot media")
-	await key(KEY_Q,true); await key(KEY_Q,false); await frames(60)
+	await key(KEY_Q,true); await key(KEY_Q,false)
+	# Test the second slot when the first cast commits, while its real shared
+	# cooldown is active; a fixed frame count can outlast that cooldown under load.
+	for i in range(90):
+		if manager.combinations.fields.any(func(field):return is_instance_valid(field) and field.field_type=="fire"):break
+		await frames(1)
 	check(manager.combinations.fields.any(func(field): return is_instance_valid(field) and field.field_type=="fire") and supplies.count("fire_stone")==0,"Q fixed fire rune failed to place/pay")
 	var after_fire:=actor.mana_component.mp
 	await key(KEY_E,true); await key(KEY_E,false)

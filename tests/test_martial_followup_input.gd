@@ -3,6 +3,9 @@ extends "res://tests/support/input_scene_probe.gd"
 const Fixture=preload("res://tests/support/grayriver_fixture.gd")
 var starts: Array[Dictionary]=[]
 var target: Enemy
+func modifier(code: Key,held: bool) -> void:
+	var event:=InputEventKey.new();event.keycode=code;event.physical_keycode=code;event.pressed=held
+	Input.parse_input_event(event);Input.flush_buffered_events()
 func aim(point: Vector2) -> void:
 	await aim_world(point)
 	check(game.player.get_mouse_direction().dot((point-game.player.global_position).normalized())>.999,"Window/canvas scaling changed actual aim")
@@ -43,6 +46,9 @@ func run() -> void:
 	target=game.active_enemies[0]
 	target.set_process(false); target.set_physics_process(false); target.state_chart.process_mode=Node.PROCESS_MODE_DISABLED
 	target.get_node("ActorComponents").process_mode=Node.PROCESS_MODE_DISABLED
+	# This stationary contact fixture must survive every followup. Actual accepted
+	# damage still confirms routes; a defeated/freed target cannot serve later trials.
+	target.health_component.max_hp=10000;target.health_component.hp=10000
 	var actor:=game.player; var actions:=actor.actor_context.actions; var store:=game.session.inventory
 	actor.health_component.regen_rate=.6; actor.mana_component.mp_regen_rate=3
 	for id in ["river_sabre","river_spear","river_staff","river_bow"]: store.receive("player",id,1)
@@ -60,14 +66,15 @@ func run() -> void:
 		var preview:=actions.weapon_art_view()
 		check(preview.form==MartialRoute.Form.FOLLOWUP and preview.reason.is_empty(),"Quickslot preview failed to show the executable route")
 		if pair[1]=="blade_breaker":
-			await key(KEY_SHIFT,true)
+			modifier(KEY_SHIFT,true)
 			check(not actions.weapon_art_view(true).reason.is_empty(),"Shift preview promised a release without actual coating")
-			await key(KEY_SHIFT,false)
-		await key(KEY_CTRL,true); await press(); await key(KEY_CTRL,false)
+			modifier(KEY_SHIFT,false)
+		# Submit the real modifier/mouse chord promptly inside the observed window.
+		modifier(KEY_CTRL,true); await press(); modifier(KEY_CTRL,false)
 		for i in range(100):
 			if not starts.is_empty() and starts.back().technique==pair[1]: break
 			await frames(1)
-		check(starts.back().technique==pair[1] and starts.back().followup and actions.profile==MartialArts.definition(pair[1]).followup_profile,"Real E input did not commit its captured followup")
+		check(starts.back().technique==pair[1] and starts.back().followup and actions.profile==MartialArts.definition(pair[1]).followup_profile,"Real Ctrl+LMB did not commit its captured followup")
 		await capture("followup-strike-"+MartialArts.definition(pair[1]).weapon_type)
 		target.position=actor.position+Vector2(500,0)
 		await idle()
