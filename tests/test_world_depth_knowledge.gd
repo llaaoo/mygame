@@ -11,6 +11,12 @@ func run() -> void:
 	session.fieldcraft.learn("player","skinning");context.martial.learn("blade_breaker")
 	check(query.knows("skinning") and query.knows("blade_breaker",WorldCondition.Knowledge.MARTIAL),"Unified knowledge missed fieldcraft/martial")
 	check(not query.knows("skinning",WorldCondition.Knowledge.MARTIAL),"Knowledge category accepted another discipline")
+	game.progress.actions["fire_sigil"]=true;game._apply_knowledge()
+	check(query.knows("inscribe",WorldCondition.Knowledge.ACTION) and query.knows("fire_sigil",WorldCondition.Knowledge.ACTION),"Legacy knowledge did not qualify its actual canonical operation")
+	var intrinsic:=SpellOperationCatalog.default_catalog().rules[0]
+	check(query.knows(intrinsic.id,WorldCondition.Knowledge.COMBINATION),"Default learned operation reaction was absent from unified knowledge")
+	var untrained:=session.actor_for_id("river.enemy.camp.fieldcraft.hound.v1") as Enemy
+	check(not untrained.actor_context.learning_query.knows("inscribe",WorldCondition.Knowledge.ACTION),"Player operation knowledge leaked into an untrained actor")
 	store.receive("player","field_knife",1)
 	var before: float=session.proficiency.get("survival",0);var xp:=game.player.stats_component.experience
 	var receipts: Array[String]=[]

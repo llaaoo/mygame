@@ -358,9 +358,11 @@ func knows(id: String,key: String,kind: int) -> bool:
 	if id=="player" and query and query.progress:
 		if kind in [WorldCondition.Knowledge.ANY,WorldCondition.Knowledge.ACTION] and query.progress.actions.has(key): return true
 		if kind in [WorldCondition.Knowledge.ANY,WorldCondition.Knowledge.COMBINATION] and query.progress.spell_rules.has(key): return true
-	if actor and id!="player":
+	if actor:
 		var manager:=actor.get_node("SkillManager") as SkillManager
-		if kind in [WorldCondition.Knowledge.ANY,WorldCondition.Knowledge.ACTION] and manager.known_actions.has(key):return true
+		if kind in [WorldCondition.Knowledge.ANY,WorldCondition.Knowledge.ACTION]:
+			var action:=manager.pool.get_skill(key)
+			if action and manager.knows_action(manager.canonical_action(action)):return true
 		if kind in [WorldCondition.Knowledge.ANY,WorldCondition.Knowledge.COMBINATION] and manager.combinations.learned_rules.has(key):return true
 	if kind in [WorldCondition.Knowledge.ANY,WorldCondition.Knowledge.FIELDCRAFT] and fieldcraft.knows(id,key): return true
 	if kind in [WorldCondition.Knowledge.ANY,WorldCondition.Knowledge.MARTIAL]:

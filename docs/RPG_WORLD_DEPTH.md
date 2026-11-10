@@ -22,7 +22,7 @@
 
 | 能力 | 唯一状态所有者 | 定义与组合入口 |
 | --- | --- | --- |
-| 已学知识 | 原Progress、MartialArts、FieldcraftKnowledge、SkillMasteryManager各持有自己的知识 | `ConditionQuery.knows`只查询；WorldCondition区分动作/组合/武技/专业/Perk，不复制已学表 |
+| 已学知识 | 原Progress、MartialArts、FieldcraftKnowledge、SkillMasteryManager各持有自己的知识 | `ConditionQuery.knows`只查询；基础操作复用SkillManager的旧技能映射/实际知识判定，组合读取原已学规则，WorldCondition区分动作/组合/武技/专业/Perk，不复制已学表 |
 | 狩猎实践 | FieldcraftKnowledge的原部位UID收据 | 实际`corpse_harvested`事实进入原成长入口；同UID跨读档不重复加经验 |
 | 领地与协同 | 每个活敌人的EnemyAwareness；当前区域的弱引用EncounterCoordinator | EncounterData.tactics可编辑Resource。沿用原角色，不复制角色模板；最后目击点、警告、搜索均为瞬态 |
 | 身份 | RelationService.affiliations | 两种一次性互斥誓约；与战斗阵营分离。CharterDefinition配置前提、武技和描述；箱子的affiliation_id配置权限 |
