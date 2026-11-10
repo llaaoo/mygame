@@ -7,7 +7,7 @@ const PAGES := [
  {"id":"loadout","title":"技法","key":KEY_K,"caption":"K","icon":"sparkles"},
  {"id":"quests","title":"委托与旅程","key":KEY_J,"caption":"J","icon":"book-open"},
  {"id":"progression","title":"角色成长","key":KEY_P,"caption":"P","icon":"sparkles"},
- {"id":"map","title":"行路图","key":KEY_G,"caption":"G","icon":"compass"},
+ {"id":"map","title":"行路图","key":KEY_M,"caption":"M","icon":"compass"},
 ]
 var current_page := ""
 var navigate: Callable

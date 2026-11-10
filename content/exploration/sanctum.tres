@@ -33,7 +33,7 @@ requires_clear = true
 script = ExtResource("1_2tmke")
 id = "sanctum_sap"
 title = "封存树液"
-text = "取得施法原料。返回营地工作台可加工，M查看库存。此处只搜刮一次，休息与重置遭遇都不会重新发放。"
+text = "取得施法原料。返回营地工作台可加工，G查看库存。此处只搜刮一次，休息与重置遭遇都不会重新发放。"
 pos = Vector2(350, 230)
 materials = {
 "sap": 6
@@ -44,7 +44,7 @@ script = ExtResource("1_2tmke")
 id = "echo_knowledge"
 intro_text = "先用回响铭印准备印记，再用凝神形成护盾。印记必须先存在；普通施法保留可释放恩赐。"
 title = "回响刻板：印记与转化"
-text = "学会回响铭印（用K编组），6 MP和回响墨1换取12秒印记。印记内火花→三重矢，震荡→三次脉冲，凝神→40%减伤护盾，水引→持续恢复。普通震荡保留护盾；按住Shift再接震荡才主动爆破。相容的回响与法阵可共同触发；互斥增益按优先级取一个，护盾爆破优先于回响脉冲。成功转化才消耗状态，跨区清理；M可配置新增材料。"
+text = "学会回响铭印（用K编组），6 MP和回响墨1换取12秒印记。印记内火花→三重矢，震荡→三次脉冲，凝神→40%减伤护盾，水引→持续恢复。普通震荡保留护盾；按住Shift再接震荡才主动爆破。相容的回响与法阵可共同触发；互斥增益按优先级取一个，护盾爆破优先于回响脉冲。成功转化才消耗状态，跨区清理；G可配置新增材料。"
 pos = Vector2(0, -220)
 actions = Array[String](["echo_mark"])
 spell_rules = Array[String](["echo_spark", "echo_pulse", "echo_focus", "echo_water", "guard_pulse"])

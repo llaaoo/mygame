@@ -78,7 +78,7 @@ func open_techniques() -> void:
 func open_for(skill: SkillData) -> void:
 	_selected_skill=skill; _selected_item.clear(); _selected_choice.clear(); _show_items=false; _show_techniques=false; _selected_technique=""
 	open()
-	_hint_label.text="选择来源后点击目标快捷槽；也可先绑定默认动作，再用M切换。"
+	_hint_label.text="选择来源后点击目标快捷槽；也可先绑定默认动作，再用G切换。"
 
 func close() -> void:
 	_selected_skill = null
@@ -312,7 +312,7 @@ func _refresh_detail() -> void:
 	if not _selected_skill.operation_id.is_empty():
 		var operation:=SpellOperationCatalog.default_catalog().operation(_selected_skill.operation_id)
 		var choices:=OptionButton.new(); choices.fit_to_longest_item=false; choices.clip_text=true
-		choices.add_item("智能跟随最近施法元素" if _skill_manager.spell_forms.supports(_selected_skill) else "动作默认来源（M按槽切换）")
+		choices.add_item("智能跟随最近施法元素" if _skill_manager.spell_forms.supports(_selected_skill) else "动作默认来源（G按槽切换）")
 		for payload in operation.payloads:
 			choices.add_item(payload.title)
 			if _selected_choice.get("payload","")==payload.id: choices.select(choices.item_count-1)
@@ -388,7 +388,7 @@ func _refresh_detail() -> void:
 
 func _format_skill_stats(skill: SkillData) -> String:
 	if not skill.operation_id.is_empty():
-		return "M轮盘按快捷槽选择来源，查看实际费用与条件。\n蓄力/引导按住所编组键，其余按设置按下或松开施放。"
+		return "G轮盘按快捷槽选择来源，查看实际费用与条件。\n蓄力/引导按住所编组键，其余按设置按下或松开施放。"
 	var lines: Array[String] = [
 		"%s · T%d · %s" % [_type_name(skill.skill_type), skill.tier, skill.role],
 		"伤害 %d  |  法力 %d  |  冷却 %.1fs" % [skill.damage, skill.mp_cost, skill.cooldown],
@@ -463,7 +463,7 @@ func _make_skill_card(skill: SkillData) -> PanelContainer:
 	var tp := Label.new()
 	tp.text = "%s · %s" % [_type_name(skill.skill_type), "%d 路" % skill.upgrades.size() if unlocked else "Lv.%d" % _unlock_level(skill)]
 	if not skill.operation_id.is_empty():
-		tp.text="M 选材"
+		tp.text="G 选材"
 	elif skill.combination_only:
 		tp.text = "组合结果"
 	tp.add_theme_font_size_override("font_size", 12)
@@ -516,7 +516,7 @@ func _refresh_equip_slots() -> void:
 			var choice:=_skill_manager.shortcuts.selection(src)
 			var operation:=SpellOperationCatalog.default_catalog().operation(skill.operation_id)
 			var payload:=operation.payload(str(choice.get("payload",""))) if operation else null
-			sub_lbl.text=display_label+(" · 固定"+payload.title if payload else " · 跟随M" if operation else " · 动作")+(" · 强化%d"%total_ranks if total_ranks>0 else "")
+			sub_lbl.text=display_label+(" · 固定"+payload.title if payload else " · 跟随G" if operation else " · 动作")+(" · 强化%d"%total_ranks if total_ranks>0 else "")
 		elif _skill_manager.shortcuts.binding(src).get("kind","")=="technique":
 			var data:=MartialArts.definition(_skill_manager.shortcuts.binding(src).technique_id)
 			tex.texture=GameUIStyle.icon("swords"); tex.modulate=Color.WHITE

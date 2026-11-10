@@ -22,7 +22,7 @@
 script = ExtResource("region")
 id = "river_records"
 title = "河谷公署"
-description = "可进入的镇中地点；F与实物交互，G查看室内地图。"
+description = "可进入的镇中地点；F与实物交互，M查看室内地图。"
 authored_size = Vector2(1152, 832)
 authored_entry = Vector2(0, 280)
 presentation_environment = ExtResource("environment")

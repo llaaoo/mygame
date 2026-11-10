@@ -31,6 +31,7 @@ func run() -> void:
 	check(not InputBindings.assign("skill_1",reserved).accepted,"Rebinding allowed a skill to steal left mouse")
 	check(not InputBindings.assign("skill_1",event(KEY_CTRL)).accepted,"Plain Ctrl was not reserved for art cycling")
 	check(not InputBindings.assign("skill_1",event(KEY_K)).accepted,"Remap stole a global menu shortcut")
+	check(not InputBindings.assign("skill_1",event(KEY_M)).accepted and not InputBindings.assign("skill_1",event(KEY_G)).accepted,"Remap stole map/selector menu keys")
 	check(not InputBindings.assign("skill_1",event(KEY_F)).accepted,"Remap duplicated world interaction")
 	var before:=InputMap.action_get_events("skill_5").size()
 	InputBindings.install()

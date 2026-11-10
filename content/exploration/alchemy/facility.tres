@@ -16,4 +16,4 @@ description = "档案室读图纸，回廊与机房解封并F取件；可提前�
 required_claims = PackedStringArray("alchemy.started", "alchemy.schematic", "alchemy.pump_taken", "alchemy.regulator_taken")
 assembly = SubResource("assembly")
 
-completion_text = "调和台已修复：靠近F或M进入回收。委托板可交付1属性点奖励。"
+completion_text = "调和台已修复：靠近F或G进入回收。委托板可交付1属性点奖励。"

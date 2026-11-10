@@ -23,7 +23,7 @@ func claim_title(id: String) -> String:
 	return id
 
 func status_text() -> String:
-	if game.progress.claims.has(REPAIRED): return "调和台已重启：营地E或M可回收多余成品；委托板奖励仅领一次。"
+	if game.progress.claims.has(REPAIRED): return "调和台已重启：营地E或G可回收多余成品；委托板奖励仅领一次。"
 	var text := "重启调和台\n营地东北调和台接下委托；档案室图纸可提前阅读。解封与取件分开，部件不占施法材料库存。\n"
 	for id in ["alchemy.started", "alchemy.schematic", "alchemy.pump_taken", "alchemy.regulator_taken"]:
 		text += ("✓ " if game.progress.claims.has(id) else "□ ") + claim_title(id) + "\n"

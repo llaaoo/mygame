@@ -20,7 +20,7 @@ heal = true
 script = ExtResource("1_58wt0")
 id = "powder_charcoal"
 title = "火药研磨残料"
-text = "取得施法原料。返回营地工作台可加工，M查看库存。此处只搜刮一次，休息与重置遭遇都不会重新发放。"
+text = "取得施法原料。返回营地工作台可加工，G查看库存。此处只搜刮一次，休息与重置遭遇都不会重新发放。"
 pos = Vector2(-300, -200)
 materials = {
 "charcoal": 5
