@@ -25,13 +25,11 @@ SaveManager: saved user://save_3.sav
 SaveManager: saved user://save_3.sav
 SaveManager: saved user://save_3.sav
 SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
 ⚡ [OnKillBonusExp] +15 额外经验 (target=Encounter_18)
 SaveManager: saved user://save_3.sav
-WORLD_DEPTH_LIVE seconds=10.54 hp_loss=30 swings=10 mp=60->60 normal_ai=true
-SaveManager: saved user://save_3.sav
-SaveManager: saved user://save_3.sav
-SaveManager: saved user://save_3.sav
-SaveManager: saved user://save_3.sav
+WORLD_DEPTH_LIVE seconds=5.58 hp_loss=10 swings=5 mp=60->60 normal_ai=true
 SaveManager: saved user://save_3.sav
 SaveManager: saved user://save_3.sav
 SaveManager: saved user://save_3.sav
@@ -43,10 +41,12 @@ SaveManager: saved user://save_3.sav
 SaveManager: saved user://save_3.sav
 SaveManager: saved user://save_3.sav
 SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
 ⏰ 11:00 (☀️ 白天)
 SaveManager: saved user://save_3.sav
-WORLD_DEPTH_RETURN hours=2.5 portions=1 elapsed_simulation=154.82
 SaveManager: saved user://save_3.sav
+WORLD_DEPTH_RETURN hours=2.5 portions=1 elapsed_simulation=154.80
 SaveManager: saved user://save_3.sav
 ⏰ WorldTime 启动: 08:00
 🏛️ GameRuntime: 五大 Runtime 初始化完成
@@ -61,5 +61,6 @@ SaveManager: saved user://save_3.sav
 ⏰ 08:00 (☀️ 白天)
 SaveManager: saved user://save_3.sav
 ⏰ 11:00 (☀️ 白天)
+⏰ 12:00 (☀️ 白天)
 SaveManager: saved user://save_3.sav
 PASS world depth input: real public book, territory warning/withdrawal, normal AI mouse duel, professional work -> finite NPC supply -> charter/member access, witnessed property/return, prepared journey/F5/cold save/small UI; controlled travel, spear and provisions
