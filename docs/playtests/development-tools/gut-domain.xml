@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="GutTests" failures="0" tests="9" >
+  <testsuite name="tests/unit/test_condition_contracts.gd" tests="3" failures="0" skipped="0" time="0.00042" >
+      <testcase name="test_legacy_knowledge_fallback_respects_category" assertions="4" status="pass" classname="tests/unit/test_condition_contracts.gd" time="0.000236" >
+      </testcase>
+      <testcase name="test_injected_knowledge_owner_receives_actual_actor_and_category" assertions="2" status="pass" classname="tests/unit/test_condition_contracts.gd" time="0.000086" >
+      </testcase>
+      <testcase name="test_unmet_claims_do_not_report_completion" assertions="3" status="pass" classname="tests/unit/test_condition_contracts.gd" time="0.000098" >
+      </testcase>
+  </testsuite>
+  <testsuite name="tests/unit/test_inventory_contracts.gd" tests="6" failures="0" skipped="0" time="0.018882" >
+      <testcase name="test_stale_transfer_has_no_partial_write_or_notification" assertions="3" status="pass" classname="tests/unit/test_inventory_contracts.gd" time="0.01336" >
+      </testcase>
+      <testcase name="test_equipped_item_transfer_preserves_identity_and_clears_slot" assertions="6" status="pass" classname="tests/unit/test_inventory_contracts.gd" time="0.000409" >
+      </testcase>
+      <testcase name="test_failed_exchange_preserves_both_inventories" assertions="3" status="pass" classname="tests/unit/test_inventory_contracts.gd" time="0.002391" >
+      </testcase>
+      <testcase name="test_full_containers_can_swap_real_items_atomically" assertions="5" status="pass" classname="tests/unit/test_inventory_contracts.gd" time="0.000538" >
+      </testcase>
+      <testcase name="test_detached_pack_invalidates_plan_and_does_not_refill" assertions="7" status="pass" classname="tests/unit/test_inventory_contracts.gd" time="0.00031" >
+      </testcase>
+      <testcase name="test_query_copies_cannot_mutate_authoritative_inventory" assertions="2" status="pass" classname="tests/unit/test_inventory_contracts.gd" time="0.001874" >
+      </testcase>
+  </testsuite>
+</testsuites>

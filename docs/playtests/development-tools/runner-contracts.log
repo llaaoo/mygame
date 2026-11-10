@@ -1,0 +1,12 @@
+test_checkout_lock_rejects_competing_runner (tools.test_run_tests.RunnerContractTests.test_checkout_lock_rejects_competing_runner) ... ok
+test_diagnostics_and_exit_codes_are_never_green (tools.test_run_tests.RunnerContractTests.test_diagnostics_and_exit_codes_are_never_green) ... ok
+test_empty_gut_run_is_not_success (tools.test_run_tests.RunnerContractTests.test_empty_gut_run_is_not_success) ... ok
+test_gut_xml_must_contain_executed_passing_cases (tools.test_run_tests.RunnerContractTests.test_gut_xml_must_contain_executed_passing_cases) ... ok
+test_import_failure_stops_suite (tools.test_run_tests.RunnerContractTests.test_import_failure_stops_suite) ... ok
+test_inherited_input_probes_are_detected (tools.test_run_tests.RunnerContractTests.test_inherited_input_probes_are_detected) ... ok
+test_preflight_failure_marks_unrun_tests_as_skipped (tools.test_run_tests.RunnerContractTests.test_preflight_failure_marks_unrun_tests_as_skipped) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 1.176s
+
+OK

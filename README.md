@@ -299,7 +299,10 @@ MVP 使用独立的 `user://save_2.sav`，不会读取或覆盖旧房间模式�
 python3 tools/run_tests.py
 python3 tools/run_tests.py --suite quick
 python3 tools/run_tests.py --tests save_recovery cast_refactor
+python3 tools/run_tests.py --tests gut_domain
 ```
+
+已接入GUT 9.6.1（Godot 4.6），用于无帧率依赖的领域检查。runner按前置/并行集成/串行输入分阶段执行，保留`results.json`与错误摘要，并阻止同一检出目录重复运行。插件取舍、上游许可、测试失败原因与操作见[开发工具](docs/DEVELOPMENT_TOOLS.md)。
 
 也可单独运行Godot脚本：
 

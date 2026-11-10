@@ -2,16 +2,20 @@
 """Run Godot regressions with isolated saves, bounded runtime and retained logs."""
 import argparse
 import concurrent.futures
+from contextlib import contextmanager
+import json
 import os
 from pathlib import Path
+import platform
 import re
 import shutil
 import subprocess
 import tempfile
 import time
+import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
-QUICK = ["save_system", "save_recovery", "skill_catalog", "skill_upgrades", "room_generation"]
+QUICK = ["gut_domain", "save_system", "save_recovery", "skill_catalog", "skill_upgrades", "room_generation"]
 INTEGRATION = [
     "world_depth_knowledge", "world_depth_property", "world_depth_economy", "world_depth_journey", "world_depth_territory", "world_depth_input",
     "fieldcraft", "enemy_diversity", "fieldcraft_input", "enemy_diversity_input",
@@ -56,6 +60,57 @@ INTEGRATION = [
 ]
 CHECKS = ["content", "maps", "startup"]
 DIAGNOSTIC = re.compile(r"^(?:SCRIPT ERROR:|ERROR:|WARNING:)", re.MULTILINE)
+ANSI = re.compile(r"\x1b\[[0-9;]*m")
+
+
+@contextmanager
+def checkout_lock():
+    """Prevent independent runners from competing over this checkout/import cache."""
+    lock = ROOT / ".godot/run_tests.lock"
+    lock.parent.mkdir(exist_ok=True)
+    with lock.open("a+b") as stream:
+        if os.name == "nt":
+            import msvcrt
+            stream.seek(0)
+            stream.write(b"0")
+            stream.flush()
+            stream.seek(0)
+            msvcrt.locking(stream.fileno(), msvcrt.LK_NBLCK, 1)
+        else:
+            import fcntl
+            fcntl.flock(stream, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        # Closing releases the OS lock even on abnormal process exit.
+        yield
+
+
+def input_probe(name):
+    """Follow script inheritance, rather than guessing from test-name suffixes."""
+    script = ROOT / f"tests/test_{name}.gd"
+    visited = set()
+    while script.exists() and script not in visited:
+        visited.add(script)
+        if script == ROOT / "tests/support/input_scene_probe.gd":
+            return True
+        source = script.read_text(encoding="utf-8")
+        if re.search(r"\b(?:Input\.|push_input\(|InputEvent)", source):
+            return True
+        parent = re.search(r'^extends\s+["\']res://([^"\']+)["\']', source, re.MULTILINE)
+        if not parent:
+            break
+        script = ROOT / parent[1]
+    return False
+
+
+def failure_category(code, output, timed_out=False):
+    if timed_out:
+        return "timeout"
+    if "SCRIPT ERROR:" in output:
+        return "script_error"
+    if re.search(r"^ERROR:", output, re.MULTILINE):
+        return "godot_error"
+    if re.search(r"^WARNING:", output, re.MULTILINE):
+        return "warning"
+    return "exit_code" if code != 0 else "passed"
 
 
 def main():
@@ -65,6 +120,8 @@ def main():
     parser.add_argument("--jobs", type=int, default=2)
     parser.add_argument("--timeout", type=float, default=180)
     parser.add_argument("--godot", default="godot")
+    parser.add_argument("--report", type=Path, help="JSON report path (default: retained log directory/results.json)")
+    parser.add_argument("--source-revision", help="Source commit label for a git-archive export without .git")
     args = parser.parse_args()
     if args.jobs < 1 or args.timeout <= 0:
         parser.error("jobs and timeout must be positive")
@@ -73,6 +130,28 @@ def main():
         parser.error(f"Godot executable not found: {args.godot}")
     logs = Path(tempfile.mkdtemp(prefix="mygame-tests-"))
     print(f"Logs and isolated saves: {logs}", flush=True)
+    report_path = args.report or logs / "results.json"
+    names = args.tests or (QUICK + CHECKS if args.suite == "quick" else
+                           INTEGRATION if args.suite == "integration" else
+                           QUICK + INTEGRATION + CHECKS)
+    names = list(dict.fromkeys(names))
+    def git_value(*options):
+        result = subprocess.run(["git", *options], cwd=ROOT, capture_output=True, text=True, timeout=10)
+        return result.stdout.strip() if result.returncode == 0 else "unknown"
+    version = subprocess.run([godot, "--version"], capture_output=True, text=True, timeout=10)
+    status = git_value("status", "--porcelain")
+    report = {"schema": 1, "revision": args.source_revision or git_value("rev-parse", "HEAD"),
+              "dirty": None if status == "unknown" else status != "", "godot": version.stdout.strip(),
+              "platform": platform.platform(), "jobs": args.jobs, "timeout": args.timeout,
+              "logs": str(logs), "requested": names, "results": [], "skipped": [], "complete": False}
+
+    def save_report():
+        report_path.parent.mkdir(parents=True, exist_ok=True)
+        staging = report_path.with_suffix(report_path.suffix + ".tmp")
+        staging.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        staging.replace(report_path)
+
+    save_report()
 
     def execute(name, options):
         workspace = logs / name
@@ -86,10 +165,12 @@ def main():
                 env[f"XDG_{kind}_HOME"] = str(workspace / kind.lower())
         started = time.monotonic()
         path = logs / f"{name}.log"
+        timed_out = False
+        command = [godot, "--headless", "--path", str(ROOT), *options]
         with path.open("w", encoding="utf-8") as output_file:
             try:
                 result = subprocess.run(
-                    [godot, "--headless", "--path", str(ROOT), *options],
+                    command,
                     cwd=ROOT, env=env, stdout=output_file, stderr=subprocess.STDOUT,
                     text=True, timeout=args.timeout,
                 )
@@ -97,34 +178,83 @@ def main():
             except subprocess.TimeoutExpired:
                 output_file.write(f"\nERROR: timeout after {args.timeout} seconds\n")
                 code = -1
-        output = path.read_text(encoding="utf-8", errors="replace")
-        good = code == 0 and not DIAGNOSTIC.search(output)
+                timed_out = True
+        output = ANSI.sub("", path.read_text(encoding="utf-8", errors="replace"))
+        category = failure_category(code, output, timed_out)
+        # A successful process without discovered/executed tests is not a green GUT run.
+        if name == "gut_domain" and category == "passed":
+            try:
+                xml = ET.parse(logs / "gut-domain.xml").getroot()
+                cases = list(xml.iter("testcase"))
+                if not cases or any(case.find("failure") is not None or case.find("skipped") is not None or
+                                    case.find("error") is not None for case in cases):
+                    category = "test_result"
+            except (OSError, ET.ParseError):
+                category = "missing_test_result"
+        good = category == "passed"
+        duration = time.monotonic() - started
+        diagnostic = DIAGNOSTIC.search(output)
+        excerpt = output[diagnostic.start():].splitlines()[:8] if diagnostic else output.splitlines()[-8:]
         print(f"{'PASS' if good else 'FAIL'} {name} ({time.monotonic() - started:.1f}s)" +
-              (f" — {path}" if not good else ""), flush=True)
-        return good
+              (f" [{category}] — {path}\n" + "\n".join(excerpt) if not good else ""), flush=True)
+        return {"name": name, "passed": good, "category": category, "exit_code": code,
+                "seconds": round(duration, 3), "command": command, "log": str(path),
+                "diagnostic": excerpt if not good else []}
+
+    def record(result):
+        report["results"].append(result)
+        save_report()
+        return result["passed"]
 
     # Recovery mode imports assets/classes without starting editor plugins.
     if not (ROOT / ".godot/global_script_class_cache.cfg").exists():
-        if not execute("import", ["--editor", "--import", "--recovery-mode"]):
+        if not record(execute("import", ["--editor", "--import", "--recovery-mode"])):
+            report["skipped"] = names
+            save_report()
             return 1
-    names = args.tests or (QUICK + CHECKS if args.suite == "quick" else
-                           INTEGRATION if args.suite == "integration" else
-                           QUICK + INTEGRATION + CHECKS)
-    names = list(dict.fromkeys(names))
 
     def run(name):
-        if name == "startup":
+        if name == "gut_domain":
+            options = ["--script", "res://addons/gut/gut_cmdln.gd", "-gexit", "-gdisable_colors",
+                       f"-gjunit_xml_file={logs / 'gut-domain.xml'}"]
+        elif name == "startup":
             options = ["--quit-after", "180"]
         else:
             script = "tools/validate_mvp_content.gd" if name == "content" else "tools/validate_maps.gd" if name == "maps" else f"tests/test_{name}.gd"
             options = ["--script", f"res://{script}"]
         return execute(name, options)
 
+    # Validate authored content first; do not turn one parser/catalog error into 140 failures.
+    preflight = [name for name in ["content", "maps", "gut_domain"] if name in names]
+    for name in preflight:
+        if not record(run(name)):
+            done = {result["name"] for result in report["results"]}
+            report["skipped"] = [pending for pending in names if pending not in done]
+            save_report()
+            print(f"Preflight failed; remaining checks not run. Report: {report_path}", flush=True)
+            return 1
+    remaining = [name for name in names if name not in preflight]
+    probes = [name for name in remaining if input_probe(name)]
+    domain = [name for name in remaining if name not in probes]
+    # Native input/short combat windows run alone; never overlap them with domain workers.
+    print(f"Schedule: {len(domain)} parallel-domain checks, then {len(probes)} serial input checks", flush=True)
     with concurrent.futures.ThreadPoolExecutor(max_workers=args.jobs) as pool:
-        results = list(pool.map(run, names))
-    print(f"{sum(results)}/{len(results)} checks passed. Logs: {logs}")
+        for future in concurrent.futures.as_completed([pool.submit(run, name) for name in domain]):
+            record(future.result())
+    for name in probes:
+        record(run(name))
+    results = [result["passed"] for result in report["results"] if result["name"] in names]
+    report["complete"] = len(results) == len(names)
+    save_report()
+    print(f"{sum(results)}/{len(names)} checks passed. Logs: {logs}. Report: {report_path}")
     return 0 if all(results) else 1
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    try:
+        with checkout_lock():
+            code = main()
+    except BlockingIOError:
+        print("Another test runner owns this checkout; wait for it to finish before running again.", flush=True)
+        code = 2
+    raise SystemExit(code)
