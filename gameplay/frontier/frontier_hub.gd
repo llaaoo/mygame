@@ -138,6 +138,7 @@ func entries() -> Array[Dictionary]:
 		"quests":
 			for entry in game.session.conversations.favor_entries():
 				if filter_index==0 and entry.done or filter_index==1 and not entry.ready or filter_index==2 and not entry.done: continue
+				if entry.id==game.progress.tracked_quest: entry.rank=0; entry.subtitle+=" · 正在追踪"
 				result.append(entry)
 			for quest in game.quests:
 				if not quest.available(game.progress): continue
@@ -148,7 +149,7 @@ func entries() -> Array[Dictionary]:
 				result.append({"id":quest.id,"rank":0 if quest.id==game.progress.tracked_quest else 1 if ready else 2,"title":quest.title,"text":quest.description,"subtitle":("已完成" if done else "可交付" if ready else "%d/%d项"%[quest.objective_count(game.progress),quest.required_claims.size()+quest.required_clears.size()])+(" · 正在追踪" if game.progress.tracked_quest==quest.id else "")})
 		"knowledge":
 			result.append({"id":"overview","title":"旅程总览与施法资料","text":game.presenter.journal_text(),"subtitle":"地点 · 设施 · 未取战利品"})
-			for entry in game.progress.journal: result.append({"id":entry.id,"title":entry.title,"text":game.catalog.record_text(entry,game.progress),"subtitle":"亲历记录"})
+			for entry in game.progress.journal: result.append({"id":entry.id,"title":entry.title,"text":game.record_text(entry),"subtitle":"亲历记录"})
 		"settings":
 			result.append({"id":"controls","title":"施法与快捷操作","text":"操作设置","subtitle":"键位 · 输入偏好"})
 			result.append({"id":"animation_demo","title":"动画与素材演示","text":"八方向预览 · 连招实战 · 法阵施法","subtitle":"独立沙盒，不改变正式旅程"})
@@ -287,6 +288,11 @@ func _show_detail() -> void:
 		"quests":
 			if entry.get("npc_favor",false):
 				card.add_child(W.label("人情委托需回到原委托人身边交付；日志不提供远程领取。服务日程与实际库存仍需重新核对。",13,true))
+				var detail:=game.session.conversations.favor_details(entry.id)
+				var goal:=game.guidance.goal_for(entry.id)
+				if not goal.is_empty(): card.add_child(W.label("下一步："+str(goal.title),14,true))
+				if not str(detail.get("reason","")).is_empty() and not entry.done: card.add_child(W.label(str(detail.reason),14,true))
+				_detail.add_child(W.button("追踪这个人情",_pin.bind(entry.id),entry.done or bool(detail.get("dead",false))))
 				return
 			var quest: ExplorationQuestData
 			for candidate in game.quests:

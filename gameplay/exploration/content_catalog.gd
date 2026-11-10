@@ -67,19 +67,23 @@ func discovery_text(entry: ExplorationDiscoveryData, progress: ExplorationProgre
 	var result := entry.intro_text if brief and not entry.intro_text.is_empty() else entry.text
 	var origin := fact(entry.id)
 	if origin.is_empty(): return result
-	for hint in entry.navigation_hints:
+	return result+navigation_text(entry.navigation_hints,origin.region,entry.pos,entry.title,progress)
+
+func navigation_text(hints: Array[ExplorationNavigationHint],origin_region: String,origin_position: Vector2,origin_title: String,progress: ExplorationProgress) -> String:
+	var result:=""
+	for hint in hints:
 		var destination := fact(hint.target_claim) if not hint.target_claim.is_empty() else {}
 		var target_region: String = destination.get("region",hint.target_region)
 		if not regions.has(target_region): continue
 		var title: String = destination.get("title",regions[target_region].title)
 		var point: Vector2 = destination.get("position",Vector2.ZERO)
-		if target_region != origin.region:
-			var passage := passage_toward(origin.region,target_region,progress,entry.pos)
+		if target_region != origin_region:
+			var passage := passage_toward(origin_region,target_region,progress,origin_position)
 			if not passage:
 				result += "\n线索指向："+title+"；通路尚未接通。"
 				continue
 			point = passage.pos
-		result += "\n从「%s」出发：%s方向 · %s%s。" % [entry.title,compass(point-entry.pos),title,"入口" if target_region!=origin.region else ""]
+		result += "\n从「%s」出发：%s方向 · %s%s。" % [origin_title,compass(point-origin_position),title,"入口" if target_region!=origin_region else ""]
 	return result
 
 func record_text(record: Dictionary, progress: ExplorationProgress) -> String:

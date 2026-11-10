@@ -5,11 +5,21 @@ var store: InventoryService
 var catalog: ProductionCatalog
 var seconds_per_hour := 60.0
 var _jobs: Dictionary={}
+var producer_reason: Callable
+func availability(actor_id: String) -> String:
+	return str(producer_reason.call(actor_id)) if producer_reason.is_valid() else ""
+func cancel_actor(actor_id: String,reason := "producer_dead",publish := true) -> void:
+	for id in _jobs.keys():
+		if catalog.definition(id).actor_id!=actor_id: continue
+		_jobs.erase(id)
+		if publish: _publish("production_cancelled",actor_id,{"id":id,"reason":reason})
 func configure(items: InventoryService,definitions: ProductionCatalog,hour_seconds: float) -> void:
 	store=items; catalog=definitions; seconds_per_hour=hour_seconds
 func start(id: String,batches := 1) -> OperationResult:
 	var definition:=catalog.definition(id)
 	if not definition or not definition.valid() or not store.has_container(definition.actor_id+".pack") or batches<1 or batches>20: return OperationResult.reject("invalid_order")
+	var refused:=availability(definition.actor_id)
+	if not refused.is_empty(): return OperationResult.reject(refused)
 	if _jobs.has(id): return OperationResult.reject("already_scheduled")
 	_jobs[id]={"due":store.clock_seconds+definition.work_hours*seconds_per_hour,"batches":batches,"blocked":false}
 	_publish("production_scheduled",definition.actor_id,{"id":id,"batches":batches})
@@ -24,10 +34,14 @@ func status(id: String) -> Dictionary:
 	var job: Dictionary=_jobs.get(id,{})
 	var outputs: Dictionary={definition.recipe.output_id:definition.recipe.output_count}
 	var result:=store.preview_craft(definition.actor_id,definition.recipe.inputs,outputs)
-	return {"scheduled":not job.is_empty(),"remaining":maxf(0,float(job.get("due",store.clock_seconds))-store.clock_seconds),"batches":int(job.get("batches",0)),"blocked":bool(job.get("blocked",false)),"reason":result.reason,"stock":store.count(definition.actor_id,definition.recipe.output_id)}
+	var refused:=availability(definition.actor_id)
+	return {"scheduled":not job.is_empty(),"remaining":maxf(0,float(job.get("due",store.clock_seconds))-store.clock_seconds),"batches":int(job.get("batches",0)),"blocked":bool(job.get("blocked",false)),"reason":refused if not refused.is_empty() else result.reason,"stock":store.count(definition.actor_id,definition.recipe.output_id)}
 func advance() -> void:
 	for id in _jobs.keys():
+		if not _jobs.has(id): continue
 		var definition:=catalog.definition(id)
+		if availability(definition.actor_id)=="producer_dead": cancel_actor(definition.actor_id); continue
+		if not availability(definition.actor_id).is_empty(): continue
 		var job: Dictionary=_jobs[id]
 		var outputs: Dictionary={definition.recipe.output_id:definition.recipe.output_count}
 		if bool(job.blocked):
@@ -35,7 +49,10 @@ func advance() -> void:
 				job.blocked=false; job.due=store.clock_seconds+definition.work_hours*seconds_per_hour
 				_publish("production_resumed",definition.actor_id,{"id":id})
 			continue
-		while float(job.due)<=store.clock_seconds+.000001 and int(job.batches)>0:
+		while _jobs.has(id) and float(job.due)<=store.clock_seconds+.000001 and int(job.batches)>0:
+			if not availability(definition.actor_id).is_empty():
+				if availability(definition.actor_id)=="producer_dead": cancel_actor(definition.actor_id)
+				break
 			# Suppress inventory facts until the schedule and stock agree.
 			store.begin_batch()
 			var result:=store.craft_batch(definition.actor_id,definition.recipe.inputs,outputs)
@@ -47,7 +64,12 @@ func advance() -> void:
 			_publish("production_completed",definition.actor_id,{"id":id,"remaining_batches":job.batches})
 func snapshot() -> Dictionary: return {"schema":1,"jobs":_jobs.duplicate(true)}
 func restore(data: Dictionary) -> void:
-	if valid_snapshot(data): _jobs=data.get("jobs",{}).duplicate(true)
+	if valid_snapshot(data):
+		_jobs=data.get("jobs",{}).duplicate(true)
+		for id in _jobs.keys():
+			if not _jobs.has(id): continue
+			var actor_id:=catalog.definition(id).actor_id
+			if availability(actor_id)=="producer_dead": cancel_actor(actor_id,"producer_dead",false)
 static func valid_snapshot(data: Variant) -> bool:
 	if not data is Dictionary: return false
 	if data.is_empty(): return true

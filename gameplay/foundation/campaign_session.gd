@@ -50,6 +50,7 @@ func configure(content: ExplorationContentCatalog,profile: RulesetDefinition) ->
 	inventory.perk_query=perk_value
 	relations.facts=facts
 	conversations.configure(self,NpcCatalog.default_catalog())
+	production.producer_reason=producer_reason
 	relations.factions["guards|traveler"]="hostile"
 	relations.factions["traveler|guards"]="hostile"
 	for item in ItemCatalog.default_catalog().items: inventory.register_definition(item)
@@ -62,8 +63,8 @@ func restore(data: Dictionary) -> bool:
 	state=data.duplicate(true)
 	inventory.clock_seconds=float(data.get("clock_seconds",0))
 	if data.has("inventory"): inventory.restore(data.inventory)
-	production.restore(data.get("production",{}))
 	actor_records=data.get("actors",{}).duplicate(true)
+	production.restore(data.get("production",{}))
 	proficiency=data.get("proficiency",{}).duplicate(true)
 	if data.has("relations"): relations.restore(data.relations)
 	conversations.restore(data.get("conversations",{}))
@@ -245,6 +246,7 @@ func mark_dead(actor: CharacterBody2D) -> void:
 	if actor_records.get(id,{}).get("dead",false): return
 	actor_records[id]=_actor_record(actor)
 	actor_records[id].dead=true; actor_records[id].hp=0
+	production.cancel_actor(id)
 	facts.publish("actor_died",id,{"region":region.id,"reward_eligible":actor.actor_context.reward_eligible})
 	if actor.actor_context.loot_eligible and death_handler.is_valid(): death_handler.call(actor)
 func drop_pack(actor_id: String) -> bool:
@@ -493,3 +495,7 @@ func nearby_allies(radius: float,id: String) -> Array[Node2D]:
 
 func perk_value(actor_id: String,key: String) -> float:
 	return ActorProgression.modifier(actor_for_id(actor_id),key)
+func producer_reason(id: String) -> String:
+	if actor_records.get(id,{}).get("dead",false): return "producer_dead"
+	var actor:=actor_for_id(id)
+	return "producer_dead" if is_instance_valid(actor) and actor.get_node("HealthComponent").is_dead else ""

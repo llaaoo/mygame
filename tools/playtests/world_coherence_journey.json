@@ -1,0 +1,348 @@
+[
+  {
+    "label": "开始河谷旅程",
+    "op": "click"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3500.0,
+      2350.0
+    ]
+  },
+  {
+    "capture": "01-handbook-final",
+    "key": "F",
+    "op": "key"
+  },
+  {
+    "label": "记入日志，继续探索",
+    "op": "click"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3850.0,
+      2350.0
+    ]
+  },
+  {
+    "key": "F",
+    "op": "key"
+  },
+  {
+    "label": "记入日志，继续探索",
+    "op": "click"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3400.0,
+      1850.0
+    ]
+  },
+  {
+    "capture": "03-stove-final",
+    "key": "F",
+    "op": "key"
+  },
+  {
+    "key": "Escape",
+    "op": "key"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3100.0,
+      1850.0
+    ]
+  },
+  {
+    "key": "F",
+    "op": "key"
+  },
+  {
+    "op": "click",
+    "label": "火石"
+  },
+  {
+    "label": "加工：火石",
+    "op": "click"
+  },
+  {
+    "label": "继续探索",
+    "op": "click"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3400.0,
+      1260.0
+    ]
+  },
+  {
+    "capture": "06-sign-final",
+    "key": "F",
+    "op": "key"
+  },
+  {
+    "label": "记入日志，继续探索",
+    "op": "click"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3500.0,
+      900.0
+    ]
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3500.0,
+      0.0
+    ]
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3260.0,
+      -780.0
+    ]
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3060,
+      -1200
+    ],
+    "tolerance": 6.0
+  },
+  {
+    "capture": "07-safe-preparation-final",
+    "key": "F",
+    "op": "key"
+  },
+  {
+    "label": "precombat-final",
+    "op": "save"
+  },
+  {
+    "label": "记入日志，继续探索",
+    "op": "click"
+  },
+  {
+    "op": "wheel",
+    "key": "5",
+    "payload": "ember",
+    "capture": "08-select-firestone-final"
+  },
+  {
+    "op": "duel",
+    "style": "combo",
+    "capture": "09-fireball-result-final"
+  },
+  {
+    "op": "key",
+    "key": "Escape"
+  },
+  {
+    "op": "walk_loot"
+  },
+  {
+    "op": "key",
+    "key": "F",
+    "capture": "10-real-loot"
+  },
+  {
+    "op": "key",
+    "key": "T"
+  },
+  {
+    "op": "key",
+    "key": "Escape"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3072,
+      -1200
+    ]
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3260,
+      -780
+    ]
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3500,
+      0
+    ]
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3500,
+      900
+    ]
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3500,
+      2100
+    ]
+  },
+  {
+    "op": "save",
+    "label": "returned-final",
+    "capture": "11-returned-town"
+  },
+  {
+    "op": "key",
+    "key": "P"
+  },
+  {
+    "op": "click",
+    "label": "属性与派生"
+  },
+  {
+    "op": "capture",
+    "capture": "journey-growth"
+  },
+  {
+    "op": "key",
+    "key": "Escape"
+  },
+  {
+    "op": "inventory",
+    "item": "river_sabre",
+    "action": "装备这件"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3305,
+      2200
+    ]
+  },
+  {
+    "op": "key",
+    "key": "F"
+  },
+  {
+    "op": "click",
+    "label": "你的货从哪里来？"
+  },
+  {
+    "op": "click",
+    "label": "委托：补一批木炭"
+  },
+  {
+    "op": "click",
+    "label": "接受委托"
+  },
+  {
+    "op": "key",
+    "key": "Escape"
+  },
+  {
+    "op": "key",
+    "key": "J"
+  },
+  {
+    "op": "click",
+    "label": "委托：补一批木炭"
+  },
+  {
+    "op": "click",
+    "label": "追踪这个人情"
+  },
+  {
+    "op": "capture",
+    "capture": "journey-personal-tracker"
+  },
+  {
+    "op": "key",
+    "key": "Escape"
+  },
+  {
+    "op": "key",
+    "key": "F"
+  },
+  {
+    "op": "click",
+    "label": "委托：补一批木炭"
+  },
+  {
+    "op": "click",
+    "label": "交付物资并领取报酬"
+  },
+  {
+    "op": "capture",
+    "capture": "journey-funded-supply"
+  },
+  {
+    "op": "key",
+    "key": "Escape"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3300,
+      2300
+    ]
+  },
+  {
+    "op": "key",
+    "key": "F"
+  },
+  {
+    "op": "click",
+    "label": "学习武技"
+  },
+  {
+    "op": "click",
+    "label": "破势斩 · 8币"
+  },
+  {
+    "op": "key",
+    "key": "Escape"
+  },
+  {
+    "op": "key",
+    "key": "F"
+  },
+  {
+    "op": "click",
+    "label": "委托：训练后的口粮"
+  },
+  {
+    "op": "click",
+    "label": "接受委托"
+  },
+  {
+    "op": "click",
+    "label": "交付物资并领取报酬"
+  },
+  {
+    "op": "capture",
+    "capture": "journey-course-funded-favor"
+  },
+  {
+    "op": "key",
+    "key": "Escape"
+  },
+  {
+    "op": "save",
+    "label": "coherence-returned",
+    "capture": "journey-returned"
+  },
+  {
+    "op": "quit"
+  }
+]

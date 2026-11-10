@@ -20,7 +20,10 @@ func _ready() -> void:
 	guidance=FrontierGuidance.new(self)
 	stories=GrayriverStories.new(self)
 	loot = GrayriverLoot.new(self)
-	town_services=TownServices.new(self)
+	var resident_catalog:=NpcCatalog.default_catalog()
+	var merchant_profile:=resident_catalog.profile(TownServices.MERCHANT)
+	var trainer_profile:=resident_catalog.profile(TrainingCatalog.default_catalog().actor_id)
+	town_services=TownServices.new(self,merchant_profile.market,trainer_profile.training,false)
 	residents=GrayriverResidents.new(self)
 	definition = GrayriverDefinition.data()
 	catalog = ExplorationContentCatalog.new(GrayriverDefinition.build())
@@ -248,12 +251,21 @@ func _service_feedback(fact: Dictionary) -> void:
 	if fact.kind=="character_leveled" and fact.source=="player":
 		ui.queue_notice("提升到Lv.%d · +3属性点、+1Perk点 · P查看角色成长"%fact.data.level)
 		return
+	if fact.kind=="production_cancelled" and fact.data.get("reason","")=="producer_dead":
+		progress_service.record_service_result("service.production."+str(fact.data.id),"排产已终止","生产者已死亡，未完成的批次已取消；没有扣除或返还未交付的原料。")
+		ui.queue_notice("生产者死亡，未完成的排产已终止。")
+		return
 	if fact.kind!="production_completed": return
 	var definition:=session.production.catalog.definition(str(fact.data.get("id","")))
 	if not definition: return
 	var title:=player.skill_manager.combinations.supplies.title(definition.recipe.output_id)
-	var text:="店家已制成%s ×%d · 返回整修铺购买。"%[title,definition.recipe.output_count]
-	progress_service.record_service_result("service.production."+definition.id,"整修铺完工："+title,WorldTime.instance.stamp()+"\n"+text+"货品属于店家；价格和余量以实际库存为准。")
+	var producer:=session.conversations.catalog.profile(definition.actor_id)
+	var text:="%s已制成%s ×%d · 返回整修铺购买。"%[producer.character.title if producer else "店家",title,definition.recipe.output_count]
+	var suffix:="货品属于店家；价格和余量以实际库存为准。"
+	if session.producer_reason(definition.actor_id)=="producer_dead":
+		text="本批%s ×%d已完成并留在生产者遗骸中；未完成的排产已经终止。"%[title,definition.recipe.output_count]
+		suffix="可搜刮实际遗骸，物品不会转移到另一商人。"
+	progress_service.record_service_result("service.production."+definition.id,"本批完工："+title,WorldTime.instance.stamp()+"\n"+text+suffix)
 	ui.queue_notice(text)
 
 func grant_material_reward(source_id: String, title: String, point: Vector2, materials: Dictionary) -> void:

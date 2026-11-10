@@ -64,6 +64,7 @@ required_attributes = {"strength": 12}
 [resource]
 script = ExtResource("profile")
 actor_id = "river.enemy.service.trainer"
+threat_response = 1
 role = "武器战技与战斗准备"
 character = ExtResource("character")
 training = ExtResource("training")

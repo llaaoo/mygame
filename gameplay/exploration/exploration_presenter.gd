@@ -153,7 +153,7 @@ func journal_text() -> String:
 		_: text += "尚未重启。继续调查已发现的支路与设备。\n"
 	text += "\n发现记录\n"
 	for note in game.progress.journal:
-		text += "\n%s\n%s\n" % [note.title, game.catalog.record_text(note,game.progress)]
+		text += "\n%s\n%s\n" % [note.title, game.record_text(note)]
 	return text
 
 

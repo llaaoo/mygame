@@ -34,7 +34,7 @@ func journal_text() -> String:
 		if record.equipment.is_empty() and record.materials.is_empty(): continue
 		text += game.catalog.regions[record.region].title+" · "+record.title+"：装备%d种，物资%d种，靠近F搜刮。\n" % [record.equipment.size(),record.materials.size()]
 	text += "\n发现记录\n"
-	for note in game.progress.journal: text += "\n"+note.title+"\n"+game.catalog.record_text(note,game.progress)+"\n"
+	for note in game.progress.journal: text += "\n"+note.title+"\n"+game.record_text(note)+"\n"
 	return text
 
 func _choose_world_event(entry: ExplorationWorldEventData, choice: ExplorationWorldChoiceData) -> void:

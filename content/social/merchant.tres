@@ -1,5 +1,6 @@
 [gd_resource type="Resource" script_class="NpcProfile" format=3]
 [ext_resource type="Script" path="res://gameplay/social/npc_profile.gd" id="profile"]
+[ext_resource type="Resource" path="res://content/frontier/town_market.tres" id="market"]
 [ext_resource type="Script" path="res://gameplay/social/npc_topic.gd" id="topic"]
 [ext_resource type="Resource" path="res://content/social/merchant_character.tres" id="character"]
 [ext_resource type="Resource" path="res://content/foundation/trainer_schedule.tres" id="schedule"]
@@ -63,6 +64,7 @@ required_attributes = {"intelligence": 12}
 [resource]
 script = ExtResource("profile")
 actor_id = "river.merchant"
+market = ExtResource("market")
 role = "整修、实物交易与店内排产"
 character = ExtResource("character")
 schedule = ExtResource("schedule")

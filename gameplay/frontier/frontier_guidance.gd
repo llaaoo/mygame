@@ -24,9 +24,36 @@ func next_step(quest: ExplorationQuestData) -> Dictionary:
 func tracked() -> Dictionary:
 	if not game.progress.waypoint.is_empty():
 		return {"title":"自定路标","region":"camp","position":GrayriverDefinition.vector(game.progress.waypoint.position),"known":true}
+	return goal_for(game.progress.tracked_quest)
+func goal_for(id: String) -> Dictionary:
 	for quest in game.quests:
-		if quest.id == game.progress.tracked_quest: return next_step(quest)
-	return {}
+		if quest.id==id: return next_step(quest)
+	var detail:=game.session.conversations.favor_details(id)
+	if detail.is_empty() or detail.state=="completed": return {}
+	var profile:=detail.profile as NpcProfile; var entry:=detail.topic as NpcTopic
+	if detail.dead: return {"title":entry.title+" · 原委托人已死亡","region":profile.region_id,"position":profile.work_location(),"known":false,"terminal":true}
+	var missing: PackedStringArray=[]
+	for item_id in entry.requested_items:
+		var amount:=maxi(0,int(entry.requested_items[item_id])-game.session.inventory.count("player",item_id))
+		if amount<=0: continue
+		missing.append("%s ×%d"%[game.session.inventory.definitions[item_id].display_name,amount])
+		var site:=known_gathering(item_id)
+		if not site.is_empty(): return {"title":"收集："+missing[-1]+" · "+site.title,"region":site.region,"position":site.position,"known":true}
+	if not missing.is_empty(): return {"title":"收集："+"、".join(missing)+" · 查看已学配方或寻找物资","region":"","position":Vector2.ZERO,"known":false}
+	var npc:=game.session.actor_for_id(profile.actor_id)
+	var routine:=profile.daily_schedule().get_entry_for_hour(float(game.session.hour_query.call()))
+	var point: Vector2=npc.position if is_instance_valid(npc) else profile.rest_location() if routine and routine.target_marker=="rest" else profile.work_location()
+	return {"title":("返回"+profile.character.title+"交付" if str(detail.reason).is_empty() else str(detail.reason)),"region":profile.region_id,"position":point,"known":true}
+func known_gathering(item_id: String) -> Dictionary:
+	var candidates: Array[Dictionary]=[]
+	for region: ExplorationRegionData in game.catalog.regions.values():
+		for station in region.survival_stations:
+			if int(station.harvest.get(item_id,0))<=0 or not known(region.id,station.pos) or not game.progress.condition_query.claims_satisfied(station.required_claims) or float(game.survival.needs.harvests.get(station.id,0))>0: continue
+			candidates.append({"title":station.title,"region":region.id,"position":station.pos})
+	candidates.sort_custom(func(a: Dictionary,b: Dictionary):
+		if (a.region==game.region_id)!=(b.region==game.region_id): return a.region==game.region_id
+		return a.position.distance_squared_to(game.player.position)<b.position.distance_squared_to(game.player.position))
+	return candidates[0] if not candidates.is_empty() else {}
 
 func town_orientation() -> Dictionary:
 	if not game.is_at_base(): return {}
@@ -35,7 +62,7 @@ func town_orientation() -> Dictionary:
 	return {}
 
 func route_target(goal: Dictionary) -> Vector2:
-	if goal.is_empty() or str(goal.region).is_empty(): return Vector2.INF
+	if goal.is_empty() or goal.get("terminal",false) or str(goal.region).is_empty(): return Vector2.INF
 	if game.region_id == goal.region: return goal.position if goal.known else Vector2.INF
 	var passage := game.catalog.passage_toward(game.region_id,goal.region,game.progress,game.player.position)
 	return passage.pos if passage else Vector2.INF
@@ -61,7 +88,8 @@ func overworld_point(region: String) -> Vector2:
 		region = passage.target
 	return Vector2.ZERO
 func pin(id: String) -> void:
-	if not game.quests.any(func(quest): return quest.id == id): return
+	var goal:=goal_for(id)
+	if goal.is_empty() or goal.get("terminal",false): return
 	game.progress.tracked_quest = id
 	game.progress.waypoint.clear()
 	game._queue_save()
