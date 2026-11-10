@@ -26,7 +26,15 @@
 
 截图00—08及原生运行日志保存在本目录，散列见`evidence.sha256`。视频保留在云端`/tmp/grayriver-first30/world-depth-acceptance-native/weapon-response.mp4`，未作为仓库发行物提交。
 
-干净提交归档的全量回归结果在交付前补记，不能用前面的定向通过代替。
+最终全量回归来源：干净提交 `2cba5e1f8ece3645d2ccfb46f6ab41122969b66f` 的 `git archive`，导出时确认不存在 `.godot`。首次Godot导入退出0、无错误/警告；随后执行：
+
+```sh
+taskset -c 0,1,2,3 python3 tools/run_tests.py --suite all --jobs 2 --timeout 300
+```
+
+结果 **142/142通过**，逐份日志检查无`ERROR`、`SCRIPT ERROR`或`WARNING`。完整runner摘要见`all-tests.log`，首次导入记录见`first-import.log`；独立保存与逐项原始日志留在云端`/tmp/mygame-tests-2jr49m4p`，被测源码归档为`/tmp/grayriver-depth-green-mtgoojbv`。
+
+验收后只澄清归还说明文字：材料按既有规则合堆，整件装备/喷剂保留UID。没有修改游戏规则或测试脚本；该文字修改通过独立脚本语法检查。
 
 ## 限制
 

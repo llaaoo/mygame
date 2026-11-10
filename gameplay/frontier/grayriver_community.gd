@@ -27,7 +27,7 @@ func _join(npc: String,id: String) -> void:
 func show_mediation(npc := "") -> void:
 	if not _mediation_available(npc):return
 	var options: Array[Dictionary]=[]
-	var text:="归还实物保留原UID；物资已经消耗或不在随身容器时，可支付真实赔款。重复取用且被目击时，物主会追回可归还物品。未结纠纷限制物主服务，结清后恢复；信任损失不自动抹去。\n"
+	var text:="归还材料遵守原堆叠规则；整件装备和喷剂保留UID。物资已经消耗或不在随身容器时，可支付真实赔款。重复取用且被目击时，物主会追回可归还物品。未结纠纷限制物主服务，结清后恢复；信任损失不自动抹去。\n"
 	for id in game.session.law.cases:
 		var entry: Dictionary=game.session.law.cases[id]
 		if entry.actor!="player" or entry.settled:continue
