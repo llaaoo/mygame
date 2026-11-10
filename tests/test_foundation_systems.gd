@@ -58,6 +58,7 @@ func run() -> void:
 	var origin:=game.player.position
 	var sim:=GameRuntime.instance.get_simulation_runtime()
 	var baseline:=sim.entity_ticker_count()
+	var actor_count:=session.actors.size()
 	var guard_id:="river.enemy.camp.bridge_keeper"
 	var guard_food:=store.count(guard_id,"ration")
 	for cycle in range(10):
@@ -65,7 +66,7 @@ func run() -> void:
 		if cycle==0: game.progress.story_actors[guard_id].materials={"ration":90}
 		await fixture.travel("camp",origin)
 		check(store.entries("player.pack")==bag_rows and not store.is_attached("player.pack"),"Travel copied or silently recovered dropped pack")
-		check(session.actors.size()==14,"Travel accumulated actor registrations")
+		check(session.actors.size()==actor_count,"Travel accumulated actor registrations")
 		check(sim.entity_ticker_count()==baseline,"Travel accumulated entity tickers")
 	npc=session.actor_for_id(npc_id) as ServiceNPC
 	check(store.count(guard_id,"ration")==guard_food,"Legacy story projection refilled canonical NPC inventory")

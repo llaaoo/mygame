@@ -9,6 +9,7 @@ var production:=ProductionService.new()
 var _production_time := 0.0
 var facts:=GameplayFacts.new()
 var relations:=RelationService.new()
+var conversations:=NpcConversationService.new()
 var actor_records: Dictionary={}
 var actors: Dictionary={}
 var proficiency: Dictionary={}
@@ -48,6 +49,7 @@ func configure(content: ExplorationContentCatalog,profile: RulesetDefinition) ->
 	inventory.facts=facts
 	inventory.perk_query=perk_value
 	relations.facts=facts
+	conversations.configure(self,NpcCatalog.default_catalog())
 	relations.factions["guards|traveler"]="hostile"
 	relations.factions["traveler|guards"]="hostile"
 	for item in ItemCatalog.default_catalog().items: inventory.register_definition(item)
@@ -64,6 +66,7 @@ func restore(data: Dictionary) -> bool:
 	actor_records=data.get("actors",{}).duplicate(true)
 	proficiency=data.get("proficiency",{}).duplicate(true)
 	if data.has("relations"): relations.restore(data.relations)
+	conversations.restore(data.get("conversations",{}))
 	return true
 func bind_actor(actor: CharacterBody2D,id: String,legacy_counts: Dictionary = {},legacy_loadout: Dictionary = {}, persistent := true) -> ActorContext:
 	var context:=ActorContext.new()
@@ -194,8 +197,9 @@ func _actor_record(actor: CharacterBody2D) -> Dictionary:
 func snapshot() -> Dictionary:
 	capture_actors()
 	if sync_extra.is_valid(): sync_extra.call()
-	return {"schema":1,"clock_seconds":inventory.clock_seconds,"shortcut_schema":1,"production":production.snapshot(),"inventory":persistent_inventory(),"actors":actor_records.duplicate(true),"relations":relations.snapshot(),"proficiency":proficiency.duplicate(true)}
+	return {"schema":1,"clock_seconds":inventory.clock_seconds,"shortcut_schema":1,"production":production.snapshot(),"inventory":persistent_inventory(),"actors":actor_records.duplicate(true),"relations":relations.snapshot(),"conversations":conversations.snapshot(),"proficiency":proficiency.duplicate(true)}
 func leave_region() -> void:
+	conversations.invalidate()
 	capture_actors()
 	for id in actors.keys():
 		if id=="player": continue
@@ -316,6 +320,9 @@ func _on_fact(fact: Dictionary) -> void:
 static func valid_snapshot(data: Variant) -> bool:
 	if not data is Dictionary: return false
 	if data.is_empty(): return true
+	if not NpcConversationService.valid_state(data.get("conversations",{})): return false
+	if not data.get("relations",{}) is Dictionary: return false
+	if not RelationService.valid_dispositions(data.get("relations",{}).get("dispositions",{})): return false
 	if typeof(data.get("clock_seconds",0)) not in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(data.get("clock_seconds",0))) or data.get("clock_seconds",0)<0 or data.get("clock_seconds",0)>1000000000: return false
 	if not ProductionService.valid_snapshot(data.get("production",{})): return false
 	if data.has("shortcut_schema") and (not data.shortcut_schema is int or data.shortcut_schema!=1): return false
@@ -369,7 +376,9 @@ func _on_hostile_contact(source: Node2D,target: Node2D) -> void:
 	var a: ActorContext=source.actor_context
 	var b: ActorContext=target.actor_context
 	if a.id==b.id: return
+	var was_hostile:=relations.attitude(b.id,a.id)=="hostile"
 	relations.set_attitude(b.id,a.id,"hostile")
+	if not was_hostile and b.actor is ServiceNPC: relations.adjust_disposition(b.id,a.id,-30)
 	if "story_truce" in target: target.story_truce=false
 	if b.hostile_requested.is_valid(): b.hostile_requested.call(target)
 func has_hostiles_near(actor_id: String,point: Vector2,radius := 500.0) -> bool:

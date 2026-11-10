@@ -136,6 +136,9 @@ func entries() -> Array[Dictionary]:
 					if not definition or not definition.use_profile or definition.use_profile.kind!=ItemUseDefinition.Kind.SPRAY: continue
 					result.append({"id":"uid:"+row.uid,"item":row.definition,"uid":row.uid,"title":definition.display_name,"text":definition.description,"subtitle":("口袋 · " if source.ends_with("pocket") else "背包 · ")+game.session.inventory.state_text(row.uid)})
 		"quests":
+			for entry in game.session.conversations.favor_entries():
+				if filter_index==0 and entry.done or filter_index==1 and not entry.ready or filter_index==2 and not entry.done: continue
+				result.append(entry)
 			for quest in game.quests:
 				if not quest.available(game.progress): continue
 				var stage:=quest.stage(game.progress)
@@ -282,6 +285,9 @@ func _show_detail() -> void:
 				_binding_picker(id,str(entry.get("uid","")) if definition and definition.use_profile and definition.use_profile.kind==ItemUseDefinition.Kind.SPRAY else "")
 			_detail.add_child(W.button("查看本次施法材料",func(): game.workshop.show_materials()))
 		"quests":
+			if entry.get("npc_favor",false):
+				card.add_child(W.label("人情委托需回到原委托人身边交付；日志不提供远程领取。服务日程与实际库存仍需重新核对。",13,true))
+				return
 			var quest: ExplorationQuestData
 			for candidate in game.quests:
 				if candidate.id==entry.id: quest=candidate

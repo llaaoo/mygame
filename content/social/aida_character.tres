@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="ActorCharacterData" format=3]
+[ext_resource type="Script" path="res://gameplay/characters/actor_character_data.gd" id="def"]
+[resource]
+script = ExtResource("def")
+id = "aida"
+title = "艾妲 · 河谷书记"
+base_move_speed = 110.0
+materials = {"coin": 24}

@@ -42,6 +42,8 @@
 
 - 角色等级/经验/属性点只归StatsComponent，分支熟练度与已学Perk只归SkillMasteryManager；Perk全局预算来自角色等级，不再按学派另发可花点。属性与Perk经ActorProgression共同投影，真实费用/命中/库存仍由原执行器提交。新节点必须登记实际效果消费者、条件、前置与验证，不能只改说明或无材料自动施法。成长界面P不暂停世界，升级不强制弹窗；规则与旧点数迁移见[角色成长](docs/RPG_PROGRESSION_SYSTEM.md)。
 
+- NPC交谈/人情记忆归Session的NpcConversationService，态度与信任归RelationService；正式任务与发现仍归原Progress。服务检查真实角色、日程、关系、距离、视线与危险，实物交付复用库存事务，完成收据先于库存通知；换区/读档不恢复会话。新增内容见[NPC交互](docs/NPC_INTERACTIONS.md)。
+
 ## Godot架构与职责
 
 - 采用Godot场景组合和显式依赖注入，不引入没有实际需求的通用ECS或自制脚本语言。重要架构调整先核对所用引擎版本的官方最佳实践，再结合既有代码决定。

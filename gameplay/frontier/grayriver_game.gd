@@ -6,6 +6,7 @@ var guidance: FrontierGuidance
 var stories: GrayriverStories
 var frontier_hud: FrontierHUD
 var town_services: TownServices
+var residents: GrayriverResidents
 var loot: GrayriverLoot
 var definition: Dictionary
 var terrain: GrayriverTerrain
@@ -20,6 +21,7 @@ func _ready() -> void:
 	stories=GrayriverStories.new(self)
 	loot = GrayriverLoot.new(self)
 	town_services=TownServices.new(self)
+	residents=GrayriverResidents.new(self)
 	definition = GrayriverDefinition.data()
 	catalog = ExplorationContentCatalog.new(GrayriverDefinition.build())
 	save_slot = 3
@@ -38,8 +40,8 @@ func _build_camp() -> void:
 	_add_interaction("镇中篝火：休整与粗食",Vector2(-3500,2100),Callable(),"mechanism")
 	var rest := region_root.get_child(region_root.get_child_count()-1) as ExplorationInteractable
 	survival.mount_rest(rest)
-	_mount_trainer(town_services.training.work_position,town_services.show_training)
 	town_services.ensure_stock()
+	residents.mount()
 	_add_interaction("整修铺：交易、拆解与强化",town_services.market.position,town_services.show,"mechanism")
 	_add_interaction("镇中工作台：制造与炼制",Vector2(-3100,1800),workshop.show_crafts,"mechanism")
 	_add_interaction("艾妲的委托板",Vector2(-2900,2200),_show_quests,"person")
@@ -241,17 +243,6 @@ func inspect_actor(actor: Enemy) -> void:
 
 func record_actor_loot(actor: CharacterBody2D) -> void:
 	loot.record_enemy(actor)
-
-func _mount_trainer(point: Vector2,request: Callable) -> void:
-	var id:=town_services.training.actor_id
-	var configure_actor:=func(actor: CharacterBody2D):
-		var npc:=actor as ServiceNPC
-		npc.schedule=town_services.training.schedule
-		npc.locations={"work":point,"rest":town_services.training.rest_position}
-		npc.hour_query=session.hour_query; npc.service_request=request; npc.notify=session.notify; npc.lookup_actor=session.actor_for_id
-		npc.set_meta("frontier_claim",id)
-	var npc:=session.mount_actor(load("res://gameplay/foundation/service_npc.tscn"),id,point,configure_actor)
-	if npc: session.relations.memberships[id]="civilian"
 
 func _service_feedback(fact: Dictionary) -> void:
 	if fact.kind=="character_leveled" and fact.source=="player":

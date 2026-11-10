@@ -30,6 +30,7 @@ func run() -> void:
 	var npc:=game.session.actor_for_id("river.enemy.service.trainer") as ServiceNPC
 	actor.position=npc.position+Vector2(0,40); actor.get_node("Camera2D").reset_smoothing(); await frames(10)
 	await key(KEY_F,true); await key(KEY_F,false)
+	await click("学习武技")
 	await click("破势斩 · 8币")
 	check(actor.actor_context.martial.learned.has("blade_breaker"),"Trainer mouse service did not unlock martial knowledge")
 	await key(KEY_ESCAPE,true); await key(KEY_ESCAPE,false)
