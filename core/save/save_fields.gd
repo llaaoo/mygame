@@ -25,6 +25,10 @@ static func _compatible(default: Variant,value: Variant) -> bool:
 	if typeof(default)==TYPE_FLOAT and typeof(value)==TYPE_INT: return true
 	if typeof(default)!=typeof(value): return false
 	if default is Dictionary:
+		if default.is_typed():
+			for key in value:
+				if default.get_typed_key_builtin()!=TYPE_NIL and typeof(key)!=default.get_typed_key_builtin(): return false
+				if default.get_typed_value_builtin()!=TYPE_NIL and typeof(value[key])!=default.get_typed_value_builtin(): return false
 		for key in default:
 			if value.has(key) and not _compatible(default[key],value[key]): return false
 	elif default is Array and default.is_typed():
@@ -45,7 +49,8 @@ static func restore(owner: RefCounted,data: Dictionary) -> Dictionary:
 	return unknown
 static func _defaults(default: Variant,value: Variant) -> Variant:
 	if default is Dictionary:
-		var result: Dictionary=value.duplicate(true)
+		var result: Dictionary=default.duplicate(true)
+		result.merge(value.duplicate(true),true)
 		for key in default: result[key]=_defaults(default[key],value.get(key,default[key]))
 		return result
 	if default is Array:

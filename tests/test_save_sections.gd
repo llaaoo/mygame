@@ -7,6 +7,7 @@ class Earlier extends SaveRecord:
 class Additive extends Earlier:
 	@export_storage var discoveries: Array[String]=["town"]
 	@export_storage var optional_budget := 9
+	@export_storage var typed_counts: Dictionary[String,int]={}
 class Renamed extends SaveRecord:
 	@export_storage var purse := 0
 	func save_version() -> int:return 2
@@ -53,6 +54,9 @@ func run() -> void:
 	roundtrip.deserialize_save_data({"settings":{"future_setting":7}})
 	check(roundtrip.settings=={"enabled":true,"future_setting":7},"New nested defaults erased older optional settings")
 	check(not roundtrip.validate_save_data({"balance":"bad"}) and not roundtrip.validate_save_data({"balance":INF}),"Declared fields accepted malformed or nonfinite data")
+	check(not roundtrip.validate_save_data({"typed_counts":{"coin":"bad"}}) and not roundtrip.validate_save_data({"typed_counts":{2:1}}),"Typed dictionary accepted incompatible keys or values")
+	roundtrip.deserialize_save_data({"typed_counts":{"coin":3}})
+	check(roundtrip.typed_counts.get("coin")==3 and roundtrip.typed_counts.is_typed(),"Typed dictionary did not restore valid values with its declared type")
 	var node:=Node.new()
 	check(not roundtrip.validate_save_data({"future_node":node}) and not SaveValues.valid({"callback":run}),"Runtime objects/callbacks entered a value snapshot")
 	node.free()
