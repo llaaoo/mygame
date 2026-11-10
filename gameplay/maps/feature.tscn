@@ -1,0 +1,4 @@
+[gd_scene format=3]
+[ext_resource type="Script" path="res://gameplay/maps/map_feature.gd" id="1"]
+[node name="Feature" type="Node2D"]
+script = ExtResource("1")

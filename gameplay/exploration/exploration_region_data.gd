@@ -7,6 +7,10 @@ extends Resource
 @export var room_type: String = "barracks"
 @export var open_field := false
 @export var presentation_environment: EnvironmentProfile
+@export var map_scene: PackedScene
+@export var storage: Array[WorldStorageData] = []
+@export var amenities: Array[MapAmenityData] = []
+var map_errors: PackedStringArray = []
 @export var authored_size := Vector2.ZERO
 @export var authored_entry := Vector2.ZERO
 @export var authored_obstacles: Array[Dictionary] = []
@@ -24,8 +28,11 @@ extends Resource
 @export var exits: Array[ExplorationExitData] = []
 
 func reserve_interaction_space(layout: RefCounted) -> void:
+	# Authored walls must never silently disappear to accommodate a misplaced marker.
+	if map_scene and not open_field: return
 	# Authored points take precedence over the reusable random obstacle pattern.
 	for obstacle in layout.obstacles.duplicate():
+		if obstacle.get("kind","")=="map_furniture": continue
 		var rect := Rect2(obstacle.position - obstacle.size * 0.5, obstacle.size).grow(48)
 		for entry in interaction_points():
 			if rect.has_point(entry.pos):
@@ -43,8 +50,10 @@ func interaction_points() -> Array[Resource]:
 	points.append_array(facilities)
 	points.append_array(delivery_sites)
 	points.append_array(survival_stations)
+	points.append_array(storage)
+	points.append_array(amenities)
 	for station in survival_stations:
-		if station and station.kind == "cook":
+		if station and station.kind == "cook" and not station.lit:
 			var heat := SurfacePatchData.new()
 			heat.pos = station.pos + station.heat_offset
 			points.append(heat)

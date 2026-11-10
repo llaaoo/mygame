@@ -103,6 +103,7 @@ func _spawn_enemy(spec: ExplorationEncounterData, layout: RefCounted, index: int
 func _add_interaction(title: String, point: Vector2, callback: Callable, kind: String = "note") -> ExplorationInteractable:
 	var node := ExplorationInteractable.new()
 	node.world_art=game.rules.world_interaction_art
+	node.marker_art=not game.current_data.map_scene or game.current_data.open_field
 	node.title = title
 	node.kind = kind
 	node.position = point
@@ -120,6 +121,13 @@ func _add_discovery(entry: ExplorationDiscoveryData) -> void:
 	node.callback = game.presenter.inspect_discovery.bind(entry, node)
 
 func build_element_objects() -> void:
+	if not game.world_storage: game.world_storage=WorldStorageService.new(game)
+	for spec in game.current_data.storage: game.world_storage.mount(spec)
+	for spec in game.current_data.amenities:
+		var callback: Callable=game.workshop.show_crafts if spec.service=="craft" else game.equipment_service.show_equipment
+		var node:=_add_interaction(spec.title,spec.pos,callback,"mechanism")
+		node.set_meta("map_amenity",spec.id)
+		if spec.service=="rest": game.survival.mount_rest(node)
 	for spec in game.current_data.delivery_sites: game.deliveries.mount(spec)
 	var surfaces := GameRuntime.instance.get_simulation_runtime().get_surface_manager()
 	for facility in game.current_data.facilities: game.alchemy.mount(facility)

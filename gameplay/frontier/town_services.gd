@@ -34,7 +34,7 @@ func ensure_stock() -> void:
 	store.end_batch()
 func reason() -> String:
 	if not market: return "此人不提供交易与整修。"
-	if game.region_id!=market.region_id or game.player.global_position.distance_to(market.position)>market.service_range: return "请靠近镇中整修铺。"
+	if game.region_id!=market.region_id or game.player.global_position.distance_to(market.position)>market.service_range: return "请靠近这位店主的交易位置。"
 	var social_reason:=game.session.conversations.reason(market.actor_id,true,180)
 	if not social_reason.is_empty(): return social_reason
 	if game.has_hostiles_near(game.player.global_position) or game.player.actor_context.actions.busy(): return "先结束战斗与动作。"
@@ -59,6 +59,7 @@ func preview_trade(uid: String,selling: bool,quantity: int) -> OperationResult:
 	var store:=game.session.inventory
 	return store.preview_trade_instance(market.actor_id if selling else "player","player" if selling else market.actor_id,uid,quantity,price(uid,not selling)*quantity)
 func salvage(uid: String,upgrade: bool) -> OperationResult:
+	if not market or not market.equipment_services: return OperationResult.reject("此店只提供实物交易，不提供拆解或强化。")
 	if not reason().is_empty(): return OperationResult.reject(reason())
 	return game.session.inventory.upgrade_instance("player",uid) if upgrade else game.session.inventory.dismantle_instance("player",uid)
 func show(selling := true) -> void:
@@ -68,11 +69,11 @@ func show(selling := true) -> void:
 	ensure_stock()
 	_screen=preload("res://gameplay/foundation/ui/expedition_screen.tscn").instantiate() as ExpeditionScreen
 	_screen.get_node("Navigation/Caption").text=service_title(market.actor_id,"整修铺")
-	_screen.tabs.add_child(W.button("出售 / 拆解 / 强化",show.bind(true)))
+	_screen.tabs.add_child(W.button("出售 / 拆解 / 强化" if market.equipment_services else "出售实物",show.bind(true)))
 	_screen.tabs.add_child(W.button("购买实物",show.bind(false)))
-	_screen.tabs.add_child(W.button("店内排产",show_production))
+	if market.production_services: _screen.tabs.add_child(W.button("店内排产",show_production))
 	_screen.search.text_changed.connect(func(query: String): _rows(query))
-	var hint:=W.label("交易库存有限；装备先卸下再整修。整修保留同一件实物，涂层不会重置。"+(" 熟客购买减价10%，出售原价。" if game.session.relations.disposition(market.actor_id,"player")>=10 else " 与店主交谈、履行委托可获得熟客买价。"),12,true)
+	var hint:=W.label(("交易库存有限；装备先卸下再整修。整修保留同一件实物，涂层不会重置。" if market.equipment_services else "交易库存和店家钱袋有限；此店不提供拆解、强化或排产。")+(" 熟客购买减价10%，出售原价。" if game.session.relations.disposition(market.actor_id,"player")>=10 else " 与店主交谈、履行委托可获得熟客买价。"),12,true)
 	hint.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 	_screen.footer.add_child(hint)
 	game.ui.show_view(service_title(market.actor_id,"整修铺"),_screen)
@@ -137,7 +138,7 @@ func _detail(uid: String) -> void:
 			stack_button.disabled=not preview_trade(uid,_selling,item.quantity).accepted
 		_trade_quantity.value_changed.connect(refresh_totals)
 		refresh_totals.call(_trade_quantity.value)
-	if _selling and definition is EquipmentData:
+	if _selling and definition is EquipmentData and market.equipment_services:
 		var level:=clampi(int(item.properties.get("upgrade_level",0)),0,3)
 		_screen.detail.add_child(W.label("强化每级：主手攻击+1；其余装备生命上限+4。最高+3。",14,true))
 		_screen.detail.add_child(W.button("拆解 · 获得%d金属碎料（销毁这件装备）"%store.dismantle_yield("player",uid),_request.bind("dismantle",uid)))
@@ -196,6 +197,7 @@ func _requirements_hint(offer: LearningOffer) -> String:
 	return "\n"+"；".join(parts) if not parts.is_empty() else ""
 
 func show_production() -> void:
+	if not market or not market.production_services: return
 	if not reason().is_empty(): game.ui.notify(reason()); return
 	game.session.production.advance()
 	var screen:=preload("res://gameplay/foundation/ui/expedition_screen.tscn").instantiate() as ExpeditionScreen

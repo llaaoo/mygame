@@ -9,8 +9,9 @@ func run() -> void:
  var domain:=game.session.conversations; var store:=game.session.inventory; var relations:=game.session.relations
  var merchant_id:=TownServices.MERCHANT; var merchant:=game.session.actor_for_id(merchant_id) as ServiceNPC
  var aida:=game.session.actor_for_id("river.aida") as ServiceNPC
- check(domain.catalog.profiles.size()==3 and domain.catalog.validation_errors().is_empty(),"NPC definitions invalid or missing actual town residents")
+ check(domain.catalog.profiles.size()>=3 and domain.catalog.validation_errors().is_empty(),"NPC definitions invalid or missing actual town residents")
  for profile in domain.catalog.profiles:
+  if profile.region_id!=game.region_id: continue
   var npc:=game.session.actor_for_id(profile.actor_id) as ServiceNPC
   check(npc!=null and npc.character_definition==profile.character and npc.actor_context.items==store,"NPC is a marker or uses a duplicate actor/inventory model")
   npc.set_physics_process(false); npc.actor_context.actions.set_physics_process(false)

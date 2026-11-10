@@ -25,11 +25,15 @@ func contains_offset(point: Vector2, margin: float = 0.0) -> bool:
 
 
 func is_point_clear(point: Vector2, radius: float = 24.0) -> bool:
-	if not contains_offset(point, radius + 24.0):
-		return false
 	if point.distance_to(entry_offset) < radius + 130.0:
 		return false
 	if point.distance_to(exit_offset) < radius + 120.0:
+		return false
+	return is_walkable(point,radius)
+
+func is_walkable(point: Vector2, radius: float = 24.0) -> bool:
+	# Entry/exit reservations keep generated enemies away, not the player.
+	if not contains_offset(point, radius + 24.0):
 		return false
 	for obstacle in obstacles:
 		var obstacle_size: Vector2 = obstacle.get("size", Vector2.ZERO)

@@ -50,5 +50,6 @@ func validation_errors() -> Array[String]:
 		seen[entry.id]=true; errors.append_array(entry.validation_errors())
 		if entry.kind==NpcTopic.Kind.SERVICE:
 			if entry.service in ["trade","production"] and not market: errors.append("NPC service requires its own market: "+entry.id)
+			if entry.service=="production" and market and not market.production_services: errors.append("NPC market does not offer production: "+entry.id)
 			if entry.service=="training" and not training: errors.append("NPC service requires its own training catalog: "+entry.id)
 	return errors

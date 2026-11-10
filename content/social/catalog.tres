@@ -3,6 +3,7 @@
 [ext_resource type="Resource" path="res://content/social/merchant.tres" id="merchant"]
 [ext_resource type="Resource" path="res://content/social/trainer.tres" id="trainer"]
 [ext_resource type="Resource" path="res://content/social/aida.tres" id="aida"]
+[ext_resource type="Resource" path="res://content/social/innkeeper.tres" id="innkeeper"]
 [resource]
 script = ExtResource("def")
-profiles = [ExtResource("merchant"), ExtResource("trainer"), ExtResource("aida")]
+profiles = [ExtResource("merchant"), ExtResource("trainer"), ExtResource("aida"), ExtResource("innkeeper")]

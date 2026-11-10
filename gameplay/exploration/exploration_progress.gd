@@ -65,6 +65,8 @@ func validate_save_data(value: Variant) -> bool:
 	var mark = value.get("waypoint", {})
 	if not mark is Dictionary: return false
 	if not mark.is_empty():
+		if not mark.get("region","camp") is String: return false
+		if condition_query and not condition_query.regions.is_empty() and not condition_query.regions.has(mark.get("region","camp")): return false
 		if not mark.get("position") is Array or mark.position.size()!=2: return false
 		for n in mark.position:
 			if typeof(n) not in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(n)) or absf(float(n))>100000: return false

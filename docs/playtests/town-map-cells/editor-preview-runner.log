@@ -1,0 +1,13 @@
+
+xwininfo: Window id: 0x254 (the root window) (has no name)
+
+  Root window id: 0x254 (the root window) (has no name)
+  Parent window id: 0x0 (none)
+     2 children:
+     0x600003 "inn.tscn - Study - Godot Engine": ("Godot_Editor" "Godot")  1152x648+0+0  +0+0
+        1 child:
+        0x600004 (has no name): ()  1x1+0+0  +0+0
+     0x200001 (has no name): ()  10x10+-20+-20  +-20+-20
+
+
+EDITOR_PREVIEW_CAPTURED
