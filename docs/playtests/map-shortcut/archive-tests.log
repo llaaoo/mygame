@@ -1,0 +1,11 @@
+Logs and isolated saves: /tmp/mygame-tests-8ucz15ye
+PASS import (12.9s)
+PASS input_bindings (0.5s)
+PASS visual_interface (15.9s)
+PASS flow_input (29.2s)
+PASS interface_navigation (32.6s)
+PASS grayriver_journey (10.6s)
+PASS content (2.1s)
+PASS town_cells_input (25.4s)
+PASS realtime_interaction (43.9s)
+8/8 checks passed. Logs: /tmp/mygame-tests-8ucz15ye

@@ -173,12 +173,12 @@ func _unhandled_input(event: InputEvent) -> void:
 		else:
 			show_journal()
 		get_viewport().set_input_as_handled()
-	elif event.keycode == KEY_G and map_provider.is_valid():
+	elif event.keycode == KEY_M and map_provider.is_valid():
 		if modal_locked: return
 		if is_instance_valid(modal): close_modal()
 		else: map_provider.call()
 		get_viewport().set_input_as_handled()
-	elif event.keycode == KEY_M:
+	elif event.keycode == KEY_G:
 		if modal_locked:
 			return
 		if is_instance_valid(modal):

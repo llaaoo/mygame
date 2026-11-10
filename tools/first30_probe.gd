@@ -132,7 +132,7 @@ func click_point(point: Vector2) -> void:
 	Input.parse_input_event(event); Input.flush_buffered_events(); await settle(3)
 	event=event.duplicate(); event.pressed=false; Input.parse_input_event(event); await settle(3)
 func wheel_choice(key: String,payload: String,uid: String) -> String:
-	await tap(KEY_M); await tap(OS.find_keycode_from_string(key))
+	await tap(KEY_G); await tap(OS.find_keycode_from_string(key))
 	var wheel:=game.player.material_wheel
 	if not wheel.visible: return "wheel_not_open"
 	var index:=-1

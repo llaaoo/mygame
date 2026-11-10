@@ -182,7 +182,7 @@ func _bootstrap() -> void:
 	(player.get_node("EquipmentManager") as EquipmentManager).loadout_changed.connect(_queue_save)
 	presenter.show_arrival()
 	if player.skill_manager.combinations.supplies.discarded_legacy_selection:
-		ui.notify("材料已改为本次选择：旧自动绑定已清除，库存保留。M轮盘按快捷槽选择来源，K完整编组。")
+		ui.notify("材料已改为本次选择：旧自动绑定已清除，库存保留。G轮盘按快捷槽选择来源，K完整编组。")
 
 	if load_status == SaveRepository.Status.RECOVERED:
 		ui.notify("主存档不可用，已从有效备份恢复进度。")

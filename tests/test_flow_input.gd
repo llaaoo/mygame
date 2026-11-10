@@ -74,7 +74,7 @@ func run() -> void:
  check(manager.shortcuts.selection("quick_e").get("payload")=="basic" and casts==2 and actor.mana_component.mp==mana and store.snapshot()==snapshot,"World scroll did not fix a form, or cast/spent resources")
  await scroll(MOUSE_BUTTON_WHEEL_UP)
  check(manager.shortcuts.selection("quick_e").get("payload","")=="attune_fire","World scroll did not return to the executable fire form")
- await key(KEY_M,true); await key(KEY_M,false); await key(KEY_E,true); await key(KEY_E,false); await frames(20)
+ await key(KEY_G,true); await key(KEY_G,false); await key(KEY_E,true); await key(KEY_E,false); await frames(20)
  check(actor.material_wheel.visible and not actor.material_wheel.entries.is_empty() and actor.material_wheel.entries.all(func(row: Dictionary): return row.is_empty() or row.ready and row.variant_id!="auto"),"Live wheel failed to show only currently executable concrete forms")
  await capture("automatic-follow-and-wheel")
  await key(KEY_ESCAPE,true); await key(KEY_ESCAPE,false)

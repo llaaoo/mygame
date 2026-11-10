@@ -35,9 +35,9 @@ func run() -> void:
 	check(game.active_enemies.size()==11 and game.progress.claims.has(id),"Defeated outdoor actor respawned on load")
 	game.show_map()
 	check(not paused and game.player.ui_blocked,"Map failed pause lifecycle")
-	var key:=InputEventKey.new();key.keycode=KEY_G;key.pressed=true
+	var key:=InputEventKey.new();key.keycode=KEY_M;key.pressed=true
 	game.ui._unhandled_input(key)
-	check(not paused and not is_instance_valid(game.ui.modal),"G cannot close paused map")
+	check(not paused and not is_instance_valid(game.ui.modal),"M cannot close live map")
 	game.player.position=Vector2(-3300,2100)
 	check(game.is_at_base(),"Town service boundary broken")
 	game.progress.claims["river.bridge_fixed"]=true

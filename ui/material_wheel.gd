@@ -171,10 +171,10 @@ func _update_detail() -> void:
  var index:=page*8+hovered
  if hovered<0 or index>=entries.size() or entries[index].is_empty():
   var has_choices:=entries.any(func(row): return not row.is_empty())
-  _detail.text="选择只改变本槽来源，不施法、不消费材料。\n%s\n中键松开 / M模式点击确认 · 移回中心或Esc取消"%(("第%d/%d页"%[page+1,maxi(1,ceili(entries.size()/8.0))]) if has_choices else QuickslotMaterials.unavailable_summary(player,source))
+  _detail.text="选择只改变本槽来源，不施法、不消费材料。\n%s\n中键松开 / G模式点击确认 · 移回中心或Esc取消"%(("第%d/%d页"%[page+1,maxi(1,ceili(entries.size()/8.0))]) if has_choices else QuickslotMaterials.unavailable_summary(player,source))
   return
  var entry: Dictionary=entries[index]
- _detail.text="%s · %d MP · %s\n%s\n第%d/%d页 · 中键松开 / M模式点击确认 · Esc取消"%[entry.title,entry.cost,entry.detail,entry.reason if not entry.ready else "可释放 · 确认后按原快捷键施放",page+1,maxi(1,ceili(entries.size()/8.0))]
+ _detail.text="%s · %d MP · %s\n%s\n第%d/%d页 · 中键松开 / G模式点击确认 · Esc取消"%[entry.title,entry.cost,entry.detail,entry.reason if not entry.ready else "可释放 · 确认后按原快捷键施放",page+1,maxi(1,ceili(entries.size()/8.0))]
 func _pick(point: Vector2) -> void:
  var offset:=point-(_ring.position+Vector2(180,180))
  hovered=-1 if offset.length()<74 or not _hold and offset.length()>192 else int(floor(fposmod(offset.angle()+PI/2+PI/8,TAU)/(TAU/8)))
@@ -198,7 +198,7 @@ func _input(event: InputEvent) -> void:
    if visible: get_viewport().set_input_as_handled()
   return
  if event is InputEventKey and event.pressed and not event.echo:
-  if event.keycode in [KEY_ESCAPE,KEY_M]: close(); get_viewport().set_input_as_handled(); return
+  if event.keycode in [KEY_ESCAPE,KEY_G]: close(); get_viewport().set_input_as_handled(); return
   for candidate in QuickslotLoadout.SOURCES:
    if event.is_action_pressed(InputBindings.action_for_source(candidate)):
     player.input_controller.suppress_source(candidate)

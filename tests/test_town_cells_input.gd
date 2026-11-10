@@ -37,7 +37,7 @@ func run() -> void:
 	await tap(KEY_F);await create_timer(3.4).timeout;await frames(4)
 	check(game.session.inventory.clock_seconds-clock>=3600.0/WorldTime.instance.time_scale and store.count("player","ration")==bread-1 and store.count("player","clean_water")==water-1,"Bed rest did not advance an actual hour and consume provisions")
 	await at(Vector2(450,-155));await tap(KEY_F);await capture("inn-cooking");await tap(KEY_ESCAPE)
-	await tap(KEY_G);await capture("inn-local-map")
+	await tap(KEY_M);await capture("inn-local-map")
 	var map: GrayriverMap
 	for child in root.find_children("*","Control",true,false):
 		if child is GrayriverMap:map=child;break

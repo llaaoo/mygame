@@ -31,7 +31,7 @@ func resolve_automatic(skill: SkillData) -> Dictionary:
  return {"payload":operation.default_payload,"modifier":"","uid":""}
 func unavailable_reason(skill: SkillData) -> String:
  if not supports(skill) or not resolve_automatic(skill).get("payload","").is_empty(): return ""
- return "等待一次成功施法确定元素，或用滚轮/M手动选择形式。" if affinity.is_empty() else "这个动作没有当前元素的形式；用滚轮/M手动选择，不会自动换成其他元素。"
+ return "等待一次成功施法确定元素，或用滚轮/G手动选择形式。" if affinity.is_empty() else "这个动作没有当前元素的形式；用滚轮/G手动选择，不会自动换成其他元素。"
 func observe(plan: CastPlan) -> void:
  if not plan.action: return
  var operation:=SpellOperationCatalog.default_catalog().operation(plan.action.operation_id)

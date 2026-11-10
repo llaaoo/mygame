@@ -23,7 +23,7 @@
 script = ExtResource("region")
 id = "river_inn"
 title = "灰苇客栈"
-description = "可进入的镇中地点；F与实物交互，G查看室内地图。"
+description = "可进入的镇中地点；F与实物交互，M查看室内地图。"
 authored_size = Vector2(1280, 896)
 authored_entry = Vector2(0, 280)
 presentation_environment = ExtResource("environment")

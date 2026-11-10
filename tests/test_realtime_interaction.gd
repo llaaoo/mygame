@@ -66,7 +66,7 @@ func run() -> void:
  # M click mode changes one source only, without casts, costs or instance recreation.
  var stock:=store.snapshot(); var mp:=actor.mana_component.mp
  var attack_sequence:=actor.actor_context.actions._attack_sequence
- await key(KEY_M,true); await key(KEY_M,false); await key(KEY_Q,true); await key(KEY_Q,false)
+ await key(KEY_G,true); await key(KEY_G,false); await key(KEY_Q,true); await key(KEY_Q,false)
  check(actor.material_wheel.visible and not paused and not actor.ui_blocked,"Wheel blocked world or took full-menu input ownership")
  await choose("ember")
  check(actor.actor_context.actions._attack_sequence==attack_sequence and actor.actor_context.actions.stamina.current==100,"Confirming the wheel leaked a physical attack or stamina cost")
@@ -102,7 +102,7 @@ func run() -> void:
  check(sm.shortcuts.selection("left").payload=="frost" and commits.size()==2 and sm.get_instance("left")==instance,"Hold-confirm recast, reset, or changed the wrong source")
  # Confirming a selector and pressing its shortcut in one input frame is one new cast.
  if sm.get_cooldown("right")>0: await create_timer(sm.get_cooldown("right")+.05).timeout
- await key(KEY_M,true); await key(KEY_M,false); await key(KEY_R,true)
+ await key(KEY_G,true); await key(KEY_G,false); await key(KEY_R,true)
  var finish_key:=InputEventKey.new(); finish_key.keycode=KEY_R; finish_key.physical_keycode=KEY_R; finish_key.pressed=false
  Input.parse_input_event(finish_key)
  var basic_point:=wheel._ring.position+Vector2(180,55)
@@ -115,10 +115,10 @@ func run() -> void:
  # Exact-bottle choice; a partial pulse remains paid after opening the selector.
  var poison:=store.ready_uid("player","venom_sprayer")
  var water:=store.ready_uid("player","water_sprayer")
- await key(KEY_M,true); await key(KEY_M,false); await key(KEY_E,true); await key(KEY_E,false); await choose("venom",poison)
+ await key(KEY_G,true); await key(KEY_G,false); await key(KEY_E,true); await key(KEY_E,false); await choose("venom",poison)
  check(sm.shortcuts.selection("quick_e").uid==poison,"Spray selector did not pin the visible bottle")
  await key(KEY_E,true); await create_timer(.6).timeout
- await key(KEY_M,true); await key(KEY_M,false)
+ await key(KEY_G,true); await key(KEY_G,false)
  var spent_doses: int=store.item(poison).properties.doses if store.item(poison) else 0
  await key(KEY_E,false); await frames(14)
  check(spent_doses<3 and (int(store.item(poison).properties.doses) if store.item(poison) else 0)==spent_doses,"Opening selector refunded or continued the old spray")
@@ -129,7 +129,7 @@ func run() -> void:
  await choose("venom",other_poison)
  check(sm.shortcuts.selection("quick_e").uid==other_poison and int(store.item(other_poison).properties.doses)==3,"Grouped bottle scroll did not select the explicit second UID")
  check((int(store.item(poison).properties.doses) if store.item(poison) else 0)==spent_doses,"Switching bottles changed the old partial remainder")
- await key(KEY_M,true); await key(KEY_M,false)
+ await key(KEY_G,true); await key(KEY_G,false)
  await choose("water",water)
  check(sm.shortcuts.selection("quick_e").uid==water and sm.shortcuts.selection("left").payload=="frost","Selecting another bottle changed the wrong shortcut")
  # Full screen does not stop actor recovery, status clocks or AI.
@@ -184,10 +184,10 @@ func run() -> void:
  var origin:=actor.position
  var world_clock:=store.clock_seconds
  var before_selection:=commits.size()
- await key(KEY_M,true); await key(KEY_M,false); await key(KEY_Q,true); await key(KEY_Q,false)
+ await key(KEY_G,true); await key(KEY_G,false); await key(KEY_Q,true); await key(KEY_Q,false)
  await key(KEY_A,true); await choose("ember"); await key(KEY_A,false)
  check(actor.position.distance_to(origin)>8 and store.clock_seconds>world_clock and commits.size()==before_selection,"Combat wheel froze movement/time or cast while selecting")
- await key(KEY_M,true); await key(KEY_M,false)
+ await key(KEY_G,true); await key(KEY_G,false)
  var dodge:=InputEventKey.new(); dodge.keycode=KEY_SPACE; dodge.physical_keycode=KEY_SPACE; dodge.pressed=true
  var stamina_before:=actor.actor_context.actions.stamina.current
  Input.parse_input_event(dodge); Input.flush_buffered_events(); await frames(1)

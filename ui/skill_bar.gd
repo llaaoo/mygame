@@ -164,7 +164,7 @@ func _process(_delta: float) -> void:
 			var comparison_key := str(key) + ":comparison"
 			if not previews.has(comparison_key):
 				var alternate := _skill_manager.preview_source(_sources[i], not empower)
-				previews[comparison_key] = instance.data.display_name + "\n\n普通 · " + _brief_plan(alternate if empower else preview) + "\n\nShift · " + _brief_plan(preview if empower else alternate) + "\n\n数字为本次MP费用 · K配置此槽，未固定来源时跟随M"
+				previews[comparison_key] = instance.data.display_name + "\n\n普通 · " + _brief_plan(alternate if empower else preview) + "\n\nShift · " + _brief_plan(preview if empower else alternate) + "\n\n数字为本次MP费用 · K配置此槽，未固定来源时跟随G"
 			var binding:=InputBindings.action_for_source(_sources[i])
 			_panels[i].tooltip_text = "按键："+InputBindings.labels(binding)+"\n"+previews[comparison_key]+"\n"+_skill_manager.spell_forms.label(_sources[i])+" · 世界滚轮切换最近动作形式\n"+QuickslotMaterials.stock_text(actor,preview.material_costs)
 		if preview:

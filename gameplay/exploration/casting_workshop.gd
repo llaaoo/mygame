@@ -46,7 +46,7 @@ func _source_detail(screen: ExpeditionScreen,skill: SkillData) -> void:
 	var configure:=FoundationWidgets.button("配置："+skill.display_name,show_action.bind(skill))
 	configure.icon=GameUIStyle.icon("chevron-right"); configure.expand_icon=true; configure.add_theme_constant_override("icon_max_width",18)
 	screen.detail.add_child(configure)
-	FoundationWidgets.disclosure(screen.detail,"来源与消耗规则","选择不扣物资。成功释放才结算真实来源；耗尽或失效会拒绝，不自动换料。K和M共用按槽来源；轮盘确认后再按快捷键施放，改料不会重置冷却。组合条件需亲手准备，额外修饰只作用于一次施法。")
+	FoundationWidgets.disclosure(screen.detail,"来源与消耗规则","选择不扣物资。成功释放才结算真实来源；耗尽或失效会拒绝，不自动换料。K和G共用按槽来源；轮盘确认后再按快捷键施放，改料不会重置冷却。组合条件需亲手准备，额外修饰只作用于一次施法。")
 
 func show_action(skill: SkillData) -> void:
 	if game.rules.material_operations and is_instance_valid(game.player.material_wheel):
@@ -54,7 +54,7 @@ func show_action(skill: SkillData) -> void:
 		game.ui.close_modal()
 		if source.is_empty():
 			game.player.skill_pool_ui.open_for(skill)
-			game.ui.notify("先将这个动作绑定快捷槽，再用M选材。")
+			game.ui.notify("先将这个动作绑定快捷槽，再用G选材。")
 		else:
 			game.player.material_wheel.remember_source(source)
 			game.player.material_wheel.open()
@@ -247,7 +247,7 @@ func show_payloads(skill: SkillData) -> void:
 		var current:=str(supplies.modifiers.get(skill.get_id(),""))==material.id
 		screen.detail.add_child(FoundationWidgets.button(("✓ 本次修饰：" if current else "本次修饰：")+material.title,_select_modifier.bind(skill,material.id)))
 	if supplies.modifiers.has(skill.get_id()): screen.detail.add_child(FoundationWidgets.button("清除本次修饰",_select_modifier.bind(skill,"")))
-	FoundationWidgets.disclosure(screen.detail,"操作与实物规则","介质选定后保留，离区、死亡或读档清除。物资不足不会自动换料。喷洒需先制造喷剂；按住所编组键持续释放，松开即停。K固定来源的快捷槽不受M影响。")
+	FoundationWidgets.disclosure(screen.detail,"操作与实物规则","介质选定后保留，离区、死亡或读档清除。物资不足不会自动换料。喷洒需先制造喷剂；按住所编组键持续释放，松开即停。K固定来源的快捷槽不受G影响。")
 	game.ui.show_view("释放介质："+skill.display_name,screen)
 	refresh.call("")
 

@@ -59,7 +59,7 @@ static func options(actor: Player,source: String) -> Array[Dictionary]:
   auto_detail+=" · "+stock_text(actor,preview.material_costs)
   if following and not following.source_kind.is_empty(): auto_detail+=" · "+_source_hint(following)
   if following and following.required_rule: auto_detail+=" · "+following.required_rule.condition_label()
-  result.append({"variant_id":"auto","title":"跟随·"+following.title if following else "智能跟随","choice":{"mode":"auto"},"cost":preview.cost,"ready":preview.ready,"reason":preview.reason,"detail":auto_detail,"description":"只改变后续形式；仍须真实来源和手动释放。滚轮/M可固定形式。","current":automatic})
+  result.append({"variant_id":"auto","title":"跟随·"+following.title if following else "智能跟随","choice":{"mode":"auto"},"cost":preview.cost,"ready":preview.ready,"reason":preview.reason,"detail":auto_detail,"description":"只改变后续形式；仍须真实来源和手动释放。滚轮/G可固定形式。","current":automatic})
  for payload in entry.payloads:
   var choice: Dictionary={"payload":payload.id,"modifier":str(current.get("modifier","")),"uid":""}
   var composed:=entry.compose(payload)
