@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="NpcCatalog" format=3]
+[ext_resource type="Script" path="res://gameplay/social/npc_catalog.gd" id="def"]
+[ext_resource type="Resource" path="res://content/social/merchant.tres" id="merchant"]
+[ext_resource type="Resource" path="res://content/social/trainer.tres" id="trainer"]
+[ext_resource type="Resource" path="res://content/social/aida.tres" id="aida"]
+[resource]
+script = ExtResource("def")
+profiles = [ExtResource("merchant"), ExtResource("trainer"), ExtResource("aida")]

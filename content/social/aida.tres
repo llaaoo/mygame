@@ -1,0 +1,73 @@
+[gd_resource type="Resource" script_class="NpcProfile" format=3]
+[ext_resource type="Script" path="res://gameplay/social/npc_profile.gd" id="profile"]
+[ext_resource type="Script" path="res://gameplay/social/npc_topic.gd" id="topic"]
+[ext_resource type="Resource" path="res://content/social/aida_character.tres" id="character"]
+[ext_resource type="Resource" path="res://content/foundation/trainer_schedule.tres" id="schedule"]
+
+[sub_resource type="Resource" id="about"]
+script = ExtResource("topic")
+id = "about"
+title = "你如何记录行路人的成果？"
+response = "委托板记录河谷的大事，我也托人办些小事。传闻只进你的日志，地图上是否发现过那里，仍以你亲自走到为准。"
+
+[sub_resource type="Resource" id="quests"]
+script = ExtResource("topic")
+id = "quests"
+title = "查看河谷委托"
+response = "看看你亲自找到的证据和已经完成的成果，再决定追踪哪条线索。"
+kind = 1
+category = "服务"
+service = "quests"
+
+[sub_resource type="Resource" id="routes"]
+script = ExtResource("topic")
+id = "routes"
+title = "北路和东路各有什么？"
+response = "从镇北沿路到旧猎营，能读到火石阵准备的说明。东路朝旧驿站延伸，再通矿道与湖岸。先在安全处读笔记和整理材料，发现敌人就退回开阔处。"
+
+[sub_resource type="Resource" id="herbs"]
+script = ExtResource("topic")
+id = "herbs"
+title = "委托：留一份药草储备"
+response = "给我2份草药，我付6河谷币。留给受伤的行路人；这批储备只收一次。"
+kind = 2
+category = "人情委托"
+requested_items = {"herb": 2}
+payment = {"coin": 6}
+
+[sub_resource type="Resource" id="archives"]
+script = ExtResource("topic")
+id = "archives"
+title = "能告诉我更远的档案线索吗？"
+response = "东北旧监狱的档案窖里有一份名册。它可能改变仍在执行旧令的老兵的态度。这里只给线索，不算你已经调查了档案窖。"
+category = "信任"
+minimum_disposition = 10
+
+[sub_resource type="Resource" id="bridge_deed"]
+script = ExtResource("topic")
+id = "bridge_deed"
+title = "木桥已经修好了"
+response = "你修好了中部木桥，往返不必再绕那么远。这是真正改变河谷的成果，我会记下来。"
+category = "河谷成果"
+required_claims = PackedStringArray("river.bridge_fixed")
+recognition = 10
+
+[sub_resource type="Resource" id="analysis"]
+script = ExtResource("topic")
+id = "analysis"
+title = "我能从旧档案里分析出什么？"
+response = "观察文书的签发时间和守岗的实际理由，再去核对当事人的说法。线索并不等于新命令，找到名册后亲手出示，才能让仍在守岗的老兵作决定。"
+category = "能力见解"
+required_attributes = {"intelligence": 12}
+
+[resource]
+script = ExtResource("profile")
+actor_id = "river.aida"
+role = "镇中委托、行路线索与河谷见闻"
+character = ExtResource("character")
+schedule = ExtResource("schedule")
+work_position = Vector2(-2840, 2260)
+rest_position = Vector2(-3820, 2680)
+greeting = "我记下的是行路人亲手做成的事。你想找活干，还是问问这片河谷？"
+familiar_greeting = "又见面了。你为河谷做的事我记着，我愿意把更远处的消息也告诉你，但传闻终究得自己去验证。"
+topics = [SubResource("analysis"), SubResource("about"), SubResource("quests"), SubResource("routes"), SubResource("herbs"), SubResource("archives"), SubResource("bridge_deed")]

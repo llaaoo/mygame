@@ -1,0 +1,73 @@
+[gd_resource type="Resource" script_class="NpcProfile" format=3]
+[ext_resource type="Script" path="res://gameplay/social/npc_profile.gd" id="profile"]
+[ext_resource type="Script" path="res://gameplay/social/npc_topic.gd" id="topic"]
+[ext_resource type="Resource" path="res://content/social/merchant_character.tres" id="character"]
+[ext_resource type="Resource" path="res://content/foundation/trainer_schedule.tres" id="schedule"]
+
+[sub_resource type="Resource" id="about"]
+script = ExtResource("topic")
+id = "about"
+title = "你在这里做什么？"
+response = "我收购沿路带回来的实物，修整武器，也把木炭和碎料制成箭。卖掉、拆解和强化是三种不同去向，先想好要留什么。"
+
+[sub_resource type="Resource" id="trade"]
+script = ExtResource("topic")
+id = "trade"
+title = "交易与整修"
+response = "看看双方实有的货物、货币和这件装备。"
+kind = 1
+category = "服务"
+service = "trade"
+
+[sub_resource type="Resource" id="production"]
+script = ExtResource("topic")
+id = "production"
+title = "商量店内排产"
+response = "你可以卖给我原料，再安排一批加工；工时结束后成品仍归店里，需要购买。"
+kind = 1
+category = "服务"
+service = "production"
+
+[sub_resource type="Resource" id="supply"]
+script = ExtResource("topic")
+id = "supply"
+title = "你的货从哪里来？"
+response = "原料不够时我会等，不会每天把货架变满。灰河谷的草药点、木炭和敌人剩余行囊都能形成供给。休息能推进工期，也会消耗一天里的时间。"
+
+[sub_resource type="Resource" id="charcoal"]
+script = ExtResource("topic")
+id = "charcoal"
+title = "委托：补一批木炭"
+response = "给我2份木炭，我付8河谷币。只要这一批，收齐后当面交货。"
+kind = 2
+category = "人情委托"
+requested_items = {"charcoal": 2}
+payment = {"coin": 8}
+
+[sub_resource type="Resource" id="trusted"]
+script = ExtResource("topic")
+id = "trusted"
+title = "熟客能得到什么照顾？"
+response = "熟悉后买价降低10%，出售价格照旧。货不会免费，已经买走的东西也不会再出现。"
+category = "信任"
+minimum_disposition = 10
+
+[sub_resource type="Resource" id="assessment"]
+script = ExtResource("topic")
+id = "assessment"
+title = "怎样估算这件装备该卖还是该拆？"
+response = "强化是在同一件实物上投入币和碎料；拆解会销毁它，回收投入只是一部分。把当前主手和备用武器比较后，再看制造需求。不要把暂时不用的一切都熔掉。"
+category = "能力见解"
+required_attributes = {"intelligence": 12}
+
+[resource]
+script = ExtResource("profile")
+actor_id = "river.merchant"
+role = "整修、实物交易与店内排产"
+character = ExtResource("character")
+schedule = ExtResource("schedule")
+work_position = Vector2(-3280, 2200)
+rest_position = Vector2(-4090, 2670)
+greeting = "先看看要修的是哪件。柜台里的货都是我实有的；你卖来的材料，也会成为排产的原料。"
+familiar_greeting = "是你啊，之前那批木炭已经收好。熟客买货少收一些，店里的余钱和货物仍然有限。"
+topics = [SubResource("assessment"), SubResource("about"), SubResource("trade"), SubResource("production"), SubResource("supply"), SubResource("charcoal"), SubResource("trusted")]

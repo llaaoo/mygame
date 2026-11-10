@@ -34,6 +34,7 @@ func run() -> void:
 	var trainer:=game.session.actor_for_id("river.enemy.service.trainer")
 	actor.position=trainer.position+Vector2(0,35); actor.get_node("Camera2D").reset_smoothing(); await frames(8)
 	await key(KEY_F,true); await key(KEY_F,false)
+	await click("学习武技")
 	await capture("course-requirement")
 	await click("压阵横扫 · 8币")
 	check(actor.actor_context.martial.learned.has("staff_sweep"),"Actual conditional course did not teach owned-weapon requirement")

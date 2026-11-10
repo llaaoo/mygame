@@ -21,6 +21,7 @@ func _init(owner_game: GrayriverGame,market_profile: MarketDefinition=null,train
 	training=training_profile if training_profile else TrainingCatalog.default_catalog()
 func ensure_stock() -> void:
 	var store:=game.session.inventory
+	if game.session.actor_records.get(market.actor_id,{}).get("dead",false): return
 	if store.has_container(market.actor_id+".pack"): return
 	store.ensure_actor(market.actor_id)
 	store.begin_batch()
@@ -29,6 +30,8 @@ func ensure_stock() -> void:
 	store.end_batch()
 func reason() -> String:
 	if game.region_id!=market.region_id or game.player.global_position.distance_to(market.position)>market.service_range: return "请靠近镇中整修铺。"
+	var social_reason:=game.session.conversations.reason(market.actor_id,true,180)
+	if not social_reason.is_empty(): return social_reason
 	if game.has_hostiles_near(game.player.global_position) or game.player.actor_context.actions.busy(): return "先结束战斗与动作。"
 	return ""
 func price(uid: String,buying: bool) -> int:
@@ -38,7 +41,7 @@ func price(uid: String,buying: bool) -> int:
 	var definition:=store.definitions[item.definition_id] as ItemData
 	var base:=maxi(definition.sell_price,8 if definition is EquipmentData else 1)
 	base+=clampi(int(item.properties.get("upgrade_level",0)),0,3)*2
-	return base*2 if buying else base
+	return maxi(base+1,int(ceil(base*1.8))) if buying and game.session.relations.disposition(market.actor_id,"player")>=10 else base*2 if buying else base
 func transact(uid: String,selling: bool,quantity := 1) -> OperationResult:
 	if not reason().is_empty(): return OperationResult.reject(reason())
 	var store:=game.session.inventory
@@ -63,7 +66,7 @@ func show(selling := true) -> void:
 	_screen.tabs.add_child(W.button("购买实物",show.bind(false)))
 	_screen.tabs.add_child(W.button("店内排产",show_production))
 	_screen.search.text_changed.connect(func(query: String): _rows(query))
-	var hint:=W.label("交易库存有限；装备先卸下再整修。整修保留同一件实物，涂层不会重置。",12,true)
+	var hint:=W.label("交易库存有限；装备先卸下再整修。整修保留同一件实物，涂层不会重置。"+(" 熟客购买减价10%，出售原价。" if game.session.relations.disposition(market.actor_id,"player")>=10 else " 与店主交谈、履行委托可获得熟客买价。"),12,true)
 	hint.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 	_screen.footer.add_child(hint)
 	game.ui.show_view("灰河谷 · 整修铺",_screen)
@@ -155,7 +158,7 @@ func _request(method: String,uid: String) -> void:
 
 func show_training() -> void:
 	var npc:=game.session.actor_for_id(training.actor_id)
-	if not is_instance_valid(npc) or npc.health_component.is_dead or game.session.relations.attitude(npc.actor_context.id,"player")=="hostile" or npc.global_position.distance_to(game.player.global_position)>150 or not npc.working: game.ui.notify("请靠近当值的训练师。"); return
+	if not is_instance_valid(npc) or not game.session.conversations.reason(training.actor_id,true,150).is_empty(): game.ui.notify("请靠近当值的训练师。"); return
 	var options: Array[Dictionary]=[]
 	for offer in training.offers:
 		var data:=offer.technique
@@ -171,7 +174,7 @@ func _teach(id: String) -> void:
 	var npc:=game.session.actor_for_id(training.actor_id)
 	var context:=game.player.actor_context
 	var offer:=training.offer(id)
-	if not is_instance_valid(npc) or npc.health_component.is_dead or game.session.relations.attitude(npc.actor_context.id,"player")=="hostile" or not npc.working or npc.global_position.distance_to(game.player.global_position)>150 or game.has_hostiles_near(game.player.global_position) or context.actions.busy() or not offer: return
+	if not is_instance_valid(npc) or not game.session.conversations.reason(training.actor_id,true,150).is_empty() or not offer: return
 	var result:=TechniqueLearning.purchase(offer,context,training.actor_id)
 	game.ui.notify("已学会"+offer.technique.title+" · 连招后按"+InputBindings.label("weapon_art")+"发动，K查看条件，无需占快捷槽。" if result.accepted else str(ERRORS.get(result.reason,result.reason)))
 	game._save_progress(); show_training()

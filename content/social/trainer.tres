@@ -1,0 +1,72 @@
+[gd_resource type="Resource" script_class="NpcProfile" format=3]
+[ext_resource type="Script" path="res://gameplay/social/npc_profile.gd" id="profile"]
+[ext_resource type="Script" path="res://gameplay/social/npc_topic.gd" id="topic"]
+[ext_resource type="Resource" path="res://content/foundation/trainer.tres" id="character"]
+[ext_resource type="Resource" path="res://content/training/catalog.tres" id="training"]
+
+[sub_resource type="Resource" id="about"]
+script = ExtResource("topic")
+id = "about"
+title = "战斗应该先练什么？"
+response = "先看距离、体力和后摇。轻击与重击形成连招机会，Ctrl加左键手动接武技；不要把每个窗口都当成必须抢的奖励。"
+
+[sub_resource type="Resource" id="training"]
+script = ExtResource("topic")
+id = "training"
+title = "学习武技"
+response = "我教知识，不替你造出武器、实物箭或附魔。每门课程按自己的条件收费。"
+kind = 1
+category = "服务"
+service = "training"
+
+[sub_resource type="Resource" id="progression"]
+script = ExtResource("topic")
+id = "progression"
+title = "谈谈等级与成长"
+response = "成功实践提升熟练度。升级给属性点和通用Perk点，满足基础属性与前置才能学习。"
+kind = 1
+category = "服务"
+service = "progression"
+
+[sub_resource type="Resource" id="preparation"]
+script = ExtResource("topic")
+id = "preparation"
+title = "怎样使用法阵而不挨打？"
+response = "在敌人看不见或够不着的位置先准备。你用火石布火阵，再以火花触发火球；默认凝能阵不会凭空变成火阵。打开菜单也挡不住来袭的敌人。"
+
+[sub_resource type="Resource" id="ration"]
+script = ExtResource("topic")
+id = "ration"
+title = "委托：训练后的口粮"
+response = "给我1份烤饼，我付3河谷币。烤饼要真正在你身上，别把救急的最后一份也交掉。"
+kind = 2
+category = "人情委托"
+requested_items = {"ration": 1}
+payment = {"coin": 3}
+
+[sub_resource type="Resource" id="bridge_deed"]
+script = ExtResource("topic")
+id = "bridge_deed"
+title = "谈谈与断桥守望者的协议"
+response = "你亲自解决了断桥的纠纷。能留住补给、也能留住性命，这同样是战斗判断。"
+category = "河谷成果"
+required_claims = PackedStringArray("river.bridge_settled")
+recognition = 10
+
+[sub_resource type="Resource" id="pressure"]
+script = ExtResource("topic")
+id = "pressure"
+title = "能谈谈重击与破势的取舍吗？"
+response = "力量不能替你支付体力。重击和破势会提高压制机会，却也延长承诺。用短招逼对手落空，再把有限体力花在确有机会的一击上。"
+category = "能力见解"
+required_attributes = {"strength": 12}
+
+[resource]
+script = ExtResource("profile")
+actor_id = "river.enemy.service.trainer"
+role = "武器战技与战斗准备"
+character = ExtResource("character")
+training = ExtResource("training")
+greeting = "先把呼吸放稳。想学招式，还是谈谈为什么总在出招后挨打？"
+familiar_greeting = "你的行路判断我记着。今天练哪条路线？本领要靠你自己把动作接起来。"
+topics = [SubResource("pressure"), SubResource("about"), SubResource("training"), SubResource("progression"), SubResource("preparation"), SubResource("ration"), SubResource("bridge_deed")]
