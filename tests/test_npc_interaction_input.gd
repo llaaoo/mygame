@@ -62,7 +62,7 @@ func run() -> void:
  # Trainer remains a shared service, reached through conversation and original learning transaction.
  var trainer:=game.session.actor_for_id(game.town_services.training.actor_id) as ServiceNPC
  actor.position=trainer.position+Vector2(0,35); actor.get_node("Camera2D").reset_smoothing(); await frames(8)
- await key(KEY_F,true); await key(KEY_F,false); await click("学习武技")
+ await key(KEY_F,true); await key(KEY_F,false); await click("学习武技与野外技艺")
  check(is_instance_valid(game.ui.modal) and game.ui.modal.get_meta("npc_conversation","").is_empty(),"Trainer conversation did not open existing paid courses")
  await key(KEY_ESCAPE,true); await key(KEY_ESCAPE,false)
  actor.position=merchant.position+Vector2(-35,0); actor.get_node("Camera2D").reset_smoothing(); await frames(8)

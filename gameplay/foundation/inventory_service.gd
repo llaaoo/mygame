@@ -495,6 +495,8 @@ static func valid_snapshot(data: Variant) -> bool:
 		for raw in c.items:
 			if not raw is Dictionary or not raw.get("uid") is String or not raw.uid.begins_with("item.") or not raw.uid.trim_prefix("item.").is_valid_int() or seen.has(raw.uid) or not raw.get("definition") is String or raw.definition.is_empty() or not raw.get("quantity") is int or raw.quantity<1 or raw.quantity>1000000 or not raw.get("properties",{}) is Dictionary: return false
 			var instance_properties: Dictionary=raw.get("properties",{})
+			if instance_properties.has("harvest"):
+				if id!=c.owner+".anatomy" or c.kind!="cache" or raw.quantity!=1 or not HarvestPart.valid(instance_properties.harvest) or instance_properties.harvest.raw_item!=raw.definition: return false
 			if instance_properties.has("upgrade_level") and (not instance_properties.upgrade_level is int or instance_properties.upgrade_level<0 or instance_properties.upgrade_level>3): return false
 			var number:=int(raw.uid.trim_prefix("item."))
 			if number<1: return false
@@ -675,6 +677,24 @@ func dismantle_instance(actor: String,uid: String) -> OperationResult:
 	if scratch.receive(actor,"metal_scrap",amount)!=amount: return OperationResult.reject("capacity")
 	_adopt(scratch,[actor])
 	_publish("equipment_dismantled",actor,{"uid":uid,"scrap":amount})
+	return OperationResult.success(amount)
+
+func process_anatomy(actor: String,owner_id: String,uid: String,commit_result := true) -> OperationResult:
+	var source:=owner_id+".anatomy"
+	var entry:=item(uid)
+	if actor==owner_id or not entry or locate(uid)!=source or not has_container(source) or _containers[source].owner!=owner_id or entry.quantity!=1: return OperationResult.reject("source")
+	var part: Variant=entry.properties.get("harvest")
+	if not HarvestPart.valid(part) or part.raw_item!=entry.definition_id: return OperationResult.reject("part")
+	var scratch:=_scratch([actor,owner_id])
+	var raw:=scratch._instance(uid)
+	scratch._containers[source].items.erase(raw);scratch._unindex(raw);scratch._touch(source)
+	var amount:=0
+	for key in part.outputs:
+		if scratch.receive(actor,key,int(part.outputs[key]))!=int(part.outputs[key]): return OperationResult.reject("capacity")
+		amount+=int(part.outputs[key])
+	if commit_result:
+		_adopt(scratch,[actor,owner_id])
+		_publish("corpse_harvested",actor,{"corpse":owner_id,"part":part.id,"raw_uid":uid,"outputs":part.outputs.duplicate(true)})
 	return OperationResult.success(amount)
 
 func upgrade_instance(actor: String,uid: String) -> OperationResult:

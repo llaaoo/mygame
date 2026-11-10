@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="HarvestProfile" format=3]
+[ext_resource type="Script" path="res://gameplay/harvesting/harvest_profile.gd" id="profile"]
+[ext_resource type="Script" path="res://gameplay/harvesting/harvest_part.gd" id="part"]
+[sub_resource type="Resource" id="hide"]
+script = ExtResource("part")
+id = "hide"
+title = "兽皮"
+raw_item = "raw_hide"
+skill_id = "skinning"
+outputs = {"beast_hide": 1}
+duration = 3
+[sub_resource type="Resource" id="fangs"]
+script = ExtResource("part")
+id = "fangs"
+title = "兽牙"
+raw_item = "raw_fang"
+skill_id = "fang_work"
+outputs = {"beast_fang": 2}
+duration = 2.5
+[resource]
+script = ExtResource("profile")
+parts = Array[ExtResource("part")]([SubResource("hide"), SubResource("fangs")])

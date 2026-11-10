@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/data/item_data.gd" id="item"]
+[ext_resource type="Script" path="res://gameplay/items/item_use_definition.gd" id="use"]
+[sub_resource type="Resource" id="Use"]
+script = ExtResource("use")
+id = "book_skinning"
+kind = 4
+fieldcraft_skill = "skinning"
+duration = 2.0
+[resource]
+script = ExtResource("item")
+id = "book_skinning"
+display_name = "猎人入门：剥皮"
+description = "移入口袋后使用，站定阅读两秒学习剥皮。实际完成才消耗书；也可向镇中训练师付费学习。取牙和摘腺须另学。"
+weight = 0.2
+stackable = true
+max_stack = 99
+sell_price = 4
+use_profile = SubResource("Use")

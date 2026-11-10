@@ -175,9 +175,13 @@ func show_training() -> void:
 		var price_text:=game.player.skill_manager.combinations.supplies.describe_cost(offer.costs)
 		if offer.costs.size()==1 and offer.costs.has("coin"): price_text="%d币"%offer.costs.coin
 		options.append({"title":data.title+(" · 已学会" if known else " · "+price_text)+(_requirements_hint(offer) if not known else ""),"disabled":not refused.is_empty(),"callback":_teach.bind(offer.id)})
+	for id in training.fieldcraft_skills:
+		var skill:=FieldcraftCatalog.default_catalog().skill(id)
+		var refused:=FieldcraftLearning.reason(skill,game.player.actor_context)
+		options.append({"title":"野外技艺："+skill.title+" · "+game.survival.supplies.describe_cost(skill.costs)+("\n"+refused if not refused.is_empty() else ""),"disabled":not refused.is_empty(),"callback":_teach_fieldcraft.bind(skill.id)})
 	options.append({"title":"查看武技与连招","callback":_open_techniques})
 	options.append({"title":"分配已有属性点","callback":game.presenter._show_training})
-	game.ui.show_panel(service_title(training.actor_id,"武技训练师"),"武技消耗体力与对应武器资源，不消耗MP。购买只解锁知识；到K的武技页查看连招与配置，每个组合最多装备两招，轻点Ctrl切换。刀破势、矛控距、杖压制、弓蓄射各有起手与恢复风险。",options)
+	game.ui.show_panel(service_title(training.actor_id,"训练师"),"武技只解锁知识，到K查看连招与配置；使用消耗体力与实物资源。\n\n野外技艺解锁遗骸的专业处理与对应制造配方。先学剥皮，再学取牙或摘腺；作坊留有入门书和小刀。未处理部位会保留，携刀站定作业，留意附近危险。",options)
 func _teach(id: String) -> void:
 	var npc:=game.session.actor_for_id(training.actor_id)
 	var context:=game.player.actor_context
@@ -186,6 +190,12 @@ func _teach(id: String) -> void:
 	var result:=TechniqueLearning.purchase(offer,context,training.actor_id)
 	game.ui.notify("已学会"+offer.technique.title+" · 连招后按"+InputBindings.label("weapon_art")+"发动，K查看条件，无需占快捷槽。" if result.accepted else str(ERRORS.get(result.reason,result.reason)))
 	game._save_progress(); show_training()
+func _teach_fieldcraft(id: String) -> void:
+	if not training or id not in training.fieldcraft_skills or not is_instance_valid(game.session.actor_for_id(training.actor_id)) or not game.session.conversations.reason(training.actor_id,true,150).is_empty(): return
+	var skill:=FieldcraftCatalog.default_catalog().skill(id)
+	var result:=FieldcraftLearning.purchase(skill,game.player.actor_context,training.actor_id)
+	game.ui.notify("已学会"+skill.title+"；携带小刀，在遗骸详情选择专业处理。" if result.accepted else result.reason)
+	game.knowledge_changed();game._save_progress();show_training()
 func _open_techniques() -> void:
 	game.ui.close_modal()
 	game.player.skill_pool_ui.open_techniques()

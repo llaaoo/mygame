@@ -6,7 +6,7 @@ extends Resource
 @export var chain_window := .65
 @export var attacks: Array[AttackProfile]=[]
 
-const TITLES := {"blade":"刀剑","spear":"长矛","staff":"战杖","bow":"弓"}
+const TITLES := {"blade":"刀剑","spear":"长矛","staff":"战杖","bow":"弓","beast":"兽类"}
 func valid() -> bool:
 	if not TITLES.has(weapon_type) or not is_finite(chain_window) or chain_window<=0 or attacks.is_empty(): return false
 	for stroke in attacks:

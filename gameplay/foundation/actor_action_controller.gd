@@ -58,11 +58,17 @@ var _current_technique := ""
 func active() -> bool:
 	return context and context.rules and context.rules.tactical_combat
 func busy() -> bool: return mode!="idle"
+func attack_moveset() -> WeaponMoveset:
+	var uid:=str(context.items.equipped(context.id).get(str(EquipmentData.SlotType.RIGHT_HAND),""))
+	var weapon:=context.items.equipment_definition(uid)
+	if weapon: return weapon.moveset
+	return context.body_moveset
 func next_attack_profile(heavy := false) -> AttackProfile:
 	var uid:=str(context.items.equipped(context.id).get(str(EquipmentData.SlotType.RIGHT_HAND),""))
 	var weapon:=context.items.equipment_definition(uid)
 	var candidate:=weapon.attack_profile if weapon and weapon.attack_profile else AttackProfile.new()
-	if weapon and weapon.moveset and not weapon.moveset.attacks.is_empty(): candidate=weapon.moveset.attacks[0 if heavy else combo.stage_for(uid,weapon.moveset)]
+	var moveset:=attack_moveset()
+	if moveset and not moveset.attacks.is_empty(): candidate=moveset.attacks[0 if heavy else combo.stage_for(uid,moveset)]
 	return candidate.heavy() if heavy else candidate
 func inventory_changed() -> void:
 	if not context or not context.items: return
@@ -326,7 +332,7 @@ func try_action(action: Action) -> OperationResult:
 			_cancel_work(); _cancel_cast()
 			_attack_sequence+=1
 			_family="weapon.%s.%d"%[context.id,_attack_sequence]
-			if action.action_type==Action.ActionType.MELEE: combo.begin(weapon_uid,weapon.moveset if weapon else null,_family,reserved_stage)
+			if action.action_type==Action.ActionType.MELEE: combo.begin(weapon_uid,attack_moveset(),_family,reserved_stage)
 			else: combo.reset()
 			if action.action_type in [Action.ActionType.MELEE,Action.ActionType.HEAVY_ATTACK]: weapon_art.begin(weapon_uid,"light" if action.action_type==Action.ActionType.MELEE else "heavy",_family,weapon.moveset.chain_window if weapon and weapon.moveset else .65,float(_weapon_reservation.get("grace",0)) if reserved and bool(_weapon_reservation.get("history",false)) else 0.0)
 			else: weapon_art.reset()
@@ -687,6 +693,7 @@ func activity_efficiency(school: SkillMastery.School) -> float:
 	return actor.mastery_manager.activity_efficiency(school) if "mastery_manager" in actor and actor.mastery_manager else 1.0
 
 func can_guard() -> bool:
+	if not context.guard_allowed: return false
 	var manager:=context.actor.get_node_or_null("EquipmentManager") as EquipmentManager
 	var weapon:=manager.get_equipment(EquipmentData.SlotType.RIGHT_HAND) if manager else null
 	if weapon and weapon.moveset and weapon.moveset.weapon_type=="bow": return false

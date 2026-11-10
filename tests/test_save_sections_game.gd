@@ -14,6 +14,7 @@ func run() -> void:
 	var file:=FileAccess.open("user://save_3.sav",FileAccess.WRITE);file.store_buffer(original);file.close()
 	var fixture:=Fixture.new(self);var game:=await fixture.boot(true)
 	check(SaveManager.instance.last_read.usable() and not game.progress.foundation.is_empty(),"Real historical save did not migrate")
+	check(game.session.fieldcraft.learned.is_empty(),"Pre-fieldcraft historical save invented professional knowledge")
 	var record:=game.session.inventory.snapshot()
 	var module:=OptionalModule.new();module.surveyed={"river_inn":true};module.budget=7
 	game.session.save_sections.register("test.cartography",module)

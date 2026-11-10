@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="WeaponMoveset" format=3]
+[ext_resource type="Script" path="res://gameplay/foundation/data/weapon_moveset.gd" id="moves"]
+[ext_resource type="Script" path="res://gameplay/foundation/data/attack_profile.gd" id="attack"]
+[sub_resource type="Resource" id="stroke0"]
+script = ExtResource("attack")
+title = "甲壳横撞"
+motion = "thrust"
+windup = 0.65
+active = 0.2
+recovery = 0.85
+reach = 78
+angle_degrees = 135
+stamina_cost = 23
+impact = 42
+guard_pressure = 1.8
+step_distance = 12
+movement_multiplier = 0.1
+[sub_resource type="Resource" id="stroke1"]
+script = ExtResource("attack")
+title = "沉身顶撞"
+motion = "thrust"
+windup = 0.8
+active = 0.18
+recovery = 1.0
+reach = 96
+angle_degrees = 70
+stamina_cost = 28
+impact = 50
+guard_pressure = 2.0
+step_distance = 22
+movement_multiplier = 0.1
+[resource]
+script = ExtResource("moves")
+weapon_type = "beast"
+description = "缓慢撞击的宽扇面和高格挡压力；拉开距离、绕侧，避免连续硬挡。"
+chain_window = 1.0
+attacks = [SubResource("stroke0"), SubResource("stroke1")]

@@ -29,7 +29,8 @@ static func validate(raw: Dictionary) -> Array[String]:
 			var id:=str(encounter.get("id",""))
 			if id.is_empty() or enemy_ids.has(id):errors.append(field+".encounters.id: missing/duplicate '"+id+"'")
 			enemy_ids[id]=true
-			if encounter.get("profile","guard") not in ["guard","hunter","sentry"]:errors.append(field+".encounters.profile: unknown '"+str(encounter.profile)+"'")
+			var profile:=str(encounter.get("profile","guard"))
+			if not profile.is_valid_identifier() or not ResourceLoader.exists("res://content/exploration/enemies/%s.tres"%profile):errors.append(field+".encounters.profile: unknown '"+profile+"'")
 		for collection in ["notes","encounters","stations","puzzles","facilities","exits","valves","events","deliveries","props"]:
 			for j in range(region.get(collection,[]).size()):
 				var point:Vector2=GrayriverDefinition.vector(region[collection][j].pos)

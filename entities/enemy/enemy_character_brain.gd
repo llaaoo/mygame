@@ -36,6 +36,7 @@ func choose(target: Node2D) -> Array[Action]:
 	_clock = INTERVAL
 	var controller := actor.skill_manager.combinations
 	var dist := actor.global_position.distance_to(target.global_position)
+	var toward:=actor.global_position.direction_to(target.global_position)
 	if actor.actor_context and actor.actor_context.actions.active():
 		var actions:=actor.actor_context.actions
 		var store:=actor.actor_context.items
@@ -76,41 +77,49 @@ func choose(target: Node2D) -> Array[Action]:
 		if actions.stamina.current<actions.stamina.maximum*_tempo.retreat_fraction:
 			if dist>actor.attack_range*2 and actions.needs.water_remaining<=0 and store.can_pay(owner_id,{"clean_water":1},true):
 				var drink:=Action.new(); drink.action_type=Action.ActionType.USE_ITEM; drink.skill_id="clean_water"; return [drink]
-			return [Action.move(-actor.get_target_direction()*.65,actor)]
+			return [Action.move(-toward*.65,actor)]
 		var weapon:=store.equipment_definition(weapon_uid)
 		var next_stroke:=actions.next_attack_profile()
 		var guard_break:=false
-		if weapon and weapon.world_shape in ["blade","spear","staff"] and target_context and target_context.actions.guarding and actions.stamina.current>40:
+		var close_combat: bool=weapon!=null and weapon.world_shape in ["blade","spear","staff"] or not weapon and actions.attack_moveset()!=null
+		var opening: bool=target_context!=null and (target_context.actions.guarding or _tempo.heavy_when_open and target_context.actions.is_preparing())
+		if close_combat and opening and actions.stamina.current>40:
 			var heavy_stroke:=actions.next_attack_profile(true)
 			if actions.stamina.current>=actions.attack_stamina_cost(heavy_stroke):
 				guard_break=true; next_stroke=heavy_stroke
-		var reach:=next_stroke.reach if weapon else actor.attack_range
-		if weapon and weapon.moveset and weapon.moveset.weapon_type=="bow" and store.can_pay(owner_id,{"arrow":1},true):
-			if dist<140: return [Action.move(-actor.get_target_direction(),actor)]
+		var reach:=next_stroke.reach if close_combat or weapon else actor.attack_range
+		if weapon and weapon.moveset and weapon.moveset.weapon_type=="bow":
+			# An empty quiver means withdrawal, never free arrows or bow melee.
+			if not store.can_pay(owner_id,{"arrow":1},true):
+				if dist<reach: return [Action.move(-toward*.65,actor)]
+				return result
+			if dist<140: return [Action.move(-toward,actor)]
 			if dist<=reach and _offense_cooldown<=0 and actions.stamina.current>=actions.attack_stamina_cost(next_stroke):
 				if not shot_lane_clear(target): return _reposition_for_shot(target)
-				var shot:=Action.melee(actor); shot.direction=actor.get_target_direction(); return [shot]
+				var shot:=Action.melee(actor); shot.direction=toward; return [shot]
+			if dist>reach: return [Action.move(toward,actor)]
+			return result
 		if dist<=reach and (_offense_cooldown>0 or _ally_striking(target)):
 			var backstep:=clampf((reach*_tempo.preferred_reach-dist)/maxf(1,reach),.2,.7)
-			return [Action.move(actor.get_target_direction().orthogonal()*.35-actor.get_target_direction()*backstep,actor)]
-		if dist<=reach and weapon and weapon.world_shape in ["blade","spear","staff"]:
+			return [Action.move(toward.orthogonal()*.35-toward*backstep,actor)]
+		if dist<=reach and close_combat:
 			if _crowded(target): return _reposition_for_shot(target)
 			if guard_break:
-				var heavy:=Action.new(); heavy.action_type=Action.ActionType.HEAVY_ATTACK; heavy.direction=actor.get_target_direction(); return [heavy]
+				var heavy:=Action.new(); heavy.action_type=Action.ActionType.HEAVY_ATTACK; heavy.direction=toward; return [heavy]
 			if actions.stamina.current>=actions.attack_stamina_cost(next_stroke): return [Action.melee(actor)]
 		# A visible preparation in striking distance invites pressure, not free setup.
 		if target_context and target_context.actor.get_node("SkillManager").combinations.is_busy() and dist<180 and actions.stamina.current>24:
-			return [Action.move(actor.get_target_direction(),actor)]
+			return [Action.move(toward,actor)]
 
 		if dist>90 and not weapon_uid.is_empty() and not store.coating(weapon_uid) and store.can_pay(owner_id,{"poison_rag":1},true):
 			var coat:=Action.new(); coat.action_type=Action.ActionType.USE_ITEM; coat.skill_id="poison_rag"; return [coat]
 		if dist>140 and dist<320 and store.can_pay(owner_id,{"venom_bottle":1},true):
-			if actor.actor_context.item_actions.begin("venom_bottle",false,actor.get_target_direction()): return result
+			if actor.actor_context.item_actions.begin("venom_bottle",false,toward): return result
 		if dist<115 and not find_source("disperse").is_empty() and store.can_pay(owner_id,{"venom_sprayer":1},true):
 			var spray:=cast("venom_mist",target)
 			if spray: return [spray]
 		if actor.ai_role==Enemy.AIRole.RANGED and dist<actor.ranged_preferred_range*.45:
-			return [Action.move(-actor.get_target_direction()*.65,actor)]
+			return [Action.move(-toward*.65,actor)]
 		if dist>reach and actor.actor_context.region.navigation:
 			var route:=actor.actor_context.region.navigation.direction(actor.position,target.position)
 			if route.length_squared()>.01 and not actor.surface_awareness.should_evade and actor.ai_role==Enemy.AIRole.MELEE: return [Action.move(route,actor)]
@@ -143,7 +152,7 @@ func choose(target: Node2D) -> Array[Action]:
 				if shot:
 					if not shot_lane_clear(target): return _reposition_for_shot(target)
 					return [shot]
-				if actor.mana_component.mp<plan.cost: return [Action.move(actor.get_target_direction(),actor)]
+				if actor.mana_component.mp<plan.cost: return [Action.move(toward,actor)]
 				return result # Wait for cooldown while keeping position inside the field.
 			var placement := cast("fire_sigil",target)
 			if placement:
@@ -156,7 +165,7 @@ func choose(target: Node2D) -> Array[Action]:
 		var focus := cast("focus",target)
 		if focus: return [focus]
 	# No usable spell: approach for an ordinary weapon hit; never conjure resources.
-	return [Action.move(actor.get_target_direction(),actor)]
+	return [Action.move(toward,actor)]
 
 func find_source(id: String) -> String:
 	if actor.skill_manager.material_operations: id=SpellOperationCatalog.default_catalog().canonical(id)
@@ -187,8 +196,8 @@ func cast(id: String,target: Node2D,empower:=false,at_self:=false) -> Action:
 	action.cast_context=context
 	return action
 
-func _guard(_target: Node2D) -> Action:
-	var defend:=Action.new(); defend.action_type=Action.ActionType.GUARD; defend.params["held"]=true; defend.direction=actor.get_target_direction()
+func _guard(target: Node2D) -> Action:
+	var defend:=Action.new(); defend.action_type=Action.ActionType.GUARD; defend.params["held"]=true; defend.direction=actor.global_position.direction_to(target.global_position)
 	return defend
 func _ally_striking(target: Node2D) -> bool:
 	var context:=actor.actor_context

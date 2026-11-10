@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="ExplorationEnemyProfile" format=3]
+[ext_resource type="Script" path="res://gameplay/exploration/data/enemy_profile.gd" id="data"]
+[resource]
+script = ExtResource("data")
+id = "archer"
+title = "断路弓手"
+role = 1
+attack_range = 50
+ranged_preferred_range = 360

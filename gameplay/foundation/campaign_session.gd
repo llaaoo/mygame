@@ -43,6 +43,7 @@ var _activity_families: Dictionary={}
 var _pending_effect_time: Dictionary={}
 var restoring_effects := false
 var save_sections:=SaveSections.new()
+var fieldcraft:=FieldcraftKnowledge.new()
 func configure(content: ExplorationContentCatalog,profile: RulesetDefinition) -> void:
 	catalog=content
 	rules=profile
@@ -57,6 +58,7 @@ func configure(content: ExplorationContentCatalog,profile: RulesetDefinition) ->
 	save_sections.register("production",SaveAdapter.new(production.snapshot,production.restore,ProductionService.valid_snapshot))
 	save_sections.register("relations",SaveAdapter.new(relations.snapshot,relations.restore,_valid_relation_state))
 	save_sections.register("conversations",SaveAdapter.new(conversations.snapshot,conversations.restore,NpcConversationService.valid_state))
+	save_sections.register("fieldcraft",fieldcraft)
 	for item in ItemCatalog.default_catalog().items: inventory.register_definition(item)
 	for item: EquipmentData in catalog.equipment.values(): inventory.register_definition(item)
 	facts.committed.connect(_on_fact)
@@ -82,6 +84,9 @@ func bind_actor(actor: CharacterBody2D,id: String,legacy_counts: Dictionary = {}
 	if not persistent: id="trial.%d.%s"%[region.generation,id]
 	context.actor=actor; context.id=id; context.rules=rules; context.region=region
 	context.items=inventory; context.facts=facts; context.relations=relations
+	context.fieldcraft=fieldcraft
+	var body:=actor.get("character_definition") as ActorCharacterData
+	if body: context.body_moveset=body.body_moveset;context.guard_allowed=body.can_guard
 	context.learning_query=ConditionQuery.new()
 	context.learning_query.actor_id=id; context.learning_query.items=inventory; context.learning_query.relations=relations
 	if condition_query: context.learning_query.progress=condition_query.progress; context.learning_query.regions=condition_query.regions
@@ -129,7 +134,10 @@ func bind_actor(actor: CharacterBody2D,id: String,legacy_counts: Dictionary = {}
 					inventory.register_definition(entry.item)
 					inventory.receive(id,entry.item.id,entry.quantity,true)
 			inventory.end_batch()
+			if context.loot_eligible and body and body.harvest_profile:
+				body.harvest_profile.initialize(inventory,id)
 		supplies.bind_inventory(inventory,id)
+		supplies.fieldcraft=fieldcraft
 		if manager: manager.bind_inventory(inventory,id)
 		if "inventory" in actor and actor.inventory: actor.inventory.bind_container(inventory,id+".pack")
 	if rules.physical_inventory and actor_records.has(id): _restore_actor(actor,actor_records[id])

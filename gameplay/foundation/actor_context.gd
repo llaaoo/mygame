@@ -12,6 +12,9 @@ var item_actions: Node
 var spray: Node
 var actions: ActorActionController
 var martial:=MartialArts.new()
+var fieldcraft: FieldcraftKnowledge
+var body_moveset: WeaponMoveset
+var guard_allowed := true
 var learning_query: ConditionQuery
 var preparation_query: Callable
 var cancel_preparation: Callable

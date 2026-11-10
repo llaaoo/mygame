@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ActorCharacterData" format=3]
+[ext_resource type="Script" path="res://gameplay/characters/actor_character_data.gd" id="data"]
+[ext_resource type="Resource" path="res://content/tactics/crawler.tres" id="tempo"]
+[ext_resource type="Resource" path="res://content/weapons/crawler.tres" id="moves"]
+[ext_resource type="Resource" path="res://content/harvesting/crawler.tres" id="harvest"]
+[ext_resource type="Resource" path="res://content/animations/crawler.tres" id="visual"]
+[resource]
+script = ExtResource("data")
+id = "river_crawler"
+title = "沼甲伏兽"
+strength = 6
+intelligence = 1
+agility = 3
+endurance = 5
+base_move_speed = 72
+melee_multiplier = 0.6
+temperament = ExtResource("tempo")
+equipment = []
+materials = {}
+techniques = Array[String]([])
+body_moveset = ExtResource("moves")
+harvest_profile = ExtResource("harvest")
+animation_profile = ExtResource("visual")
+can_guard = false

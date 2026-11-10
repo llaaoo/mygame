@@ -13,8 +13,8 @@ response = "先看距离、体力和后摇。轻击与重击形成连招机会�
 [sub_resource type="Resource" id="training"]
 script = ExtResource("topic")
 id = "training"
-title = "学习武技"
-response = "我教知识，不替你造出武器、实物箭或附魔。每门课程按自己的条件收费。"
+title = "学习武技与野外技艺"
+response = "我教知识，不替你造出武器、实物箭或附魔。每门课程按自己的条件收费。剥皮、取牙与摘腺要先学会，再携刀处理实物遗骸。"
 kind = 1
 category = "服务"
 service = "training"

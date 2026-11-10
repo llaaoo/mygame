@@ -75,3 +75,6 @@
 ![湖岸营地与现场作业按钮](playtests/grayriver_expedition_work.png)
 
 复现图形夹具：`godot --path . --rendering-method gl_compatibility --script res://tools/capture_frontier_expedition.gd -- --output=/tmp/frontier-captures`，需要可用图形显示环境。脚本冻结模拟、给予演示物资并指定位置，覆盖1152×648、960×600和真实鼠标点击作业入口；不使用玩家存档。
+
+
+专业遗骸部位使用真实 anatomy 容器，独立于普通搜刮。技艺、工具、现场作业、制造与持久化的当前规则见[敌人与专业剥取](ENEMIES_AND_FIELDCRAFT.md)。

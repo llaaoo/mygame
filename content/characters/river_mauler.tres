@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ActorCharacterData" format=3]
+[ext_resource type="Script" path="res://gameplay/characters/actor_character_data.gd" id="data"]
+[ext_resource type="Resource" path="res://content/tactics/mauler.tres" id="tempo"]
+[ext_resource type="Resource" path="res://content/frontier/equipment/river_maul.tres" id="river_maul"]
+[ext_resource type="Resource" path="res://content/frontier/equipment/river_coat.tres" id="river_coat"]
+[resource]
+script = ExtResource("data")
+id = "river_mauler"
+title = "工区破阵手"
+strength = 6
+intelligence = 2
+agility = 4
+endurance = 4
+base_move_speed = 82
+melee_multiplier = 0.6
+temperament = ExtResource("tempo")
+equipment = [ExtResource("river_maul"), ExtResource("river_coat")]
+materials = {"cloth": 1, "ration": 1}
+techniques = Array[String](["staff_sweep"])

@@ -2,6 +2,8 @@
 [ext_resource type="Script" path="res://gameplay/presentation/actors/actor_animation_catalog.gd" id="catalog"]
 [ext_resource type="Script" path="res://gameplay/presentation/actors/actor_animation_profile.gd" id="profile"]
 [ext_resource type="Resource" path="res://content/animations/puny_body.tres" id="body"]
+[ext_resource type="Resource" path="res://content/animations/hound.tres" id="hound"]
+[ext_resource type="Resource" path="res://content/animations/crawler.tres" id="crawler"]
 [resource]
 script = ExtResource("catalog")
-profiles = Array[ExtResource("profile")]([ExtResource("body")])
+profiles = Array[ExtResource("profile")]([ExtResource("body"), ExtResource("hound"), ExtResource("crawler")])

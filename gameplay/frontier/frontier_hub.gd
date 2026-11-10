@@ -4,6 +4,7 @@ extends RefCounted
 const W := preload("res://gameplay/frontier/frontier_widgets.gd")
 const TABS := {"actions":"整备与制作","quests":"委托与旅程","equipment":"装备","supplies":"物品与补给","knowledge":"知识","settings":"操作设置"}
 var game: GrayriverGame
+var _loot_all_button: Button
 var page := "quests"
 var query := ""
 var selected := ""
@@ -68,7 +69,7 @@ func open(tab := "quests", source := "", resume := false) -> void:
 		button.expand_icon=true; button.add_theme_constant_override("icon_max_width",18)
 		GameUIStyle.apply_button(button,GameUIStyle.GOLD,page==key)
 		tabs.add_child(button)
-	if page == "loot": root.footer.add_child(W.label("遗骸 · 未取走的东西会留在原处。%s尽量取走全部；点击选择，Esc关闭。"%InputBindings.label("loot_all"),13,true))
+	if page == "loot": root.footer.add_child(W.label("未取物品与部位会保留。%s搜取随身物品；专业部位点击处理，Esc关闭。"%InputBindings.label("loot_all"),13,true))
 	var tools:=root.tools
 	_search=root.search
 	_search.text=query
@@ -85,7 +86,8 @@ func open(tab := "quests", source := "", resume := false) -> void:
 	_rows=root.rows
 	_detail=root.detail
 	if page == "loot":
-		root.footer.add_child(W.button(InputBindings.label("loot_all")+"  尽量全部取走",take_all))
+		_loot_all_button=W.button(InputBindings.label("loot_all")+"  尽量全部取走",take_all)
+		root.footer.add_child(_loot_all_button)
 	game.ui.show_view("战利品" if page=="loot" else TABS.get(page,"旅程"),root,"quests" if page in ["quests","knowledge"] else "actions")
 	game.ui.modal.set_meta("frontier_page",page)
 	_refresh_rows()
@@ -128,7 +130,7 @@ func entries() -> Array[Dictionary]:
 				if definition and definition.use_profile and definition.use_profile.kind==ItemUseDefinition.Kind.SPRAY: continue
 				var food: bool=SurvivalCatalog.FOODS.has(id) or definition!=null and definition.use_profile!=null
 				if filter_index == 1 and not food or filter_index == 2 and food: continue
-				result.append({"id":id,"title":game.survival.supplies.title(id),"text":"补给" if food else "施法与制造材料","subtitle":"×%d · %s"%[count,"可使用" if food else "材料"]})
+				result.append({"id":id,"title":game.survival.supplies.title(id),"text":definition.description if definition else "补给" if food else "施法与制造材料","subtitle":"×%d · %s"%[count,"可使用" if food else "材料"]})
 			for source in ["player.pocket","player.pack"]:
 				if source=="player.pack" and not game.session.inventory.is_attached(source): continue
 				for row in game.session.inventory.entries(source):
@@ -149,6 +151,8 @@ func entries() -> Array[Dictionary]:
 				result.append({"id":quest.id,"rank":0 if quest.id==game.progress.tracked_quest else 1 if ready else 2,"title":quest.title,"text":quest.description,"subtitle":("已完成" if done else "可交付" if ready else "%d/%d项"%[quest.objective_count(game.progress),quest.required_claims.size()+quest.required_clears.size()])+(" · 正在追踪" if game.progress.tracked_quest==quest.id else "")})
 		"knowledge":
 			result.append({"id":"overview","title":"旅程总览与施法资料","text":game.presenter.journal_text(),"subtitle":"地点 · 设施 · 未取战利品"})
+			for skill in FieldcraftCatalog.default_catalog().skills:
+				result.append({"id":"fieldcraft:"+skill.id,"title":skill.title,"text":skill.description+"\n普通随身物品可直接搜刮；专业部位需要小刀和对应知识。未处理的部位会留在遗骸，移动、受伤或失去原工具会中断处理。镇中训练师教授技艺，整修作坊留有入门书和小刀。","subtitle":"野外技艺 · "+("已学会" if game.session.fieldcraft.knows("player",skill.id) else "未学会")})
 			for entry in game.progress.journal: result.append({"id":entry.id,"title":entry.title,"text":game.record_text(entry),"subtitle":"亲历记录"})
 		"settings":
 			result.append({"id":"controls","title":"施法与快捷操作","text":"操作设置","subtitle":"键位 · 输入偏好"})
@@ -161,6 +165,7 @@ func entries() -> Array[Dictionary]:
 
 func _refresh_rows() -> void:
 	if not is_instance_valid(_rows): return
+	if page=="loot" and is_instance_valid(_loot_all_button): _loot_all_button.disabled=not entries().any(func(entry: Dictionary):return entry.get("kind","")!="harvest")
 	W.clear(_rows)
 	var available:=entries().filter(func(entry: Dictionary): return query.is_empty() or query.to_lower() in (entry.title+entry.text).to_lower())
 	available.sort_custom(func(a: Dictionary,b: Dictionary):
@@ -232,6 +237,10 @@ func _show_detail() -> void:
 					if is_instance_valid(target): _detail.add_child(W.button("使用附近目标",_interact.bind(weakref(target))))
 					else: card.add_child(W.label("当前没有足够近的交互目标。",13,true))
 		"equipment","loot":
+			if page=="loot" and entry.get("kind","")=="harvest":
+				_detail.add_child(W.label(str(entry.subtitle),14,true))
+				_detail.add_child(W.button("开始专业处理",game.loot.harvesting.inspect.bind(loot_id,str(entry.uid)),not game.loot.harvesting.reason(loot_id,str(entry.uid),entry.part).is_empty()))
+				return
 			var id: String=entry.get("item",entry.id)
 			var item:=game.catalog.equipment.get(id) as EquipmentData
 			if item:

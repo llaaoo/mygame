@@ -20,6 +20,13 @@
 
 [ext_resource type="PackedScene" path="res://gameplay/maps/arrival.tscn" id="arrival_marker"]
 
+[sub_resource type="Resource" id="field_supplies"]
+script = ExtResource("script3")
+id = "storage.town.workshop.fieldcraft"
+title = "猎人留赠：小刀与剥皮手册"
+capacity = 4
+initial_items = {"field_knife": 1, "book_skinning": 1}
+access_actor_id = ""
 [sub_resource type="Resource" id="definition"]
 script = ExtResource("region")
 id = "river_workshop"
@@ -141,3 +148,13 @@ definition = SubResource("feature5")
 position = Vector2(0, 280)
 id = "entry"
 default_entry = true
+
+[node name="猎人补给箱外观" parent="." instance=ExtResource("furniture")]
+position = Vector2(250, 310)
+footprint = Vector2(90, 50)
+form = "chest"
+solid = true
+texture = ExtResource("art_chest")
+[node name="猎人留赠：小刀与剥皮手册" parent="." instance=ExtResource("feature")]
+position = Vector2(250, 230)
+definition = SubResource("field_supplies")

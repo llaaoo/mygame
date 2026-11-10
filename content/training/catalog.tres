@@ -13,3 +13,4 @@ schedule = ExtResource("schedule")
 actor_id = "river.enemy.service.trainer"
 work_position = Vector2(-3300,2350)
 rest_position = Vector2(-3960,2680)
+fieldcraft_skills = PackedStringArray("skinning", "fang_work", "gland_work")

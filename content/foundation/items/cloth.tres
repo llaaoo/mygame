@@ -4,7 +4,7 @@
 script = ExtResource("1")
 id = "cloth"
 display_name = "布料"
-description = "制作涂附抹布；来自真实补给和行囊。"
+description = "制作涂附抹布；来自真实补给、行囊或加工后的兽皮缚带。"
 stackable = true
 max_stack = 99
 weight = 0.1

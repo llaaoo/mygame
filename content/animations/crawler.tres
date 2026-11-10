@@ -1,0 +1,126 @@
+[gd_resource type="Resource" script_class="ActorAnimationProfile" format=3]
+[ext_resource type="Script" path="res://gameplay/presentation/actors/actor_animation_profile.gd" id="profile"]
+[ext_resource type="Script" path="res://gameplay/presentation/actors/actor_animation_clip.gd" id="clip"]
+[ext_resource type="SpriteFrames" path="res://content/animations/crawler_frames.tres" id="frames"]
+[ext_resource type="AnimationLibrary" path="res://content/animations/actor_poses.tres" id="poses"]
+[sub_resource type="Resource" id="idle"]
+script = ExtResource("clip")
+id = &"idle"
+frames = &"idle"
+pose = &"idle"
+[sub_resource type="Resource" id="walk"]
+script = ExtResource("clip")
+id = &"walk"
+footsteps = PackedFloat32Array(0, 0.5)
+frames = &"walk"
+pose = &"walk"
+[sub_resource type="Resource" id="slash"]
+script = ExtResource("clip")
+id = &"slash"
+frames = &"bite"
+pose = &"slash"
+[sub_resource type="Resource" id="slash_reverse"]
+script = ExtResource("clip")
+id = &"slash_reverse"
+frames = &"bite"
+pose = &"slash_reverse"
+[sub_resource type="Resource" id="slash_heavy"]
+script = ExtResource("clip")
+id = &"slash_heavy"
+frames = &"bite"
+pose = &"slash_heavy"
+[sub_resource type="Resource" id="thrust"]
+script = ExtResource("clip")
+id = &"thrust"
+frames = &"bite"
+pose = &"thrust"
+[sub_resource type="Resource" id="thrust_heavy"]
+script = ExtResource("clip")
+id = &"thrust_heavy"
+frames = &"bite"
+pose = &"thrust_heavy"
+[sub_resource type="Resource" id="sweep"]
+script = ExtResource("clip")
+id = &"sweep"
+frames = &"bite"
+pose = &"sweep"
+[sub_resource type="Resource" id="sweep_heavy"]
+script = ExtResource("clip")
+id = &"sweep_heavy"
+frames = &"bite"
+pose = &"sweep_heavy"
+[sub_resource type="Resource" id="shot"]
+script = ExtResource("clip")
+id = &"shot"
+frames = &"bite"
+pose = &"shot"
+[sub_resource type="Resource" id="shot_heavy"]
+script = ExtResource("clip")
+id = &"shot_heavy"
+frames = &"bite"
+pose = &"shot_heavy"
+[sub_resource type="Resource" id="cast"]
+script = ExtResource("clip")
+id = &"cast"
+frames = &"bite"
+pose = &"cast"
+[sub_resource type="Resource" id="throw"]
+script = ExtResource("clip")
+id = &"throw"
+frames = &"bite"
+pose = &"cast"
+[sub_resource type="Resource" id="use"]
+script = ExtResource("clip")
+id = &"use"
+frames = &"bite"
+pose = &"cast"
+[sub_resource type="Resource" id="guard"]
+script = ExtResource("clip")
+id = &"guard"
+frames = &"bite"
+pose = &"guard"
+[sub_resource type="Resource" id="charge"]
+script = ExtResource("clip")
+id = &"charge"
+frames = &"bite"
+pose = &"charge"
+[sub_resource type="Resource" id="dodge"]
+script = ExtResource("clip")
+id = &"dodge"
+frames = &"walk"
+pose = &"dodge"
+[sub_resource type="Resource" id="hurt"]
+script = ExtResource("clip")
+id = &"hurt"
+frames = &"hurt"
+pose = &"hurt"
+[sub_resource type="Resource" id="death"]
+script = ExtResource("clip")
+id = &"death"
+frames = &"death"
+pose = &"death"
+[sub_resource type="Resource" id="work_gather"]
+script = ExtResource("clip")
+id = &"work_gather"
+frames = &"bite"
+pose = &"work_gather"
+[sub_resource type="Resource" id="work_craft"]
+script = ExtResource("clip")
+id = &"work_craft"
+frames = &"bite"
+pose = &"work_craft"
+[sub_resource type="Resource" id="work_rest"]
+script = ExtResource("clip")
+id = &"work_rest"
+frames = &"idle"
+pose = &"work_rest"
+[resource]
+script = ExtResource("profile")
+id = &"crawler"
+title = "沼甲兽"
+sprite_frames = ExtResource("frames")
+poses = ExtResource("poses")
+clips = Array[ExtResource("clip")]([SubResource("idle"), SubResource("walk"), SubResource("slash"), SubResource("slash_reverse"), SubResource("slash_heavy"), SubResource("thrust"), SubResource("thrust_heavy"), SubResource("sweep"), SubResource("sweep_heavy"), SubResource("shot"), SubResource("shot_heavy"), SubResource("cast"), SubResource("throw"), SubResource("use"), SubResource("guard"), SubResource("charge"), SubResource("dodge"), SubResource("hurt"), SubResource("death"), SubResource("work_gather"), SubResource("work_craft"), SubResource("work_rest")])
+fallback = {"spray": "cast", "channel": "cast", "aim": "charge", "item": "use", "stagger": "hurt", "sprint": "walk"}
+body_scale = Vector2(1.8, 1.8)
+body_offset = Vector2(0, -6)

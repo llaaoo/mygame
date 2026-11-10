@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="CraftingRecipe" format=3]
+[ext_resource type="Script" path="res://gameplay/abilities/materials/crafting_recipe.gd" id="recipe"]
+[resource]
+script = ExtResource("recipe")
+id = "fang_ward"
+inputs = {"beast_fang": 2, "crystal": 1}
+output_id = "ward_powder"
+output_count = 1
+fieldcraft_skill = "fang_work"
+title = "兽牙研粉"
