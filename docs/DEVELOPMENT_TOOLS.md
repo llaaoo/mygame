@@ -12,7 +12,7 @@
 
 ## ChatGPT插件：查询结果与实际使用
 
-通过Plugin Management目录查询`game development Godot`、`Blender game assets`、`Figma`、`Game Studio Godot Blender`。搜索结果不穷尽整个[插件目录](https://chatgpt.com/plugins)。
+通过Plugin Management目录查询`game development Godot`、`Blender game assets`、`Figma`、`Game Studio Godot Blender`，并单独查询`Godot`、`Blender`、`Game Studio`。搜索结果不穷尽整个[插件目录](https://chatgpt.com/plugins)。
 
 | 工具 | 对本项目的用途 | 本轮状态 |
 | --- | --- | --- |
@@ -32,6 +32,7 @@
 | --- | --- | --- |
 | **GUT 9.6.1** | `tests/unit`中库存事务、装备身份、背包恢复、知识隔离；编辑器与统一runner共用目录 | 本轮新增并启用，MIT，Godot 4.6匹配 |
 | **State Charts 0.22.4** | `entities/enemy/enemy.tscn`和Boss场景的Idle/Chase/Attack状态机 | 保留并验证既有实际使用，不再引入另一套行为树控制同一敌人 |
+| LimboAI（已有GDExtension） | 已随库保存，原生编辑器可见；当前玩法源码未发现BTPlayer/LimboHSM引用 | 暂不另接一套行为树控制现有State Charts敌人，本轮未升级 |
 | **Dialogue Manager 3.10.4** | 已启用，既有NPC对话适配与编辑器工具 | 保留；不在此轮升级到4.x，也不另造任务/人情状态，灰河谷会话仍归NpcConversationService |
 | **Grayriver Map Authoring 1.0** | 编辑器地图校验、命名落点、隔离试玩 | 自有插件继续使用，见[工作流](MAP_AUTHORING.md) |
 | Phantom Camera 0.11 | 已随库保存，但未启用或接入当前游戏镜头 | 适合后续镜头/过场；当前已有镜头表现服务，不为安装而替换瞄准链 |
@@ -71,3 +72,5 @@ python3 tools/run_tests.py --suite all --jobs 2 --timeout 300 --report /tmp/gray
 编辑器启用GUT后可在底部GUT面板或`Project → Tools → GUT`运行。首次编辑器使用时，在GUT设置中载入项目根的`.gutconfig.json`，目录应为`res://tests/unit`，不要把旧SceneTree集成脚本目录一起扫描。编辑器使用其本机`user://`配置；需要测试保存行为时仍用隔离runner。
 
 新纯领域测试用GUT验证失败边界、守恒、防重和查询隔离；需要场景/物理/输入/AI/持久化时继续用现有集成夹具。异步探针等待实际可观察状态并设置上界，动作窗口内不要塞额外准备帧。不得在完整回归进行时继续改源码、运行导入或启动图形试玩；检查最终报告，不能凭若干中间PASS宣称全量通过。GitHub Actions继续停用。
+
+本轮定向、原生编辑器与干净归档完整回归证据见[验证报告](playtests/development-tools/REPORT.md)。

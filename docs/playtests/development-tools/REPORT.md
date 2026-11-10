@@ -19,4 +19,16 @@
 
 ## 完整归档回归
 
-最终归档来源、首次导入与完整runner结果在运行结束后追加；未完成前不将定向通过写成全量通过。
+来源：提交`fe9882c019e6b5304296ad89b87ee8de8d75dcf8`的`git archive`，导出目录`/tmp/grayriver-tools-archive-tia_149u`；导出后确认不存在`.godot`。未在回归期间修改源码、重启回归或叠加导入/图形试玩。
+
+```sh
+taskset -c 0,1,2,3 python3 tools/run_tests.py --suite all --jobs 2 --timeout 300 \
+  --source-revision fe9882c019e6b5304296ad89b87ee8de8d75dcf8 \
+  --report /tmp/grayriver-tools-all-results.json
+```
+
+首次导入退出0、无错误或警告。最终runner退出0，**143/143通过**：前置3项、其他并行检查91项、串行输入检查49项。原有142项全部保留，新增`gut_domain`一组（9用例/35断言）；没有修改旧测试源码或放宽断言，没有自动重试。
+
+检查144份Godot日志（含首次导入），无`SCRIPT ERROR`、`ERROR`或`WARNING`诊断。最终JSON记录`complete=true`、`skipped=[]`，全部结果通过；归档无`.git`，`dirty=null`如实表示无法从Git独立核对工作区。`all-tests.log`、`all-results.json`、`first-import.log`、`gut-domain.xml`保留在本目录；逐项完整日志与独立存档留在云端`/tmp/mygame-tests-_ha8xtaa`。
+
+后续提交仅补充本报告、研究说明与验证产物；游戏/测试/runner/GUT源码保持上述被测版本。

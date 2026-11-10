@@ -1,0 +1,2611 @@
+{
+  "schema": 1,
+  "revision": "fe9882c019e6b5304296ad89b87ee8de8d75dcf8",
+  "dirty": null,
+  "godot": "4.6.3.stable.official.7d41c59c4",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "jobs": 2,
+  "timeout": 300.0,
+  "logs": "/tmp/mygame-tests-_ha8xtaa",
+  "requested": [
+    "gut_domain",
+    "save_system",
+    "save_recovery",
+    "skill_catalog",
+    "skill_upgrades",
+    "room_generation",
+    "world_depth_knowledge",
+    "world_depth_property",
+    "world_depth_economy",
+    "world_depth_journey",
+    "world_depth_territory",
+    "world_depth_input",
+    "fieldcraft",
+    "enemy_diversity",
+    "fieldcraft_input",
+    "enemy_diversity_input",
+    "map_authoring",
+    "map_preview_input",
+    "save_sections",
+    "save_sections_game",
+    "town_cells",
+    "town_cells_input",
+    "presentation_system",
+    "presentation_input",
+    "actor_animation",
+    "animation_demo_input",
+    "weapon_hold",
+    "weapon_hold_input",
+    "weapon_hold_handover_input",
+    "weapon_art_routes",
+    "weapon_art_input",
+    "martial_followups",
+    "martial_followup_input",
+    "weapon_combos",
+    "weapon_combo_contacts",
+    "weapon_combo_input",
+    "weapon_response",
+    "weapon_response_input",
+    "interface_navigation",
+    "world_feedback",
+    "world_feedback_input",
+    "followup_fixes",
+    "grayriver_demo",
+    "spell_form_assist",
+    "contextual_choices",
+    "combat_choices_input",
+    "flow_input",
+    "provision_lifecycle",
+    "production_learning",
+    "extensibility_input",
+    "campaign_effects",
+    "inventory_stability",
+    "new_journey",
+    "weapon_enchantment",
+    "enchantment_input",
+    "counterplay",
+    "counterplay_input",
+    "counterplay_encounters",
+    "combat_tactics",
+    "tactical_ai",
+    "tactics_input",
+    "system_depth",
+    "weapon_actions",
+    "depth_input",
+    "slot_materials",
+    "inventory_lifecycle",
+    "realtime_interaction",
+    "keyboard_casting",
+    "visual_interface",
+    "controls_workflow",
+    "unified_quickslots",
+    "legacy_operation_coverage",
+    "input_bindings",
+    "world_pointer_input",
+    "enemy_retaliation",
+    "item_actions",
+    "spray_channel",
+    "reaction_sources",
+    "spell_operations",
+    "foundation_inventory",
+    "foundation_combat",
+    "foundation_systems",
+    "frontier_expedition",
+    "frontier_projects",
+    "grayriver_loot",
+    "grayriver_salvage",
+    "shared_characters",
+    "field_work",
+    "grayriver_foundation",
+    "grayriver_content",
+    "grayriver_journey",
+    "grayriver_routes",
+    "material_intent",
+    "retreat_ledger",
+    "enemy_preparation",
+    "field_outpost",
+    "expedition_feedback",
+    "survival_needs",
+    "survival_world",
+    "survival_rest",
+    "alchemy_repair",
+    "material_recycling",
+    "rpg_attributes",
+    "rpg_progression",
+    "rpg_progression_input",
+    "npc_interactions",
+    "npc_interaction_input",
+    "world_coherence",
+    "coherence_input",
+    "playtest_iteration",
+    "tactical_balance",
+    "normal_budget_tactics",
+    "content_expansion",
+    "environment_attunement",
+    "five_element_rules",
+    "partial_boons",
+    "element_knowledge",
+    "element_world",
+    "enemy_surfaces",
+    "element_trials",
+    "cast_refactor",
+    "status_transactions",
+    "content_contracts",
+    "region_lifecycle",
+    "player_components",
+    "soul_spell_system",
+    "expedition_builds",
+    "existing_spell_interactions",
+    "emergent_mediums",
+    "boon_choices",
+    "joint_interactions",
+    "advanced_spells",
+    "spell_materials",
+    "exploration_content",
+    "exploration_mvp",
+    "fire_combinations",
+    "ui_system",
+    "run_loop",
+    "equipment_system",
+    "gameplay",
+    "content",
+    "maps",
+    "startup"
+  ],
+  "results": [
+    {
+      "name": "import",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 18.886,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--editor",
+        "--import",
+        "--recovery-mode"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/import.log",
+      "diagnostic": []
+    },
+    {
+      "name": "content",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 2.824,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tools/validate_mvp_content.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/content.log",
+      "diagnostic": []
+    },
+    {
+      "name": "maps",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 2.626,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tools/validate_maps.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/maps.log",
+      "diagnostic": []
+    },
+    {
+      "name": "gut_domain",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 3.385,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://addons/gut/gut_cmdln.gd",
+        "-gexit",
+        "-gdisable_colors",
+        "-gjunit_xml_file=/tmp/mygame-tests-_ha8xtaa/gut-domain.xml"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/gut_domain.log",
+      "diagnostic": []
+    },
+    {
+      "name": "save_system",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 2.482,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_save_system.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/save_system.log",
+      "diagnostic": []
+    },
+    {
+      "name": "save_recovery",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 5.445,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_save_recovery.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/save_recovery.log",
+      "diagnostic": []
+    },
+    {
+      "name": "skill_catalog",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 3.375,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_skill_catalog.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/skill_catalog.log",
+      "diagnostic": []
+    },
+    {
+      "name": "room_generation",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 0.566,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_room_generation.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/room_generation.log",
+      "diagnostic": []
+    },
+    {
+      "name": "skill_upgrades",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 2.171,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_skill_upgrades.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/skill_upgrades.log",
+      "diagnostic": []
+    },
+    {
+      "name": "world_depth_knowledge",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 18.419,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_world_depth_knowledge.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/world_depth_knowledge.log",
+      "diagnostic": []
+    },
+    {
+      "name": "world_depth_property",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 19.733,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_world_depth_property.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/world_depth_property.log",
+      "diagnostic": []
+    },
+    {
+      "name": "world_depth_economy",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 16.667,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_world_depth_economy.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/world_depth_economy.log",
+      "diagnostic": []
+    },
+    {
+      "name": "world_depth_territory",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 9.794,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_world_depth_territory.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/world_depth_territory.log",
+      "diagnostic": []
+    },
+    {
+      "name": "world_depth_journey",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 34.834,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_world_depth_journey.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/world_depth_journey.log",
+      "diagnostic": []
+    },
+    {
+      "name": "fieldcraft",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 14.456,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_fieldcraft.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/fieldcraft.log",
+      "diagnostic": []
+    },
+    {
+      "name": "map_authoring",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 3.474,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_map_authoring.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/map_authoring.log",
+      "diagnostic": []
+    },
+    {
+      "name": "save_sections",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 2.422,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_save_sections.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/save_sections.log",
+      "diagnostic": []
+    },
+    {
+      "name": "enemy_diversity",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 14.706,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_enemy_diversity.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/enemy_diversity.log",
+      "diagnostic": []
+    },
+    {
+      "name": "save_sections_game",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 12.004,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_save_sections_game.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/save_sections_game.log",
+      "diagnostic": []
+    },
+    {
+      "name": "town_cells",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 11.95,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_town_cells.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/town_cells.log",
+      "diagnostic": []
+    },
+    {
+      "name": "presentation_system",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 7.636,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_presentation_system.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/presentation_system.log",
+      "diagnostic": []
+    },
+    {
+      "name": "weapon_hold",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 9.046,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_weapon_hold.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/weapon_hold.log",
+      "diagnostic": []
+    },
+    {
+      "name": "actor_animation",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 13.611,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_actor_animation.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/actor_animation.log",
+      "diagnostic": []
+    },
+    {
+      "name": "weapon_art_routes",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 9.291,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_weapon_art_routes.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/weapon_art_routes.log",
+      "diagnostic": []
+    },
+    {
+      "name": "martial_followups",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 8.889,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_martial_followups.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/martial_followups.log",
+      "diagnostic": []
+    },
+    {
+      "name": "weapon_combos",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 9.253,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_weapon_combos.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/weapon_combos.log",
+      "diagnostic": []
+    },
+    {
+      "name": "weapon_combo_contacts",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 8.901,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_weapon_combo_contacts.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/weapon_combo_contacts.log",
+      "diagnostic": []
+    },
+    {
+      "name": "weapon_response",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 8.599,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_weapon_response.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/weapon_response.log",
+      "diagnostic": []
+    },
+    {
+      "name": "world_feedback",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 17.829,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_world_feedback.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/world_feedback.log",
+      "diagnostic": []
+    },
+    {
+      "name": "spell_form_assist",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 12.748,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_spell_form_assist.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/spell_form_assist.log",
+      "diagnostic": []
+    },
+    {
+      "name": "contextual_choices",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 7.196,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_contextual_choices.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/contextual_choices.log",
+      "diagnostic": []
+    },
+    {
+      "name": "grayriver_demo",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 42.07,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_grayriver_demo.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/grayriver_demo.log",
+      "diagnostic": []
+    },
+    {
+      "name": "provision_lifecycle",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 24.185,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_provision_lifecycle.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/provision_lifecycle.log",
+      "diagnostic": []
+    },
+    {
+      "name": "production_learning",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 17.512,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_production_learning.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/production_learning.log",
+      "diagnostic": []
+    },
+    {
+      "name": "weapon_enchantment",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 13.306,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_weapon_enchantment.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/weapon_enchantment.log",
+      "diagnostic": []
+    },
+    {
+      "name": "counterplay",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 6.637,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_counterplay.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/counterplay.log",
+      "diagnostic": []
+    },
+    {
+      "name": "campaign_effects",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 26.543,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_campaign_effects.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/campaign_effects.log",
+      "diagnostic": []
+    },
+    {
+      "name": "combat_tactics",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 7.285,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_combat_tactics.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/combat_tactics.log",
+      "diagnostic": []
+    },
+    {
+      "name": "tactical_ai",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 6.238,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_tactical_ai.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/tactical_ai.log",
+      "diagnostic": []
+    },
+    {
+      "name": "weapon_actions",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 6.233,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_weapon_actions.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/weapon_actions.log",
+      "diagnostic": []
+    },
+    {
+      "name": "system_depth",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 11.548,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_system_depth.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/system_depth.log",
+      "diagnostic": []
+    },
+    {
+      "name": "slot_materials",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 11.0,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_slot_materials.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/slot_materials.log",
+      "diagnostic": []
+    },
+    {
+      "name": "inventory_lifecycle",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 13.203,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_inventory_lifecycle.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/inventory_lifecycle.log",
+      "diagnostic": []
+    },
+    {
+      "name": "legacy_operation_coverage",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 8.945,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_legacy_operation_coverage.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/legacy_operation_coverage.log",
+      "diagnostic": []
+    },
+    {
+      "name": "enemy_retaliation",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 7.49,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_enemy_retaliation.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/enemy_retaliation.log",
+      "diagnostic": []
+    },
+    {
+      "name": "spray_channel",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 6.181,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_spray_channel.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/spray_channel.log",
+      "diagnostic": []
+    },
+    {
+      "name": "reaction_sources",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 6.082,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_reaction_sources.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/reaction_sources.log",
+      "diagnostic": []
+    },
+    {
+      "name": "spell_operations",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 5.978,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_spell_operations.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/spell_operations.log",
+      "diagnostic": []
+    },
+    {
+      "name": "foundation_inventory",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 1.97,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_foundation_inventory.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/foundation_inventory.log",
+      "diagnostic": []
+    },
+    {
+      "name": "foundation_combat",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 6.433,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_foundation_combat.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/foundation_combat.log",
+      "diagnostic": []
+    },
+    {
+      "name": "foundation_systems",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 15.162,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_foundation_systems.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/foundation_systems.log",
+      "diagnostic": []
+    },
+    {
+      "name": "grayriver_loot",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 17.774,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_grayriver_loot.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/grayriver_loot.log",
+      "diagnostic": []
+    },
+    {
+      "name": "grayriver_salvage",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 12.952,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_grayriver_salvage.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/grayriver_salvage.log",
+      "diagnostic": []
+    },
+    {
+      "name": "shared_characters",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 6.834,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_shared_characters.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/shared_characters.log",
+      "diagnostic": []
+    },
+    {
+      "name": "grayriver_routes",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 1.968,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_grayriver_routes.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/grayriver_routes.log",
+      "diagnostic": []
+    },
+    {
+      "name": "material_intent",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 2.972,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_material_intent.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/material_intent.log",
+      "diagnostic": []
+    },
+    {
+      "name": "grayriver_foundation",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 7.739,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_grayriver_foundation.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/grayriver_foundation.log",
+      "diagnostic": []
+    },
+    {
+      "name": "retreat_ledger",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 3.274,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_retreat_ledger.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/retreat_ledger.log",
+      "diagnostic": []
+    },
+    {
+      "name": "enemy_preparation",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 2.974,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_enemy_preparation.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/enemy_preparation.log",
+      "diagnostic": []
+    },
+    {
+      "name": "field_outpost",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 4.025,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_field_outpost.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/field_outpost.log",
+      "diagnostic": []
+    },
+    {
+      "name": "expedition_feedback",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 4.377,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_expedition_feedback.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/expedition_feedback.log",
+      "diagnostic": []
+    },
+    {
+      "name": "survival_needs",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 1.971,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_survival_needs.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/survival_needs.log",
+      "diagnostic": []
+    },
+    {
+      "name": "survival_rest",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 3.274,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_survival_rest.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/survival_rest.log",
+      "diagnostic": []
+    },
+    {
+      "name": "survival_world",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 5.33,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_survival_world.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/survival_world.log",
+      "diagnostic": []
+    },
+    {
+      "name": "material_recycling",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 4.126,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_material_recycling.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/material_recycling.log",
+      "diagnostic": []
+    },
+    {
+      "name": "alchemy_repair",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 7.386,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_alchemy_repair.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/alchemy_repair.log",
+      "diagnostic": []
+    },
+    {
+      "name": "rpg_attributes",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 5.23,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_rpg_attributes.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/rpg_attributes.log",
+      "diagnostic": []
+    },
+    {
+      "name": "rpg_progression",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 12.1,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_rpg_progression.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/rpg_progression.log",
+      "diagnostic": []
+    },
+    {
+      "name": "npc_interactions",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 17.163,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_npc_interactions.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/npc_interactions.log",
+      "diagnostic": []
+    },
+    {
+      "name": "playtest_iteration",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 6.186,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_playtest_iteration.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/playtest_iteration.log",
+      "diagnostic": []
+    },
+    {
+      "name": "world_coherence",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 17.217,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_world_coherence.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/world_coherence.log",
+      "diagnostic": []
+    },
+    {
+      "name": "normal_budget_tactics",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 6.982,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_normal_budget_tactics.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/normal_budget_tactics.log",
+      "diagnostic": []
+    },
+    {
+      "name": "content_expansion",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 10.344,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_content_expansion.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/content_expansion.log",
+      "diagnostic": []
+    },
+    {
+      "name": "tactical_balance",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 20.676,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_tactical_balance.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/tactical_balance.log",
+      "diagnostic": []
+    },
+    {
+      "name": "five_element_rules",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 3.826,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_five_element_rules.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/five_element_rules.log",
+      "diagnostic": []
+    },
+    {
+      "name": "environment_attunement",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 4.582,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_environment_attunement.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/environment_attunement.log",
+      "diagnostic": []
+    },
+    {
+      "name": "partial_boons",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 3.525,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_partial_boons.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/partial_boons.log",
+      "diagnostic": []
+    },
+    {
+      "name": "element_knowledge",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 4.783,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_element_knowledge.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/element_knowledge.log",
+      "diagnostic": []
+    },
+    {
+      "name": "element_world",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 4.276,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_element_world.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/element_world.log",
+      "diagnostic": []
+    },
+    {
+      "name": "enemy_surfaces",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 3.074,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_enemy_surfaces.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/enemy_surfaces.log",
+      "diagnostic": []
+    },
+    {
+      "name": "status_transactions",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 3.274,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_status_transactions.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/status_transactions.log",
+      "diagnostic": []
+    },
+    {
+      "name": "element_trials",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 7.188,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_element_trials.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/element_trials.log",
+      "diagnostic": []
+    },
+    {
+      "name": "content_contracts",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 4.929,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_content_contracts.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/content_contracts.log",
+      "diagnostic": []
+    },
+    {
+      "name": "player_components",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 3.474,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_player_components.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/player_components.log",
+      "diagnostic": []
+    },
+    {
+      "name": "soul_spell_system",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 3.575,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_soul_spell_system.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/soul_spell_system.log",
+      "diagnostic": []
+    },
+    {
+      "name": "emergent_mediums",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 3.175,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_emergent_mediums.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/emergent_mediums.log",
+      "diagnostic": []
+    },
+    {
+      "name": "expedition_builds",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 5.128,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_expedition_builds.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/expedition_builds.log",
+      "diagnostic": []
+    },
+    {
+      "name": "advanced_spells",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 36.58,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_advanced_spells.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/advanced_spells.log",
+      "diagnostic": []
+    },
+    {
+      "name": "joint_interactions",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 37.436,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_joint_interactions.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/joint_interactions.log",
+      "diagnostic": []
+    },
+    {
+      "name": "spell_materials",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 32.481,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_spell_materials.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/spell_materials.log",
+      "diagnostic": []
+    },
+    {
+      "name": "exploration_content",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 33.033,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_exploration_content.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/exploration_content.log",
+      "diagnostic": []
+    },
+    {
+      "name": "run_loop",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 5.132,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_run_loop.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/run_loop.log",
+      "diagnostic": []
+    },
+    {
+      "name": "equipment_system",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 5.032,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_equipment_system.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/equipment_system.log",
+      "diagnostic": []
+    },
+    {
+      "name": "gameplay",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 5.431,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_gameplay.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/gameplay.log",
+      "diagnostic": []
+    },
+    {
+      "name": "startup",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 27.551,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--quit-after",
+        "180"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/startup.log",
+      "diagnostic": []
+    },
+    {
+      "name": "world_depth_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 110.256,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_world_depth_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/world_depth_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "fieldcraft_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 58.898,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_fieldcraft_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/fieldcraft_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "enemy_diversity_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 43.998,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_enemy_diversity_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/enemy_diversity_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "map_preview_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 25.695,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_map_preview_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/map_preview_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "town_cells_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 44.35,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_town_cells_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/town_cells_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "presentation_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 68.822,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_presentation_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/presentation_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "animation_demo_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 50.635,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_animation_demo_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/animation_demo_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "weapon_hold_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 161.385,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_weapon_hold_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/weapon_hold_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "weapon_hold_handover_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 13.808,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_weapon_hold_handover_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/weapon_hold_handover_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "weapon_art_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 104.658,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_weapon_art_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/weapon_art_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "martial_followup_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 37.232,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_martial_followup_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/martial_followup_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "weapon_combo_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 38.431,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_weapon_combo_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/weapon_combo_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "weapon_response_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 16.917,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_weapon_response_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/weapon_response_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "interface_navigation",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 132.941,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_interface_navigation.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/interface_navigation.log",
+      "diagnostic": []
+    },
+    {
+      "name": "world_feedback_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 14.914,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_world_feedback_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/world_feedback_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "followup_fixes",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 7.637,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_followup_fixes.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/followup_fixes.log",
+      "diagnostic": []
+    },
+    {
+      "name": "combat_choices_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 50.17,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_combat_choices_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/combat_choices_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "flow_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 31.613,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_flow_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/flow_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "extensibility_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 67.079,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_extensibility_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/extensibility_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "inventory_stability",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 10.598,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_inventory_stability.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/inventory_stability.log",
+      "diagnostic": []
+    },
+    {
+      "name": "new_journey",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 12.203,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_new_journey.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/new_journey.log",
+      "diagnostic": []
+    },
+    {
+      "name": "enchantment_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 18.775,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_enchantment_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/enchantment_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "counterplay_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 18.073,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_counterplay_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/counterplay_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "counterplay_encounters",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 61.507,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_counterplay_encounters.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/counterplay_encounters.log",
+      "diagnostic": []
+    },
+    {
+      "name": "tactics_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 10.698,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_tactics_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/tactics_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "depth_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 75.152,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_depth_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/depth_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "realtime_interaction",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 135.624,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_realtime_interaction.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/realtime_interaction.log",
+      "diagnostic": []
+    },
+    {
+      "name": "keyboard_casting",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 10.045,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_keyboard_casting.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/keyboard_casting.log",
+      "diagnostic": []
+    },
+    {
+      "name": "visual_interface",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 56.192,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_visual_interface.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/visual_interface.log",
+      "diagnostic": []
+    },
+    {
+      "name": "controls_workflow",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 85.12,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_controls_workflow.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/controls_workflow.log",
+      "diagnostic": []
+    },
+    {
+      "name": "unified_quickslots",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 92.193,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_unified_quickslots.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/unified_quickslots.log",
+      "diagnostic": []
+    },
+    {
+      "name": "input_bindings",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 0.365,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_input_bindings.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/input_bindings.log",
+      "diagnostic": []
+    },
+    {
+      "name": "world_pointer_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 9.095,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_world_pointer_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/world_pointer_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "item_actions",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 13.207,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_item_actions.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/item_actions.log",
+      "diagnostic": []
+    },
+    {
+      "name": "frontier_expedition",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 18.673,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_frontier_expedition.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/frontier_expedition.log",
+      "diagnostic": []
+    },
+    {
+      "name": "frontier_projects",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 8.19,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_frontier_projects.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/frontier_projects.log",
+      "diagnostic": []
+    },
+    {
+      "name": "field_work",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 5.683,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_field_work.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/field_work.log",
+      "diagnostic": []
+    },
+    {
+      "name": "grayriver_content",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 11.25,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_grayriver_content.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/grayriver_content.log",
+      "diagnostic": []
+    },
+    {
+      "name": "grayriver_journey",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 16.77,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_grayriver_journey.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/grayriver_journey.log",
+      "diagnostic": []
+    },
+    {
+      "name": "rpg_progression_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 79.363,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_rpg_progression_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/rpg_progression_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "npc_interaction_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 74.042,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_npc_interaction_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/npc_interaction_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "coherence_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 82.774,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_coherence_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/coherence_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "cast_refactor",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 3.828,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_cast_refactor.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/cast_refactor.log",
+      "diagnostic": []
+    },
+    {
+      "name": "region_lifecycle",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 6.288,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_region_lifecycle.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/region_lifecycle.log",
+      "diagnostic": []
+    },
+    {
+      "name": "existing_spell_interactions",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 3.476,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_existing_spell_interactions.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/existing_spell_interactions.log",
+      "diagnostic": []
+    },
+    {
+      "name": "boon_choices",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 34.88,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_boon_choices.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/boon_choices.log",
+      "diagnostic": []
+    },
+    {
+      "name": "exploration_mvp",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 13.762,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_exploration_mvp.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/exploration_mvp.log",
+      "diagnostic": []
+    },
+    {
+      "name": "fire_combinations",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 21.892,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_fire_combinations.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/fire_combinations.log",
+      "diagnostic": []
+    },
+    {
+      "name": "ui_system",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 9.047,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/tmp/grayriver-tools-archive-tia_149u",
+        "--script",
+        "res://tests/test_ui_system.gd"
+      ],
+      "log": "/tmp/mygame-tests-_ha8xtaa/ui_system.log",
+      "diagnostic": []
+    }
+  ],
+  "skipped": [],
+  "complete": true
+}
