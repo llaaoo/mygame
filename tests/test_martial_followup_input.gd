@@ -16,7 +16,10 @@ func idle() -> void:
 		if game.player.actor_context.actions.mode=="idle": return
 		await frames(1)
 	check(false,"Stroke did not finish")
-func prime(weapon: String,id: String) -> void:
+func linked(id: String) -> bool:
+	var view:=game.player.actor_context.actions.weapon_art_view()
+	return not view.is_empty() and view.technique==id and view.form==MartialRoute.Form.FOLLOWUP
+func prime(weapon: String,id: String) -> bool:
 	var actor:=game.player; var actions:=actor.actor_context.actions; var store:=game.session.inventory
 	actions.cancel(); store.equip("player",store.find_owned("player",weapon))
 	for i in range(700):
@@ -25,6 +28,7 @@ func prime(weapon: String,id: String) -> void:
 	check(actions.stamina.current>=95 and actor.actor_context.martial.reason(id,actor.actor_context).is_empty(),"Normal recovery/cooldown did not become ready")
 	actor.position=Vector2(-4000,800); actor.get_node("Camera2D").reset_smoothing()
 	var data:=MartialArts.definition(id)
+	await aim(actor.position+Vector2(150,0))
 	for stage in range(data.followup_after[0]+1):
 		# Prior strokes whiff; only the specified stage may confirm the branch.
 		target.position=actor.position+Vector2(1000,0)
@@ -32,13 +36,18 @@ func prime(weapon: String,id: String) -> void:
 			target.health_component.hp=target.health_component.max_hp; target.health_component.invincible=false
 			target.actor_context.actions.cancel(); target.actor_context.actions.stability.current=100
 			target.position=actor.position+Vector2(45 if weapon!="river_bow" else 110,0)
-		await frames(3); await aim(actor.position+Vector2(150,0)); await press()
-		if stage<data.followup_after[0]: await idle()
+		await press()
+		if stage<data.followup_after[0]:
+			# Submit the next real tap in recovery, before the normal chain gap.
+			for i in range(120):
+				if actions.remaining<=.2:break
+				await frames(1)
 	for i in range(150):
-		if actions.technique_view(id).linked: break
+		if linked(id): break
 		await frames(1)
-	check(actions.technique_view(id).linked,"Real weapon contact did not offer a followup")
-	if not actions.technique_view(id).linked: print("PRIME_DIAG ",JSON.stringify({"weapon":weapon,"facing":str(actions.facing),"player":str(actor.position),"target":str(target.position),"hp":target.health_component.hp,"dead":target.health_component.is_dead,"confirmed":actions.weapon_art.confirmed(actions.combo.family),"chain":actions.combo_snapshot()}))
+	check(linked(id),"Real weapon contact did not offer a shared-key followup")
+	if not linked(id): print("PRIME_DIAG ",JSON.stringify({"weapon":weapon,"facing":str(actions.facing),"player":str(actor.position),"target":str(target.position),"hp":target.health_component.hp,"dead":target.health_component.is_dead,"confirmed":actions.weapon_art.confirmed(actions.combo.family),"chain":actions.combo_snapshot()}))
+	return linked(id)
 func run() -> void:
 	var fixture:=Fixture.new(self); game=await fixture.boot(true)
 	GameRuntime.instance.set_process(true)
@@ -57,7 +66,8 @@ func run() -> void:
 	game.session.facts.committed.connect(func(fact: Dictionary):
 		if fact.kind=="physical_action_started" and fact.source=="player": starts.append(fact.data.duplicate(true)))
 	for pair in [["river_sabre","blade_breaker"],["river_spear","spear_thrust"],["river_staff","staff_sweep"],["river_bow","bow_aim"]]:
-		await prime(pair[0],pair[1])
+		var prepared: bool=await prime(pair[0],pair[1])
+		if not prepared:continue
 		await capture("followup-ready-"+MartialArts.definition(pair[1]).weapon_type)
 		# Wait for the final 200ms, not for a forced cancel of the current attack.
 		for i in range(120):
