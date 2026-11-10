@@ -351,3 +351,17 @@ func _complete(option: FieldWorkMethod, node: Node2D, spec: SurvivalStationData)
 	return true
 
 func harvest_ready(id: String) -> bool: return not needs.harvests.has(id)
+
+## Travel advances the same campaign clock/effects as rest, without flat rest healing.
+func advance_journey(hours: float,portions: int,fatigue: float) -> void:
+	var elapsed:=hours*3600.0/WorldTime.instance.time_scale
+	_advancing_rest=true
+	game.session.advance_rest_time(elapsed)
+	var left:=elapsed
+	while left>0:
+		var step:=minf(1,left)
+		GameRuntime.instance.get_simulation_runtime().tick(step);left-=step
+	_advancing_rest=false
+	needs.nutrition=clampf(needs.nutrition+portions*30,0,100)
+	needs.hydration=clampf(needs.hydration+portions*30,0,100)
+	needs.fatigue=clampf(needs.fatigue+fatigue,0,100)

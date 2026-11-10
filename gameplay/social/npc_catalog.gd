@@ -18,6 +18,7 @@ func validation_errors(world: ExplorationContentCatalog=null,extra_facts: Dictio
 			if not world.regions.has(entry.region_id): errors.append("Unknown NPC region: "+entry.actor_id)
 			for topic in entry.topics:
 				if not topic: continue
+				if not topic.successor_actor_id.is_empty() and (topic.successor_actor_id==entry.actor_id or not profile(topic.successor_actor_id)):errors.append("Invalid favor successor: "+topic.id)
 				for claim in topic.required_claims:
 					if world.fact(claim).is_empty() and not extra_facts.has(claim) and not world.chapter.quests.any(func(quest: ExplorationQuestData): return "quest."+quest.id==claim): errors.append("Unknown NPC prerequisite: "+claim)
 				for hint in topic.navigation_hints:

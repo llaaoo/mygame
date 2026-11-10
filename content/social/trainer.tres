@@ -61,6 +61,15 @@ response = "力量不能替你支付体力。重击和破势会提高压制机�
 category = "能力见解"
 required_attributes = {"strength": 12}
 
+[sub_resource type="Resource" id="charters"]
+script = ExtResource("topic")
+id = "charters"
+title = "身份与专长誓约"
+response = "核对实际条件、本人日程与库存后办理。"
+kind = 1
+category = "服务"
+service = "charters"
+
 [resource]
 script = ExtResource("profile")
 actor_id = "river.enemy.service.trainer"
@@ -70,4 +79,4 @@ character = ExtResource("character")
 training = ExtResource("training")
 greeting = "先把呼吸放稳。想学招式，还是谈谈为什么总在出招后挨打？"
 familiar_greeting = "你的行路判断我记着。今天练哪条路线？本领要靠你自己把动作接起来。"
-topics = [SubResource("pressure"), SubResource("about"), SubResource("training"), SubResource("progression"), SubResource("preparation"), SubResource("ration"), SubResource("bridge_deed")]
+topics = [SubResource("charters"), SubResource("pressure"), SubResource("about"), SubResource("training"), SubResource("progression"), SubResource("preparation"), SubResource("ration"), SubResource("bridge_deed")]

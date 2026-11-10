@@ -1,0 +1,99 @@
+[gd_resource type="Resource" script_class="MartialTechnique" format=3]
+[ext_resource type="Script" path="res://gameplay/martial/martial_technique.gd" id="tech"]
+[ext_resource type="Script" path="res://gameplay/foundation/data/attack_profile.gd" id="attack"]
+[ext_resource type="Script" path="res://gameplay/martial/martial_route.gd" id="route"]
+[ext_resource type="Resource" path="res://content/martial/routes/power.tres" id="power"]
+[ext_resource type="Resource" path="res://content/martial/routes/steady.tres" id="flow"]
+[ext_resource type="Resource" path="res://content/martial/routes/power_followup.tres" id="power_followup"]
+[sub_resource type="Resource" id="Attack"]
+script = ExtResource("attack")
+push_distance = 44
+step_distance = 0.0
+movement_multiplier = 0.0
+interrupts_preparation = true
+motion = "shot"
+windup = 0.85
+active = 0.08
+recovery = 0.55
+reach = 680
+angle_degrees = 8
+stamina_cost = 24
+impact = 35
+damage_multiplier = 1.35
+ammo_id = "arrow"
+projectile_speed = 820.0
+[sub_resource type="Resource" id="Followup"]
+script = ExtResource("attack")
+push_distance = 44
+step_distance = 0.0
+movement_multiplier = 0.0
+interrupts_preparation = true
+motion = "shot"
+windup = 0.52
+active = 0.08
+recovery = 0.58
+reach = 580
+angle_degrees = 8
+stamina_cost = 24
+impact = 35
+damage_multiplier = 1.5
+ammo_id = "arrow"
+projectile_speed = 820.0
+title = "猎队逐退箭"
+[sub_resource type="Resource" id="Charged"]
+script = ExtResource("attack")
+push_distance = 44
+animation_id = &"shot_heavy"
+title = "猎队逐退箭"
+step_distance = 0
+movement_multiplier = 0
+interrupts_preparation = true
+motion = "shot"
+windup = 1.04
+active = 0.08
+recovery = 0.72
+reach = 820
+angle_degrees = 6
+stamina_cost = 32
+impact = 48
+damage_multiplier = 1.6
+ammo_id = "arrow"
+projectile_speed = 950
+[sub_resource type="Resource" id="ChargedFollowup"]
+script = ExtResource("attack")
+push_distance = 44
+animation_id = &"shot_heavy"
+title = "猎队逐退箭"
+step_distance = 0
+movement_multiplier = 0
+interrupts_preparation = true
+motion = "shot"
+windup = 0.78
+active = 0.08
+recovery = 0.72
+reach = 740
+angle_degrees = 6
+stamina_cost = 32
+impact = 48
+damage_multiplier = 2.0
+ammo_id = "arrow"
+projectile_speed = 950
+[resource]
+script = ExtResource("tech")
+id = "hunter_pin"
+title = "猎队逐退箭"
+weapon_type = "bow"
+description = "以实物箭推离扑来的敌人，打断准备并为退步创造距离。消耗箭与体力，无法穿墙；重发推力更强。"
+profile = SubResource("Attack")
+
+release_reach = 70.0
+release_angle = 360.0
+release_speed = 420.0
+
+followup_after = Array[int]([0])
+followup_profile = SubResource("Followup")
+
+art_routes = Array[ExtResource("route")]([ExtResource("power"), ExtResource("flow"), ExtResource("power_followup")])
+
+charged_profile = SubResource("Charged")
+charged_followup_profile = SubResource("ChargedFollowup")

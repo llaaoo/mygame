@@ -27,6 +27,20 @@ title = "猎人留赠：小刀与剥皮手册"
 capacity = 4
 initial_items = {"field_knife": 1, "book_skinning": 1}
 access_actor_id = ""
+[sub_resource type="Resource" id="charter_hunters"]
+script = ExtResource("script3")
+id = "storage.town.hunters"
+title = "猎队寄存箱"
+affiliation_id = "hunters"
+capacity = 8
+initial_items = {"arrow":6,"cloth":2}
+[sub_resource type="Resource" id="charter_wardens"]
+script = ExtResource("script3")
+id = "storage.town.wardens"
+title = "守路队寄存箱"
+affiliation_id = "wardens"
+capacity = 8
+initial_items = {"ration":1,"metal_scrap":2}
 [sub_resource type="Resource" id="definition"]
 script = ExtResource("region")
 id = "river_workshop"
@@ -158,3 +172,23 @@ texture = ExtResource("art_chest")
 [node name="猎人留赠：小刀与剥皮手册" parent="." instance=ExtResource("feature")]
 position = Vector2(250, 230)
 definition = SubResource("field_supplies")
+
+[node name="猎队寄存箱外观" parent="." instance=ExtResource("furniture")]
+position = Vector2(-100, 170)
+footprint = Vector2(80, 45)
+form = "chest"
+solid = true
+texture = ExtResource("art_chest")
+[node name="猎队寄存箱" parent="." instance=ExtResource("feature")]
+position = Vector2(-100, 80)
+definition = SubResource("charter_hunters")
+
+[node name="守路队寄存箱外观" parent="." instance=ExtResource("furniture")]
+position = Vector2(70, 170)
+footprint = Vector2(80, 45)
+form = "chest"
+solid = true
+texture = ExtResource("art_chest")
+[node name="守路队寄存箱" parent="." instance=ExtResource("feature")]
+position = Vector2(70, 80)
+definition = SubResource("charter_wardens")

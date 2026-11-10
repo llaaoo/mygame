@@ -4,4 +4,4 @@ extends Resource
 @export var id := ""
 @export var title := ""
 @export var pos := Vector2.ZERO
-@export_enum("rest", "craft", "equipment") var service := "craft"
+@export_enum("rest", "craft", "equipment", "mediation") var service := "craft"

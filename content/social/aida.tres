@@ -91,6 +91,15 @@ title = "镇里有哪些能进去的屋子？"
 response = "门牌下按F就能进去。灰苇客栈有客床、个人寄存箱和柴灶，作坊可以制造和整备，公署有公开文书。萨芙和训练师白天仍在集市当值；进屋不会补货、跳时或恢复伤势。"
 navigation_hints = [SubResource("inn_lead"), SubResource("workshop_lead"), SubResource("records_lead")]
 
+[sub_resource type="Resource" id="mediation"]
+script = ExtResource("topic")
+id = "mediation"
+title = "处理私产纠纷与遗产委托"
+response = "核对实际条件、本人日程与库存后办理。"
+kind = 1
+category = "服务"
+service = "mediation"
+
 [resource]
 script = ExtResource("profile")
 actor_id = "river.aida"
@@ -101,4 +110,4 @@ work_position = Vector2(-2840, 2260)
 rest_position = Vector2(-3820, 2680)
 greeting = "我记下的是行路人亲手做成的事。你想找活干，还是问问这片河谷？"
 familiar_greeting = "又见面了。你为河谷做的事我记着，我愿意把更远处的消息也告诉你，但传闻终究得自己去验证。"
-topics = [SubResource("analysis"), SubResource("about"), SubResource("quests"), SubResource("routes"), SubResource("town_rooms"), SubResource("herbs"), SubResource("archives"), SubResource("bridge_deed")]
+topics = [SubResource("mediation"), SubResource("analysis"), SubResource("about"), SubResource("quests"), SubResource("routes"), SubResource("town_rooms"), SubResource("herbs"), SubResource("archives"), SubResource("bridge_deed")]

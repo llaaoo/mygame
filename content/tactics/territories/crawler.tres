@@ -1,0 +1,6 @@
+[gd_resource type="Resource" script_class="EncounterTactics" format=3]
+[ext_resource type="Script" path="res://gameplay/encounters/encounter_tactics.gd" id="rules"]
+[resource]
+script = ExtResource("rules")
+role = 0
+observation = "撞击慢而宽、格挡压力高；先拉开，落空后再还击。"

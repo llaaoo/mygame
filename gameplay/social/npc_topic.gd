@@ -9,19 +9,26 @@ enum Kind { INFORMATION, SERVICE, FAVOR }
 @export var kind: Kind = Kind.INFORMATION
 @export var service := ""
 @export var required_claims: PackedStringArray=[]
+@export var conditions: Array[WorldCondition]=[]
 @export var required_attributes: Dictionary={}
 @export var minimum_disposition := -100
 @export var recognition := 0
 @export var requested_items: Dictionary={}
 @export var payment: Dictionary={}
 @export var trust_reward := 10
+@export var repeat_hours := 0.0
+@export var maximum_deliveries := 1
+@export var successor_actor_id := ""
 @export var navigation_hints: Array[ExplorationNavigationHint]=[]
 
 func validation_errors() -> Array[String]:
 	var errors: Array[String]=[]
 	if id.is_empty() or "/" in id or title.is_empty() or response.is_empty() or kind not in Kind.values() or minimum_disposition < -100 or minimum_disposition>100: errors.append("Invalid NPC topic")
+	if not is_finite(repeat_hours) or repeat_hours<0 or repeat_hours>72 or maximum_deliveries<1 or maximum_deliveries>20 or maximum_deliveries>1 and repeat_hours<=0:errors.append("Invalid favor cadence: "+id)
 	if not StatsComponent.valid_requirements(required_attributes): errors.append("Invalid dialogue attributes: "+id)
-	if kind==Kind.SERVICE and service not in ["trade","training","production","quests","progression"]: errors.append("Unknown NPC service: "+id)
+	for condition in conditions:
+		if not condition or not condition.valid(): errors.append("Invalid dialogue condition: "+id)
+	if kind==Kind.SERVICE and service not in ["trade","training","production","quests","progression","charters","mediation"]: errors.append("Unknown NPC service: "+id)
 	if recognition<0 or recognition>10 or recognition>0 and (kind!=Kind.INFORMATION or required_claims.is_empty()): errors.append("Recognition requires an actual world deed: "+id)
 	if kind==Kind.FAVOR:
 		if requested_items.is_empty() or payment.is_empty() or trust_reward<0 or trust_reward>25: errors.append("Invalid NPC favor: "+id)

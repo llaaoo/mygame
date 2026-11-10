@@ -11,7 +11,7 @@ func eat(game: GrayriverGame,id: String) -> void:
 	game.player.field_work.tick(2)
 	game.player.field_work.close_panel()
 func run() -> void:
-	var fixture:=Fixture.new(self); var game:=await fixture.boot(true)
+	var fixture:=Fixture.new(self); var game:=await fixture.boot(true,true)
 	var actor:=game.player; var buffs:=actor.get_node("BuffManager") as BuffManager
 	var needs:=game.survival.needs
 	eat(game,"ration"); eat(game,"clean_water"); eat(game,"tea")
@@ -33,7 +33,7 @@ func run() -> void:
 	check(game.session.actor_records.player.dead and game.session.actor_records.player.hp==0 and game.session.actor_records.player.effects.entries.is_empty(),"Death save retained a previous live effect snapshot")
 	check(SaveRepository.new().read("user://save_3.sav").usable(),"Death state was not saveable")
 	await fixture.close()
-	fixture=Fixture.new(self); game=await fixture.boot(true)
+	fixture=Fixture.new(self); game=await fixture.boot(true,true)
 	check(not game.player.health_component.is_dead and game.player.health_component.hp<=51 and game.player.health_component.max_hp==100 and game.survival.needs.meal_remaining==0,"Reloading death resurrected old food or bypassed half-health recovery")
 	check(game.player.skill_manager.combinations.cooldowns.get("ignite",0)>7,"Death recovery erased action cooldown")
 	# A real v8 envelope with the historical mismatched food state migrates once.
@@ -46,12 +46,12 @@ func run() -> void:
 	record.effects.entries.append({"path":"res://content/status/meal_fortitude.tres","id":"meal_fortitude","duration":180.0,"remaining":150.0,"stacks":1,"elapsed":0.0,"source_magic":0.0,"source_id":"player"})
 	record.effects.entries.append({"path":"res://content/spell_operations/statuses/toxin.tres","id":"poison","duration":5.0,"remaining":4.0,"stacks":1,"elapsed":0.0,"source_magic":0.0,"source_id":"player"})
 	var file:=FileAccess.open("user://save_3.sav",FileAccess.WRITE); file.store_var(data); file.close()
-	fixture=Fixture.new(self); game=await fixture.boot(true)
+	fixture=Fixture.new(self); game=await fixture.boot(true,true)
 	needs=game.survival.needs; buffs=game.player.get_node("BuffManager") as BuffManager
 	check(not buffs.has_buff("meal_fortitude") and needs.meal_remaining==0 and needs.water_remaining>44 and needs.water_remaining<=45,"V8 migration retained phantom food or refilled legacy water")
 	check(buffs.has_buff("poison") and needs.tea_remaining<=30 and needs.tea_remaining>29,"Legacy tea replayed cleanse on load")
 	game._save_progress(); await fixture.close()
-	fixture=Fixture.new(self); game=await fixture.boot(true)
+	fixture=Fixture.new(self); game=await fixture.boot(true,true)
 	check(game.survival.needs.water_remaining<=45 and game.player.health_component.max_hp==100,"Migrated effects were renewed on second load")
 	await fixture.close()
 	if failures.is_empty(): print("PASS provision lifecycle: real consumption/replacement/dispel, single clock, death before recovery/save, retained cooldown and v8 migration/reentry")

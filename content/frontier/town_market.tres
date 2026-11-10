@@ -7,3 +7,4 @@ initial_stock = {"coin":160,"metal_scrap":12,"charcoal":6,"sap":6,"crystal":4,"c
 region_id = "camp"
 position = Vector2(-3210,2200)
 service_range = 150.0
+demand = {"beast_hide":{"target":2,"premium":1},"beast_fang":{"target":4,"premium":1},"gland_sample":{"target":2,"premium":1}}

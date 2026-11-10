@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="EquipmentRefit" format=3]
+[ext_resource type="Script" path="res://gameplay/inventory/refits/equipment_refit.gd" id="refit"]
+[resource]
+script = ExtResource("refit")
+id = "brace"
+title = "稳架整修"
+description = "每级冲击抵抗+5%，移动速度-3；兽皮补强受力结构。"
+category = "armor"
+extra_costs = {"beast_hide": 1}
+stat_per_level = {"move_speed": -3}
+combat_per_level = {"impact_resistance": 0.05}

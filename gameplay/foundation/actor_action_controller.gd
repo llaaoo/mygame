@@ -89,7 +89,7 @@ func combo_snapshot() -> Dictionary:
 	return view
 func attack_stamina_cost(strike: AttackProfile,is_art := false) -> float:
 	var art: bool=is_art or strike in _art_profiles()
-	return strike.stamina_cost*burden_cost()*activity_efficiency(SkillMastery.School.MELEE)*clampf(1+ActorProgression.modifier(context.actor,"stamina.art" if art else "stamina.attack"),.4,1.5)
+	return strike.stamina_cost*clampf(1+equipment_value("weapon_stamina_cost"),.5,1.5)*burden_cost()*activity_efficiency(SkillMastery.School.MELEE)*clampf(1+ActorProgression.modifier(context.actor,"stamina.art" if art else "stamina.attack"),.4,1.5)
 func technique_view(id: String,force_base := false,release_enchantment := false) -> Dictionary:
 	var data:=MartialArts.definition(id)
 	if not data: return {}
@@ -305,6 +305,8 @@ func try_action(action: Action) -> OperationResult:
 			if reserved and bool(action.params.get("charged",false)) and float(action.params.get("charge_credit",0))>0:
 				candidate=candidate.duplicate(true) as AttackProfile
 				candidate.windup=maxf(.08,candidate.windup-minf(WEAPON_HOLD_SECONDS,float(action.params.charge_credit)))
+			if not is_zero_approx(equipment_value("impact_bonus")):
+				candidate=candidate.duplicate(true) as AttackProfile;candidate.impact+=equipment_value("impact_bonus")
 			if not is_zero_approx(ActorProgression.modifier(context.actor,"combat.impact")):
 				candidate=candidate.duplicate(true) as AttackProfile; candidate.impact*=1+ActorProgression.modifier(context.actor,"combat.impact")
 			var cost:=attack_stamina_cost(candidate,action.action_type==Action.ActionType.TECHNIQUE)

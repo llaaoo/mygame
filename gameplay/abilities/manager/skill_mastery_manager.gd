@@ -350,7 +350,7 @@ func _load_tree_for_school(school: SkillMastery.School) -> Array[SkillPerkData]:
 
 
 func record_activity(kind: String,amount := 1.0) -> void:
-	var school: int={"melee_hit":SkillMastery.School.MELEE,"hit_blocked":SkillMastery.School.DEFENSE,"recipe_crafted":SkillMastery.School.CRAFTING,"field_work":SkillMastery.School.CRAFTING,"resource_harvested":SkillMastery.School.SURVIVAL,"discovery":SkillMastery.School.SURVIVAL,"equipment_upgraded":SkillMastery.School.CRAFTING,"equipment_dismantled":SkillMastery.School.CRAFTING}.get(kind,-1)
+	var school: int={"melee_hit":SkillMastery.School.MELEE,"hit_blocked":SkillMastery.School.DEFENSE,"recipe_crafted":SkillMastery.School.CRAFTING,"field_work":SkillMastery.School.CRAFTING,"resource_harvested":SkillMastery.School.SURVIVAL,"corpse_harvested":SkillMastery.School.SURVIVAL,"discovery":SkillMastery.School.SURVIVAL,"equipment_upgraded":SkillMastery.School.CRAFTING,"equipment_dismantled":SkillMastery.School.CRAFTING}.get(kind,-1)
 	if school<0 or amount<=0: return
 	_add_xp(_ensure_mastery(school),amount)
 func activity_efficiency(school: SkillMastery.School) -> float:

@@ -66,6 +66,8 @@ func _spawn_enemy(spec: ExplorationEncounterData, layout: RefCounted, index: int
 				point = candidate
 				break
 	enemy.position = point
+	enemy.set_meta("encounter_group",spec.group)
+	enemy.set_meta("encounter_tactics",spec.tactics)
 	if not boss:
 		enemy.character_definition = spec.character
 		enemy.enemy_type = spec.profile.appearance_preset if spec.profile else (2 if game.region_id == "gate" and index == 0 else 0)
@@ -126,6 +128,7 @@ func build_element_objects() -> void:
 	for spec in game.current_data.storage: game.world_storage.mount(spec)
 	for spec in game.current_data.amenities:
 		var callback: Callable=game.workshop.show_crafts if spec.service=="craft" else game.equipment_service.show_equipment
+		if spec.service=="mediation":callback=game.map_service_request.bind(spec.service) if game.map_service_request.is_valid() else Callable()
 		var node:=_add_interaction(spec.title,spec.pos,callback,"mechanism")
 		node.set_meta("map_amenity",spec.id)
 		if spec.service=="rest": game.survival.mount_rest(node)

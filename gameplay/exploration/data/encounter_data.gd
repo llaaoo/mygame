@@ -1,5 +1,6 @@
 class_name ExplorationEncounterData
 extends Resource
+@export var tactics: EncounterTactics
 
 @export var persistent_id := ""
 @export var group := ""

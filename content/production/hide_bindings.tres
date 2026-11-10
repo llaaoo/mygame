@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="ProductionDefinition" format=3]
+[ext_resource type="Script" path="res://gameplay/foundation/data/production_definition.gd" id="definition"]
+[ext_resource type="Resource" path="res://content/crafting/hide_bindings.tres" id="recipe"]
+[resource]
+script = ExtResource("definition")
+id = "town.hide_bindings"
+actor_id = "river.merchant"
+recipe = ExtResource("recipe")
+work_hours = 2.0

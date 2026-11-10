@@ -1,5 +1,6 @@
 [gd_resource type="Resource" script_class="RulesetDefinition" load_steps=2 format=3]
 [ext_resource type="Script" path="res://gameplay/foundation/data/ruleset_definition.gd" id="1"]
+[ext_resource type="Resource" path="res://content/expedition/grayriver.tres" id="expedition"]
 [resource]
 script = ExtResource("1")
 material_operations = true
@@ -11,3 +12,4 @@ tactical_combat = true
 world_interaction_art = true
 base_areas = [Rect2(-4600,1100,2400,2200)]
 additional_base_regions = PackedStringArray("river_inn", "river_workshop", "river_records")
+expedition = ExtResource("expedition")

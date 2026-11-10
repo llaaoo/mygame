@@ -212,6 +212,7 @@ func _on_target_killed(ev: CombatEvent) -> void:
 
 func _get_current_target() -> Node2D:
 	if story_truce: return null
+	if actor_context and actor_context.awareness:return actor_context.awareness.visible_target()
 	if actor_context and actor_context.relations.attitude(actor_context.id,"player")=="friendly" and not _is_valid_target(_revenge_target): return null
 	if _is_valid_target(_revenge_target):
 		return _revenge_target
@@ -459,6 +460,11 @@ func _begin_return_home() -> void:
 
 
 func _tick_idle_navigation(delta: float) -> void:
+	if actor_context and actor_context.awareness:
+		var state:=actor_context.awareness
+		if state.phase in ["search","warning"]:
+			actor_context.actions.try_action(Action.move(state.search_direction(),self))
+			return
 	if _suspicion_timer > 0.0:
 		_suspicion_timer = maxf(0.0, _suspicion_timer - delta)
 
@@ -541,6 +547,7 @@ func _resolve_melee_hit(target: Node2D) -> void:
 
 
 func _process(delta: float) -> void:
+	if actor_context and actor_context.awareness:actor_context.awareness.advance(delta)
 	_sight_memory=maxf(0,_sight_memory-delta)
 	if character_brain: character_brain.tick(delta)
 	if not attack_ready:

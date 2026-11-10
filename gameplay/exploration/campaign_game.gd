@@ -26,6 +26,7 @@ var progress_service: ExplorationProgressService
 var presenter: ExplorationPresenter
 var builder: ExplorationRegionBuilder
 var world_storage: WorldStorageService
+var map_service_request: Callable
 var _save_dirty: bool:
 	get: return progress_service._save_dirty if progress_service else false
 var persistence_enabled := true
@@ -77,6 +78,9 @@ func _bootstrap() -> void:
 	progress.condition_query.regions=catalog.regions
 	progress.condition_query.catalog=catalog
 	session.condition_query=progress.condition_query
+	progress.condition_query.actor_query=session.actor_for_id
+	progress.condition_query.law=session.law
+	progress.condition_query.fieldcraft=session.fieldcraft;progress.condition_query.knowledge_query=session.knows
 	progress.foundation_status=session.snapshot_read_status
 	session.save_requested=_queue_save
 	session.inspect_actor=inspect_actor
@@ -175,8 +179,10 @@ func _bootstrap() -> void:
 	presentation.catalog=presentation_catalog
 	add_child(presentation)
 	presentation.configure(player,session.facts,session.actor_for_id,WorldTime.instance.get_hour)
+	var rescued:=retreat.resume_pending_rescue()
 	_change_region(start.region, start.position)
 	ready_for_play = true
+	if rescued:_save_progress()
 	player.skill_manager.hand_changed.connect(func(_source: String): _queue_save())
 	player.skill_manager.binding_changed.connect(func(_source: String): _queue_save())
 	player.skill_manager.combinations.supplies.changed.connect(_queue_save)
@@ -362,11 +368,12 @@ func _on_player_died() -> void:
 	if trial_recorder and trial_recorder.active: trial_recorder.call_deferred("finish", "死亡中断")
 	if player.actor_context: session.mark_dead(player)
 	progress.deaths += 1
+	retreat.on_defeat()
 	player.skill_manager.combinations.supplies.clear_selection()
 	player.skill_manager.combinations.cancel("死亡")
 	player.skill_manager.combinations.clear_field()
 	_save_progress()
-	ui.show_panel("远征中断", "返回营地后恢复半数生命和法力，并保留最低饱食饮水。到篝火主动休整或吃粗食，库存不会免费补满。已学知识、已清理区域和发现记录保留；未清理遭遇重新开始。", [{"title": "返回营地", "callback": func(): ui.close_modal(); request_travel("camp")}], true)
+	ui.show_panel("远征中断", "返回营地后恢复半数生命和法力，并保留最低饱食饮水。到篝火主动休整或吃粗食，库存不会免费补满。已学知识、已清理区域和发现记录保留。"+("\n\n救援推进%.1f小时；野外败退的非空旅行背包留在原地，口袋与穿戴保留。M查看位置，亲自F回收。已放下的背包不会被移走或复制。"%rules.expedition.rescue_hours if rules.expedition and session.expedition.pending_rescue else ""), [{"title": "返回营地", "callback": retreat.rescue}], true)
 
 func reload_progress() -> void:
 	var data := SaveManager.instance.read_extension(save_slot, save_section)

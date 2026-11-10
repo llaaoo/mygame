@@ -8,6 +8,9 @@ func _init() -> void:
 	failures.append_array(NpcCatalog.default_catalog().validation_errors(ExplorationContentCatalog.new(GrayriverDefinition.build()),social_facts))
 	failures.append_array(ItemCatalog.default_catalog().validation_errors())
 	failures.append_array(FieldcraftCatalog.default_catalog().validation_errors())
+	failures.append_array(CharterCatalog.default_catalog().validation_errors())
+	for id in EquipmentRefit.IDS:
+		if not EquipmentRefit.definition(id).valid():failures.append("Invalid equipment refit: "+id)
 	failures.append_array(SpellOperationCatalog.default_catalog().validation_errors())
 	var frontier_failures := GrayriverValidator.validate(GrayriverDefinition.data())
 	if frontier_failures.is_empty():

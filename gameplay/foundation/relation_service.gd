@@ -5,6 +5,12 @@ var personal: Dictionary = {}
 var factions: Dictionary = {}
 var memberships: Dictionary = {}
 var _dispositions: Dictionary={}
+var _affiliations: Dictionary={}
+func affiliation(actor_id: String) -> String:return str(_affiliations.get(actor_id,""))
+func join_affiliation(actor_id: String,id: String) -> bool:
+	if actor_id.is_empty() or not affiliation(actor_id).is_empty() or not CharterCatalog.default_catalog().definition(id):return false
+	_affiliations[actor_id]=id
+	return true
 var facts: GameplayFacts
 func attitude(a: String,b: String) -> String:
 	if a==b: return "friendly"
@@ -19,12 +25,13 @@ func set_attitude(a: String,b: String,value: String) -> bool:
 	if facts: facts.publish("relation_changed",a,{"target":b,"attitude":value})
 	return true
 func snapshot() -> Dictionary:
-	return {"personal":personal.duplicate(),"factions":factions.duplicate(),"memberships":memberships.duplicate(),"dispositions":_dispositions.duplicate()}
+	return {"personal":personal.duplicate(),"factions":factions.duplicate(),"memberships":memberships.duplicate(),"dispositions":_dispositions.duplicate(),"affiliations":_affiliations.duplicate()}
 func restore(data: Dictionary) -> void:
 	personal=data.get("personal",{}).duplicate()
 	factions=data.get("factions",{}).duplicate()
 	memberships=data.get("memberships",{}).duplicate()
 	_dispositions=data.get("dispositions",{}).duplicate()
+	_affiliations=data.get("affiliations",{}).duplicate()
 func disposition(a: String,b: String) -> int:
 	return int(_dispositions.get(a+"|"+b,0))
 func adjust_disposition(a: String,b: String,amount: int) -> void:
@@ -38,4 +45,10 @@ static func valid_dispositions(data: Variant) -> bool:
 	if not data is Dictionary or data.size()>1024: return false
 	for key in data:
 		if not key is String or key.count("|")!=1 or not data[key] is int or data[key]<-100 or data[key]>100: return false
+	return true
+
+static func valid_affiliations(data: Variant) -> bool:
+	if not data is Dictionary or data.size()>4096:return false
+	for key in data:
+		if not key is String or key.is_empty() or not data[key] is String or not CharterCatalog.default_catalog().definition(data[key]):return false
 	return true

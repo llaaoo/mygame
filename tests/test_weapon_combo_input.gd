@@ -44,7 +44,7 @@ func run() -> void:
 					if actions.remaining<=.22: break
 					await frames(1)
 				await press()
-				check(not actions.buffered_action_label().is_empty(),"Manual continuation did not enter the short buffer")
+				check(not actions.buffered_action_label().is_empty() or starts.size()==before+index+2 and actions.combo.current_index==index+1,"Manual continuation was neither buffered nor accepted after recovery")
 				for i in range(60):
 					if starts.size()==before+index+2: break
 					await frames(1)

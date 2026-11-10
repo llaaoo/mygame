@@ -1,10 +1,12 @@
-[gd_resource type="Resource" script_class="MartialCatalog" load_steps=7 format=3]
+[gd_resource type="Resource" script_class="MartialCatalog" load_steps=9 format=3]
 [ext_resource type="Script" path="res://gameplay/martial/martial_catalog.gd" id="catalog"]
 [ext_resource type="Script" path="res://gameplay/martial/martial_technique.gd" id="def"]
 [ext_resource type="Resource" path="res://content/martial/blade_breaker.tres" id="blade_breaker"]
 [ext_resource type="Resource" path="res://content/martial/spear_thrust.tres" id="spear_thrust"]
 [ext_resource type="Resource" path="res://content/martial/staff_sweep.tres" id="staff_sweep"]
 [ext_resource type="Resource" path="res://content/martial/bow_aim.tres" id="bow_aim"]
+[ext_resource type="Resource" path="res://content/martial/hunter_pin.tres" id="hunter_pin"]
+[ext_resource type="Resource" path="res://content/martial/warden_drive.tres" id="warden_drive"]
 [resource]
 script = ExtResource("catalog")
-techniques = Array[ExtResource("def")]([ExtResource("blade_breaker"), ExtResource("spear_thrust"), ExtResource("staff_sweep"), ExtResource("bow_aim")])
+techniques = Array[ExtResource("def")]([ExtResource("blade_breaker"), ExtResource("spear_thrust"), ExtResource("staff_sweep"), ExtResource("bow_aim"), ExtResource("hunter_pin"), ExtResource("warden_drive")])

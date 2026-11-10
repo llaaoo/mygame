@@ -75,6 +75,7 @@ static func build(map_catalog: MapCellCatalog=null,resolve_connections := true) 
 			encounter.pos = vector(raw.pos)
 			encounter.hp = int(raw.get("hp",1))
 			if raw.has("character"): encounter.character=load("res://content/characters/river_%s.tres"%raw.character)
+			if raw.has("tactics"):encounter.tactics=load("res://content/tactics/territories/%s.tres"%raw.tactics) as EncounterTactics
 			encounter.speed = float(raw.get("speed", 105))
 			encounter.detect_range = float(raw.get("detect_range", 440))
 			encounter.boss = raw.get("boss", false)
@@ -207,6 +208,7 @@ static func build(map_catalog: MapCellCatalog=null,resolve_connections := true) 
 		quest.required_clears = PackedStringArray(raw.get("required_clears", []))
 		quest.attribute_points = int(raw.points)
 		chapter.quests.append(quest)
+	chapter.quests.append(load("res://content/frontier/quests/hunting_evidence.tres") as ExplorationQuestData)
 	return chapter
 
 static func work_method(raw: Dictionary) -> FieldWorkMethod:

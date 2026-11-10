@@ -34,12 +34,14 @@ func ensure_stock() -> void:
 	store.end_batch()
 func reason() -> String:
 	if not market: return "此人不提供交易与整修。"
+	var property_reason:=game.session.law.service_reason(market.actor_id)
+	if not property_reason.is_empty():return property_reason
 	if game.region_id!=market.region_id or game.player.global_position.distance_to(market.position)>market.service_range: return "请靠近这位店主的交易位置。"
 	var social_reason:=game.session.conversations.reason(market.actor_id,true,180)
 	if not social_reason.is_empty(): return social_reason
 	if game.has_hostiles_near(game.player.global_position) or game.player.actor_context.actions.busy(): return "先结束战斗与动作。"
 	return ""
-func price(uid: String,buying: bool) -> int:
+func _base_price(uid: String,buying: bool) -> int:
 	if not market: return 0
 	var store:=game.session.inventory
 	var item:=store.item(uid)
@@ -48,16 +50,32 @@ func price(uid: String,buying: bool) -> int:
 	var base:=maxi(definition.sell_price,8 if definition is EquipmentData else 1)
 	base+=clampi(int(item.properties.get("upgrade_level",0)),0,3)*2
 	return maxi(base+1,int(ceil(base*1.8))) if buying and game.session.relations.disposition(market.actor_id,"player")>=10 else base*2 if buying else base
+func total_price(uid: String,buying: bool,quantity: int) -> int:
+	var base:=_base_price(uid,buying)
+	var item:=game.session.inventory.item(uid)
+	if not item or quantity<1:return 0
+	var rule: Dictionary=market.demand.get(item.definition_id,{}) if market else {}
+	if buying or rule.is_empty():return base*quantity
+	var wanted:=clampi(int(rule.target)-game.session.inventory.count(market.actor_id,item.definition_id),0,quantity)
+	return base*quantity+wanted*int(rule.premium)
+func price(uid: String,buying: bool) -> int:return total_price(uid,buying,1)
+func affordable(uid: String,buying: bool,quantity: int,funds: int) -> int:
+	var low:=0;var high:=quantity
+	while low<high:
+		var middle:=(low+high+1)/2
+		if total_price(uid,buying,middle)<=funds:low=middle
+		else:high=middle-1
+	return low
 func transact(uid: String,selling: bool,quantity := 1) -> OperationResult:
 	if not reason().is_empty(): return OperationResult.reject(reason())
 	var store:=game.session.inventory
 	var item:=store.item(uid)
 	if not item or item.definition_id=="coin": return OperationResult.reject("不可交易")
-	return store.trade_instance(market.actor_id if selling else "player","player" if selling else market.actor_id,uid,quantity,price(uid,not selling)*quantity)
+	return store.trade_instance(market.actor_id if selling else "player","player" if selling else market.actor_id,uid,quantity,total_price(uid,not selling,quantity))
 func preview_trade(uid: String,selling: bool,quantity: int) -> OperationResult:
 	if not reason().is_empty(): return OperationResult.reject(reason())
 	var store:=game.session.inventory
-	return store.preview_trade_instance(market.actor_id if selling else "player","player" if selling else market.actor_id,uid,quantity,price(uid,not selling)*quantity)
+	return store.preview_trade_instance(market.actor_id if selling else "player","player" if selling else market.actor_id,uid,quantity,total_price(uid,not selling,quantity))
 func salvage(uid: String,upgrade: bool) -> OperationResult:
 	if not market or not market.equipment_services: return OperationResult.reject("此店只提供实物交易，不提供拆解或强化。")
 	if not reason().is_empty(): return OperationResult.reject(reason())
@@ -107,6 +125,9 @@ func _detail(uid: String) -> void:
 	var data:=store.equipment_definition(uid) if definition is EquipmentData else definition
 	_screen.detail.add_child(W.label(data.display_name,22))
 	_screen.detail.add_child(W.label(data.description+"\n"+store.state_text(uid),14,true))
+	if _selling and market.demand.has(item.definition_id):
+		var demand: Dictionary=market.demand[item.definition_id]
+		_screen.detail.add_child(W.label("店内需求：目标%d，当前%d；缺额内每件额外%d币，整叠按缺额分段计价。"%[demand.target,store.count(market.actor_id,item.definition_id),demand.premium],14,true))
 	var worn:=_selling and store.locate(uid)=="player.gear"
 	if worn:
 		_screen.detail.add_child(W.label("这件装备仍在身上。先卸下，属性变化和背包空间按正常换装规则检查。",14,true))
@@ -125,12 +146,11 @@ func _detail(uid: String) -> void:
 		var stack_button:=W.button("出售整叠" if _selling else "购买整叠",_request.bind("trade_stack",uid)); _screen.detail.add_child(stack_button)
 		var refresh_totals:=func(value: float):
 			_quantity_value=int(value)
-			var unit_price:=price(uid,not _selling)
 			var payer:=market.actor_id if _selling else "player"
 			var funds:=store.count(payer,"coin")
-			var total:=unit_price*_quantity_value
+			var total:=total_price(uid,not _selling,_quantity_value)
 			var preview:=preview_trade(uid,_selling,_quantity_value)
-			totals.text="总价%d币 · %s持有%d币 · 资金最多%d件"%[total,"店家" if _selling else "你",funds,mini(item.quantity,funds/maxi(1,unit_price))]
+			totals.text="总价%d币 · %s持有%d币 · 资金最多%d件"%[total,"店家" if _selling else "你",funds,affordable(uid,not _selling,item.quantity,funds)]
 			if funds<total: totals.text+=" · 缺少%d币"%(total-funds)
 			elif not preview.accepted: totals.text+=" · "+str(ERRORS.get(preview.reason,preview.reason))
 			else: totals.text+=" · 付款后余%d币"%(funds-total)
@@ -140,11 +160,24 @@ func _detail(uid: String) -> void:
 		refresh_totals.call(_trade_quantity.value)
 	if _selling and definition is EquipmentData and market.equipment_services:
 		var level:=clampi(int(item.properties.get("upgrade_level",0)),0,3)
-		_screen.detail.add_child(W.label("强化每级：主手攻击+1；其余装备生命上限+4。最高+3。",14,true))
+		var refit:=EquipmentRefit.definition(str(item.properties.get("upgrade_path","balanced")))
+		_screen.detail.add_child(W.label(("已固定方向："+refit.title+"\n" if level>0 else "首次可选择方向，之后保持；最高+3。\n")+refit.description,14,true))
 		_screen.detail.add_child(W.button("拆解 · 获得%d金属碎料（销毁这件装备）"%store.dismantle_yield("player",uid),_request.bind("dismantle",uid)))
-		_screen.detail.add_child(W.button("强化 · %d币 + %d金属碎料"%[store.upgrade_cost("player",uid).coin,store.upgrade_cost("player",uid).metal_scrap],_request.bind("upgrade",uid),level>=3))
+		_screen.detail.add_child(W.button(("强化 · "+game.survival.supplies.describe_cost(store.upgrade_cost("player",uid))) if refit.id!="balanced" else "强化 · %d币 + %d金属碎料"%[store.upgrade_cost("player",uid).coin,store.upgrade_cost("player",uid).metal_scrap],_request.bind("upgrade",uid),level>=3))
+		if level==0:
+			for path_id in EquipmentRefit.IDS:
+				var path:=EquipmentRefit.definition(path_id)
+				if path_id=="balanced" or not path.supports(definition):continue
+				_screen.detail.add_child(W.label(path.description,13,true))
+				_screen.detail.add_child(W.button("定向整修："+path.title+" · "+game.survival.supplies.describe_cost(store.upgrade_cost("player",uid,path_id)),_refit.bind(uid,path_id)))
 	for button in _screen.detail.find_children("*","Button",true,false):
 		button.clip_text=true; button.tooltip_text=button.text
+func _refit(uid: String,path: String) -> void:
+	if not reason().is_empty() or not market.equipment_services:return
+	var result:=game.session.inventory.upgrade_instance("player",uid,path)
+	game.ui.notify("已按所选方向整修；后续三阶内保持该方向。" if result.accepted else result.reason)
+	if result.accepted:game._save_progress()
+	_rows(_screen.search.text)
 func _request(method: String,uid: String) -> void:
 	var focused:=_screen.get_viewport().gui_get_focus_owner()
 	var focus_text: String=focused.text if focused is Button else ""
@@ -165,6 +198,7 @@ func _request(method: String,uid: String) -> void:
 
 func show_training() -> void:
 	if not training: return
+	if not game.session.law.service_reason(training.actor_id).is_empty():game.ui.notify(game.session.law.service_reason(training.actor_id));return
 	var npc:=game.session.actor_for_id(training.actor_id)
 	if not is_instance_valid(npc) or not game.session.conversations.reason(training.actor_id,true,150).is_empty(): game.ui.notify("请靠近当值的训练师。"); return
 	var options: Array[Dictionary]=[]
@@ -183,6 +217,7 @@ func show_training() -> void:
 	options.append({"title":"分配已有属性点","callback":game.presenter._show_training})
 	game.ui.show_panel(service_title(training.actor_id,"训练师"),"武技只解锁知识，到K查看连招与配置；使用消耗体力与实物资源。\n\n野外技艺解锁遗骸的专业处理与对应制造配方。先学剥皮，再学取牙或摘腺；作坊留有入门书和小刀。未处理部位会保留，携刀站定作业，留意附近危险。",options)
 func _teach(id: String) -> void:
+	if not game.session.law.service_reason(training.actor_id).is_empty():return
 	var npc:=game.session.actor_for_id(training.actor_id)
 	var context:=game.player.actor_context
 	var offer:=training.offer(id)
@@ -191,6 +226,7 @@ func _teach(id: String) -> void:
 	game.ui.notify("已学会"+offer.technique.title+" · 连招后按"+InputBindings.label("weapon_art")+"发动，K查看条件，无需占快捷槽。" if result.accepted else str(ERRORS.get(result.reason,result.reason)))
 	game._save_progress(); show_training()
 func _teach_fieldcraft(id: String) -> void:
+	if not game.session.law.service_reason(training.actor_id).is_empty():return
 	if not training or id not in training.fieldcraft_skills or not is_instance_valid(game.session.actor_for_id(training.actor_id)) or not game.session.conversations.reason(training.actor_id,true,150).is_empty(): return
 	var skill:=FieldcraftCatalog.default_catalog().skill(id)
 	var result:=FieldcraftLearning.purchase(skill,game.player.actor_context,training.actor_id)

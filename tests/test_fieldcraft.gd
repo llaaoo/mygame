@@ -72,7 +72,7 @@ func run() -> void:
 	check(FieldcraftLearning.purchase(FieldcraftCatalog.default_catalog().skill("gland_work"),game.player.actor_context,teacher).accepted,"Qualified gland lesson refused")
 	var crawler: Enemy
 	for foe in game.active_enemies:
-		if foe.character_definition.id=="river_crawler":crawler=foe
+		if foe.actor_context.id=="river.enemy.camp.fieldcraft.crawler.v1":crawler=foe
 	var crawler_id:=crawler.actor_context.id
 	game.player.position=crawler.position+Vector2(25,0);crawler.take_damage(1000);await frames()
 	var gland: Dictionary=store.entries(crawler_id+".anatomy")[0]

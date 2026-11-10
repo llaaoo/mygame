@@ -44,12 +44,16 @@ var _pending_effect_time: Dictionary={}
 var restoring_effects := false
 var save_sections:=SaveSections.new()
 var fieldcraft:=FieldcraftKnowledge.new()
+var encounters:=EncounterCoordinator.new()
+var law:=LawService.new()
+var expedition:=ExpeditionState.new()
 func configure(content: ExplorationContentCatalog,profile: RulesetDefinition) -> void:
 	catalog=content
 	rules=profile
 	inventory.rules=rules
 	inventory.facts=facts
 	inventory.perk_query=perk_value
+	law.configure(inventory,relations,facts);law.witness_query=property_witnesses
 	relations.facts=facts
 	conversations.configure(self,NpcCatalog.default_catalog())
 	production.producer_reason=producer_reason
@@ -59,6 +63,8 @@ func configure(content: ExplorationContentCatalog,profile: RulesetDefinition) ->
 	save_sections.register("relations",SaveAdapter.new(relations.snapshot,relations.restore,_valid_relation_state))
 	save_sections.register("conversations",SaveAdapter.new(conversations.snapshot,conversations.restore,NpcConversationService.valid_state))
 	save_sections.register("fieldcraft",fieldcraft)
+	save_sections.register("law",law)
+	save_sections.register("expedition",expedition)
 	for item in ItemCatalog.default_catalog().items: inventory.register_definition(item)
 	for item: EquipmentData in catalog.equipment.values(): inventory.register_definition(item)
 	facts.committed.connect(_on_fact)
@@ -76,7 +82,7 @@ func restore(data: Dictionary) -> bool:
 func snapshot_read_status(data: Variant) -> int:
 	return int(save_sections.prepare(data).status)
 static func _valid_relation_state(data: Variant) -> bool:
-	return data is Dictionary and RelationService.valid_dispositions(data.get("dispositions",{}))
+	return data is Dictionary and RelationService.valid_dispositions(data.get("dispositions",{})) and RelationService.valid_affiliations(data.get("affiliations",{}))
 func _exit_tree() -> void:
 	save_sections.clear()
 func bind_actor(actor: CharacterBody2D,id: String,legacy_counts: Dictionary = {},legacy_loadout: Dictionary = {}, persistent := true) -> ActorContext:
@@ -87,8 +93,14 @@ func bind_actor(actor: CharacterBody2D,id: String,legacy_counts: Dictionary = {}
 	context.fieldcraft=fieldcraft
 	var body:=actor.get("character_definition") as ActorCharacterData
 	if body: context.body_moveset=body.body_moveset;context.guard_allowed=body.can_guard
+	context.encounter_group=str(actor.get_meta("encounter_group",""))
+	var tactics:=actor.get_meta("encounter_tactics") as EncounterTactics if actor.has_meta("encounter_tactics") else null
+	if tactics and actor is Enemy:context.awareness=encounters.register(context,tactics)
 	context.learning_query=ConditionQuery.new()
 	context.learning_query.actor_id=id; context.learning_query.items=inventory; context.learning_query.relations=relations
+	context.learning_query.actor_query=actor_for_id
+	context.learning_query.law=law
+	context.learning_query.fieldcraft=fieldcraft;context.learning_query.knowledge_query=knows
 	if condition_query: context.learning_query.progress=condition_query.progress; context.learning_query.regions=condition_query.regions
 	context.reward_eligible=bool(actor.get("rewards_enabled")) if "rewards_enabled" in actor else true
 	context.persistent=persistent
@@ -219,6 +231,7 @@ func snapshot() -> Dictionary:
 	result.erase("belt")
 	return save_sections.capture(result)
 func leave_region() -> void:
+	encounters.clear();law.leave_region()
 	conversations.invalidate()
 	capture_actors()
 	for id in actors.keys():
@@ -325,8 +338,9 @@ func _on_fact(fact: Dictionary) -> void:
 	if fact.source=="player":
 		var actor:=actor_for_id("player")
 		if actor and not actor.actor_context.reward_eligible: return
-	if fact.source=="player" and fact.kind in ["melee_hit","hit_blocked","recipe_crafted","resource_harvested","field_work","discovery","equipment_upgraded","equipment_dismantled"]:
-		var school: String={"melee_hit":"melee","hit_blocked":"defense","recipe_crafted":"crafting","resource_harvested":"survival","field_work":"crafting","discovery":"survival","equipment_upgraded":"crafting","equipment_dismantled":"crafting"}[fact.kind]
+	if fact.kind=="corpse_harvested" and not fieldcraft.record_harvest(str(fact.source),str(fact.data.get("raw_uid","")),str(fact.data.get("skill",""))): return
+	if fact.source=="player" and fact.kind in ["melee_hit","hit_blocked","recipe_crafted","resource_harvested","corpse_harvested","field_work","discovery","equipment_upgraded","equipment_dismantled"]:
+		var school: String={"melee_hit":"melee","hit_blocked":"defense","recipe_crafted":"crafting","resource_harvested":"survival","corpse_harvested":"survival","field_work":"crafting","discovery":"survival","equipment_upgraded":"crafting","equipment_dismantled":"crafting"}[fact.kind]
 		var family: String=str(fact.data.get("family",""))
 		var receipt: String=str(fact.kind)+"."+family
 		if not family.is_empty() and _activity_families.has(receipt): return
@@ -336,14 +350,33 @@ func _on_fact(fact: Dictionary) -> void:
 		proficiency[school]=float(proficiency.get(school,0))+1
 		if actors.has("player"):
 			var player: Object=actors["player"].get_ref()
-			if is_instance_valid(player) and player.mastery_manager: player.mastery_manager.record_activity(fact.kind,4.0 if fact.kind in ["recipe_crafted","resource_harvested","discovery"] else 1.0)
+			if is_instance_valid(player) and player.mastery_manager: player.mastery_manager.record_activity(fact.kind,4.0 if fact.kind in ["recipe_crafted","resource_harvested","corpse_harvested","discovery"] else 1.0)
 	if save_requested.is_valid(): save_requested.call()
+func knows(id: String,key: String,kind: int) -> bool:
+	var actor:=actor_for_id(id)
+	var query:=condition_query
+	if id=="player" and query and query.progress:
+		if kind in [WorldCondition.Knowledge.ANY,WorldCondition.Knowledge.ACTION] and query.progress.actions.has(key): return true
+		if kind in [WorldCondition.Knowledge.ANY,WorldCondition.Knowledge.COMBINATION] and query.progress.spell_rules.has(key): return true
+	if actor and id!="player":
+		var manager:=actor.get_node("SkillManager") as SkillManager
+		if kind in [WorldCondition.Knowledge.ANY,WorldCondition.Knowledge.ACTION] and manager.known_actions.has(key):return true
+		if kind in [WorldCondition.Knowledge.ANY,WorldCondition.Knowledge.COMBINATION] and manager.combinations.learned_rules.has(key):return true
+	if kind in [WorldCondition.Knowledge.ANY,WorldCondition.Knowledge.FIELDCRAFT] and fieldcraft.knows(id,key): return true
+	if kind in [WorldCondition.Knowledge.ANY,WorldCondition.Knowledge.MARTIAL]:
+		if actor and actor.actor_context.martial.learned.has(key): return true
+		if not actor and actor_records.get(id,{}).get("martial",{}).get("learned",{}).has(key): return true
+	if kind in [WorldCondition.Knowledge.ANY,WorldCondition.Knowledge.PERK] and actor and "mastery_manager" in actor and actor.mastery_manager: return actor.mastery_manager.has_perk(key)
+	return false
 static func valid_snapshot(data: Variant) -> bool:
 	if not data is Dictionary: return false
 	if data.is_empty(): return true
 	if not NpcConversationService.valid_state(data.get("conversations",{})): return false
 	if not data.get("relations",{}) is Dictionary: return false
 	if not RelationService.valid_dispositions(data.get("relations",{}).get("dispositions",{})): return false
+	if not RelationService.valid_affiliations(data.get("relations",{}).get("affiliations",{})):return false
+	var law_state: Variant=data.get("law",{})
+	if not LawService.valid_state(law_state):return false
 	if typeof(data.get("clock_seconds",0)) not in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(data.get("clock_seconds",0))) or data.get("clock_seconds",0)<0 or data.get("clock_seconds",0)>1000000000: return false
 	if not ProductionService.valid_snapshot(data.get("production",{})): return false
 	if data.has("shortcut_schema") and (not data.shortcut_schema is int or data.shortcut_schema!=1): return false
@@ -353,6 +386,7 @@ static func valid_snapshot(data: Variant) -> bool:
 			if not binding is Dictionary or not binding.get("id") is String or binding.get("method","") not in ["use","throw"]: return false
 			if not valid_belt_item(binding.id,binding.method): return false
 	if data.get("schema")!=1 or not InventoryService.valid_snapshot(data.get("inventory",{})) or not data.get("actors") is Dictionary or not data.get("relations") is Dictionary or not data.get("proficiency") is Dictionary: return false
+	if not LawService.valid_inventory_links(data.inventory,law_state.get("cases",{})):return false
 	for id in data.actors:
 		var record=data.actors[id]
 		if not id is String or not record is Dictionary or not record.get("hp") is int or record.hp<0 or record.hp>100000 or not record.get("dead") is bool or not record.get("region") is String: return false
@@ -389,6 +423,9 @@ func _on_damage(source: Node2D,target: Node2D,amount: int) -> void:
 		if context:
 			context.item_actions.cancel()
 			context.spray.stop()
+		if context and context.awareness:
+			var body:=target as Enemy
+			context.awareness.provoke(source.position if is_instance_valid(source) and body.can_see(source) else target.position)
 		_on_hostile_contact(source,target)
 func _on_hostile_contact(source: Node2D,target: Node2D) -> void:
 	if not is_instance_valid(source) or not is_instance_valid(target) or source==target: return
@@ -518,3 +555,15 @@ func producer_reason(id: String) -> String:
 	if actor_records.get(id,{}).get("dead",false): return "producer_dead"
 	var actor:=actor_for_id(id)
 	return "producer_dead" if is_instance_valid(actor) and actor.get_node("HealthComponent").is_dead else ""
+
+func property_witnesses(actor_id: String,point: Vector2) -> Array[String]:
+	var result: Array[String]=[];var offender:=actor_for_id(actor_id)
+	if not offender:return result
+	for id in actors:
+		var npc:=actor_for_id(id) as ServiceNPC
+		if not npc or npc.health_component.is_dead or npc.position.distance_to(point)>260:continue
+		var sight:=PhysicsRayQueryParameters2D.create(npc.global_position,offender.global_position,1,[npc.get_rid()])
+		if not npc.get_world_2d().direct_space_state.intersect_ray(sight).is_empty():continue
+		var ray:=PhysicsRayQueryParameters2D.create(npc.global_position,point,1,[npc.get_rid()])
+		if npc.get_world_2d().direct_space_state.intersect_ray(ray).is_empty():result.append(id)
+	return result

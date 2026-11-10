@@ -1,0 +1,42 @@
+[gd_resource type="Resource" script_class="CharterCatalog" format=3]
+[ext_resource type="Script" path="res://gameplay/social/charter_catalog.gd" id="catalog"]
+[ext_resource type="Script" path="res://gameplay/social/charter_definition.gd" id="charter"]
+[ext_resource type="Script" path="res://gameplay/foundation/data/world_condition.gd" id="condition"]
+[sub_resource type="Resource" id="civil"]
+script = ExtResource("condition")
+kind = 7
+key = "civil"
+hint = "先结清已通报的私产纠纷"
+[sub_resource type="Resource" id="condition_hunters"]
+script = ExtResource("condition")
+kind = 5
+key = "skinning"
+hint = "先亲手完成一次剥皮"
+[sub_resource type="Resource" id="hunters"]
+script = ExtResource("charter")
+id = "hunters"
+title = "灰河猎队"
+description = "以野外知识与狩猎供给获得认可。入队解锁逐退箭，并可使用猎队寄存箱；与守路队身份互斥，本旅程只选择一次。"
+technique_id = "hunter_pin"
+conditions = Array[ExtResource("condition")]([SubResource("civil"), SubResource("condition_hunters")])
+[sub_resource type="Resource" id="condition_wardens"]
+script = ExtResource("condition")
+kind = 0
+key = "river.bridge_settled"
+hint = "先处理断桥守望者的纠纷"
+[sub_resource type="Resource" id="martial_warden"]
+script = ExtResource("condition")
+kind = 4
+knowledge_kind = 3
+key = "blade_breaker"
+hint = "先学习破势斩"
+[sub_resource type="Resource" id="wardens"]
+script = ExtResource("charter")
+id = "wardens"
+title = "河谷守路队"
+description = "凭破势斩知识和断桥纠纷的处理获得认可。入队解锁驱逐斩，并可使用守路队寄存箱；与猎队身份互斥，本旅程只选择一次。"
+technique_id = "warden_drive"
+conditions = Array[ExtResource("condition")]([SubResource("civil"), SubResource("condition_wardens"), SubResource("martial_warden")])
+[resource]
+script = ExtResource("catalog")
+entries = Array[ExtResource("charter")]([SubResource("hunters"), SubResource("wardens")])

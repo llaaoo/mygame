@@ -359,6 +359,36 @@
           ],
           "requires_clear": false,
           "text": "整修作坊有留赠的小刀和剥皮入门书；书要移入口袋后使用。镇中训练师还教授取牙与摘腺。普通武器、衣物和随身物资仍直接搜刮；兽皮、兽牙和毒腺要学会对应技艺，携刀在遗骸详情开始专业处理。未学会的部位会保留，之后可回来。处理时世界继续运转，先确认安全。\n\n西林深处有芦苇猎犬：扑咬锁向，绕侧反打。南湿地深处有沼甲伏兽：撞击慢而宽，不宜连续硬挡。旧监狱西侧的断路弓手会保持射距，利用掩体接近；箭是有限的。工区东侧的破阵手重杖起手明显，等落空再还击。\n\n学会的剥取技艺也解锁作业台配方：兽皮＋灰烬制抹布，兽牙＋晶砂研磨护阵粉，毒腺液＋草药精炼浓缩毒剂。"
+        },
+        {
+          "id": "river.hunting.route",
+          "title": "猎队招募与巡林取证",
+          "pos": [
+            -3500,
+            2550
+          ],
+          "text": "作坊可领剥皮书和小刀。学会后到西北高地观察猎群；警告出现时可以退开，靠近或停留会引发交战。同群会依据最后目击位置警戒，躲到墙后不会让敌人知道你的新位置。亲手处理两处兽皮可向艾妲报告，也可凭摘腺实践或清除高地前后排营地报告。同一委托只奖励一次，做法会影响关系。训练师提供猎队/守路队身份选择，萨芙按批次收兽皮与腺液并可安排加工。返程可选择备粮或较慢求援，都会消耗游戏时间。",
+          "requires_clear": false
+        },
+        {
+          "id": "river.hunting.ridge",
+          "title": "西北高地：猎群足迹",
+          "pos": [
+            -3850,
+            -2680
+          ],
+          "text": "向西北可遇到两只相互警戒的猎犬，再向东北可寻找另一只。警告期间退回可避免交战；扑咬锁向，绕侧等它落空后再还击。部位未学会可保留，M仍标记遗骸。附近高地营地的重杖手会保护有箭的弓手，绕开前排或耗尽箭袋会改变它们的站位。",
+          "requires_clear": false
+        },
+        {
+          "id": "river.hunting.camp",
+          "title": "高地营地观察记录",
+          "pos": [
+            -950,
+            -2300
+          ],
+          "text": "前方弓手与重杖手互相掩护。先看警告与站位，利用地形分开它们；弓手箭是有限的，前排保护会随其弹药变化。清除两名成员后，可作为巡林取证的战斗方案报告；专业处理也是另一条途径。",
+          "requires_clear": false
         }
       ],
       "stations": [
@@ -1070,6 +1100,110 @@
           "detect_range": 300,
           "group": "fieldcraft.mauler",
           "optional": true
+        },
+        {
+          "id": "camp.depth.ridge_hound.1.v1",
+          "character": "hound",
+          "tactics": "hound",
+          "profile": "hound",
+          "pos": [
+            -4250,
+            -2850
+          ],
+          "group": "depth.hunt.ridge",
+          "optional": true,
+          "detect_range": 360
+        },
+        {
+          "id": "camp.depth.ridge_hound.2.v1",
+          "character": "hound",
+          "tactics": "hound",
+          "profile": "hound",
+          "pos": [
+            -4050,
+            -3020
+          ],
+          "group": "depth.hunt.ridge",
+          "optional": true,
+          "detect_range": 360
+        },
+        {
+          "id": "camp.depth.ridge_hound.3.v1",
+          "character": "hound",
+          "tactics": "hound",
+          "profile": "hound",
+          "pos": [
+            -3550,
+            -3200
+          ],
+          "group": "depth.hunt.west",
+          "optional": true,
+          "detect_range": 360
+        },
+        {
+          "id": "camp.depth.marsh_crawler.1.v1",
+          "character": "crawler",
+          "tactics": "crawler",
+          "profile": "crawler",
+          "pos": [
+            2450,
+            3000
+          ],
+          "group": "depth.hunt.marsh",
+          "optional": true,
+          "detect_range": 360
+        },
+        {
+          "id": "camp.depth.marsh_crawler.2.v1",
+          "character": "crawler",
+          "tactics": "crawler",
+          "profile": "crawler",
+          "pos": [
+            3200,
+            2800
+          ],
+          "group": "depth.hunt.marsh.east",
+          "optional": true,
+          "detect_range": 360
+        },
+        {
+          "id": "camp.depth.marsh_crawler.3.v1",
+          "character": "crawler",
+          "tactics": "crawler",
+          "profile": "crawler",
+          "pos": [
+            3000,
+            3350
+          ],
+          "group": "depth.hunt.marsh.south",
+          "optional": true,
+          "detect_range": 360
+        },
+        {
+          "id": "camp.depth.ridge_archer.v1",
+          "character": "archer",
+          "tactics": "archer",
+          "profile": "archer",
+          "pos": [
+            -850,
+            -2800
+          ],
+          "group": "depth.ridge_camp",
+          "optional": true,
+          "detect_range": 360
+        },
+        {
+          "id": "camp.depth.ridge_mauler.v1",
+          "character": "mauler",
+          "tactics": "mauler",
+          "profile": "mauler",
+          "pos": [
+            -1030,
+            -2750
+          ],
+          "group": "depth.ridge_camp",
+          "optional": true,
+          "detect_range": 360
         }
       ],
       "deliveries": [

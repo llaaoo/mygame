@@ -7,6 +7,7 @@ var stories: GrayriverStories
 var frontier_hud: FrontierHUD
 var town_services: TownServices
 var residents: GrayriverResidents
+var community: GrayriverCommunity
 var loot: GrayriverLoot
 var definition: Dictionary
 var terrain: GrayriverTerrain
@@ -25,6 +26,9 @@ func _ready() -> void:
 	var trainer_profile:=resident_catalog.profile(TrainingCatalog.default_catalog().actor_id)
 	town_services=TownServices.new(self,merchant_profile.market,trainer_profile.training,false)
 	residents=GrayriverResidents.new(self)
+	community=GrayriverCommunity.new(self)
+	map_service_request=func(kind: String):
+		if kind=="mediation":community.show_mediation()
 	definition = GrayriverDefinition.data()
 	if not catalog: catalog = ExplorationContentCatalog.new(GrayriverDefinition.build())
 	save_slot = 3
@@ -191,7 +195,7 @@ func _inventory_navigation(key: int) -> void:
 		KEY_M: show_map()
 		KEY_G: player.material_wheel.open()
 func show_valley_pause() -> void:
-	ui.show_panel("灰河谷 · 系统菜单","世界持续运行，打开界面仍可能受伤。野外连续行走，遗迹沿实际入口往返。M只记录亲自到过的地点。\n\n撤回镇中需现场站定3秒，移动、攻击、施法或受伤打断；不治疗、不补货。F5保存当前地点与进度，F9读取。已击败敌人和永久成果保留。",[{"title":"继续旅程","callback":ui.close_modal},{"title":"重新开始灰河谷","callback":confirm_new_journey},{"title":"查看行路图","callback":show_map},{"title":"现场撤回河谷镇","disabled":is_at_base(),"callback":retreat.begin},{"title":"重试遗迹（无击杀奖励）","disabled":not can_practice(),"callback":progress_service.practice_encounters},{"title":"重置河谷遭遇（无击杀奖励）","callback":replay_encounters},{"title":"旧监狱验证场（独立存档）","callback":open_prototype}])
+	ui.show_panel("灰河谷 · 系统菜单","世界持续运行，打开界面仍可能受伤。野外连续行走，遗迹沿实际入口往返。M只记录亲自到过的地点。\n\n返程需先脱离危险，再选择备粮或较慢的徒步求援；完成时推进实际行程时间，消耗补给或增加疲劳。败退可能将旅行背包留在原地，可亲自回收。F5保存当前地点与进度，F9读取。已击败敌人和永久成果保留。",[{"title":"继续旅程","callback":ui.close_modal},{"title":"重新开始灰河谷","callback":confirm_new_journey},{"title":"查看行路图","callback":show_map},{"title":"现场撤回河谷镇","disabled":is_at_base(),"callback":retreat.begin},{"title":"重试遗迹（无击杀奖励）","disabled":not can_practice(),"callback":progress_service.practice_encounters},{"title":"重置河谷遭遇（无击杀奖励）","callback":replay_encounters},{"title":"旧监狱验证场（独立存档）","callback":open_prototype}])
 func replay_encounters() -> void:
 	if trial_recorder.active: trial_recorder.finish("重置河谷遭遇")
 	ui.close_modal()
@@ -217,6 +221,7 @@ func open_prototype() -> void:
 	get_tree().change_scene_to_file("res://mvp.tscn")
 
 func _change_region(destination: String, arrival: Vector2 = Vector2.INF) -> void:
+	retreat.distance_query=func():return player.position.distance_to(rules.expedition.base_point) if region_id=="camp" else guidance.overworld_point(region_id).distance_to(rules.expedition.base_point)
 	for id in GrayriverStories.PEOPLE:
 		if progress.claims.has(id):
 			var person: Dictionary=GrayriverStories.PEOPLE[id]

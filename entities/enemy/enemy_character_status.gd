@@ -22,6 +22,7 @@ func _process(delta: float) -> void:
 	var in_combat:=not actor.story_truce and physical and (not partial.is_empty() or buffs.has_buff("burning") or buffs.has_buff("poison") or physical.busy() or physical.guarding or is_instance_valid(actor.player) and actor.player.actor_context and (actor.player.actor_context.actions.busy() or actor.player.actor_context.actions.guarding or actor.player.actor_context.actions.counter_remaining>0))
 	_label.position.y=-76 if in_combat else -98
 	_label.text=actor.enemy_name
+	if actor.actor_context and actor.actor_context.awareness:_label.text+="\n"+actor.actor_context.awareness.caption()
 	for id in partial:
 		var buildup: Dictionary=partial[id]
 		var definition:=WeaponEnchantment.definition(id)
