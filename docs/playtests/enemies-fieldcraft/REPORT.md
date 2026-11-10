@@ -25,7 +25,7 @@
 
 - `fieldcraft`：书中断/完成/重复、课程先修/付款、原工具UID锁定、受伤中断、满包失败、普通搜刮隔离、有限部位、三种制造、冷重进、日志地图待取投影。
 - `enemy_diversity`：天生连段、无伪造装备、有限8支箭离弦消费/空袋撤退、死亡余量、重杖UID回收/玩家共同规则。
-- `fieldcraft_input`、`enemy_diversity_input`：实际键鼠与正常AI，覆盖上述图形流程。头部几何/位置与初始武器、加工灰烬、学费为受控设置；不是全程徒步新档通关。
+- `fieldcraft_input`、`enemy_diversity_input`：实际键鼠与正常AI，覆盖上述图形流程。场地、位置、初始长矛、加工灰烬和学费为受控设置；不是全程徒步新档通关。
 - `save_sections_game`：仓库中的实际历史旧档可迁移，未凭空学会专业技艺。
 - 完整回归从提交的 `git archive` 导出且不带 `.godot` 缓存的副本执行，结果在完成后记录于此。
 - GitHub Actions 保持停用，云端运行测试。
