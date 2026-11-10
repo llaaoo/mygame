@@ -1,0 +1,23 @@
+{
+  "content": [
+    {
+      "text": "{\"expression\":\"{\\\"growth\\\":ui.modal.get_meta(\\\"character_progression\\\",false),\\\"paused\\\":get_tree().paused,\\\"clock\\\":session.inventory.clock_seconds}\",\"node_path\":\"/root/MCPInspection\",\"refresh_result\":{\"sessions_updated\":1,\"status\":\"success\"},\"status\":\"success\",\"value\":{\"clock\":53.0617223333333,\"growth\":true,\"paused\":false}}",
+      "type": "text"
+    }
+  ],
+  "isError": false,
+  "structuredContent": {
+    "expression": "{\"growth\":ui.modal.get_meta(\"character_progression\",false),\"paused\":get_tree().paused,\"clock\":session.inventory.clock_seconds}",
+    "node_path": "/root/MCPInspection",
+    "refresh_result": {
+      "sessions_updated": 1,
+      "status": "success"
+    },
+    "status": "success",
+    "value": {
+      "clock": 53.0617223333333,
+      "growth": true,
+      "paused": false
+    }
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "content": [
+    {
+      "text": "{\"arguments\":[\"archive-71426a8-fresh\"],\"method_name\":\"query_profile\",\"node_path\":\"/root/MCPInspection\",\"refresh_result\":{\"sessions_updated\":1,\"status\":\"success\"},\"result\":{\"enemies\":24,\"has_focus\":false,\"interactables\":95,\"max_fps\":0,\"nodes\":2549.0,\"normal_ai\":true,\"queries\":{\"all_enemy_visibility\":{\"calls\":5,\"total_usec\":342},\"enemy_navigation\":{\"calls\":5,\"total_usec\":575},\"interaction_focus_sweep\":{\"calls\":5,\"total_usec\":325},\"inventory_weight\":{\"calls\":5,\"total_usec\":29},\"progression\":{\"calls\":5,\"total_usec\":193},\"spell_preview\":{\"calls\":5,\"total_usec\":1223}},\"sample_id\":\"archive-71426a8-fresh\"},\"status\":\"success\"}",
+      "type": "text"
+    }
+  ],
+  "isError": false,
+  "structuredContent": {
+    "arguments": [
+      "archive-71426a8-fresh"
+    ],
+    "method_name": "query_profile",
+    "node_path": "/root/MCPInspection",
+    "refresh_result": {
+      "sessions_updated": 1,
+      "status": "success"
+    },
+    "result": {
+      "enemies": 24,
+      "has_focus": false,
+      "interactables": 95,
+      "max_fps": 0,
+      "nodes": 2549.0,
+      "normal_ai": true,
+      "queries": {
+        "all_enemy_visibility": {
+          "calls": 5,
+          "total_usec": 342
+        },
+        "enemy_navigation": {
+          "calls": 5,
+          "total_usec": 575
+        },
+        "interaction_focus_sweep": {
+          "calls": 5,
+          "total_usec": 325
+        },
+        "inventory_weight": {
+          "calls": 5,
+          "total_usec": 29
+        },
+        "progression": {
+          "calls": 5,
+          "total_usec": 193
+        },
+        "spell_preview": {
+          "calls": 5,
+          "total_usec": 1223
+        }
+      },
+      "sample_id": "archive-71426a8-fresh"
+    },
+    "status": "success"
+  }
+}

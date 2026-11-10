@@ -28,6 +28,8 @@ python3 tools/godot_mcp.py --timeout 45 call audit_project_health \
 
 `enable`仅调用本地插件的工具状态接口，并重新检查工具列表；不改变游戏知识、权限、库存或项目规则。连接状态与工具真实可用性分开判断。若本地桥启用了认证，用环境变量`GODOT_MCP_TOKEN`提供令牌，不把令牌写进仓库或截图。
 
+插件默认限流是每60秒100个RPC请求，包含初始化、schema发现和待返回轮询。连续批量审查可能触发`Rate limit exceeded`；客户端会明确报错，不自动重放操作。等待窗口恢复后，只重新提出已确认安全的查询；修改类请求须先检查实际结果。批量脚本可复用`tools.godot_mcp.Client`的连接握手，仍通过`call`读取实际schema与检查失败。
+
 ## 运行真实世界，隔离正式存档
 
 ```sh
