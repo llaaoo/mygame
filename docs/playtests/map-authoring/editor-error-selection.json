@@ -1,0 +1,78 @@
+{
+  "buttons": [
+    {
+      "disabled": false,
+      "rect": [
+        884.5,
+        109.5,
+        260.0,
+        26.0
+      ],
+      "text": "默认入口"
+    },
+    {
+      "disabled": false,
+      "rect": [
+        884.5,
+        138.5,
+        260.0,
+        26.0
+      ],
+      "text": "保存并检查当前地图"
+    },
+    {
+      "disabled": false,
+      "rect": [
+        884.5,
+        167.5,
+        260.0,
+        26.0
+      ],
+      "text": "检查灰河谷地图目录"
+    },
+    {
+      "disabled": false,
+      "rect": [
+        884.5,
+        196.5,
+        260.0,
+        26.0
+      ],
+      "text": "保存并试玩当前地图"
+    }
+  ],
+  "dock_tab": [
+    1069.0,
+    33.0,
+    64.0,
+    27.0
+  ],
+  "errors": [
+    {
+      "rect": [
+        890.5,
+        257.5,
+        248.0,
+        19.0
+      ],
+      "text": "res://content/maps/grayriver/town_sites.tscn::进入灰苇客栈: Door arrival blocked by furniture: river_inn"
+    },
+    {
+      "rect": [
+        890.5,
+        276.5,
+        248.0,
+        19.0
+      ],
+      "text": "<unsaved content>: res://content/maps/grayriver/inn.tscn::默认入口落点: Default spawn is outside bounds or blocked"
+    }
+  ],
+  "labels": [
+    "场景节点摆放 · 命名落点 · 原生碰撞与导航\n点击检查结果可定位到对应场景节点。",
+    "发现2项问题。"
+  ],
+  "scene": "res://content/maps/grayriver/inn.tscn",
+  "selected": [
+    "默认入口落点"
+  ]
+}

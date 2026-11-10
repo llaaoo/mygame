@@ -1,0 +1,120 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:364)
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+⏰ WorldTime 启动: 08:00
+🏛️ GameRuntime: 五大 Runtime 初始化完成
+   CommandBus       : ✅
+   CombatExecutor   : ✅
+   CombatEventBus   : ✅
+   WorldRuntime     : ✅
+   SimulationRuntime: ✅
+   WorldTime        : ✅
+⚡ 已注册触发效果: OnKillBonusExp
+📊 CombatDebugger: trace enabled
+⏰ 08:00 (☀️ 白天)
+SaveManager: saved user://save_3.sav
+FIRST30 1.0 click  pos=(-3700.0, 2100.0) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 2.0 walk  pos=(-3509.431, 2351.069) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 3.0 key  pos=(-3509.431, 2351.069) hp=100
+FIRST30 4.0 click  pos=(-3509.431, 2351.069) hp=100
+FIRST30 5.0 walk  pos=(-3851.214, 2304.399) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 6.0 key  pos=(-3851.214, 2304.399) hp=100
+FIRST30 7.0 click  pos=(-3851.214, 2304.399) hp=100
+FIRST30 8.0 walk  pos=(-3766.596, 2514.182) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 9.0 key  pos=(-3766.596, 2514.182) hp=100
+FIRST30 10.0 click  pos=(-3766.596, 2514.182) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 11.0 walk  pos=(-3856.047, 3010.241) hp=100
+FIRST30 12.0 walk  pos=(-4102.328, 2958.739) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 13.0 key  pos=(0.0, 280.0) hp=100
+FIRST30 14.0 walk  pos=(-97.50362, 80.27457) hp=100
+FIRST30 15.0 walk  pos=(-396.7818, 103.6091) hp=100
+FIRST30 16.0 walk  pos=(-393.8363, 200.0546) hp=100
+FIRST30 17.0 walk  pos=(-513.8927, 200.0546) hp=100
+FIRST30 18.0 key  pos=(-513.8927, 200.0546) hp=100
+FIRST30 19.0 click  pos=(-513.8927, 200.0546) hp=100
+FIRST30 20.0 click  pos=(-513.8927, 200.0546) hp=100
+FIRST30 21.0 click  pos=(-513.8927, 200.0546) hp=100
+FIRST30 22.0 click  pos=(-513.8927, 200.0546) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 23.0 click  pos=(-513.8927, 200.0546) hp=100
+FIRST30 24.0 click  pos=(-513.8927, 200.0546) hp=100
+FIRST30 25.0 click  pos=(-513.8927, 200.0546) hp=100
+FIRST30 26.0 capture  pos=(-513.8927, 200.0546) hp=100
+FIRST30 27.0 key  pos=(-513.8927, 200.0546) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 28.0 walk  pos=(-346.6145, 207.8327) hp=100
+FIRST30 29.0 walk  pos=(-346.6145, -100.1673) hp=100
+FIRST30 30.0 walk  pos=(-451.1145, -100.1673) hp=100
+FIRST30 31.0 key  pos=(-451.1145, -100.1673) hp=100
+FIRST30 32.0 key  pos=(-451.1145, -100.1673) hp=100
+⏰ 09:00 (☀️ 白天)
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+FIRST30 33.0 wait  pos=(-451.1145, -100.1673) hp=100
+FIRST30 34.0 walk  pos=(-349.9979, 93.11452) hp=100
+FIRST30 35.0 walk  pos=(-146.4979, 93.11452) hp=100
+FIRST30 36.0 walk  pos=(-146.4979, -82.88549) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 37.0 walk  pos=(160.2821, -19.04916) hp=100
+FIRST30 38.0 key  pos=(160.2821, -19.04916) hp=100
+FIRST30 39.0 click  pos=(160.2821, -19.04916) hp=100
+FIRST30 40.0 click  pos=(160.2821, -19.04916) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 41.0 click  pos=(160.2821, -19.04916) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 42.0 click  pos=(160.2821, -19.04916) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 43.0 click  pos=(160.2821, -19.04916) hp=100
+FIRST30 44.0 click  pos=(160.2821, -19.04916) hp=100
+FIRST30 45.0 click  pos=(160.2821, -19.04916) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 46.0 click  pos=(160.2821, -19.04916) hp=100
+FIRST30 47.0 capture  pos=(160.2821, -19.04916) hp=100
+FIRST30 48.0 key  pos=(160.2821, -19.04916) hp=100
+FIRST30 49.0 walk  pos=(297.7821, -19.04916) hp=100
+FIRST30 50.0 walk  pos=(297.7821, 299.9509) hp=100
+FIRST30 51.0 walk  pos=(5.223934, 350.5092) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 52.0 key  pos=(-4100.0, 2960.0) hp=100
+FIRST30 53.0 walk  pos=(-3842.995, 2991.113) hp=100
+FIRST30 54.0 walk  pos=(-3854.663, 1747.446) hp=100
+FIRST30 55.0 walk  pos=(-4261.618, 1611.329) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 56.0 key  pos=(0.0, 280.0) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 57.0 walk  pos=(-311.1271, -80.62702) hp=100
+FIRST30 58.0 key  pos=(-311.1271, -80.62702) hp=100
+FIRST30 59.0 click  pos=(-311.1271, -80.62702) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 60.0 click  pos=(-311.1271, -80.62702) hp=100
+FIRST30 61.0 capture  pos=(-311.1271, -80.62702) hp=100
+FIRST30 62.0 key  pos=(-311.1271, -80.62702) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 63.0 walk  pos=(3.889092, 340.7764) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 64.0 key  pos=(-4250.0, 1610.0) hp=100
+⏰ 10:00 (☀️ 白天)
+SaveManager: saved user://save_3.sav
+FIRST30 65.0 walk  pos=(-2900.461, 2994.412) hp=100
+FIRST30 66.0 walk  pos=(-2542.338, 2812.289) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 67.0 key  pos=(0.0, 280.0) hp=100
+FIRST30 68.0 walk  pos=(-194.4544, -61.61988) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 69.0 key  pos=(-194.4544, -61.61988) hp=100
+FIRST30 70.0 click  pos=(-194.4544, -61.61988) hp=100
+FIRST30 71.0 key  pos=(-194.4544, -61.61988) hp=100
+FIRST30 72.0 click  pos=(-194.4544, -61.61988) hp=100
+FIRST30 73.0 click  pos=(-194.4544, -61.61988) hp=100
+FIRST30 74.0 key  pos=(-194.4544, -61.61988) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 75.0 save  pos=(-194.4544, -61.61988) hp=100
+FIRST30 76.0 quit  pos=(-194.4544, -61.61988) hp=100

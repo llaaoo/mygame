@@ -1,0 +1,9 @@
+{
+  "map_plugin_enabled": false,
+  "setup": "Controlled EditorInterface marker selection, not a native input acceptance test",
+  "selected": [
+    "默认入口落点"
+  ],
+  "editor_exit": -6,
+  "result": "Native editor shutdown failed while script documentation was unfinished; not counted as a successful test"
+}
