@@ -1,5 +1,4 @@
 extends SceneTree
-const Awake=preload("res://tests/support/awakened_actor_fixture.gd")
 ## End-to-end T1 checks using the real player, executor, physics and mana components.
 
 class DamageTarget extends CharacterBody2D:
@@ -27,7 +26,7 @@ func _run() -> void:
 	player.global_position = Vector2(12000, 12000)
 	player.mana_component.mp_regen_rate = 0
 	player.health_component.regen_rate = 0
-	_check(Awake.awaken(player),"Fire transaction fixture requires explicit awakened eligibility")
+	_check(player.mana_component.magic_state.awakened,"Standalone prison fixture must retain its existing spell qualification")
 	player.mana_component.max_mp = 200
 	player.mana_component.mp = 200
 	var sm: SkillManager = player.skill_manager

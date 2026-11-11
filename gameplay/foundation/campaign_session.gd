@@ -186,6 +186,7 @@ func bind_actor(actor: CharacterBody2D,id: String,legacy_counts: Dictionary = {}
 		if not actor.skill_manager.binding_changed.is_connected(actor.input_controller.shortcut_changed): actor.skill_manager.binding_changed.connect(actor.input_controller.shortcut_changed)
 	return context
 func _restore_actor(actor: CharacterBody2D,record: Dictionary) -> void:
+	var mana:=actor.get_node_or_null("ManaComponent") as ManaComponent
 	var saved_magic: Dictionary=record.get("magic",{})
 	actor.actor_context.magic.deserialize_save_data(saved_magic)
 	# Missing magic belongs to a real old actor record, including old zero-MP
@@ -193,7 +194,9 @@ func _restore_actor(actor: CharacterBody2D,record: Dictionary) -> void:
 	if not record.has("magic"):
 		var legacy:=ActorMagicState.new()
 		actor.actor_context.magic.deserialize_save_data(legacy.serialize_save_data())
-	ActorCombatModel.rebuild(actor)
+	# Only shared attribute bodies own this capacity projection, as in bind_actor.
+	# Legacy preset enemies/bosses keep their encounter-authored HP/damage/speed.
+	if mana:ActorCombatModel.rebuild(actor)
 	if record.get("position") is Array: actor.position=Vector2(float(record.position[0]),float(record.position[1]))
 	if "story_truce" in actor: actor.story_truce=bool(record.get("truce",actor.story_truce))
 	actor.actor_context.actions.stamina.restore(record.get("stamina",{}))
@@ -214,7 +217,6 @@ func _restore_actor(actor: CharacterBody2D,record: Dictionary) -> void:
 	actor.actor_context.martial.restore(record.get("martial",{}))
 	var health:=actor.get_node("HealthComponent") as HealthComponent
 	health.hp=clampi(int(record.get("hp",health.hp)),1,health.max_hp)
-	var mana:=actor.get_node_or_null("ManaComponent") as ManaComponent
 	if mana: mana.mp=clampi(int(record.get("mp",mana.mp)),0,mana.max_mp)
 
 func restore_actor_state(actor: CharacterBody2D) -> void:

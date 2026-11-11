@@ -6,6 +6,14 @@ func check(ok: bool,message: String) -> void:
  if not ok: errors.append(message); push_error(message)
 func frames(n:=3) -> void:
  for i in range(n): await process_frame
+func check_preset_boss(game: GrayriverGame,expected_hp: int,stage: String) -> Enemy:
+ var boss:=game.session.actor_for_id("river.enemy.river_prison.river_prison.3") as Enemy
+ check(is_instance_valid(boss),"Missing preset prison boss: "+stage)
+ if not is_instance_valid(boss): return null
+ check(boss.character_definition==null and boss.get_node_or_null("ManaComponent")==null,"Preset boss acquired a shared body template/capability: "+stage)
+ check(boss.max_hp==280 and boss.health_component.max_hp==280 and boss.attack_damage==15 and is_equal_approx(boss.move_speed,90),"Preset boss lost its encounter-authored HP/damage/speed: "+stage)
+ check(boss.health_component.hp==expected_hp,"Preset boss lost its actual wounded HP: "+stage)
+ return boss
 func run() -> void:
  var fixture:=Fixture.new(self)
  var game:=await fixture.boot(true)
@@ -72,6 +80,10 @@ func run() -> void:
  Input.parse_input_event(key)
  game.ui.close_modal()
  await fixture.travel("river_prison")
+ var preset_boss:=check_preset_boss(game,280,"first visit")
+ if is_instance_valid(preset_boss):
+  preset_boss.take_damage(40)
+  check(preset_boss.health_component.hp==240,"Preset boss fixture did not take real damage")
  var veteran:=game.stories.actors["river.enemy.river_prison.veteran"] as Enemy
  game.player.position=veteran.position
  check(not game.stories.act(veteran,"surrender"),"Healthy veteran surrendered without condition")
@@ -112,12 +124,14 @@ func run() -> void:
  game=await fixture.boot(true)
  check(game.progress.tracked_quest=="river_road_people" and not game.progress.waypoint.is_empty(),"Tracking preferences lost on reload")
  await fixture.travel("river_prison")
+ check_preset_boss(game,240,"cold save/reentry")
  veteran=game.stories.actors["river.enemy.river_prison.veteran"]
  check(veteran.story_truce and veteran.health_component.hp==1 and not game.active_enemies.has(veteran),"Reload forgot wounded survivor or peace")
  game.player.position=veteran.position
  check(game.stories.act(veteran,"fight"),"Survivor could not be deliberately antagonized")
  await fixture.travel("camp")
  await fixture.travel("river_prison")
+ check_preset_boss(game,240,"region return after betrayal")
  veteran=game.stories.actors["river.enemy.river_prison.veteran"]
  check(not veteran.story_truce and not veteran.rewards_enabled and game.active_enemies.has(veteran),"Betrayal reload restored rewards or lost hostility")
  await fixture.close()
