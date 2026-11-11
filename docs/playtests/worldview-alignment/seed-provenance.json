@@ -1,0 +1,12 @@
+{
+  "seeded_checkpoint": true,
+  "fresh_journey": false,
+  "source": "/workspace/worldview-validation-recovered/native/accept-before-fix/worldview-safe-pre-fix-save.sav",
+  "source_bytes": 127004,
+  "source_sha256": "803ea5b41069666c43cc54ddbc29465a8d1964d62145588ebcff4aba07ff4fae",
+  "target": "/workspace/worldview-validation-recovered/native-final/data/godot/app_userdata/Study/save_3.sav",
+  "target_prelaunch_sha256": "803ea5b41069666c43cc54ddbc29465a8d1964d62145588ebcff4aba07ff4fae",
+  "copied_utc": "2026-11-11T14:30:22.812174+00:00",
+  "origin": "Actual F5 checkpoint written by the prior normal-input newly generated journey; unawakened at archive trial site, trial complete, acceptance not paid.",
+  "note": "Byte-for-byte checkpoint restore explicitly authorized. No inventory/attributes/knowledge/claims edited. Runner itself never copies seeds, so its seed_copied=false describes the runner operation only, not this external preparation."
+}

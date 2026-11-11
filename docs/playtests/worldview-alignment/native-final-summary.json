@@ -1,0 +1,375 @@
+{
+  "schema": 1,
+  "created_utc": "2026-11-11T14:34:32.924271+00:00",
+  "base": "/workspace/worldview-validation-recovered/native-final",
+  "status": "Final-version seeded native acceptance and cold restart completed; both engines/Xorg exited before parent final regression.",
+  "source": {
+    "head": "0737c7cc39629bfe0d53dd290b41860f030a5103",
+    "production_fix_commit": "df9d24a",
+    "native_from_git_archive": false,
+    "clean_worktree_at_launch": true
+  },
+  "seeded_checkpoint": true,
+  "fresh_new_game": false,
+  "seed_provenance": "seed-provenance.json",
+  "seed_restore_comparison": "seed-restoration-comparison.json",
+  "runner_seed_flag_scope": "Runner launch.seed_copied=false only means the runner itself did not copy a seed. This orchestrator explicitly restored the recorded genuine checkpoint beforehand; never use that runner field to claim an empty/no-seed journey.",
+  "phases": {
+    "accept": {
+      "launch": "accept/launch.json",
+      "revision": "0737c7cc39629bfe0d53dd290b41860f030a5103",
+      "dirty_files": [],
+      "exit_code": 0,
+      "driver_error": null,
+      "ready": "accept/ready.json",
+      "result": "accept/result.json",
+      "requests": 30.0,
+      "probe_active_seconds": 34.014361,
+      "ready_to_end_wall_seconds": 34.356584,
+      "errors": [],
+      "warnings": [
+        "WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver."
+      ],
+      "normal_ai_in_all_command_samples": true
+    },
+    "resume": {
+      "launch": "resume/launch.json",
+      "revision": "0737c7cc39629bfe0d53dd290b41860f030a5103",
+      "dirty_files": [],
+      "exit_code": 0,
+      "driver_error": null,
+      "ready": "resume/ready.json",
+      "result": "resume/result.json",
+      "requests": 3.0,
+      "probe_active_seconds": 0.836417333333333,
+      "ready_to_end_wall_seconds": 0.708624,
+      "errors": [],
+      "warnings": [
+        "WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver."
+      ],
+      "normal_ai_in_all_command_samples": true
+    }
+  },
+  "assistance": "Known-route keyboard/pointer automation, normal AI settings; cleared checkpoint area, no new combat. No direct domain completion calls, grants, numeric writes, teleport cheats or frozen actors. Audio Dummy. Not blind/human reaction/balance/demo-duration evidence.",
+  "before_accept": {
+    "snapshot": "accept/step_0003.json",
+    "magic": {
+      "aptitude": true,
+      "awakened": false,
+      "hp_cost": 0,
+      "legacy_exempt": false,
+      "mana_base": 60,
+      "schema": 1,
+      "source_id": "",
+      "stamina_cost": 0.0
+    },
+    "player": {
+      "art_window": {},
+      "attacks": 0,
+      "base": false,
+      "channel_source": "",
+      "charge_source": "",
+      "counter_remaining": 0.0,
+      "damage_taken": 0,
+      "dead": false,
+      "guarding": false,
+      "health_decreases": 0,
+      "hp": 100,
+      "max_hp": 100,
+      "max_mp": 0,
+      "max_stamina": 100.0,
+      "mode": "idle",
+      "mp": 0,
+      "position": [
+        -784.998107910156,
+        -486.001922607422
+      ],
+      "stamina": 100.0,
+      "ui_blocked": false
+    },
+    "magic_events": [],
+    "accepted_claim": false,
+    "notice": ""
+  },
+  "interrupted_acceptance": {
+    "snapshot": "accept/step_0009.json",
+    "magic": {
+      "aptitude": true,
+      "awakened": false,
+      "hp_cost": 0,
+      "legacy_exempt": false,
+      "mana_base": 60,
+      "schema": 1,
+      "source_id": "",
+      "stamina_cost": 0.0
+    },
+    "player": {
+      "art_window": {},
+      "attacks": 0,
+      "base": false,
+      "channel_source": "",
+      "charge_source": "",
+      "counter_remaining": 0.0,
+      "damage_taken": 0,
+      "dead": false,
+      "guarding": false,
+      "health_decreases": 0,
+      "hp": 100,
+      "max_hp": 100,
+      "max_mp": 0,
+      "max_stamina": 100.0,
+      "mode": "idle",
+      "mp": 0,
+      "position": [
+        -784.998107910156,
+        -623.501953125
+      ],
+      "stamina": 100.0,
+      "ui_blocked": false
+    },
+    "magic_events": [],
+    "accepted_claim": false,
+    "notice": "开始其他动作"
+  },
+  "accepted_once": {
+    "snapshot": "accept/step_0014.json",
+    "magic": {
+      "aptitude": true,
+      "awakened": true,
+      "hp_cost": 10,
+      "legacy_exempt": false,
+      "mana_base": 60,
+      "schema": 1,
+      "source_id": "awakening.archive",
+      "stamina_cost": 10.0
+    },
+    "player": {
+      "art_window": {},
+      "attacks": 0,
+      "base": false,
+      "channel_source": "",
+      "charge_source": "",
+      "counter_remaining": 0.0,
+      "damage_taken": 0,
+      "dead": false,
+      "guarding": false,
+      "health_decreases": 10,
+      "hp": 90,
+      "max_hp": 90,
+      "max_mp": 60,
+      "max_stamina": 90.0,
+      "mode": "idle",
+      "mp": 0,
+      "position": [
+        -784.998107910156,
+        -491.501953125
+      ],
+      "stamina": 90.0,
+      "ui_blocked": false
+    },
+    "magic_events": [
+      {
+        "data": {
+          "hp_cost": 10,
+          "mana_base": 60,
+          "source": "awakening.archive",
+          "stamina_cost": 10.0
+        },
+        "kind": "magic_awakened",
+        "t": 8.06346399999998
+      }
+    ],
+    "accepted_claim": true,
+    "notice": "觉醒完成：永久代价已结算，基础法力容量已开启；当前法力会逐渐恢复，重复调查不会再次扣除。"
+  },
+  "repeat_inspection": {
+    "snapshot": "accept/step_0016.json",
+    "magic": {
+      "aptitude": true,
+      "awakened": true,
+      "hp_cost": 10,
+      "legacy_exempt": false,
+      "mana_base": 60,
+      "schema": 1,
+      "source_id": "awakening.archive",
+      "stamina_cost": 10.0
+    },
+    "player": {
+      "art_window": {},
+      "attacks": 0,
+      "base": false,
+      "channel_source": "",
+      "charge_source": "",
+      "counter_remaining": 0.0,
+      "damage_taken": 0,
+      "dead": false,
+      "guarding": false,
+      "health_decreases": 10,
+      "hp": 90,
+      "max_hp": 90,
+      "max_mp": 60,
+      "max_stamina": 90.0,
+      "mode": "idle",
+      "mp": 0,
+      "position": [
+        -784.998107910156,
+        -491.501953125
+      ],
+      "stamina": 90.0,
+      "ui_blocked": false
+    },
+    "magic_events": [
+      {
+        "data": {
+          "hp_cost": 10,
+          "mana_base": 60,
+          "source": "awakening.archive",
+          "stamina_cost": 10.0
+        },
+        "kind": "magic_awakened",
+        "t": 8.06346399999998
+      }
+    ],
+    "accepted_claim": true,
+    "notice": "觉醒完成：永久代价已结算，基础法力容量已开启；当前法力会逐渐恢复，重复调查不会再次扣除。"
+  },
+  "spell_commits": [
+    {
+      "action": "ignite",
+      "charge_power": 1.0,
+      "materials": {},
+      "mp_after": 55,
+      "mp_cost": 4,
+      "position": [
+        -784.998107910156,
+        -491.501953125
+      ],
+      "result": "ignite",
+      "rule": "",
+      "t": 29.7555555555555
+    },
+    {
+      "action": "inscribe",
+      "charge_power": 1.0,
+      "materials": {
+        "fire_stone": 1
+      },
+      "mp_after": 47,
+      "mp_cost": 8,
+      "position": [
+        -784.998107910156,
+        -491.501953125
+      ],
+      "result": "inscribe",
+      "rule": "",
+      "t": 31.9767439999999
+    },
+    {
+      "action": "ignite",
+      "charge_power": 1.0,
+      "materials": {},
+      "mp_after": 35,
+      "mp_cost": 12,
+      "position": [
+        -784.998107910156,
+        -491.501953125
+      ],
+      "result": "fireball",
+      "rule": "fire_sigil_fireball",
+      "t": 32.9171268571428
+    }
+  ],
+  "fire_stone_before": 3,
+  "fire_stone_after": 2,
+  "final_gear": [
+    {
+      "definition": "river_sabre",
+      "properties": {
+        "coating": {
+          "expires_at": 170.959610666667,
+          "id": "poison_rag"
+        }
+      },
+      "quantity": 1,
+      "uid": "item.31"
+    },
+    {
+      "definition": "river_coat",
+      "properties": {},
+      "quantity": 1,
+      "uid": "item.32"
+    }
+  ],
+  "partial_bottle": [
+    {
+      "definition": "resin_sprayer",
+      "properties": {
+        "doses": 2
+      },
+      "quantity": 1,
+      "uid": "item.124"
+    }
+  ],
+  "final_magic": {
+    "aptitude": true,
+    "awakened": true,
+    "hp_cost": 10,
+    "legacy_exempt": false,
+    "mana_base": 60,
+    "schema": 1,
+    "source_id": "awakening.archive",
+    "stamina_cost": 10.0
+  },
+  "cold_comparison": "cold-final-comparison.json",
+  "all_13_persistent_projections_equal": true,
+  "restored_13_projections_match_checkpoint": true,
+  "mp_saved_ready_final": [
+    35,
+    35,
+    35
+  ],
+  "transient_field_counts": [
+    1,
+    0
+  ],
+  "limits": [
+    "This is an explicitly seeded checkpoint supplement, not a fresh full-route rerun.",
+    "Original normal-AI fights, genuine defeat/rescue/paid rest/pack recovery and mundane completion are evidenced separately under../native at d5c7e6a. Do not relabel them as0737/df9 evidence.",
+    "No new enemy was fought and no food-expiry or actual incoming-damage event was deliberately recreated in this final native supplement. Matching regression/full checks provide that distinct coverage.",
+    "The earlier d5 false-interrupt observation remains a real failure; subsequent fixes and test results do not erase it."
+  ],
+  "save_artifacts": [
+    {
+      "path": "accept/worldview-awakened-final.sav",
+      "bytes": 127616,
+      "sha256": "5f3c4e0960fd67fea8c512ad41e07bd1291fe1edf076f2a58b32fb56ee175f15"
+    },
+    {
+      "path": "final-game-written-save_3.sav",
+      "bytes": 127616,
+      "sha256": "f1ddcb71dbbaf0d27cd44b389a3e489b73003830801a2e9b1663c0d5640470a9"
+    }
+  ],
+  "key_screenshots": [
+    {
+      "path": "accept/worldview-after-fix-before-accept.png",
+      "bytes": 99558,
+      "sha256": "02551788489b393a0884f98b0cd2e77c7e2d4c444303aad761c937c3bb37c343"
+    },
+    {
+      "path": "accept/worldview-13-awakened.png",
+      "bytes": 76857,
+      "sha256": "f4198752d514d419ee3bae655cfe8858bfc2f5962685ac2ab187579bde9024f9"
+    },
+    {
+      "path": "accept/worldview-16-real-material-combo.png",
+      "bytes": 81977,
+      "sha256": "1ca508722c8f9c274115805c688c51cdfb0700e58fd93bae227f438eee1b3153"
+    },
+    {
+      "path": "resume/worldview-17-awakened-cold-resume.png",
+      "bytes": 58581,
+      "sha256": "ed4c4cc473cb40a247502bbe97f4d9aafd8fe3d5b6e0d9be36d37f06d2748984"
+    }
+  ]
+}
