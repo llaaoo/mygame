@@ -1,0 +1,93 @@
+{
+  "schema": 1,
+  "revision": "dedd7702e722ef181f89899899b6663c10a065af",
+  "dirty": true,
+  "godot": "4.6.3.stable.official.7d41c59c4",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "jobs": 2,
+  "timeout": 120.0,
+  "logs": "/tmp/mygame-tests-m1v1vp84",
+  "requested": [
+    "field_work",
+    "fieldcraft",
+    "worldview_journey",
+    "magic_awakening"
+  ],
+  "results": [
+    {
+      "name": "fieldcraft",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 10.147,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_fieldcraft.gd"
+      ],
+      "log": "/tmp/mygame-tests-m1v1vp84/fieldcraft.log",
+      "diagnostic": [],
+      "retained_log": "/workspace/worldview-validation-recovered/field-work-final-logs/fieldcraft.log"
+    },
+    {
+      "name": "magic_awakening",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 11.652,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_magic_awakening.gd"
+      ],
+      "log": "/tmp/mygame-tests-m1v1vp84/magic_awakening.log",
+      "diagnostic": [],
+      "retained_log": "/workspace/worldview-validation-recovered/field-work-final-logs/magic_awakening.log"
+    },
+    {
+      "name": "field_work",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 6.033,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_field_work.gd"
+      ],
+      "log": "/tmp/mygame-tests-m1v1vp84/field_work.log",
+      "diagnostic": [],
+      "retained_log": "/workspace/worldview-validation-recovered/field-work-final-logs/field_work.log"
+    },
+    {
+      "name": "worldview_journey",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 14.068,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_worldview_journey.gd"
+      ],
+      "log": "/tmp/mygame-tests-m1v1vp84/worldview_journey.log",
+      "diagnostic": [],
+      "retained_log": "/workspace/worldview-validation-recovered/field-work-final-logs/worldview_journey.log"
+    }
+  ],
+  "skipped": [],
+  "complete": true,
+  "retained_logs": "/workspace/worldview-validation-recovered/field-work-final-logs"
+}

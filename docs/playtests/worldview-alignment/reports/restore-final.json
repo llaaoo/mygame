@@ -1,0 +1,124 @@
+{
+  "schema": 1,
+  "revision": "df146cea187e80130f2d9a5effed0ef88c51acf8",
+  "dirty": true,
+  "godot": "4.6.3.stable.official.7d41c59c4",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "jobs": 2,
+  "timeout": 120.0,
+  "logs": "/tmp/mygame-tests-njd6jq6_",
+  "requested": [
+    "frontier_expedition",
+    "fire_combinations",
+    "shared_characters",
+    "magic_awakening",
+    "save_sections_game",
+    "worldview_journey"
+  ],
+  "results": [
+    {
+      "name": "shared_characters",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 5.783,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_shared_characters.gd"
+      ],
+      "log": "/tmp/mygame-tests-njd6jq6_/shared_characters.log",
+      "diagnostic": []
+    },
+    {
+      "name": "magic_awakening",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 10.545,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_magic_awakening.gd"
+      ],
+      "log": "/tmp/mygame-tests-njd6jq6_/magic_awakening.log",
+      "diagnostic": []
+    },
+    {
+      "name": "save_sections_game",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 8.541,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_save_sections_game.gd"
+      ],
+      "log": "/tmp/mygame-tests-njd6jq6_/save_sections_game.log",
+      "diagnostic": []
+    },
+    {
+      "name": "frontier_expedition",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 16.982,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_frontier_expedition.gd"
+      ],
+      "log": "/tmp/mygame-tests-njd6jq6_/frontier_expedition.log",
+      "diagnostic": []
+    },
+    {
+      "name": "fire_combinations",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 21.132,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_fire_combinations.gd"
+      ],
+      "log": "/tmp/mygame-tests-njd6jq6_/fire_combinations.log",
+      "diagnostic": []
+    },
+    {
+      "name": "worldview_journey",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 14.055,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_worldview_journey.gd"
+      ],
+      "log": "/tmp/mygame-tests-njd6jq6_/worldview_journey.log",
+      "diagnostic": []
+    }
+  ],
+  "skipped": [],
+  "complete": true
+}

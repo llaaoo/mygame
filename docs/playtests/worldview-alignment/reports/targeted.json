@@ -1,0 +1,253 @@
+{
+  "schema": 1,
+  "revision": "b9a90057b1070a6914e0227ba649c4bdb143579a",
+  "dirty": true,
+  "godot": "4.6.3.stable.official.7d41c59c4",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "jobs": 2,
+  "timeout": 120.0,
+  "logs": "/tmp/mygame-tests-8nftg8lx",
+  "requested": [
+    "content",
+    "maps",
+    "gut_domain",
+    "worldview_journey",
+    "magic_awakening",
+    "mundane_spray_input",
+    "spray_channel",
+    "item_feedback_input",
+    "new_journey",
+    "save_sections_game",
+    "shared_characters",
+    "player_components",
+    "counterplay_input"
+  ],
+  "results": [
+    {
+      "name": "content",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 2.827,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tools/validate_mvp_content.gd"
+      ],
+      "log": "/tmp/mygame-tests-8nftg8lx/content.log",
+      "diagnostic": []
+    },
+    {
+      "name": "maps",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 2.428,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tools/validate_maps.gd"
+      ],
+      "log": "/tmp/mygame-tests-8nftg8lx/maps.log",
+      "diagnostic": []
+    },
+    {
+      "name": "gut_domain",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 3.526,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://addons/gut/gut_cmdln.gd",
+        "-gexit",
+        "-gdisable_colors",
+        "-gjunit_xml_file=/tmp/mygame-tests-8nftg8lx/gut-domain.xml"
+      ],
+      "log": "/tmp/mygame-tests-8nftg8lx/gut_domain.log",
+      "diagnostic": []
+    },
+    {
+      "name": "spray_channel",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 4.833,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_spray_channel.gd"
+      ],
+      "log": "/tmp/mygame-tests-8nftg8lx/spray_channel.log",
+      "diagnostic": []
+    },
+    {
+      "name": "magic_awakening",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 9.81,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_magic_awakening.gd"
+      ],
+      "log": "/tmp/mygame-tests-8nftg8lx/magic_awakening.log",
+      "diagnostic": []
+    },
+    {
+      "name": "save_sections_game",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 9.696,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_save_sections_game.gd"
+      ],
+      "log": "/tmp/mygame-tests-8nftg8lx/save_sections_game.log",
+      "diagnostic": []
+    },
+    {
+      "name": "shared_characters",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 4.929,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_shared_characters.gd"
+      ],
+      "log": "/tmp/mygame-tests-8nftg8lx/shared_characters.log",
+      "diagnostic": []
+    },
+    {
+      "name": "player_components",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 3.175,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_player_components.gd"
+      ],
+      "log": "/tmp/mygame-tests-8nftg8lx/player_components.log",
+      "diagnostic": []
+    },
+    {
+      "name": "worldview_journey",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 14.22,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_worldview_journey.gd"
+      ],
+      "log": "/tmp/mygame-tests-8nftg8lx/worldview_journey.log",
+      "diagnostic": []
+    },
+    {
+      "name": "mundane_spray_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 6.506,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_mundane_spray_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-8nftg8lx/mundane_spray_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "item_feedback_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 18.067,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_item_feedback_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-8nftg8lx/item_feedback_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "new_journey",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 9.97,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_new_journey.gd"
+      ],
+      "log": "/tmp/mygame-tests-8nftg8lx/new_journey.log",
+      "diagnostic": []
+    },
+    {
+      "name": "counterplay_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 12.952,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_counterplay_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-8nftg8lx/counterplay_input.log",
+      "diagnostic": []
+    }
+  ],
+  "skipped": [],
+  "complete": true
+}
