@@ -49,6 +49,9 @@ func _execute(ev: CombatEvent) -> void:
 	if not caster:
 		return
 
+	var actor_mana:=caster.get_node_or_null("ManaComponent") as ManaComponent
+	if actor_mana and not actor_mana.can_cast(skill.requires_magic):return
+
 	var target_pos := _resolve_target_position(ev, caster)
 	var ctx := CastContext.at_position(caster, target_pos, skill)
 

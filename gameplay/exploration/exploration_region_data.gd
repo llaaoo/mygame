@@ -25,6 +25,7 @@ var map_arrival_rules: Dictionary = {}
 @export var surface_patches: Array[SurfacePatchData] = []
 @export var fixed_props: Array[ExplorationPropData] = []
 @export var delivery_sites: Array[DeliverySiteData] = []
+@export var awakening_sites: Array[AwakeningSiteData] = []
 @export var facilities: Array[RepairFacilityData] = []
 @export var survival_stations: Array[SurvivalStationData] = []
 @export var exits: Array[ExplorationExitData] = []
@@ -51,6 +52,7 @@ func interaction_points() -> Array[Resource]:
 	points.append_array(fixed_props)
 	points.append_array(facilities)
 	points.append_array(delivery_sites)
+	points.append_array(awakening_sites)
 	points.append_array(survival_stations)
 	points.append_array(storage)
 	points.append_array(amenities)

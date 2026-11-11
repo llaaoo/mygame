@@ -1,4 +1,5 @@
 extends SceneTree
+const Awake=preload("res://tests/support/awakened_actor_fixture.gd")
 const Fixture := preload("res://tests/support/mvp_fixture.gd")
 var errors: Array[String] = []
 var game: MVPGame
@@ -57,6 +58,7 @@ func probe(spec: SpellPuzzleData) -> SpellWorldObject:
 func _run() -> void:
 	var fixture := Fixture.new(self)
 	game = await fixture.boot(true)
+	check(Awake.awaken(game.player),"Magic-specific fixture could not establish explicit awakened eligibility")
 	GameRuntime.instance.set_process(false)
 	var sm := game.player.skill_manager
 	sm.restrict_actions = false

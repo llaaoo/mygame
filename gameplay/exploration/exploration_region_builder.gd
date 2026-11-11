@@ -133,6 +133,7 @@ func build_element_objects() -> void:
 		node.set_meta("map_amenity",spec.id)
 		if spec.service=="rest": game.survival.mount_rest(node)
 	for spec in game.current_data.delivery_sites: game.deliveries.mount(spec)
+	for spec in game.current_data.awakening_sites: game.awakening.mount(spec)
 	var surfaces := GameRuntime.instance.get_simulation_runtime().get_surface_manager()
 	for facility in game.current_data.facilities: game.alchemy.mount(facility)
 	mount_available_stations()

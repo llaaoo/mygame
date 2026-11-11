@@ -71,6 +71,7 @@ func _run() -> void:
 
 	# Range control must hit both sides and apply the existing frozen status.
 	game.player.global_position = Vector2(12000, 12000)
+	_check(Awake.awaken(game.player),"Spell-content phase requires explicit awakened eligibility")
 	game.player.mana_component.max_mp = 300
 	game.player.mana_component.mp = 300
 	game.player.mana_component.mp_regen_rate = 0

@@ -2,6 +2,7 @@ extends "res://tests/support/input_scene_probe.gd"
 ## Input/transaction fixture: explicit safe position, gear, knowledge and supplies.
 ## All authored AI runs normally; distant placement isolates feedback from combat.
 const Fixture:=preload("res://tests/support/grayriver_fixture.gd")
+const Awake:=preload("res://tests/support/awakened_actor_fixture.gd")
 var notices: Array[String]=[]
 func notice(text: String) -> void:notices.append(text)
 func feedback(fragment: String,before: int) -> void:
@@ -74,14 +75,15 @@ func run() -> void:
 	var action:=manager.pool.get_skill("disperse")
 	var choice: Dictionary={"payload":"water","uid":spray_uid,"modifier":""}
 	var cost:=manager.combinations.preview(action,actor,false,choice).cost
-	actor.mana_component.mp=cost
+	check(cost==0 and not actor.mana_component.can_cast(),"Ordinary spray fixture must be unawakened with zero MP cost")
+	actor.mana_component.mp=0
 	before=notices.size();await key(KEY_E,true)
 	var deadline:=Time.get_ticks_msec()+1500
-	while context.spray.active and Time.get_ticks_msec()<deadline:await frames(1)
+	while int(store.item(spray_uid).properties.doses)==3 and Time.get_ticks_msec()<deadline:await frames(1)
 	await key(KEY_E,false)
-	feedback("法力不足",before)
-	await capture("item-feedback-mana")
-	check(store.item(spray_uid)!=null and int(store.item(spray_uid).properties.doses)==2 and actor.mana_component.mp==0,"Failed second pulse refunded the first or spent another dose")
+	check(notices.size()==before,"Successful zero-mana ordinary spray reported failure")
+	await capture("item-feedback-ordinary-zero-mana")
+	check(store.item(spray_uid)!=null and int(store.item(spray_uid).properties.doses)==2 and actor.mana_component.mp==0,"Ordinary first pulse must consume exactly one dose and no MP")
 	await settle_feedback()
 	actor.mana_component.mp=actor.mana_component.max_mp
 	before=notices.size();await key(KEY_E,true);await key(KEY_E,false)
@@ -134,11 +136,19 @@ func run() -> void:
 	await capture("item-feedback-staggered-skill")
 	check(not context.spray.active and int(store.item(final_uid).properties.doses)==3 and actor.mana_component.mp==start_mp,"Staggered skill-slot spray charged a dose or MP")
 	await settle_feedback()
+	# Missing MP belongs to explicit magical reinforcement, not ordinary water.
+	check(Awake.awaken(actor),"Cannot establish explicit awakened mana-feedback fixture")
+	check(store.receive_into("player.pocket","venom_extract",1)==1,"Missing real magical reinforcement reagent")
+	check(manager.shortcuts.set_selection("slot_0",{"payload":"water","uid":final_uid,"modifier":"venom_extract"}),"Cannot explicitly select magical reinforcement")
+	var reinforced:=manager.combinations.preview(action,actor,false,manager.selection_for_source("slot_0"))
+	check(reinforced.ready and reinforced.requires_magic and reinforced.cost>0,"Mana-feedback fixture must be a valid magical action before depleting MP")
+	var reagent_count:=store.count("player","venom_extract")
 	actor.mana_component.mp=0;before=notices.size()
 	await key(KEY_1,true);await key(KEY_1,false)
 	feedback("法力",before)
-	check(not context.spray.active and int(store.item(final_uid).properties.doses)==3 and actor.mana_component.mp==0,"Skill-manager refusal charged a dose or duplicated the item-slot path")
+	await capture("item-feedback-magic-low-mana")
+	check(not context.spray.active and int(store.item(final_uid).properties.doses)==3 and store.count("player","venom_extract")==reagent_count and actor.mana_component.mp==0,"Skill-manager refusal charged a dose/reagent or duplicated the item-slot path")
 	context.actions.action_refused.disconnect(notice)
 	await fixture.close()
-	if failures.is_empty():print("PASS item feedback input: real Q/E/R/1 and movement/RMB, success and manual-stop silence, single HUD damage/weapon/stamina/mana/source/empty/control/stagger outcomes, exact committed costs; normal distant AI, controlled supply/position/invalidation fixture")
+	if failures.is_empty():print("PASS item feedback input: real Q/E/R/1 and movement/RMB, success and manual-stop silence, single HUD damage/weapon/stamina/source/empty/control/stagger outcomes, zero-MP ordinary spray and exact dose costs; normal distant AI, controlled supply/position/invalidation fixture")
 	quit(0 if failures.is_empty() else 1)

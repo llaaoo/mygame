@@ -17,6 +17,8 @@ extends Resource
 @export var melee_multiplier := 1.0
 @export var health_regen := 0.0
 @export var mana_regen := 2.0
+@export var magic_aptitude := true
+@export var starts_awakened := true
 @export var skills: Array[SkillData] = []
 @export var techniques: Array[String]=[]
 @export var combinations: PackedStringArray = []
@@ -32,6 +34,7 @@ func validation_errors(available_rules: Variant = null) -> Array[String]:
 	if temperament and not temperament.valid(): errors.append("Invalid combat temperament")
 	if body_moveset and not body_moveset.valid(): errors.append("Invalid natural attack moveset")
 	if harvest_profile: errors.append_array(harvest_profile.validation_errors())
+	if starts_awakened and not magic_aptitude: errors.append("Awakened character lacks magic aptitude")
 	if level<1 or level>100: errors.append("Invalid character level")
 	if id.is_empty() or title.is_empty(): errors.append("Missing character id/title")
 	for key in Buff.PRIMARY_STATS:

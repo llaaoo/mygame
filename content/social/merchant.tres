@@ -10,7 +10,7 @@
 script = ExtResource("topic")
 id = "about"
 title = "你在这里做什么？"
-response = "我收购沿路带回来的实物，修整武器，也把木炭和碎料制成箭。卖掉、拆解和强化是三种不同去向，先想好要留什么。"
+response = "我收购沿路带回来的实物，修整武器，也把木炭和碎料制成箭。卖掉、拆解和强化是三种不同去向，先想好要留什么。 匠人敬炉火，也记得工具和原料从哪来；祷词不替你交材料。"
 
 [sub_resource type="Resource" id="trade"]
 script = ExtResource("topic")

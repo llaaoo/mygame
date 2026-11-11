@@ -139,7 +139,7 @@ func _commit() -> void:
 	close_panel()
 	if accepted:
 		work_committed.emit(method)
-		if player.actor_context and not method.id.begins_with("sleep") and not method.id.begins_with("rest") and not method.id.begins_with("eat") and not method.id.begins_with("basic") and not method.id.begins_with("fill") and not method.id.begins_with("harvest") and not method.id.begins_with("cook"):
+		if player.actor_context and not method.id.begins_with("awakening:") and not method.id.begins_with("sleep") and not method.id.begins_with("rest") and not method.id.begins_with("eat") and not method.id.begins_with("basic") and not method.id.begins_with("fill") and not method.id.begins_with("harvest") and not method.id.begins_with("cook"):
 			player.actor_context.facts.publish("field_work",player.actor_context.id,{"method":method.id})
 	else:
 		work_cancelled.emit(method, "操作条件失效")
@@ -186,5 +186,6 @@ func _refresh_panel() -> void:
 	panel.present_work(_title,summary,seconds,cost,reason,guide,1-float(pending.remaining)/float(pending.duration) if not pending.is_empty() else -1.0)
 
 func _efficiency() -> float:
+	if not methods.is_empty() and methods[selected].fixed_duration: return 1.0
 	if not methods.is_empty() and (methods[selected].id.begins_with("rest") or methods[selected].id.begins_with("sleep")): return 1.0
 	return (player.mastery_manager.activity_efficiency(SkillMastery.School.CRAFTING) if player.mastery_manager else 1.0)*float(ActorProgression.values(player).work_multiplier)

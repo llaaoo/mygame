@@ -1,4 +1,5 @@
 extends SceneTree
+const Awake=preload("res://tests/support/awakened_actor_fixture.gd")
 const Fixture=preload("res://tests/support/grayriver_fixture.gd")
 var failures: Array[String]=[]
 class Reject extends SkillExecutor:
@@ -9,6 +10,7 @@ func check(ok: bool,message: String) -> void:
 func run() -> void:
 	var fixture:=Fixture.new(self)
 	var game: GrayriverGame=await fixture.boot()
+	check(Awake.awaken(game.player),"Magic-specific fixture could not establish explicit awakened eligibility")
 	var actor:=game.player
 	var sm:=actor.skill_manager
 	var controller:=sm.combinations
@@ -40,6 +42,7 @@ func run() -> void:
 		controller.clear_field(); controller.cooldowns.clear(); controller._recovery=0
 		actor.get_node("BuffManager").clear_all()
 		actor.get_node("SummonManager").clear_all()
+		actor.mana_component.max_mp=999
 		actor.mana_component.mp=999
 		if entry.source!="material": check(not controller.preview(action,actor).ready,"Invented absent source: "+entry.legacy)
 		var field: FireSigil

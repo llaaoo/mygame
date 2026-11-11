@@ -1,4 +1,5 @@
 extends "res://tests/support/input_scene_probe.gd"
+const Awake=preload("res://tests/support/awakened_actor_fixture.gd")
 ## Real scene transitions and key/mouse events. Sandbox kit/positions are explicitly controlled, AI stays normal.
 const Fixture=preload("res://tests/support/grayriver_fixture.gd")
 func animation_capture(name: String) -> void:
@@ -82,6 +83,7 @@ func run() -> void:
 	await click("素材浏览"); gallery=await wait_scene("gallery") as AnimationGallery
 	await click("03 施法与取消实战"); game=await wait_scene("sandbox") as AnimationSandbox
 	actor=game.player; rig=(actor.get_node("EquipmentVisual") as ActorEquipmentVisual).animator
+	check(Awake.awaken(actor),"Spell animation sandbox requires explicit awakened eligibility")
 	var casts: Array[String]=[]
 	actor.skill_manager.cast_committed.connect(func(plan: CastPlan): casts.append(plan.skill.get_id()))
 	var store:=game.session.inventory; var stones:=store.count("player","fire_stone"); var mana:=actor.mana_component.mp

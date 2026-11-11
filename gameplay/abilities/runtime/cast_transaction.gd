@@ -39,6 +39,7 @@ func _init(actor: Node2D, inventory: CastingSupplies, id: int) -> void:
 		supplies.begin_transaction()
 
 func reserve(plan: CastPlan) -> bool:
+	if mana and not mana.can_cast(plan.requires_magic):return false
 	if plan.soul_remnant != null:
 		if not is_instance_valid(plan.soul_remnant) or not plan.soul_remnant.reserve(plan.soul_revision):
 			return false

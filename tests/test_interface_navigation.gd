@@ -1,4 +1,5 @@
 extends "res://tests/support/input_scene_probe.gd"
+const Awake=preload("res://tests/support/awakened_actor_fixture.gd")
 ## Real menu input in an explicit inventory fixture, with normal AI/simulation.
 const Fixture=preload("res://tests/support/grayriver_fixture.gd")
 var casts:=0
@@ -23,6 +24,7 @@ func right_click(point: Vector2) -> void:
  event=event.duplicate(); event.pressed=false; root.push_input(event,true); await frames()
 func run() -> void:
  var fixture:=Fixture.new(self); game=await fixture.boot(true)
+ check(Awake.awaken(game.player),"Magic-specific fixture could not establish explicit awakened eligibility")
  GameRuntime.instance.set_process(true)
  for foe in game.active_enemies: foe.process_mode=Node.PROCESS_MODE_INHERIT
  game.player.skill_manager.cast_committed.connect(func(_plan): casts+=1)

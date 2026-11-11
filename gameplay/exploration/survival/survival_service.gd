@@ -91,16 +91,25 @@ func timers_line() -> String:
 func status_line() -> String:
 	return "饱食%.0f · 饮水%.0f · 疲劳%.0f%s" % [needs.nutrition, needs.hydration, needs.fatigue, " · 疲惫" if needs.fatigue >= 85 else " · 困倦" if needs.fatigue >= 60 else ""]
 
+func _awakened() -> bool:
+	return game.player.actor_context.magic.awakened
+
+func hydration_hint() -> String:
+	return "饮水不足：清水可改善法力回复。" if _awakened() else "饮水不足：先补充清水。饮水不会使未觉醒者获得魔力。"
+
 func description() -> String:
 	var recovery := needs.recovery()
 	var text := status_line() + "\n\n远征中饱食约每15秒下降1，饮水每10秒下降1；疲劳随时间、施法和近战积累。耐力10以上每点降低2%消耗，最多30%。营地需要消耗为四分之一，不积累时间疲劳。暂停和离线不消耗。\n"
 	text += "饱食或饮水≤20，相应自然回复降为35%；疲劳60/85时准备×1.15/1.25，85时两种自然回复再减半。不会额外扣生命，也不封锁近战、闪避或返程。\n"
-	text += "当前生命自然回复×%.2f、额外%.1f/秒；法力×%.2f、额外%.1f/秒；疲劳准备×%.2f。仍遵守受伤/施法后的原回复延迟。\n" % [recovery.health_multiplier, recovery.health_bonus, recovery.mana_multiplier, recovery.mana_bonus, needs.preparation_multiplier()]
+	if _awakened():
+		text += "当前生命自然回复×%.2f、额外%.1f/秒；法力×%.2f、额外%.1f/秒；疲劳准备×%.2f。仍遵守受伤/施法后的原回复延迟。\n" % [recovery.health_multiplier, recovery.health_bonus, recovery.mana_multiplier, recovery.mana_bonus, needs.preparation_multiplier()]
+	else:
+		text += "当前生命自然回复×%.2f、额外%.1f/秒；疲劳准备×%.2f。尚未觉醒：没有可恢复的法力，吃喝和休息不会授予施法资格。\n" % [recovery.health_multiplier,recovery.health_bonus,needs.preparation_multiplier()]
 	if needs.meal_remaining > 0: text += "食物：%s %.0f秒\n" % [supplies.title(needs.meal), needs.meal_remaining]
 	if needs.water_remaining > 0: text += "饮水恢复：%.0f秒\n" % needs.water_remaining
 	if needs.tea_remaining > 0: text += "醒神茶：%.0f秒\n" % needs.tea_remaining
 	text += "\n水袋共%d/%d份：饮用水%d，未净化水%d。\n" % [SurvivalCatalog.water_count(supplies), SurvivalCatalog.WATER_CAPACITY, supplies.count("clean_water"), supplies.count("dirty_water")]
-	text += "普通魔法水面可洗毒，但不是可随取的饮用水。标记水源才可装水；未净化水需要炭屑过滤并煮沸。冰阻塞取水，电水危险，污染会让清水变浑。回廊排污泵修好后改善原水源。\n\n烹饪可用炭屑，或先对锅旁火位施放火花，借实际燃烧节省燃料。净水仍需1炭屑过滤。营地炉灶常燃。N查看补给，营地篝火主动休整；返营和读档不自动补满。"
+	text += "普通魔法水面可洗毒，但不是可随取的饮用水。标记水源才可装水；未净化水需要炭屑过滤并煮沸。冰阻塞取水，电水危险，污染会让清水变浑。回廊排污泵修好后改善原水源。\n\n烹饪可用炭屑或已有真实火源；已觉醒者也可先以火花点燃锅旁火位，节省燃料。净水仍需1炭屑过滤。营地炉灶常燃。N查看补给，营地篝火主动休整；返营和读档不自动补满。"
 	return text
 
 func show_page() -> void:
@@ -111,10 +120,11 @@ func show_page() -> void:
 	var text := status_line() + "\n" + timers_line() + "\n\n"
 	var demands: Array[String] = []
 	if needs.nutrition <= 20: demands.append("饱食不足：食品可改善生命回复")
-	if needs.hydration <= 20: demands.append("饮水不足：饮水可改善法力回复")
+	if needs.hydration <= 20: demands.append(hydration_hint())
 	if needs.fatigue >= 60: demands.append("疲劳影响准备：茶或休整可缓解")
 	text += "；".join(demands) if not demands.is_empty() else "当前需求稳定，可按下一场遭遇选择补给。"
-	text += "\n额外恢复：生命%.1f/秒，法力%.1f/秒（受原回复延迟约束）。\n使用补给需要站定，移动或受伤会打断，成功才消费。\n\n可用补给\n" % [recovery.health_bonus, recovery.mana_bonus]
+	text += ("\n额外恢复：生命%.1f/秒，法力%.1f/秒（受原回复延迟约束）。" % [recovery.health_bonus,recovery.mana_bonus]) if _awakened() else ("\n额外生命恢复%.1f/秒；尚未觉醒，补给不授予魔力。" % recovery.health_bonus)
+	text += "\n使用补给需要站定，移动或受伤会打断，成功才消费。\n\n可用补给\n"
 	var buttons: Array[Dictionary] = []
 	for id in SurvivalCatalog.FOODS:
 		if supplies.count(id) < 1: continue
@@ -191,8 +201,9 @@ func inspect_rest(node: ExplorationInteractable) -> void:
 	for hours in [1,3,6]:
 		var portions:=ceili(hours/3.0)
 		options.append(method("sleep:%d"%hours,"休息%d小时 · 烤饼%d / 清水%d"%[hours,portions,portions],2.0+hours*.4,{"ration":portions,"clean_water":portions}))
-	options.append(method("basic","营地粗食：饱食、饮水至少60（不恢复生命法力）",2))
-	_open(node,options,WorldTime.instance.stamp()+"。选项按游戏小时推进；准备可中断，成功才扣补给。自然恢复继续推进，另每小时恢复20%生命、25%法力、降低15疲劳；补给维持饱食饮水；食物药效、涂层、采集与服务时段同时推进。敌人附近、燃烧或中毒时不能睡眠。")
+	options.append(method("basic","营地粗食：饱食、饮水至少60（不恢复生命法力）" if _awakened() else "营地粗食：饱食、饮水至少60（不直接恢复生命，不授予魔力）",2))
+	var recovery_text: String="另每小时恢复20%生命、25%法力、降低15疲劳。" if _awakened() else "另每小时恢复20%生命、降低15疲劳；尚未觉醒，没有可恢复的法力，休息不会使人觉醒。"
+	_open(node,options,WorldTime.instance.stamp()+"。选项按游戏小时推进；准备可中断，成功才扣补给。自然恢复继续推进；"+recovery_text+"补给维持饱食饮水；食物药效、涂层、采集与服务时段同时推进。敌人附近、燃烧或中毒时不能睡眠。")
 
 func inspect(node: ExplorationInteractable, spec: SurvivalStationData) -> void:
 	if not _available(node, spec): return

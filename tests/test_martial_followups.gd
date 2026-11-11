@@ -47,6 +47,7 @@ func prime(weapon: String,id: String,hit := true,blocked := false) -> void:
 func run() -> void:
 	var fixture:=Fixture.new(self); game=await fixture.boot(true)
 	actor=game.player; actions=actor.actor_context.actions; target=game.active_enemies[0]
+	check(preload("res://tests/support/awakened_actor_fixture.gd").awaken(actor),"Controlled physical-action MP budget could not initialize")
 	actor.get_node("ActorComponents").process_mode=Node.PROCESS_MODE_DISABLED
 	target.process_mode=Node.PROCESS_MODE_INHERIT; target.set_process(false); target.set_physics_process(false)
 	target.state_chart.process_mode=Node.PROCESS_MODE_DISABLED; target.get_node("ActorComponents").process_mode=Node.PROCESS_MODE_DISABLED

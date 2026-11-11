@@ -5,6 +5,8 @@
 [ext_resource type="Resource" path="res://content/harvesting/crawler.tres" id="harvest"]
 [ext_resource type="Resource" path="res://content/animations/crawler.tres" id="visual"]
 [resource]
+magic_aptitude = false
+starts_awakened = false
 script = ExtResource("data")
 id = "river_crawler"
 title = "沼甲伏兽"

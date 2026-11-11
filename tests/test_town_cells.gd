@@ -24,6 +24,7 @@ func run() -> void:
 	var rejected:=ExplorationContentValidator.new().validate(ExplorationContentCatalog.new(chapter))
 	check(rejected.any(func(message: String): return message.contains("Interaction blocked by geometry")),"Bad authored geometry was silently repaired or accepted")
 	var fixture:=Fixture.new(self); var game:=await fixture.boot(true)
+	check(preload("res://tests/support/awakened_actor_fixture.gd").awaken(game.player),"Controlled cell-travel MP fixture could not awaken")
 	var store:=game.session.inventory
 	for id in ["river_inn","river_workshop","river_records"]:
 		var data:=game.catalog.regions[id] as ExplorationRegionData

@@ -1,4 +1,5 @@
 extends SceneTree
+const Awake=preload("res://tests/support/awakened_actor_fixture.gd")
 const Fixture := preload("res://tests/support/mvp_fixture.gd")
 var errors: Array[String] = []
 func _init() -> void: call_deferred("run")
@@ -11,6 +12,7 @@ func run() -> void:
 	for guarded in [false, true]:
 		var fixture := Fixture.new(self)
 		var game := await fixture.boot()
+		check(Awake.awaken(game.player),"Magic-specific fixture could not establish explicit awakened eligibility")
 		game.progress.choices.waterworks_choice = "cooling"
 		game._change_region("boss")
 		var player := game.player

@@ -26,6 +26,8 @@
 [ext_resource type="Script" path="res://gameplay/exploration/data/spell_puzzle_route.gd" id="24_index_route"]
 [ext_resource type="Script" path="res://gameplay/exploration/data/field_work_method.gd" id="25_index_work"]
 
+[ext_resource type="Resource" path="res://content/awakening/archive.tres" id="26_awakening"]
+
 [sub_resource type="Resource" id="Resource_3k8nr"]
 script = ExtResource("10_0poi7")
 id = "river_archive"
@@ -37,8 +39,8 @@ authored_size = Vector2(2000, 1400)
 script = ExtResource("4_wq16e")
 id = "river.pulse"
 title = "搬运工的震荡记录"
-text = "震荡可以破冰。先观察目标已有状态，普通近战可以保留冻结控制。西侧书架遮挡守卫视线，可在这里整备后选择北侧绕行或南侧正面。东侧受潮压印台先用水引润开，再用震荡松脱；也可付布料1擦拭撬修。火阵要放在有射界的空地；南侧靠墙留有较远的准备位置，书架后射线会被挡住。修好后可从搬运竖井返回林地。原入口始终可以撤退。"
-intro_text = "已掌握震荡。先在西侧书架后整备；北侧可绕行，南侧通正面。东侧压印台可用水引→震荡，或付布料1手工清理，修好后开放返程竖井。火阵选南侧较远空地，留出射界；书架后会挡住火球。原入口始终可撤退。"
+text = "你已记下震荡知识，尚未觉醒时不能施法。西侧书架遮挡守卫视线，可在这里用武器、食物与涂附整备；北侧可绕行，南侧通正面。东侧受潮压印台可付布料1手工擦拭撬修，不要求魔力；已经觉醒者也可水引→震荡。取得名册并修好压印台后，可到西北旧试感台自愿试感，再决定是否接受长期代价；不接受仍可返镇报告。修好后搬运竖井可返回林地，原入口始终可退。火阵仅供已觉醒者使用，须在安全距离留出射界，书架后会挡射线。"
+intro_text = "已记下震荡知识，不等于觉醒。先借西侧书架整备，北侧可绕行；压印台可付布料1手工清理，修好后开放返程竖井。取得名册后，可自愿调查西北旧试感台；试感不扣属性，也不自动觉醒。原入口始终可撤退。"
 reading_margin = 120.0
 actions = Array[String](["pulse"])
 spell_rules = Array[String](["fire_sigil_pulse"])
@@ -84,8 +86,8 @@ metadata/crafting_recipes = []
 script = ExtResource("4_wq16e")
 id = "river.dossier"
 title = "监狱封锁名册"
-text = "水工守卫仍听命于旧监狱的火焰领主。查明工区污染后，可沿北岸或东侧驿道深入。"
-intro_text = "水工守卫仍听命于旧监狱的火焰领主。查明工区污染后，可沿北岸或东侧驿道深入。"
+text = "水工守卫仍听命于旧监狱的火焰领主，名册记录的是封锁命令与实际执勤者，不是解除封锁的新令。查明工区污染后，可沿北岸或东侧驿道深入。背页还记着西北旧试感台：先修好压印台，再自愿试感；试感不等于觉醒，之后可以离开或另行选择接受明确的永久代价。"
+intro_text = "水工守卫仍听命于旧监狱的火焰领主，名册记录的是封锁命令与实际执勤者，不是解除封锁的新令。查明工区污染后，可沿北岸或东侧驿道深入。背页还记着西北旧试感台：先修好压印台，再自愿试感；试感不等于觉醒，之后可以离开或另行选择接受明确的永久代价。"
 requires_clear = true
 metadata/crafting_recipes = []
 
@@ -160,7 +162,7 @@ script = ExtResource("11_xj8ao")
 id = "archive.index_press"
 title = "受潮档案压印台"
 routes = Array[ExtResource("24_index_route")]([SubResource("ArchiveIndexWaterRoute")])
-hint = "旧纸屑与蜡封卡住了压印轴。先用水引润开，再用震荡松脱；也可消耗布料1，站定3秒擦拭撬修。附近守卫仍会打断作业，先借书架分开应对。恢复后，东侧搬运竖井可返回林地；原入口始终开放。"
+hint = "旧纸屑与蜡封卡住了压印轴。普通旅人可消耗布料1，站定3秒擦拭撬修，不需要魔力；已觉醒者也可先用水引润开，再用震荡松脱。附近守卫仍会打断作业，先借书架分开应对。恢复后，东侧搬运竖井可返回林地；原入口始终开放。"
 work_methods = Array[ExtResource("25_index_work")]([SubResource("ArchiveIndexHandwork")])
 completion_text = "压印轴重新转动，东侧搬运竖井已可返回林地。既有名册与物资仍在原处，压印台不额外生成奖励；可以带成果回镇报告并整备下一程。"
 
@@ -283,3 +285,16 @@ form = "door"
 footprint = Vector2(96, 72)
 solid = false
 caption = "搬运竖井"
+
+[node name="旧试感台" type="Node2D" parent="."]
+position = Vector2(-780, -520)
+script = ExtResource("16_xi24o")
+definition = ExtResource("26_awakening")
+
+[node name="旧试感台台面" type="Node2D" parent="."]
+position = Vector2(-780, -520)
+script = ExtResource("22_ihkoh")
+form = "bench"
+footprint = Vector2(88, 56)
+solid = false
+caption = "旧试感台"

@@ -1,4 +1,5 @@
 extends SceneTree
+const Awake=preload("res://tests/support/awakened_actor_fixture.gd")
 const Fixture := preload("res://tests/support/mvp_fixture.gd")
 var errors: Array[String] = []
 class RejectingExecutor extends SkillExecutor:
@@ -13,6 +14,7 @@ func check(value: bool, message: String) -> void:
 func _run() -> void:
 	var fixture := Fixture.new(self)
 	var game: MVPGame = await fixture.boot()
+	check(Awake.awaken(game.player),"Magic-specific fixture could not establish explicit awakened eligibility")
 	GameRuntime.instance.set_process(false)
 	var player := game.player
 	player.global_position = Vector2(21000, 21000)

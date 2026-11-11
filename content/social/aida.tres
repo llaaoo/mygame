@@ -36,7 +36,7 @@ service = "quests"
 script = ExtResource("topic")
 id = "routes"
 title = "北路和东路各有什么？"
-response = "猎营有火石阵准备的说明，旧驿站能成为行路的前哨。先在安全处读笔记和整理材料，发现敌人就退回开阔处。"
+response = "先领离镇口粮旧械包，按O穿上短刀，附近布料包留一份给档案窖检修。北路猎营有行路与火阵知识，阅读不要求施法；借入口和书架应对守卫，付布料1修压印台，取名册再回来。旧试感台只是可选探索，试感不等于觉醒。东路旧驿站可成为前哨，先观察退路。"
 navigation_hints = [SubResource("hunter_lead"), SubResource("outpost_lead")]
 
 [sub_resource type="Resource" id="herbs"]

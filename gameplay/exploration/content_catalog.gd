@@ -30,6 +30,13 @@ func fact(id: String) -> Dictionary:
 					var prerequisites := PackedStringArray()
 					if not entry is ExplorationDiscoveryData: prerequisites = entry.required_claims
 					return {"title":entry.title,"region":region.id,"position":entry.pos,"definition":entry,"prerequisites":prerequisites,"kind":"discovery" if entry is ExplorationDiscoveryData else "objective"}
+		for site in region.awakening_sites:
+			if site.id==id:
+				var prerequisites:=site.required_claims.duplicate()
+				prerequisites.append(site.trial_claim)
+				return {"title":site.title,"region":region.id,"position":site.pos,"definition":site,"prerequisites":prerequisites,"kind":"awakening"}
+			if site.trial_claim==id:
+				return {"title":site.title+"的试感记录","region":region.id,"position":site.pos,"definition":site,"prerequisites":site.required_claims,"kind":"awakening_trial"}
 		for puzzle in region.spell_objects:
 			if not puzzle.pickup_claim.is_empty() and puzzle.pickup_claim == id:
 				return {"title":puzzle.pickup_title,"region":region.id,"position":puzzle.pos,"definition":puzzle,"prerequisites":PackedStringArray([puzzle.id]),"kind":"pickup"}

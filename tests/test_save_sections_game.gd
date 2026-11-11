@@ -14,7 +14,22 @@ func run() -> void:
 	var file:=FileAccess.open("user://save_3.sav",FileAccess.WRITE);file.store_buffer(original);file.close()
 	var fixture:=Fixture.new(self);var game:=await fixture.boot(true)
 	check(SaveManager.instance.last_read.usable() and not game.progress.foundation.is_empty(),"Real historical save did not migrate")
+	var magic:=game.player.actor_context.magic
+	check(magic.awakened and magic.legacy_exempt and magic.hp_cost==0 and is_zero_approx(magic.stamina_cost),"Historical traveler lost casting eligibility or was charged a new awakening cost")
 	check(game.session.fieldcraft.learned.is_empty(),"Pre-fieldcraft historical save invented professional knowledge")
+	check(game.progress.claims.has("river.pack"),"Historical cache regression requires the actual old claimed provision pack")
+	await fixture.travel("camp")
+	var pack: ExplorationDiscoveryData
+	for entry: ExplorationDiscoveryData in game.current_data.discoveries:
+		if entry.id=="river.pack": pack=entry; break
+	check(pack!=null,"Current chapter lost the historical provision-pack identity")
+	var before_pack:=game.session.inventory.snapshot()
+	var before_loot:=game.progress.loot_records.duplicate(true)
+	if pack:
+		game.player.position=pack.pos+Vector2(0,25)
+		game.progress_service.discover(pack)
+		game.progress_service.discover(pack)
+	check(game.session.inventory.snapshot()==before_pack and game.progress.loot_records==before_loot,"Re-reading an old claimed pack created the newly authored sabre or another cache reward")
 	var record:=game.session.inventory.snapshot()
 	var module:=OptionalModule.new();module.surveyed={"river_inn":true};module.budget=7
 	game.session.save_sections.register("test.cartography",module)
@@ -35,6 +50,8 @@ func run() -> void:
 	check(data.foundation.inventory.containers.has(private_id) and record.next_uid<=data.foundation.inventory.next_uid,"Upgrade lost real inventory or rewound UID allocation")
 	await fixture.close();fixture=Fixture.new(self);game=await fixture.boot(true)
 	check(game.region_id=="river_inn" and game.session.inventory.entries(private_id)==expected and game.session.inventory.item(uid).properties.doses==2,"Actual modular reload changed room/UID/doses")
+	magic=game.player.actor_context.magic
+	check(magic.awakened and magic.legacy_exempt and magic.hp_cost==0 and is_zero_approx(magic.stamina_cost),"Cold reload lost grandfathered eligibility or applied a new awakening cost")
 	# This module is currently absent, but another ordinary save must retain it.
 	game._save_progress();data=SaveManager.instance.read_extension(3,game.save_section)
 	check(data.foundation["test.cartography"].surveyed.river_inn and data.foundation["test.cartography"].budget==7,"An unloaded campaign module was silently erased")

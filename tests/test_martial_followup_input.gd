@@ -50,6 +50,7 @@ func prime(weapon: String,id: String) -> bool:
 	return linked(id)
 func run() -> void:
 	var fixture:=Fixture.new(self); game=await fixture.boot(true)
+	check(preload("res://tests/support/awakened_actor_fixture.gd").awaken(game.player),"Controlled physical-action MP budget could not initialize")
 	GameRuntime.instance.set_process(true)
 	for foe in game.active_enemies: foe.process_mode=Node.PROCESS_MODE_INHERIT
 	target=game.active_enemies[0]

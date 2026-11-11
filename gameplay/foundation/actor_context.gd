@@ -12,6 +12,7 @@ var item_actions: Node
 var spray: Node
 var actions: ActorActionController
 var martial:=MartialArts.new()
+var magic:=ActorMagicState.new()
 var fieldcraft: FieldcraftKnowledge
 var awareness: EnemyAwareness
 var encounter_group := ""

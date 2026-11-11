@@ -1,4 +1,5 @@
 extends "res://tests/support/input_scene_probe.gd"
+const Awake=preload("res://tests/support/awakened_actor_fixture.gd")
 const Fixture=preload("res://tests/support/grayriver_fixture.gd")
 var casts:=0
 func card(title: String) -> void:
@@ -24,6 +25,7 @@ func run() -> void:
 	root.size=Vector2i(960,600)
 	var fixture:=Fixture.new(self)
 	game=await fixture.boot(true)
+	check(Awake.awaken(game.player),"Magic-specific fixture could not establish explicit awakened eligibility")
 	var actor:=game.player
 	var manager:=actor.skill_manager
 	var store:=game.session.inventory

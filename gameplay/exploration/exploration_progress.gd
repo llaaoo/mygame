@@ -4,6 +4,7 @@ extends SaveRecord
 var condition_query: ConditionQuery
 var foundation_status: Callable
 @export_storage var foundation: Dictionary={}
+@export_storage var magic_schema := 1
 @export_storage var tracked_quest := ""
 @export_storage var waypoint: Dictionary = {}
 @export_storage var story_actors: Dictionary = {}
@@ -47,6 +48,7 @@ func save_read_status(value: Dictionary) -> int:
 func validate_save_data(value: Variant) -> bool:
 	if not super.validate_save_data(value):
 		return false
+	if value.has("magic_schema") and (not value.magic_schema is int or value.magic_schema!=1):return false
 	if not CampaignSession.valid_snapshot(value.get("foundation",{})): return false
 	if condition_query and condition_query.items:
 		if value.get("foundation",{}).has("inventory") and not condition_query.items.valid_definitions(value.foundation.inventory): return false

@@ -20,6 +20,7 @@ func impact() -> void:
 	if spent: return
 	spent=true; hide(); set_physics_process(false)
 	var skill:=SkillData.new(); skill.id="item."+profile.id; skill.display_name="投掷 · "+profile.payload.title
+	skill.requires_magic=false
 	skill.skill_type=SkillData.SkillType.AOE; skill.archetype="persistent_aoe"; skill.damage=0; skill.damage_scaling=0
 	skill.tags=profile.payload.tags.duplicate(); skill.contact_statuses=profile.payload.statuses.duplicate()
 	skill.aoe_radius=profile.splash_radius; skill.aoe_lifetime=.5; skill.aoe_color=profile.payload.color

@@ -1,4 +1,5 @@
 extends SceneTree
+const Awake=preload("res://tests/support/awakened_actor_fixture.gd")
 const Fixture=preload("res://tests/support/grayriver_fixture.gd")
 var failures: Array[String]=[]
 var casts:=0
@@ -27,6 +28,7 @@ func run() -> void:
 	root.size=Vector2i(1152,648)
 	var fixture:=Fixture.new(self)
 	var game: GrayriverGame=await fixture.boot()
+	check(Awake.awaken(game.player),"Magic-specific fixture could not establish explicit awakened eligibility")
 	var actor:=game.player
 	var manager:=actor.skill_manager
 	var store:=game.session.inventory

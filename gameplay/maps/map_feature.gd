@@ -19,6 +19,7 @@ static func collection_for(value: Resource) -> String:
 	if value is SurfaceValveData: return "valves"
 	if value is SurfacePatchData: return "surface_patches"
 	if value is DeliverySiteData: return "delivery_sites"
+	if value is AwakeningSiteData: return "awakening_sites"
 	if value is RepairFacilityData: return "facilities"
 	return ""
 func _draw() -> void:

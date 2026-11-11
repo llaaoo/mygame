@@ -7,7 +7,8 @@ static func modifier(actor: Node,key: String) -> float:
 static func values(actor: Node,overrides: Dictionary={}) -> Dictionary:
  var stats:=actor.get_node_or_null("StatsComponent") as StatsComponent
  var result:=stats.derived_values(overrides) if stats else {"max_stamina":100.0,"stamina_regeneration":10.0,"carry_bonus":0.0,"dodge_multiplier":1.0,"work_multiplier":1.0}
- result.max_stamina=maxf(1,result.max_stamina+modifier(actor,"stamina.maximum"))
+ var mana:=actor.get_node_or_null("ManaComponent") as ManaComponent
+ result.max_stamina=maxf(1,result.max_stamina+modifier(actor,"stamina.maximum")-(mana.magic_state.stamina_cost if mana else 0))
  result.stamina_regeneration=maxf(0,result.stamina_regeneration+modifier(actor,"stamina.regeneration"))
  result.carry_bonus+=modifier(actor,"carry.maximum")
  result.dodge_multiplier=clampf(result.dodge_multiplier*(1+modifier(actor,"stamina.dodge")),.4,1.5)

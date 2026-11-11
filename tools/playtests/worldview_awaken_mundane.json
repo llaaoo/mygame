@@ -1,0 +1,928 @@
+[
+  {
+    "op": "click",
+    "label": "开始河谷旅程",
+    "phase": "A: ordinary unawakened new traveler, genuine kit sabre and materials",
+    "note": "Planned assisted native route, not a blind/human-duration result. Empty isolated XDG, normal AI; no inventory grants, teleport, state writes or recovery seed. expect/phase/note are review metadata, not executable assertions. Stop on failures and retain evidence."
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3500,
+      2350
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F",
+    "capture": "adventure-01-handbook"
+  },
+  {
+    "op": "click",
+    "label": "记入日志，继续探索"
+  },
+  {
+    "op": "key",
+    "key": "J"
+  },
+  {
+    "op": "click",
+    "label": "委托记录"
+  },
+  {
+    "op": "click",
+    "label": "首次出征：林下档案窖"
+  },
+  {
+    "op": "click",
+    "label": "追踪这个委托"
+  },
+  {
+    "op": "key",
+    "key": "Escape"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3850,
+      2300
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F",
+    "capture": "adventure-02-rations"
+  },
+  {
+    "op": "click",
+    "label": "记入日志，继续探索"
+  },
+  {
+    "op": "state",
+    "capture": "worldview-01-unawakened",
+    "expect": "magic.awakened=false; MP/maxMP=0; no awakening costs"
+  },
+  {
+    "op": "inventory",
+    "item": "river_sabre",
+    "action": "装备这件"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3800,
+      2200
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F"
+  },
+  {
+    "op": "click",
+    "label": "记入日志，继续探索"
+  },
+  {
+    "op": "inventory",
+    "item": "ash",
+    "quantity": 2,
+    "action": "移至背包",
+    "note": "Move actual existing raw stack to leave ready pocket slots; no grants."
+  },
+  {
+    "op": "inventory",
+    "item": "frost_salt",
+    "quantity": 2,
+    "action": "移至背包",
+    "note": "Move actual existing raw stack to leave ready pocket slots; no grants."
+  },
+  {
+    "op": "inventory",
+    "item": "storm_dust",
+    "quantity": 3,
+    "action": "移至背包",
+    "note": "Move actual existing raw stack to leave ready pocket slots; no grants."
+  },
+  {
+    "op": "inventory",
+    "item": "crystal",
+    "quantity": 6,
+    "action": "移至背包",
+    "note": "Move actual existing raw stack to leave ready pocket slots; no grants."
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3100,
+      1850
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F"
+  },
+  {
+    "op": "click",
+    "label": "树脂制剂"
+  },
+  {
+    "op": "click",
+    "label": "加工：树脂制剂"
+  },
+  {
+    "op": "click",
+    "label": "加工：树脂制剂"
+  },
+  {
+    "op": "click",
+    "label": "火焰抹布"
+  },
+  {
+    "op": "click",
+    "label": "加工：火焰抹布"
+  },
+  {
+    "op": "click",
+    "label": "树脂喷剂"
+  },
+  {
+    "op": "click",
+    "label": "加工：树脂喷剂"
+  },
+  {
+    "op": "click",
+    "label": "火油瓶"
+  },
+  {
+    "op": "click",
+    "label": "加工：火油瓶"
+  },
+  {
+    "op": "click",
+    "label": "火石"
+  },
+  {
+    "op": "click",
+    "label": "加工：火石"
+  },
+  {
+    "op": "click",
+    "label": "继续探索"
+  },
+  {
+    "op": "state",
+    "expect": "Crafting formulas/materials do not awaken; review real costs and UIDs"
+  },
+  {
+    "op": "inventory",
+    "item": "fire_rag",
+    "action": "Q"
+  },
+  {
+    "op": "key",
+    "key": "Q"
+  },
+  {
+    "op": "wait",
+    "seconds": 1.8
+  },
+  {
+    "op": "state",
+    "capture": "worldview-02-mundane-coating",
+    "expect": "Real rag consumed, exact equipped sabre coated at MP0 while unawakened"
+  },
+  {
+    "op": "inventory",
+    "item": "resin_sprayer",
+    "action": "Q"
+  },
+  {
+    "op": "aim",
+    "point": [
+      -2980,
+      1840
+    ]
+  },
+  {
+    "op": "hold_key",
+    "key": "Q"
+  },
+  {
+    "op": "wait",
+    "seconds": 0.35
+  },
+  {
+    "op": "release_key",
+    "key": "Q"
+  },
+  {
+    "op": "state",
+    "capture": "worldview-03-mundane-spray",
+    "expect": "Same real bottle loses doses at MP0; no spell commit"
+  },
+  {
+    "op": "inventory",
+    "item": "oil_bottle",
+    "action": "Q"
+  },
+  {
+    "op": "aim",
+    "point": [
+      -2860,
+      1830
+    ]
+  },
+  {
+    "op": "key",
+    "key": "Q"
+  },
+  {
+    "op": "wait",
+    "seconds": 1.2
+  },
+  {
+    "op": "state",
+    "capture": "worldview-04-mundane-throw",
+    "expect": "Real oil bottle commits without casting or MP; do not use duel throw, which includes ignite"
+  },
+  {
+    "op": "key",
+    "key": "R"
+  },
+  {
+    "op": "wait",
+    "seconds": 0.5
+  },
+  {
+    "op": "state",
+    "capture": "worldview-05-casting-refusal",
+    "expect": "Known active spell refused; no MP/material/field cost"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3400,
+      1260
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F",
+    "capture": "worldview-adventure-05-north-sign"
+  },
+  {
+    "op": "click",
+    "label": "记入日志，继续探索"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3500,
+      900
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3500,
+      0
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3260,
+      -780
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3350,
+      -1200
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F",
+    "capture": "worldview-adventure-06-west-safe-fire-record"
+  },
+  {
+    "op": "click",
+    "label": "记入日志，继续探索"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3060,
+      -1200
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "save",
+    "label": "worldview-before-forest-combat"
+  },
+  {
+    "op": "duel",
+    "style": "basic",
+    "target": "river.enemy.camp.forest.3",
+    "capture": "worldview-adventure-08-forest-combat",
+    "note": "Disclosed basic move/aim/physical-attack assistance toward a known target; normal AI. This controls inputs, not an unenchanted damage baseline. The kit blade has a previously real-applied fire rag in the forest; looted weapons may retain their own timed coating. Check actual physical/damage/item facts; style basic does not prepare spells or combinations."
+  },
+  {
+    "op": "key",
+    "key": "Escape"
+  },
+  {
+    "op": "walk_loot",
+    "target": "river.enemy.camp.forest.3"
+  },
+  {
+    "op": "key",
+    "key": "F",
+    "capture": "worldview-adventure-09-forest-real-loot"
+  },
+  {
+    "op": "key",
+    "key": "T"
+  },
+  {
+    "op": "key",
+    "key": "Escape"
+  },
+  {
+    "op": "inventory",
+    "item": "river_sabre",
+    "action": "装备这件",
+    "capture": "worldview-adventure-10-real-sabre-equipped"
+  },
+  {
+    "op": "inventory",
+    "item": "river_coat",
+    "action": "装备这件"
+  },
+  {
+    "op": "key",
+    "key": "7"
+  },
+  {
+    "op": "wait",
+    "seconds": 2.5
+  },
+  {
+    "op": "key",
+    "key": "8"
+  },
+  {
+    "op": "wait",
+    "seconds": 2.5
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3072,
+      -1200
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -2850,
+      -1500
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -2730,
+      -1850
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -2600,
+      -1800
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F",
+    "capture": "worldview-adventure-11-archive-entry",
+    "phase": "B: actual archive room and three normal enemies"
+  },
+  {
+    "op": "save",
+    "label": "worldview-before-archive-combat",
+    "note": "Game-generated common starting point for future weapon/form/item counterplay comparisons; no fixture grants or positions."
+  },
+  {
+    "op": "walk",
+    "point": [
+      -780,
+      390
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F",
+    "capture": "worldview-adventure-12-impact-knowledge"
+  },
+  {
+    "op": "click",
+    "label": "记入日志，继续探索"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -550,
+      420
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F",
+    "capture": "worldview-adventure-13-dispatch"
+  },
+  {
+    "op": "click",
+    "label": "记入日志，继续探索"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -450,
+      450
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -170,
+      450
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "duel",
+    "style": "basic",
+    "target": "river.enemy.river_archive.river_archive.1",
+    "capture": "worldview-adventure-14-archive-first-guard",
+    "note": "Disclosed basic move/aim/physical-attack assistance toward a known target; normal AI. This controls inputs, not an unenchanted damage baseline. The kit blade has a previously real-applied fire rag in the forest; looted weapons may retain their own timed coating. Check actual physical/damage/item facts; style basic does not prepare spells or combinations."
+  },
+  {
+    "op": "key",
+    "key": "Escape"
+  },
+  {
+    "op": "walk_loot",
+    "target": "river.enemy.river_archive.river_archive.1"
+  },
+  {
+    "op": "key",
+    "key": "F",
+    "capture": "worldview-adventure-15-first-guard-loot"
+  },
+  {
+    "op": "key",
+    "key": "T"
+  },
+  {
+    "op": "key",
+    "key": "Escape"
+  },
+  {
+    "op": "key",
+    "key": "7"
+  },
+  {
+    "op": "wait",
+    "seconds": 2.5
+  },
+  {
+    "op": "walk",
+    "point": [
+      120,
+      -250
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "duel",
+    "style": "basic",
+    "target": "river.enemy.river_archive.river_archive.2",
+    "capture": "worldview-adventure-16-archive-second-guard",
+    "note": "Disclosed basic move/aim/physical-attack assistance toward a known target; normal AI. This controls inputs, not an unenchanted damage baseline. The kit blade has a previously real-applied fire rag in the forest; looted weapons may retain their own timed coating. Check actual physical/damage/item facts; style basic does not prepare spells or combinations."
+  },
+  {
+    "op": "key",
+    "key": "Escape"
+  },
+  {
+    "op": "walk_loot",
+    "target": "river.enemy.river_archive.river_archive.2"
+  },
+  {
+    "op": "key",
+    "key": "F",
+    "capture": "worldview-adventure-17-second-guard-loot"
+  },
+  {
+    "op": "key",
+    "key": "T"
+  },
+  {
+    "op": "key",
+    "key": "Escape"
+  },
+  {
+    "op": "walk",
+    "point": [
+      260,
+      -310
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      490,
+      -310
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      520,
+      -40
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "duel",
+    "style": "basic",
+    "target": "river.enemy.river_archive.river_archive.3",
+    "capture": "worldview-adventure-18-archive-caster",
+    "note": "Disclosed basic move/aim/physical-attack assistance toward a known target; normal AI. This controls inputs, not an unenchanted damage baseline. The kit blade has a previously real-applied fire rag in the forest; looted weapons may retain their own timed coating. Check actual physical/damage/item facts; style basic does not prepare spells or combinations."
+  },
+  {
+    "op": "key",
+    "key": "Escape"
+  },
+  {
+    "op": "walk_loot",
+    "target": "river.enemy.river_archive.river_archive.3"
+  },
+  {
+    "op": "key",
+    "key": "F",
+    "capture": "worldview-adventure-19-caster-real-remainder"
+  },
+  {
+    "op": "key",
+    "key": "T"
+  },
+  {
+    "op": "key",
+    "key": "Escape"
+  },
+  {
+    "op": "walk",
+    "point": [
+      800,
+      100
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F",
+    "capture": "worldview-adventure-20-dossier"
+  },
+  {
+    "op": "click",
+    "label": "记入日志，继续探索"
+  },
+  {
+    "op": "walk",
+    "point": [
+      600,
+      400
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F",
+    "capture": "worldview-adventure-21-echo-reward"
+  },
+  {
+    "op": "click",
+    "label": "记入日志，继续探索"
+  },
+  {
+    "op": "walk",
+    "point": [
+      600,
+      -420
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F",
+    "capture": "worldview-adventure-22-schematic"
+  },
+  {
+    "op": "click",
+    "label": "记入日志，继续探索"
+  },
+  {
+    "op": "walk",
+    "point": [
+      760,
+      -400
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F",
+    "capture": "worldview-adventure-23-index-work-ready",
+    "phase": "C: archive mechanism and opened route",
+    "note": "archive.index_press. Current work method 擦拭并撬修压印台: cloth1,3s. No extra reward created by the press."
+  },
+  {
+    "op": "click",
+    "label": "F  开始作业"
+  },
+  {
+    "op": "wait",
+    "seconds": 3.4
+  },
+  {
+    "op": "capture",
+    "capture": "worldview-adventure-24-index-work-completed",
+    "expect": {
+      "claim": "archive.index_press",
+      "cloth_delta": -1
+    },
+    "note": "Expectation metadata is for reviewer checks; existing probe does not execute assertions."
+  },
+  {
+    "op": "walk",
+    "point": [
+      450,
+      -600
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      0,
+      -600
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -780,
+      -600
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -780,
+      -490
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F"
+  },
+  {
+    "op": "capture",
+    "capture": "worldview-06-trial-terms"
+  },
+  {
+    "op": "click",
+    "label": "F  开始作业"
+  },
+  {
+    "op": "wait",
+    "seconds": 6.5
+  },
+  {
+    "op": "state",
+    "capture": "worldview-07-trial-only",
+    "expect": "Trial receipt true, accepted receipt absent; unawakened and zero permanent costs"
+  },
+  {
+    "op": "key",
+    "key": "F"
+  },
+  {
+    "op": "capture",
+    "capture": "worldview-08-decline-acceptance",
+    "expect": "Visible permanent10HP/10stamina cost; decline by closing without starting"
+  },
+  {
+    "op": "key",
+    "key": "Escape"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -780,
+      -600
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      0,
+      -600
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      450,
+      -600
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      840,
+      -560
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F",
+    "capture": "adventure-25-new-shaft-used",
+    "note": "archive.index_return uses the same corrected initial safe landing as the west exit. Existing pursuers are not removed by travel; retreat normally if already engaged."
+  },
+  {
+    "op": "walk",
+    "point": [
+      -2850,
+      -1800
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3072,
+      -1200
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3260,
+      -780
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3500,
+      0
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3500,
+      900
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3500,
+      2100
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "save",
+    "label": "adventure-returned-with-records",
+    "capture": "adventure-26-returned-town",
+    "phase": "D: report, sell real duplicate, craft consumable, persist UID"
+  },
+  {
+    "op": "key",
+    "key": "J"
+  },
+  {
+    "op": "click",
+    "label": "委托记录"
+  },
+  {
+    "op": "click",
+    "label": "首次出征：林下档案窖"
+  },
+  {
+    "op": "click",
+    "label": "在镇中报告",
+    "capture": "adventure-27-first-expedition-reported"
+  },
+  {
+    "op": "key",
+    "key": "Escape"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3500,
+      2000
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3210,
+      2000
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3210,
+      2220
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F"
+  },
+  {
+    "op": "click",
+    "label": "旧驿路皮甲 ×1 · 8币"
+  },
+  {
+    "op": "click",
+    "label": "出售一件 · 8币",
+    "capture": "adventure-28-duplicate-coat-sold",
+    "note": "Click selects the first unworn duplicate row; equipped original is listed later with 已穿戴 suffix. Verify exact transferred UID and merchant/player balances in snapshots. If NPC conversation intercepts F, choose 交易与整修 manually; do not skip trade."
+  },
+  {
+    "op": "key",
+    "key": "Escape"
+  },
+  {
+    "op": "inventory",
+    "item": "resin_sprayer",
+    "action": "Q"
+  },
+  {
+    "op": "state",
+    "capture": "worldview-09-returned-still-mundane",
+    "expect": "Reported without awakening; same partly-used bottle boundQ, genuine gear/trade retained"
+  },
+  {
+    "op": "save",
+    "label": "worldview-mundane-final"
+  },
+  {
+    "op": "quit"
+  }
+]

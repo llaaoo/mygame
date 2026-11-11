@@ -3,7 +3,9 @@ extends RefCounted
 ## Single attribute/scaling/loadout implementation for player and authored NPCs.
 static func bases(stats: StatsComponent, move_base: float, melee_multiplier: float) -> Dictionary:
 	stats._recalculate_all()
-	return {"max_hp":50+stats.max_hp_bonus,"max_mana":stats.max_mana,"attack_damage":roundi((10+stats.physical_damage)*melee_multiplier),"move_speed":move_base+stats.move_speed_bonus}
+	var mana:=stats.get_parent().get_node_or_null("ManaComponent") as ManaComponent if stats.get_parent() else null
+	var magic:=mana.magic_state if mana else null
+	return {"max_hp":50+stats.max_hp_bonus,"max_mana":stats.max_mana+(magic.mana_base-60 if magic and magic.awakened else 0),"attack_damage":roundi((10+stats.physical_damage)*melee_multiplier),"move_speed":move_base+stats.move_speed_bonus}
 
 static func rebuild(actor: Node2D) -> void:
 	var stats:=actor.get_node("StatsComponent") as StatsComponent
@@ -23,6 +25,7 @@ static func initialize_body(actor: Node2D, definition: ActorCharacterData) -> vo
 	actor.melee_damage_multiplier = definition.melee_multiplier
 	(actor.get_node("HealthComponent") as HealthComponent).regen_rate = definition.health_regen
 	(actor.get_node("ManaComponent") as ManaComponent).mp_regen_rate = definition.mana_regen
+	(actor.get_node("ManaComponent") as ManaComponent).configure_magic(definition.magic_aptitude,definition.starts_awakened)
 
 static func setup_scaling(manager: SkillManager) -> void:
 	for modifier in manager.executor.modifiers:
@@ -65,6 +68,7 @@ static func melee_contact(actor: Node2D, target: Node2D, damage: int, base_tags:
 			if tag not in tags: tags.append(tag)
 		skill = SkillData.new()
 		skill.id="imbued_melee"
+		skill.requires_magic=false
 		skill.display_name="元素近战"
 		skill.tags=tags
 	var result:=CombatExecutor.report_hit(actor,target,damage,target.global_position,skill,tags)

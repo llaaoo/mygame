@@ -39,6 +39,7 @@ const PLAYER_SKILL_IDS: Array[String] = [
 ## ── 移动基础值（最终速度 = 基础 + 敏捷加成） ──
 @export var base_move_speed: float = 300.0
 @export var character_definition: ActorCharacterData
+@export var starts_awakened := true
 
 ## ── 背包 ──
 @export var inventory: Inventory
@@ -119,6 +120,7 @@ func _ready() -> void:
 
 	# Attributes share the same body definition/formula as authored NPCs.
 	if character_definition: ActorCombatModel.initialize_body(self, character_definition)
+	mana_component.configure_magic(character_definition.magic_aptitude if character_definition else true,starts_awakened)
 	# 属性系统
 	_apply_stats()
 	stats_component.stat_changed.connect(_on_stat_changed)

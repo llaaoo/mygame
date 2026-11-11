@@ -24,7 +24,8 @@ static func apply(actor: Node2D,skill: SkillData,direction: Vector2,family: Stri
 	var surfaces:=SurfaceManager.instance
 	if not surfaces: return
 	var center:=SurfaceManager.cell_at(origin)
-	for x in range(center.x-3,center.x+4):
-		for y in range(center.y-3,center.y+4):
+	var extent:=ceili(reach/64.0)+1
+	for x in range(center.x-extent,center.x+extent+1):
+		for y in range(center.y-extent,center.y+extent+1):
 			var point:=Vector2(x,y)*64+Vector2(32,32)
 			if contains(actor,origin,direction,point,reach,angle,excluded): surfaces.apply_area(point,0,skill.tags,skill.display_name,skill.creates_surface,residual_seconds,false,skill.surface_payload_tags)

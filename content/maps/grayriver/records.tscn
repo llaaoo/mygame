@@ -53,7 +53,7 @@ target_region = "river_archive"
 script = ExtResource("script2")
 id = "town.records.river"
 title = "巡河档案索引"
-text = "这里是公开索引，不是旧档案原件。北路猎营的笔记提及林下档案窖，驿路留下运料单，真正的名册仍需亲自带回并出示给守岗者。读过索引不会替你发现遗迹、取得名册或完成委托。"
+text = "这里是公开索引，不是旧档案原件。北路猎营的笔记提及林下档案窖，驿路留下运料单，真正的名册仍需亲自带回并出示给守岗者。读过索引不会替你发现遗迹、取得名册或完成委托。\n\n首次出征可用武器和实物，布料1手工修复压印台、取名册返镇，不要求施法。名册背页提及档案窖西北旧试感台；须先修好压印台并读名册，试感不自动觉醒，也不扣永久属性，之后再自愿决定是否接受明确的永久代价。"
 requires_clear = false
 navigation_hints = [SubResource("nav1_0")]
 [sub_resource type="Resource" id="feature3"]

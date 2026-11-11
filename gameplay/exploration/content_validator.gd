@@ -224,7 +224,7 @@ func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 			for id in note.equipment:
 				if not catalog.equipment.has(id):
 					_fail(note, "Unknown equipment reward: " + id)
-			_validate_materials(note, note.materials, supplies)
+			_validate_item_rewards(note, note.materials, catalog)
 		for station in region.survival_stations:
 			if station.presentation_profile:
 				for error in station.presentation_profile.validation_errors(): _fail(station,error)
@@ -254,6 +254,12 @@ func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 				if not method or not method.validation_error().is_empty() or method.material_costs.is_empty() or method_ids.has(method.id): _fail(site,"Invalid delivery method")
 				else:
 					method_ids[method.id]=true
+		for site in region.awakening_sites:
+			_claim(claims,site.id,site)
+			_claim(claims,site.trial_claim,site)
+			completion_claims[site.id]=true
+			completion_claims[site.trial_claim]=true
+			for error in site.validation_errors(): _fail(site,error)
 		for encounter in region.encounters:
 			if encounter.tactics and not encounter.tactics.valid():_fail(encounter,"Invalid encounter territory tactics")
 			if encounter.has_meta("persistent_id"):
@@ -358,6 +364,9 @@ func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 		for site in region.delivery_sites:
 			for id in site.required_claims:
 				if not completion_claims.has(id): _fail(site,"Unknown delivery prerequisite: "+id)
+		for site in region.awakening_sites:
+			for id in site.required_claims:
+				if not completion_claims.has(id): _fail(site,"Unknown awakening prerequisite: "+id)
 		for puzzle in region.spell_objects:
 			for id in puzzle.required_claims:
 				if not completion_claims.has(id): _fail(puzzle, "required_claims: unknown work prerequisite '%s'" % id)
@@ -381,6 +390,9 @@ func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 	for region in catalog.chapter.regions:
 		for entries in [region.spell_objects,region.facilities,region.delivery_sites,region.events]:
 			for entry in entries: _validate_dependency(entry.id,catalog,dependency_states,entry)
+		for site in region.awakening_sites:
+			_validate_dependency(site.trial_claim,catalog,dependency_states,site)
+			_validate_dependency(site.id,catalog,dependency_states,site)
 	var quest_ids: Dictionary = {}
 	for quest in catalog.chapter.quests:
 		if quest_ids.has(quest.id):
@@ -500,6 +512,13 @@ func _validate_materials(resource: Resource, values: Dictionary, supplies: Casti
 		if not values[id] is int or int(values[id]) <= 0:
 			_fail(resource, "Material quantities must be positive integers")
 
+func _validate_item_rewards(resource: Resource,values: Dictionary,catalog: ExplorationContentCatalog) -> void:
+	# Discovery receipts may contain registered real equipment; these are not
+	# spell materials and must never enter the CastingSupplies spendable namespace.
+	for id in values:
+		if not id is String or not (CastingSupplies.known_item(id) or catalog.equipment.get(id) is EquipmentData): _fail(resource,"Unknown item reward: "+str(id))
+		if not values[id] is int or int(values[id])<=0: _fail(resource,"Item reward quantities must be positive integers")
+
 func _validate_entries(chapter: ExplorationChapterData) -> bool:
 	var resources: Array = []
 	resources.append_array(chapter.equipment)
@@ -517,6 +536,11 @@ func _validate_entries(chapter: ExplorationChapterData) -> bool:
 			resources.append_array(region.fixed_props)
 			resources.append_array(region.facilities)
 			resources.append_array(region.delivery_sites)
+			resources.append_array(region.awakening_sites)
+			for site in region.awakening_sites:
+				if site:
+					resources.append(site.trial_method)
+					resources.append(site.accept_method)
 			resources.append_array(region.survival_stations)
 			for facility in region.facilities:
 				if facility: resources.append(facility.assembly)

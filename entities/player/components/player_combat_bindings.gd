@@ -280,11 +280,13 @@ func _on_perk_unlocked(_school: int, perk_id: String) -> void:
 		_register_triggered_effects(trigger)
 
 func _on_skill_used_for_mastery(_source: String, skill: SkillData) -> void:
+	if not skill.requires_magic: return
 	if player.actor_context and not player.actor_context.reward_eligible: return
 	if player.mastery_manager:
 		player.mastery_manager.on_skill_cast(skill)
 
 func _on_player_hit_for_mastery(ev: CombatEvent) -> void:
+	if ev.skill and not ev.skill.requires_magic: return
 	if is_instance_valid(ev.target) and "rewards_enabled" in ev.target and not ev.target.rewards_enabled: return
 	var hit:=ev.data.get("hit_result") as HitResult
 	if hit and hit.blocked: return
@@ -310,6 +312,9 @@ func _on_player_hit_for_mastery(ev: CombatEvent) -> void:
 		player.mastery_manager.on_deal_damage(school, damage)
 
 func _on_player_kill_for_mastery(ev: CombatEvent) -> void:
+	var source_tags: Array=ev.data.get("tags",[]).duplicate()
+	if ev.skill: source_tags.append_array(ev.skill.tags)
+	if ev.skill and not ev.skill.requires_magic and "physical" not in source_tags: return
 	if not ev.data.get("reward_eligible",true): return
 	if player.actor_context and not player.actor_context.reward_eligible: return
 	if ev.source != player:
@@ -325,7 +330,7 @@ func _on_player_kill_for_mastery(ev: CombatEvent) -> void:
 			school = SkillMastery.School.CONJURATION
 		elif "shadow" in tags:
 			school = SkillMastery.School.ILLUSION
-	if "physical" in ev.data.get("tags",[]) or "melee" in ev.data.get("tags",[]): school=SkillMastery.School.MELEE
+	if "physical" in source_tags or "melee" in source_tags: school=SkillMastery.School.MELEE
 	player.mastery_manager.on_kill(school)
 
 func _guess_school_from_skill(skill: SkillData) -> SkillMastery.School:

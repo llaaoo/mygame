@@ -20,6 +20,7 @@ func run() -> void:
 	var fixture:=Fixture.new(self)
 	var game:=await fixture.boot(true,true)
 	var p:=game.player
+	check(preload("res://tests/support/awakened_actor_fixture.gd").awaken(p),"Controlled journey MP fixture could not awaken")
 	p.position=Vector2(-1800,1000)
 	p.health_component.hp=67
 	p.mana_component.mp=29

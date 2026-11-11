@@ -219,9 +219,11 @@ func _on_health_changed(current_hp: int, max_hp: int) -> void:
 
 
 func _on_mp_changed(current_mp: int, max_mp: int) -> void:
-	mana_bar.max_value = max_mp
+	var awakened: bool=player.mana_component.can_cast()
+	mana_bar.visible=awakened
+	mana_bar.max_value = maxi(1,max_mp)
 	mana_bar.value = current_mp
-	mana_label.text = "%d / %d" % [current_mp, max_mp]
+	mana_label.text = "%d / %d" % [current_mp, max_mp] if awakened else "未觉醒"
 
 
 func _on_player_died() -> void:

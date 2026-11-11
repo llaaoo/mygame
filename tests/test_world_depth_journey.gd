@@ -10,6 +10,7 @@ func run() -> void:
 	var fixture:=Fixture.new(self);var game:=await fixture.boot(true,true)
 	game.session.set_process(false)
 	var store:=game.session.inventory;var player:=game.player
+	check(preload("res://tests/support/awakened_actor_fixture.gd").awaken(player),"Controlled journey MP fixture could not awaken")
 	player.position=Vector2(-2800,-1800)
 	store.receive("player","ration",3);store.receive("player","clean_water",3)
 	player.health_component.hp=50;player.mana_component.mp=20

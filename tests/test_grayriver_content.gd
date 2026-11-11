@@ -1,4 +1,5 @@
 extends SceneTree
+const Awake=preload("res://tests/support/awakened_actor_fixture.gd")
 const Fixture:=preload("res://tests/support/grayriver_fixture.gd")
 var errors:Array[String]=[]
 var game:GrayriverGame
@@ -52,6 +53,7 @@ func run() -> void:
 	check(ExplorationContentValidator.new().validate(ExplorationContentCatalog.new(bad_chapter)).any(func(e):return "unknown_food" in e),"Unknown delivery inventory reference accepted")
 	var fixture:=Fixture.new(self)
 	game=await fixture.boot(true)
+	check(Awake.awaken(game.player),"Magic-specific fixture could not establish explicit awakened eligibility")
 	var p:=game.player
 	var supplies:=p.skill_manager.combinations.supplies
 	check(p.health_component.max_hp==100 and p.mana_component.max_mp==60,"Functional test changed normal caps")

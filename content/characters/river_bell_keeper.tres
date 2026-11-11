@@ -1,14 +1,11 @@
-[gd_resource type="Resource" script_class="ActorCharacterData" load_steps=8 format=3]
+[gd_resource type="Resource" script_class="ActorCharacterData" format=3]
 [ext_resource type="Script" path="res://gameplay/characters/actor_character_data.gd" id="data"]
-[ext_resource type="Script" path="res://gameplay/abilities/loadout/skill_loadout.gd" id="loadout"]
-[ext_resource type="Resource" path="res://gameplay/abilities/data/focus_data.tres" id="focus"]
 [ext_resource type="Resource" path="res://content/frontier/equipment/river_staff.tres" id="river_spear"]
 [ext_resource type="Resource" path="res://content/frontier/equipment/river_boots.tres" id="river_boots"]
 [ext_resource type="Resource" path="res://content/tactics/spacing.tres" id="temperament"]
-[sub_resource type="Resource" id="Loadout"]
-script = ExtResource("loadout")
-slots = Array[String](["focus"])
 [resource]
+magic_aptitude = true
+starts_awakened = false
 script = ExtResource("data")
 temperament = ExtResource("temperament")
 id = "river_bell_keeper"
@@ -19,7 +16,5 @@ agility = 12
 endurance = 10
 base_move_speed = 100.0
 melee_multiplier = 0.6
-skills = [ExtResource("focus")]
-loadout = SubResource("Loadout")
 equipment = [ExtResource("river_spear"), ExtResource("river_boots")]
 materials = {"echo_ink": 1, "coin": 4, "herb": 1}

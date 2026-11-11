@@ -17,7 +17,10 @@ func run() -> void:
 	var fixture := Fixture.new(self)
 	var game := await fixture.boot()
 	var player := game.player
+	check(preload("res://tests/support/awakened_actor_fixture.gd").awaken(player),"Shared body comparison needs the same explicit innate qualification")
 	var peer := actor(player.character_definition,game.region_root)
+	var peer_magic:=peer.mana_component.magic_state
+	check(peer_magic.awakened==player.actor_context.magic.awakened and peer_magic.hp_cost==player.actor_context.magic.hp_cost and peer_magic.stamina_cost==player.actor_context.magic.stamina_cost,"Shared body fixture started with different magic qualification or permanent costs")
 	check(peer.stats_component.primary_values()==player.stats_component.primary_values(),"Same definition changed primaries by controller")
 	check(peer.health_component.max_hp==player.health_component.max_hp and peer.mana_component.max_mp==player.mana_component.max_mp and peer.attack_damage==player.combat_component.attack_damage and peer.move_speed==player.move_speed,"Same body definition produces different derived attributes")
 	var bolt:=load("res://gameplay/abilities/data/ignite_data.tres") as SkillData

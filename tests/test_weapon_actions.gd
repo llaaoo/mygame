@@ -1,4 +1,5 @@
 extends SceneTree
+const Awake=preload("res://tests/support/awakened_actor_fixture.gd")
 const Fixture:=preload("res://tests/support/grayriver_fixture.gd")
 class RejectingExecutor extends SkillExecutor:
 	func execute(_skill: SkillData,_context: CastContext) -> bool: return false
@@ -127,6 +128,7 @@ func run() -> void:
 	var manager:=actor.skill_manager
 	var controller:=manager.combinations
 	manager.known_actions["inscribe"]=true; manager.known_actions["pulse"]=true
+	check(Awake.awaken(actor),"Timed rune transaction phase requires explicit awakened eligibility")
 	manager.equip_slot(0,manager.pool.get_skill("inscribe")); manager.equip_slot(1,manager.pool.get_skill("pulse"))
 	actor.mana_component.mp=actor.mana_component.max_mp
 	check(manager.use_slot(0,actor,Vector2.RIGHT),"Timed rune placement refused")

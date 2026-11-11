@@ -253,7 +253,7 @@ func _refresh_stats() -> void:
   _needs_label.text="旅途状态\n饱食 %.0f · 饮水 %.0f\n疲劳 %.0f"%[needs.nutrition,needs.hydration,needs.fatigue]
   _needs_label.tooltip_text=actor.survival.timers_line()
  var stats:=actor.stats_component
- _stats.text="力量 %d · 智力 %d\n敏捷 %d · 耐力 %d\n生命 %d · 法力 %d"%[stats.effective_stat("strength"),stats.effective_stat("intelligence"),stats.effective_stat("agility"),stats.effective_stat("endurance"),actor.health_component.max_hp,actor.mana_component.max_mp]
+ _stats.text="力量 %d · 智力 %d\n敏捷 %d · 耐力 %d\n生命 %d · %s"%[stats.effective_stat("strength"),stats.effective_stat("intelligence"),stats.effective_stat("agility"),stats.effective_stat("endurance"),actor.health_component.max_hp,QuickslotView.magic_status(actor)]
 func _select(uid: String) -> void:
  if uid!=selected and is_instance_valid(_quantity): _quantity.value=1
  var previous:=selected

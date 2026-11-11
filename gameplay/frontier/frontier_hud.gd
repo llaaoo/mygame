@@ -99,7 +99,7 @@ func _process(delta: float) -> void:
 			belt[i].icon=InterfaceIcons.item(ItemCatalog.default_catalog().definition(str(binding.item_id)))
 		elif inst:
 			var plan:=game.player.skill_manager.preview_source(source)
-			detail=inst.data.description+"\n"+plan.reason; amount="%d"%plan.cost
+			detail=inst.data.description+"\n"+plan.reason; amount=plan.cost_label(); ready=plan.ready
 			belt[i].icon=InterfaceIcons.skill(inst.data)
 		else: belt[i].icon=null
 		belt[i].text="%s  %s"%[InputBindings.label(BELT_ACTIONS[i]),amount]

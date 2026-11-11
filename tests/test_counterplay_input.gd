@@ -12,6 +12,7 @@ func run() -> void:
 	var fixture:=Fixture.new(self)
 	game=await fixture.boot(true)
 	var actor:=game.player
+	check(preload("res://tests/support/awakened_actor_fixture.gd").awaken(actor),"Controlled counterplay caster could not awaken")
 	var stock:=game.session.inventory
 	var manager:=actor.skill_manager
 	var base:=Vector2(-4000,800)
@@ -20,7 +21,7 @@ func run() -> void:
 	stock.receive("player","resin_sprayer",1); stock.receive("player","river_staff",1)
 	stock.equip("player",stock.find_owned("player","river_staff"))
 	var bottle:=stock.find_owned("player","resin_sprayer")
-	game.progress.actions["disperse"]=true; game._apply_knowledge()
+	game.progress.actions["disperse"]=true; game.progress.actions["ignite"]=true; game._apply_knowledge()
 	manager.equip_source("left",manager.pool.get_skill("disperse"))
 	check(QuickslotMaterials.select(actor,"left",{"payload":"resin","uid":bottle,"modifier":""}),"Fixed real resin bottle could not be selected")
 	manager.equip_source("slot_0",manager.pool.get_skill("ignite"))
@@ -30,12 +31,12 @@ func run() -> void:
 	await frames(6); aim_at(actor.position+Vector2(200,0))
 	var mp:=actor.mana_component.mp
 	await key(KEY_Q,true); await create_timer(.3).timeout; await key(KEY_Q,false)
-	check(stock.item(bottle)!=null and int(stock.item(bottle).properties.doses)==2 and actor.mana_component.mp==mp-2,"Real Q did not commit exactly one resin dose and 2 MP")
+	check(stock.item(bottle)!=null and int(stock.item(bottle).properties.doses)==2 and actor.mana_component.mp==mp,"Real Q did not commit exactly one ordinary resin dose at zero MP")
 	var surfaces:=SurfaceManager.instance
 	check(surfaces.surface_at(base+Vector2(192,0)).state=="oiled","Real spray failed to create the target oil cell")
 	await capture("counterplay-oil-preparation")
 	await key(KEY_1,true); await key(KEY_1,false); await create_timer(.4).timeout
-	check(actor.mana_component.mp==mp-6 and surfaces.surface_at(base+Vector2(128,0)).state=="burning","Real 1 did not turn the prepared oil into fire for 4 MP")
+	check(actor.mana_component.mp==mp-4 and surfaces.surface_at(base+Vector2(128,0)).state=="burning","Real 1 did not turn the prepared oil into fire for 4 MP")
 	# Earn the sweep with real light/heavy strokes away from the delivery target.
 	actor.position=base; actor.get_node("Camera2D").reset_smoothing()
 	await aim_world(base+Vector2(0,-150))

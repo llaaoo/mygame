@@ -104,7 +104,7 @@ func commit() -> bool:
 	if not available(): cancel(); return false
 	if profile.kind==ItemUseDefinition.Kind.BOOK and not _book_reason().is_empty(): cancel(_book_reason()); return false
 	if context.actions.stamina.current<profile.stamina: cancel("体力不足，使用中断"); return false
-	var plan:=CastPlan.new(); plan.actor=context.actor; plan.action=SkillData.new(); plan.action.operation_id="item_use"; plan.stamina_cost=profile.stamina
+	var plan:=CastPlan.new(); plan.requires_magic=false; plan.actor=context.actor; plan.action=SkillData.new(); plan.action.operation_id="item_use"; plan.stamina_cost=profile.stamina
 	plan.instance_costs=[{"uid":uid,"property":"quantity","amount":1}]
 	var supplies: CastingSupplies=context.actor.get_node("SkillManager").combinations.supplies
 	var transaction:=CastTransaction.new(context.actor,supplies,CastTransaction.allocate_id())

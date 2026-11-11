@@ -1,9 +1,10 @@
 class_name GrayriverPresenter
 extends ExplorationPresenter
 func show_arrival() -> void:
-	var arrival: String = "旅程已恢复："+game.current_data.title+"。生命、补给与世界成果沿用存档。" if game.resuming_journey else "你来到灰河谷西南的河谷镇。先读镇中施法手册、领取口粮，再自行选路。"
-	game.ui.show_panel("灰河谷 · 自由远征",arrival+InputBindings.menu_help("\n\n林地、矿道、湖岸、工区和湿地互相连通，旧监狱在东北。北桥和南侧浅滩始终开放，修复木桥可缩短往返。镇中艾妲记录你的发现与世界成果。\n\nF观察敌人或搜刮遗骸，物品取自真实穿戴和剩余行囊；取不下的留在原地，F打开战利品面板，T尽量取走全部。\n\nTab远征面板 · J委托 · I行囊 · O穿戴 · N补给 · M地图
+	var arrival: String = "旅程已恢复："+game.current_data.title+"。生命、补给与世界成果沿用存档。" if game.resuming_journey else "你来到灰河谷西南的河谷镇。你尚未觉醒魔力。先读行路手册、领取离镇口粮旧械包，按O穿戴短刀，再自行选路。"
+	game.ui.show_panel("灰河谷 · 自由远征",InputBindings.menu_help(arrival)+InputBindings.menu_help("\n\n林地、矿道、湖岸、工区和湿地互相连通，旧监狱在东北。北桥和南侧浅滩始终开放，修复木桥可缩短往返。镇中艾妲记录你的发现与世界成果。\n\nF观察敌人或搜刮遗骸，物品取自真实穿戴和剩余行囊；取不下的留在原地，F打开战利品面板，T尽量取走全部。\n\nTab远征面板 · J委托 · I行囊 · O穿戴 · N补给 · M地图
 7烤饼、8清水、9茶、0炖汤（默认，可在K改放动作或物品）；仍需站定使用，受伤会打断。
+主动施法需要觉醒，知识不会自动授予资格；普通物品和武技不需要魔力。
 普通基础动作默认按下即施放；可在操作设置切回按住预览、松开施放。
 Q/E/R与1—0独立快捷槽 · F交互 · G/按住中键选材 · K编组\n界面不会暂停世界；背包可右键丢弃，地面物资用F拾取。轮盘打开时按动作快捷键选槽，再选介质；同种喷剂可滚轮切瓶。\n地图只记录亲自到过的地点。动作、材料和恩赐需要亲手组合，系统不会自动准备。F5存档，F9读档；独立旅程不覆盖监狱验证场。"),[{"title":"开始河谷旅程","callback":game.ui.close_modal},{"title":"查看日志","callback":game.ui.show_journal},{"title":"重新开始灰河谷","callback":game.confirm_new_journey}])
 func _update_objective() -> void:
@@ -12,8 +13,10 @@ func _update_objective() -> void:
 	game.ui.objective.text = InputBindings.menu_help("镇中门牌可F进入 · 客栈寄存休息 / 作坊制造 / 公署阅读" if game.region_id=="camp" and game.is_at_base() else game.current_data.description)
 	if game.region_id=="camp" and game.is_at_base() and game.progress.claims.has("river.handbook") and game.progress.claims.has("river.pack") and not game.progress.claims.has("river.fire"):
 		game.ui.objective.text = InputBindings.menu_help("北路通林地 · 东路通旧驿站 · M 行路图")
+	var blade_hint: String=(game as GrayriverGame).guidance.unequipped_blade_hint()
+	if not blade_hint.is_empty(): game.ui.objective.text=blade_hint
 func journal_text() -> String:
-	var text := InputBindings.menu_help("灰河谷旅程\nWASD移动，左键近战，右键格挡，R键火花，F调查；M地图、N补给、G/中键按槽选材、K编组、I行囊、O穿戴。知识通过现场阅读学习；组合由当前地面、法阵、恩赐和素材产生。\n\n已发现地点\n")
+	var text := InputBindings.menu_help("灰河谷旅程\nWASD移动，左键近战，右键格挡，F调查；主动施法需要觉醒（R默认火花），普通物品不需要魔力；M地图、N补给、G/中键按槽选材、K编组、I行囊、O穿戴。知识通过现场阅读学习，阅读不授予施法资格；普通武器、涂附、喷剂和投瓶支持未觉醒旅人。完成压印台与名册后可自愿调查旧试感台，试感不等于接受代价。法术组合由当前地面、法阵、恩赐和素材产生。\n\n已发现地点\n")
 	text += (game as GrayriverGame).discovered_places()
 	text += "\n镇中委托\n"
 	for quest in game.quests:

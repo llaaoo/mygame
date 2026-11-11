@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="AwakeningSiteData" format=3]
+
+[ext_resource type="Script" path="res://gameplay/exploration/data/awakening_site_data.gd" id="site"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/field_work_method.gd" id="work"]
+
+[sub_resource type="Resource" id="Trial"]
+script = ExtResource("work")
+id = "awakening:trial"
+title = "站定试感：尚不觉醒，不付永久代价"
+duration = 6.0
+fixed_duration = true
+animation_id = &"work_rest"
+
+[sub_resource type="Resource" id="Accept"]
+script = ExtResource("work")
+id = "awakening:accept"
+title = "自愿接受：永久生命上限−10、体力上限−10"
+duration = 4.0
+fixed_duration = true
+animation_id = &"work_rest"
+
+[resource]
+script = ExtResource("site")
+id = "awakening.archive"
+title = "旧试感台"
+description = "名册背页记录一项旧考验：先修好压印台并读名册，才能核对试感方法。站定试感只验证适格性，不会觉醒或扣除永久属性。试感后可离开，之后再来；再次调查才会说明自愿接受的永久代价。接受需要生命与体力上限各付10，开启基础魔力容量60；当前法力不即时补满，会逐渐恢复，本版没有重修或撤回。移动、受伤、附近敌人或条件失效会中断未完成的作业；完成前可取消。不觉醒仍可凭武器、技艺与实物继续旅程，信仰不决定资格。"
+trial_claim = "awakening.archive.trial"
+required_claims = PackedStringArray("archive.index_press", "river.dossier")
+trial_method = SubResource("Trial")
+accept_method = SubResource("Accept")
+permanent_hp_cost = 10
+permanent_stamina_cost = 10.0
+mana_base = 60

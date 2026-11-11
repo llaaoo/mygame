@@ -1,4 +1,5 @@
 extends "res://tests/support/input_scene_probe.gd"
+const Awake=preload("res://tests/support/awakened_actor_fixture.gd")
 const Fixture=preload("res://tests/support/grayriver_fixture.gd")
 var casts:=0
 func visible_text(fragment: String) -> bool:
@@ -55,6 +56,7 @@ func run() -> void:
   check(game.hub.page=="knowledge" and game.hub.selected=="river.handbook","J did not locate the actual newly read handbook")
   await key(KEY_ESCAPE,true); await key(KEY_ESCAPE,false)
  # Controlled known actions and material stock; subsequent requests use real input.
+ check(Awake.awaken(actor),"Spell-only input phase requires explicit awakened eligibility")
  for operation in SpellOperationCatalog.default_catalog().operations: game.progress.actions[operation.action.get_id()]=true
  game._apply_knowledge()
  var rune:=manager.pool.get_skill("inscribe")
