@@ -7,6 +7,17 @@
   "restart_exit": 0,
   "restart_equal": true,
   "comparator_application_changes": false,
-  "post_primary_changes": "Only test-tool snapshot deep copy and archive note wording; no domain, geometry, actors, rewards, input or costs changed",
-  "full_regression": "pending"
+  "post_primary_changes": "Only two named-return test assertions, test-tool snapshot deep copy, route note metadata and archive note wording; no domain logic, geometry, actors, rewards, input or costs changed",
+  "full_regression": {
+    "complete": true,
+    "checks": 148,
+    "passed": 148,
+    "import_additional": true,
+    "results_entries": 149,
+    "report": "all-complete.json"
+  },
+  "revision": "5486ec15202f2e7e39c6f0dd8e31b9b5127ab6e7",
+  "archive": "/tmp/grayriver-adventure-final-5486ec15",
+  "source_files_compared": 4355,
+  "source_mismatches": []
 }
