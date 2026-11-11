@@ -1,0 +1,470 @@
+[
+  {
+    "target": "river.enemy.camp.forest.3",
+    "style": "combo",
+    "seconds": 4.23535533333332,
+    "wall_seconds": 4.636141,
+    "confirmed_damage": 0,
+    "hp_before": 100,
+    "hp_after": 100,
+    "mp_before": 60,
+    "mp_after": 29,
+    "materials_before": {
+      "ash": 2,
+      "charcoal": 3,
+      "clean_water": 4,
+      "crystal": 7,
+      "fire_stone": 2,
+      "frost_salt": 2,
+      "grain": 3,
+      "herb": 2,
+      "ration": 2,
+      "resin": 2,
+      "sap": 9,
+      "storm_dust": 3
+    },
+    "materials_after": {
+      "ash": 2,
+      "charcoal": 3,
+      "clean_water": 4,
+      "crystal": 7,
+      "fire_stone": 1,
+      "frost_salt": 2,
+      "grain": 3,
+      "herb": 2,
+      "ration": 2,
+      "resin": 2,
+      "sap": 9,
+      "storm_dust": 3
+    },
+    "casts": [
+      {
+        "action": "inscribe",
+        "charge_power": 1.0,
+        "materials": {
+          "fire_stone": 1
+        },
+        "mp_after": 52,
+        "mp_cost": 8,
+        "position": [
+          -3058.4755859375,
+          -1202.38037109375
+        ],
+        "result": "inscribe",
+        "rule": "",
+        "t": 42.9873123333334
+      },
+      {
+        "action": "ignite",
+        "charge_power": 1.0,
+        "materials": {},
+        "mp_after": 40,
+        "mp_cost": 12,
+        "position": [
+          -3058.4755859375,
+          -1202.38037109375
+        ],
+        "result": "fireball",
+        "rule": "fire_sigil_fireball",
+        "t": 43.5833333333334
+      },
+      {
+        "action": "ignite",
+        "charge_power": 1.0,
+        "materials": {},
+        "mp_after": 29,
+        "mp_cost": 12,
+        "position": [
+          -3058.4755859375,
+          -1202.38037109375
+        ],
+        "result": "fireball",
+        "rule": "fire_sigil_fireball",
+        "t": 45.9173046666667
+      }
+    ],
+    "damage_events": [],
+    "physical_actions": []
+  },
+  {
+    "target": "river.enemy.river_archive.river_archive.1",
+    "style": "combo",
+    "seconds": 8.44155900000001,
+    "wall_seconds": 8.680421,
+    "confirmed_damage": 40,
+    "hp_before": 110,
+    "hp_after": 70,
+    "mp_before": 60,
+    "mp_after": 18,
+    "materials_before": {
+      "ash": 2,
+      "charcoal": 3,
+      "clean_water": 3,
+      "cloth": 1,
+      "crystal": 7,
+      "fire_stone": 1,
+      "frost_salt": 2,
+      "grain": 3,
+      "herb": 2,
+      "poison_rag": 1,
+      "ration": 2,
+      "resin": 2,
+      "sap": 9,
+      "storm_dust": 3
+    },
+    "materials_after": {
+      "ash": 2,
+      "charcoal": 3,
+      "clean_water": 3,
+      "cloth": 1,
+      "crystal": 7,
+      "frost_salt": 2,
+      "grain": 3,
+      "herb": 2,
+      "poison_rag": 1,
+      "ration": 2,
+      "resin": 2,
+      "sap": 9,
+      "storm_dust": 3
+    },
+    "casts": [
+      {
+        "action": "inscribe",
+        "charge_power": 1.0,
+        "materials": {
+          "fire_stone": 1
+        },
+        "mp_after": 52,
+        "mp_cost": 8,
+        "position": [
+          -171.437927246094,
+          440.505706787109
+        ],
+        "result": "inscribe",
+        "rule": "",
+        "t": 76.4794593333334
+      },
+      {
+        "action": "ignite",
+        "charge_power": 1.0,
+        "materials": {},
+        "mp_after": 40,
+        "mp_cost": 12,
+        "position": [
+          -171.437927246094,
+          440.505706787109
+        ],
+        "result": "fireball",
+        "rule": "fire_sigil_fireball",
+        "t": 77.057584
+      },
+      {
+        "action": "ignite",
+        "charge_power": 1.0,
+        "materials": {},
+        "mp_after": 29,
+        "mp_cost": 12,
+        "position": [
+          -171.437927246094,
+          440.505706787109
+        ],
+        "result": "fireball",
+        "rule": "fire_sigil_fireball",
+        "t": 79.4858930000001
+      },
+      {
+        "action": "ignite",
+        "charge_power": 1.0,
+        "materials": {},
+        "mp_after": 17,
+        "mp_cost": 12,
+        "position": [
+          -171.437927246094,
+          440.505706787109
+        ],
+        "result": "fireball",
+        "rule": "fire_sigil_fireball",
+        "t": 81.8833333333334
+      }
+    ],
+    "damage_events": [
+      {
+        "amount": 12,
+        "hp_after": 98,
+        "t": 80.7166666666668
+      },
+      {
+        "amount": 4,
+        "hp_after": 94,
+        "t": 80.7166666666668
+      },
+      {
+        "amount": 14,
+        "hp_after": 80,
+        "t": 81.8833333333334
+      },
+      {
+        "amount": 4,
+        "hp_after": 76,
+        "t": 81.8833333333334
+      },
+      {
+        "amount": 3,
+        "hp_after": 73,
+        "t": 82.9000000000002
+      },
+      {
+        "amount": 3,
+        "hp_after": 70,
+        "t": 83.8833333333334
+      }
+    ],
+    "physical_actions": []
+  },
+  {
+    "target": "river.enemy.river_archive.river_archive.2",
+    "style": "basic",
+    "seconds": 2.25237066666665,
+    "wall_seconds": 2.456164,
+    "confirmed_damage": 34,
+    "hp_before": 62,
+    "hp_after": 28,
+    "mp_before": 49,
+    "mp_after": 57,
+    "materials_before": {
+      "ash": 2,
+      "charcoal": 3,
+      "clean_water": 3,
+      "cloth": 2,
+      "crystal": 7,
+      "frost_salt": 2,
+      "grain": 3,
+      "herb": 2,
+      "poison_rag": 1,
+      "ration": 3,
+      "resin": 2,
+      "sap": 9,
+      "storm_dust": 3
+    },
+    "materials_after": {
+      "ash": 2,
+      "charcoal": 3,
+      "clean_water": 3,
+      "cloth": 2,
+      "crystal": 7,
+      "frost_salt": 2,
+      "grain": 3,
+      "herb": 2,
+      "poison_rag": 1,
+      "ration": 3,
+      "resin": 2,
+      "sap": 9,
+      "storm_dust": 3
+    },
+    "casts": [],
+    "damage_events": [
+      {
+        "amount": 12,
+        "hp_after": 50,
+        "t": 93.4254503333332
+      },
+      {
+        "amount": 4,
+        "hp_after": 46,
+        "t": 93.4254503333332
+      },
+      {
+        "amount": 14,
+        "hp_after": 32,
+        "t": 94.6963217777777
+      },
+      {
+        "amount": 4,
+        "hp_after": 28,
+        "t": 94.6963217777777
+      }
+    ],
+    "physical_actions": [
+      {
+        "data": {
+          "art_route": "",
+          "charged": false,
+          "counter": false,
+          "family": "weapon.player.1",
+          "followup": false,
+          "stamina": 11.0,
+          "stroke_count": 3,
+          "stroke_index": 0,
+          "stroke_title": "横斩",
+          "technique": "",
+          "weapon_art": false,
+          "weapon_uid": "item.31"
+        },
+        "t": 93.3521169999999
+      },
+      {
+        "data": {
+          "art_route": "",
+          "charged": false,
+          "counter": false,
+          "family": "weapon.player.2",
+          "followup": false,
+          "stamina": 13.0,
+          "stroke_count": 3,
+          "stroke_index": 1,
+          "stroke_title": "返刃",
+          "technique": "",
+          "weapon_art": false,
+          "weapon_uid": "item.31"
+        },
+        "t": 94.1683083333332
+      },
+      {
+        "data": {
+          "art_route": "",
+          "charged": false,
+          "counter": false,
+          "family": "weapon.player.3",
+          "followup": false,
+          "stamina": 17.0,
+          "stroke_count": 3,
+          "stroke_index": 2,
+          "stroke_title": "进步直刺",
+          "technique": "",
+          "weapon_art": false,
+          "weapon_uid": "item.31"
+        },
+        "t": 94.9608766666666
+      }
+    ]
+  },
+  {
+    "target": "river.enemy.river_archive.river_archive.3",
+    "style": "basic",
+    "seconds": 2.85952033333349,
+    "wall_seconds": 3.243987,
+    "confirmed_damage": 15,
+    "hp_before": 16,
+    "hp_after": 1,
+    "mp_before": 60,
+    "mp_after": 60,
+    "materials_before": {
+      "ash": 2,
+      "charcoal": 3,
+      "clean_water": 3,
+      "cloth": 3,
+      "crystal": 7,
+      "frost_salt": 2,
+      "grain": 3,
+      "herb": 2,
+      "poison_rag": 1,
+      "ration": 4,
+      "resin": 2,
+      "sap": 9,
+      "storm_dust": 3
+    },
+    "materials_after": {
+      "ash": 2,
+      "charcoal": 3,
+      "clean_water": 3,
+      "cloth": 3,
+      "crystal": 7,
+      "frost_salt": 2,
+      "grain": 3,
+      "herb": 2,
+      "poison_rag": 1,
+      "ration": 4,
+      "resin": 2,
+      "sap": 9,
+      "storm_dust": 3
+    },
+    "casts": [],
+    "damage_events": [
+      {
+        "amount": 3,
+        "hp_after": 13,
+        "t": 99.7045216666666
+      },
+      {
+        "amount": 6,
+        "hp_after": 7,
+        "t": 100.374938666667
+      },
+      {
+        "amount": 6,
+        "hp_after": 1,
+        "t": 101.537833
+      }
+    ],
+    "physical_actions": [
+      {
+        "data": {
+          "art_route": "",
+          "charged": false,
+          "counter": false,
+          "family": "weapon.player.4",
+          "followup": false,
+          "stamina": 11.0,
+          "stroke_count": 3,
+          "stroke_index": 0,
+          "stroke_title": "横斩",
+          "technique": "",
+          "weapon_art": false,
+          "weapon_uid": "item.31"
+        },
+        "t": 99.8757009999999
+      },
+      {
+        "data": {
+          "art_route": "",
+          "charged": false,
+          "counter": false,
+          "family": "weapon.player.5",
+          "followup": false,
+          "stamina": 13.0,
+          "stroke_count": 3,
+          "stroke_index": 1,
+          "stroke_title": "返刃",
+          "technique": "",
+          "weapon_art": false,
+          "weapon_uid": "item.31"
+        },
+        "t": 100.70383
+      },
+      {
+        "data": {
+          "art_route": "",
+          "charged": false,
+          "counter": false,
+          "family": "weapon.player.6",
+          "followup": false,
+          "stamina": 17.0,
+          "stroke_count": 3,
+          "stroke_index": 2,
+          "stroke_title": "进步直刺",
+          "technique": "",
+          "weapon_art": false,
+          "weapon_uid": "item.31"
+        },
+        "t": 101.508049666667
+      },
+      {
+        "data": {
+          "art_route": "",
+          "charged": false,
+          "counter": false,
+          "family": "weapon.player.7",
+          "followup": false,
+          "stamina": 11.0,
+          "stroke_count": 3,
+          "stroke_index": 0,
+          "stroke_title": "横斩",
+          "technique": "",
+          "weapon_art": false,
+          "weapon_uid": "item.31"
+        },
+        "t": 102.314042
+      }
+    ]
+  }
+]

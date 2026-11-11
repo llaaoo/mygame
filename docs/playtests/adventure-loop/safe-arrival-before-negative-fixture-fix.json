@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "revision": "1c1d4d34d20baf94a70df44c16511484daff370e",
+  "dirty": true,
+  "godot": "4.6.3.stable.official.7d41c59c4",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "jobs": 2,
+  "timeout": 300.0,
+  "logs": "/tmp/mygame-tests-fi_1v25v",
+  "requested": [
+    "maps",
+    "map_authoring",
+    "archive_adventure"
+  ],
+  "results": [
+    {
+      "name": "maps",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 2.12,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tools/validate_maps.gd"
+      ],
+      "log": "/tmp/mygame-tests-fi_1v25v/maps.log",
+      "diagnostic": []
+    },
+    {
+      "name": "map_authoring",
+      "passed": false,
+      "category": "godot_error",
+      "exit_code": 1,
+      "seconds": 3.274,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_map_authoring.gd"
+      ],
+      "log": "/tmp/mygame-tests-fi_1v25v/map_authoring.log",
+      "diagnostic": [
+        "ERROR: Moving an enemy onto the return landing did not fail authoring validation",
+        "   at: push_error (core/variant/variant_utility.cpp:1024)",
+        "   GDScript backtrace (most recent call first):",
+        "       [0] check (res://tests/test_map_authoring.gd:6)",
+        "       [1] run (res://tests/test_map_authoring.gd:39)"
+      ]
+    },
+    {
+      "name": "archive_adventure",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 11.352,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_archive_adventure.gd"
+      ],
+      "log": "/tmp/mygame-tests-fi_1v25v/archive_adventure.log",
+      "diagnostic": []
+    }
+  ],
+  "skipped": [],
+  "complete": true
+}

@@ -1,0 +1,751 @@
+[
+  {
+    "op": "click",
+    "label": "开始河谷旅程",
+    "phase": "A: new save, handbook, rations and real crafting",
+    "note": "Planned assisted acceptance route, not a 30–45 minute measured completion. Empty isolated XDG; normal AI/default stats. No fixture or domain mutation."
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3500,
+      2350
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F",
+    "capture": "adventure-01-handbook"
+  },
+  {
+    "op": "click",
+    "label": "记入日志，继续探索"
+  },
+  {
+    "op": "key",
+    "key": "J"
+  },
+  {
+    "op": "click",
+    "label": "委托记录"
+  },
+  {
+    "op": "click",
+    "label": "首次出征：林下档案窖"
+  },
+  {
+    "op": "click",
+    "label": "追踪这个委托"
+  },
+  {
+    "op": "key",
+    "key": "Escape"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3850,
+      2300
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F",
+    "capture": "adventure-02-rations"
+  },
+  {
+    "op": "click",
+    "label": "记入日志，继续探索"
+  },
+  {
+    "op": "inventory",
+    "item": "ash",
+    "quantity": 2,
+    "action": "移至背包",
+    "capture": "adventure-03-free-pocket",
+    "note": "Move actual ash stack; make a slot for the crafted field medium. Do not grant or reconstruct supplies."
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3100,
+      1850
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F"
+  },
+  {
+    "op": "click",
+    "label": "火石"
+  },
+  {
+    "op": "click",
+    "label": "加工：火石"
+  },
+  {
+    "op": "click",
+    "label": "加工：火石",
+    "capture": "adventure-04-two-crafted-firestones"
+  },
+  {
+    "op": "click",
+    "label": "继续探索"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3400,
+      1260
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F",
+    "capture": "adventure-05-north-sign"
+  },
+  {
+    "op": "click",
+    "label": "记入日志，继续探索"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3500,
+      900
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3500,
+      0
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3260,
+      -780
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3350,
+      -1200
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F",
+    "capture": "adventure-06-west-safe-fire-record"
+  },
+  {
+    "op": "click",
+    "label": "记入日志，继续探索"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3060,
+      -1200
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "wheel",
+    "key": "5",
+    "payload": "ember",
+    "capture": "adventure-07-fire-medium",
+    "note": "Requires the current entry_point-based probe adapter. Validate selected source payload=ember; wheel confirmation alone is not a cast."
+  },
+  {
+    "op": "save",
+    "label": "adventure-before-forest-combat"
+  },
+  {
+    "op": "duel",
+    "style": "combo",
+    "target": "river.enemy.camp.forest.3",
+    "capture": "adventure-08-forest-combat",
+    "note": "Disclosed scripted actual-key assistance: helper presses 5 then 6 and aims at known test target. Check committed fire field/fireball and fire_stone consumption; do not infer success merely from helper exit."
+  },
+  {
+    "op": "key",
+    "key": "Escape"
+  },
+  {
+    "op": "walk_loot",
+    "target": "river.enemy.camp.forest.3"
+  },
+  {
+    "op": "key",
+    "key": "F",
+    "capture": "adventure-09-forest-real-loot"
+  },
+  {
+    "op": "key",
+    "key": "T"
+  },
+  {
+    "op": "key",
+    "key": "Escape"
+  },
+  {
+    "op": "inventory",
+    "item": "river_sabre",
+    "action": "装备这件",
+    "capture": "adventure-10-real-sabre-equipped"
+  },
+  {
+    "op": "inventory",
+    "item": "river_coat",
+    "action": "装备这件"
+  },
+  {
+    "op": "key",
+    "key": "7"
+  },
+  {
+    "op": "wait",
+    "seconds": 2.5
+  },
+  {
+    "op": "key",
+    "key": "8"
+  },
+  {
+    "op": "wait",
+    "seconds": 2.5
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3072,
+      -1200
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -2850,
+      -1500
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -2730,
+      -1850
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -2600,
+      -1800
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F",
+    "capture": "adventure-11-archive-entry",
+    "phase": "B: actual archive room and three normal enemies"
+  },
+  {
+    "op": "save",
+    "label": "adventure-before-archive-combat",
+    "note": "Game-generated common starting point for future weapon/form/item counterplay comparisons; no fixture grants or positions."
+  },
+  {
+    "op": "walk",
+    "point": [
+      -780,
+      390
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F",
+    "capture": "adventure-12-impact-knowledge"
+  },
+  {
+    "op": "click",
+    "label": "记入日志，继续探索"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -550,
+      420
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F",
+    "capture": "adventure-13-dispatch"
+  },
+  {
+    "op": "click",
+    "label": "记入日志，继续探索"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -450,
+      450
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -170,
+      450
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "duel",
+    "style": "combo",
+    "target": "river.enemy.river_archive.river_archive.1",
+    "capture": "adventure-14-archive-first-guard",
+    "note": "Use the second actually crafted firestone in the archive, then fall back to the equipped blade if field charges expire. The pilot three-basic-fight route ended at 2HP; this is an explicit paid preparation choice, not a stat or AI change."
+  },
+  {
+    "op": "key",
+    "key": "Escape"
+  },
+  {
+    "op": "walk_loot",
+    "target": "river.enemy.river_archive.river_archive.1"
+  },
+  {
+    "op": "key",
+    "key": "F",
+    "capture": "adventure-15-first-guard-loot"
+  },
+  {
+    "op": "key",
+    "key": "T"
+  },
+  {
+    "op": "key",
+    "key": "Escape"
+  },
+  {
+    "op": "key",
+    "key": "7"
+  },
+  {
+    "op": "wait",
+    "seconds": 2.5
+  },
+  {
+    "op": "walk",
+    "point": [
+      120,
+      -250
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "duel",
+    "style": "basic",
+    "target": "river.enemy.river_archive.river_archive.2",
+    "capture": "adventure-16-archive-second-guard"
+  },
+  {
+    "op": "key",
+    "key": "Escape"
+  },
+  {
+    "op": "walk_loot",
+    "target": "river.enemy.river_archive.river_archive.2"
+  },
+  {
+    "op": "key",
+    "key": "F",
+    "capture": "adventure-17-second-guard-loot"
+  },
+  {
+    "op": "key",
+    "key": "T"
+  },
+  {
+    "op": "key",
+    "key": "Escape"
+  },
+  {
+    "op": "walk",
+    "point": [
+      260,
+      -310
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      490,
+      -310
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      520,
+      -40
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "duel",
+    "style": "basic",
+    "target": "river.enemy.river_archive.river_archive.3",
+    "capture": "adventure-18-archive-caster"
+  },
+  {
+    "op": "key",
+    "key": "Escape"
+  },
+  {
+    "op": "walk_loot",
+    "target": "river.enemy.river_archive.river_archive.3"
+  },
+  {
+    "op": "key",
+    "key": "F",
+    "capture": "adventure-19-caster-real-remainder"
+  },
+  {
+    "op": "key",
+    "key": "T"
+  },
+  {
+    "op": "key",
+    "key": "Escape"
+  },
+  {
+    "op": "walk",
+    "point": [
+      800,
+      100
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F",
+    "capture": "adventure-20-dossier"
+  },
+  {
+    "op": "click",
+    "label": "记入日志，继续探索"
+  },
+  {
+    "op": "walk",
+    "point": [
+      600,
+      400
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F",
+    "capture": "adventure-21-echo-reward"
+  },
+  {
+    "op": "click",
+    "label": "记入日志，继续探索"
+  },
+  {
+    "op": "walk",
+    "point": [
+      600,
+      -420
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F",
+    "capture": "adventure-22-schematic"
+  },
+  {
+    "op": "click",
+    "label": "记入日志，继续探索"
+  },
+  {
+    "op": "walk",
+    "point": [
+      760,
+      -400
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F",
+    "capture": "adventure-23-index-work-ready",
+    "phase": "C: archive mechanism and opened route",
+    "note": "archive.index_press. Current work method 擦拭并撬修压印台: cloth1,3s. No extra reward created by the press."
+  },
+  {
+    "op": "click",
+    "label": "F  开始作业"
+  },
+  {
+    "op": "wait",
+    "seconds": 3.4
+  },
+  {
+    "op": "capture",
+    "capture": "adventure-24-index-work-completed",
+    "expect": {
+      "claim": "archive.index_press",
+      "cloth_delta": -1
+    },
+    "note": "Expectation metadata is for reviewer checks; existing probe does not execute assertions."
+  },
+  {
+    "op": "walk",
+    "point": [
+      840,
+      -560
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F",
+    "capture": "adventure-25-new-shaft-used",
+    "note": "archive.index_return uses the same corrected initial safe landing as the west exit. Existing pursuers are not removed by travel; retreat normally if already engaged."
+  },
+  {
+    "op": "walk",
+    "point": [
+      -2850,
+      -1800
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3072,
+      -1200
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3260,
+      -780
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3500,
+      0
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3500,
+      900
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3500,
+      2100
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "save",
+    "label": "adventure-returned-with-records",
+    "capture": "adventure-26-returned-town",
+    "phase": "D: report, sell real duplicate, craft consumable, persist UID"
+  },
+  {
+    "op": "key",
+    "key": "J"
+  },
+  {
+    "op": "click",
+    "label": "委托记录"
+  },
+  {
+    "op": "click",
+    "label": "首次出征：林下档案窖"
+  },
+  {
+    "op": "click",
+    "label": "在镇中报告",
+    "capture": "adventure-27-first-expedition-reported"
+  },
+  {
+    "op": "key",
+    "key": "Escape"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3500,
+      2000
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3210,
+      2000
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3210,
+      2220
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F"
+  },
+  {
+    "op": "click",
+    "label": "旧驿路皮甲 ×1 · 8币"
+  },
+  {
+    "op": "click",
+    "label": "出售一件 · 8币",
+    "capture": "adventure-28-duplicate-coat-sold",
+    "note": "Click selects the first unworn duplicate row; equipped original is listed later with 已穿戴 suffix. Verify exact transferred UID and merchant/player balances in snapshots. If NPC conversation intercepts F, choose 交易与整修 manually; do not skip trade."
+  },
+  {
+    "op": "key",
+    "key": "Escape"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3100,
+      1850
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F"
+  },
+  {
+    "op": "click",
+    "label": "火焰抹布"
+  },
+  {
+    "op": "click",
+    "label": "加工：火焰抹布",
+    "capture": "adventure-29-loot-to-crafted-rag"
+  },
+  {
+    "op": "click",
+    "label": "树脂喷剂"
+  },
+  {
+    "op": "click",
+    "label": "加工：树脂喷剂",
+    "capture": "adventure-30-crafted-real-bottle"
+  },
+  {
+    "op": "click",
+    "label": "继续探索"
+  },
+  {
+    "op": "inventory",
+    "item": "resin_sprayer",
+    "action": "移至背包",
+    "capture": "adventure-31-specific-bottle-to-pack",
+    "note": "Fresh-route budget: initial resin2, rag consumes1 and sprayer consumes1; exhausted resin pocket stack frees a slot, so crafted bottle should be in pocket. Move this actual bottle to pack; verify UID."
+  },
+  {
+    "op": "inventory",
+    "item": "resin_sprayer",
+    "action": "移至口袋",
+    "capture": "adventure-31b-specific-bottle-back-to-pocket",
+    "note": "Move the same UID back; pocket slot was freed by the preceding transfer. No replacement or refill."
+  },
+  {
+    "op": "inventory",
+    "item": "resin_sprayer",
+    "action": "Q",
+    "capture": "adventure-32-bind-specific-bottle",
+    "note": "Inventory QuickBind Q binds this exact UID; no need to assume which numeric slot contains disperse after learning pulse."
+  },
+  {
+    "op": "aim",
+    "point": [
+      -2980,
+      1840
+    ]
+  },
+  {
+    "op": "hold_key",
+    "key": "Q"
+  },
+  {
+    "op": "wait",
+    "seconds": 0.28
+  },
+  {
+    "op": "release_key",
+    "key": "Q"
+  },
+  {
+    "op": "capture",
+    "capture": "adventure-33-real-partial-bottle",
+    "expect": {
+      "resin_sprayer_doses": "1 or 2, same UID as crafted bottle; reject full/empty sample"
+    },
+    "note": "Timing varies under software rendering. If bottle did not commit or emptied, stop/review this sample; never write doses or add replacement to manufacture a pass."
+  },
+  {
+    "op": "save",
+    "label": "adventure-final-normal-save",
+    "capture": "adventure-34-final-save",
+    "note": "After this quit, restart same isolated XDG/new process. Compare same saved bottle UID/doses/properties, equipped UID, inventory quantities, quest+mechanism claims and merchant stock. F9 alone is insufficient restart evidence."
+  },
+  {
+    "op": "quit"
+  }
+]

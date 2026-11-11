@@ -1,0 +1,172 @@
+{
+  "schema": 1,
+  "revision": "1c1d4d34d20baf94a70df44c16511484daff370e",
+  "dirty": true,
+  "godot": "4.6.3.stable.official.7d41c59c4",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "jobs": 2,
+  "timeout": 300.0,
+  "logs": "/tmp/mygame-tests-_gjrj1d0",
+  "requested": [
+    "content",
+    "maps",
+    "gut_domain",
+    "map_authoring",
+    "archive_adventure",
+    "enemy_observation_input",
+    "grayriver_routes",
+    "grayriver_demo"
+  ],
+  "results": [
+    {
+      "name": "content",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 2.575,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tools/validate_mvp_content.gd"
+      ],
+      "log": "/tmp/mygame-tests-_gjrj1d0/content.log",
+      "diagnostic": []
+    },
+    {
+      "name": "maps",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 2.323,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tools/validate_maps.gd"
+      ],
+      "log": "/tmp/mygame-tests-_gjrj1d0/maps.log",
+      "diagnostic": []
+    },
+    {
+      "name": "gut_domain",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 3.531,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://addons/gut/gut_cmdln.gd",
+        "-gexit",
+        "-gdisable_colors",
+        "-gjunit_xml_file=/tmp/mygame-tests-_gjrj1d0/gut-domain.xml"
+      ],
+      "log": "/tmp/mygame-tests-_gjrj1d0/gut_domain.log",
+      "diagnostic": []
+    },
+    {
+      "name": "map_authoring",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 3.527,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_map_authoring.gd"
+      ],
+      "log": "/tmp/mygame-tests-_gjrj1d0/map_authoring.log",
+      "diagnostic": []
+    },
+    {
+      "name": "grayriver_routes",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 2.525,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_grayriver_routes.gd"
+      ],
+      "log": "/tmp/mygame-tests-_gjrj1d0/grayriver_routes.log",
+      "diagnostic": []
+    },
+    {
+      "name": "archive_adventure",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 13.41,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_archive_adventure.gd"
+      ],
+      "log": "/tmp/mygame-tests-_gjrj1d0/archive_adventure.log",
+      "diagnostic": []
+    },
+    {
+      "name": "grayriver_demo",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 26.997,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_grayriver_demo.gd"
+      ],
+      "log": "/tmp/mygame-tests-_gjrj1d0/grayriver_demo.log",
+      "diagnostic": []
+    },
+    {
+      "name": "enemy_observation_input",
+      "passed": false,
+      "category": "godot_error",
+      "exit_code": 1,
+      "seconds": 4.579,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_enemy_observation_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-_gjrj1d0/enemy_observation_input.log",
+      "diagnostic": [
+        "ERROR: Nearby cover failed to hide the status/counter text",
+        "   at: push_error (core/variant/variant_utility.cpp:1024)",
+        "   GDScript backtrace (most recent call first):",
+        "       [0] check (res://tests/support/input_scene_probe.gd:6)",
+        "       [1] run (res://tests/test_enemy_observation_input.gd:36)",
+        "       [2] frames (res://tests/support/input_scene_probe.gd:10)",
+        "ERROR: F observation did not read this encounter's actual rules",
+        "   at: push_error (core/variant/variant_utility.cpp:1024)"
+      ]
+    }
+  ],
+  "skipped": [],
+  "complete": true
+}

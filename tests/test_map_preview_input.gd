@@ -40,8 +40,9 @@ func run() -> void:
 	preview=await boot_preview("res://content/maps/grayriver/archive.tscn")
 	check(game.region_id=="river_archive" and game.active_enemies.size()==3 and game.active_enemies.all(func(enemy):return enemy.can_process()),"Dungeon preview changed its encounter budget or disabled normal AI")
 	await capture("preview-archive-start")
+	var return_point: Vector2=game.catalog.regions.camp.arrival_points["archive_return"]
 	game.player.position=Vector2(-850,0);await frames(4);await tap(KEY_F);await frames(6)
-	check(game.region_id=="camp" and game.player.position.distance_to(Vector2(-2600,-1660))<2,"Dungeon's named return did not resolve to the outdoor anchor")
+	check(game.region_id=="camp" and game.player.position.distance_to(return_point)<2,"Dungeon's named return did not resolve to the outdoor anchor")
 	await close_game()
 	check(FileAccess.get_file_as_bytes("user://save_3.sav")==original,"Dungeon travel/reset leaked preview state into the formal file")
 	game=await fixture.boot(true)

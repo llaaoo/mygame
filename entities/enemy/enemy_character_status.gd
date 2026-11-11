@@ -18,16 +18,21 @@ func _process(delta: float) -> void:
 	# Hidden labels still pay shaping/layout costs when their text changes. Gate
 	# the expensive status projection before querying it; bars remain independent.
 	queue_redraw()
-	_label.visible=is_instance_valid(actor.player) and actor.position.distance_squared_to(actor.player.position)<260.0*260.0
+	_label.visible=is_instance_valid(actor.player) and actor.position.distance_squared_to(actor.player.position)<260.0*260.0 and actor.can_see(actor.player)
 	if not _label.visible:return
 	var plan := actor.skill_manager.combinations.pending
 	var physical:=actor.actor_context.actions if actor.actor_context else null
 	var buffs:=actor.get_node("BuffManager") as BuffManager
 	var partial:=buffs.buildup.snapshot()
 	var in_combat:=not actor.story_truce and physical and (not partial.is_empty() or buffs.has_buff("burning") or buffs.has_buff("poison") or physical.busy() or physical.guarding or is_instance_valid(actor.player) and actor.player.actor_context and (actor.player.actor_context.actions.busy() or actor.player.actor_context.actions.guarding or actor.player.actor_context.actions.counter_remaining>0))
-	_label.position.y=-76 if in_combat else -98
+	var awareness:=actor.actor_context.awareness if actor.actor_context else null
+	var warning: bool=awareness!=null and awareness.phase=="warning" and awareness.rules!=null
 	var text:=actor.enemy_name
-	if actor.actor_context and actor.actor_context.awareness:text+="\n"+actor.actor_context.awareness.caption()
+	if awareness:text+="\n"+awareness.caption()
+	# Encounter rules live on this regional awareness, not on the shared body.
+	# Warning is the existing opportunity to read a counter and withdraw, without
+	# opening a near-range inventory panel or stopping normal AI.
+	if warning: text+="\n"+awareness.rules.observation
 	for id in partial:
 		var buildup: Dictionary=partial[id]
 		var definition:=WeaponEnchantment.definition(id)
@@ -38,9 +43,14 @@ func _process(delta: float) -> void:
 			text+=" · "+entry.name
 	if not plan.is_empty():
 		text+="\n"+plan.action.display_name+(" → "+plan.effect_label if plan.action.display_name!=plan.effect_label else "")
-	if actor.physical_loot and not in_combat:
+	if actor.physical_loot and not in_combat and actor.position.distance_squared_to(actor.player.position)<PlayerInputController.INTERACT_RANGE*PlayerInputController.INTERACT_RANGE:
 		text += "\n[F] 交涉 · 停战中" if actor.story_truce else "\n[F] 观察穿戴与行囊"
-	if _label.text!=text:_label.text=text
+	var width:=240.0 if warning else 200.0
+	if _label.text!=text or _label.size.x!=width:
+		_label.size.x=width
+		_label.text=text
+		_label.size.y=0
+	_label.position=Vector2(-width*.5,-54-_label.get_combined_minimum_size().y if warning else -76 if in_combat else -98)
 	if is_instance_valid(actor.player):
 		_label.modulate=Color("a5d5bd") if actor.story_truce else Color.WHITE
 func _draw() -> void:

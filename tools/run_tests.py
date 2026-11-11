@@ -32,6 +32,7 @@ INTEGRATION = [
     "slot_materials", "inventory_lifecycle", "realtime_interaction", "keyboard_casting", "visual_interface", "controls_workflow", "unified_quickslots", "legacy_operation_coverage", "input_bindings", "world_pointer_input", "enemy_retaliation", "item_actions", "spray_channel", "reaction_sources", "spell_operations", "foundation_inventory", "foundation_combat", "foundation_systems",
     "frontier_expedition", "frontier_projects",
     "grayriver_loot",
+    "archive_adventure", "enemy_observation_input",
     "grayriver_salvage",
     "shared_characters",
     "field_work",

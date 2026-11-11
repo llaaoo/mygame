@@ -1,0 +1,64 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:364)
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+⏰ WorldTime 启动: 08:00
+🏛️ GameRuntime: 五大 Runtime 初始化完成
+   CommandBus       : ✅
+   CombatExecutor   : ✅
+   CombatEventBus   : ✅
+   WorldRuntime     : ✅
+   SimulationRuntime: ✅
+   WorldTime        : ✅
+⚡ 已注册触发效果: OnKillBonusExp
+📊 CombatDebugger: trace enabled
+⏰ 08:00 (☀️ 白天)
+SaveManager: saved user://save_3.sav
+⏰ 09:00 (☀️ 白天)
+FIRST30 1.0 click  pos=(-820.0, 0.0) hp=110
+FIRST30 2.0 walk  pos=(-781.109, 374.391) hp=110
+SaveManager: saved user://save_3.sav
+FIRST30 3.0 key  pos=(-781.109, 374.391) hp=110
+FIRST30 4.0 click  pos=(-781.109, 374.391) hp=110
+FIRST30 5.0 walk  pos=(-559.3834, 436.6166) hp=110
+SaveManager: saved user://save_3.sav
+FIRST30 6.0 key  pos=(-559.3834, 436.6166) hp=110
+FIRST30 7.0 click  pos=(-559.3834, 436.6166) hp=110
+FIRST30 8.0 walk  pos=(-458.1052, 444.3948) hp=110
+FIRST30 9.0 walk  pos=(-182.2086, 596.0696) hp=110
+SaveManager: saved user://save_3.sav
+FIRST30 10.0 save  pos=(-182.2086, 596.0696) hp=110
+SaveManager: saved user://save_3.sav
+🔥 [OnHitApplyStatus] Player → Encounter_0 挂 燃烧
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚔️  CombatTrace  #1 | cast_fireball
+   技能: 火球术 | 事件数: 19 | 最终伤害: 45
+   伤害链: StatScalingModifier(+20)
+    1. ▶  cast: 火球术
+    2. ▶  PHASE: MODIFIER
+    3. ▶  PHASE: EFFECT
+    4. 💥 resolve_damage: 火球术 | base=25
+    5. 📊 StatScalingModifier @ FLAT: 25 → 45 (+20)
+    6. ▶  PHASE: EVENT
+    7. ▶  PHASE: POST
+    8. ⚡ done: 火球术 | success=OK ✅
+    9. ▶  PHASE: IDLE
+   10. ▶  PHASE: MODIFIER
+   11. ▶  PHASE: EFFECT
+   12. ▶  PHASE: EVENT
+   13. 📡 ON_CAST → ?  [tags=["fire", "projectile"], extra={  }]
+   14. ▶  PHASE: POST
+   15. ▶  PHASE: IDLE
+   16. ▶  PHASE: EVENT
+   17. 📡 ON_HIT → Encounter_0  [damage=45, position=(-102.568, 114.2741), tags=["fire", "projectile"], hit_result=<RefCounted#-9223371060286580591>, target_statuses_before=[], source_statuses_before=["meal_fortitude", "water_recovery"]]
+   18. 📡 ON_STATUS_APPLIED → Encounter_0  [buff_name=燃烧, effect=燃烧: DOT 5/1.0s 4.0s, duration=4.0]
+   19. 📡 ON_DAMAGE → Encounter_0  [damage=41, remaining_hp=19]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SaveManager: saved user://save_3.sav
+⚡ [OnKillBonusExp] +15 额外经验 (target=Encounter_0)
+SaveManager: saved user://save_3.sav
+FIRST30 11.0 duel  pos=(-182.2086, 596.0696) hp=110
+FIRST30 12.0 quit  pos=(-182.2086, 596.0696) hp=110

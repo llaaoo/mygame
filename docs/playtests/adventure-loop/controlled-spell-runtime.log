@@ -1,0 +1,123 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:364)
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+⏰ WorldTime 启动: 08:00
+🏛️ GameRuntime: 五大 Runtime 初始化完成
+   CommandBus       : ✅
+   CombatExecutor   : ✅
+   CombatEventBus   : ✅
+   WorldRuntime     : ✅
+   SimulationRuntime: ✅
+   WorldTime        : ✅
+⚡ 已注册触发效果: OnKillBonusExp
+📊 CombatDebugger: trace enabled
+⏰ 08:00 (☀️ 白天)
+SaveManager: saved user://save_3.sav
+FIRST30 1.0 click  pos=(720.0, -400.0) hp=100
+FIRST30 2.0 key  pos=(720.0, -400.0) hp=100
+FIRST30 3.0 click  pos=(720.0, -400.0) hp=100
+FIRST30 4.0 click  pos=(720.0, -400.0) hp=100
+FIRST30 5.0 click  pos=(720.0, -400.0) hp=100
+FIRST30 6.0 key  pos=(720.0, -400.0) hp=100
+FIRST30 7.0 capture  pos=(720.0, -400.0) hp=100
+FIRST30 8.0 aim  pos=(720.0, -400.0) hp=100
+FIRST30 9.0 key  pos=(720.0, -400.0) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 10.0 wait  pos=(720.0, -400.0) hp=100
+FIRST30 11.0 capture  pos=(720.0, -400.0) hp=100
+FIRST30 12.0 key  pos=(720.0, -400.0) hp=100
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚔️  CombatTrace  #1 | cast_pulse
+   技能: 震荡 | 事件数: 18 | 最终伤害: 26
+   伤害链: StatScalingModifier(+20)
+    1. ▶  cast: 震荡
+    2. ▶  PHASE: MODIFIER
+    3. ▶  PHASE: EFFECT
+    4. 💥 resolve_damage: 震荡 | base=6
+    5. 📊 StatScalingModifier @ FLAT: 6 → 26 (+20)
+    6. ▶  PHASE: EVENT
+    7. ▶  PHASE: POST
+    8. ⚡ done: 震荡 | success=OK ✅
+    9. ▶  PHASE: IDLE
+   10. ▶  PHASE: MODIFIER
+   11. ▶  PHASE: EFFECT
+   12. ▶  PHASE: EVENT
+   13. 📡 ON_CAST → ?  [tags=["arcane", "aoe", "impact"], extra={  }]
+   14. ▶  PHASE: POST
+   15. ▶  PHASE: IDLE
+   16. ▶  PHASE: EVENT
+   17. 📡 ON_HIT → @Area2D@442  [damage=26, position=(720.0, -400.0), tags=["arcane", "aoe", "impact"], hit_result=<RefCounted#-9223371308237055640>, target_statuses_before=[], source_statuses_before=[]]
+   18. ▶  PHASE: IDLE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+FIRST30 13.0 wait  pos=(720.0, -400.0) hp=100
+FIRST30 14.0 capture  pos=(720.0, -400.0) hp=100
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+FIRST30 15.0 aim  pos=(720.0, -400.0) hp=100
+FIRST30 16.0 key  pos=(720.0, -400.0) hp=100
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚔️  CombatTrace  #2 | cast_water_call
+   技能: 水引 | 事件数: 17 | 最终伤害: 0
+   伤害链: (no modifiers)
+    1. ▶  cast: 水引
+    2. ▶  PHASE: MODIFIER
+    3. ▶  PHASE: EFFECT
+    4. ▶  PHASE: EVENT
+    5. ▶  PHASE: POST
+    6. ⚡ done: 水引 | success=OK ✅
+    7. ▶  PHASE: IDLE
+    8. ▶  PHASE: MODIFIER
+    9. ▶  PHASE: EFFECT
+   10. ▶  PHASE: EVENT
+   11. 📡 ON_CAST → ?  [tags=["water", "aoe"], extra={  }]
+   12. ▶  PHASE: POST
+   13. ▶  PHASE: IDLE
+   14. ▶  PHASE: EVENT
+   15. 📡 ON_HIT → @Area2D@442  [damage=0, position=(760.0, -400.0), tags=["water", "aoe"], hit_result=<RefCounted#-9223369347785811971>, target_statuses_before=[], source_statuses_before=[]]
+   16. ▶  PHASE: IDLE
+   17. 📡 ON_STATUS_APPLIED → Player  [buff_name=潮湿, effect=潮湿: no modifiers 6.0s, duration=6.0]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+FIRST30 17.0 wait  pos=(720.0, -400.0) hp=100
+FIRST30 18.0 capture  pos=(720.0, -400.0) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 19.0 key  pos=(720.0, -400.0) hp=100
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚔️  CombatTrace  #3 | cast_pulse
+   技能: 震荡 | 事件数: 18 | 最终伤害: 26
+   伤害链: StatScalingModifier(+20)
+    1. ▶  cast: 震荡
+    2. ▶  PHASE: MODIFIER
+    3. ▶  PHASE: EFFECT
+    4. 💥 resolve_damage: 震荡 | base=6
+    5. 📊 StatScalingModifier @ FLAT: 6 → 26 (+20)
+    6. ▶  PHASE: EVENT
+    7. ▶  PHASE: POST
+    8. ⚡ done: 震荡 | success=OK ✅
+    9. ▶  PHASE: IDLE
+   10. ▶  PHASE: MODIFIER
+   11. ▶  PHASE: EFFECT
+   12. ▶  PHASE: EVENT
+   13. 📡 ON_CAST → ?  [tags=["arcane", "aoe", "impact"], extra={  }]
+   14. ▶  PHASE: POST
+   15. ▶  PHASE: IDLE
+   16. ▶  PHASE: EVENT
+   17. 📡 ON_HIT → @Area2D@442  [damage=26, position=(720.0, -400.0), tags=["arcane", "aoe", "impact"], hit_result=<RefCounted#-9223369303963723777>, target_statuses_before=[], source_statuses_before=["wet"]]
+   18. ▶  PHASE: IDLE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⏰ 09:00 (☀️ 白天)
+SaveManager: saved user://save_3.sav
+FIRST30 20.0 wait  pos=(720.0, -400.0) hp=100
+FIRST30 21.0 capture  pos=(720.0, -400.0) hp=100
+FIRST30 22.0 quit  pos=(720.0, -400.0) hp=100

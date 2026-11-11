@@ -1,0 +1,803 @@
+{
+  "request": {
+    "id": 20.0,
+    "op": "wait",
+    "seconds": 1.0
+  },
+  "state": {
+    "active_seconds": 59.3785593703699,
+    "buttons": [],
+    "campaign_clock": 60.3016567037032,
+    "casts": [
+      {
+        "action": "pulse",
+        "charge_power": 1.0,
+        "materials": {
+
+        },
+        "mp_after": 57,
+        "mp_cost": 3,
+        "position": [
+          720.0,
+          -400.0
+        ],
+        "result": "pulse",
+        "rule": "",
+        "t": 5.05555555555555
+      },
+      {
+        "action": "water_call",
+        "charge_power": 1.0,
+        "materials": {
+
+        },
+        "mp_after": 55,
+        "mp_cost": 5,
+        "position": [
+          720.0,
+          -400.0
+        ],
+        "result": "water_call",
+        "rule": "",
+        "t": 57.1708333333329
+      },
+      {
+        "action": "pulse",
+        "charge_power": 1.0,
+        "materials": {
+
+        },
+        "mp_after": 52,
+        "mp_cost": 3,
+        "position": [
+          720.0,
+          -400.0
+        ],
+        "result": "pulse",
+        "rule": "",
+        "t": 58.3687823333328
+      }
+    ],
+    "claims": [
+      "equipment.sources_v1",
+      "river.handbook",
+      "loot.cache.river.handbook",
+      "river.fire",
+      "equipment.river.pulse.keeper_ring",
+      "river.pulse",
+      "river.enemy.river_archive.river_archive.1",
+      "river.enemy.river_archive.river_archive.2",
+      "river.enemy.river_archive.river_archive.3",
+      "river.dossier",
+      "archive.index_press"
+    ],
+    "date": "第1天 09:00",
+    "defenses": [],
+    "display": "X11",
+    "effective_forms": {
+      "right": {
+
+      },
+      "slot_0": {
+
+      },
+      "slot_1": {
+
+      },
+      "slot_3": {
+
+      },
+      "slot_4": {
+        "modifier": "",
+        "payload": "arcane",
+        "uid": ""
+      },
+      "slot_5": {
+
+      }
+    },
+    "enemies": [],
+    "error": "",
+    "fields": [],
+    "gear": [],
+    "growth": {
+      "attribute_points": 3,
+      "attributes": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "experience": 115,
+      "level": 2,
+      "mastery": {
+        "character_level": 2,
+        "legacy_credit": 0,
+        "masteries": {
+          "0": {
+            "level": 2,
+            "perk_points": 0,
+            "xp": 14.0,
+            "xp_to_next": 19.2
+          },
+          "1": {
+            "level": 1,
+            "perk_points": 0,
+            "xp": 0.0,
+            "xp_to_next": 15.0
+          },
+          "2": {
+            "level": 1,
+            "perk_points": 0,
+            "xp": 0.0,
+            "xp_to_next": 15.0
+          },
+          "3": {
+            "level": 1,
+            "perk_points": 0,
+            "xp": 0.0,
+            "xp_to_next": 15.0
+          },
+          "4": {
+            "level": 1,
+            "perk_points": 0,
+            "xp": 0.0,
+            "xp_to_next": 15.0
+          },
+          "5": {
+            "level": 1,
+            "perk_points": 0,
+            "xp": 0.0,
+            "xp_to_next": 15.0
+          },
+          "6": {
+            "level": 1,
+            "perk_points": 0,
+            "xp": 0.0,
+            "xp_to_next": 15.0
+          },
+          "7": {
+            "level": 1,
+            "perk_points": 0,
+            "xp": 0.0,
+            "xp_to_next": 15.0
+          },
+          "8": {
+            "level": 2,
+            "perk_points": 0,
+            "xp": 1.0,
+            "xp_to_next": 19.2
+          }
+        },
+        "schema": 2,
+        "total_mastery_levels": 2,
+        "unlocked_perks": {
+          "0": [],
+          "1": [],
+          "2": [],
+          "3": [],
+          "4": [],
+          "5": [],
+          "6": [],
+          "7": [],
+          "8": []
+        }
+      }
+    },
+    "hands": {
+      "q": "",
+      "r": "ignite"
+    },
+    "id": 20.0,
+    "items": [
+      {
+        "definition": "ash",
+        "properties": {
+
+        },
+        "quantity": 2,
+        "uid": "item.108"
+      },
+      {
+        "definition": "charcoal",
+        "properties": {
+
+        },
+        "quantity": 4,
+        "uid": "item.109"
+      },
+      {
+        "definition": "crystal",
+        "properties": {
+
+        },
+        "quantity": 6,
+        "uid": "item.110"
+      },
+      {
+        "definition": "frost_salt",
+        "properties": {
+
+        },
+        "quantity": 2,
+        "uid": "item.111"
+      },
+      {
+        "definition": "resin",
+        "properties": {
+
+        },
+        "quantity": 2,
+        "uid": "item.112"
+      },
+      {
+        "definition": "sap",
+        "properties": {
+
+        },
+        "quantity": 6,
+        "uid": "item.113"
+      },
+      {
+        "definition": "storm_dust",
+        "properties": {
+
+        },
+        "quantity": 3,
+        "uid": "item.114"
+      }
+    ],
+    "known_actions": {
+      "fire_sigil": true,
+      "ignite": true,
+      "oil_flask": true,
+      "project": true,
+      "pulse": true,
+      "water_call": true
+    },
+    "loot_records": {
+      "cache.river.handbook": {
+        "equipment": {
+
+        },
+        "materials": {
+
+        },
+        "position": [
+          -3500.0,
+          2472.0
+        ],
+        "region": "camp",
+        "title": "行路者的施法手册 · 留存物资"
+      },
+      "river.enemy.river_archive.river_archive.1": {
+        "equipment": {
+          "river_coat": 1,
+          "river_sabre": 1
+        },
+        "materials": {
+          "cloth": 1,
+          "poison_rag": 1,
+          "ration": 1
+        },
+        "position": [
+          -100.0,
+          100.0
+        ],
+        "region": "river_archive",
+        "title": "流亡守备兵的遗骸",
+        "visual_facing": [
+          0.0,
+          1.0
+        ],
+        "visual_profile": "puny_body"
+      },
+      "river.enemy.river_archive.river_archive.2": {
+        "equipment": {
+          "river_coat": 1,
+          "river_sabre": 1
+        },
+        "materials": {
+          "cloth": 1,
+          "poison_rag": 1,
+          "ration": 1
+        },
+        "position": [
+          300.0,
+          -250.0
+        ],
+        "region": "river_archive",
+        "title": "流亡守备兵的遗骸",
+        "visual_facing": [
+          0.0,
+          1.0
+        ],
+        "visual_profile": "puny_body"
+      },
+      "river.enemy.river_archive.river_archive.3": {
+        "equipment": {
+          "cadence_gloves": 1,
+          "river_staff": 1
+        },
+        "materials": {
+          "fire_stone": 2,
+          "venom_sprayer": 1,
+          "ward_powder": 1
+        },
+        "position": [
+          600.0,
+          160.0
+        ],
+        "region": "river_archive",
+        "title": "刻阵术士的遗骸",
+        "visual_facing": [
+          0.0,
+          1.0
+        ],
+        "visual_profile": "puny_body"
+      }
+    },
+    "martial": {
+      "learned": {
+
+      },
+      "ready_at": {
+
+      },
+      "routes": {
+
+      }
+    },
+    "materials": {
+      "ash": 2,
+      "charcoal": 4,
+      "crystal": 6,
+      "frost_salt": 2,
+      "resin": 2,
+      "sap": 6,
+      "storm_dust": 3
+    },
+    "melee_hits": [],
+    "modal_texts": [],
+    "normal_ai": true,
+    "notice": "压印轴重新转动，东侧搬运竖井已可返回林地。既有名册与物资仍在原处，压印台不额外生成奖励；可以带成果回镇报告并整备下一程。\n捷径已开启：搬运竖井：返回林地；使用现场出口通行。\n可回镇报告：首次出征：林下档案窖。",
+    "npc_accounts": {
+      "river.aida": {
+        "coin": 24,
+        "dead": false,
+        "items": [
+          {
+            "container": "river.aida.pocket",
+            "definition": "coin",
+            "properties": {
+
+            },
+            "quantity": 24,
+            "uid": "item.17"
+          }
+        ],
+        "trust": 0
+      },
+      "river.enemy.service.trainer": {
+        "coin": 0,
+        "dead": false,
+        "items": [],
+        "trust": 0
+      },
+      "river.innkeeper": {
+        "coin": 0,
+        "dead": false,
+        "items": [],
+        "trust": 0
+      },
+      "river.merchant": {
+        "coin": 160,
+        "dead": false,
+        "items": [
+          {
+            "container": "river.merchant.pocket",
+            "definition": "coin",
+            "properties": {
+
+            },
+            "quantity": 160,
+            "uid": "item.1"
+          },
+          {
+            "container": "river.merchant.pocket",
+            "definition": "metal_scrap",
+            "properties": {
+
+            },
+            "quantity": 12,
+            "uid": "item.2"
+          },
+          {
+            "container": "river.merchant.pocket",
+            "definition": "charcoal",
+            "properties": {
+
+            },
+            "quantity": 6,
+            "uid": "item.3"
+          },
+          {
+            "container": "river.merchant.pocket",
+            "definition": "sap",
+            "properties": {
+
+            },
+            "quantity": 6,
+            "uid": "item.4"
+          },
+          {
+            "container": "river.merchant.pocket",
+            "definition": "crystal",
+            "properties": {
+
+            },
+            "quantity": 4,
+            "uid": "item.5"
+          },
+          {
+            "container": "river.merchant.pocket",
+            "definition": "cloth",
+            "properties": {
+
+            },
+            "quantity": 6,
+            "uid": "item.6"
+          },
+          {
+            "container": "river.merchant.pocket",
+            "definition": "ration",
+            "properties": {
+
+            },
+            "quantity": 6,
+            "uid": "item.7"
+          },
+          {
+            "container": "river.merchant.pocket",
+            "definition": "clean_water",
+            "properties": {
+
+            },
+            "quantity": 4,
+            "uid": "item.8"
+          },
+          {
+            "container": "river.merchant.pocket",
+            "definition": "arrow",
+            "properties": {
+
+            },
+            "quantity": 24,
+            "uid": "item.13"
+          },
+          {
+            "container": "river.merchant.pocket",
+            "definition": "guard_tonic",
+            "properties": {
+
+            },
+            "quantity": 2,
+            "uid": "item.14"
+          },
+          {
+            "container": "river.merchant.pocket",
+            "definition": "clear_tonic",
+            "properties": {
+
+            },
+            "quantity": 2,
+            "uid": "item.15"
+          },
+          {
+            "container": "river.merchant.pocket",
+            "definition": "book_spear_thrust",
+            "properties": {
+
+            },
+            "quantity": 1,
+            "uid": "item.16"
+          },
+          {
+            "container": "river.merchant.pack",
+            "definition": "river_sabre",
+            "properties": {
+
+            },
+            "quantity": 1,
+            "uid": "item.9"
+          },
+          {
+            "container": "river.merchant.pack",
+            "definition": "river_spear",
+            "properties": {
+
+            },
+            "quantity": 1,
+            "uid": "item.10"
+          },
+          {
+            "container": "river.merchant.pack",
+            "definition": "river_staff",
+            "properties": {
+
+            },
+            "quantity": 1,
+            "uid": "item.11"
+          },
+          {
+            "container": "river.merchant.pack",
+            "definition": "river_bow",
+            "properties": {
+
+            },
+            "quantity": 1,
+            "uid": "item.12"
+          }
+        ],
+        "trust": 0
+      }
+    },
+    "objective": "沿旧档案寻找水工图纸、回响与食品记录；出口始终开放。",
+    "pack": [
+      {
+        "definition": "keeper_ring",
+        "properties": {
+
+        },
+        "quantity": 1,
+        "uid": "item.130"
+      }
+    ],
+    "paused": false,
+    "physical_actions": [],
+    "player": {
+      "attacks": 0,
+      "base": false,
+      "channel_source": "",
+      "charge_source": "",
+      "damage_taken": 0,
+      "dead": false,
+      "guarding": false,
+      "hp": 100,
+      "mode": "idle",
+      "mp": 52,
+      "position": [
+        720.0,
+        -400.0
+      ],
+      "stamina": 100.0,
+      "ui_blocked": false
+    },
+    "region_id": "river_archive",
+    "runtime_scripts": [
+      "",
+      "res://core/command/command_bus.gd",
+      "res://core/debug/combat_debug_ui.gd",
+      "res://core/event/combat_event_bus.gd",
+      "res://core/game_runtime.gd",
+      "res://core/region_runtime.gd",
+      "res://core/save_manager.gd",
+      "res://core/state/state_machine.gd",
+      "res://entities/components/combat_component.gd",
+      "res://entities/components/health_component.gd",
+      "res://entities/components/mana_component.gd",
+      "res://entities/components/stats_component.gd",
+      "res://entities/player/components/player_casting_controller.gd",
+      "res://entities/player/components/player_combat_bindings.gd",
+      "res://entities/player/components/player_field_work.gd",
+      "res://entities/player/components/player_input_controller.gd",
+      "res://entities/player/player.gd",
+      "res://entities/player/states/attack.gd",
+      "res://entities/player/states/dodge.gd",
+      "res://entities/player/states/idle.gd",
+      "res://entities/player/states/move.gd",
+      "res://entities/player/states/skill.gd",
+      "res://entities/player/states/work.gd",
+      "res://gameplay/abilities/combinations/conditional_cast_controller.gd",
+      "res://gameplay/abilities/fields/field_placement_preview.gd",
+      "res://gameplay/abilities/fields/preparation_overlay.gd",
+      "res://gameplay/abilities/manager/skill_manager.gd",
+      "res://gameplay/abilities/manager/skill_mastery_manager.gd",
+      "res://gameplay/abilities/manager/summon_manager.gd",
+      "res://gameplay/abilities/runtime/skill_executor.gd",
+      "res://gameplay/abilities/runtime/skill_synergy_resolver.gd",
+      "res://gameplay/characters/actor_equipment_visual.gd",
+      "res://gameplay/combat/combat_executor.gd",
+      "res://gameplay/combat/on_hit/element_hit_bindings.gd",
+      "res://gameplay/exploration/element_knowledge.gd",
+      "res://gameplay/exploration/element_trial_recorder.gd",
+      "res://gameplay/exploration/expedition_ui.gd",
+      "res://gameplay/exploration/exploration_interactable.gd",
+      "res://gameplay/exploration/spell_world_object.gd",
+      "res://gameplay/exploration/surface_overlay.gd",
+      "res://gameplay/exploration/survival/survival_service.gd",
+      "res://gameplay/foundation/actor_action_controller.gd",
+      "res://gameplay/foundation/actor_components.gd",
+      "res://gameplay/foundation/campaign_session.gd",
+      "res://gameplay/foundation/interaction_provider.gd",
+      "res://gameplay/foundation/stability_component.gd",
+      "res://gameplay/foundation/stamina_component.gd",
+      "res://gameplay/foundation/ui/actor_status_view.gd",
+      "res://gameplay/frontier/frontier_hud.gd",
+      "res://gameplay/frontier/grayriver_game.gd",
+      "res://gameplay/frontier/grayriver_loot_corpse.gd",
+      "res://gameplay/interaction/propagation_scheduler.gd",
+      "res://gameplay/interaction/respawn_scheduler.gd",
+      "res://gameplay/interaction/simulation_runtime.gd",
+      "res://gameplay/interaction/surface_manager.gd",
+      "res://gameplay/interaction/surface_scheduler.gd",
+      "res://gameplay/inventory/equipment_manager.gd",
+      "res://gameplay/items/item_action_controller.gd",
+      "res://gameplay/items/spray_channel.gd",
+      "res://gameplay/maps/authored_map_cell.gd",
+      "res://gameplay/maps/map_arrival.gd",
+      "res://gameplay/maps/map_feature.gd",
+      "res://gameplay/maps/map_furniture.gd",
+      "res://gameplay/presentation/actors/actor_animation_controller.gd",
+      "res://gameplay/presentation/actors/actor_weapon_visual.gd",
+      "res://gameplay/presentation/button_motion.gd",
+      "res://gameplay/presentation/camera_feedback.gd",
+      "res://gameplay/presentation/environment_presentation.gd",
+      "res://gameplay/presentation/presentation_audio.gd",
+      "res://gameplay/presentation/presentation_director.gd",
+      "res://gameplay/presentation/world_object_presentation.gd",
+      "res://gameplay/status/buff_manager.gd",
+      "res://ui/actor_inventory_screen.gd",
+      "res://ui/boss_hp_bar.gd",
+      "res://ui/buff_status_ui.gd",
+      "res://ui/damage_number_spawner.gd",
+      "res://ui/expedition_backdrop.gd",
+      "res://ui/expedition_navigation.gd",
+      "res://ui/field_work_panel.gd",
+      "res://ui/hud.gd",
+      "res://ui/inventory_item_tile.gd",
+      "res://ui/inventory_panel.gd",
+      "res://ui/material_wheel.gd",
+      "res://ui/paper_doll_view.gd",
+      "res://ui/skill_bar.gd",
+      "res://ui/skill_pool_ui.gd",
+      "res://ui/slot_button.gd",
+      "res://ui/summon_status_ui.gd",
+      "res://world/object/interactable.gd",
+      "res://world/state/world_state_manager.gd",
+      "res://world/time/world_time.gd",
+      "res://world/world_runtime.gd"
+    ],
+    "save_path": "/tmp/grayriver-adventure-magic/data/godot/app_userdata/Study/save_3.sav",
+    "selected": {
+
+    },
+    "shortcuts": {
+      "item_0": {
+        "item_id": "ration",
+        "kind": "item",
+        "uid": ""
+      },
+      "item_1": {
+        "item_id": "clean_water",
+        "kind": "item",
+        "uid": ""
+      },
+      "item_2": {
+        "item_id": "tea",
+        "kind": "item",
+        "uid": ""
+      },
+      "item_3": {
+        "item_id": "broth",
+        "kind": "item",
+        "uid": ""
+      },
+      "right": {
+        "kind": "skill",
+        "skill_id": "ignite",
+        "upgrades": {
+
+        }
+      },
+      "slot_0": {
+        "kind": "skill",
+        "skill_id": "disperse",
+        "upgrades": {
+
+        }
+      },
+      "slot_1": {
+        "kind": "skill",
+        "skill_id": "pulse",
+        "upgrades": {
+
+        }
+      },
+      "slot_3": {
+        "kind": "skill",
+        "skill_id": "water_call",
+        "upgrades": {
+
+        }
+      },
+      "slot_4": {
+        "kind": "skill",
+        "selection": {
+          "mode": "auto"
+        },
+        "skill_id": "inscribe",
+        "upgrades": {
+
+        }
+      },
+      "slot_5": {
+        "kind": "skill",
+        "skill_id": "ignite",
+        "upgrades": {
+
+        }
+      }
+    },
+    "simulation": true,
+    "slots": [
+      "disperse",
+      "pulse",
+      "",
+      "water_call",
+      "inscribe",
+      "ignite"
+    ],
+    "social": {
+      "cycles": {
+
+      },
+      "favors": {
+
+      },
+      "known": {
+
+      },
+      "schema": 1
+    },
+    "spell_affinity": "arcane",
+    "tracked_id": "river.first_expedition",
+    "tracker": "追踪委托\n回镇向艾妲报告\n↗ 6步 · 先到遗迹出口",
+    "visited": [
+      "camp",
+      "river_archive"
+    ],
+    "wall_usec": 64780298,
+    "wheel": {
+      "source": "",
+      "visible": false
+    },
+    "world_storage": {
+      "storage.town.hunters": [],
+      "storage.town.inn.common": [],
+      "storage.town.inn.player": [],
+      "storage.town.merchant.sealed": [
+        {
+          "definition": "metal_scrap",
+          "properties": {
+
+          },
+          "quantity": 2,
+          "uid": "item.106"
+        },
+        {
+          "definition": "cloth",
+          "properties": {
+
+          },
+          "quantity": 2,
+          "uid": "item.107"
+        }
+      ],
+      "storage.town.records.common": [],
+      "storage.town.wardens": [],
+      "storage.town.workshop.common": [],
+      "storage.town.workshop.fieldcraft": []
+    }
+  }
+}

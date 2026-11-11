@@ -1,0 +1,9 @@
+{
+  "complete": false,
+  "reason": "Stopped after confirmed stale return-coordinate failure; second stale coordinate found before reaching serial map_preview_input; no source was edited during this run",
+  "stopped_pids": [
+    146605,
+    147752,
+    147762
+  ]
+}

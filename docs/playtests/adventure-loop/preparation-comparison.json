@@ -1,0 +1,130 @@
+[
+  {
+    "name": "near",
+    "shared_checkpoint_sha256": "0ae51e5a18e68dc8f9a6738af4f6d3cde45e8611e6eb0dbe06626f657e255cbb",
+    "target": "river.enemy.river_archive.river_archive.1",
+    "source": "/tmp/grayriver-preparation-near",
+    "seconds": 5.80916666666667,
+    "confirmed_damage": 16,
+    "hp_before": 110,
+    "hp_after": 94,
+    "mp_before": 60,
+    "mp_after": 29,
+    "start_position": [
+      -185.659729003906,
+      446.005706787109
+    ],
+    "firestones_spent": 1,
+    "casts": [
+      {
+        "action": "inscribe",
+        "charge_power": 1.0,
+        "materials": {
+          "fire_stone": 1
+        },
+        "mp_after": 52,
+        "mp_cost": 8,
+        "position": [
+          -185.659729003906,
+          446.005706787109
+        ],
+        "result": "inscribe",
+        "rule": "",
+        "t": 6.91482133333333
+      },
+      {
+        "action": "ignite",
+        "charge_power": 1.0,
+        "materials": {},
+        "mp_after": 40,
+        "mp_cost": 12,
+        "position": [
+          -185.659729003906,
+          446.005706787109
+        ],
+        "result": "fireball",
+        "rule": "fire_sigil_fireball",
+        "t": 7.44713166666667
+      },
+      {
+        "action": "ignite",
+        "charge_power": 1.0,
+        "materials": {},
+        "mp_after": 29,
+        "mp_cost": 12,
+        "position": [
+          -185.659729003906,
+          446.005706787109
+        ],
+        "result": "fireball",
+        "rule": "fire_sigil_fireball",
+        "t": 9.85719266666667
+      }
+    ],
+    "snapshot_history_immutable": true
+  },
+  {
+    "name": "south",
+    "shared_checkpoint_sha256": "0ae51e5a18e68dc8f9a6738af4f6d3cde45e8611e6eb0dbe06626f657e255cbb",
+    "target": "river.enemy.river_archive.river_archive.1",
+    "source": "/tmp/grayriver-preparation-south",
+    "seconds": 4.45746233333334,
+    "confirmed_damage": 0,
+    "hp_before": 110,
+    "hp_after": 110,
+    "mp_before": 60,
+    "mp_after": 29,
+    "start_position": [
+      -182.208633422852,
+      596.069641113281
+    ],
+    "firestones_spent": 1,
+    "casts": [
+      {
+        "action": "inscribe",
+        "charge_power": 1.0,
+        "materials": {
+          "fire_stone": 1
+        },
+        "mp_after": 52,
+        "mp_cost": 8,
+        "position": [
+          -182.208633422852,
+          596.069641113281
+        ],
+        "result": "inscribe",
+        "rule": "",
+        "t": 7.34249433333333
+      },
+      {
+        "action": "ignite",
+        "charge_power": 1.0,
+        "materials": {},
+        "mp_after": 40,
+        "mp_cost": 12,
+        "position": [
+          -182.208633422852,
+          596.069641113281
+        ],
+        "result": "fireball",
+        "rule": "fire_sigil_fireball",
+        "t": 7.84804988888888
+      },
+      {
+        "action": "ignite",
+        "charge_power": 1.0,
+        "materials": {},
+        "mp_after": 29,
+        "mp_cost": 12,
+        "position": [
+          -182.208633422852,
+          596.069641113281
+        ],
+        "result": "fireball",
+        "rule": "fire_sigil_fireball",
+        "t": 10.2493016666667
+      }
+    ],
+    "snapshot_history_immutable": true
+  }
+]

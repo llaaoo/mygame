@@ -151,8 +151,9 @@ position = Vector2(-2550, 2810)
 id = "records_return"
 
 [node name="返回林地落点" parent="." instance=ExtResource("arrival_marker")]
-position = Vector2(-2600, -1660)
+position = Vector2(-2700, -1800)
 id = "archive_return"
+minimum_enemy_distance = 520.0
 
 [node name="进入林下档案窖" parent="." instance=ExtResource("feature")]
 position = Vector2(-2600, -1800)

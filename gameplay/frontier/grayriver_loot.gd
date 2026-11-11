@@ -137,11 +137,13 @@ func take(id: String, kind := "", item_id := "",uid := "") -> int:
 
 func inspect_actor(enemy: Enemy) -> void:
 	if not is_instance_valid(enemy) or enemy.health_component.is_dead or enemy.global_position.distance_to(game.player.global_position) >= PlayerInputController.INTERACT_RANGE: return
+	if not enemy.can_see(game.player): return
 	if game.stories.inspect(enemy): return
 	var carried := snapshot(enemy)
 	var text := "穿戴与行囊读取当前实物，击败后回收这些装备及尚未用掉的物资。\n\n" if enemy.rewards_enabled else "这是无奖励试战：穿戴仍产生战斗效果，击败后不生成新的战利品。\n\n"
-	if enemy.character_definition and enemy.character_definition.encounter_tactics:
-		text+="观察习性："+enemy.character_definition.encounter_tactics.observation+"\n\n"
+	var awareness:=enemy.actor_context.awareness if enemy.actor_context else null
+	if awareness and awareness.rules:
+		text+="观察习性："+awareness.rules.observation+"\n\n"
 	for id in carried.equipment:
 		var item := game.catalog.equipment.get(id) as EquipmentData
 		if item: text += item.display_name+"\n"+item.description+"\n\n"
