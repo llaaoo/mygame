@@ -16,6 +16,8 @@ var regen_bonus_sources: Dictionary = {}
 ## 信号
 signal recovered(actual: float, source: String)
 signal health_changed(current_hp: int, max_hp: int)
+## Accepted HP loss only; cap projections/healing never emit this local fact.
+signal damaged(actual: int)
 signal died
 
 ## 运行时状态
@@ -79,10 +81,13 @@ func take_damage(amount: int) -> void:
 
 	var previous_hp := hp
 	hp = maxi(0, hp - amount)
+	# Preserve accepted loss even if health_changed observers synchronously heal.
+	var actual := mini(previous_hp, amount)
 	if _hit_group_depth > 0 and _periodic_depth == 0:
 		_group_damaged = true
 	_time_since_damage = 0.0
 	health_changed.emit(hp, max_hp)
+	if actual > 0: damaged.emit(actual)
 
 	# 发射 ON_DAMAGE 事件（伤害已应用）
 	_emit_damage_event(amount)

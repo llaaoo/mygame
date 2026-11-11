@@ -98,6 +98,17 @@ func run() -> void:
 	CombatExecutor.report_hit(null, player, 5, player.position, null, ["test"])
 	check(not work.is_busy() and supplies.serialize() == before and not site.completed, "Heal then damage did not cancel without payment")
 	check(work.start_selected(), "Interrupted work could not restart")
+	# The public actor damage boundary is valid without an outer report_hit.
+	# A synchronous health_changed observer healing this loss cannot hide it.
+	var before_direct:=player.health_component.hp
+	var heal_damage:=func(current_hp: int,_maximum: int) -> void:
+		if current_hp<before_direct: player.health_component.heal(before_direct-current_hp)
+	player.health_component.health_changed.connect(heal_damage)
+	player.health_component.invincible=false
+	player.take_damage(1)
+	player.health_component.health_changed.disconnect(heal_damage)
+	check(player.health_component.hp==before_direct and not work.is_busy() and supplies.serialize()==before and not site.completed,"Synchronous healing masked direct accepted damage or work charged interrupted materials")
+	check(work.start_selected(), "Work could not restart after directly applied damage")
 	work.tick(1.5)
 	check(site.completed and supplies.count("resin") == 3 and supplies.count("crystal") == 6 and game.progress.choices[spec.id] == "patch", "Successful work did not commit once")
 	check(not game.progress.claims.has(spec.pickup_claim), "Opening teleported the part into inventory")
