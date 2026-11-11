@@ -1,0 +1,393 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+
+[   0% ] [90m[1mfirst_scan_filesystem[22m | Started Project initialization (5 steps)[39m[0m
+[   0% ] [90m[1mfirst_scan_filesystem[22m | Scanning file structure...[39m[0m
+[  16% ] [90m[1mfirst_scan_filesystem[22m | Loading global class names...[39m[0m
+[  33% ] [90m[1mfirst_scan_filesystem[22m | Verifying GDExtensions...[39m[0m
+[  50% ] [90m[1mfirst_scan_filesystem[22m | Creating autoload scripts...[39m[0m
+[  66% ] [90m[1mfirst_scan_filesystem[22m | Initializing plugins...[39m[0m
+[  83% ] [90m[1mfirst_scan_filesystem[22m | Starting file scan...[39m[0m
+[92m[ DONE ][39m [1mfirst_scan_filesystem[22m
+[0m
+[   0% ] [90m[1mupdate_scripts_classes[22m | Started Registering global classes... (30 steps)[39m[0m
+[   0% ] [90m[1mupdate_scripts_classes[22m | Enemy[39m[0m
+[   3% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[   6% ] [90m[1mupdate_scripts_classes[22m | PlayerInputController[39m[0m
+[   9% ] [90m[1mupdate_scripts_classes[22m | SkillManager[39m[0m
+[  12% ] [90m[1mupdate_scripts_classes[22m | CampaignGame[39m[0m
+[  16% ] [90m[1mupdate_scripts_classes[22m | ExpeditionUI[39m[0m
+[  19% ] [90m[1mupdate_scripts_classes[22m | ActorActionController[39m[0m
+[  22% ] [90m[1mupdate_scripts_classes[22m | CampaignSession[39m[0m
+[  25% ] [90m[1mupdate_scripts_classes[22m | FrontierHub[39m[0m
+[  29% ] [90m[1mupdate_scripts_classes[22m | GrayriverDefinition[39m[0m
+[  32% ] [90m[1mupdate_scripts_classes[22m | GrayriverValidator[39m[0m
+[  35% ] [90m[1mupdate_scripts_classes[22m | TownServices[39m[0m
+[  38% ] [90m[1mupdate_scripts_classes[22m | ItemActionController[39m[0m
+[  41% ] [90m[1mupdate_scripts_classes[22m | SprayChannel[39m[0m
+[  45% ] [90m[1mupdate_scripts_classes[22m | ThrownDose[39m[0m
+[  48% ] [90m[1mupdate_scripts_classes[22m | ThrowTrajectory[39m[0m
+[  51% ] [90m[1mupdate_scripts_classes[22m | MapAuthoringAudit[39m[0m
+[  54% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  58% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  61% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  64% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  67% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  70% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  74% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  77% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  80% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  83% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  87% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  90% ] [90m[1mupdate_scripts_classes[22m | NpcConversationScreen[39m[0m
+[  93% ] [90m[1mupdate_scripts_classes[22m | SkillPoolUI[39m[0m
+[92m[ DONE ][39m [1mupdate_scripts_classes[22m
+[0m
+[   0% ] [90m[1m_update_scan_actions[22m | Started Scanning actions... (110 steps)[39m[0m
+[   0% ] [90m[1m_update_scan_actions[22m | mcp_panel.csv[39m[0m
+[   0% ] [90m[1m_update_scan_actions[22m | cast-release.png[39m[0m
+[   1% ] [90m[1m_update_scan_actions[22m | combat-charge.png[39m[0m
+[   2% ] [90m[1m_update_scan_actions[22m | gallery.png[39m[0m
+[   3% ] [90m[1m_update_scan_actions[22m | paper-doll.png[39m[0m
+[   4% ] [90m[1m_update_scan_actions[22m | same-combo-second-art.png[39m[0m
+[   5% ] [90m[1m_update_scan_actions[22m | shared-art-bow.png[39m[0m
+[   6% ] [90m[1m_update_scan_actions[22m | shop-full-bag-sale.png[39m[0m
+[   7% ] [90m[1m_update_scan_actions[22m | shop-small-window.png[39m[0m
+[   8% ] [90m[1m_update_scan_actions[22m | shop-worn-item.png[39m[0m
+[   9% ] [90m[1m_update_scan_actions[22m | two-art-loadout.png[39m[0m
+[   9% ] [90m[1m_update_scan_actions[22m | wheel-lost-material.png[39m[0m
+[  10% ] [90m[1m_update_scan_actions[22m | archer-combat.png[39m[0m
+[  11% ] [90m[1m_update_scan_actions[22m | crawler-combat.png[39m[0m
+[  12% ] [90m[1m_update_scan_actions[22m | fieldcraft-courses.png[39m[0m
+[  13% ] [90m[1m_update_scan_actions[22m | hound-combat.png[39m[0m
+[  14% ] [90m[1m_update_scan_actions[22m | mauler-combat.png[39m[0m
+[  15% ] [90m[1m_update_scan_actions[22m | professional-work.png[39m[0m
+[  16% ] [90m[1m_update_scan_actions[22m | unlearned-fangs.png[39m[0m
+[  17% ] [90m[1m_update_scan_actions[22m | body-frame-review.png[39m[0m
+[  18% ] [90m[1m_update_scan_actions[22m | day.png[39m[0m
+[  18% ] [90m[1m_update_scan_actions[22m | harvest-depleted.png[39m[0m
+[  19% ] [90m[1m_update_scan_actions[22m | mechanism-work.png[39m[0m
+[  20% ] [90m[1m_update_scan_actions[22m | night.png[39m[0m
+[  21% ] [90m[1m_update_scan_actions[22m | settings-small.png[39m[0m
+[  22% ] [90m[1m_update_scan_actions[22m | editor-blocked-spawn.png[39m[0m
+[  23% ] [90m[1m_update_scan_actions[22m | editor-isolated-play.png[39m[0m
+[  24% ] [90m[1m_update_scan_actions[22m | editor-validation-passed.png[39m[0m
+[  25% ] [90m[1m_update_scan_actions[22m | normal-reentry.png[39m[0m
+[  26% ] [90m[1m_update_scan_actions[22m | preview-archive-start.png[39m[0m
+[  27% ] [90m[1m_update_scan_actions[22m | preview-inn-start.png[39m[0m
+[  27% ] [90m[1m_update_scan_actions[22m | preview-local-map.png[39m[0m
+[  28% ] [90m[1m_update_scan_actions[22m | g-selector.png[39m[0m
+[  29% ] [90m[1m_update_scan_actions[22m | m-map.png[39m[0m
+[  30% ] [90m[1m_update_scan_actions[22m | followup-ready-blade.png[39m[0m
+[  31% ] [90m[1m_update_scan_actions[22m | followup-ready-bow.png[39m[0m
+[  32% ] [90m[1m_update_scan_actions[22m | followup-ready-spear.png[39m[0m
+[  33% ] [90m[1m_update_scan_actions[22m | followup-ready-staff.png[39m[0m
+[  34% ] [90m[1m_update_scan_actions[22m | followup-strike-blade.png[39m[0m
+[  35% ] [90m[1m_update_scan_actions[22m | followup-strike-bow.png[39m[0m
+[  36% ] [90m[1m_update_scan_actions[22m | followup-strike-spear.png[39m[0m
+[  36% ] [90m[1m_update_scan_actions[22m | followup-strike-staff.png[39m[0m
+[  37% ] [90m[1m_update_scan_actions[22m | aida-routes-small.png[39m[0m
+[  38% ] [90m[1m_update_scan_actions[22m | familiar-shop.png[39m[0m
+[  39% ] [90m[1m_update_scan_actions[22m | favor-journal.png[39m[0m
+[  40% ] [90m[1m_update_scan_actions[22m | merchant-favor-completed.png[39m[0m
+[  41% ] [90m[1m_update_scan_actions[22m | merchant-topics.png[39m[0m
+[  42% ] [90m[1m_update_scan_actions[22m | off-duty-service.png[39m[0m
+[  43% ] [90m[1m_update_scan_actions[22m | ammo-output-preview.png[39m[0m
+[  44% ] [90m[1m_update_scan_actions[22m | craft-tree.png[39m[0m
+[  45% ] [90m[1m_update_scan_actions[22m | stamina-investment.png[39m[0m
+[  45% ] [90m[1m_update_scan_actions[22m | survival-tree-small.png[39m[0m
+[  46% ] [90m[1m_update_scan_actions[22m | weapon-tree-requirements.png[39m[0m
+[  47% ] [90m[1m_update_scan_actions[22m | 00-unfinished-evidence-guidance.png[39m[0m
+[  48% ] [90m[1m_update_scan_actions[22m | 01-territory-warning.png[39m[0m
+[  49% ] [90m[1m_update_scan_actions[22m | 02-territory-combat.png[39m[0m
+[  50% ] [90m[1m_update_scan_actions[22m | 03-funded-supply-next-batch.png[39m[0m
+[  51% ] [90m[1m_update_scan_actions[22m | 04-earned-charter.png[39m[0m
+[  52% ] [90m[1m_update_scan_actions[22m | 05-finite-member-box.png[39m[0m
+[  53% ] [90m[1m_update_scan_actions[22m | 06-private-property-mediation.png[39m[0m
+[  54% ] [90m[1m_update_scan_actions[22m | 07-actual-journey-cost.png[39m[0m
+[  54% ] [90m[1m_update_scan_actions[22m | 08-reloaded-member-box-small.png[39m[0m
+[  55% ] [90m[1m_update_scan_actions[22m | normal-reentry.png[39m[0m
+[  56% ] [90m[1m_update_scan_actions[22m | used-spray-storage.png[39m[0m
+[  57% ] [90m[1m_update_scan_actions[22m | shared-art-blade.png[39m[0m
+[  58% ] [90m[1m_update_scan_actions[22m | shared-art-bow.png[39m[0m
+[  59% ] [90m[1m_update_scan_actions[22m | shared-art-flow.png[39m[0m
+[  60% ] [90m[1m_update_scan_actions[22m | shared-art-spear.png[39m[0m
+[  61% ] [90m[1m_update_scan_actions[22m | shared-art-staff.png[39m[0m
+[  62% ] [90m[1m_update_scan_actions[22m | 01-town-directions.png[39m[0m
+[  63% ] [90m[1m_update_scan_actions[22m | 03-real-storage-remainder.png[39m[0m
+[  63% ] [90m[1m_update_scan_actions[22m | 06-workshop-crafting.png[39m[0m
+[  64% ] [90m[1m_update_scan_actions[22m | 07-records-readable.png[39m[0m
+[  65% ] [90m[1m_update_scan_actions[22m | 09-town-cells-saved.png[39m[0m
+[  66% ] [90m[1m_update_scan_actions[22m | godot-inn-editor.png[39m[0m
+[  67% ] [90m[1m_update_scan_actions[22m | inn-common-room.png[39m[0m
+[  68% ] [90m[1m_update_scan_actions[22m | inn-cooking.png[39m[0m
+[  69% ] [90m[1m_update_scan_actions[22m | inn-hourly-rest.png[39m[0m
+[  70% ] [90m[1m_update_scan_actions[22m | inn-local-map-small.png[39m[0m
+[  71% ] [90m[1m_update_scan_actions[22m | inn-local-map.png[39m[0m
+[  72% ] [90m[1m_update_scan_actions[22m | inn-real-provision-trade.png[39m[0m
+[  72% ] [90m[1m_update_scan_actions[22m | innkeeper-conversation.png[39m[0m
+[  73% ] [90m[1m_update_scan_actions[22m | journey-reloaded.png[39m[0m
+[  74% ] [90m[1m_update_scan_actions[22m | records-readable-directory.png[39m[0m
+[  75% ] [90m[1m_update_scan_actions[22m | storage-actual-instance.png[39m[0m
+[  76% ] [90m[1m_update_scan_actions[22m | town-inn-door.png[39m[0m
+[  77% ] [90m[1m_update_scan_actions[22m | workshop-real-crafting.png[39m[0m
+[  78% ] [90m[1m_update_scan_actions[22m | combo-blade.png[39m[0m
+[  79% ] [90m[1m_update_scan_actions[22m | combo-bow.png[39m[0m
+[  80% ] [90m[1m_update_scan_actions[22m | combo-spear.png[39m[0m
+[  81% ] [90m[1m_update_scan_actions[22m | combo-staff.png[39m[0m
+[  81% ] [90m[1m_update_scan_actions[22m | charged-art-blade.png[39m[0m
+[  82% ] [90m[1m_update_scan_actions[22m | small-window-heavy.png[39m[0m
+[  83% ] [90m[1m_update_scan_actions[22m | moving-during-recovery.png[39m[0m
+[  84% ] [90m[1m_update_scan_actions[22m | queued-staff-stroke.png[39m[0m
+[  85% ] [90m[1m_update_scan_actions[22m | 07-safe-preparation-final.png[39m[0m
+[  86% ] [90m[1m_update_scan_actions[22m | 09-fireball-result-final.png[39m[0m
+[  87% ] [90m[1m_update_scan_actions[22m | effective-stamina-stable-controls.png[39m[0m
+[  88% ] [90m[1m_update_scan_actions[22m | independent-merchant.png[39m[0m
+[  89% ] [90m[1m_update_scan_actions[22m | independent-training.png[39m[0m
+[  90% ] [90m[1m_update_scan_actions[22m | journey-course-funded-favor.png[39m[0m
+[  90% ] [90m[1m_update_scan_actions[22m | journey-funded-supply.png[39m[0m
+[  91% ] [90m[1m_update_scan_actions[22m | journey-growth.png[39m[0m
+[  92% ] [90m[1m_update_scan_actions[22m | journey-personal-tracker.png[39m[0m
+[  93% ] [90m[1m_update_scan_actions[22m | journey-reloaded.png[39m[0m
+[  94% ] [90m[1m_update_scan_actions[22m | personal-delivery.png[39m[0m
+[  95% ] [90m[1m_update_scan_actions[22m | personal-objective-small.png[39m[0m
+[  96% ] [90m[1m_update_scan_actions[22m | typed-route-leads.png[39m[0m
+[  97% ] [90m[1m_update_scan_actions[22m | counterplay_delivery.png[39m[0m
+[  98% ] [90m[1m_update_scan_actions[22m | counterplay_warning.png[39m[0m
+[92m[ DONE ][39m [1m_update_scan_actions[22m
+[0m
+[   0% ] [90m[1mreimport[22m | Started (Re)Importing Assets (109 steps)[39m[0m
+[   0% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[   0% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[   1% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[   2% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[   3% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[   4% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[   5% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[   6% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[   7% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[   8% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[   9% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  10% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  10% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  11% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  12% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  13% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  14% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  15% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  16% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  17% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  18% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  19% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  20% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  20% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  21% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  22% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  23% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  24% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  25% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  26% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  27% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  28% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  29% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  30% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  30% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  31% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  32% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  33% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  34% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  35% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  36% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  37% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  38% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  39% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  40% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  40% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  41% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  42% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  43% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  44% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  45% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  46% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  47% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  48% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  49% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  50% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  50% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  51% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  52% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  53% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  54% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  55% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  56% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  57% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  58% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  59% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  60% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  60% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  61% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  62% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  63% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  64% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  65% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  66% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  67% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  68% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  69% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  70% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  70% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  71% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  72% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  73% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  74% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  75% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  76% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  77% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  78% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  79% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  80% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  80% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  81% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  82% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  83% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  84% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  85% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  86% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  87% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  88% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  89% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  90% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  90% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  91% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  92% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  93% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  94% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  95% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  96% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  97% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  98% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[   0% ] [90m[1mreimport[22m | Executing pre-reimport operations...[39m[0m
+[   0% ] [90m[1mreimport[22m | journey-reloaded.png[39m[0m
+[   0% ] [90m[1mreimport[22m | innkeeper-conversation.png[39m[0m
+[   1% ] [90m[1mreimport[22m | inn-real-provision-trade.png[39m[0m
+[   2% ] [90m[1mreimport[22m | inn-local-map.png[39m[0m
+[   3% ] [90m[1mreimport[22m | inn-local-map-small.png[39m[0m
+[   4% ] [90m[1mreimport[22m | inn-hourly-rest.png[39m[0m
+[   5% ] [90m[1mreimport[22m | inn-cooking.png[39m[0m
+[   6% ] [90m[1mreimport[22m | inn-common-room.png[39m[0m
+[   7% ] [90m[1mreimport[22m | godot-inn-editor.png[39m[0m
+[   8% ] [90m[1mreimport[22m | 09-town-cells-saved.png[39m[0m
+[   9% ] [90m[1mreimport[22m | 07-records-readable.png[39m[0m
+[  10% ] [90m[1mreimport[22m | 06-workshop-crafting.png[39m[0m
+[  10% ] [90m[1mreimport[22m | 03-real-storage-remainder.png[39m[0m
+[  11% ] [90m[1mreimport[22m | 01-town-directions.png[39m[0m
+[  12% ] [90m[1mreimport[22m | shared-art-staff.png[39m[0m
+[  13% ] [90m[1mreimport[22m | shared-art-spear.png[39m[0m
+[  14% ] [90m[1mreimport[22m | shared-art-flow.png[39m[0m
+[  15% ] [90m[1mreimport[22m | shared-art-bow.png[39m[0m
+[  16% ] [90m[1mreimport[22m | shared-art-blade.png[39m[0m
+[  17% ] [90m[1mreimport[22m | used-spray-storage.png[39m[0m
+[  18% ] [90m[1mreimport[22m | normal-reentry.png[39m[0m
+[  19% ] [90m[1mreimport[22m | 08-reloaded-member-box-small.png[39m[0m
+[  20% ] [90m[1mreimport[22m | 07-actual-journey-cost.png[39m[0m
+[  20% ] [90m[1mreimport[22m | 06-private-property-mediation.png[39m[0m
+[  21% ] [90m[1mreimport[22m | 05-finite-member-box.png[39m[0m
+[  22% ] [90m[1mreimport[22m | 04-earned-charter.png[39m[0m
+[  23% ] [90m[1mreimport[22m | 03-funded-supply-next-batch.png[39m[0m
+[  24% ] [90m[1mreimport[22m | counterplay_warning.png[39m[0m
+[  25% ] [90m[1mreimport[22m | counterplay_delivery.png[39m[0m
+[  26% ] [90m[1mreimport[22m | typed-route-leads.png[39m[0m
+[  27% ] [90m[1mreimport[22m | personal-objective-small.png[39m[0m
+[  28% ] [90m[1mreimport[22m | personal-delivery.png[39m[0m
+[  29% ] [90m[1mreimport[22m | journey-reloaded.png[39m[0m
+[  30% ] [90m[1mreimport[22m | journey-personal-tracker.png[39m[0m
+[  30% ] [90m[1mreimport[22m | journey-growth.png[39m[0m
+[  31% ] [90m[1mreimport[22m | journey-funded-supply.png[39m[0m
+[  32% ] [90m[1mreimport[22m | journey-course-funded-favor.png[39m[0m
+[  33% ] [90m[1mreimport[22m | independent-training.png[39m[0m
+[  34% ] [90m[1mreimport[22m | independent-merchant.png[39m[0m
+[  35% ] [90m[1mreimport[22m | effective-stamina-stable-controls.png[39m[0m
+[  36% ] [90m[1mreimport[22m | 09-fireball-result-final.png[39m[0m
+[  37% ] [90m[1mreimport[22m | 07-safe-preparation-final.png[39m[0m
+[  38% ] [90m[1mreimport[22m | queued-staff-stroke.png[39m[0m
+[  39% ] [90m[1mreimport[22m | moving-during-recovery.png[39m[0m
+[  40% ] [90m[1mreimport[22m | small-window-heavy.png[39m[0m
+[  40% ] [90m[1mreimport[22m | charged-art-blade.png[39m[0m
+[  41% ] [90m[1mreimport[22m | combo-staff.png[39m[0m
+[  42% ] [90m[1mreimport[22m | combo-spear.png[39m[0m
+[  43% ] [90m[1mreimport[22m | combo-bow.png[39m[0m
+[  44% ] [90m[1mreimport[22m | combo-blade.png[39m[0m
+[  45% ] [90m[1mreimport[22m | workshop-real-crafting.png[39m[0m
+[  46% ] [90m[1mreimport[22m | town-inn-door.png[39m[0m
+[  47% ] [90m[1mreimport[22m | storage-actual-instance.png[39m[0m
+[  48% ] [90m[1mreimport[22m | records-readable-directory.png[39m[0m
+[  49% ] [90m[1mreimport[22m | editor-validation-passed.png[39m[0m
+[  50% ] [90m[1mreimport[22m | editor-isolated-play.png[39m[0m
+[  50% ] [90m[1mreimport[22m | editor-blocked-spawn.png[39m[0m
+[  51% ] [90m[1mreimport[22m | settings-small.png[39m[0m
+[  52% ] [90m[1mreimport[22m | night.png[39m[0m
+[  53% ] [90m[1mreimport[22m | mechanism-work.png[39m[0m
+[  54% ] [90m[1mreimport[22m | harvest-depleted.png[39m[0m
+[  55% ] [90m[1mreimport[22m | day.png[39m[0m
+[  56% ] [90m[1mreimport[22m | body-frame-review.png[39m[0m
+[  57% ] [90m[1mreimport[22m | unlearned-fangs.png[39m[0m
+[  58% ] [90m[1mreimport[22m | professional-work.png[39m[0m
+[  59% ] [90m[1mreimport[22m | mauler-combat.png[39m[0m
+[  60% ] [90m[1mreimport[22m | hound-combat.png[39m[0m
+[  60% ] [90m[1mreimport[22m | fieldcraft-courses.png[39m[0m
+[  61% ] [90m[1mreimport[22m | crawler-combat.png[39m[0m
+[  62% ] [90m[1mreimport[22m | archer-combat.png[39m[0m
+[  63% ] [90m[1mreimport[22m | wheel-lost-material.png[39m[0m
+[  64% ] [90m[1mreimport[22m | two-art-loadout.png[39m[0m
+[  65% ] [90m[1mreimport[22m | shop-worn-item.png[39m[0m
+[  66% ] [90m[1mreimport[22m | shop-small-window.png[39m[0m
+[  67% ] [90m[1mreimport[22m | shop-full-bag-sale.png[39m[0m
+[  68% ] [90m[1mreimport[22m | shared-art-bow.png[39m[0m
+[  69% ] [90m[1mreimport[22m | same-combo-second-art.png[39m[0m
+[  70% ] [90m[1mreimport[22m | paper-doll.png[39m[0m
+[  70% ] [90m[1mreimport[22m | gallery.png[39m[0m
+[  71% ] [90m[1mreimport[22m | combat-charge.png[39m[0m
+[  72% ] [90m[1mreimport[22m | cast-release.png[39m[0m
+[  73% ] [90m[1mreimport[22m | 02-territory-combat.png[39m[0m
+[  74% ] [90m[1mreimport[22m | 01-territory-warning.png[39m[0m
+[  75% ] [90m[1mreimport[22m | 00-unfinished-evidence-guidance.png[39m[0m
+[  76% ] [90m[1mreimport[22m | weapon-tree-requirements.png[39m[0m
+[  77% ] [90m[1mreimport[22m | survival-tree-small.png[39m[0m
+[  78% ] [90m[1mreimport[22m | stamina-investment.png[39m[0m
+[  79% ] [90m[1mreimport[22m | craft-tree.png[39m[0m
+[  80% ] [90m[1mreimport[22m | ammo-output-preview.png[39m[0m
+[  80% ] [90m[1mreimport[22m | off-duty-service.png[39m[0m
+[  81% ] [90m[1mreimport[22m | merchant-topics.png[39m[0m
+[  82% ] [90m[1mreimport[22m | merchant-favor-completed.png[39m[0m
+[  83% ] [90m[1mreimport[22m | favor-journal.png[39m[0m
+[  84% ] [90m[1mreimport[22m | familiar-shop.png[39m[0m
+[  85% ] [90m[1mreimport[22m | aida-routes-small.png[39m[0m
+[  86% ] [90m[1mreimport[22m | followup-strike-staff.png[39m[0m
+[  87% ] [90m[1mreimport[22m | followup-strike-spear.png[39m[0m
+[  88% ] [90m[1mreimport[22m | followup-strike-bow.png[39m[0m
+[  89% ] [90m[1mreimport[22m | followup-strike-blade.png[39m[0m
+[  90% ] [90m[1mreimport[22m | followup-ready-staff.png[39m[0m
+[  90% ] [90m[1mreimport[22m | followup-ready-spear.png[39m[0m
+[  91% ] [90m[1mreimport[22m | followup-ready-bow.png[39m[0m
+[  92% ] [90m[1mreimport[22m | followup-ready-blade.png[39m[0m
+[  93% ] [90m[1mreimport[22m | m-map.png[39m[0m
+[  94% ] [90m[1mreimport[22m | g-selector.png[39m[0m
+[  95% ] [90m[1mreimport[22m | preview-local-map.png[39m[0m
+[  96% ] [90m[1mreimport[22m | preview-inn-start.png[39m[0m
+[  97% ] [90m[1mreimport[22m | preview-archive-start.png[39m[0m
+[  98% ] [90m[1mreimport[22m | normal-reentry.png[39m[0m
+[  99% ] [90m[1mreimport[22m | Finalizing Asset Import...[39m[0m
+[92m[ DONE ][39m [1mreimport[22m
+[0m
+[   0% ] [90m[1mreimport[22m | Started (Re)Importing Assets (109 steps)[39m[0m
+[   0% ] [90m[1mreimport[22m | Executing post-reimport operations...[39m[0m
+[92m[ DONE ][39m [1mreimport[22m
+[0m
+[   0% ] [90m[1mloading_editor_layout[22m | Started Loading editor (5 steps)[39m[0m
+[   0% ] [90m[1mloading_editor_layout[22m | Loading editor layout...[39m[0m
+[  16% ] [90m[1mloading_editor_layout[22m | Loading docks...[39m[0m
+[  33% ] [90m[1mloading_editor_layout[22m | Reopening scenes...[39m[0m
+[  50% ] [90m[1mloading_editor_layout[22m | Loading central editor layout...[39m[0m
+[  66% ] [90m[1mloading_editor_layout[22m | Loading plugin window layout...[39m[0m
+[  83% ] [90m[1mloading_editor_layout[22m | Editor layout ready.[39m[0m
+[92m[ DONE ][39m [1mloading_editor_layout[22m
+[0m

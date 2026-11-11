@@ -14,7 +14,19 @@ var terrain: GrayriverTerrain
 var resuming_journey := false
 var _location_clock := 0.0
 var _discovery_clock := 0.0
+@export_file("*.json") var source_path := GrayriverDefinition.PATH
+var startup_errors: PackedStringArray=PackedStringArray()
 func _ready() -> void:
+	# Fail before CampaignGame schedules bootstrap or registers/reads a save slot.
+	var checked:=GrayriverDefinition.read_source(source_path)
+	if not checked.errors.is_empty():
+		_show_startup_error(PackedStringArray(checked.errors)); return
+	definition=checked.data
+	if not catalog:
+		var chapter:=GrayriverDefinition.build_from_data(definition,null,true,source_path)
+		if chapter.has_meta("preflight_errors"):
+			_show_startup_error(chapter.get_meta("preflight_errors")); return
+		catalog=ExplorationContentCatalog.new(chapter)
 	rules=preload("res://content/foundation/frontier_rules.tres")
 	FrontierControls.load_preferences()
 	hub=FrontierHub.new(self)
@@ -29,12 +41,37 @@ func _ready() -> void:
 	community=GrayriverCommunity.new(self)
 	map_service_request=func(kind: String):
 		if kind=="mediation":community.show_mediation()
-	definition = GrayriverDefinition.data()
-	if not catalog: catalog = ExplorationContentCatalog.new(GrayriverDefinition.build())
 	save_slot = 3
 	save_section = "grayriver_frontier"
 	super._ready()
 	presenter = GrayriverPresenter.new(self)
+func _show_startup_error(errors: PackedStringArray) -> void:
+	startup_errors=errors
+	persistence_enabled=false
+	set_process(false); set_physics_process(false); set_process_input(false); set_process_unhandled_input(false)
+	# Child scenes have already entered the tree. Disable their explicit ALWAYS
+	# consumers too, including SaveManager's F5/F9 input, before showing the error.
+	for node in find_children("*","",true,false): node.process_mode=Node.PROCESS_MODE_DISABLED
+	GameUIStyle.install_theme(get_window())
+	var layer:=CanvasLayer.new(); layer.name="StartupError"; layer.layer=GameUIStyle.LAYER_CRITICAL
+	add_child(layer)
+	var backdrop:=ColorRect.new(); backdrop.color=GameUIStyle.PANEL_BG_SOLID
+	backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); layer.add_child(backdrop)
+	var margin:=MarginContainer.new(); margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	for side in ["left","top","right","bottom"]: margin.add_theme_constant_override("margin_"+side,32)
+	backdrop.add_child(margin)
+	var panel:=PanelContainer.new(); panel.add_theme_stylebox_override("panel",GameUIStyle.panel_style())
+	margin.add_child(panel)
+	var box:=VBoxContainer.new(); box.add_theme_constant_override("separation",16); panel.add_child(box)
+	var title:=Label.new(); title.text="灰河谷暂时无法启动"; GameUIStyle.apply_label(title,24,GameUIStyle.GOLD); box.add_child(title)
+	var summary:=Label.new(); summary.text="内容检查未通过，请修正以下字段后重新启动。本次未加载或更改旅程存档。"
+	summary.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART; box.add_child(summary)
+	var scroll:=ScrollContainer.new(); scroll.size_flags_vertical=Control.SIZE_EXPAND_FILL
+	scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED; box.add_child(scroll)
+	var details:=Label.new(); details.name="Diagnostics"; details.text="\n\n".join(errors)
+	details.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART; details.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	GameUIStyle.apply_label(details,16,GameUIStyle.TEXT_MAIN); scroll.add_child(details)
+
 func render_terrain(layout: RunRoomLayout) -> void:
 	if region_id != "camp":
 		super.render_terrain(layout)

@@ -114,6 +114,8 @@ func _build_ui() -> void:
 	var tabs:=HBoxContainer.new(); library.add_child(tabs)
 	for pair in [["基础动作",0],["可用物品",1],["武技",2]]:
 		var button:=FoundationWidgets.button(pair[0],func(): _show_items=pair[1]==1; _show_techniques=pair[1]==2; _selected_technique=""; _selected_skill=null; _selected_item.clear(); _selected_choice.clear(); _refresh_all())
+		button.set_meta("ui_action","loadout_tab")
+		button.set_meta("loadout_page",["actions","items","techniques"][pair[1]])
 		tabs.add_child(button)
 	var scroll:=ScrollContainer.new(); scroll.size_flags_vertical=Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED
@@ -641,6 +643,8 @@ func _refresh_techniques() -> void:
 		var data:=MartialArts.definition(id)
 		var known: bool=actor.actor_context.martial.learned.has(id)
 		var button:=FoundationWidgets.button(data.title+(" · 已学" if known else " · 训练师或武技书"),_select_technique.bind(id),not known)
+		button.set_meta("ui_action","select_technique")
+		button.set_meta("technique_id",id)
 		_skill_grid.add_child(button)
 func _select_technique(id: String) -> void:
 	_selected_skill=null; _selected_item.clear(); _selected_choice.clear(); _selected_technique=id

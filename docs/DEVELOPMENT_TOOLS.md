@@ -74,4 +74,6 @@ python3 tools/run_tests.py --suite all --jobs 2 --timeout 300 --report /tmp/gray
 
 新纯领域测试用GUT验证失败边界、守恒、防重和查询隔离；需要场景/物理/输入/AI/持久化时继续用现有集成夹具。异步探针等待实际可观察状态并设置上界，动作窗口内不要塞额外准备帧。不得在完整回归进行时继续改源码、运行导入或启动图形试玩；检查最终报告，不能凭若干中间PASS宣称全量通过。GitHub Actions继续停用。
 
+交易、课程等动态文案控件可用`ui_action + actor_id + item_uid/course_id`元数据定位。`InputSceneProbe.click_identity()`要求唯一可见、未禁用的按钮，滚动到可见后仍发送真实坐标鼠标事件；不能直接调用回调。价格和库存断言从领域查询独立取得，继续核对双方款物、具体UID和单次提交事实；修改按钮文案不应改变测试所选实物。
+
 本轮定向、原生编辑器与干净归档完整回归证据见[验证报告](playtests/development-tools/REPORT.md)。

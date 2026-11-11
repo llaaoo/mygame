@@ -1,0 +1,46 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:364)
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+⏰ WorldTime 启动: 08:00
+🏛️ GameRuntime: 五大 Runtime 初始化完成
+   CommandBus       : ✅
+   CombatExecutor   : ✅
+   CombatEventBus   : ✅
+   WorldRuntime     : ✅
+   SimulationRuntime: ✅
+   WorldTime        : ✅
+⚡ 已注册触发效果: OnKillBonusExp
+📊 CombatDebugger: trace enabled
+⏰ 08:00 (☀️ 白天)
+ERROR: Player HUD did not show 已用完: 受伤中断喷洒
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/support/input_scene_probe.gd:6)
+       [1] feedback (res://tests/test_item_feedback_input.gd:9)
+       [2] run (res://tests/test_item_feedback_input.gd:104)
+       [3] key (res://tests/support/input_scene_probe.gd:13)
+       [4] frames (res://tests/support/input_scene_probe.gd:10)
+ERROR: Empty bottle feedback changed pulse costs or silently reloaded
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/support/input_scene_probe.gd:6)
+       [1] run (res://tests/test_item_feedback_input.gd:106)
+       [2] capture (res://tests/support/input_scene_probe.gd:75)
+ERROR: Expected exactly one feedback for 绑定的实物已失去, got []
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/support/input_scene_probe.gd:6)
+       [1] feedback (res://tests/test_item_feedback_input.gd:8)
+       [2] run (res://tests/test_item_feedback_input.gd:111)
+       [3] key (res://tests/support/input_scene_probe.gd:13)
+       [4] frames (res://tests/support/input_scene_probe.gd:10)
+ERROR: Player HUD did not show 绑定的实物已失去: 受伤中断喷洒
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/support/input_scene_probe.gd:6)
+       [1] feedback (res://tests/test_item_feedback_input.gd:9)
+       [2] run (res://tests/test_item_feedback_input.gd:111)
+       [3] key (res://tests/support/input_scene_probe.gd:13)
+       [4] frames (res://tests/support/input_scene_probe.gd:10)

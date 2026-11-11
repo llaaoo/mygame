@@ -3,17 +3,21 @@ extends RefCounted
 const CATALOG := "res://content/maps/grayriver/catalog.tres"
 static func catalog_report() -> Dictionary:
 	return _report(GrayriverDefinition.build())
-static func cell_report(cell: AuthoredMapCell) -> Dictionary:
+static func cell_report(cell: AuthoredMapCell,registered: MapCellCatalog=null) -> Dictionary:
+	if not is_instance_valid(cell): return {"errors":["Missing authored map cell"]}
 	var local:=cell.validation_errors()
 	if not local.is_empty(): return {"errors":local}
-	var registered:=load(CATALOG) as MapCellCatalog
+	if not registered and ResourceLoader.exists(CATALOG): registered=load(CATALOG) as MapCellCatalog
+	if not registered: return {"errors":["Missing authored map catalog: "+CATALOG]}
 	var others:=MapCellCatalog.new();var found:=false
 	for scene in registered.maps:
-		if scene.resource_path==cell.scene_file_path: found=true
+		# Preserve empty catalog entries for append_to's returned diagnostics.
+		if scene and scene.resource_path==cell.scene_file_path: found=true
 		else: others.maps.append(scene)
 	if not found: return {"errors":["请先保存场景并登记到 "+CATALOG+"，再检查完整连接。"]}
 	# Compile the unsaved edited tree over the legacy base, never over its old compiled copy.
 	var chapter:=GrayriverDefinition.build(others,false)
+	if chapter.has_meta("preflight_errors"): return _report(chapter)
 	var index:=-1
 	for i in chapter.regions.size():
 		if chapter.regions[i].id==cell.region_definition.id: index=i;break
@@ -27,9 +31,10 @@ static func cell_report(cell: AuthoredMapCell) -> Dictionary:
 	var report:=_report(chapter);report["region"]=compiled
 	return report
 static func _report(chapter: ExplorationChapterData) -> Dictionary:
+	var raw_errors: PackedStringArray=chapter.get_meta("preflight_errors",PackedStringArray())
+	if not raw_errors.is_empty(): return {"errors":raw_errors,"chapter":chapter,"cells":0,"passages":0,"arrivals":0}
 	var catalog:=ExplorationContentCatalog.new(chapter)
 	var errors:=ExplorationContentValidator.new().validate(catalog)
-	errors.append_array(GrayriverValidator.validate(GrayriverDefinition.data()))
 	var cells:=0;var passages:=0;var arrivals:=0
 	for region in chapter.regions:
 		if region.map_scene: cells+=1

@@ -1,0 +1,4 @@
+Logs and isolated saves: /tmp/mygame-tests-lz1rvlin
+Schedule: 0 parallel-domain checks, then 1 serial input checks
+PASS item_feedback_input (18.3s)
+1/1 checks passed. Logs: /tmp/mygame-tests-lz1rvlin. Report: /tmp/reliable-actions-feedback-final.json

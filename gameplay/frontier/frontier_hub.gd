@@ -398,7 +398,7 @@ func _repack(id: String,to_pocket: bool,uid := "") -> void:
 func _use_item(id: String,aim: bool) -> void:
 	game.ui.close_modal()
 	game.player.actor_context.actions.input_suppressed=.15
-	if not game.player.actor_context.item_actions.begin(id,aim,game.player.get_mouse_direction()): game.ui.notify("无法使用：检查口袋、武器和当前动作。")
+	if not game.player.actor_context.item_actions.begin(id,aim,game.player.get_mouse_direction()): game.ui.notify(game.player.actor_context.item_actions.last_reason)
 func _binding_picker(id: String,uid: String) -> void:
 	var row:=HBoxContainer.new(); _detail.add_child(row)
 	var picker:=OptionButton.new(); picker.size_flags_horizontal=Control.SIZE_EXPAND_FILL

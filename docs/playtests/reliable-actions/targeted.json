@@ -1,0 +1,232 @@
+{
+  "schema": 1,
+  "revision": "d840ec13bad758fddfda7482f4bdbfcb03f7e871",
+  "dirty": true,
+  "godot": "4.6.3.stable.official.7d41c59c4",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "jobs": 2,
+  "timeout": 300.0,
+  "logs": "/tmp/mygame-tests-yxadfc8i",
+  "requested": [
+    "content",
+    "maps",
+    "content_preflight",
+    "map_authoring",
+    "item_actions",
+    "spray_channel",
+    "throw_trajectory_input",
+    "item_feedback_input",
+    "depth_input",
+    "unified_quickslots",
+    "controls_workflow",
+    "npc_interaction_input"
+  ],
+  "results": [
+    {
+      "name": "content",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 2.221,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tools/validate_mvp_content.gd"
+      ],
+      "log": "/tmp/mygame-tests-yxadfc8i/content.log",
+      "diagnostic": []
+    },
+    {
+      "name": "maps",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 2.121,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tools/validate_maps.gd"
+      ],
+      "log": "/tmp/mygame-tests-yxadfc8i/maps.log",
+      "diagnostic": []
+    },
+    {
+      "name": "map_authoring",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 3.374,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_map_authoring.gd"
+      ],
+      "log": "/tmp/mygame-tests-yxadfc8i/map_authoring.log",
+      "diagnostic": []
+    },
+    {
+      "name": "content_preflight",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 6.633,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_content_preflight.gd"
+      ],
+      "log": "/tmp/mygame-tests-yxadfc8i/content_preflight.log",
+      "diagnostic": []
+    },
+    {
+      "name": "spray_channel",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 4.375,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_spray_channel.gd"
+      ],
+      "log": "/tmp/mygame-tests-yxadfc8i/spray_channel.log",
+      "diagnostic": []
+    },
+    {
+      "name": "item_actions",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 9.041,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_item_actions.gd"
+      ],
+      "log": "/tmp/mygame-tests-yxadfc8i/item_actions.log",
+      "diagnostic": []
+    },
+    {
+      "name": "throw_trajectory_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 11.096,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_throw_trajectory_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-yxadfc8i/throw_trajectory_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "item_feedback_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 18.315,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_item_feedback_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-yxadfc8i/item_feedback_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "depth_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 24.487,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_depth_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-yxadfc8i/depth_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "unified_quickslots",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 33.016,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_unified_quickslots.gd"
+      ],
+      "log": "/tmp/mygame-tests-yxadfc8i/unified_quickslots.log",
+      "diagnostic": []
+    },
+    {
+      "name": "controls_workflow",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 17.314,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_controls_workflow.gd"
+      ],
+      "log": "/tmp/mygame-tests-yxadfc8i/controls_workflow.log",
+      "diagnostic": []
+    },
+    {
+      "name": "npc_interaction_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 16.363,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_npc_interaction_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-yxadfc8i/npc_interaction_input.log",
+      "diagnostic": []
+    }
+  ],
+  "skipped": [],
+  "complete": true
+}

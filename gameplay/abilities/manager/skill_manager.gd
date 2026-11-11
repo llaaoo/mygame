@@ -310,6 +310,12 @@ func get_cooldown_total(source: String) -> float:
 func report_refusal(source: String,context: CastContext = null) -> void:
 	var instance:=get_instance(source)
 	if not instance: return
+	var owner:=get_parent() as Node2D
+	if instance.data.operation_id=="disperse" and "actor_context" in owner and owner.actor_context:
+		var choice: Dictionary=context.selection if context and not context.selection.is_empty() else selection_for_source(source)
+		var spray_reason: String=owner.actor_context.spray.refusal_reason(instance.data,choice)
+		owner.actor_context.actions.report_action_feedback(spray_reason if not spray_reason.is_empty() else "喷洒条件已变化，请重新按键")
+		return
 	var plan:=combinations.preview(instance.data,get_parent(),context.empower if context else false,context.selection if context and not context.selection.is_empty() else selection_for_source(source))
 	var reason:=plan.reason if not plan.ready else "动作条件已变化，请重新按键。"
 	if spell_forms.automatic(source) and not spell_forms.unavailable_reason(instance.data).is_empty(): reason=spell_forms.unavailable_reason(instance.data)

@@ -198,14 +198,21 @@ func _physics_process(delta: float) -> void:
 	if input_provider.is_valid() and input_suppressed==0:
 		movement=Vector2.ZERO
 		for action: Action in input_provider.call():
-			var result:=try_action(action)
-			_report_refusal(action,result)
+			request_action(action)
 	advance(delta)
-func _report_refusal(action: Action,result: OperationResult) -> void:
-	if result.accepted or result.reason in ["buffered","unpaired_release"] or _feedback_cooldown>0: return
-	if action.action_type not in [Action.ActionType.TECHNIQUE,Action.ActionType.MELEE,Action.ActionType.HEAVY_ATTACK]: return
+func request_action(action: Action) -> OperationResult:
+	var result:=try_action(action)
+	_report_refusal(action,result)
+	return result
+func report_action_feedback(reason: String) -> void:
+	# Controllers also serve AI. Only the local player's outcomes reach this HUD.
+	if not context or context.id!="player" or reason.is_empty() or reason in ["scope_left","dead","interface"] or _feedback_cooldown>0: return
 	_feedback_cooldown=.8
-	action_refused.emit({"stamina":"体力不足","ammunition":"口袋中缺少箭矢","busy":"当前动作尚未结束","stale_binding":"快捷绑定已改变","controlled":"控制状态中","stagger":"失衡中"}.get(result.reason,result.reason))
+	action_refused.emit(reason)
+func _report_refusal(action: Action,result: OperationResult) -> void:
+	if result.accepted or result.reason in ["buffered","unpaired_release"]: return
+	if action.action_type not in [Action.ActionType.TECHNIQUE,Action.ActionType.MELEE,Action.ActionType.HEAVY_ATTACK,Action.ActionType.USE_ITEM,Action.ActionType.DODGE,Action.ActionType.CAST]: return
+	report_action_feedback({"stamina":"体力不足","ammunition":"口袋中缺少箭矢","busy":"当前动作尚未结束","stale_binding":"快捷绑定已改变","controlled":"控制状态中","stagger":"失衡中","unavailable":"当前物品不可用"}.get(result.reason,result.reason))
 func try_action(action: Action) -> OperationResult:
 	var actor:=context.actor if context else null
 	if not actor or actor.get_node("HealthComponent").is_dead: return OperationResult.reject("dead")
@@ -221,7 +228,8 @@ func try_action(action: Action) -> OperationResult:
 		var casting: PlayerCastingController=actor.casting
 		if not casting.aiming_sources.has(action.skill_source) and casting._channeling_source!=action.skill_source and not casting._charge_source_matches(action.skill_source): return OperationResult.reject("unpaired_release")
 	if mode=="spray" and action.action_type in [Action.ActionType.DODGE,Action.ActionType.MELEE,Action.ActionType.HEAVY_ATTACK]: context.spray.stop()
-	if mode=="item" and (action.action_type in [Action.ActionType.MELEE,Action.ActionType.HEAVY_ATTACK,Action.ActionType.TECHNIQUE,Action.ActionType.DODGE,Action.ActionType.CAST] or action.action_type==Action.ActionType.MOVE and action.direction.length_squared()>.01): cancel("other_action")
+	if mode=="item" and (action.action_type in [Action.ActionType.MELEE,Action.ActionType.HEAVY_ATTACK,Action.ActionType.TECHNIQUE,Action.ActionType.DODGE,Action.ActionType.CAST] or action.action_type==Action.ActionType.MOVE and action.direction.length_squared()>.01):
+		context.item_actions.cancel("移动中断使用" if action.action_type==Action.ActionType.MOVE else "")
 	match action.action_type:
 		Action.ActionType.MOVE:
 			movement=action.direction.limit_length(1)
@@ -266,7 +274,10 @@ func try_action(action: Action) -> OperationResult:
 		Action.ActionType.USE_ITEM:
 			if not item_request.is_valid(): return OperationResult.reject("unavailable")
 			if not action.params.get("release",false) and (busy() or "field_work" in actor and actor.field_work and actor.field_work.is_busy()): return OperationResult.reject("busy")
-			if not item_request.call(action): return OperationResult.reject("unavailable")
+			var item_result: Variant=item_request.call(action)
+			if item_result is OperationResult:
+				if not item_result.accepted: return item_result
+			elif not item_result: return OperationResult.reject("unavailable")
 			_clear_sequences()
 			if not ("field_work" in actor and actor.field_work) and not context.item_actions.busy() and SurvivalCatalog.FOODS.has(action.skill_id):
 				mode="item"; elapsed=0; remaining=SurvivalCatalog.FOODS[action.skill_id].seconds; movement=Vector2.ZERO
@@ -641,8 +652,8 @@ func interrupt(seconds: float) -> void:
 	if mode=="stagger": return
 	_clear_sequences(); _ammo_uid=""
 	counter_remaining=0; counter_strike=false; _push_remaining=0
-	if context.item_actions: context.item_actions.cancel()
-	if context.spray: context.spray.stop()
+	if context.item_actions: context.item_actions.cancel("失衡中断使用")
+	if context.spray: context.spray.stop("失衡中断喷洒")
 	_cancel_work(); _cancel_cast()
 	clear_input()
 	mode="stagger"; elapsed=0; remaining=seconds

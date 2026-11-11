@@ -315,6 +315,8 @@ func show_panel(title: String, text: String, buttons: Array[Dictionary], locked:
 		button.custom_minimum_size.y = 38
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		button.disabled = bool(entry.get("disabled", false))
+		var identity: Dictionary=entry.get("identity",{})
+		for key in identity: button.set_meta(key,identity[key])
 		GameUIStyle.apply_button(button)
 		button.pressed.connect(entry.callback)
 		button_host.add_child(button)

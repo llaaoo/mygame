@@ -215,7 +215,7 @@ func use_inventory_item(uid: String) -> void:
 					_queue_save()
 					return
 			ui.notify("这瓶喷剂不在可用口袋中。")
-		elif not player.actor_context.item_actions.begin(uid,definition.use_profile.kind==ItemUseDefinition.Kind.THROWABLE,player.get_mouse_direction()): ui.notify("无法使用：检查口袋、武器和当前动作。")
+		elif not player.actor_context.item_actions.begin(uid,definition.use_profile.kind==ItemUseDefinition.Kind.THROWABLE,player.get_mouse_direction()): ui.notify(player.actor_context.item_actions.last_reason)
 	elif SurvivalCatalog.FOODS.has(definition.id): survival.begin_eating(definition.id)
 
 func get_active_region() -> Node2D:

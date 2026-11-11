@@ -153,7 +153,7 @@ func _poll_cast_edge(actions: Array[Action], source: String, pressed: bool) -> v
 
 func resolve_action(action: Action) -> void:
 	if player.actor_context and player.actor_context.actions.active():
-		player.actor_context.actions.try_action(action)
+		player.actor_context.actions.request_action(action)
 		return
 	execute_action(action)
 
@@ -364,8 +364,8 @@ func shortcut_changed(source: String) -> void:
 	_mouse_shortcuts.erase(source)
 	casting.cancel_source(source)
 	if not player.actor_context: return
-	if player.actor_context.spray.source==source: player.actor_context.spray.stop()
-	if player.actor_context.item_actions.input_source==source: player.actor_context.item_actions.cancel()
+	if player.actor_context.spray.source==source: player.actor_context.spray.stop("快捷绑定已改变，喷洒中断")
+	if player.actor_context.item_actions.input_source==source: player.actor_context.item_actions.cancel("快捷绑定已改变，使用中断")
 
 func _focus_lost() -> void:
 	_cycle_pending=false

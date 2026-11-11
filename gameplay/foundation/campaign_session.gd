@@ -168,7 +168,7 @@ func bind_actor(actor: CharacterBody2D,id: String,legacy_counts: Dictionary = {}
 		context.actions.legacy_request=actor.input_controller.execute_action
 		context.actions.pack_request=drop_pack.bind(id)
 	if rules.tactical_combat:
-		context.actions.item_request=func(request: Action): return execute_item_request(id,request)
+		context.actions.item_request=func(request: Action): return execute_item_request_result(id,request)
 	relations.memberships[id]="traveler" if id=="player" else "guards"
 	if actor is Player:
 		restore_shortcuts(actor)
@@ -423,8 +423,8 @@ func _on_damage(source: Node2D,target: Node2D,amount: int) -> void:
 	if amount>0:
 		var context:=target.get("actor_context") as ActorContext if "actor_context" in target else null
 		if context:
-			context.item_actions.cancel()
-			context.spray.stop()
+			context.item_actions.cancel("受伤中断使用")
+			context.spray.stop("受伤中断喷洒")
 		if context and context.awareness:
 			var body:=target as Enemy
 			context.awareness.provoke(source.position if is_instance_valid(source) and body.can_see(source) else target.position)
@@ -501,31 +501,36 @@ static func valid_belt_item(id: String,method: String) -> bool:
 	return method=="use" and (SurvivalCatalog.FOODS.has(id) or definition.use_profile!=null)
 
 func execute_item_request(actor_id: String,request: Action) -> bool:
+	return execute_item_request_result(actor_id,request).accepted
+func execute_item_request_result(actor_id: String,request: Action) -> OperationResult:
 	var actor:=actor_for_id(actor_id)
-	if not actor: return false
-	if not request.params.has("binding"): return begin_item(actor_id,request.skill_id)
+	if not actor: return OperationResult.reject("角色已不可用")
+	if not request.params.has("binding"):
+		var entry:=inventory.definitions.get(request.skill_id) as ItemData
+		if entry and entry.use_profile and entry.use_profile.kind!=ItemUseDefinition.Kind.SPRAY: return actor.actor_context.item_actions.begin_result(request.skill_id)
+		return OperationResult.success() if begin_item(actor_id,request.skill_id) else OperationResult.reject("当前物品不可用")
 	var manager:=actor.get_node("SkillManager") as SkillManager
 	var binding:=manager.shortcuts.binding(request.skill_source)
-	if binding!=request.params.binding or binding.get("kind","")!="item": return false
+	if binding!=request.params.binding or binding.get("kind","")!="item": return OperationResult.reject("快捷绑定已改变")
 	var controller: ItemActionController=actor.actor_context.item_actions
 	if request.params.get("release",false):
-		return controller.input_source==request.skill_source and controller.confirm()
+		return OperationResult.success() if controller.input_source==request.skill_source and controller.confirm() else OperationResult.reject("unpaired_release")
 	var id:=str(binding.item_id)
 	var uid:=str(binding.get("uid",""))
 	var definition:=inventory.definitions.get(id) as ItemData
-	if not definition: return false
+	if not definition: return OperationResult.reject("物品定义不可用")
 	if not uid.is_empty():
 		var instance:=inventory.item(uid)
-		if not instance or instance.definition_id!=id or inventory.locate(uid) not in inventory.actor_containers(actor_id)+[actor_id+".gear"]: return false
-	if definition is EquipmentData: return equip_item.is_valid() and equip_item.call(id,uid)
+		if not instance or instance.definition_id!=id or inventory.locate(uid) not in inventory.actor_containers(actor_id)+[actor_id+".gear"]: return OperationResult.reject("绑定的实物已失去，不会换用另一件")
+	if definition is EquipmentData: return OperationResult.success() if equip_item.is_valid() and equip_item.call(id,uid) else OperationResult.reject("当前无法换装")
 	if definition.use_profile:
 		if definition.use_profile.kind==ItemUseDefinition.Kind.SPRAY:
 			var operation:=SpellOperationCatalog.default_catalog().operation("disperse")
 			for payload in operation.payloads:
-				if payload.material_id==id: return actor.actor_context.spray.start(operation.action,request.skill_source,request.direction,{"payload":payload.id,"uid":uid,"modifier":""})
-			return false
-		return controller.begin(uid if not uid.is_empty() else id,definition.use_profile.kind==ItemUseDefinition.Kind.THROWABLE,request.direction,request.skill_source)
-	return begin_item(actor_id,id)
+				if payload.material_id==id: return actor.actor_context.spray.start_result(operation.action,request.skill_source,request.direction,{"payload":payload.id,"uid":uid,"modifier":""})
+			return OperationResult.reject("此物品不是可用喷剂")
+		return controller.begin_result(uid if not uid.is_empty() else id,definition.use_profile.kind==ItemUseDefinition.Kind.THROWABLE,request.direction,request.skill_source)
+	return OperationResult.success() if begin_item(actor_id,id) else OperationResult.reject("补给不可用，检查口袋与当前动作")
 
 func advance_rest_time(seconds: float) -> void:
 	if not is_finite(seconds) or seconds<=0: return

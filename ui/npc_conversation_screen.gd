@@ -68,6 +68,8 @@ func _rows() -> void:
 		if not _screen.search.text.is_empty() and not (entry.title+entry.category).contains(_screen.search.text): continue
 		var button:=W.button(_topic_text(entry),_select.bind(entry.id))
 		button.set_meta("topic",entry.id)
+		button.set_meta("ui_action","npc_topic")
+		button.set_meta("actor_id",npc_id)
 		button.clip_text=true; button.custom_minimum_size.y=54
 		GameUIStyle.apply_button(button,GameUIStyle.ACCENT,entry.id==_selected)
 		_screen.rows.add_child(button)

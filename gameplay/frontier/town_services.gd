@@ -80,6 +80,12 @@ func salvage(uid: String,upgrade: bool) -> OperationResult:
 	if not market or not market.equipment_services: return OperationResult.reject("此店只提供实物交易，不提供拆解或强化。")
 	if not reason().is_empty(): return OperationResult.reject(reason())
 	return game.session.inventory.upgrade_instance("player",uid) if upgrade else game.session.inventory.dismantle_instance("player",uid)
+func _item_button(text: String,action: Callable,operation: String,uid: String,disabled := false) -> Button:
+	var button:=W.button(text,action,disabled)
+	button.set_meta("ui_action",operation)
+	button.set_meta("actor_id",market.actor_id)
+	button.set_meta("item_uid",uid)
+	return button
 func show(selling := true) -> void:
 	if not reason().is_empty(): game.ui.notify(reason()); return
 	_selling=selling
@@ -87,8 +93,13 @@ func show(selling := true) -> void:
 	ensure_stock()
 	_screen=preload("res://gameplay/foundation/ui/expedition_screen.tscn").instantiate() as ExpeditionScreen
 	_screen.get_node("Navigation/Caption").text=service_title(market.actor_id,"整修铺")
-	_screen.tabs.add_child(W.button("出售 / 拆解 / 强化" if market.equipment_services else "出售实物",show.bind(true)))
-	_screen.tabs.add_child(W.button("购买实物",show.bind(false)))
+	for selling_tab in [true,false]:
+		var text: String=("出售 / 拆解 / 强化" if market.equipment_services else "出售实物") if selling_tab else "购买实物"
+		var tab:=W.button(text,show.bind(selling_tab))
+		tab.set_meta("ui_action","market_tab")
+		tab.set_meta("actor_id",market.actor_id)
+		tab.set_meta("trade_mode","sell" if selling_tab else "buy")
+		_screen.tabs.add_child(tab)
 	if market.production_services: _screen.tabs.add_child(W.button("店内排产",show_production))
 	_screen.search.text_changed.connect(func(query: String): _rows(query))
 	var hint:=W.label(("交易库存有限；装备先卸下再整修。整修保留同一件实物，涂层不会重置。" if market.equipment_services else "交易库存和店家钱袋有限；此店不提供拆解、强化或排产。")+(" 熟客购买减价10%，出售原价。" if game.session.relations.disposition(market.actor_id,"player")>=10 else " 与店主交谈、履行委托可获得熟客买价。"),12,true)
@@ -109,7 +120,7 @@ func _rows(query: String) -> void:
 			if row.definition=="coin" or not query.is_empty() and not definition.display_name.contains(query): continue
 			var data:=store.equipment_definition(row.uid) if definition is EquipmentData else definition
 			shown.append(row.uid)
-			var button:=W.button("%s ×%d · %d币"%[data.display_name,row.quantity,price(row.uid,not _selling)]+("\n已穿戴 · 先卸下" if container=="player.gear" else ""),_detail.bind(row.uid))
+			var button:=_item_button("%s ×%d · %d币"%[data.display_name,row.quantity,price(row.uid,not _selling)]+("\n已穿戴 · 先卸下" if container=="player.gear" else ""),_detail.bind(row.uid),"market_item",row.uid)
 			button.clip_text=true; button.tooltip_text=button.text; _screen.rows.add_child(button)
 	if _selected_uid in shown: _detail(_selected_uid)
 	elif not shown.is_empty(): _detail(shown[0])
@@ -131,19 +142,19 @@ func _detail(uid: String) -> void:
 	var worn:=_selling and store.locate(uid)=="player.gear"
 	if worn:
 		_screen.detail.add_child(W.label("这件装备仍在身上。先卸下，属性变化和背包空间按正常换装规则检查。",14,true))
-		_screen.detail.add_child(W.button("卸下这件装备",_request.bind("unequip",uid)))
+		_screen.detail.add_child(_item_button("卸下这件装备",_request.bind("unequip",uid),"unequip",uid))
 	if data is EquipmentData:
 		W.disclosure(_screen.detail,"当前装备属性",W.comparison(null,data))
 		if data.moveset: W.disclosure(_screen.detail,"武器动作",data.moveset.describe())
-	_screen.detail.add_child(W.button(("出售一件" if _selling else "购买一件")+" · %d币"%price(uid,not _selling),_request.bind("trade",uid),not preview_trade(uid,_selling,1).accepted))
+	_screen.detail.add_child(_item_button(("出售一件" if _selling else "购买一件")+" · %d币"%price(uid,not _selling),_request.bind("trade",uid),"sell_item" if _selling else "buy_item",uid,not preview_trade(uid,_selling,1).accepted))
 	var trade_preview:=preview_trade(uid,_selling,1)
 	if not trade_preview.accepted and not worn: _screen.detail.add_child(W.label("无法交易："+str(ERRORS.get(trade_preview.reason,trade_preview.reason)),14,true))
 	if item.quantity>1:
 		_trade_quantity=SpinBox.new(); _trade_quantity.min_value=1; _trade_quantity.max_value=item.quantity; _trade_quantity.step=1; _trade_quantity.value=mini(_quantity_value,item.quantity)
 		_screen.detail.add_child(_trade_quantity)
 		var totals:=W.label("",14,true); _screen.detail.add_child(totals)
-		var selected_button:=W.button("出售所选数量" if _selling else "购买所选数量",_request.bind("trade_quantity",uid)); _screen.detail.add_child(selected_button)
-		var stack_button:=W.button("出售整叠" if _selling else "购买整叠",_request.bind("trade_stack",uid)); _screen.detail.add_child(stack_button)
+		var selected_button:=_item_button("出售所选数量" if _selling else "购买所选数量",_request.bind("trade_quantity",uid),"sell_quantity" if _selling else "buy_quantity",uid); _screen.detail.add_child(selected_button)
+		var stack_button:=_item_button("出售整叠" if _selling else "购买整叠",_request.bind("trade_stack",uid),"sell_stack" if _selling else "buy_stack",uid); _screen.detail.add_child(stack_button)
 		var refresh_totals:=func(value: float):
 			_quantity_value=int(value)
 			var payer:=market.actor_id if _selling else "player"
@@ -162,14 +173,16 @@ func _detail(uid: String) -> void:
 		var level:=clampi(int(item.properties.get("upgrade_level",0)),0,3)
 		var refit:=EquipmentRefit.definition(str(item.properties.get("upgrade_path","balanced")))
 		_screen.detail.add_child(W.label(("已固定方向："+refit.title+"\n" if level>0 else "首次可选择方向，之后保持；最高+3。\n")+refit.description,14,true))
-		_screen.detail.add_child(W.button("拆解 · 获得%d金属碎料（销毁这件装备）"%store.dismantle_yield("player",uid),_request.bind("dismantle",uid)))
-		_screen.detail.add_child(W.button(("强化 · "+game.survival.supplies.describe_cost(store.upgrade_cost("player",uid))) if refit.id!="balanced" else "强化 · %d币 + %d金属碎料"%[store.upgrade_cost("player",uid).coin,store.upgrade_cost("player",uid).metal_scrap],_request.bind("upgrade",uid),level>=3))
+		_screen.detail.add_child(_item_button("拆解 · 获得%d金属碎料（销毁这件装备）"%store.dismantle_yield("player",uid),_request.bind("dismantle",uid),"dismantle",uid))
+		_screen.detail.add_child(_item_button(("强化 · "+game.survival.supplies.describe_cost(store.upgrade_cost("player",uid))) if refit.id!="balanced" else "强化 · %d币 + %d金属碎料"%[store.upgrade_cost("player",uid).coin,store.upgrade_cost("player",uid).metal_scrap],_request.bind("upgrade",uid),"upgrade",uid,level>=3))
 		if level==0:
 			for path_id in EquipmentRefit.IDS:
 				var path:=EquipmentRefit.definition(path_id)
 				if path_id=="balanced" or not path.supports(definition):continue
 				_screen.detail.add_child(W.label(path.description,13,true))
-				_screen.detail.add_child(W.button("定向整修："+path.title+" · "+game.survival.supplies.describe_cost(store.upgrade_cost("player",uid,path_id)),_refit.bind(uid,path_id)))
+				var refit_button:=_item_button("定向整修："+path.title+" · "+game.survival.supplies.describe_cost(store.upgrade_cost("player",uid,path_id)),_refit.bind(uid,path_id),"refit",uid)
+				refit_button.set_meta("refit_path",path_id)
+				_screen.detail.add_child(refit_button)
 	for button in _screen.detail.find_children("*","Button",true,false):
 		button.clip_text=true; button.tooltip_text=button.text
 func _refit(uid: String,path: String) -> void:
@@ -208,11 +221,11 @@ func show_training() -> void:
 		var refused:=TechniqueLearning.reason(offer,game.player.actor_context)
 		var price_text:=game.player.skill_manager.combinations.supplies.describe_cost(offer.costs)
 		if offer.costs.size()==1 and offer.costs.has("coin"): price_text="%d币"%offer.costs.coin
-		options.append({"title":data.title+(" · 已学会" if known else " · "+price_text)+(_requirements_hint(offer) if not known else ""),"disabled":not refused.is_empty(),"callback":_teach.bind(offer.id)})
+		options.append({"title":data.title+(" · 已学会" if known else " · "+price_text)+(_requirements_hint(offer) if not known else ""),"disabled":not refused.is_empty(),"callback":_teach.bind(offer.id),"identity":{"ui_action":"learn_technique","actor_id":training.actor_id,"course_id":offer.id}})
 	for id in training.fieldcraft_skills:
 		var skill:=FieldcraftCatalog.default_catalog().skill(id)
 		var refused:=FieldcraftLearning.reason(skill,game.player.actor_context)
-		options.append({"title":"野外技艺："+skill.title+" · "+game.survival.supplies.describe_cost(skill.costs)+("\n"+refused if not refused.is_empty() else ""),"disabled":not refused.is_empty(),"callback":_teach_fieldcraft.bind(skill.id)})
+		options.append({"title":"野外技艺："+skill.title+" · "+game.survival.supplies.describe_cost(skill.costs)+("\n"+refused if not refused.is_empty() else ""),"disabled":not refused.is_empty(),"callback":_teach_fieldcraft.bind(skill.id),"identity":{"ui_action":"learn_fieldcraft","actor_id":training.actor_id,"course_id":skill.id}})
 	options.append({"title":"查看武技与连招","callback":_open_techniques})
 	options.append({"title":"分配已有属性点","callback":game.presenter._show_training})
 	game.ui.show_panel(service_title(training.actor_id,"训练师"),"武技只解锁知识，到K查看连招与配置；使用消耗体力与实物资源。\n\n野外技艺解锁遗骸的专业处理与对应制造配方。先学剥皮，再学取牙或摘腺；作坊留有入门书和小刀。未处理部位会保留，携刀站定作业，留意附近危险。",options)
