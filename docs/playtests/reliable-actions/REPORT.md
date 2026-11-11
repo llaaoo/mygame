@@ -40,4 +40,14 @@ Godot 4.6.3，Linux云端。无头检查通过统一runner隔离存档；图形�
 
 ## 冻结归档回归
 
-在下方追加冻结提交、冷导入及完整runner最终结果；完整回归期间不改源码、不同时启动其他Godot。
+冻结源码`c005f863b1becc26d82fc414f96c1873ac539733`从干净工作区导出`git archive`至`/tmp/reliable-actions-archive-u5q09jz2`；启动前确认无`.godot`。统一runner自动执行恢复模式首次导入，再运行：
+
+```sh
+python3 tools/run_tests.py --suite all --jobs 2 --timeout 300 \
+  --source-revision c005f863b1becc26d82fc414f96c1873ac539733 \
+  --report /tmp/reliable-actions-full.json
+```
+
+最终退出0、`complete=true`，**154/154检查通过**，无跳过、失败或超时；另有首次导入成功。全部无头结果的诊断数组为空，无ERROR/WARNING。GUT为23个测试、187条断言。见[完整JSON](full-regression.json)、[汇总](full-regression.log)、[首次导入](archive-import.log)、[GUT XML](gut-domain.xml)。详细运行日志保留在`/tmp/mygame-tests-cpzuppw5`。
+
+完整回归期间未修改源码，未同时启动其他Godot。其后仅追加验证证据与修正文档措辞；玩法源码、测试、资源和runner保持冻结版本。GitHub Actions继续停用，没有生成或发布游戏安装包。
