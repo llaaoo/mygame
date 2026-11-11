@@ -1,6 +1,6 @@
 # 世界观落地与验收
 
-2026-11-11。验收源码：`8797428e29d8f8c7adb26ac4b64f410f8ba10ddc`；现场作业修复：`df9d24a59563b936ffc5d985b1cdda1881aa5cea`。源码已推送；最终无缓存归档全量正在运行，以下待填项不表示通过。
+2026-11-11。验收源码：`8797428e29d8f8c7adb26ac4b64f410f8ba10ddc`；现场作业修复：`df9d24a59563b936ffc5d985b1cdda1881aa5cea`。源码与已有证据已推送。云环境现不可用，最终全量结果尚未确认；保持草稿状态，未合并主线。
 
 ## 实现
 
@@ -25,7 +25,7 @@
 | Python工具检查 | d5归档20项通过，不启动真实引擎；后续修复未改工具源码。 |
 | 恢复边界专项 | restore-final.json六项6/6通过，含预设boss受伤保存/返场与独立监狱施法，complete=true；来自879提交前工作区。 |
 | 0737归档全量 | complete=true，注册检查155/157通过、2失败；另导入通过。保留完整失败记录，不能称通过。 |
-| 最终归档全量 | 源码879，初始无.godot缓存；157项注册检查另加导入。**运行中，待all-8797428e.json的complete与结果后填写总数。** |
+| 最终归档全量 | 源码879，初始无.godot缓存；157项注册检查另加导入。**最后读到108/157项通过，complete=false；随后云环境不可用，后续结果未知，不能宣称全量通过。** |
 
 最终JSON与日志由本目录证据包归档；dedd停止记录保留，不改写成通过。
 
@@ -61,7 +61,18 @@ Linux、Godot4.6.3、X11、1152×648、OpenGL兼容、Mesa llvmpipe软件渲染�
 
 未覆盖所有旧档、水利分支、打断、Windows、手柄、听觉体验或目标硬件性能。不从含诊断/救援/休息的辅助运行时间推算30–45分钟或两小时Demo。GitHub Actions保持停用。
 
-## 待最终填写
+## 未完成的验收与恢复入口
 
-- 879干净归档all-8797428e.json、导入诊断、complete、通过/失败/跳过/超时、GUT与工具统计：待填。当前运行中，部分结果不代表全量完成。
-- PR、合并前远端/保护规则与最终合并提交：待填。
+879首次归档运行在68项已通过、未记录失败时执行会话消失；工作区当时完整，cgroup未记录OOM，原因未确认。该次报告为`all-8797428e.json`，保持`complete=false`。随后从同一提交重新导出无缓存副本，由独立后台进程重新执行整套测试，没有拼接部分结果。
+
+最后一次成功读取显示108/157项通过、无已记录失败，随后终端报`exec-server transport disconnected`，环境标记`unavailable`。服务端同时曾观察到`running/offline`，因此既不能断言后台已经停止，也不能宣称已完成。以下本地恢复记录当时尚未来得及上传：
+
+- `/workspace/worldview-validation-recovered/final-supervisor.json`：监督进程状态与退出码；原PID8179不可当作恢复后的进程身份依据。
+- `/workspace/worldview-validation-recovered/all-8797428e-final.json`：本次完整回归结果；只有`complete=true`、157项全部通过且监督退出码0才满足验收。
+- `/workspace/worldview-validation-recovered/all-8797428e-console.log`：持续保存的控制台日志。
+- `/workspace/worldview-validation-recovered/archive-8797428e-detached/`：无缓存起步的提交归档；对应测试日志目录为`/tmp/mygame-tests-0kcs30dg`。
+- 已推送的[155/157旧全量记录](reports/all-0737c7cc.json)与[两项问题修后6项专项](reports/restore-final.json)是独立证据，不能替代最终全量。
+
+恢复后先核对工作区与日志是否仍在，保留已有改动；读取上述报告和监督结果，不依据进程名或中间PASS文字推断完成。如证据不完整，应从`8797428e29d8f8c7adb26ac4b64f410f8ba10ddc`或后续纯文档提交重新导出干净归档，执行`python3 tools/run_tests.py --suite all --jobs 2 --timeout 300 --source-revision <源码提交> --report <独立JSON路径>`，期间不修改源码或并行运行GUI。
+
+最终全量确认后，再归档结果、检查远端main与保护规则、将草稿PR转为可合并并完成合并。本次已检查main仍为`b9a90057b1070a6914e0227ba649c4bdb143579a`、无保护及规则集；这些状态须在实际合并前刷新。GitHub Actions保持停用。
