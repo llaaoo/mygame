@@ -1,6 +1,6 @@
 # 灰河谷操作、表现与工具整改
 
-2026-11-11，北京时间。沿用现有 Godot 4.6.3 项目、真实 UID 库存、施法事务与模块化存档。本轮使用 Design Game Studio 的现有项目/试玩流程、Game Studio 的界面规范及项目 Godot MCP；Figma 的 OAuth 未接通，没有声称读取或产出设计稿。手柄支持按用户要求暂缓。
+2026-11-11，UTC。沿用现有 Godot 4.6.3 项目、真实 UID 库存、施法事务与模块化存档。本轮使用 Design Game Studio 的现有项目/试玩流程、Game Studio 的界面规范及项目 Godot MCP；Figma 的 OAuth 未接通，没有声称读取或产出设计稿。手柄支持按用户要求暂缓。
 
 ## 战斗选择与信息层级
 
@@ -39,4 +39,4 @@ MCP 最终退出释放工具回调、日志订阅与元数据，普通 transport
 
 ## 验收
 
-定向检查、原生输入/截图、干净提交归档首次导入与完整回归按 AGENTS 执行。结果以[本轮验证记录](playtests/studio-review-fixes/REPORT.md)为准，完整回归结束前不宣称全套通过。GitHub Actions 保持停用。
+定向检查、原生输入/截图、干净提交归档首次导入与完整回归按 AGENTS 执行。结果以[本轮验证记录](playtests/studio-review-fixes/REPORT.md)为准，最终干净归档146/146检查通过，首次导入另计通过；原生图形/真实输入与Python20项也已完成。GitHub Actions 保持停用。

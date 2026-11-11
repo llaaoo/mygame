@@ -1,6 +1,6 @@
 # 操作、表现与工具整改验证
 
-2026-11-11，UTC；Godot 4.6.3、Linux云端。起点`d73f490`，包含上一轮尚未合并的MCP改动。冻结源码提交为`725e39a20d7989fefd51aece7adbee6dbcfc34f8`，从git archive导出无`.godot`副本至`/tmp/grayriver-studio-fixes-final-725e39a2`。以下定向与图形结果不等于完整回归已通过。
+2026-11-11，UTC；Godot 4.6.3、Linux云端。起点`d73f490`，包含上一轮尚未合并的MCP改动。冻结源码提交为`725e39a20d7989fefd51aece7adbee6dbcfc34f8`，从git archive导出无`.godot`副本至`/tmp/grayriver-studio-fixes-final-725e39a2`。原生验证运行时代码与最终验证提交一致；最终完整回归146/146通过，首次导入另计1项通过。
 
 ## 已执行的定向检查
 
@@ -32,10 +32,12 @@ verbose已启动完成的编辑器退出原有6个资源泄漏，分别为MCP回
 
 本地MCP桥在归档运行同一默认内存检查场景，等待至少120个process frames后采样：约35 FPS、31.4ms帧、4.1ms物理帧、238次draw call，24名正常AI、世界速度1.0、max_fps=0、低处理器模式false、窗口聚焦。启动初期1 FPS快照单独保留，未用于稳定性能对照。数据见`performance-steady.json/steady-history.json/state-steady.json`。原生Compatibility仍有V-Sync、Vulkan探测与XServer的已知平台诊断；没有把它们说成无诊断运行，实际窗口显示/输入已另验证。最终编辑器正常退出0，没有原有资源或ObjectDB泄漏。
 
-原生退出后恢复编辑器临时改写的project.godot，并逐文件核对脚本、场景、Resource、Python、UID与冻结提交一致。完整命令为`taskset -c 0,1,2,3 python3 tools/run_tests.py --suite all --jobs 2 --timeout 300 --source-revision 725e39a20d7989fefd51aece7adbee6dbcfc34f8 --report /tmp/grayriver-studio-fixes-all.json`。期间源码冻结，没有并行导入、试玩或其他Godot检查。首轮完整结果为145/146，唯一失败是旧grayriver_journey直接调用UI回调、构造缺少physical_keycode的M事件。现改为Input.parse_input_event真实按下/松开，同时验证开图和关图；定向复测通过（11.7秒）。原始完整失败报告和首条诊断分别保存在all-before-journey-input-fix.json和journey-before-input-fix.log；修后定向报告为journey-real-input-fixed.json。随后从包含测试修正的新提交重新归档、导入并执行完整回归，结果待登记。旧96/144的中断结果不作为本轮全量通过证据。
+原生退出后恢复编辑器临时改写的project.godot，并逐文件核对脚本、场景、Resource、Python、UID与冻结提交一致。完整命令为`taskset -c 0,1,2,3 python3 tools/run_tests.py --suite all --jobs 2 --timeout 300 --source-revision 725e39a20d7989fefd51aece7adbee6dbcfc34f8 --report /tmp/grayriver-studio-fixes-all.json`。期间源码冻结，没有并行导入、试玩或其他Godot检查。首轮完整结果为145/146，唯一失败是旧grayriver_journey直接调用UI回调、构造缺少physical_keycode的M事件。现改为Input.parse_input_event真实按下/松开，同时验证开图和关图；定向复测通过（11.7秒）。原始完整失败报告和首条诊断分别保存在all-before-journey-input-fix.json和journey-before-input-fix.log；修后定向报告为journey-real-input-fixed.json。随后从包含测试修正的新提交4935573308b3944cd2c5e4e5fe9a39285930a9b2重新归档至/tmp/grayriver-studio-fixes-final-49355733，首次导入通过；完整回归最终146/146通过（另有首次导入1项，all-final.json合计147条结果），没有跳过项。命令参数与首轮相同，仅source-revision和报告路径分别改为4935573308b3944cd2c5e4e5fe9a39285930a9b2及/tmp/grayriver-studio-fixes-all-final.json。旧96/144的中断结果不作为本轮全量通过证据。
 
 原生animation_demo_input也退出0，覆盖实际轻击/长按重击、连招武技、武器切换、正常AI对练、火石组合与演示内存F5/F9；正式旅程哈希、UID与物资保持。截图animation-combat-strike.png、animation-combat-charge.png和animation-paper-doll.png来自725e39a运行时代码，位置/装备/知识使用演示夹具，不能当作自然获取流程。
 
 ## 范围与限制
 
 检查使用隔离数据目录与内存场景，控制位置、知识和物资的用例会明确记录夹具；没有改正式旅程、停止正常AI来提升帧率或修改费用平衡。并非自然首玩通关、战斗平衡或两小时内容验收。Figma工具的OAuth尚未接通，本轮没有Figma设计稿；Design Game Studio/Game Studio技能与Godot MCP按实际执行记录使用。手柄支持按用户要求暂缓，GitHub Actions保持停用。
+
+最终回归退出0后，逐文件核对全部4282个归档跟踪文件与验证提交一致，没有源码或资源差异。725e39a之后只修正上述真实输入测试并补充文档/证据，原生演示使用的运行时代码未再改变；最终证据归档提交仅含文档。
