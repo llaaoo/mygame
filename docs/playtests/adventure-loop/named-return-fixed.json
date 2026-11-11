@@ -1,0 +1,52 @@
+{
+  "schema": 1,
+  "revision": "abb2dffba6e6694ca7c51b2efbaf0dcc3d685a75",
+  "dirty": true,
+  "godot": "4.6.3.stable.official.7d41c59c4",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "jobs": 2,
+  "timeout": 300.0,
+  "logs": "/tmp/mygame-tests-01mjtaa5",
+  "requested": [
+    "grayriver_foundation",
+    "map_preview_input"
+  ],
+  "results": [
+    {
+      "name": "grayriver_foundation",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 5.132,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_grayriver_foundation.gd"
+      ],
+      "log": "/tmp/mygame-tests-01mjtaa5/grayriver_foundation.log",
+      "diagnostic": []
+    },
+    {
+      "name": "map_preview_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 14.506,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_map_preview_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-01mjtaa5/map_preview_input.log",
+      "diagnostic": []
+    }
+  ],
+  "skipped": [],
+  "complete": true
+}

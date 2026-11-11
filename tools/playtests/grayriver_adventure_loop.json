@@ -538,7 +538,7 @@
     "op": "key",
     "key": "F",
     "capture": "adventure-25-new-shaft-used",
-    "note": "archive.index_return -> camp archive_return. West entrance remains free. Leave the arrival quickly: the unfought forest hunter may be within aggro range."
+    "note": "archive.index_return uses the same corrected initial safe landing as the west exit. Existing pursuers are not removed by travel; retreat normally if already engaged."
   },
   {
     "op": "walk",

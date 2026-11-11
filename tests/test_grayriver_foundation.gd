@@ -32,12 +32,14 @@ func run() -> void:
 	check(not game.progress.validate_save_data({"journey":{"region":"camp","position":[NAN,0]}}),"Invalid journey coordinates accepted")
 	# Authored node order is editable; a geographic route has a stable identity.
 	var entrance: ExplorationExitData=game.current_data.exits.filter(func(entry: ExplorationExitData):return entry.id=="archive.enter")[0]
+	var return_point: Vector2=game.catalog.regions.camp.arrival_points["archive_return"]
+	check(return_point.distance_to(entrance.pos)<200,"Named archive return no longer belongs to its geographic entrance")
 	game._use_exit(entrance)
 	for i in range(6): await process_frame
 	check(game.region_id=="river_archive" and game.player.health_component.hp==hp,"Dungeon transition healed or failed")
 	game._use_exit(game.current_data.exits.filter(func(entry: ExplorationExitData):return entry.id=="archive.leave")[0])
 	for i in range(6): await process_frame
-	check(game.region_id=="camp" and game.player.position.distance_to(Vector2(-2600,-1660))<2,"Dungeon did not return to its geographic entrance")
+	check(game.region_id=="camp" and game.player.position.distance_to(return_point)<2,"Dungeon did not return to its named geographic entrance")
 	game.ui.close_modal()
 	game.queue_free()
 	current_scene=null
