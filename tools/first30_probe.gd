@@ -366,7 +366,7 @@ func duel(style: String,enemy_id: String) -> String:
 		if not art.is_empty() and str(art.get("reason","")).is_empty() and active_time>=next_technique and distance<65 and not game.player.actor_context.actions.busy():
 			await trial_strike(false,true);prefix_heavy=false
 			next_technique=active_time+.1; next_attack=active_time+.9
-		if active_time>=next_attack and (use_field or distance<65) and not game.player.actor_context.actions.busy():
+		if active_time>=next_attack and (use_field or distance<65) and not game.player.actor_context.actions.busy() and (style not in ["throw","spray"] or next_attack>0):
 			if use_field: await tap(KEY_6)
 			elif style=="martial":
 				await trial_strike(prefix_heavy);prefix_heavy=not prefix_heavy
