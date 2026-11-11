@@ -1,0 +1,25 @@
+{
+  "content": [
+    {
+      "text": "{\"broken_scripts\":[],\"cyclic_dependencies\":[],\"missing_dependencies\":[],\"search_path\":\"res://demos/\",\"status\":\"healthy\",\"summary\":{\"broken_scripts\":0,\"cyclic_dependencies\":0,\"missing_dependencies\":0,\"scanned_resources\":11,\"scanned_scripts\":5,\"script_warnings\":0},\"truncated\":false}",
+      "type": "text"
+    }
+  ],
+  "isError": false,
+  "structuredContent": {
+    "broken_scripts": [],
+    "cyclic_dependencies": [],
+    "missing_dependencies": [],
+    "search_path": "res://demos/",
+    "status": "healthy",
+    "summary": {
+      "broken_scripts": 0,
+      "cyclic_dependencies": 0,
+      "missing_dependencies": 0,
+      "scanned_resources": 11,
+      "scanned_scripts": 5,
+      "script_warnings": 0
+    },
+    "truncated": false
+  }
+}

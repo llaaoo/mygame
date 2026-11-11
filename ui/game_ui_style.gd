@@ -106,7 +106,7 @@ static func apply_button(button: Button, accent: Color = ACCENT, selected: bool 
 	button.add_theme_color_override("font_hover_color", Color.WHITE)
 	button.add_theme_color_override("font_pressed_color", Color.WHITE)
 	button.add_theme_color_override("font_disabled_color", TEXT_DISABLED)
-	button.add_theme_font_size_override("font_size", 14)
+	apply_font_size(button,14)
 	if button.text=="关闭":
 		button.icon=icon("x"); button.expand_icon=true; button.add_theme_constant_override("icon_max_width",14)
 	button.custom_minimum_size.y = maxf(button.custom_minimum_size.y, 38.0)
@@ -126,7 +126,7 @@ static func apply_tab(button: Button, selected := false) -> void:
 
 static func primary(button: Button) -> void:
 	apply_button(button,GOLD,true)
-	button.add_theme_font_size_override("font_size",15)
+	apply_font_size(button,15)
 
 static func decorate(panel: Control) -> void:
 	var background:=ExpeditionBackdrop.new()
@@ -173,8 +173,29 @@ static func apply_progress(bar: ProgressBar, color: Color, height: float = 10.0)
 
 
 static func apply_label(label: Label, size: int = 12, color: Color = TEXT_MAIN) -> void:
-	label.add_theme_font_size_override("font_size", maxi(size,12))
+	apply_font_size(label,maxi(size,12))
 	label.add_theme_color_override("font_color", color)
+
+static func font_size(base: int) -> int:
+	return roundi(base*float(PresentationPreferences.value("text_scale")))
+static func apply_font_size(control: Control,base: int) -> void:
+	control.set_meta("ui_base_font_size",base)
+	control.add_theme_font_size_override("font_size",font_size(base))
+static func apply_reading_size(control: RichTextLabel,base: int) -> void:
+	control.set_meta("ui_base_reading_size",base)
+	for name in ["normal_font_size","bold_font_size","italics_font_size","bold_italics_font_size","mono_font_size"]:
+		control.add_theme_font_size_override(name,font_size(base))
+static func set_text_scale(value: float,window: Window) -> bool:
+	if not PresentationPreferences.set_option("text_scale",value): return false
+	install_theme(window)
+	_resize_fonts(window)
+	return true
+static func _resize_fonts(node: Node) -> void:
+	if node is Control and node.has_meta("ui_base_font_size"):
+		node.add_theme_font_size_override("font_size",font_size(int(node.get_meta("ui_base_font_size"))))
+	if node is RichTextLabel and node.has_meta("ui_base_reading_size"):
+		apply_reading_size(node,int(node.get_meta("ui_base_reading_size")))
+	for child in node.get_children(): _resize_fonts(child)
 
 
 static func apply_title(label: Label, size: int = 22) -> void:
@@ -242,7 +263,14 @@ static func install_theme(window: Window) -> void:
 	window.gui_embed_subwindows=true
 	# Project custom themes load before first-import fonts exist. Install only
 	# when a real game UI enters the tree, after imported resources are available.
-	if window.theme==null: window.theme=load("res://ui/themes/grayriver.tres") as Theme
+	var scale: float=PresentationPreferences.value("text_scale")
+	if window.theme!=null and window.get_meta("ui_text_scale",-1.0)==scale: return
+	var theme:= (load("res://ui/themes/grayriver.tres") as Theme).duplicate() as Theme
+	theme.default_font_size=font_size(theme.default_font_size)
+	for type in theme.get_type_list():
+		for name in theme.get_font_size_list(type): theme.set_font_size(name,type,font_size(theme.get_font_size(name,type)))
+	window.theme=theme
+	window.set_meta("ui_text_scale",scale)
 
 static func close_gameplay_views(actor: Node) -> void:
 	for view in actor.get_tree().get_nodes_in_group("modal_ui"):

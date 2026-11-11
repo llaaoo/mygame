@@ -23,6 +23,15 @@ class Ring extends Control:
    if index<wheel.entries.size() and wheel.entries[index].get("current",false):
     var angle: float=-PI/2+i*TAU/8
     draw_arc(center,162,angle-PI/8+.08,angle+PI/8-.08,16,GameUIStyle.ACCENT,2,true)
+class CompactList extends Control:
+ var wheel: MaterialWheel
+ func _draw() -> void:
+  for i in range(wheel.page_size()):
+   var index:=wheel.page*wheel.page_size()+i
+   var entry: Dictionary=wheel.entries[index] if index<wheel.entries.size() else {}
+   var rect:=Rect2(Vector2(0,i*64),Vector2(size.x,58))
+   draw_style_box(GameUIStyle.surface_style(i==wheel.hovered),rect)
+   if entry.get("current",false): draw_line(rect.position+Vector2(2,4),rect.position+Vector2(2,54),GameUIStyle.ACCENT,3)
 var player: Player
 var save_request: Callable
 var source := ""
@@ -33,6 +42,11 @@ var page := 0
 var hovered := -1
 var _hold := false
 var _ring: Ring
+var _compact_view: CompactList
+var _compact_labels: Array[Label]=[]
+var _compact_mode := false
+var _compact_rows := 1
+var _layout_selected := false
 var _source_host: ScrollContainer
 var _source_list: VBoxContainer
 var _source_signature := ""
@@ -62,6 +76,10 @@ func _ready() -> void:
  for i in range(8):
   var label:=FoundationWidgets.label("",13); label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
   _ring.add_child(label); _labels.append(label)
+ _compact_view=CompactList.new(); _compact_view.wheel=self; _compact_view.mouse_filter=Control.MOUSE_FILTER_IGNORE; background.add_child(_compact_view)
+ for i in range(3):
+  var label:=FoundationWidgets.label("",14); label.mouse_filter=Control.MOUSE_FILTER_IGNORE
+  _compact_view.add_child(label); _compact_labels.append(label)
  _detail_host=PanelContainer.new(); _detail_host.mouse_filter=Control.MOUSE_FILTER_IGNORE
  _detail_host.add_theme_stylebox_override("panel",GameUIStyle.quiet_panel(.96)); background.add_child(_detail_host)
  _detail=FoundationWidgets.label("",14); _detail.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
@@ -70,8 +88,18 @@ func _ready() -> void:
  get_window().focus_exited.connect(close)
  get_viewport().size_changed.connect(_layout)
  _layout(); hide()
+func page_size() -> int:
+ return _compact_rows if _compact_mode else 8
+func selector_rect() -> Rect2:
+ return _compact_view.get_global_rect() if _compact_mode else _ring.get_global_rect()
+func entry_point(index: int) -> Vector2:
+ var slot:=posmod(index,page_size())
+ if _compact_mode: return _compact_view.position+Vector2(_compact_view.size.x*.5,slot*64+29)
+ return _ring.position+(Vector2(180,180)+Vector2.from_angle(-PI/2+slot*TAU/8)*125)*_ring.scale
 func _layout() -> void:
  var size:=get_viewport().get_visible_rect().size
+ _ring.scale=Vector2.ONE
+ _detail.max_lines_visible=3 if size.x<900 else 8
  _ring.position=Vector2(size.x*.5-180,maxf(64,(size.y-360)*.5-24))
  _source_host.position=Vector2(maxf(20,size.x*.5-390),_ring.position.y+32); _source_host.size=Vector2(190,280)
  _title.position=Vector2(24,24); _title.size=Vector2(size.x-48,56)
@@ -79,7 +107,33 @@ func _layout() -> void:
  for i in range(8):
   _labels[i].position=Vector2(180,180)+Vector2.from_angle(-PI/2+i*TAU/8)*125-Vector2(64,24)
   _labels[i].size=Vector2(128,48)
- _detail_host.position=Vector2(size.x*.5+185,_ring.position.y+68); _detail_host.size=Vector2(minf(260,size.x*.5-205),200)
+ _ring.visible=not _compact_mode
+ _compact_view.visible=_compact_mode
+ if _compact_mode:
+  _compact_view.position=Vector2(size.x*.5-152,maxf(94,size.y*.5-80)); _compact_view.size=Vector2(304,page_size()*64)
+  for i in range(3):
+   _compact_labels[i].position=Vector2(14,i*64+8); _compact_labels[i].size=Vector2(276,48)
+  _source_host.position=Vector2(maxf(20,size.x*.5-360),_compact_view.position.y); _source_host.size=Vector2(190,160)
+  _detail_host.position=Vector2(size.x*.5+170,_compact_view.position.y); _detail_host.size=Vector2(minf(260,size.x*.5-190),180)
+ else:
+  _detail_host.position=Vector2(size.x*.5+185,_ring.position.y+68); _detail_host.size=Vector2(minf(260,size.x*.5-205),200)
+ if size.x<900:
+  _title.text="选择释放形式 · 世界持续运行"
+  # Stack source navigation and the short explanation above the choices.
+  # Only presentation scales; pointer projection uses the same transform.
+  var source_width:=minf(190,size.x*.3)
+  # Reserve the complete three-line font height. A fixed 68px PanelContainer
+  # silently grows to its text minimum and otherwise overlaps the first wedge.
+  var header_height:=maxf(96,ceilf(_detail.get_theme_font("font").get_height(_detail.get_theme_font_size("font_size")))*3+24)
+  var choices_top:=82+header_height+14
+  _source_host.position=Vector2(16,82); _source_host.size=Vector2(source_width,header_height)
+  _detail_host.position=Vector2(source_width+32,82); _detail_host.size=Vector2(size.x-source_width-48,header_height)
+  if _compact_mode:
+   _compact_view.position=Vector2(maxf(16,size.x*.5-152),choices_top)
+  else:
+   var scale_factor:=clampf((size.y-choices_top-28)/360.0,.6,1.0)
+   _ring.scale=Vector2.ONE*scale_factor
+   _ring.position=Vector2(size.x*.5-180*scale_factor,choices_top)
 func remember_source(value: String) -> void:
  if QuickslotMaterials.available(player.skill_manager,value): last_source=value
 func open(held := false) -> void:
@@ -130,14 +184,16 @@ func _refresh() -> void:
  var live:=QuickslotMaterials.usable_options(player,source)
  if _entry_source!=source:
   entries=[]; _slot_ids.clear(); _preview_choices.clear(); hovered=-1
-  _entry_source=source
- var old_index:=page*8+hovered
+  _entry_source=source; _layout_selected=false
+ var old_index:=page*page_size()+hovered
  var old_choice: Dictionary=entries[old_index].get("choice",{}) if hovered>=0 and old_index<entries.size() else {}
  var groups: Dictionary={}
  for row in live:
   if not groups.has(row.variant_id): groups[row.variant_id]=[]
   groups[row.variant_id].append(row)
   if row.variant_id not in _slot_ids: _slot_ids.append(row.variant_id)
+ if not _layout_selected:
+  _compact_mode=_slot_ids.size()<=3; _compact_rows=clampi(_slot_ids.size(),1,3); _layout_selected=true
  entries=[]
  for id in _slot_ids:
   if not groups.has(id): entries.append({}); continue
@@ -150,15 +206,12 @@ func _refresh() -> void:
  # Wedges keep their identity during this opening. Lost conditions leave an empty
  # sector; they never slide a different form under a held pointer/release.
  if hovered>=0 and (old_index>=entries.size() or entries[old_index].get("choice",{})!=old_choice): hovered=-1
- page=clampi(page,0,maxi(0,(entries.size()-1)/8))
- if not entries.slice(page*8,(page+1)*8).any(func(row): return not row.is_empty()):
-  for index in range(entries.size()):
-   if not entries[index].is_empty():
-    page=index/8; hovered=-1; break
+ page=clampi(page,0,maxi(0,(entries.size()-1)/page_size()))
+ # Keep even an emptied page in place; only explicit scrolling changes pages.
  var instance:=player.skill_manager.get_instance(source)
- _title.text="可释放形式\n仅显示满足条件的形式 · 按快捷键切槽 · 滚轮翻页 / 同类切瓶 · 世界持续运行"
+ _title.text="选择释放形式\n仅列当前可用来源 · 选择后手动施放 · 世界持续运行"
  _refresh_sources()
- _center.text=(InputBindings.label(InputBindings.action_for_source(source))+"\n"+instance.data.display_name) if instance else "尚无选材动作\nK编组已学动作"
+ _center.text=(InputBindings.label(InputBindings.action_for_source(source))+"\n"+instance.data.display_name) if instance else InputBindings.menu_help("尚无选材动作\nK编组已学动作")
  for i in range(8):
   var index:=page*8+i
   _labels[i].text=""
@@ -166,23 +219,40 @@ func _refresh() -> void:
   var entry: Dictionary=entries[index]
   _labels[i].text=("✓ " if entry.current else "")+entry.title+"\n%d MP"%entry.cost+((" · 瓶%s"%str(entry.choice.get("uid","")).trim_prefix("item.")) if not str(entry.choice.get("uid","")).is_empty() else "")
   _labels[i].add_theme_color_override("font_color",GameUIStyle.TEXT_MAIN if entry.ready else GameUIStyle.TEXT_MUTED)
- _update_detail(); _ring.queue_redraw()
+ for i in range(3):
+  _compact_labels[i].visible=i<page_size()
+  var index:=page*page_size()+i
+  var entry: Dictionary=entries[index] if index<entries.size() else {}
+  _compact_labels[i].text=("条件已失效" if _slot_ids.size()>0 else "当前没有可用形式") if entry.is_empty() else ("✓ " if entry.current else "")+entry.title+"\n%d MP"%entry.cost
+  _compact_labels[i].add_theme_color_override("font_color",GameUIStyle.TEXT_MUTED if entry.is_empty() else GameUIStyle.TEXT_MAIN)
+ _layout(); _update_detail(); _ring.queue_redraw(); _compact_view.queue_redraw()
 func _update_detail() -> void:
- var index:=page*8+hovered
+ var index:=page*page_size()+hovered
  if hovered<0 or index>=entries.size() or entries[index].is_empty():
   var has_choices:=entries.any(func(row): return not row.is_empty())
-  _detail.text="选择只改变本槽来源，不施法、不消费材料。\n%s\n中键松开 / G模式点击确认 · 移回中心或Esc取消"%(("第%d/%d页"%[page+1,maxi(1,ceili(entries.size()/8.0))]) if has_choices else QuickslotMaterials.unavailable_summary(player,source))
+  var instruction: String="松开中键确认" if _hold else "点击形式确认"
+  var pages: String=" · 滚轮翻页 %d/%d"%[page+1,ceili(float(entries.size())/page_size())] if entries.size()>page_size() else ""
+  _detail.text=("%s%s\n按 %s 手动释放\nEsc取消"%[instruction,pages,InputBindings.label(InputBindings.action_for_source(source))]) if has_choices else QuickslotMaterials.unavailable_summary(player,source)
+  if not has_choices and not QuickslotMaterials.available(player.skill_manager,source): _detail.text=InputBindings.menu_help(_detail.text)
   return
  var entry: Dictionary=entries[index]
- _detail.text="%s · %d MP · %s\n%s\n第%d/%d页 · 中键松开 / G模式点击确认 · Esc取消"%[entry.title,entry.cost,entry.detail,entry.reason if not entry.ready else "可释放 · 确认后按原快捷键施放",page+1,maxi(1,ceili(entries.size()/8.0))]
+ _detail.text="%s · %d MP\n%s\n%s"%[entry.title,entry.cost,entry.detail,entry.reason if not entry.ready else ("松开中键确认" if _hold else "点击确认")+" · 按原快捷键释放"]
+ if entry.get("alternatives",[]).size()>1: _detail.text+="\n滚轮切换同类实物"
+ elif entries.size()>page_size(): _detail.text+="\n滚轮翻页 %d/%d"%[page+1,ceili(float(entries.size())/page_size())]
 func _pick(point: Vector2) -> void:
- var offset:=point-(_ring.position+Vector2(180,180))
- hovered=-1 if offset.length()<74 or not _hold and offset.length()>192 else int(floor(fposmod(offset.angle()+PI/2+PI/8,TAU)/(TAU/8)))
- var index:=page*8+hovered
+ hovered=-1
+ if _compact_mode:
+  var local:=point-_compact_view.position
+  for i in range(page_size()):
+   if Rect2(Vector2(0,i*64),Vector2(_compact_view.size.x,58)).has_point(local): hovered=i; break
+ else:
+  var offset:=(point-_ring.position)/_ring.scale-Vector2(180,180)
+  hovered=-1 if offset.length()<74 or not _hold and offset.length()>192 else int(floor(fposmod(offset.angle()+PI/2+PI/8,TAU)/(TAU/8)))
+ var index:=page*page_size()+hovered
  if hovered>=0 and (index>=entries.size() or entries[index].is_empty()): hovered=-1
- _update_detail(); _ring.queue_redraw()
+ _update_detail(); _ring.queue_redraw(); _compact_view.queue_redraw()
 func _confirm() -> void:
- var index:=page*8+hovered
+ var index:=page*page_size()+hovered
  if hovered>=0 and index<entries.size() and not entries[index].is_empty():
   if QuickslotMaterials.select(player,source,entries[index].choice,true):
    last_source=source
@@ -198,7 +268,7 @@ func _input(event: InputEvent) -> void:
    if visible: get_viewport().set_input_as_handled()
   return
  if event is InputEventKey and event.pressed and not event.echo:
-  if event.keycode in [KEY_ESCAPE,KEY_G]: close(); get_viewport().set_input_as_handled(); return
+  if InputBindings.menu_key(event) in [KEY_ESCAPE,KEY_G]: close(); get_viewport().set_input_as_handled(); return
   for candidate in QuickslotLoadout.SOURCES:
    if event.is_action_pressed(InputBindings.action_for_source(candidate)):
     player.input_controller.suppress_source(candidate)
@@ -211,7 +281,7 @@ func _input(event: InputEvent) -> void:
    if event.button_index==MOUSE_BUTTON_LEFT: player.input_controller.pointer_consumed()
    return
   if event.pressed and event.button_index in [MOUSE_BUTTON_WHEEL_UP,MOUSE_BUTTON_WHEEL_DOWN]:
-   var index:=page*8+hovered
+   var index:=page*page_size()+hovered
    var step:=1 if event.button_index==MOUSE_BUTTON_WHEEL_DOWN else -1
    var alternatives: Array=entries[index].get("alternatives",[]) if hovered>=0 and index<entries.size() and not entries[index].is_empty() else []
    if alternatives.size()>1:
@@ -220,11 +290,11 @@ func _input(event: InputEvent) -> void:
      if alternatives[i].choice.get("uid","")==entries[index].choice.get("uid",""): position=i; break
     var changed: Dictionary=alternatives[posmod(position+step,alternatives.size())].duplicate(true)
     _preview_choices[str(changed.variant_id)]=changed.choice
-   else: page=posmod(page+step,maxi(1,ceili(entries.size()/8.0)))
+   else: page=posmod(page+step,maxi(1,ceili(float(entries.size())/page_size())))
    var sector:=hovered if alternatives.size()>1 else -1
    _refresh()
    if sector>=0:
-    hovered=sector; _update_detail(); _ring.queue_redraw()
+    hovered=sector; _update_detail(); _ring.queue_redraw(); _compact_view.queue_redraw()
   elif event.button_index==MOUSE_BUTTON_LEFT:
    player.input_controller.pointer_consumed()
    if event.pressed and not _hold: _pick(event.position); _confirm()

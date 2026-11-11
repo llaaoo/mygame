@@ -13,6 +13,9 @@ const DIRECTIONS: Array[String]=["s","sw","w","nw","n","ne","e","se"]
 @export var body_scale:=Vector2(3,3)
 @export var body_offset:=Vector2(0,-4)
 @export var stride_distance := 64.0
+## Rig position tracks use (sideways, forward) for these poses. Only the visual
+## child is transformed; the physics root and authored action reach never move.
+@export var facing_relative_poses: Array[StringName]=[]
 func resolve(key: StringName) -> ActorAnimationClip:
 	var seen: Dictionary={}
 	var wanted:=key
@@ -47,6 +50,10 @@ func validation_errors() -> Array[String]:
 		if not seen.has(StringName(next)): errors.append("Unknown animation fallback: "+str(key))
 	# Pose libraries cannot make calls, play other animations, or write gameplay paths.
 	if poses:
+		var directional_seen: Dictionary={}
+		for name in facing_relative_poses:
+			if name.is_empty() or directional_seen.has(name) or not poses.has_animation(name): errors.append("Unknown/duplicate facing-relative pose")
+			directional_seen[name]=true
 		if not poses.has_animation("RESET"): errors.append("Missing RESET pose")
 		else:
 			var reset:=poses.get_animation("RESET"); var missing:=POSE_TRACKS.duplicate()

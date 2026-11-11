@@ -7,6 +7,61 @@ func check(ok: bool,message: String) -> void:
 	if not ok: failures.append(message); push_error(message)
 func frames(n := 3) -> void:
 	for i in n: await process_frame
+func weapon_feedback(actor: Player,rig: ActorAnimationController,visual: ActorEquipmentVisual) -> void:
+	var actions:=actor.actor_context.actions; var store:=actor.actor_context.items
+	var weapon_visual: ActorWeaponVisual
+	for child in visual.get_children():
+		if child is ActorWeaponVisual: weapon_visual=child
+	check(weapon_visual!=null,"Missing shared weapon visual")
+	if not weapon_visual: return
+	store.receive("player","arrow",8,true)
+	var signatures: Dictionary={}
+	for pair in [["river_sabre","blade","slash"],["river_spear","spear","thrust"],["river_staff","staff","sweep"],["river_bow","bow","shot"]]:
+		actions.cancel(); actions.stamina.current=100
+		if store.find_owned("player",pair[0]).is_empty(): store.receive("player",pair[0],1)
+		var uid:=store.find_owned("player",pair[0]); check(store.equip("player",uid).accepted,"Could not equip feedback weapon: "+pair[0])
+		var request:=Action.melee(actor); request.direction=Vector2.RIGHT
+		check(actions.try_action(request).accepted,"Could not start feedback action: "+pair[0])
+		actions.advance(actions.profile.windup*.9); rig.render(0)
+		var anticipated:=rig.rig.position
+		var view:=weapon_visual.visual_snapshot()
+		check(view.uid==uid and view.shape==pair[1] and view.phase=="windup","Weapon view lost its actual UID/shape/phase")
+		check(rig.body.animation==StringName(pair[2]+"_e") and anticipated.dot(Vector2.RIGHT)<0,"Body did not anticipate its own weapon along the locked facing: "+pair[0])
+		check(bool(view.nocked)==(pair[1]=="bow"),"Nocked ammunition is not tied to real bow windup")
+		signatures[pair[1]]=str([rig.rig.position,rig.main_hand.position,rig.off_hand.position])
+		var stock:=store.snapshot();var elapsed:=actions.elapsed;var remaining:=actions.remaining;var stamina:=actions.stamina.current;var position:=actor.position
+		rig.render(2); weapon_visual.visual_snapshot()
+		check(rig.rig.position.is_equal_approx(anticipated),"Repeated seek accumulated facing-relative visual displacement")
+		check(store.snapshot()==stock and actor.position==position and actions.elapsed==elapsed and actions.remaining==remaining and actions.stamina.current==stamina,"Feedback query/render changed physical state")
+		actions.advance(actions.profile.windup*.1+actions.profile.active*.6); rig.render(0)
+		view=weapon_visual.visual_snapshot()
+		check(view.phase=="active" and not view.nocked,"Released arrow remained drawn on the bow")
+		check(rig.rig.position.dot(Vector2.RIGHT)>0 if pair[1]!="bow" else rig.rig.position.dot(Vector2.RIGHT)<0,"Release silhouette did not distinguish planted bow from melee extension")
+		actions.cancel(); actions.stamina.current=100
+		request.action_type=Action.ActionType.HEAVY_ATTACK
+		check(actions.try_action(request).accepted,"Could not start heavy feedback action")
+		actions.advance(actions.profile.windup*.9);rig.render(0)
+		check(rig.current.resolved==pair[2]+"_heavy" and rig.rig.position.length()>anticipated.length(),"Heavy strike reused the light body anticipation")
+		actions.cancel();rig.render(0)
+		check(rig.rig.position.is_equal_approx(Vector2.ZERO),"Weapon pose leaked after cancellation")
+	for first in signatures:
+		for second in signatures:
+			if first!=second:check(signatures[first]!=signatures[second],"Weapon silhouettes collapsed into one gesture")
+	actions.cancel(); actions.stamina.current=100
+	store.equip("player",store.find_owned("player","river_staff"))
+	for state in ["sweep","thrust","sweep_reverse"]:
+		var request:=Action.melee(actor);request.direction=Vector2.RIGHT
+		check(actions.try_action(request).accepted,"Staff combo feedback action refused")
+		rig.render(0)
+		check(rig.current.resolved==state,"Staff reverse finisher fell back to an idle body")
+		actions.advance(actions.remaining)
+	store.equip("player",store.find_owned("player","river_sabre"))
+	var guard:=Action.new();guard.action_type=Action.ActionType.GUARD;guard.params["held"]=true;guard.direction=Vector2.RIGHT
+	check(actions.try_action(guard).accepted,"Guard presentation request refused")
+	rig.render(0)
+	check(rig.body.animation==&"guard_e" and rig.current.resolved=="guard","Guard still uses the casting gesture")
+	actions.cancel();rig.render(0)
+	actions.stamina.current=100
 func run() -> void:
 	var assets: Variant=JSON.parse_string(FileAccess.get_file_as_string("res://content/art/third_party/puny/animation_assets.json"))
 	check(assets is Array,"Missing animation asset provenance")
@@ -19,6 +74,8 @@ func run() -> void:
 		check(profile.validation_errors().is_empty(),"Animation profile invalid: "+key)
 		for direction in range(8): check(ActorAnimationProfile.direction_index(Vector2.DOWN.rotated(direction*PI/4))==direction,"Eight-direction row mismatch")
 	var profile:=catalog.definition(&"puny_body")
+	for key in ["slash","slash_reverse","slash_heavy","thrust","thrust_heavy","sweep","sweep_reverse","sweep_heavy","shot","shot_heavy","guard"]:
+		check(profile.resolve(key).frames==StringName(key),"Weapon body still uses the generic gesture: "+key)
 	# Source weapon pixels must never enter live characters, irrespective of animation semantics.
 	for name in profile.sprite_frames.get_animation_names():
 		for index in profile.sprite_frames.get_frame_count(name):
@@ -27,6 +84,9 @@ func run() -> void:
 	var invalid:=profile.duplicate(true) as ActorAnimationProfile
 	invalid.fallback={"a":"b","b":"a"}
 	check(not invalid.validation_errors().is_empty(),"Cyclic visual fallback accepted")
+	invalid=profile.duplicate(true) as ActorAnimationProfile
+	invalid.facing_relative_poses=[&"missing_pose"]
+	check(not invalid.validation_errors().is_empty(),"Unresolved visual offset basis accepted")
 	invalid=profile.duplicate(true) as ActorAnimationProfile
 	invalid.poses=AnimationLibrary.new()
 	for name in profile.poses.get_animation_list(): invalid.poses.add_animation(name,profile.poses.get_animation(name))
@@ -47,7 +107,7 @@ func run() -> void:
 	var duration:=actions.remaining; var elapsed:=actions.elapsed
 	rig.render(5)
 	check(actions.remaining==duration and actions.elapsed==elapsed and actor.position==position and store.snapshot()==inventory and actions.stamina.current==cost,"Rendering advanced a domain clock, moved the body or paid resources")
-	check(rig.current.get("phase","")=="windup" and rig.current.get("direction",-1)==6 and rig.body.animation==&"gesture_e","Presentation did not read the actual locked direction/windup")
+	check(rig.current.get("phase","")=="windup" and rig.current.get("direction",-1)==6 and rig.body.animation==&"slash_e","Presentation did not read the actual locked direction/windup")
 	var cues: Array[String]=[]; rig.cue_emitted.connect(func(kind: String,_token: String): cues.append(kind))
 	actions.advance(actions.profile.windup+.01); rig.render(0)
 	var live_frame:=rig.body.frame; var socket:=rig.socket_position(&"main_hand")
@@ -61,6 +121,7 @@ func run() -> void:
 	actions.stamina.current=100; actions.try_action(request); actions.advance(actions.remaining)
 	check(cues.count("weapon_release")==2,"Skipping render frames lost an actual committed release cue")
 	rig.render(0)
+	weapon_feedback(actor,rig,visual)
 	# Footsteps follow authored contacts and actual distance, independent of sprite frame count.
 	actor.velocity=Vector2.RIGHT*100; rig.render(0)
 	var steps:=cues.count("footstep")

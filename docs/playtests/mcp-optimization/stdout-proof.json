@@ -1,0 +1,17 @@
+{
+  "content": [
+    {
+      "text": "{\"diagnostics\":[],\"output\":[\"mcp-proof\",\"mcp-proof\"],\"success\":true}",
+      "type": "text"
+    }
+  ],
+  "isError": false,
+  "structuredContent": {
+    "diagnostics": [],
+    "output": [
+      "mcp-proof",
+      "mcp-proof"
+    ],
+    "success": true
+  }
+}

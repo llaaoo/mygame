@@ -21,7 +21,7 @@ func _ready() -> void:
   var button:=InventoryItemTile.new(); button.name="GearSlot_%d"%slot
   button.custom_minimum_size=Vector2(76,46); button.expand_icon=true; button.add_theme_constant_override("icon_max_width",16)
   GameUIStyle.apply_button(button)
-  button.add_theme_font_size_override("font_size",12)
+  GameUIStyle.apply_font_size(button,12)
   for state in ["normal","hover","pressed","focus","disabled"]:
    var style:=button.get_theme_stylebox(state).duplicate() as StyleBoxFlat
    style.content_margin_left=3; style.content_margin_right=3

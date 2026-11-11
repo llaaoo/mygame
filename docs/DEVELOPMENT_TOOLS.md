@@ -1,6 +1,6 @@
 # 开发插件与回归流程
 
-核对日期：2026-11-10；本项目使用Godot 4.6.3、GDScript与原生2D场景。插件须服务现有领域边界，不另建库存、任务、知识或AI权威。
+核对日期：2026-11-11；本项目使用Godot 4.6.3、GDScript与原生2D场景。插件须服务现有领域边界，不另建库存、任务、知识或AI权威。本轮操作、性能与引用清理改动见[整改说明](STUDIO_REVIEW_FIXES.md)，第三方局部修改见[清理补丁](dependencies/editor-cleanup-patches.md)。
 
 ## 为什么测试曾反复失败
 
@@ -19,10 +19,11 @@
 | GitHub | 读取上游版本/许可、检查分支/保护、PR交付 | 已连接；实际读取GUT官方README核对4.6版本匹配 |
 | Plugin Management | 查询可用插件及连接状态 | 已使用；不会把推荐或待连接写成已安装 |
 | Cloud Environment | 环境/网络诊断，原生编辑器验证 | 已使用；当前会话没有暴露桌面控制工具，原生窗口另用Xorg验证 |
-| Figma | HUD、装备页、菜单的设计稿与设计交付 | 目录返回，未连接；此前已有推荐，不重复发起 |
+| Figma | HUD、装备页、菜单的设计稿与设计交付 | 已安装且工具可发现；实际whoami返回OAuth未认证，未读取或产出设计稿 |
 | Context7 | 开发库文档/API检索，需逐库确认实际覆盖 | 目录返回，未连接；此次用GitHub与官方文档完成核对 |
 | Superpowers | 规划、调试和开发流程技能 | 目录返回，未安装；此次按本仓库AGENTS执行 |
-| Game Studio | 当前可见技能主要服务浏览器游戏、WebGL与网页界面 | 本轮未套用到原生Godot，也未切换技术栈 |
+| Game Studio | 当前可见技能主要服务浏览器游戏、WebGL与网页界面 | 已采用UI信息层级与真实输入/截图规范，仍使用原生Godot |
+| Design Game Studio | 现有Godot项目维护、玩法边界、素材、性能与协作验收 | 已采用相关技能；真实分工覆盖界面、武器表现、工具/性能诊断、配方与引用审计，并独立复核输入/字号边界 |
 
 本次目录查询没有返回可确认的专用Godot/Blender连接器。没有调用未连接插件，没有提供API密钥、启动付费AI服务或安装外部服务端。Figma等需要用户完成ChatGPT连接后才能实际调用；这不阻塞Godot工程工作。
 
@@ -37,7 +38,7 @@
 | **Grayriver Map Authoring 1.0** | 编辑器地图校验、命名落点、隔离试玩 | 自有插件继续使用，见[工作流](MAP_AUTHORING.md) |
 | Phantom Camera 0.11 | 已随库保存，但未启用或接入当前游戏镜头 | 适合后续镜头/过场；当前已有镜头表现服务，不为安装而替换瞄准链 |
 | Importality 0.3.0 | 已保存，当前未启用 | 有Aseprite/Krita导入需求且工具链/许可核实后再接；不声称已导入新动画 |
-| Godot MCP Native 1.0.0 | 已启用的编辑器桥 | 保持原配置；当前ChatGPT工具列表没有Godot桥工具，不能声称通过MCP编辑过场景 |
+| Godot MCP Native 1.0.0 | 已启用的编辑器桥 | 已通过项目CLI实际连通；支持隔离运行检查、输入和截图，见[MCP工作流](GODOT_MCP_WORKFLOW.md)。当前ChatGPT工具列表仍没有直接注册的Godot工具 |
 | Godot AI / Gamedev AI | 已保存、未启用 | 本轮不接付费提供商或引入运行时网络依赖 |
 
 参考上游：[GUT版本矩阵](https://github.com/bitwes/Gut/blob/v9.6.1/README.md)、[GUT 9.6.1文档](https://gut.readthedocs.io/en/v9.6.1/)、[State Charts](https://github.com/derkork/godot-statecharts)、[Dialogue Manager](https://github.com/nathanhoad/godot_dialogue_manager)、[Phantom Camera](https://phantom-camera.dev/)。注意上游最新版和本地已安装版本不同，不能拿最新版文档直接宣称本地拥有全部能力。

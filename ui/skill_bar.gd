@@ -73,7 +73,7 @@ func _build() -> void:
 	_combination_hint = Label.new()
 	_combination_hint.custom_minimum_size.x = 440
 	_combination_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_combination_hint.add_theme_font_size_override("font_size", 12)
+	GameUIStyle.apply_font_size(_combination_hint,12)
 	_combination_hint.add_theme_color_override("font_color", GameUIStyle.TEXT_MAIN)
 	_combination_hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	details.add_child(_combination_hint)
@@ -231,7 +231,7 @@ func _add_item(source: String, label: String, size: Vector2) -> void:
 	_cost_labels.append(cost)
 	var variant:=Label.new()
 	variant.position=Vector2(3,size.y-17); variant.size=Vector2(30,15)
-	variant.add_theme_font_size_override("font_size",11)
+	GameUIStyle.apply_font_size(variant,11)
 	variant.add_theme_color_override("font_color",GameUIStyle.TEXT_MAIN)
 	variant.add_theme_color_override("font_shadow_color",Color.BLACK)
 	variant.add_theme_constant_override("shadow_offset_x",1); variant.add_theme_constant_override("shadow_offset_y",1)
@@ -248,7 +248,7 @@ func _add_item(source: String, label: String, size: Vector2) -> void:
 
 	var cd_label := Label.new()
 	cd_label.size = size
-	cd_label.add_theme_font_size_override("font_size", 13)
+	GameUIStyle.apply_font_size(cd_label,13)
 	cd_label.add_theme_color_override("font_color", Color.WHITE)
 	cd_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	cd_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -257,7 +257,7 @@ func _add_item(source: String, label: String, size: Vector2) -> void:
 	_cd_labels.append(cd_label)
 
 	var bind_label := Label.new()
-	bind_label.add_theme_font_size_override("font_size", 11)
+	GameUIStyle.apply_font_size(bind_label,11)
 	bind_label.add_theme_color_override("font_color", GameUIStyle.TEXT_MUTED)
 	bind_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	bind_label.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM

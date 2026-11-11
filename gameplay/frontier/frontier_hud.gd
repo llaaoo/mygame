@@ -8,6 +8,9 @@ var _focus: WeakRef
 var belt: Array[Button] = []
 var _belt_grid: GridContainer
 var _clock := 0.0
+var _binding_revision := -1
+var _loadout_hint := ""
+var _journal_hint := ""
 const FOODS := ["ration","clean_water","tea","broth"]
 const BELT_ACTIONS := ["quick_item_1","quick_item_2","quick_item_3","quick_item_4"]
 func _ready() -> void:
@@ -26,7 +29,7 @@ func _ready() -> void:
 	tracker.alignment=HORIZONTAL_ALIGNMENT_LEFT
 	tracker.add_theme_stylebox_override("normal",StyleBoxEmpty.new())
 	tracker.add_theme_stylebox_override("disabled",StyleBoxEmpty.new())
-	tracker.add_theme_font_size_override("font_size",14)
+	GameUIStyle.apply_font_size(tracker,14)
 	root.add_child(tracker)
 	time_label=FoundationWidgets.label("",13,true)
 	time_label.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
@@ -69,6 +72,10 @@ func _process(delta: float) -> void:
 	_clock-=delta
 	if _clock>0 or not game.ready_for_play: return
 	_clock=.15
+	if _binding_revision!=InputBindings.revision:
+		_binding_revision=InputBindings.revision
+		_loadout_hint=InputBindings.menu_help("K编组动作或物品")
+		_journal_hint=InputBindings.menu_help("旅程  /  J\n选择要追踪的委托")
 	time_label.text=WorldTime.instance.stamp()
 	tracker.disabled=is_instance_valid(game.ui.modal)
 	var selecting:=is_instance_valid(game.player.material_wheel) and game.player.material_wheel.visible
@@ -79,7 +86,7 @@ func _process(delta: float) -> void:
 		var binding:=game.player.skill_manager.shortcuts.binding(source)
 		var inst:=game.player.skill_manager.get_instance(source)
 		var title: String=inst.data.display_name if inst else "空槽"
-		var detail: String="K编组动作或物品"
+		var detail: String=_loadout_hint
 		var amount: String=""
 		var ready:=inst!=null
 		if binding.get("kind","")=="technique":
@@ -101,7 +108,7 @@ func _process(delta: float) -> void:
 	var goal:=game.guidance.tracked()
 	var orienting := goal.is_empty()
 	if orienting: goal = game.guidance.town_orientation()
-	tracker.text="旅程  /  J\n选择要追踪的委托"
+	tracker.text=_journal_hint
 	if not goal.is_empty():
 		tracker.text=("镇中整备\n" if orienting else "追踪委托\n")+goal.title
 		var point:=game.guidance.route_target(goal)

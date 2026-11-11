@@ -102,7 +102,7 @@ func entries() -> Array[Dictionary]:
 			result.append({"id":"supplies","title":"饮食与背包","text":"用鼠标使用、换装和整理；Q/E/R与1—0均可绑定动作或物品；用鼠标编组后，按对应键使用。","subtitle":"生存整备"})
 			var target:=game.player.input_controller.interaction_target(true)
 			result.append({"id":"nearby","title":"附近交互","text":"点击与F使用同一交互请求，不远程开启设施。","subtitle":target.title if is_instance_valid(target) and "title" in target else "靠近设施、人物或遗骸"})
-			result.append({"id":"progression","title":"等级、属性与Perk","text":"升级获得属性点与Perk点；各分支由实际实践成长。P打开角色成长。","subtitle":"角色成长"})
+			result.append({"id":"progression","title":"等级、属性与Perk","text":InputBindings.menu_help("升级获得属性点与Perk点；各分支由实际实践成长。P打开角色成长。"),"subtitle":"角色成长"})
 		"equipment":
 			for id in game.catalog.equipment:
 				var item: EquipmentData=game.catalog.equipment[id]
@@ -340,7 +340,7 @@ func _show_detail() -> void:
 				if not FrontierControls.set_quick_cast(value): game.ui.notify("本次设置已生效，但未保存到磁盘。"))
 			card.add_child(toggle)
 			card.add_child(preload("res://gameplay/foundation/ui/binding_editor.tscn").instantiate())
-			card.add_child(W.label("关闭时按住预览、松开施放。蓄力与引导仍需按住；Shift只表示显式消费恩赐。每次只执行一个基础动作，不自动组合。\n\nWASD 移动 · 空格闪避 · F交互\nQ/E/R与1—0 独立快捷槽 · K绑定动作或物品\nTab 远征面板 · J委托 · I行囊 · O穿戴 · N补给 · M地图\n右键按住格挡 · Alt冲刺 · 左键短按轻击、长按重击 · Ctrl+左键武技（可长按） · Ctrl+Shift+左键释放附魔 · B放下背包\n地图滚轮缩放、中键/右键拖动、左键放路标。",14))
+			card.add_child(W.label(InputBindings.menu_help("关闭时按住预览、松开施放。蓄力与引导仍需按住；Shift只表示显式消费恩赐。每次只执行一个基础动作，不自动组合。\n\nWASD 移动 · 空格闪避 · F交互\nQ/E/R与1—0 独立快捷槽 · K绑定动作或物品\nTab 远征面板 · J委托 · I行囊 · O穿戴 · N补给 · M地图\n右键按住格挡 · Alt冲刺 · 左键短按轻击、长按重击 · Ctrl+左键武技（可长按） · Ctrl+Shift+左键释放附魔 · B放下背包\n地图滚轮缩放、中键/右键拖动、左键放路标。"),14))
 
 func _open_loadout() -> void:
 	game.ui.close_modal()

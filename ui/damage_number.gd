@@ -31,7 +31,7 @@ func configure(text: String, color: Color, scale_mod: float = 1.0) -> void:
 	_label.add_theme_color_override("font_color", color)
 	_label.add_theme_color_override("font_outline_color", Color(0.01, 0.01, 0.015, 0.95))
 	_label.add_theme_constant_override("outline_size", 2)
-	_label.add_theme_font_size_override("font_size", int(16 * scale_mod))
+	GameUIStyle.apply_font_size(_label,int(16 * scale_mod))
 
 	_play_anim()
 

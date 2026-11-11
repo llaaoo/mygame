@@ -136,7 +136,7 @@ func _equipment_stat_lines(eq: EquipmentData) -> Array[String]:
 func _add_label(parent: Control, value: String, size: int, color: Color, wrap: bool = false) -> void:
 	var label := Label.new()
 	label.text = value
-	label.add_theme_font_size_override("font_size", size)
+	GameUIStyle.apply_font_size(label,size)
 	label.add_theme_color_override("font_color", color)
 	if wrap:
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART

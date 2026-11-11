@@ -1,0 +1,23 @@
+{
+  "content": [
+    {
+      "text": "{\"current_scene\":\"/root/MCPInspection\",\"format\":\"png\",\"height\":618,\"refresh_result\":{\"sessions_updated\":1,\"status\":\"success\"},\"save_path\":\"user://archive-growth.png\",\"size\":\"1100x618\",\"status\":\"success\",\"viewport_path\":\"/root\",\"width\":1100}",
+      "type": "text"
+    }
+  ],
+  "isError": false,
+  "structuredContent": {
+    "current_scene": "/root/MCPInspection",
+    "format": "png",
+    "height": 618,
+    "refresh_result": {
+      "sessions_updated": 1,
+      "status": "success"
+    },
+    "save_path": "user://archive-growth.png",
+    "size": "1100x618",
+    "status": "success",
+    "viewport_path": "/root",
+    "width": 1100
+  }
+}

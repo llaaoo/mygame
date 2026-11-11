@@ -3,6 +3,15 @@ extends GutTest
 var store: InventoryService
 var blade: EquipmentData
 
+func test_occupancy_counts_real_stacks_without_cloning_or_mutation() -> void:
+	store.receive("a",blade.id,2);store.receive("a","test_coin",8)
+	var before:=store.snapshot()
+	assert_eq(store.occupied_slots("a.pack"),3)
+	assert_eq(store.occupied_slots("missing"),0)
+	assert_eq(store.snapshot(),before)
+	assert_true(store.pay("a",{"test_coin":8}))
+	assert_eq(store.occupied_slots("a.pack"),2)
+
 func before_each() -> void:
 	store=InventoryService.new()
 	blade=EquipmentData.new();blade.id="test_blade";blade.slot_type=EquipmentData.SlotType.RIGHT_HAND

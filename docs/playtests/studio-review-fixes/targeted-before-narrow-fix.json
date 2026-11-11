@@ -1,0 +1,333 @@
+{
+  "schema": 1,
+  "revision": "d73f4907c6aa93e9fa5b9b7e23f16b15a9c1c944",
+  "dirty": true,
+  "godot": "4.6.3.stable.official.7d41c59c4",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "jobs": 2,
+  "timeout": 300.0,
+  "logs": "/tmp/mygame-tests-3ifuwaga",
+  "requested": [
+    "content",
+    "maps",
+    "gut_domain",
+    "input_bindings",
+    "selector_feedback_input",
+    "accessibility_input",
+    "actor_animation",
+    "animation_demo_input",
+    "presentation_system",
+    "content_expansion",
+    "survival_needs",
+    "fieldcraft",
+    "realtime_interaction",
+    "combat_choices_input",
+    "interface_navigation",
+    "world_feedback_input",
+    "field_work"
+  ],
+  "results": [
+    {
+      "name": "content",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 2.272,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tools/validate_mvp_content.gd"
+      ],
+      "log": "/tmp/mygame-tests-3ifuwaga/content.log",
+      "diagnostic": []
+    },
+    {
+      "name": "maps",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 2.423,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tools/validate_maps.gd"
+      ],
+      "log": "/tmp/mygame-tests-3ifuwaga/maps.log",
+      "diagnostic": []
+    },
+    {
+      "name": "gut_domain",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 3.68,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://addons/gut/gut_cmdln.gd",
+        "-gexit",
+        "-gdisable_colors",
+        "-gjunit_xml_file=/tmp/mygame-tests-3ifuwaga/gut-domain.xml"
+      ],
+      "log": "/tmp/mygame-tests-3ifuwaga/gut_domain.log",
+      "diagnostic": []
+    },
+    {
+      "name": "presentation_system",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 4.277,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_presentation_system.gd"
+      ],
+      "log": "/tmp/mygame-tests-3ifuwaga/presentation_system.log",
+      "diagnostic": []
+    },
+    {
+      "name": "actor_animation",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 7.085,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_actor_animation.gd"
+      ],
+      "log": "/tmp/mygame-tests-3ifuwaga/actor_animation.log",
+      "diagnostic": []
+    },
+    {
+      "name": "survival_needs",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 1.669,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_survival_needs.gd"
+      ],
+      "log": "/tmp/mygame-tests-3ifuwaga/survival_needs.log",
+      "diagnostic": []
+    },
+    {
+      "name": "content_expansion",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 10.142,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_content_expansion.gd"
+      ],
+      "log": "/tmp/mygame-tests-3ifuwaga/content_expansion.log",
+      "diagnostic": []
+    },
+    {
+      "name": "fieldcraft",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 7.182,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_fieldcraft.gd"
+      ],
+      "log": "/tmp/mygame-tests-3ifuwaga/fieldcraft.log",
+      "diagnostic": []
+    },
+    {
+      "name": "input_bindings",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 0.365,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_input_bindings.gd"
+      ],
+      "log": "/tmp/mygame-tests-3ifuwaga/input_bindings.log",
+      "diagnostic": []
+    },
+    {
+      "name": "selector_feedback_input",
+      "passed": false,
+      "category": "godot_error",
+      "exit_code": 1,
+      "seconds": 7.987,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_selector_feedback_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-3ifuwaga/selector_feedback_input.log",
+      "diagnostic": [
+        "ERROR: Narrow metadata covers radial choices",
+        "   at: push_error (core/variant/variant_utility.cpp:1024)",
+        "   GDScript backtrace (most recent call first):",
+        "       [0] check (res://tests/support/input_scene_probe.gd:6)",
+        "       [1] run (res://tests/test_selector_feedback_input.gd:76)",
+        "       [2] key (res://tests/support/input_scene_probe.gd:13)",
+        "       [3] frames (res://tests/support/input_scene_probe.gd:10)"
+      ]
+    },
+    {
+      "name": "accessibility_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 9.291,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_accessibility_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-3ifuwaga/accessibility_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "animation_demo_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 23.632,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_animation_demo_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-3ifuwaga/animation_demo_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "realtime_interaction",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 40.186,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_realtime_interaction.gd"
+      ],
+      "log": "/tmp/mygame-tests-3ifuwaga/realtime_interaction.log",
+      "diagnostic": []
+    },
+    {
+      "name": "combat_choices_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 15.61,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_combat_choices_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-3ifuwaga/combat_choices_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "interface_navigation",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 26.942,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_interface_navigation.gd"
+      ],
+      "log": "/tmp/mygame-tests-3ifuwaga/interface_navigation.log",
+      "diagnostic": []
+    },
+    {
+      "name": "world_feedback_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 11.347,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_world_feedback_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-3ifuwaga/world_feedback_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "field_work",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 5.78,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_field_work.gd"
+      ],
+      "log": "/tmp/mygame-tests-3ifuwaga/field_work.log",
+      "diagnostic": []
+    }
+  ],
+  "skipped": [],
+  "complete": true
+}

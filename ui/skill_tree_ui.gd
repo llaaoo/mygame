@@ -37,10 +37,10 @@ func setup(player: Player) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed or event.echo:
 		return
-	if visible and event.keycode == KEY_ESCAPE:
+	if visible and InputBindings.menu_key(event) == KEY_ESCAPE:
 		close()
 		get_viewport().set_input_as_handled()
-	elif event.keycode == KEY_M:
+	elif InputBindings.menu_key(event) == KEY_M:
 		if get_tree().paused and not visible:
 			return
 		toggle()

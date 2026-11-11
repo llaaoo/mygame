@@ -104,7 +104,7 @@ func run() -> void:
  check(source_button!=null,"Wheel lacks mouse-accessible source buttons")
  if source_button: await point_click(source_button.get_global_rect().get_center())
  check(wheel.visible and wheel.source=="slot_0" and actor.actor_context.actions._attack_sequence==sequence and casts==0,"Source list click closed wheel or leaked world attack/cast")
- check(not Rect2(wheel._ring.position+Vector2(9,9),Vector2(342,342)).intersects(wheel._detail_host.get_global_rect()),"Wheel detail overlaps a radial choice")
+ check(not wheel.selector_rect().intersects(wheel._detail_host.get_global_rect()),"Wheel detail overlaps a radial choice")
  await capture("mouse-source-wheel")
  var clock:=GameRuntime.instance.simulation_runtime.elapsed_time
  await frames(25)

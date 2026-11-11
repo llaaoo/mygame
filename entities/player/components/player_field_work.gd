@@ -173,19 +173,17 @@ func _on_health(hp: int, _maximum: int) -> void:
 
 func _refresh_panel() -> void:
 	if not _in_range(): return
-	panel.choices(methods,selected,is_busy(),reason_for(methods[selected]) if not methods.is_empty() else "")
-	var text := _title + "\n"
-	if not pending.is_empty():
-		panel.display(text + pending.method.title + " · %.1fs\n保持站定 · Esc取消\n移动、施法和受伤会打断" % maxf(0, pending.remaining), 1 - pending.remaining / pending.duration)
-		return
-	if not methods.is_empty():
-		var method := methods[selected]
-		text += method.title+" · %.1fs\n" % method.duration
-		var reason := reason_for(method)
-		text += reason if not reason.is_empty() else "可操作"
-		if not method.material_costs.is_empty(): text += " · " + player.skill_manager.combinations.supplies.describe_cost(method.material_costs)
-		text += "\n"
-	panel.display(text + _guide + "\n"+InputBindings.label("field_method")+"切换 · "+InputBindings.label("interact")+"开始 · Esc收起\n战斗继续进行")
+	var method: FieldWorkMethod=methods[selected] if not methods.is_empty() else null
+	var reason:=reason_for(method) if method else ""
+	panel.choices(methods,selected,is_busy(),reason)
+	var summary:=method.title if method else "当前没有可用作业"
+	# The existing sleep operation ID is the same value used by the time service.
+	# The display does not invent another duration or advance time itself.
+	if method and method.id.begins_with("sleep:"): summary="休息 %s 小时（游戏时间）"%method.id.get_slice(":",1)
+	var seconds:=float(pending.remaining) if not pending.is_empty() else method.duration*_efficiency() if method else 0.0
+	var cost:=player.skill_manager.combinations.supplies.describe_cost(method.material_costs) if method and not method.material_costs.is_empty() else ""
+	var guide:=_guide+"\n"+InputBindings.label("field_method")+"切换作业 · "+InputBindings.label("interact")+"开始 · Esc收起\n移动、其他动作或受伤会中断；成功完成才结算。"
+	panel.present_work(_title,summary,seconds,cost,reason,guide,1-float(pending.remaining)/float(pending.duration) if not pending.is_empty() else -1.0)
 
 func _efficiency() -> float:
 	if not methods.is_empty() and (methods[selected].id.begins_with("rest") or methods[selected].id.begins_with("sleep")): return 1.0

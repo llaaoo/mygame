@@ -14,6 +14,9 @@ var last_spell_source := ""
 var _focus: Node2D
 var _focus_frame := -1
 var _focus_origin := Vector2.INF
+var _focus_empty := false
+var _focus_generation := -1
+var focus_query_count := 0
 const INTERACT_RANGE := 80.0
 
 func _init(actor: Player) -> void:
@@ -328,9 +331,14 @@ func _notification(what: int) -> void:
 
 func interaction_target(refresh := false) -> Node2D:
 	var frame := Engine.get_physics_frames()
-	if not refresh and frame == _focus_frame and _focus_origin == player.global_position and is_instance_valid(_focus): return _focus
+	var generation:=player.actor_context.region.generation if player.actor_context and player.actor_context.region else -1
+	if not refresh and frame == _focus_frame and _focus_origin == player.global_position and _focus_generation==generation:
+		if _focus_empty: return null
+		if is_instance_valid(_focus) and _focus.is_inside_tree() and not _focus.is_queued_for_deletion(): return _focus
 	_focus_frame=frame
 	_focus_origin=player.global_position
+	_focus_generation=generation
+	focus_query_count+=1
 	_focus=null
 	var nearest:=INTERACT_RANGE
 	for node in get_tree().get_nodes_in_group("interactable"):
@@ -340,6 +348,7 @@ func interaction_target(refresh := false) -> Node2D:
 			if node is ExplorationInteractable and not node.visible_from(player): continue
 			nearest=distance
 			_focus=node
+	_focus_empty=_focus==null
 	return _focus
 
 func _pointer_over_interface() -> bool:

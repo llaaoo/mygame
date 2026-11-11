@@ -75,7 +75,7 @@ func _run() -> void:
 	var core_recipes:=supplies.crafting_recipes.values().filter(func(recipe: CraftingRecipe):return recipe.fieldcraft_skill.is_empty())
 	for recipe: CraftingRecipe in supplies.crafting_recipes.values():
 		if not recipe.fieldcraft_skill.is_empty():check(not supplies.knows_recipe(recipe.id),"Legacy chapter auto-unlocked professional harvesting recipes")
-	check(game.catalog.regions.size() == 9 and game.catalog.actions.size() == 11 and game.catalog.spell_rules.size() == 24 and supplies.catalog.size() == 7 and core_recipes.size() == CastingSupplies.MATERIAL_IDS.size()+SpellOperationCatalog.default_catalog().recipes.size()+3 and game.catalog.equipment.size() == 4 and encounter_count == 18 and puzzle_count == 10, "Content expansion inflated core catalogs")
+	check(game.catalog.regions.size() == 9 and game.catalog.actions.size() == 11 and game.catalog.spell_rules.size() == 24 and supplies.catalog.size() == 7 and core_recipes.size() == CraftingCatalog.default_catalog().recipes.filter(func(recipe: CraftingRecipe):return recipe.fieldcraft_skill.is_empty()).size() and game.catalog.equipment.size() == 4 and encounter_count == 18 and puzzle_count == 10, "Content expansion inflated core catalogs")
 	check(new_notes == 3 and shortcuts == 3 and game.quests.size() == 5, "Expansion grants/shortcuts/quest registration incomplete")
 	var quest: ExplorationQuestData
 	for entry in game.quests:

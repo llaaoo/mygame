@@ -1,0 +1,21 @@
+{
+  "source_revision": "71426a8f92aa5e302eee7c2a817512ccb8c5ab69",
+  "no_cache_archive": "/tmp/grayriver-mcp-regression-71426a8",
+  "recovery_import": {
+    "exit_code": 0,
+    "log": "recovery-import.log"
+  },
+  "native_archive": "/tmp/grayriver-mcp-final-archive-71426a8",
+  "native_source_match": true,
+  "native_editor_exit_code": 0,
+  "full_regression": {
+    "report": "all-results-interrupted.json",
+    "complete": false,
+    "completed": 96,
+    "passed": 96,
+    "failed": 0,
+    "requested": 144,
+    "reason": "User interrupted execution during fieldcraft_input; no assertion failure was reported."
+  },
+  "actions": "disabled"
+}

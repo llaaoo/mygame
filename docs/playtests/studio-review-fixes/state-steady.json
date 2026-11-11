@@ -1,0 +1,24 @@
+{
+  "content": [
+    {
+      "text": "{\"expression\":\"{\\\"enemies\\\":active_enemies.size(),\\\"normal_ai\\\":active_enemies[0].can_process(),\\\"paused\\\":get_tree().paused,\\\"clock\\\":session.inventory.clock_seconds}\",\"node_path\":\"/root/MCPInspection\",\"refresh_result\":{\"sessions_updated\":1,\"status\":\"success\"},\"status\":\"success\",\"value\":{\"clock\":5.26216866666666,\"enemies\":24,\"normal_ai\":true,\"paused\":false}}",
+      "type": "text"
+    }
+  ],
+  "isError": false,
+  "structuredContent": {
+    "expression": "{\"enemies\":active_enemies.size(),\"normal_ai\":active_enemies[0].can_process(),\"paused\":get_tree().paused,\"clock\":session.inventory.clock_seconds}",
+    "node_path": "/root/MCPInspection",
+    "refresh_result": {
+      "sessions_updated": 1,
+      "status": "success"
+    },
+    "status": "success",
+    "value": {
+      "clock": 5.26216866666666,
+      "enemies": 24,
+      "normal_ai": true,
+      "paused": false
+    }
+  }
+}

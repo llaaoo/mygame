@@ -1,0 +1,47 @@
+{
+  "arguments": [
+    "baseline-empty-v1"
+  ],
+  "method_name": "query_profile",
+  "node_path": "/root/MCPInspection",
+  "refresh_result": {
+    "sessions_updated": 1,
+    "status": "success"
+  },
+  "result": {
+    "enemies": 24,
+    "has_focus": false,
+    "interactables": 95,
+    "max_fps": 0,
+    "nodes": 2549.0,
+    "normal_ai": true,
+    "queries": {
+      "all_enemy_visibility": {
+        "calls": 5,
+        "total_usec": 403
+      },
+      "enemy_navigation": {
+        "calls": 5,
+        "total_usec": 622
+      },
+      "interaction_focus_sweep": {
+        "calls": 5,
+        "total_usec": 15024
+      },
+      "inventory_weight": {
+        "calls": 5,
+        "total_usec": 30
+      },
+      "progression": {
+        "calls": 5,
+        "total_usec": 147
+      },
+      "spell_preview": {
+        "calls": 5,
+        "total_usec": 1932
+      }
+    },
+    "sample_id": "baseline-empty-v1"
+  },
+  "status": "success"
+}

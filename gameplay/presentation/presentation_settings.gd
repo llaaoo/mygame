@@ -2,6 +2,16 @@ class_name PresentationSettings
 extends VBoxContainer
 func _ready() -> void:
 	add_child(FoundationWidgets.label("表现选项立即生效，独立保存于偏好文件；不改变世界速度、命中或实际资源。",13,true))
+	add_child(FoundationWidgets.label("界面字号（不缩放世界或改变镜头）",13))
+	var sizes:=HBoxContainer.new();sizes.name="TextScale"
+	var group:=ButtonGroup.new()
+	for scale in [1.0,1.1,1.25]:
+		var button:=FoundationWidgets.button("%d%%"%roundi(scale*100),_text_size.bind(scale,sizes))
+		button.toggle_mode=true;button.button_group=group
+		button.set_meta("text_scale",scale)
+		button.button_pressed=is_equal_approx(float(PresentationPreferences.value("text_scale")),scale)
+		sizes.add_child(button)
+	add_child(sizes)
 	for pair in [["reduced_motion","减少动态效果"],["camera_feedback","镜头受击反馈"]]:
 		var toggle:=CheckButton.new(); toggle.text=pair[1]; toggle.button_pressed=PresentationPreferences.value(pair[0])
 		toggle.toggled.connect(_toggle.bind(pair[0],toggle)); add_child(toggle)
@@ -16,3 +26,7 @@ func _ready() -> void:
 		volume.value_changed.connect(func(value: float): PresentationPreferences.set_option(key,value)); add_child(volume)
 func _toggle(enabled: bool,key: String,toggle: CheckButton) -> void:
 	if not PresentationPreferences.set_option(key,enabled): toggle.set_pressed_no_signal(not enabled)
+func _text_size(value: float,row: HBoxContainer) -> void:
+	GameUIStyle.set_text_scale(value,get_window())
+	for button in row.get_children():
+		button.set_pressed_no_signal(is_equal_approx(float(PresentationPreferences.value("text_scale")),float(button.get_meta("text_scale"))))

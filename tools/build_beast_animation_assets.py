@@ -5,6 +5,7 @@ These drawings contain no equipment and use the shared, presentation-only rig.
 """
 from pathlib import Path
 import math
+import re
 ROOT=Path(__file__).resolve().parents[1]
 DIRECTIONS=['s','sw','w','nw','n','ne','e','se']
 for species in ['hound','crawler']:
@@ -54,7 +55,10 @@ for species in ['hound','crawler']:
     for row,col in cells:s+=f'[sub_resource type="AtlasTexture" id="f{row}_{col}"]\natlas = ExtResource("sheet")\nregion = Rect2({col*48}, {row*48}, 48, 48)\n'
     s+='[resource]\nanimations = ['+',\n'.join('{"name": &"%s_%s", "speed": 7.0, "loop": %s, "frames": [%s]}'%(clip,direction,'true' if clip in ['idle','walk'] else 'false',', '.join('{"duration": 1.0, "texture": SubResource("f%d_%d")}'%(row,col) for col in cols)) for clip,cols in clips.items() for row,direction in enumerate(DIRECTIONS))+']\n'
     (ROOT/f'content/animations/{species}_frames.tres').write_text(s)
-    s=(ROOT/'content/animations/puny_body.tres').read_text().replace('puny_body_frames.tres',species+'_frames.tres').replace('id = &"puny_body"','id = &"'+species+'"').replace('行路者 · 分层实物装备','芦苇猎犬' if species=='hound' else '沼甲兽').replace('frames = &"gesture"','frames = &"bite"')
+    s=(ROOT/'content/animations/puny_body.tres').read_text().replace('puny_body_frames.tres',species+'_frames.tres').replace('id = &"puny_body"','id = &"'+species+'"').replace('行路者 · 分层实物装备','芦苇猎犬' if species=='hound' else '沼甲兽')
+    # Native combat poses are shared, while quadrupeds keep their own bite
+    # frames. Human frame-set expansion must never break the beast catalog.
+    s=re.sub(r'frames = &"(?!(?:idle|walk|hurt|death)")[^"]+"','frames = &"bite"',s)
     s+='body_scale = Vector2(1.8, 1.8)\nbody_offset = Vector2(0, -6)\n'
     (ROOT/f'content/animations/{species}.tres').write_text(s)
 print('Built original quadruped frames/profiles')

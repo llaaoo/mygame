@@ -128,6 +128,9 @@ func render(delta: float) -> void:
 		poses.play("RESET"); poses.advance(0)
 		poses.play(resolved_clip.pose); poses.advance(0); poses.pause()
 	poses.seek(normalized*poses.get_animation(resolved_clip.pose).length,true,true)
+	if resolved_clip.pose in profile.facing_relative_poses:
+		var offset:=rig.position
+		rig.position=-aim_direction.orthogonal()*offset.x+aim_direction*offset.y
 	sockets.rotation=aim_direction.angle()-PI*.5
 	$Reaction.position=Vector2(sin(_reaction*95)*_reaction*6*PresentationPreferences.motion_scale(),0) if _reaction>0 else Vector2.ZERO
 	if is_instance_valid(actor) and state in ["walk","sprint"] and _last_state in ["walk","sprint"]:
@@ -135,6 +138,6 @@ func render(delta: float) -> void:
 		for marker in resolved_clip.footsteps:
 			if floorf(previous_cycle-marker)<floorf(cycle-marker): cue_emitted.emit("footstep","walk:"+_context_id+":"+str(floori(cycle))+":"+str(marker))
 	_last_state=state
-	_current={"state":state,"resolved":str(resolved_clip.id),"phase":phase,"progress":progress,"normalized":normalized,"direction":direction_index,"frame":body.frame,"token":token}
+	_current={"state":state,"resolved":str(resolved_clip.id),"phase":phase,"progress":progress,"normalized":normalized,"direction":direction_index,"frame":body.frame,"pose":str(resolved_clip.pose),"visual_offset":rig.position,"token":token}
 func socket_position(key: StringName) -> Vector2:
 	return to_local((off_hand if key==&"off_hand" else main_hand).global_position)

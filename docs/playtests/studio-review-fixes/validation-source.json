@@ -1,0 +1,25 @@
+{
+  "revision": "4935573308b3944cd2c5e4e5fe9a39285930a9b2",
+  "archive": "/tmp/grayriver-studio-fixes-final-49355733",
+  "recovery_import_exit": 0,
+  "native_tests": {
+    "selector_feedback_input": 0,
+    "accessibility_input": 0,
+    "animation_demo_input": 0
+  },
+  "native_editor_exit": 0,
+  "native_code_resource_hash_match": true,
+  "independent_visual_review": "No material blocker; narrow ring edge near shortcut HUD without obscuring active text",
+  "full_regression": {
+    "complete": true,
+    "checks_passed": 146,
+    "checks_total": 146,
+    "first_import_passed": true,
+    "report": "all-final.json"
+  },
+  "native_source_revision": "725e39a20d7989fefd51aece7adbee6dbcfc34f8",
+  "first_full_report": "all-before-journey-input-fix.json",
+  "tracked_files_hash_compared": 4282,
+  "archive_mismatches": [],
+  "post_native_runtime_code_changes": []
+}

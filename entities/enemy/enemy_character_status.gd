@@ -15,30 +15,34 @@ func _process(delta: float) -> void:
 	_clock-=delta
 	if _clock>0:return
 	_clock=.1
+	# Hidden labels still pay shaping/layout costs when their text changes. Gate
+	# the expensive status projection before querying it; bars remain independent.
+	queue_redraw()
+	_label.visible=is_instance_valid(actor.player) and actor.position.distance_squared_to(actor.player.position)<260.0*260.0
+	if not _label.visible:return
 	var plan := actor.skill_manager.combinations.pending
 	var physical:=actor.actor_context.actions if actor.actor_context else null
 	var buffs:=actor.get_node("BuffManager") as BuffManager
 	var partial:=buffs.buildup.snapshot()
 	var in_combat:=not actor.story_truce and physical and (not partial.is_empty() or buffs.has_buff("burning") or buffs.has_buff("poison") or physical.busy() or physical.guarding or is_instance_valid(actor.player) and actor.player.actor_context and (actor.player.actor_context.actions.busy() or actor.player.actor_context.actions.guarding or actor.player.actor_context.actions.counter_remaining>0))
 	_label.position.y=-76 if in_combat else -98
-	_label.text=actor.enemy_name
-	if actor.actor_context and actor.actor_context.awareness:_label.text+="\n"+actor.actor_context.awareness.caption()
+	var text:=actor.enemy_name
+	if actor.actor_context and actor.actor_context.awareness:text+="\n"+actor.actor_context.awareness.caption()
 	for id in partial:
 		var buildup: Dictionary=partial[id]
 		var definition:=WeaponEnchantment.definition(id)
-		_label.text+=" · %s蓄积%.0f%%"%[ElementCatalog.affinity_label(definition.tags),100*float(buildup.value)/definition.threshold]
-	if not in_combat: _label.text+="\nMP %d/%d"%[actor.mana_component.mp,actor.mana_component.max_mp]
+		text+=" · %s蓄积%.0f%%"%[ElementCatalog.affinity_label(definition.tags),100*float(buildup.value)/definition.threshold]
+	if not in_combat: text+="\nMP %d/%d"%[actor.mana_component.mp,actor.mana_component.max_mp]
 	for entry in (actor.get_node("BuffManager") as BuffManager).get_active_buff_entries():
 		if entry.status_id in ["ember_focus","focus","frost_stride","resonant_guard"]:
-			_label.text+=" · "+entry.name
+			text+=" · "+entry.name
 	if not plan.is_empty():
-		_label.text+="\n"+plan.action.display_name+(" → "+plan.effect_label if plan.action.display_name!=plan.effect_label else "")
+		text+="\n"+plan.action.display_name+(" → "+plan.effect_label if plan.action.display_name!=plan.effect_label else "")
 	if actor.physical_loot and not in_combat:
-		_label.text += "\n[F] 交涉 · 停战中" if actor.story_truce else "\n[F] 观察穿戴与行囊"
+		text += "\n[F] 交涉 · 停战中" if actor.story_truce else "\n[F] 观察穿戴与行囊"
+	if _label.text!=text:_label.text=text
 	if is_instance_valid(actor.player):
-		_label.visible = actor.position.distance_to(actor.player.position) < 260
 		_label.modulate=Color("a5d5bd") if actor.story_truce else Color.WHITE
-	queue_redraw()
 func _draw() -> void:
 	if actor.actor_context and actor.actor_context.rules.tactical_combat:
 		draw_rect(Rect2(-23,-30,46,3),Color(.1,.1,.1,.8))

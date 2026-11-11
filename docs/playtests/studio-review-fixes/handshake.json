@@ -1,0 +1,21 @@
+{
+  "structuredContent": {
+    "capabilities": {
+      "prompts": {
+        "listChanged": true
+      },
+      "resources": {
+        "listChanged": true,
+        "subscribe": true
+      },
+      "tools": {
+        "listChanged": true
+      }
+    },
+    "protocolVersion": "2025-11-25",
+    "serverInfo": {
+      "name": "godot-native-mcp",
+      "version": "2.0.0"
+    }
+  }
+}

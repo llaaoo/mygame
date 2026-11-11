@@ -1,0 +1,54 @@
+[
+  {
+    "current_scene": "/root/MCPInspection",
+    "debugger_active": true,
+    "fps": 1.0,
+    "node_count": 2496,
+    "physics_frames": 36,
+    "process_frames": 8,
+    "refresh_result": {
+      "sessions_updated": 1,
+      "status": "success"
+    },
+    "status": "success"
+  },
+  {
+    "current_scene": "/root/MCPInspection",
+    "debugger_active": true,
+    "fps": 22.0,
+    "node_count": 2496,
+    "physics_frames": 120,
+    "process_frames": 53,
+    "refresh_result": {
+      "sessions_updated": 1,
+      "status": "success"
+    },
+    "status": "success"
+  },
+  {
+    "current_scene": "/root/MCPInspection",
+    "debugger_active": true,
+    "fps": 32.0,
+    "node_count": 2496,
+    "physics_frames": 203,
+    "process_frames": 98,
+    "refresh_result": {
+      "sessions_updated": 1,
+      "status": "success"
+    },
+    "status": "success"
+  },
+  {
+    "current_scene": "/root/MCPInspection",
+    "debugger_active": true,
+    "fps": 35.0,
+    "node_count": 2496,
+    "physics_frames": 287,
+    "process_frames": 148,
+    "refresh_result": {
+      "sessions_updated": 1,
+      "status": "success"
+    },
+    "status": "success"
+  }
+]

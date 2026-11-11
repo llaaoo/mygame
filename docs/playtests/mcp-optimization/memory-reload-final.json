@@ -1,0 +1,25 @@
+{
+  "content": [
+    {
+      "text": "{\"expression\":\"{\\\"region\\\":region_id,\\\"clock\\\":session.inventory.clock_seconds,\\\"repository\\\":get_node(\\\"GameRuntime/SaveManager\\\").repository.get_script().resource_path,\\\"pack\\\":session.inventory.occupied_slots(\\\"player.pack\\\"),\\\"pocket\\\":session.inventory.occupied_slots(\\\"player.pocket\\\")}\",\"node_path\":\"/root/MCPInspection\",\"refresh_result\":{\"sessions_updated\":1,\"status\":\"success\"},\"status\":\"success\",\"value\":{\"clock\":297.196046666667,\"pack\":0,\"pocket\":0,\"region\":\"camp\",\"repository\":\"res://core/save/memory_save_repository.gd\"}}",
+      "type": "text"
+    }
+  ],
+  "isError": false,
+  "structuredContent": {
+    "expression": "{\"region\":region_id,\"clock\":session.inventory.clock_seconds,\"repository\":get_node(\"GameRuntime/SaveManager\").repository.get_script().resource_path,\"pack\":session.inventory.occupied_slots(\"player.pack\"),\"pocket\":session.inventory.occupied_slots(\"player.pocket\")}",
+    "node_path": "/root/MCPInspection",
+    "refresh_result": {
+      "sessions_updated": 1,
+      "status": "success"
+    },
+    "status": "success",
+    "value": {
+      "clock": 297.196046666667,
+      "pack": 0,
+      "pocket": 0,
+      "region": "camp",
+      "repository": "res://core/save/memory_save_repository.gd"
+    }
+  }
+}

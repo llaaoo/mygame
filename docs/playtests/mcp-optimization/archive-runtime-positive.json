@@ -1,0 +1,22 @@
+{
+  "content": [
+    {
+      "text": "{\"current_scene\":\"/root/MCPInspection\",\"debugger_active\":true,\"fps\":6.0,\"node_count\":2486,\"physics_frames\":3080,\"process_frames\":385,\"refresh_result\":{\"sessions_updated\":1,\"status\":\"success\"},\"status\":\"success\"}",
+      "type": "text"
+    }
+  ],
+  "isError": false,
+  "structuredContent": {
+    "current_scene": "/root/MCPInspection",
+    "debugger_active": true,
+    "fps": 6.0,
+    "node_count": 2486,
+    "physics_frames": 3080,
+    "process_frames": 385,
+    "refresh_result": {
+      "sessions_updated": 1,
+      "status": "success"
+    },
+    "status": "success"
+  }
+}

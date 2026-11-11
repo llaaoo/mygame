@@ -11,9 +11,9 @@ func choose(payload: String,uid := "") -> void:
   if wheel.entries[i].get("choice",{}).get("payload","")==payload: index=i; break
  check(index>=0,"Missing wheel payload: "+payload)
  if index<0: return
- while wheel.page!=index/8:
+ while wheel.page!=index/wheel.page_size():
   await mouse(MOUSE_BUTTON_WHEEL_DOWN,true,wheel._ring.position+Vector2(180,180))
- var point:=wheel._ring.position+Vector2(180,180)+Vector2.from_angle(-PI/2+(index%8)*TAU/8)*125
+ var point:=wheel.entry_point(index)
  if not uid.is_empty():
   var motion:=InputEventMouseMotion.new(); motion.position=point; motion.global_position=point; root.push_input(motion,true); await frames()
   for attempt in range(8):
@@ -91,7 +91,7 @@ func run() -> void:
  var index:=0
  for i in range(wheel.entries.size()):
   if wheel.entries[i].get("choice",{}).get("payload","")=="frost": index=i
- var point:=wheel._ring.position+Vector2(180,180)+Vector2.from_angle(-PI/2+index*TAU/8)*125
+ var point:=wheel.entry_point(index)
  var move:=InputEventMouseMotion.new(); move.position=point; move.global_position=point; root.push_input(move,true); await frames()
  check(actor.actor_context.actions.guarding and actor.get_mouse_direction().is_equal_approx(wheel.opening_direction),"Opening selector dropped held guard or changed defense direction")
  var hud:=get_first_node_in_group("hud_ui")
@@ -105,7 +105,7 @@ func run() -> void:
  await key(KEY_G,true); await key(KEY_G,false); await key(KEY_R,true)
  var finish_key:=InputEventKey.new(); finish_key.keycode=KEY_R; finish_key.physical_keycode=KEY_R; finish_key.pressed=false
  Input.parse_input_event(finish_key)
- var basic_point:=wheel._ring.position+Vector2(180,55)
+ var basic_point:=wheel.entry_point(0)
  var confirm:=InputEventMouseButton.new(); confirm.button_index=MOUSE_BUTTON_LEFT; confirm.position=basic_point; confirm.global_position=basic_point; confirm.pressed=true
  Input.parse_input_event(confirm); confirm=confirm.duplicate(); confirm.pressed=false; Input.parse_input_event(confirm)
  finish_key=finish_key.duplicate(); finish_key.pressed=true; Input.parse_input_event(finish_key); Input.flush_buffered_events()

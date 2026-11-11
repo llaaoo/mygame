@@ -98,14 +98,14 @@ func _input(event: InputEvent) -> void:
  close(); get_viewport().set_input_as_handled()
 func _unhandled_input(event: InputEvent) -> void:
  if not visible or not event is InputEventKey or not event.pressed or event.echo: return
- if event.keycode==KEY_ESCAPE: close(); get_viewport().set_input_as_handled()
- elif event.keycode==KEY_O and not get_viewport().gui_get_focus_owner() is LineEdit:
+ if InputBindings.menu_key(event)==KEY_ESCAPE: close(); get_viewport().set_input_as_handled()
+ elif InputBindings.menu_key(event)==KEY_O and not get_viewport().gui_get_focus_owner() is LineEdit:
   mode="equipment"; selected_slot=-1; _invalidate(); get_viewport().set_input_as_handled()
- elif event.keycode==KEY_N and not get_viewport().gui_get_focus_owner() is LineEdit:
+ elif InputBindings.menu_key(event)==KEY_N and not get_viewport().gui_get_focus_owner() is LineEdit:
   mode="supplies"; selected_slot=-1; _invalidate(); get_viewport().set_input_as_handled()
- elif event.keycode in [KEY_I,KEY_TAB,KEY_K,KEY_G,KEY_J,KEY_M] and not get_viewport().gui_get_focus_owner() is LineEdit:
+ elif InputBindings.menu_key(event) in [KEY_I,KEY_TAB,KEY_K,KEY_G,KEY_J,KEY_M] and not get_viewport().gui_get_focus_owner() is LineEdit:
   close()
-  if event.keycode!=KEY_I and navigation_request.is_valid(): navigation_request.call(event.keycode)
+  if InputBindings.menu_key(event)!=KEY_I and navigation_request.is_valid(): navigation_request.call(InputBindings.menu_key(event))
   get_viewport().set_input_as_handled()
 func _build() -> void:
  var background:=ColorRect.new(); background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -176,7 +176,7 @@ func _process(delta: float) -> void:
  _refresh_time+=delta; _message_time=maxf(0,_message_time-delta)
  if _dirty and _refresh_time>.1 and not get_viewport().gui_is_dragging() and not Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) and not _popup.visible: _refresh()
  var context:=actor.actor_context
- _summary.text="口袋 %d/%d格 · 背包 %d/%d格%s · 负重 %.1f / %.0fkg · 生命 %d/%d"%[session.inventory.entries(context.id+".pocket").size(),context.rules.pocket_capacity,session.inventory.entries(context.id+".pack").size(),context.rules.pack_capacity,"（已放下，不可远程整理）" if not session.inventory.is_attached(context.id+".pack") else "",session.inventory.weight(context.id),context.rules.carry_limit+float(ActorProgression.values(actor).carry_bonus),actor.health_component.hp,actor.health_component.max_hp]
+ _summary.text="口袋 %d/%d格 · 背包 %d/%d格%s · 负重 %.1f / %.0fkg · 生命 %d/%d"%[session.inventory.occupied_slots(context.id+".pocket"),context.rules.pocket_capacity,session.inventory.occupied_slots(context.id+".pack"),context.rules.pack_capacity,"（已放下，不可远程整理）" if not session.inventory.is_attached(context.id+".pack") else "",session.inventory.weight(context.id),context.rules.carry_limit+float(ActorProgression.values(actor).carry_bonus),actor.health_component.hp,actor.health_component.max_hp]
  _alert.text=_message if _message_time>0 else ""
  _refresh_stats()
  _detail_clock+=delta

@@ -1,0 +1,24 @@
+{
+  "content": [
+    {
+      "text": "{\"expression\":\"{\\\"inventory\\\":inventory_screen.visible,\\\"paused\\\":get_tree().paused,\\\"clock\\\":session.inventory.clock_seconds,\\\"repository\\\":get_node(\\\"GameRuntime/SaveManager\\\").repository.get_script().resource_path}\",\"node_path\":\"/root/MCPInspection\",\"refresh_result\":{\"sessions_updated\":1,\"status\":\"success\"},\"status\":\"success\",\"value\":{\"clock\":51.8585703333333,\"inventory\":true,\"paused\":false,\"repository\":\"res://core/save/memory_save_repository.gd\"}}",
+      "type": "text"
+    }
+  ],
+  "isError": false,
+  "structuredContent": {
+    "expression": "{\"inventory\":inventory_screen.visible,\"paused\":get_tree().paused,\"clock\":session.inventory.clock_seconds,\"repository\":get_node(\"GameRuntime/SaveManager\").repository.get_script().resource_path}",
+    "node_path": "/root/MCPInspection",
+    "refresh_result": {
+      "sessions_updated": 1,
+      "status": "success"
+    },
+    "status": "success",
+    "value": {
+      "clock": 51.8585703333333,
+      "inventory": true,
+      "paused": false,
+      "repository": "res://core/save/memory_save_repository.gd"
+    }
+  }
+}
