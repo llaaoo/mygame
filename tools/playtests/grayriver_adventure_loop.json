@@ -323,10 +323,10 @@
   },
   {
     "op": "duel",
-    "style": "basic",
+    "style": "combo",
     "target": "river.enemy.river_archive.river_archive.1",
     "capture": "adventure-14-archive-first-guard",
-    "note": "Do not use a direct approach from the west entrance through the new shelf. Shared aggro can change encounter order; stop on driver failure/death and retain evidence."
+    "note": "Use the second actually crafted firestone in the archive, then fall back to the equipped blade if field charges expire. The pilot three-basic-fight route ended at 2HP; this is an explicit paid preparation choice, not a stat or AI change."
   },
   {
     "op": "key",
