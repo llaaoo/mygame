@@ -1,0 +1,15 @@
+{
+  "content/frontier/quests/first_expedition.tres": "0329a4bb264d4903e48ea501832dbd8ace3e2a40531a73e3b89b14321bead433",
+  "content/social/aida.tres": "aec16357b79eecd1a373060e4b328ed7335d8fd2c163434418a415a35b14ab76",
+  "content/social/innkeeper.tres": "b6ad700b760a212492eeee8eabab24def18b607a1b8323489980c4af3cd00d46",
+  "content/social/trainer.tres": "1facfebbdfb76c25ad0d4f96f64a5beb12dfc4ae2755a494b4fe12691f4b20e6",
+  "gameplay/exploration/exploration_progress_service.gd": "60b12ac9700af5284bff54b918d4383ab89d343b02c6d913f2d234920fa3dca1",
+  "gameplay/exploration/exploration_quest_data.gd": "8172df121825aa6cbf5b27ec2b62474a18642ed440d6b396ee33ef9a86720108",
+  "gameplay/frontier/frontier_guidance.gd": "682b7f827af5f155c5a238063cd4daf4d77e572ae05f7c6311bb35d3dd11d31f",
+  "gameplay/frontier/frontier_hub.gd": "b6930d0ce869410551bcd8e73767688c81f6c80cf44c66f0a8356bfdabf9c97d",
+  "gameplay/frontier/frontier_hud.gd": "63085a4423278154f11577c232db5bd7814c6dc210afa781acedd11439faf8d3",
+  "gameplay/frontier/grayriver_game.gd": "688843fe3059de115cde3dcff534aa91e15e3cfb1af74feb04d8dd0ede446194",
+  "gameplay/frontier/grayriver_presenter.gd": "c969b0f4872ac91e2561a694261fc719baf91d70f1237fd13e9c8ed147fa1dc9",
+  "gameplay/frontier/first_expedition_guide.gd": "674fdfb960e99aa80c921c07b0fd0f7511c5a24830838f58b7addf578faeb7dd",
+  "tests/test_first_expedition_loop.gd": "f46df1c54bd6365346ca24f48859be6e06d575330ceaa7f5f91ff23b20c4db40"
+}

@@ -174,6 +174,7 @@ func claim_quest(quest: ExplorationQuestData, approach_id: String = "") -> bool:
 		return false
 	var approach := quest.find_approach(approach_id)
 	var report := "营地收到你的报告，获得 %d 属性点。" % quest.attribute_points
+	if not quest.completion_hint.is_empty(): report+="\n\n"+InputBindings.menu_help(quest.completion_hint)
 	if approach: report += "\n完成方式：" + approach.title + "。" + approach.description
 	if not game.progress.claim("quest." + quest.id, "委托完成：" + quest.title, report, [], []):
 		return false

@@ -6,7 +6,7 @@ func show_arrival() -> void:
 7烤饼、8清水、9茶、0炖汤（默认，可在K改放动作或物品）；仍需站定使用，受伤会打断。
 主动施法需要觉醒，知识不会自动授予资格；普通物品和武技不需要魔力。
 普通基础动作默认按下即施放；可在操作设置切回按住预览、松开施放。
-Q/E/R与1—0独立快捷槽 · F交互 · G/按住中键选材 · K编组\n界面不会暂停世界；背包可右键丢弃，地面物资用F拾取。轮盘打开时按动作快捷键选槽，再选介质；同种喷剂可滚轮切瓶。\n地图只记录亲自到过的地点。动作、材料和恩赐需要亲手组合，系统不会自动准备。F5存档，F9读档；独立旅程不覆盖监狱验证场。"),[{"title":"开始河谷旅程","callback":game.ui.close_modal},{"title":"查看日志","callback":game.ui.show_journal},{"title":"重新开始灰河谷","callback":game.confirm_new_journey}])
+Q/E/R与1—0独立快捷槽 · F交互 · G/按住中键选材 · K编组\n界面不会暂停世界；背包可右键丢弃，地面物资用F拾取。轮盘打开时按动作快捷键选槽，再选介质；同种喷剂可滚轮切瓶。\n地图只记录亲自到过的地点。动作、材料和恩赐需要亲手组合，系统不会自动准备。F5存档，F9读档；独立旅程不覆盖监狱验证场。"),[{"title":"查看出发清单","callback":game.hub.open_journey},{"title":"开始河谷旅程","callback":game.ui.close_modal},{"title":"查看日志","callback":game.ui.show_journal},{"title":"重新开始灰河谷","callback":game.confirm_new_journey}])
 func _update_objective() -> void:
 	if not game.current_data: return
 	game.ui.heading.text = game.current_data.title + (" · 河谷镇" if game.is_at_base() else " · 野外" if game.region_id=="camp" else "")

@@ -1,0 +1,18 @@
+{
+  "exit_code": 0,
+  "command": [
+    "godot",
+    "--path",
+    "/workspace/mygame",
+    "--rendering-method",
+    "gl_compatibility",
+    "--audio-driver",
+    "Dummy",
+    "--resolution",
+    "1152x648",
+    "--script",
+    "res://tests/test_first_expedition_loop.gd"
+  ],
+  "controlled_ai_and_positions": true,
+  "fresh_isolated_xdg": true
+}

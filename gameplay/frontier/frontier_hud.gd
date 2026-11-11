@@ -20,7 +20,7 @@ func _ready() -> void:
 	root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	root.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	add_child(root)
-	tracker=FrontierWidgets.button("选择要追踪的委托",func(): game.hub.open("quests"))
+	tracker=FrontierWidgets.button("选择要追踪的委托",_open_tracker)
 	tracker.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
 	tracker.offset_left=-276
 	tracker.offset_right=-18
@@ -105,14 +105,16 @@ func _process(delta: float) -> void:
 		belt[i].text="%s  %s"%[InputBindings.label(BELT_ACTIONS[i]),amount]
 		belt[i].disabled=not ready or game.player.health_component.is_dead
 		belt[i].tooltip_text="按键："+InputBindings.labels(BELT_ACTIONS[i])+"\n"+title+"\n"+detail
-	var goal:=game.guidance.tracked()
-	var orienting := goal.is_empty()
-	if orienting: goal = game.guidance.town_orientation()
+	var preparation:=game.guidance.journey.town_goal()
+	var goal:=preparation if not preparation.is_empty() else game.guidance.tracked()
+	var orienting: bool = goal.is_empty() or bool(goal.get("journey",false))
+	if goal.is_empty(): goal = game.guidance.town_orientation()
 	tracker.text=_journal_hint
 	if not goal.is_empty():
 		tracker.text=("镇中整备\n" if orienting else "追踪委托\n")+goal.title
 		var point:=game.guidance.route_target(goal)
-		if point.is_finite():
+		if not goal.get("navigate",true): pass
+		elif point.is_finite():
 			var delta_pos:=point-game.player.position
 			var angle:=int(round(delta_pos.angle()/(PI/4)))
 			var arrow: String=["→","↘","↓","↙","←","↖","↑","↗"][posmod(angle,8)]
@@ -141,3 +143,7 @@ func _shortcut_mouse(event: InputEvent,index: int) -> void:
 		game.player.input_controller.request_shortcut(QuickslotLoadout.ITEM_SOURCES[index],event.pressed,true)
 func use(index: int) -> void:
 	if index>=0 and index<4: game.player.input_controller.request_shortcut(QuickslotLoadout.ITEM_SOURCES[index],true)
+
+func _open_tracker() -> void:
+	if not game.guidance.journey.town_goal().is_empty(): game.hub.open_journey()
+	else: game.hub.open("quests")

@@ -10,3 +10,5 @@ description = "先领离镇口粮旧械包，按O把驿路短刀穿入主手；�
 unlock_claims = PackedStringArray("river.handbook")
 required_claims = PackedStringArray("river.fire", "archive.index_press", "river.dossier")
 attribute_points = 1
+
+completion_hint = "你带回的名册与修好的压印台已被记录。P可分配这次得到的属性点，升级所得Perk点也在同页；属性与前置以实际显示为准。先留好趁手武器与防具，再到萨芙处比较多余战利品的出售、拆解和强化。若想继续刀剑路线，训练师教授8币的破势斩，K核对连招。补充食水、制作消耗品并休息后，在J选择下一条委托；不觉醒同样能继续探索。Tab的首次远征清单会显示当前实物和成长状态。"

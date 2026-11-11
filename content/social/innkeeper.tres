@@ -30,6 +30,17 @@ id = "directions"
 title = "镇里还有哪些能进去的地方？"
 response = "西北作坊有制造台和装备整备架，东侧公署可读文书。先离开客栈，再按门牌走；萨芙和艾妲白天仍在集市当值。"
 navigation_hints = [SubResource("workshop"), SubResource("records")]
+[sub_resource type="Resource" id="grain_errand"]
+script = ExtResource("topic")
+id = "grain_errand"
+title = "委托：给晚归者留一份谷物"
+response = "灶边还缺1份谷物，交给我可得2河谷币，从我的钱袋里付。这批只收一次；谷物也能给你自己做饭，留不留由你决定。艾妲收药草的6币加这2币，正好够训练师的一门破势斩课；也可以把钱留作补给。"
+kind = 2
+category = "人情委托"
+requested_items = {"grain":1}
+payment = {"coin":2}
+required_claims = PackedStringArray("river.pack")
+
 [resource]
 script = ExtResource("profile")
 actor_id = "river.innkeeper"
@@ -42,4 +53,4 @@ work_position = Vector2(160, -80)
 rest_position = Vector2(440, 30)
 greeting = "进来歇歇脚。想买些吃喝，还是问问客床和寄存箱？"
 familiar_greeting = "又回来了。你的寄存物还在原处，先看看要补些什么。"
-topics = [SubResource("about"), SubResource("trade"), SubResource("directions")]
+topics = [SubResource("about"), SubResource("trade"), SubResource("directions"), SubResource("grain_errand")]

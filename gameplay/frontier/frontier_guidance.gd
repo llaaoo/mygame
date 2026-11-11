@@ -1,7 +1,10 @@
 class_name FrontierGuidance
 extends RefCounted
 var game: GrayriverGame
-func _init(owner_game: GrayriverGame) -> void: game=owner_game
+var journey: FirstExpeditionGuide
+func _init(owner_game: GrayriverGame) -> void:
+	game=owner_game
+	journey=FirstExpeditionGuide.new(game)
 func objective(id: String) -> Dictionary:
 	if game.stories:
 		var story := game.stories.objective(id)
