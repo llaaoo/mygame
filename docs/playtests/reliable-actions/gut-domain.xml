@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="GutTests" failures="0" tests="23" >
+  <testsuite name="tests/unit/test_condition_contracts.gd" tests="3" failures="0" skipped="0" time="0.000351" >
+      <testcase name="test_legacy_knowledge_fallback_respects_category" assertions="4" status="pass" classname="tests/unit/test_condition_contracts.gd" time="0.000162" >
+      </testcase>
+      <testcase name="test_injected_knowledge_owner_receives_actual_actor_and_category" assertions="2" status="pass" classname="tests/unit/test_condition_contracts.gd" time="0.000074" >
+      </testcase>
+      <testcase name="test_unmet_claims_do_not_report_completion" assertions="3" status="pass" classname="tests/unit/test_condition_contracts.gd" time="0.000115" >
+      </testcase>
+  </testsuite>
+  <testsuite name="tests/unit/test_crafting_catalog.gd" tests="3" failures="0" skipped="0" time="0.005197" >
+      <testcase name="test_all_authored_recipe_files_have_one_registration" assertions="80" status="pass" classname="tests/unit/test_crafting_catalog.gd" time="0.003917" >
+      </testcase>
+      <testcase name="test_duplicate_and_missing_recipe_ids_are_rejected" assertions="2" status="pass" classname="tests/unit/test_crafting_catalog.gd" time="0.000308" >
+      </testcase>
+      <testcase name="test_shared_recipe_definitions_do_not_grant_knowledge_or_share_stock" assertions="8" status="pass" classname="tests/unit/test_crafting_catalog.gd" time="0.000972" >
+      </testcase>
+  </testsuite>
+  <testsuite name="tests/unit/test_enemy_status_view.gd" tests="3" failures="0" skipped="0" time="0.003433" >
+      <testcase name="test_distant_labels_skip_status_projection_and_nearby_labels_refresh" assertions="10" status="pass" classname="tests/unit/test_enemy_status_view.gd" time="0.001299" >
+      </testcase>
+      <testcase name="test_warning_exposes_actual_territory_counter_without_baiting_close_interaction" assertions="6" status="pass" classname="tests/unit/test_enemy_status_view.gd" time="0.001013" >
+      </testcase>
+      <testcase name="test_physical_labels_follow_executor_phase_and_hide_territory_repetition" assertions="13" status="pass" classname="tests/unit/test_enemy_status_view.gd" time="0.001121" >
+      </testcase>
+  </testsuite>
+  <testsuite name="tests/unit/test_inventory_contracts.gd" tests="7" failures="0" skipped="0" time="0.018154" >
+      <testcase name="test_occupancy_counts_real_stacks_without_cloning_or_mutation" assertions="5" status="pass" classname="tests/unit/test_inventory_contracts.gd" time="0.011507" >
+      </testcase>
+      <testcase name="test_stale_transfer_has_no_partial_write_or_notification" assertions="3" status="pass" classname="tests/unit/test_inventory_contracts.gd" time="0.002021" >
+      </testcase>
+      <testcase name="test_equipped_item_transfer_preserves_identity_and_clears_slot" assertions="6" status="pass" classname="tests/unit/test_inventory_contracts.gd" time="0.000324" >
+      </testcase>
+      <testcase name="test_failed_exchange_preserves_both_inventories" assertions="3" status="pass" classname="tests/unit/test_inventory_contracts.gd" time="0.001911" >
+      </testcase>
+      <testcase name="test_full_containers_can_swap_real_items_atomically" assertions="5" status="pass" classname="tests/unit/test_inventory_contracts.gd" time="0.000463" >
+      </testcase>
+      <testcase name="test_detached_pack_invalidates_plan_and_does_not_refill" assertions="7" status="pass" classname="tests/unit/test_inventory_contracts.gd" time="0.000284" >
+      </testcase>
+      <testcase name="test_query_copies_cannot_mutate_authoritative_inventory" assertions="2" status="pass" classname="tests/unit/test_inventory_contracts.gd" time="0.001644" >
+      </testcase>
+  </testsuite>
+  <testsuite name="tests/unit/test_mcp_diagnostics.gd" tests="7" failures="0" skipped="0" time="0.687481" >
+      <testcase name="test_final_dispose_breaks_registered_tool_core_ownership_cycle" assertions="5" status="pass" classname="tests/unit/test_mcp_diagnostics.gd" time="0.001401" >
+      </testcase>
+      <testcase name="test_state_chart_nested_resource_format_and_rejection_survive_cleanup_patch" assertions="2" status="pass" classname="tests/unit/test_mcp_diagnostics.gd" time="0.33745" >
+      </testcase>
+      <testcase name="test_named_project_types_keep_their_real_compilation_context" assertions="6" status="pass" classname="tests/unit/test_mcp_diagnostics.gd" time="0.00209" >
+      </testcase>
+      <testcase name="test_unsaved_named_type_reports_missing_context_instead_of_syntax_error" assertions="2" status="pass" classname="tests/unit/test_mcp_diagnostics.gd" time="0.000183" >
+      </testcase>
+      <testcase name="test_stdout_capture_preserves_duplicate_messages_and_closes_scope" assertions="3" status="pass" classname="tests/unit/test_mcp_diagnostics.gd" time="0.00032" >
+      </testcase>
+      <testcase name="test_old_debugger_messages_cannot_complete_a_new_runtime_request" assertions="4" status="pass" classname="tests/unit/test_mcp_diagnostics.gd" time="0.000298" >
+      </testcase>
+      <testcase name="test_validation_worker_propagates_real_compile_failure" assertions="6" status="pass" classname="tests/unit/test_mcp_diagnostics.gd" time="0.345739" >
+      </testcase>
+  </testsuite>
+</testsuites>

@@ -6,8 +6,36 @@ static func amounts(value: Dictionary) -> Dictionary:
 	var result := {}
 	for id in value: result[id] = int(value[id])
 	return result
-static func data() -> Dictionary: return JSON.parse_string(FileAccess.get_file_as_string(PATH))
+static func parse_source(text: String, path := PATH) -> Dictionary:
+	var parser:=JSON.new()
+	var errors: Array[String]=[]
+	if parser.parse(text)!=OK:
+		errors.append("%s:%d: invalid JSON: %s"%[path,parser.get_error_line()+1,parser.get_error_message()])
+		return {"data":{},"errors":errors}
+	errors=GrayriverValidator.validate(parser.data,path)
+	return {"data":parser.data if parser.data is Dictionary else {},"errors":errors}
+static func read_source(path := PATH) -> Dictionary:
+	if not FileAccess.file_exists(path): return {"data":{},"errors":[path+": source file missing"]}
+	var file:=FileAccess.open(path,FileAccess.READ)
+	if not file: return {"data":{},"errors":[path+": source file could not be read"]}
+	return parse_source(file.get_as_text(),path)
+static func data() -> Dictionary:
+	return read_source().data
 static func build(map_catalog: MapCellCatalog=null,resolve_connections := true) -> ExplorationChapterData:
+	var checked:=read_source()
+	if not checked.errors.is_empty(): return _invalid_chapter(checked.errors)
+	return _build_validated(checked.data,map_catalog,resolve_connections)
+static func build_from_data(definition: Variant,map_catalog: MapCellCatalog=null,resolve_connections := true,path := PATH) -> ExplorationChapterData:
+	var errors:=GrayriverValidator.validate(definition,path)
+	if not errors.is_empty(): return _invalid_chapter(errors)
+	return _build_validated(definition,map_catalog,resolve_connections)
+static func _invalid_chapter(errors: Array) -> ExplorationChapterData:
+	var chapter:=ExplorationChapterData.new()
+	chapter.set_meta("preflight_errors",PackedStringArray(errors))
+	# Existing full content validators already read this returned-error boundary.
+	chapter.set_meta("map_catalog_errors",PackedStringArray(errors))
+	return chapter
+static func _build_validated(definition: Dictionary,map_catalog: MapCellCatalog,resolve_connections: bool) -> ExplorationChapterData:
 	var source := ExplorationContentCatalog.new()
 	var chapter := ExplorationChapterData.new()
 	chapter.actions.assign(source.chapter.actions)
@@ -16,7 +44,6 @@ static func build(map_catalog: MapCellCatalog=null,resolve_connections := true) 
 	for id in ["project","shape","step","sustain"]:
 		chapter.actions.append(load("res://content/spell_operations/%s.tres"%id) as SkillData)
 	chapter.equipment.assign(ItemCatalog.default_catalog().equipment())
-	var definition := data()
 	for entry in definition.regions:
 		var region := ExplorationRegionData.new()
 		region.id = entry.id

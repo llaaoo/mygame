@@ -1,0 +1,15 @@
+Logs and isolated saves: /tmp/mygame-tests-yxadfc8i
+PASS content (2.2s)
+PASS maps (2.1s)
+Schedule: 3 parallel-domain checks, then 7 serial input checks
+PASS map_authoring (3.4s)
+PASS content_preflight (6.6s)
+PASS spray_channel (4.4s)
+PASS item_actions (9.0s)
+PASS throw_trajectory_input (11.1s)
+PASS item_feedback_input (18.3s)
+PASS depth_input (24.5s)
+PASS unified_quickslots (33.0s)
+PASS controls_workflow (17.3s)
+PASS npc_interaction_input (16.4s)
+12/12 checks passed. Logs: /tmp/mygame-tests-yxadfc8i. Report: /tmp/reliable-actions-targeted.json

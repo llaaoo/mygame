@@ -53,6 +53,8 @@
 
 ## 登记与兼容要求
 
+- 灰河谷JSON经`GrayriverDefinition.read_source/parse_source`和`GrayriverValidator`预检后才装配：原始类型、二维坐标、模板身份、资源存在及类型必须有效。`build()`失败返回带`preflight_errors`和`map_catalog_errors`的空章节，工具显示原字段路径；不要在检查前索引原始数组或调用模板装配。`build_from_data()`允许用独立副本验证坏输入，不改正式内容。完整类型化内容/地图校验继续执行，预检不代替领域规则。
+- 正式入口预检失败时显示启动诊断并停在旅程装配之前；`source_path`可注入隔离制作夹具。地图目录中的空Inspector槽仍须修复，当前地图检查会保留该诊断。
 - Resource是共享定义，运行时不能修改。UID、订单截止时间、批数、知识与冷却分别由现有领域服务持有。
 - 稳定ID属于存档协议；不能随意删除/改名已发布的物品、武技、订单或状态定义。变更先补迁移，不能靠忽略未知条目丢掉旧资产。
 - 先跑`python3 tools/run_tests.py --tests content`，再跑对应领域及输入验证。新行为覆盖失败、费用、容量、重复请求、离区、死亡、F9和重新进入；跨系统变更按AGENTS跑无缓存归档全套。

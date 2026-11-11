@@ -12,9 +12,8 @@ func _physics_process(delta: float) -> void:
 	if spent: return
 	var distance:=minf(remaining,480*delta)
 	var next:=global_position+direction*distance
-	var ray:=PhysicsRayQueryParameters2D.create(global_position,next,11,excluded); ray.collide_with_areas=true
-	var hit:=get_world_2d().direct_space_state.intersect_ray(ray)
-	if not hit.is_empty(): global_position=Vector2(hit.position)-direction*2; impact(); return
+	var hit:=ThrowTrajectory.first_hit(get_world_2d(),global_position,next,excluded)
+	if not hit.is_empty(): global_position=ThrowTrajectory.impact_point(hit,direction); impact(); return
 	global_position=next; remaining-=distance
 	if remaining<=0: impact()
 func impact() -> void:

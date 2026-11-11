@@ -36,11 +36,36 @@ func click(text: String) -> void:
 		if node.is_visible_in_tree() and (node.text==text or node.text.begins_with(text+"\n")): found=node; break
 	check(found!=null,"Missing visible button: "+text)
 	if not found: return
+	await _click_button(found)
+func button_by_identity(identity: Dictionary) -> Button:
+	# Identity describes the domain target/action, never translated text or price.
+	check(not identity.is_empty(),"Button identity must not be empty")
+	if identity.is_empty(): return null
+	var matches: Array[Button]=[]
+	for node in root.find_children("*","Button",true,false):
+		if not node.is_visible_in_tree(): continue
+		var matching := true
+		for key in identity:
+			if not node.has_meta(key) or node.get_meta(key)!=identity[key]:
+				matching=false
+				break
+		if matching: matches.append(node)
+	check(matches.size()==1,"Expected one visible button for %s, found %d"%[str(identity),matches.size()])
+	return matches[0] if matches.size()==1 else null
+func click_identity(identity: Dictionary) -> void:
+	var found:=button_by_identity(identity)
+	if not found: return
+	check(not found.disabled,"Disabled button for identity: "+str(identity))
+	if found.disabled: return
+	await _click_button(found)
+func _click_button(found: Button) -> void:
 	var ancestor:=found.get_parent()
 	while ancestor:
 		if ancestor is ScrollContainer: ancestor.ensure_control_visible(found)
 		ancestor=ancestor.get_parent()
 	await frames()
+	check(is_instance_valid(found) and found.is_visible_in_tree(),"Button disappeared before mouse input")
+	if not is_instance_valid(found) or not found.is_visible_in_tree(): return
 	await point_click(found.get_global_rect().get_center())
 func capture(name: String) -> void:
 	var output:=OS.get_environment("CONTROLS_VISUAL_OUTPUT")
