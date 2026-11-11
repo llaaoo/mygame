@@ -1,0 +1,39 @@
+{
+  "content": [
+    {
+      "text": "{\"current_scene\":\"/root/MCPInspection\",\"draw_calls_in_frame\":238,\"fps\":35.0,\"frame_time_sec\":0.031398,\"logical_size\":{\"x\":1152.0,\"y\":648.0},\"low_processor_usage_mode\":false,\"max_fps\":0,\"memory_static_bytes\":245098426,\"memory_static_mb\":233.744073867798,\"node_count\":2496,\"object_count\":9021,\"physics_frame_time_sec\":0.004087,\"refresh_result\":{\"sessions_updated\":1,\"status\":\"success\"},\"rendered_objects_in_frame\":6729,\"resource_count\":1617,\"status\":\"success\",\"time_scale\":1.0,\"window_focused\":true,\"window_size\":{\"x\":1100,\"y\":619}}",
+      "type": "text"
+    }
+  ],
+  "isError": false,
+  "structuredContent": {
+    "current_scene": "/root/MCPInspection",
+    "draw_calls_in_frame": 238,
+    "fps": 35.0,
+    "frame_time_sec": 0.031398,
+    "logical_size": {
+      "x": 1152.0,
+      "y": 648.0
+    },
+    "low_processor_usage_mode": false,
+    "max_fps": 0,
+    "memory_static_bytes": 245098426,
+    "memory_static_mb": 233.744073867798,
+    "node_count": 2496,
+    "object_count": 9021,
+    "physics_frame_time_sec": 0.004087,
+    "refresh_result": {
+      "sessions_updated": 1,
+      "status": "success"
+    },
+    "rendered_objects_in_frame": 6729,
+    "resource_count": 1617,
+    "status": "success",
+    "time_scale": 1.0,
+    "window_focused": true,
+    "window_size": {
+      "x": 1100,
+      "y": 619
+    }
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "revision": "725e39a20d7989fefd51aece7adbee6dbcfc34f8",
+  "dirty": true,
+  "godot": "4.6.3.stable.official.7d41c59c4",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "jobs": 2,
+  "timeout": 180.0,
+  "logs": "/tmp/mygame-tests-dtt35nca",
+  "requested": [
+    "grayriver_journey"
+  ],
+  "results": [
+    {
+      "name": "grayriver_journey",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 11.749,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_grayriver_journey.gd"
+      ],
+      "log": "/tmp/mygame-tests-dtt35nca/grayriver_journey.log",
+      "diagnostic": []
+    }
+  ],
+  "skipped": [],
+  "complete": true
+}

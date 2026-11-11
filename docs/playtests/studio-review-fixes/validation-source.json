@@ -1,0 +1,16 @@
+{
+  "revision": "725e39a20d7989fefd51aece7adbee6dbcfc34f8",
+  "archive": "/tmp/grayriver-studio-fixes-final-725e39a2",
+  "recovery_import_exit": 0,
+  "native_tests": {
+    "selector_feedback_input": 0,
+    "accessibility_input": 0,
+    "animation_demo_input": 0
+  },
+  "native_editor_exit": 0,
+  "native_code_resource_hash_match": true,
+  "independent_visual_review": "No material blocker; narrow ring edge near shortcut HUD without obscuring active text",
+  "full_regression": "first baseline 145/146; obsolete synthetic map test corrected; final archive pending",
+  "native_source_revision": "725e39a20d7989fefd51aece7adbee6dbcfc34f8",
+  "first_full_report": "all-before-journey-input-fix.json"
+}

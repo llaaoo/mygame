@@ -59,6 +59,8 @@ python3 tools/godot_mcp.py call get_runtime_screenshot --wait \
 
 `get_scene_tree`读编辑器场景；运行时树使用`get_runtime_scene_tree`。运行时`evaluate_runtime_expression`使用Godot的Expression，并非完整GDScript，不能假设支持自定义`class_name`类型判断。复杂只读检查使用检查场景中的明确方法。截图证明该平台可以显示，不证明自然通关、平衡或目标设备性能。
 
+性能采样应等到运行场景实际就绪，并跨过启动帧后再读取；本轮等待至少120个process frames。快照同时提供物理窗口/逻辑视口、焦点、低处理器模式、帧率上限、世界速度与draw calls，避免将启动或失焦数据误认为稳定表现。原生截图确认实际像素尺寸，逻辑布局测试另行声明画布设置；窗口调整请求被编辑器还原时不能算该分辨率通过。
+
 ## 结果判定与修正的根因
 
 - `pending`和`stale`不算新结果。`--wait`在服务端请求期限内轮询，不靠重新执行超时操作获得成功。未等待的待返回/旧数据退出码为3，错误为1，已完成结果为0。客户端校验JSON-RPC响应ID，保留会话头，并识别`isError`、`success=false`、`valid=false`和健康审查失败。

@@ -5,6 +5,10 @@ var errors:Array[String]=[]
 func _init() -> void:call_deferred("run")
 func check(ok:bool,message:String) -> void:
 	if not ok:errors.append(message);push_error(message)
+func map_key() -> void:
+	for pressed in [true,false]:
+		var event:=InputEventKey.new();event.keycode=KEY_M;event.physical_keycode=KEY_M;event.pressed=pressed
+		Input.parse_input_event(event);Input.flush_buffered_events();await process_frame
 func run() -> void:
 	var legacy:=Legacy.new(self)
 	var old:=await legacy.boot(true)
@@ -33,10 +37,9 @@ func run() -> void:
 	game=await fixture.boot(true,true)
 	check(game.player.position.distance_to(Vector2(-1800,1000))<2 and game.player.health_component.hp==67 and game.player.mana_component.mp==29,"Bootstrap teleported or refilled saved traveler")
 	check(game.active_enemies.size()==game.current_data.encounters.size()-1 and game.progress.claims.has(id),"Defeated outdoor actor respawned on load")
-	game.show_map()
+	await map_key()
 	check(not paused and game.player.ui_blocked,"Map failed pause lifecycle")
-	var key:=InputEventKey.new();key.keycode=KEY_M;key.pressed=true
-	game.ui._unhandled_input(key)
+	await map_key()
 	check(not paused and not is_instance_valid(game.ui.modal),"M cannot close live map")
 	game.player.position=Vector2(-3300,2100)
 	check(game.is_at_base(),"Town service boundary broken")

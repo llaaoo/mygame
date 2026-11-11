@@ -1,6 +1,6 @@
 # 操作、表现与工具整改验证
 
-2026-11-11，北京时间；Godot 4.6.3、Linux云端。起点`d73f490`，包含上一轮尚未合并的MCP改动。最终源码提交、原生复测与干净归档全量结果在执行完成后登记；以下定向结果不等于全量已通过。
+2026-11-11，UTC；Godot 4.6.3、Linux云端。起点`d73f490`，包含上一轮尚未合并的MCP改动。冻结源码提交为`725e39a20d7989fefd51aece7adbee6dbcfc34f8`，从git archive导出无`.godot`副本至`/tmp/grayriver-studio-fixes-final-725e39a2`。以下定向与图形结果不等于完整回归已通过。
 
 ## 已执行的定向检查
 
@@ -26,7 +26,15 @@ verbose已启动完成的编辑器退出原有6个资源泄漏，分别为MCP回
 
 ## 原生复测与完整回归
 
-待代码冻结提交后，从无`.godot`的git archive执行首次导入、原生复测和`--suite all`。期间不得修改源码或并行运行其他Godot验证。最终以JSON报告的complete、失败诊断与进程状态判定，旧96/144的中断结果不作为本轮全量通过证据。
+归档recovery首次导入退出0，无脚本错误或警告，日志为`archive-import.log`。两个独立原生窗口脚本`selector_feedback_input/accessibility_input`均退出0，截图来自归档实际输入。前者明确设置800×600逻辑画布及物理窗口，截图确为800×600；不是先前被嵌入编辑器还原的窗口请求。涉及位置、知识和物资的构图属于声明的夹具，仍保留正常AI。
+
+独立复核确认[紧凑选择](compact-single-form.png)、[休息摘要](rest-summary.png)、[窄屏径向选择](radial-narrow.png)和[125%字号](readable-fonts-125.png)没有遮住必需控件；窄屏外环底缘接近快捷栏，活动选项文字仍在其上方。它不是平衡或游玩时长验收。
+
+本地MCP桥在归档运行同一默认内存检查场景，等待至少120个process frames后采样：约35 FPS、31.4ms帧、4.1ms物理帧、238次draw call，24名正常AI、世界速度1.0、max_fps=0、低处理器模式false、窗口聚焦。启动初期1 FPS快照单独保留，未用于稳定性能对照。数据见`performance-steady.json/steady-history.json/state-steady.json`。原生Compatibility仍有V-Sync、Vulkan探测与XServer的已知平台诊断；没有把它们说成无诊断运行，实际窗口显示/输入已另验证。最终编辑器正常退出0，没有原有资源或ObjectDB泄漏。
+
+原生退出后恢复编辑器临时改写的project.godot，并逐文件核对脚本、场景、Resource、Python、UID与冻结提交一致。完整命令为`taskset -c 0,1,2,3 python3 tools/run_tests.py --suite all --jobs 2 --timeout 300 --source-revision 725e39a20d7989fefd51aece7adbee6dbcfc34f8 --report /tmp/grayriver-studio-fixes-all.json`。期间源码冻结，没有并行导入、试玩或其他Godot检查。首轮完整结果为145/146，唯一失败是旧grayriver_journey直接调用UI回调、构造缺少physical_keycode的M事件。现改为Input.parse_input_event真实按下/松开，同时验证开图和关图；定向复测通过（11.7秒）。原始完整失败报告和首条诊断分别保存在all-before-journey-input-fix.json和journey-before-input-fix.log；修后定向报告为journey-real-input-fixed.json。随后从包含测试修正的新提交重新归档、导入并执行完整回归，结果待登记。旧96/144的中断结果不作为本轮全量通过证据。
+
+原生animation_demo_input也退出0，覆盖实际轻击/长按重击、连招武技、武器切换、正常AI对练、火石组合与演示内存F5/F9；正式旅程哈希、UID与物资保持。截图animation-combat-strike.png、animation-combat-charge.png和animation-paper-doll.png来自725e39a运行时代码，位置/装备/知识使用演示夹具，不能当作自然获取流程。
 
 ## 范围与限制
 
