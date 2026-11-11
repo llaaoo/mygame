@@ -1,0 +1,124 @@
+{
+  "schema": 1,
+  "revision": "15f90f2fc54e0c515675f156215aff65a15bf018",
+  "dirty": true,
+  "godot": "4.6.3.stable.official.7d41c59c4",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "jobs": 2,
+  "timeout": 180.0,
+  "logs": "/tmp/mygame-tests-4z8t70cd",
+  "requested": [
+    "first_expedition_loop",
+    "npc_interactions",
+    "npc_interaction_input",
+    "worldview_journey",
+    "interface_navigation",
+    "flow_input"
+  ],
+  "results": [
+    {
+      "name": "npc_interactions",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 10.903,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_npc_interactions.gd"
+      ],
+      "log": "/tmp/mygame-tests-4z8t70cd/npc_interactions.log",
+      "diagnostic": []
+    },
+    {
+      "name": "first_expedition_loop",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 23.285,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_first_expedition_loop.gd"
+      ],
+      "log": "/tmp/mygame-tests-4z8t70cd/first_expedition_loop.log",
+      "diagnostic": []
+    },
+    {
+      "name": "npc_interaction_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 17.983,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_npc_interaction_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-4z8t70cd/npc_interaction_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "worldview_journey",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 14.812,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_worldview_journey.gd"
+      ],
+      "log": "/tmp/mygame-tests-4z8t70cd/worldview_journey.log",
+      "diagnostic": []
+    },
+    {
+      "name": "interface_navigation",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 29.587,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_interface_navigation.gd"
+      ],
+      "log": "/tmp/mygame-tests-4z8t70cd/interface_navigation.log",
+      "diagnostic": []
+    },
+    {
+      "name": "flow_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 31.163,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_flow_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-4z8t70cd/flow_input.log",
+      "diagnostic": []
+    }
+  ],
+  "skipped": [],
+  "complete": true
+}

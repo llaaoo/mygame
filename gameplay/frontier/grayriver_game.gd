@@ -145,6 +145,7 @@ func _process(delta: float) -> void:
 	if _discovery_clock>=.5:
 		_discovery_clock=0
 		_update_objective()
+		hub.refresh_journey()
 		if region_id == "camp":
 			var cell:=Vector2i(floori(player.position.x/512),floori(player.position.y/512))
 			for x in range(-1,2):

@@ -17,6 +17,7 @@ var _status: Label
 var _open := false
 var journal_page := "quests"
 var _contexts: Dictionary={}
+var _journey_labels: Dictionary={}
 func remember_record(id: String) -> void:
 	journal_page="knowledge"
 	_contexts["knowledge"]={"query":"","selected":id,"filter":0}
@@ -92,13 +93,18 @@ func open(tab := "quests", source := "", resume := false) -> void:
 	game.ui.modal.set_meta("frontier_page",page)
 	_refresh_rows()
 
+func open_journey() -> void:
+	_contexts["actions"]={"selected":"journey"}
+	open("actions")
+
 func entries() -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	match page:
 		"actions":
+			result.append({"id":"journey","title":"首次远征 · 整备与成长","text":"按真实持有、已学知识与报告成果更新。每项都可跳过，清单不自动执行操作。","subtitle":"出发 → 探索 → 返镇 → 下一程"})
 			result.append({"id":"loadout","title":"快捷栏编组","text":"用鼠标选择已学动作，再选择Q/E/R或数字槽。E和1是两个独立快捷槽；动作和物品均可绑定。","subtitle":"战斗准备"})
 			result.append({"id":"sources","title":"材料与释放来源","text":"选择真实材料、法阵或残魂；选择本身不扣物资，不自动准备组合。","subtitle":"施法准备"})
-			result.append({"id":"crafts","title":"制作配方","text":"查看已学配方与原料。到附近施法工作台交互，再用鼠标加工；口袋与背包余量来自同一库存。","subtitle":"营地加工"})
+			result.append({"id":"crafts","title":"制作配方","text":"查看已学配方与原料。到附近工作台交互，再用鼠标加工；口袋与背包余量来自同一库存。","subtitle":"营地加工"})
 			result.append({"id":"supplies","title":"饮食与背包","text":"用鼠标使用、换装和整理；Q/E/R与1—0均可绑定动作或物品；用鼠标编组后，按对应键使用。","subtitle":"生存整备"})
 			var target:=game.player.input_controller.interaction_target(true)
 			result.append({"id":"nearby","title":"附近交互","text":"点击与F使用同一交互请求，不远程开启设施。","subtitle":target.title if is_instance_valid(target) and "title" in target else "靠近设施、人物或遗骸"})
@@ -169,6 +175,7 @@ func _refresh_rows() -> void:
 	W.clear(_rows)
 	var available:=entries().filter(func(entry: Dictionary): return query.is_empty() or query.to_lower() in (entry.title+entry.text).to_lower())
 	available.sort_custom(func(a: Dictionary,b: Dictionary):
+		if page=="actions" and (a.id=="journey")!=(b.id=="journey"): return a.id=="journey"
 		if page=="quests" and a.rank!=b.rank: return a.rank<b.rank
 		return a.title.naturalnocasecmp_to(b.title)<0)
 	_status.text="%d项 · 背包 %d/%d格 · 水囊 %d/%d"%[available.size(),game.player.inventory.capacity-game.player.inventory.empty_slot_count(),game.player.inventory.capacity,SurvivalCatalog.water_count(game.survival.supplies),SurvivalCatalog.WATER_CAPACITY]
@@ -203,6 +210,7 @@ func _select(id: String) -> void:
 	_show_detail()
 
 func _show_detail() -> void:
+	_journey_labels.clear()
 	W.clear(_detail)
 	if page=="supplies":
 		var needs:=W.card(_detail,game.survival.status_line(),game.survival.timers_line())
@@ -221,6 +229,7 @@ func _show_detail() -> void:
 	match page:
 		"actions":
 			match entry.id:
+				"journey": _show_journey()
 				"progression": _detail.add_child(W.button("打开角色成长",game.open_interface.bind("progression")))
 				"loadout": _detail.add_child(W.button("打开快捷栏编组",_open_loadout))
 				"sources": _detail.add_child(W.button("选择释放来源",game.workshop.show_materials))
@@ -231,7 +240,7 @@ func _show_detail() -> void:
 						if supplies.knows_recipe(id): card.add_child(W.label(supplies.title(id)+" ← "+supplies.describe_cost(supplies.crafting_recipes[id].inputs),13,true))
 					var target:=game.player.input_controller.interaction_target(true)
 					if target is ExplorationInteractable and target.callback==game.workshop.show_crafts: _detail.add_child(W.button("使用附近工作台",_interact.bind(weakref(target))))
-					else: card.add_child(W.label("靠近施法工作台后，可按F或点击屏幕中的交互按钮。",13,true))
+					else: card.add_child(W.label("靠近工作台后，可按F或点击屏幕中的交互按钮。",13,true))
 				"nearby":
 					var target:=game.player.input_controller.interaction_target(true)
 					if is_instance_valid(target): _detail.add_child(W.button("使用附近目标",_interact.bind(weakref(target))))
@@ -306,6 +315,9 @@ func _show_detail() -> void:
 			var quest: ExplorationQuestData
 			for candidate in game.quests:
 				if candidate.id==entry.id: quest=candidate
+			if game.progress.claims.has("quest."+quest.id) and not quest.completion_hint.is_empty():
+				card.add_child(W.label(quest.completion_hint,14))
+				_detail.add_child(W.button("整备下一程",open_journey))
 			for id in quest.required_claims:
 				var goal:=game.guidance.objective(id)
 				card.add_child(W.label(("✓ " if game.progress.claims.has(id) else "○ ")+goal.title,14,game.progress.claims.has(id)))
@@ -423,3 +435,59 @@ func _open_demo(path: String) -> void:
 		game.ui.notify("正式旅程未能保存，保留当前游戏。")
 		return
 	game.get_tree().call_deferred("change_scene_to_file",path)
+
+func _show_journey() -> void:
+	var entries:=game.guidance.journey.rows()
+	# Reorder only when opening, never move a hovered button during live refresh.
+	entries.assign(entries.filter(func(entry):return not entry.done)+entries.filter(func(entry):return entry.done))
+	for entry in entries:
+		var card:=W.card(_detail,("✓ " if entry.done else "○ ")+entry.title,"可选" if entry.get("optional",false) else "当前状态")
+		var detail:=W.label(entry.detail,14)
+		card.add_child(detail)
+		_journey_labels[entry.id]=[card.get_child(0),detail]
+		if entry.id=="expedition" and not game.progress.claims.has("quest."+FirstExpeditionGuide.QUEST):
+			card.add_child(W.button("追踪首次出征",_track_first_expedition))
+		var action: String=entry.get("action","")
+		if action=="equipment":card.add_child(W.button("查看实际穿戴",open.bind("equipment")))
+		elif action=="supplies":card.add_child(W.button("检查与使用补给",open.bind("supplies")))
+		elif action=="progression":card.add_child(W.button("查看属性与Perk",game.open_interface.bind("progression")))
+		elif action=="techniques":card.add_child(W.button("查看武技与连招",game.town_services._open_techniques))
+		for link in entry.get("links",[]):
+			card.add_child(W.button(str(link.title),_mark_journey.bind(str(entry.id),str(link.actor)),bool(link.goal.get("terminal",false))))
+		var goal: Dictionary=entry.get("goal",{})
+		if not goal.is_empty() and not entry.done:
+			card.add_child(W.button("在地图上标记："+str(goal.title),_mark_journey.bind(str(entry.id)),bool(goal.get("terminal",false))))
+	_detail.add_child(W.button("选择下一条正式委托",open.bind("quests")))
+	_detail.add_child(W.button("刷新当前实物与成长状态",_show_detail))
+
+func _mark_journey(id: String,actor_id := "") -> void:
+	# Requery live data; never capture a node or stale region position from a panel.
+	for entry in game.guidance.journey.rows():
+		if entry.id!=id:continue
+		var goal: Dictionary=entry.get("goal",{})
+		if not actor_id.is_empty():
+			for link in entry.get("links",[]):
+				if link.actor==actor_id:goal=link.goal
+		if goal.is_empty():return
+		if not goal.get("known",false): game.ui.notify("先亲自探索相关地点，清单不揭示未发现目标。");return
+		if str(goal.region)!=game.region_id:
+			var passage:=game.catalog.passage_toward(game.region_id,str(goal.region),game.progress,game.player.position)
+			if not passage: game.ui.notify("当前没有可通行路线。");return
+			game.guidance.set_waypoint(passage.pos,game.region_id)
+		else: game.guidance.set_waypoint(goal.position,str(goal.region))
+		game.show_map()
+		return
+
+func _track_first_expedition() -> void:
+	game.guidance.pin(FirstExpeditionGuide.QUEST)
+	game.ui.close_modal()
+
+func refresh_journey() -> void:
+	if page!="actions" or selected!="journey" or not is_instance_valid(game.ui.modal) or game.ui.modal.get_meta("frontier_page","")!="actions": return
+	for entry in game.guidance.journey.rows():
+		if not _journey_labels.has(entry.id): continue
+		var labels: Array=_journey_labels[entry.id]
+		if not is_instance_valid(labels[0]) or not is_instance_valid(labels[1]):continue
+		var title: String=("✓ " if entry.done else "○ ")+str(entry.title)
+		if labels[0].text!=title: labels[0].text=title
+		if labels[1].text!=entry.detail: labels[1].text=entry.detail

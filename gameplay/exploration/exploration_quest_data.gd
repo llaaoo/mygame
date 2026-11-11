@@ -4,6 +4,7 @@ extends Resource
 @export var id: String
 @export var title: String
 @export_multiline var description: String
+@export_multiline var completion_hint := ""
 enum Stage { UNDISCOVERED, ACTIVE, READY, REPORTED }
 
 # Introduction clues control discovery, never the right to report earned evidence.

@@ -8,7 +8,7 @@
 script = ExtResource("topic")
 id = "about"
 title = "战斗应该先练什么？"
-response = "先看距离、体力和敌人收招。左键短按轻击、长按后松开重击，右键格挡。破势斩课程8河谷币，可在“学习武技与野外技艺”中购买；留住趁手武器与防具，多余装备才卖给萨芙，不必为法阵路线买课。学会后持刀剑，轻→重完成出招后可接破势斩；轻→轻须末击有效命中，才能接截势斩。窗口出现后Ctrl+左键手动接招，短按或按住松开分别发动轻、重武技，不花MP。K查看连招配置，不占法术或物品快捷槽。不必每次都抢窗口，更别空挥凑招。"
+response = "先看距离、体力和敌人收招。Tab的首次远征清单能核对出发与返镇整备。学费不足可向萨芙接炭屑差事；或者问艾妲和客栈苇娘的小差事，物资与报酬都是实物，别交掉救急储备。左键短按轻击、长按后松开重击，右键格挡。破势斩课程8河谷币，可在“学习武技与野外技艺”中购买；留住趁手武器与防具，多余装备才卖给萨芙，不必为法阵路线买课。学会后持刀剑，轻→重完成出招后可接破势斩；轻→轻须末击有效命中，才能接截势斩。窗口出现后Ctrl+左键手动接招，短按或按住松开分别发动轻、重武技，不花MP。K查看连招配置，不占法术或物品快捷槽。不必每次都抢窗口，更别空挥凑招。"
 
 [sub_resource type="Resource" id="training"]
 script = ExtResource("topic")
@@ -70,6 +70,15 @@ kind = 1
 category = "服务"
 service = "charters"
 
+[sub_resource type="Resource" id="first_return"]
+script = ExtResource("topic")
+id = "first_return"
+title = "名册已带回，下一步如何练？"
+response = "你靠自己的准备把档案带回来了。先用已有属性点补足适合你的方向，再决定学课或整修。破势斩只花体力：轻→重完整挥出后，窗口内Ctrl+左键接招；学会后K核对配置。别为追窗口空挥。多余的武器防具能换学费，也能拆作整修材料，先比较再决定。不觉醒也有能继续走的路。"
+category = "河谷成果"
+required_claims = PackedStringArray("quest.river.first_expedition")
+recognition = 5
+
 [resource]
 script = ExtResource("profile")
 actor_id = "river.enemy.service.trainer"
@@ -79,4 +88,4 @@ character = ExtResource("character")
 training = ExtResource("training")
 greeting = "先把呼吸放稳。想学招式，还是谈谈为什么总在出招后挨打？"
 familiar_greeting = "你的行路判断我记着。今天练哪条路线？本领要靠你自己把动作接起来。"
-topics = [SubResource("charters"), SubResource("pressure"), SubResource("about"), SubResource("training"), SubResource("progression"), SubResource("preparation"), SubResource("ration"), SubResource("bridge_deed")]
+topics = [SubResource("first_return"), SubResource("charters"), SubResource("pressure"), SubResource("about"), SubResource("training"), SubResource("progression"), SubResource("preparation"), SubResource("ration"), SubResource("bridge_deed")]
