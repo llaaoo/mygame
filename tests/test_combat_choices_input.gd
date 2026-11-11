@@ -1,9 +1,11 @@
 extends "res://tests/support/input_scene_probe.gd"
+const Awake=preload("res://tests/support/awakened_actor_fixture.gd")
 ## Normal simulation/AI; shop location, full bags and known spells are fixtures.
 const Fixture=preload("res://tests/support/grayriver_fixture.gd")
 func run() -> void:
 	root.size=Vector2i(1152,648)
 	var fixture:=Fixture.new(self); game=await fixture.boot(true)
+	check(Awake.awaken(game.player),"Magic-specific fixture could not establish explicit awakened eligibility")
 	GameRuntime.instance.set_process(true)
 	for foe in game.active_enemies: foe.process_mode=Node.PROCESS_MODE_INHERIT
 	var actor:=game.player; var store:=game.session.inventory

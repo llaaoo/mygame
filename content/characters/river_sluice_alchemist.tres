@@ -14,6 +14,8 @@ script = ExtResource("loadout")
 right_hand = "ignite"
 slots = Array[String](["fire_sigil", "focus", "water_call", "venom_mist"])
 [resource]
+magic_aptitude = true
+starts_awakened = true
 script = ExtResource("data")
 temperament = ExtResource("temperament")
 id = "river_sluice_alchemist"

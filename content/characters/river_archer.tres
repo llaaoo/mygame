@@ -4,6 +4,8 @@
 [ext_resource type="Resource" path="res://content/frontier/equipment/river_bow.tres" id="river_bow"]
 [ext_resource type="Resource" path="res://content/frontier/equipment/river_boots.tres" id="river_boots"]
 [resource]
+magic_aptitude = true
+starts_awakened = false
 script = ExtResource("data")
 id = "river_archer"
 title = "断路弓手"

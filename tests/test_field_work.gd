@@ -1,4 +1,5 @@
 extends SceneTree
+const Awake=preload("res://tests/support/awakened_actor_fixture.gd")
 const Fixture := preload("res://tests/support/mvp_fixture.gd")
 var game: MVPGame
 var errors: Array[String] = []
@@ -25,6 +26,7 @@ func finish_site(_spec: SpellPuzzleData) -> void:
 func run() -> void:
 	var fixture := Fixture.new(self)
 	game = await fixture.boot(true)
+	check(Awake.awaken(game.player),"Magic-specific fixture could not establish explicit awakened eligibility")
 	GameRuntime.instance.set_process(false)
 	var spec := SpellPuzzleData.new()
 	spec.id = "test.worksite"
@@ -72,6 +74,23 @@ func run() -> void:
 	check(not work.start_selected(), "Duplicate work request restarted timer")
 	work.tick(.7)
 	check(supplies.serialize() == before and not site.completed, "Work charged before completion")
+	# Food/attribute expiry lowers both HP and its cap without an actual hit.
+	# It must not masquerade as damage or restart/charge the pending operation.
+	var buffs:=player.get_node("BuffManager") as BuffManager
+	var health_before:=player.health_component.hp
+	var maximum_before:=player.health_component.max_hp
+	var remaining_before: float=work.pending.remaining
+	var meal:=Buff.new()
+	meal.buff_id="test.work_meal"; meal.status_id="test.work_meal"; meal.duration=.2
+	meal.stat_modifiers={"max_hp":10}
+	check(buffs.apply_buff(meal,player),"HP-cap meal fixture did not apply")
+	check(player.health_component.max_hp==maximum_before+10,"Meal fixture did not raise actual HP cap")
+	buffs.tick(.2)
+	check(player.health_component.max_hp==maximum_before and player.health_component.hp==health_before,"Meal expiry did not restore the actual HP cap/current HP")
+	check(work.is_busy() and is_equal_approx(float(work.pending.get("remaining",-1)),remaining_before) and supplies.serialize()==before,"HP-cap expiry interrupted/restarted/charged field work")
+	player.health_component.invincible=true
+	var refused:=CombatExecutor.report_hit(null,player,5,player.position,null,["test"])
+	check(refused.damage_dealt==0 and work.is_busy() and supplies.serialize()==before,"Invincible zero-damage contact interrupted/charged field work")
 	# A heal cannot mask later damage within the same frame.
 	player.health_component.heal(20)
 	check(work.is_busy(), "Healing interrupted ongoing work")
@@ -79,6 +98,17 @@ func run() -> void:
 	CombatExecutor.report_hit(null, player, 5, player.position, null, ["test"])
 	check(not work.is_busy() and supplies.serialize() == before and not site.completed, "Heal then damage did not cancel without payment")
 	check(work.start_selected(), "Interrupted work could not restart")
+	# The public actor damage boundary is valid without an outer report_hit.
+	# A synchronous health_changed observer healing this loss cannot hide it.
+	var before_direct:=player.health_component.hp
+	var heal_damage:=func(current_hp: int,_maximum: int) -> void:
+		if current_hp<before_direct: player.health_component.heal(before_direct-current_hp)
+	player.health_component.health_changed.connect(heal_damage)
+	player.health_component.invincible=false
+	player.take_damage(1)
+	player.health_component.health_changed.disconnect(heal_damage)
+	check(player.health_component.hp==before_direct and not work.is_busy() and supplies.serialize()==before and not site.completed,"Synchronous healing masked direct accepted damage or work charged interrupted materials")
+	check(work.start_selected(), "Work could not restart after directly applied damage")
 	work.tick(1.5)
 	check(site.completed and supplies.count("resin") == 3 and supplies.count("crystal") == 6 and game.progress.choices[spec.id] == "patch", "Successful work did not commit once")
 	check(not game.progress.claims.has(spec.pickup_claim), "Opening teleported the part into inventory")
@@ -150,5 +180,5 @@ func run() -> void:
 	game = await fixture.boot(true)
 	check(game.progress.claims.has(spec.id) and game.progress.claims.has(spec.pickup_claim) and not game.player.field_work.is_busy(), "Disk restore lost completion or resumed transient work")
 	await fixture.close()
-	if errors.is_empty(): print("Field work passed: live keys, state, atomic finish, actual damage interruption, all cancellation paths, competing spell solution, pickup and disk recovery")
+	if errors.is_empty(): print("Field work passed: live keys, state, atomic finish, actual damage vs HP-cap expiry/zero-damage contact, all cancellation paths, competing spell solution, pickup and disk recovery")
 	quit(0 if errors.is_empty() else 1)

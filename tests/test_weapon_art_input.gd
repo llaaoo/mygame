@@ -29,6 +29,7 @@ func ready(id: String) -> void:
 	check(false,"Natural stamina/cooldown recovery did not become ready")
 func run() -> void:
 	var fixture:=Fixture.new(self); game=await fixture.boot(true)
+	check(preload("res://tests/support/awakened_actor_fixture.gd").awaken(game.player),"Controlled physical-action MP budget could not initialize")
 	GameRuntime.instance.set_process(true)
 	for foe in game.active_enemies: foe.process_mode=Node.PROCESS_MODE_INHERIT
 	var actor:=game.player; var actions:=actor.actor_context.actions; var store:=game.session.inventory

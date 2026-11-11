@@ -39,7 +39,7 @@ static func _basic_options(actor: Player,source: String) -> Array[Dictionary]:
   var material:=supplies.catalog.get(id) as CastingMaterialData
   var detail:="不加额外材料" if id.is_empty() else "口袋 ×%d"%actor.actor_context.items.count(actor.actor_context.id,id,false,true)
   if material and plan.material_costs.is_empty(): detail+=" · 当前结果不适配，不会消费"
-  result.append({"variant_id":"modifier:"+id,"title":supplies.title(id) if material else "基础","choice":choice,"cost":plan.cost,"ready":plan.ready,"reason":plan.reason,"detail":detail,"description":material.description if material else "按原本基础动作施放。","current":current==choice})
+  result.append({"variant_id":"modifier:"+id,"title":supplies.title(id) if material else "基础","choice":choice,"cost":plan.cost,"cost_label":plan.cost_label(),"requires_magic":plan.requires_magic,"ready":plan.ready,"reason":plan.reason,"detail":detail,"description":material.description if material else "按原本基础动作施放。","current":current==choice})
  return result
 static func options(actor: Player,source: String) -> Array[Dictionary]:
  var result: Array[Dictionary]=[]
@@ -59,7 +59,7 @@ static func options(actor: Player,source: String) -> Array[Dictionary]:
   auto_detail+=" · "+stock_text(actor,preview.material_costs)
   if following and not following.source_kind.is_empty(): auto_detail+=" · "+_source_hint(following)
   if following and following.required_rule: auto_detail+=" · "+following.required_rule.condition_label()
-  result.append({"variant_id":"auto","title":"跟随·"+following.title if following else "智能跟随","choice":{"mode":"auto"},"cost":preview.cost,"ready":preview.ready,"reason":preview.reason,"detail":auto_detail,"description":"只改变后续形式；仍须真实来源和手动释放。滚轮/G可固定形式。","current":automatic})
+  result.append({"variant_id":"auto","title":"跟随·"+following.title if following else "智能跟随","choice":{"mode":"auto"},"cost":preview.cost,"cost_label":preview.cost_label(),"requires_magic":preview.requires_magic,"ready":preview.ready,"reason":preview.reason,"detail":auto_detail,"description":"只改变后续形式；仍须真实来源和手动释放。滚轮/G可固定形式。","current":automatic})
  for payload in entry.payloads:
   var choice: Dictionary={"payload":payload.id,"modifier":str(current.get("modifier","")),"uid":""}
   var composed:=entry.compose(payload)
@@ -80,7 +80,7 @@ static func options(actor: Player,source: String) -> Array[Dictionary]:
    if not current.get("modifier","").is_empty() and selected.modifier.is_empty(): detail+=" · 确认将移除不适配修饰"
    if not payload.source_kind.is_empty(): detail+=" · "+_source_hint(payload)
    if payload.required_rule: detail+=" · "+payload.required_rule.condition_label()
-   result.append({"variant_id":payload.id,"title":payload.title,"choice":selected,"cost":plan.cost,"ready":plan.ready,"reason":plan.reason,"detail":detail,"description":payload.describe(actor.actor_context.rules.timed_fields),"current":not automatic and current==selected})
+   result.append({"variant_id":payload.id,"title":payload.title,"choice":selected,"cost":plan.cost,"cost_label":plan.cost_label(),"requires_magic":plan.requires_magic,"ready":plan.ready,"reason":plan.reason,"detail":detail,"description":payload.describe(actor.actor_context.rules.timed_fields),"current":not automatic and current==selected})
  return result
 static func usable_options(actor: Player,source: String) -> Array[Dictionary]:
  # Combat selection is a query of concrete executable forms, not a catalogue.
@@ -106,7 +106,7 @@ static func usable_options(actor: Player,source: String) -> Array[Dictionary]:
    var modifier:=str(choice.get("modifier",""))
    if not plan.ready or not modifier.is_empty() and (plan.modifier_id if entry else plan.material_id)!=modifier: continue
    var option: Dictionary=row.duplicate(true)
-   option.choice=choice; option.ready=true; option.reason=""; option.cost=plan.cost
+   option.choice=choice; option.ready=true; option.reason=""; option.cost=plan.cost; option.cost_label=plan.cost_label(); option.requires_magic=plan.requires_magic
    option.variant_id=str(choice.get("payload","basic"))+"|"+modifier
    option.title=row.title if not entry else entry.payload(str(choice.payload)).title
    if not modifier.is_empty() and entry: option.title+=" · "+manager.combinations.supplies.title(modifier)

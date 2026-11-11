@@ -313,7 +313,7 @@ func report_refusal(source: String,context: CastContext = null) -> void:
 	var owner:=get_parent() as Node2D
 	if instance.data.operation_id=="disperse" and "actor_context" in owner and owner.actor_context:
 		var choice: Dictionary=context.selection if context and not context.selection.is_empty() else selection_for_source(source)
-		var spray_reason: String=owner.actor_context.spray.refusal_reason(instance.data,choice)
+		var spray_reason: String=owner.actor_context.spray.refusal_reason(instance.data,choice,context.empower if context else false)
 		owner.actor_context.actions.report_action_feedback(spray_reason if not spray_reason.is_empty() else "喷洒条件已变化，请重新按键")
 		return
 	var plan:=combinations.preview(instance.data,get_parent(),context.empower if context else false,context.selection if context and not context.selection.is_empty() else selection_for_source(source))
@@ -335,6 +335,7 @@ func can_start(source: String, caster: Node2D, context: CastContext) -> bool:
 		return false
 	var mana := caster.get_node_or_null("ManaComponent") as ManaComponent
 	var plan := combinations.build_plan(inst.data, caster, context.empower,selection) if combinations else null
+	if mana and not mana.can_cast(plan.requires_magic if plan else inst.data.requires_magic):return false
 	var cost := plan.cost if plan else _get_effective_mana_cost(inst.data, caster)
 	return inst.is_ready() and (not mana or mana.mp >= cost) and (not plan or combinations.supplies.can_pay_combat(plan.material_costs))
 
@@ -403,7 +404,7 @@ func _execute_with_context(skill: SkillData, source: String, caster: Node2D, ctx
 	if skill.combination_only:
 		return false
 	if skill.operation_id=="disperse" and "actor_context" in caster and caster.actor_context and caster.actor_context.spray:
-		return caster.actor_context.spray.start(skill,source,ctx.direction,ctx.selection)
+		return caster.actor_context.spray.start(skill,source,ctx.direction,ctx.selection,ctx.empower)
 	if combinations and combinations.handles(skill):
 		return combinations.start(skill, caster, ctx, source)
 	if combinations and combinations.is_busy():
@@ -426,6 +427,7 @@ func _execute_with_context(skill: SkillData, source: String, caster: Node2D, ctx
 			return false
 	if not combinations:
 		plan.skill = skill
+		plan.requires_magic=skill.requires_magic
 		plan.cost = _get_effective_mana_cost(skill, caster)
 		plan.cooldown = _get_effective_cooldown(skill, caster)
 	if channel_cost >= 0 and skill.operation_id.is_empty():
@@ -433,6 +435,10 @@ func _execute_with_context(skill: SkillData, source: String, caster: Node2D, ctx
 	plan.actor = caster
 	plan.action = skill
 	plan.source = source
+	var mana:=caster.get_node_or_null("ManaComponent") as ManaComponent
+	if mana and not mana.can_cast(plan.requires_magic):
+		if exec_inst:exec_inst.enter_phase(CombatPhase.Phase.IDLE)
+		return false
 	_executing = true
 	var transaction := CastTransaction.new(caster, combinations.supplies if combinations else null, CastTransaction.allocate_id())
 	if not transaction.reserve(plan):

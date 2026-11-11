@@ -1,4 +1,5 @@
 extends "res://tests/support/input_scene_probe.gd"
+const Awake=preload("res://tests/support/awakened_actor_fixture.gd")
 ## Controlled UI fixture, real keyboard/mouse events, normal AI and simulation.
 const Fixture=preload("res://tests/support/grayriver_fixture.gd")
 var casts:=0
@@ -6,6 +7,7 @@ func run() -> void:
 	root.size=Vector2i(960,600)
 	var fixture:=Fixture.new(self)
 	game=await fixture.boot()
+	check(Awake.awaken(game.player),"Magic-specific fixture could not establish explicit awakened eligibility")
 	GameRuntime.instance.set_process(true)
 	for enemy in game.active_enemies: enemy.process_mode=Node.PROCESS_MODE_INHERIT
 	var actor:=game.player

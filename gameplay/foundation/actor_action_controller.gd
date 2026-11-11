@@ -605,6 +605,7 @@ func contact(target: Node2D) -> HitResult:
 		tags.append_array(imbued)
 	var skill:=SkillData.new()
 	skill.id="weapon_contact"
+	skill.requires_magic=false
 	if _enchantment:
 		tags.append_array(_enchantment.tags)
 		skill.weapon_enchantment=_enchantment

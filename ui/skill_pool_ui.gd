@@ -348,6 +348,9 @@ func _refresh_detail() -> void:
 			_detail_box.add_child(modifiers)
 			var source_hint: String="脚下"+FireSigil.title_for(payload.source_field) if payload.source_kind=="field" else "附近真实残魂" if payload.source_kind=="soul" else ""
 			_detail_box.add_child(FoundationWidgets.label(payload.describe(_skill_manager.get_parent().actor_context.rules.timed_fields if _skill_manager.get_parent().get("actor_context") else false)+"\n必需来源："+(source_hint if not source_hint.is_empty() else "无额外场地来源")+"\n实物："+(_skill_manager.combinations.supplies.title(payload.material_id)+" ×"+str(payload.quantity) if not payload.material_id.is_empty() else "不消耗材料")+"\n绑定后固定此来源；不自动准备条件或串联动作。",11,true))
+	var owner:=_skill_manager.get_parent() as Player
+	if _selected_skill.requires_magic and owner and not owner.mana_component.can_cast():
+		_detail_box.add_child(FoundationWidgets.label("主动施法需要觉醒。已学知识与快捷编组保留，当前不能施放。",12,true))
 	if not _is_skill_unlocked(_selected_skill):
 		var locked := Label.new()
 		locked.text = "未解锁 · %s Lv.%d" % [_school_name(_selected_skill.school), _unlock_level(_selected_skill)]
@@ -389,6 +392,7 @@ func _refresh_detail() -> void:
 
 
 func _format_skill_stats(skill: SkillData) -> String:
+	if not skill.requires_magic: return "物品操作 · 普通喷洒不耗魔力\n每次1剂实物；明确法术强化需要觉醒，按实际预览另计费用。"
 	if not skill.operation_id.is_empty():
 		return InputBindings.menu_help("G轮盘按快捷槽选择来源，查看实际费用与条件。\n蓄力/引导按住所编组键，其余按设置按下或松开施放。")
 	var lines: Array[String] = [
@@ -465,7 +469,9 @@ func _make_skill_card(skill: SkillData) -> PanelContainer:
 	var tp := Label.new()
 	tp.text = "基础 %d MP"%skill.mp_cost+(" · %.1f秒冷却"%skill.cooldown if skill.cooldown>0 else "") if unlocked else "%s Lv.%d"%[_school_name(skill.school),_unlock_level(skill)]
 	if not skill.operation_id.is_empty():
-		tp.text="选来源 · G"
+		tp.text="普通操作 · 1剂喷剂" if not skill.requires_magic else "选来源 · G"
+	var owner:=_skill_manager.get_parent() as Player
+	if skill.requires_magic and owner and not owner.mana_component.can_cast(): tp.text="已学知识 · 未觉醒" if _skill_manager.knows_action(skill) else "尚未掌握"
 	elif skill.combination_only:
 		tp.text = "组合结果"
 	tp.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
@@ -585,6 +591,7 @@ func _is_skill_unlocked(skill: SkillData) -> bool:
 		return false
 	if skill.combination_only:
 		return false
+	if not skill.requires_magic: return true
 	var player := get_tree().get_first_node_in_group("player") as Player
 	return not player or not player.mastery_manager or player.mastery_manager.is_spell_unlocked(skill)
 

@@ -1,4 +1,5 @@
 extends "res://tests/support/input_scene_probe.gd"
+const Awake=preload("res://tests/support/awakened_actor_fixture.gd")
 ## Real selector/rest controls; normal AI with explicitly staged position, knowledge and stock.
 const Fixture=preload("res://tests/support/grayriver_fixture.gd")
 var casts := 0
@@ -8,6 +9,7 @@ func move_pointer(point: Vector2) -> void:
 func run() -> void:
  root.size=Vector2i(1152,648)
  var fixture:=Fixture.new(self); game=await fixture.boot(true)
+ check(Awake.awaken(game.player),"Magic-specific fixture could not establish explicit awakened eligibility")
  GameRuntime.instance.set_process(true)
  for foe in game.active_enemies: foe.process_mode=Node.PROCESS_MODE_INHERIT
  var actor:=game.player; var manager:=actor.skill_manager; var store:=game.session.inventory

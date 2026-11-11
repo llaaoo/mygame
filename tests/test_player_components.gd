@@ -1,4 +1,5 @@
 extends SceneTree
+const Awake=preload("res://tests/support/awakened_actor_fixture.gd")
 const Fixture := preload("res://tests/support/mvp_fixture.gd")
 var failures: Array[String] = []
 
@@ -17,11 +18,14 @@ func _check(value: bool, message: String) -> void:
 func _run() -> void:
 	var fixture := Fixture.new(self)
 	var game: MVPGame = await fixture.boot()
+	_check(Awake.awaken(game.player),"Magic-specific fixture could not establish explicit awakened eligibility")
 	GameRuntime.instance.set_process(false)
 	var player := game.player
 	var casting := player.casting
 	var sm := player.skill_manager
 	var mana := player.mana_component
+	# Explicit sandbox capacity preserves the 100-MP pulse/rollback budget.
+	mana.max_mp = 100
 	player.global_position = Vector2(12000, 12000)
 	sm.restrict_actions = false
 	var channel := sm.pool.get_skill("shadow_bolt").duplicate(true) as SkillData

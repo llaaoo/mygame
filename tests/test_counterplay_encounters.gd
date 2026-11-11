@@ -1,4 +1,5 @@
 extends "res://tests/support/input_scene_probe.gd"
+const Awake=preload("res://tests/support/awakened_actor_fixture.gd")
 ## Same game-generated save, controlled kit/arena, authored enemy caps and live AI.
 const Fixture:=preload("res://tests/support/grayriver_fixture.gd")
 var samples: Array[Dictionary]=[]
@@ -37,6 +38,7 @@ func run() -> void:
 	root.size=Vector2i(1152,648)
 	var fixture:=Fixture.new(self)
 	game=await fixture.boot(true)
+	check(Awake.awaken(game.player),"Magic-specific fixture could not establish explicit awakened eligibility")
 	var stock:=game.session.inventory
 	for id in ["river_sabre","oil_bottle","fire_rag"]: stock.receive("player",id,1)
 	stock.equip("player",stock.find_owned("player","river_sabre"))

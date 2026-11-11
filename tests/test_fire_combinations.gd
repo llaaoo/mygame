@@ -26,6 +26,7 @@ func _run() -> void:
 	player.global_position = Vector2(12000, 12000)
 	player.mana_component.mp_regen_rate = 0
 	player.health_component.regen_rate = 0
+	_check(player.mana_component.magic_state.awakened,"Standalone prison fixture must retain its existing spell qualification")
 	player.mana_component.max_mp = 200
 	player.mana_component.mp = 200
 	var sm: SkillManager = player.skill_manager

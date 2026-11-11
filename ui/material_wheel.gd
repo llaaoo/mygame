@@ -217,13 +217,13 @@ func _refresh() -> void:
   _labels[i].text=""
   if index>=entries.size() or entries[index].is_empty(): continue
   var entry: Dictionary=entries[index]
-  _labels[i].text=("✓ " if entry.current else "")+entry.title+"\n%d MP"%entry.cost+((" · 瓶%s"%str(entry.choice.get("uid","")).trim_prefix("item.")) if not str(entry.choice.get("uid","")).is_empty() else "")
+  _labels[i].text=("✓ " if entry.current else "")+entry.title+"\n"+str(entry.get("cost_label","%d MP"%entry.cost))+((" · 瓶%s"%str(entry.choice.get("uid","")).trim_prefix("item.")) if not str(entry.choice.get("uid","")).is_empty() else "")
   _labels[i].add_theme_color_override("font_color",GameUIStyle.TEXT_MAIN if entry.ready else GameUIStyle.TEXT_MUTED)
  for i in range(3):
   _compact_labels[i].visible=i<page_size()
   var index:=page*page_size()+i
   var entry: Dictionary=entries[index] if index<entries.size() else {}
-  _compact_labels[i].text=("条件已失效" if _slot_ids.size()>0 else "当前没有可用形式") if entry.is_empty() else ("✓ " if entry.current else "")+entry.title+"\n%d MP"%entry.cost
+  _compact_labels[i].text=("条件已失效" if _slot_ids.size()>0 else "当前没有可用形式") if entry.is_empty() else ("✓ " if entry.current else "")+entry.title+"\n"+str(entry.get("cost_label","%d MP"%entry.cost))
   _compact_labels[i].add_theme_color_override("font_color",GameUIStyle.TEXT_MUTED if entry.is_empty() else GameUIStyle.TEXT_MAIN)
  _layout(); _update_detail(); _ring.queue_redraw(); _compact_view.queue_redraw()
 func _update_detail() -> void:
@@ -236,7 +236,7 @@ func _update_detail() -> void:
   if not has_choices and not QuickslotMaterials.available(player.skill_manager,source): _detail.text=InputBindings.menu_help(_detail.text)
   return
  var entry: Dictionary=entries[index]
- _detail.text="%s · %d MP\n%s\n%s"%[entry.title,entry.cost,entry.detail,entry.reason if not entry.ready else ("松开中键确认" if _hold else "点击确认")+" · 按原快捷键释放"]
+ _detail.text="%s · %s\n%s\n%s"%[entry.title,entry.get("cost_label","%d MP"%entry.cost),entry.detail,entry.reason if not entry.ready else ("松开中键确认" if _hold else "点击确认")+" · 按原快捷键释放"]
  if entry.get("alternatives",[]).size()>1: _detail.text+="\n滚轮切换同类实物"
  elif entries.size()>page_size(): _detail.text+="\n滚轮翻页 %d/%d"%[page+1,ceili(float(entries.size())/page_size())]
 func _pick(point: Vector2) -> void:

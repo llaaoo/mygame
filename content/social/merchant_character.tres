@@ -1,6 +1,8 @@
 [gd_resource type="Resource" script_class="ActorCharacterData" format=3]
 [ext_resource type="Script" path="res://gameplay/characters/actor_character_data.gd" id="def"]
 [resource]
+magic_aptitude = true
+starts_awakened = false
 script = ExtResource("def")
 id = "merchant"
 title = "萨芙 · 整修商"

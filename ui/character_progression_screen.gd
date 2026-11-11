@@ -53,7 +53,7 @@ func _refresh() -> void:
  var stats:=actor.stats_component; var mastery:=actor.mastery_manager
  var data:=ActorProgression.values(actor)
  var recovery:=ActorProgression.stamina_values(actor)
- _overview.text="角色 Lv.%d · 经验 %d / %d    属性点 %d    Perk点 %d\n生命 %d · 法力 %d · 体力 %.0f · 当前回复 %.1f/秒（基础%.1f） · 负重承受 %.0f\n升级：3属性点＋1Perk点；成功实践提升分支熟练度。回复仍受消耗延迟与格挡限制。世界持续运行。"%[stats.level,stats.experience,stats.exp_to_next,stats.attribute_points,mastery.get_available_perk_points(),actor.health_component.max_hp,actor.mana_component.max_mp,recovery.maximum,recovery.regeneration,recovery.base_regeneration,actor.actor_context.rules.carry_limit+data.carry_bonus]
+ _overview.text="角色 Lv.%d · 经验 %d / %d    属性点 %d    Perk点 %d\n生命 %d · %s · 体力 %.0f · 当前回复 %.1f/秒（基础%.1f） · 负重承受 %.0f\n升级：3属性点＋1Perk点；成功实践提升分支熟练度。回复仍受消耗延迟与格挡限制。世界持续运行。"%[stats.level,stats.experience,stats.exp_to_next,stats.attribute_points,mastery.get_available_perk_points(),actor.health_component.max_hp,QuickslotView.magic_status(actor),recovery.maximum,recovery.regeneration,recovery.base_regeneration,actor.actor_context.rules.carry_limit+data.carry_bonus]
  _experience_bar.max_value=maxi(1,stats.exp_to_next); _experience_bar.value=stats.experience
  if _branch_buttons.is_empty():
   _branches.add_child(FoundationWidgets.button("属性与派生",_show_attributes))
@@ -77,7 +77,8 @@ func _refresh() -> void:
 func _update_existing() -> void:
  var stats:=actor.stats_component; var levels: Array=[]
  for mastery in actor.mastery_manager.get_all_masteries(): levels.append(mastery.level)
- var signature:=str([_layout_key,_selected,stats.level,stats.attribute_points,[stats.strength,stats.intelligence,stats.agility,stats.endurance],stats.primary_values(),actor.mastery_manager.revision,levels,actor.mastery_manager.get_mastery(_school).xp,actor.health_component.is_dead])
+ var magic:=actor.actor_context.magic
+ var signature:=str([_layout_key,_selected,stats.level,stats.attribute_points,[stats.strength,stats.intelligence,stats.agility,stats.endurance],stats.primary_values(),actor.mastery_manager.revision,levels,actor.mastery_manager.get_mastery(_school).xp,actor.health_component.is_dead,magic.awakened,magic.mana_base,magic.hp_cost,magic.stamina_cost,actor.mana_component.max_mp,actor.health_component.max_hp,actor.actor_context.actions.stamina.maximum])
  if signature==_controls_signature: return
  _controls_signature=signature
  if _attributes:
@@ -120,7 +121,7 @@ func _draw_attributes() -> void:
  column.minimum_size_changed.connect(_fit_attributes.bind(column))
  _fit_attributes(column)
  _detail.add_child(FoundationWidgets.label("属性准备",19))
- _detail.add_child(FoundationWidgets.label("主属性由基础值、真实装备与增益共同计算。加点不补满资源；耐力会立即改变体力上限。\n\n任务、现场作业与施法检查有效属性；永久Perk要求基础属性，不能借临时增益点亮。\n\n力量支撑近战与携带；敏捷支撑远射、机动与准备；智力支撑施法与作业；耐力支撑生存与体力。",14,true))
+ _detail.add_child(FoundationWidgets.label("主属性由基础值、真实装备与增益共同计算。加点不补满资源；耐力会立即改变体力上限。\n\n任务、现场作业与施法检查有效属性；永久Perk要求基础属性，不能借临时增益点亮。\n\n力量支撑近战与携带；敏捷支撑远射、机动与准备；智力支撑作业与觉醒后的施法；学习和属性不替代觉醒；耐力支撑生存与体力。",14,true))
 func _train(key: String) -> void:
  if train_request.is_valid(): train_request.call(key)
  _refresh()
@@ -171,7 +172,15 @@ func _attribute_text(key: String) -> String:
  var stats:=actor.stats_component; var current:=stats.derived_values(); var next:=stats.derived_values({key:int(stats.get(key))+1})
  match key:
   "strength": return "近战加成 %d→%d；负重承受 +%.0f→+%.0f"%[current.physical_damage,next.physical_damage,current.carry_bonus,next.carry_bonus]
-  "intelligence": return "法力 %d→%d；法术加成 %d→%d；作业耗时 ×%.2f→×%.2f"%[current.max_mana,next.max_mana,current.magic_damage,next.magic_damage,current.work_multiplier,next.work_multiplier]
+  "intelligence":
+   if not actor.mana_component.can_cast(): return "作业耗时 ×%.2f→×%.2f；尚未觉醒，加点不授予施法资格或可用魔力。"%[current.work_multiplier,next.work_multiplier]
+   return "法术加成 %d→%d；作业耗时 ×%.2f→×%.2f；魔力容量仍受觉醒投入限制。"%[current.magic_damage,next.magic_damage,current.work_multiplier,next.work_multiplier]
   "agility": return "远射加成 %d→%d；移速加成 %.0f→%.0f；闪避耗体 ×%.2f→×%.2f；属性准备 ×%.3f→×%.3f"%[current.ranged_damage,next.ranged_damage,current.move_speed_bonus,next.move_speed_bonus,current.dodge_multiplier,next.dodge_multiplier,current.preparation_multiplier,next.preparation_multiplier]
-  "endurance": return "生命 %d→%d；体力 %.0f→%.0f；基础回复 %.1f→%.1f/秒；危险伤害减免 %.0f%%→%.0f%%"%[50+current.max_hp_bonus,50+next.max_hp_bonus,current.max_stamina,next.max_stamina,current.stamina_regeneration,next.stamina_regeneration,(1-current.hazard_damage_multiplier)*100,(1-next.hazard_damage_multiplier)*100]
+  "endurance":
+   var buffs:=actor.get_node("BuffManager") as BuffManager
+   var current_body:=ActorProgression.values(actor)
+   var next_body:=ActorProgression.values(actor,{"endurance":stats.endurance+1})
+   var current_hp:=roundi(buffs.preview_attribute_delta("max_hp"))
+   var next_hp:=roundi(buffs.preview_attribute_delta("max_hp",next.max_hp_bonus-current.max_hp_bonus))
+   return "生命 %d→%d；体力 %.0f→%.0f；基础回复 %.1f→%.1f/秒；危险伤害减免 %.0f%%→%.0f%%"%[current_hp,next_hp,current_body.max_stamina,next_body.max_stamina,current_body.stamina_regeneration,next_body.stamina_regeneration,(1-current.hazard_damage_multiplier)*100,(1-next.hazard_damage_multiplier)*100]
  return ""

@@ -207,7 +207,7 @@ func _show_detail() -> void:
 	if page=="supplies":
 		var needs:=W.card(_detail,game.survival.status_line(),game.survival.timers_line())
 		if game.survival.needs.nutrition<=20: needs.add_child(W.label("饱食不足：食物可改善生命回复。",13,true))
-		if game.survival.needs.hydration<=20: needs.add_child(W.label("饮水不足：清水可改善法力回复。",13,true))
+		if game.survival.needs.hydration<=20: needs.add_child(W.label(game.survival.hydration_hint(),13,true))
 		if game.survival.needs.fatigue>=60: needs.add_child(W.label("疲劳影响准备：茶或休整可缓解。",13,true))
 		needs.add_child(W.button("查看恢复与休整规则",game.survival.show_rules))
 		if game.survival.supplies.count("dirty_water")>0: needs.add_child(W.button("倒掉未净化水",game.survival.begin_discard))

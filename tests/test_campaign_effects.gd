@@ -14,6 +14,7 @@ func run() -> void:
 	var fixture:=Fixture.new(self)
 	var game:=await fixture.boot(true,true)
 	var actor:=game.player
+	check(preload("res://tests/support/awakened_actor_fixture.gd").awaken(actor),"Controlled persistent MP fixture could not awaken")
 	var buffs:=actor.get_node("BuffManager") as BuffManager
 	var foe:=game.active_enemies[0]
 	var foe_id:=foe.actor_context.id

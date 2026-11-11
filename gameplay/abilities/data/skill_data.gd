@@ -18,6 +18,7 @@ enum SkillType {
 @export var skill_id: String = ""                 ## @deprecated 用 id 代替，保留兼容
 @export var display_name: String = "未命名技能"
 @export var conditional_cast := false
+@export var requires_magic := true
 @export var ground_targeted := false
 @export var requires_soul_remnant := false
 @export var soul_harvest_range := 150.0

@@ -61,6 +61,8 @@ func known_gathering(item_id: String) -> Dictionary:
 
 func town_orientation() -> Dictionary:
 	if not game.is_at_base(): return {}
+	if not unequipped_blade_hint().is_empty():
+		return {"title":unequipped_blade_hint(),"region":game.region_id,"position":game.player.position,"known":true}
 	for id in ["river.handbook", "river.pack"]:
 		if not game.progress.claims.has(id): return prerequisite_objective(id)
 	return {}
@@ -104,3 +106,10 @@ func set_waypoint(point: Vector2,region := "camp") -> void:
 	point = point.clamp(-half,half)
 	game.progress.waypoint = {"position":[point.x,point.y],"region":region}
 	game._queue_save()
+
+func unequipped_blade_hint() -> String:
+	if not game.session or not game.rules.physical_inventory: return ""
+	var store: InventoryService=game.session.inventory
+	if not str(store.equipped("player").get(str(EquipmentData.SlotType.RIGHT_HAND),"")).is_empty(): return ""
+	if store.count("player","river_sabre")<1: return ""
+	return InputBindings.menu_help("主手空着：按O穿戴驿路短刀，再出发。工具小刀不能代替战斗武器。")

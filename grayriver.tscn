@@ -19,6 +19,7 @@ script = ExtResource("12_mvp")
 [node name="Player" parent="." unique_id=87503594 instance=ExtResource("2_h2yge")]
 position = Vector2(-720, -430)
 debug_items = false
+starts_awakened = false
 exploration_mode = true
 character_definition = ExtResource("character")
 

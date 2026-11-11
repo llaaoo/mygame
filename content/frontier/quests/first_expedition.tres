@@ -6,7 +6,7 @@
 script = ExtResource("quest")
 id = "river.first_expedition"
 title = "首次出征：林下档案窖"
-description = "先领离镇口粮，在镇中工作台加工一枚火石；沿北路从西侧阅读旧猎营火阵笔记，亲手选择火石阵并试验火花。山脚的林下档案窖藏有封锁名册：入口可安全整备，借书架分开守卫，查看受潮压印台的两种修复办法。取到名册并恢复压印台后，返回河谷镇向艾妲报告。战利品可在镇中穿戴、出售或拆解；保留需要的装备，用原料补充下次远征的耗材。无需一次完成，原入口始终可撤退。"
+description = "先领离镇口粮旧械包，按O把驿路短刀穿入主手；领取附近布料包，留下布料1。沿北路从西侧读旧猎营记录，留在安全处准备武器、涂附与退路。林下档案窖藏有封锁名册：入口可整备与撤退，借书架分开应对守卫，东侧压印台可付布料1手工修复。取名册并恢复压印台后，回河谷镇向艾妲报告。不要求觉醒或施法；西北旧试感台是可选探索，试感后可离开，之后再决定是否接受永久代价。先保留所需装备，多余战利品可出售或拆解，制作下一程补给。"
 unlock_claims = PackedStringArray("river.handbook")
 required_claims = PackedStringArray("river.fire", "archive.index_press", "river.dossier")
 attribute_points = 1

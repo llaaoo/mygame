@@ -64,7 +64,7 @@ target_region = "river_records"
 script = ExtResource("script5")
 id = "town.inn.customs"
 title = "客栈房客须知"
-text = "客床按实际游戏小时休息，消耗随身烤饼和清水；不是等待几秒就过夜。寄存箱只属于你，保存每件物品的真实余量；公用补给柜可取用，但不会自行补货。需要买吃喝时找大厅里的苇娘。镇中制造在西北整修作坊，查阅文书去东侧公署。"
+text = "客床按实际游戏小时休息，消耗随身烤饼和清水；不是等待几秒就过夜。寄存箱只属于你，保存每件物品的真实余量；公用补给柜可取用，但不会自行补货。需要买吃喝时找大厅里的苇娘。镇中制造在西北整修作坊，查阅文书去东侧公署。\n\n门灯为晚归者留着，敬灯下的神，也愿邻人平安。吃喝与休息不会使未觉醒者获得魔力，信仰不决定觉醒。"
 requires_clear = false
 navigation_hints = [SubResource("nav4_0"), SubResource("nav4_1")]
 [sub_resource type="Resource" id="feature6"]

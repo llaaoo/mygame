@@ -1,0 +1,201 @@
+{
+  "schema": 1,
+  "raw_archive": "native-records.tar.gz",
+  "phases": {
+    "mundane": {
+      "schema": 1,
+      "started_utc": "2026-11-11T13:56:41.841644+00:00",
+      "source": "/workspace/mygame",
+      "revision": "d5c7e6ad34306b03c4f3b8677ea673f506d1fe7f",
+      "dirty_files": [],
+      "phase": "mundane",
+      "output": "/workspace/worldview-validation-recovered/native/mundane",
+      "display": ":93",
+      "xdg_before": {
+        "data": false,
+        "config": false,
+        "cache": false
+      },
+      "fresh_requested": true,
+      "seed_copied": false,
+      "game_command": [
+        "/opt/godot/4.6.3/Godot_v4.6.3-stable_linux.x86_64",
+        "--path",
+        "/workspace/mygame",
+        "--rendering-method",
+        "gl_compatibility",
+        "--audio-driver",
+        "Dummy",
+        "--resolution",
+        "1152x648",
+        "--script",
+        "res://tools/first30_probe.gd"
+      ],
+      "xorg_command": [
+        "Xorg",
+        ":93",
+        "-config",
+        "/workspace/mygame/tools/playtests/native_xorg_1152.conf",
+        "-noreset",
+        "-nolisten",
+        "tcp"
+      ],
+      "audio": "Dummy: auditory experience unverified",
+      "timeout_seconds": 3600,
+      "xorg_pid": 2061,
+      "godot_pid": 2062,
+      "native_exit_code": 0,
+      "xorg_exit_code": 0,
+      "ended_utc": "2026-11-11T14:14:47.823490+00:00"
+    },
+    "accept-before-fix": {
+      "schema": 1,
+      "started_utc": "2026-11-11T14:15:46.100362+00:00",
+      "source": "/workspace/mygame",
+      "revision": "d5c7e6ad34306b03c4f3b8677ea673f506d1fe7f",
+      "dirty_files": [],
+      "phase": "accept",
+      "output": "/workspace/worldview-validation-recovered/native/accept",
+      "display": ":93",
+      "xdg_before": {
+        "data": true,
+        "config": false,
+        "cache": true
+      },
+      "fresh_requested": false,
+      "seed_copied": false,
+      "game_command": [
+        "/opt/godot/4.6.3/Godot_v4.6.3-stable_linux.x86_64",
+        "--path",
+        "/workspace/mygame",
+        "--rendering-method",
+        "gl_compatibility",
+        "--audio-driver",
+        "Dummy",
+        "--resolution",
+        "1152x648",
+        "--script",
+        "res://tools/first30_probe.gd"
+      ],
+      "xorg_command": [
+        "Xorg",
+        ":93",
+        "-config",
+        "/workspace/mygame/tools/playtests/native_xorg_1152.conf",
+        "-noreset",
+        "-nolisten",
+        "tcp"
+      ],
+      "audio": "Dummy: auditory experience unverified",
+      "timeout_seconds": 3600,
+      "xorg_pid": 2698,
+      "godot_pid": 2702,
+      "native_exit_code": 0,
+      "xorg_exit_code": 0,
+      "ended_utc": "2026-11-11T14:17:23.822636+00:00"
+    },
+    "accept": {
+      "schema": 1,
+      "started_utc": "2026-11-11T14:20:49.458656+00:00",
+      "source": "/workspace/mygame",
+      "revision": "dedd7702e722ef181f89899899b6663c10a065af",
+      "dirty_files": [],
+      "phase": "accept",
+      "output": "/workspace/worldview-validation-recovered/native/accept",
+      "display": ":93",
+      "xdg_before": {
+        "data": true,
+        "config": false,
+        "cache": true
+      },
+      "fresh_requested": false,
+      "seed_copied": false,
+      "game_command": [
+        "/opt/godot/4.6.3/Godot_v4.6.3-stable_linux.x86_64",
+        "--path",
+        "/workspace/mygame",
+        "--rendering-method",
+        "gl_compatibility",
+        "--audio-driver",
+        "Dummy",
+        "--resolution",
+        "1152x648",
+        "--script",
+        "res://tools/first30_probe.gd"
+      ],
+      "xorg_command": [
+        "Xorg",
+        ":93",
+        "-config",
+        "/workspace/mygame/tools/playtests/native_xorg_1152.conf",
+        "-noreset",
+        "-nolisten",
+        "tcp"
+      ],
+      "audio": "Dummy: auditory experience unverified",
+      "timeout_seconds": 3600,
+      "xorg_pid": 3103,
+      "godot_pid": 3107,
+      "native_exit_code": 0,
+      "xorg_exit_code": 0,
+      "ended_utc": "2026-11-11T14:21:28.354630+00:00"
+    },
+    "resume": {
+      "schema": 1,
+      "started_utc": "2026-11-11T14:23:04.701663+00:00",
+      "source": "/workspace/mygame",
+      "revision": "dedd7702e722ef181f89899899b6663c10a065af",
+      "dirty_files": [],
+      "phase": "resume",
+      "output": "/workspace/worldview-validation-recovered/native/resume",
+      "display": ":93",
+      "xdg_before": {
+        "data": true,
+        "config": false,
+        "cache": true
+      },
+      "fresh_requested": false,
+      "seed_copied": false,
+      "game_command": [
+        "/opt/godot/4.6.3/Godot_v4.6.3-stable_linux.x86_64",
+        "--path",
+        "/workspace/mygame",
+        "--rendering-method",
+        "gl_compatibility",
+        "--audio-driver",
+        "Dummy",
+        "--resolution",
+        "1152x648",
+        "--script",
+        "res://tools/first30_probe.gd"
+      ],
+      "xorg_command": [
+        "Xorg",
+        ":93",
+        "-config",
+        "/workspace/mygame/tools/playtests/native_xorg_1152.conf",
+        "-noreset",
+        "-nolisten",
+        "tcp"
+      ],
+      "audio": "Dummy: auditory experience unverified",
+      "timeout_seconds": 3600,
+      "xorg_pid": 3257,
+      "godot_pid": 3261,
+      "native_exit_code": 0,
+      "xorg_exit_code": 0,
+      "ended_utc": "2026-11-11T14:23:10.704287+00:00"
+    }
+  },
+  "screenshots": {
+    "01-unawakened.png": "mundane/worldview-01-unawakened.png",
+    "02-defeat.png": "mundane/worldview-failure-01-real-defeat.png",
+    "03-rest.png": "mundane/worldview-recovery-05-real-rest-complete.png",
+    "04-trial-only.png": "mundane/worldview-07-trial-only.png",
+    "05-acceptance-terms.png": "accept-before-fix/worldview-11h-rules-bottom-track-click.png",
+    "06-awakened.png": "accept/worldview-13-awakened.png",
+    "07-fire-combination.png": "accept/worldview-16-real-material-combo.png",
+    "08-cold-resume.png": "resume/worldview-17-awakened-cold-resume.png"
+  },
+  "note": "The accept-before-fix directory was renamed after safe exit; its original launch output field still names accept. No source or save state was injected."
+}

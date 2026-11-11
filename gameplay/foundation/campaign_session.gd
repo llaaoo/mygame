@@ -42,6 +42,7 @@ var _ground_nodes: Dictionary={}
 var _activity_families: Dictionary={}
 var _pending_effect_time: Dictionary={}
 var restoring_effects := false
+var _legacy_player_magic := false
 var save_sections:=SaveSections.new()
 var fieldcraft:=FieldcraftKnowledge.new()
 var encounters:=EncounterCoordinator.new()
@@ -68,18 +69,22 @@ func configure(content: ExplorationContentCatalog,profile: RulesetDefinition) ->
 	for item in ItemCatalog.default_catalog().items: inventory.register_definition(item)
 	for item: EquipmentData in catalog.equipment.values(): inventory.register_definition(item)
 	facts.committed.connect(_on_fact)
-func restore(data: Dictionary) -> bool:
+func restore(data: Dictionary,legacy_journey := false) -> bool:
 	if not valid_snapshot(data): return false
 	if snapshot_read_status(data)!=SaveSections.Status.VALID: return false
 	if data.has("inventory") and not inventory.valid_definitions(data.inventory): return false
 	_pending_effect_time.clear()
 	state=data.duplicate(true)
+	_legacy_player_magic=legacy_journey and not data.get("actors",{}).has("player")
 	inventory.clock_seconds=float(data.get("clock_seconds",0))
 	if data.has("inventory"): inventory.restore(data.inventory)
 	actor_records=data.get("actors",{}).duplicate(true)
 	proficiency=data.get("proficiency",{}).duplicate(true)
 	return save_sections.restore(data)
 func snapshot_read_status(data: Variant) -> int:
+	if data is Dictionary and data.get("actors") is Dictionary:
+		for record: Variant in data.actors.values():
+			if record is Dictionary and record.get("magic") is Dictionary and record.magic.get("schema",1) is int and record.magic.get("schema",1)>1:return SaveSections.Status.UNSUPPORTED
 	return int(save_sections.prepare(data).status)
 static func _valid_relation_state(data: Variant) -> bool:
 	return data is Dictionary and RelationService.valid_dispositions(data.get("dispositions",{})) and RelationService.valid_affiliations(data.get("affiliations",{}))
@@ -89,6 +94,11 @@ func bind_actor(actor: CharacterBody2D,id: String,legacy_counts: Dictionary = {}
 	var context:=ActorContext.new()
 	if not persistent: id="trial.%d.%s"%[region.generation,id]
 	context.actor=actor; context.id=id; context.rules=rules; context.region=region
+	var mana:=actor.get_node_or_null("ManaComponent") as ManaComponent
+	if mana:
+		context.magic=mana.magic_state
+		if id=="player" and _legacy_player_magic:
+			mana.magic_state=ActorMagicState.new();context.magic=mana.magic_state
 	context.items=inventory; context.facts=facts; context.relations=relations
 	context.fieldcraft=fieldcraft
 	var body:=actor.get("character_definition") as ActorCharacterData
@@ -112,6 +122,7 @@ func bind_actor(actor: CharacterBody2D,id: String,legacy_counts: Dictionary = {}
 	context.inspect_requested=inspect_actor
 	context.hostile_requested=hostility_changed
 	actor.actor_context=context
+	if mana:ActorCombatModel.rebuild(actor)
 	actors[id]=weakref(actor)
 	(actor.get_node("BuffManager") as BuffManager).source_resolver=actor_for_id
 	actor.get_node("HealthComponent").died.connect(mark_dead.bind(actor))
@@ -175,6 +186,17 @@ func bind_actor(actor: CharacterBody2D,id: String,legacy_counts: Dictionary = {}
 		if not actor.skill_manager.binding_changed.is_connected(actor.input_controller.shortcut_changed): actor.skill_manager.binding_changed.connect(actor.input_controller.shortcut_changed)
 	return context
 func _restore_actor(actor: CharacterBody2D,record: Dictionary) -> void:
+	var mana:=actor.get_node_or_null("ManaComponent") as ManaComponent
+	var saved_magic: Dictionary=record.get("magic",{})
+	actor.actor_context.magic.deserialize_save_data(saved_magic)
+	# Missing magic belongs to a real old actor record, including old zero-MP
+	# records. It never means the new journey's deliberately unawakened default.
+	if not record.has("magic"):
+		var legacy:=ActorMagicState.new()
+		actor.actor_context.magic.deserialize_save_data(legacy.serialize_save_data())
+	# Only shared attribute bodies own this capacity projection, as in bind_actor.
+	# Legacy preset enemies/bosses keep their encounter-authored HP/damage/speed.
+	if mana:ActorCombatModel.rebuild(actor)
 	if record.get("position") is Array: actor.position=Vector2(float(record.position[0]),float(record.position[1]))
 	if "story_truce" in actor: actor.story_truce=bool(record.get("truce",actor.story_truce))
 	actor.actor_context.actions.stamina.restore(record.get("stamina",{}))
@@ -195,12 +217,14 @@ func _restore_actor(actor: CharacterBody2D,record: Dictionary) -> void:
 	actor.actor_context.martial.restore(record.get("martial",{}))
 	var health:=actor.get_node("HealthComponent") as HealthComponent
 	health.hp=clampi(int(record.get("hp",health.hp)),1,health.max_hp)
-	var mana:=actor.get_node_or_null("ManaComponent") as ManaComponent
 	if mana: mana.mp=clampi(int(record.get("mp",mana.mp)),0,mana.max_mp)
 
 func restore_actor_state(actor: CharacterBody2D) -> void:
 	var id: String=actor.actor_context.id
 	if actor_records.has(id): _restore_actor(actor,actor_records[id])
+	elif id=="player" and _legacy_player_magic:
+		actor.actor_context.magic.deserialize_save_data(ActorMagicState.new().serialize_save_data())
+		ActorCombatModel.rebuild(actor)
 
 func finish_effect_restoration() -> void:
 	restoring_effects=true
@@ -222,7 +246,7 @@ func capture_actors() -> void:
 func _actor_record(actor: CharacterBody2D) -> Dictionary:
 	var health:=actor.get_node("HealthComponent") as HealthComponent
 	var mana:=actor.get_node_or_null("ManaComponent") as ManaComponent
-	return {"provision_schema":1,"effects":(actor.get_node("BuffManager") as BuffManager).campaign_state(),"cooldowns":actor.get_node("SkillManager").campaign_cooldowns(),"buildup":(actor.get_node("BuffManager") as BuffManager).buildup.snapshot(),"updated_at":inventory.clock_seconds,"hp":health.hp,"mp":mana.mp if mana else 0,"position":[actor.position.x,actor.position.y],"region":region.id,"stamina":actor.actor_context.actions.stamina.snapshot(),"needs":actor.actor_context.actions.needs.serialize(),"martial":actor.actor_context.martial.snapshot(),"provisions":(actor.get_node("BuffManager") as BuffManager).provision_state(),"truce":bool(actor.story_truce) if "story_truce" in actor else false,"dead":health.is_dead}
+	return {"magic":actor.actor_context.magic.serialize_save_data(),"provision_schema":1,"effects":(actor.get_node("BuffManager") as BuffManager).campaign_state(),"cooldowns":actor.get_node("SkillManager").campaign_cooldowns(),"buildup":(actor.get_node("BuffManager") as BuffManager).buildup.snapshot(),"updated_at":inventory.clock_seconds,"hp":health.hp,"mp":mana.mp if mana else 0,"position":[actor.position.x,actor.position.y],"region":region.id,"stamina":actor.actor_context.actions.stamina.snapshot(),"needs":actor.actor_context.actions.needs.serialize(),"martial":actor.actor_context.martial.snapshot(),"provisions":(actor.get_node("BuffManager") as BuffManager).provision_state(),"truce":bool(actor.story_truce) if "story_truce" in actor else false,"dead":health.is_dead}
 func snapshot() -> Dictionary:
 	capture_actors()
 	if sync_extra.is_valid(): sync_extra.call()
@@ -393,6 +417,7 @@ static func valid_snapshot(data: Variant) -> bool:
 		var record=data.actors[id]
 		if not id is String or not record is Dictionary or not record.get("hp") is int or record.hp<0 or record.hp>100000 or not record.get("dead") is bool or not record.get("region") is String: return false
 		if not SurvivalNeeds.valid(record.get("needs",{})) or not MartialArts.valid(record.get("martial",{})) or not BuffManager.valid_provisions(record.get("provisions",[])) or not StatusBuildup.valid(record.get("buildup",{})): return false
+		if record.has("magic") and not ActorMagicState.valid_state(record.magic):return false
 		if record.has("provision_schema") and (not record.provision_schema is int or record.provision_schema!=1): return false
 		if record.has("effects") and not BuffManager.valid_campaign_state(record.effects): return false
 		if not SkillManager.valid_campaign_cooldowns(record.get("cooldowns",{})): return false

@@ -1,0 +1,6 @@
+{
+  "reason": "Execution session disappeared while runner and child processes ended; no failed checks recorded, no cgroup OOM events; cause unconfirmed. Workspace intact.",
+  "complete": false,
+  "observed_checks_passed": 68,
+  "time_utc": "2026-11-11T15:09:28.988569+00:00"
+}

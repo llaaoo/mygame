@@ -58,17 +58,24 @@ func rebuild(instances: Array[StatusInstance]) -> void:
 			# Legacy direct rewards become a base delta instead of being lost on expiry.
 			bases[key] += current - float(_last[key])
 			_external[key] = float(_external.get(key, 0)) + current - float(_last[key])
-		var flat := 0.0
-		var percent := 0.0
-		var speed := 1.0
-		for instance in instances:
-			flat += float(instance.definition.stat_modifiers.get(key, 0)) * instance.stacks
-			percent += float(instance.definition.stat_multipliers.get(key, 0)) * instance.stacks
-			if key == "move_speed":
-				speed *= pow(instance.definition.speed_multiplier, instance.stacks)
-		var value := (float(bases[key]) + flat) * maxf(0.0, 1.0 + percent) * speed
-		write_value(key, value)
+		write_value(key,_contributed_value(key,float(bases[key]),instances))
 		_last[key] = read_value(key)
+
+func _contributed_value(key: String,base: float,instances: Array[StatusInstance]) -> float:
+	var flat:=0.0
+	var percent:=0.0
+	var speed:=1.0
+	for instance in instances:
+		flat+=float(instance.definition.stat_modifiers.get(key,0))*instance.stacks
+		percent+=float(instance.definition.stat_multipliers.get(key,0))*instance.stacks
+		if key=="move_speed": speed*=pow(instance.definition.speed_multiplier,instance.stacks)
+	return (base+flat)*maxf(0,1+percent)*speed
+
+func preview_delta(key: String,base_delta: float,instances: Array[StatusInstance]) -> float:
+	# Include a pending legacy delta exactly as rebuild does, without mutating state.
+	var base:=base_value(key)
+	if bases.has(key) and _last.has(key): base+=read_value(key)-float(_last[key])
+	return float(_final_value(key,_contributed_value(key,base+base_delta,instances)))
 
 func read_value(key: String) -> float:
 	var target := _target(key)
@@ -80,7 +87,13 @@ func write_value(key: String, value: float) -> void:
 	var property := "max_mp" if key == "max_mana" else key
 	if not target or property not in target:
 		return
-	target.set(property, value if key == "move_speed" else roundi(maxf(1.0, value) if key in ["max_hp", "max_mana"] else value))
+	target.set(property,_final_value(key,value))
+
+func _final_value(key: String,value: float) -> Variant:
+	if key=="max_hp":
+		var mana:=actor.get_node_or_null("ManaComponent") as ManaComponent
+		if mana:value-=mana.magic_state.hp_cost
+	return value if key=="move_speed" else roundi(maxf(1,value) if key=="max_hp" else maxf(0,value) if key=="max_mana" else value)
 
 func _target(key: String) -> Node:
 	match key:

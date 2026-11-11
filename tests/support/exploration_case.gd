@@ -1,4 +1,5 @@
 extends SceneTree
+const Awake=preload("res://tests/support/awakened_actor_fixture.gd")
 ## Shared fixture only. Test cases never inherit other test cases.
 
 class Target extends CharacterBody2D:
@@ -99,6 +100,7 @@ func _cast(slot: int, direction := Vector2.RIGHT) -> void:
 
 func _sandbox() -> void:
 	await _travel("camp")
+	_check(Awake.awaken(game.player),"Spell sandbox requires explicit awakened eligibility")
 	game.player.global_position = Vector2(12000, 12000)
 	game.player.mana_component.max_mp = 300
 	game.player.mana_component.mp = 300

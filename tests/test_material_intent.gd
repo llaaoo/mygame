@@ -1,4 +1,5 @@
 extends SceneTree
+const Awake=preload("res://tests/support/awakened_actor_fixture.gd")
 const Fixture := preload("res://tests/support/mvp_fixture.gd")
 class Reject extends SkillExecutor:
 	func execute(_skill: SkillData, _ctx: CastContext) -> bool: return false
@@ -11,6 +12,7 @@ func _init() -> void: call_deferred("run")
 func run() -> void:
 	var fixture := Fixture.new(self)
 	var game := await fixture.boot(true)
+	check(Awake.awaken(game.player),"Magic-specific fixture could not establish explicit awakened eligibility")
 	GameRuntime.instance.set_process(false)
 	var player := game.player
 	var sm := player.skill_manager

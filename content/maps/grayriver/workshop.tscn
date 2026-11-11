@@ -75,7 +75,7 @@ target_region = "river_records"
 script = ExtResource("script4")
 id = "town.workshop.ledger"
 title = "作坊作业记录"
-text = "制造从随身的真实物资扣料；寄存箱里的东西要先取出。这里只提供作业台和整备位置。萨芙白天在镇中摊位交易、拆解、强化和接排产；店里的原料与成品归她本人，不会因你进出屋子重新出现。客栈可以寄存物资，公署记录河谷来往。"
+text = "制造从随身的真实物资扣料；寄存箱里的东西要先取出。这里只提供作业台和整备位置。萨芙白天在镇中摊位交易、拆解、强化和接排产；店里的原料与成品归她本人，不会因你进出屋子重新出现。客栈可以寄存物资，公署记录河谷来往。\n\n先从离镇口粮旧械包领短刀，按O穿到主手；工具小刀只用于野外处理，不能代替战斗武器。普通涂料、喷剂与投瓶不需要觉醒。匠人敬炉火，祷词不替你交材料。"
 requires_clear = false
 navigation_hints = [SubResource("nav3_0"), SubResource("nav3_1")]
 [sub_resource type="Resource" id="feature5"]

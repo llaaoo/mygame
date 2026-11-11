@@ -4,6 +4,8 @@
 [ext_resource type="Resource" path="res://content/frontier/equipment/river_maul.tres" id="river_maul"]
 [ext_resource type="Resource" path="res://content/frontier/equipment/river_coat.tres" id="river_coat"]
 [resource]
+magic_aptitude = true
+starts_awakened = false
 script = ExtResource("data")
 id = "river_mauler"
 title = "工区破阵手"

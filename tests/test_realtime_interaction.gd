@@ -1,5 +1,6 @@
 extends "res://tests/support/input_scene_probe.gd"
-## Real keys/mouse, normal AI and default stats; explicit knowledge/stock/position fixture.
+const Awake=preload("res://tests/support/awakened_actor_fixture.gd")
+## Real keys/mouse, normal AI and default stats; explicit awakened caster/stock fixture.
 var commits: Array[Dictionary]=[]
 func mouse(button: MouseButton,pressed: bool,point: Vector2) -> void:
  var event:=InputEventMouseButton.new(); event.button_index=button; event.pressed=pressed; event.position=point; event.global_position=point
@@ -59,6 +60,7 @@ func run() -> void:
  sm.equip_source("left",sm.pool.get_skill("inscribe")); sm.equip_source("quick_e",sm.pool.get_skill("disperse"))
  var instance:=sm.get_instance("left")
  sm.cast_committed.connect(func(plan: CastPlan): commits.append({"label":plan.effect_label,"cost":plan.cost,"source":plan.source}))
+ check(Awake.awaken(actor),"Spell selector input requires explicit awakened eligibility")
  check(actor.health_component.max_hp==100 and actor.mana_component.max_mp==60 ,"UI fixture changed default caps or regeneration")
  store.receive("player","river_sabre",1)
  var blade:=store.find_owned("player","river_sabre")

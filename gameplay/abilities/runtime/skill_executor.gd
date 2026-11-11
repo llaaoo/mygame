@@ -88,6 +88,8 @@ func _apply_stage(ctx: DamageContext, stage: DamageModifier.Stage, trace: Combat
 func execute(skill: SkillData, context: CastContext) -> bool:
 	if not skill or not context or not context.caster:
 		return false
+	var mana:=context.caster.get_node_or_null("ManaComponent") as ManaComponent
+	if mana and not mana.can_cast(skill.requires_magic):return false
 
 	var exec_inst := CombatExecutor.instance
 

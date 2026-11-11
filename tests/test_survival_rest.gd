@@ -1,4 +1,5 @@
 extends SceneTree
+const Awake=preload("res://tests/support/awakened_actor_fixture.gd")
 const Fixture := preload("res://tests/support/mvp_fixture.gd")
 var errors: Array[String] = []
 func _init() -> void: call_deferred("run")
@@ -9,6 +10,7 @@ func check(ok: bool, message: String) -> void:
 func run() -> void:
 	var fixture := Fixture.new(self)
 	var game := await fixture.boot(true)
+	check(Awake.awaken(game.player),"Magic-specific fixture could not establish explicit awakened eligibility")
 	GameRuntime.instance.set_process(false)
 	var player := game.player
 	var service := game.survival

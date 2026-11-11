@@ -17,6 +17,7 @@ import xml.etree.ElementTree as ET
 ROOT = Path(__file__).resolve().parents[1]
 QUICK = ["gut_domain", "save_system", "save_recovery", "skill_catalog", "skill_upgrades", "room_generation"]
 INTEGRATION = [
+    "worldview_journey", "magic_awakening", "mundane_spray_input",
     "content_preflight", "throw_trajectory_input", "item_feedback_input",
     "project_optimization",
     "selector_feedback_input", "accessibility_input",

@@ -5,6 +5,8 @@
 [ext_resource type="Resource" path="res://content/harvesting/hound.tres" id="harvest"]
 [ext_resource type="Resource" path="res://content/animations/hound.tres" id="visual"]
 [resource]
+magic_aptitude = false
+starts_awakened = false
 script = ExtResource("data")
 id = "river_hound"
 title = "芦苇猎犬"

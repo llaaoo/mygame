@@ -23,7 +23,7 @@ static func item_state(actor: Node2D,binding: Dictionary) -> Dictionary:
 	elif SurvivalCatalog.FOODS.has(id): result.detail+="\n站定使用，移动或受伤中断；完成才消费。"
 	elif definition.use_profile:
 		match definition.use_profile.kind:
-			ItemUseDefinition.Kind.SPRAY: result.detail+="\n按住喷洒、松开停止；逐剂支付物品与法力，空瓶停止。"
+			ItemUseDefinition.Kind.SPRAY: result.detail+="\n按住喷洒、松开停止；逐剂消耗这瓶喷剂，不消耗魔力，空瓶停止；法术强化另需觉醒。"
 			ItemUseDefinition.Kind.THROWABLE: result.detail+="\n按住瞄准、松开投掷；右键或Esc取消。"
 			ItemUseDefinition.Kind.CONSUMABLE: result.detail+="\n站定饮用，完成才消费；药效按类别互斥，剩余时长保存。"
 			ItemUseDefinition.Kind.BOOK: result.detail+="\n站定阅读，学会才消费；已学会不会浪费。"
@@ -46,3 +46,7 @@ static func technique_state(actor: Node2D,binding: Dictionary) -> Dictionary:
 	if coating and coating.enchantment: detail+="\n"+context.items.state_text(uid)+"\nShift+武技：消耗整层附魔，释放距离%.0f / 扇面%.0f°。"%[data.release_reach,data.release_angle]
 	else: detail+="\n涂附后可按Shift+武技释放元素；当前没有可用附魔。"
 	return {"title":view.title,"ready":reason.is_empty(),"detail":detail,"linked":view.linked,"element":coating.enchantment.title if coating and coating.enchantment else "","remaining":maxf(0,float(context.martial.ready_at.get(id,0))-context.items.clock_seconds),"cost":view.cost}
+
+static func magic_status(actor: Node2D) -> String:
+	var mana:=actor.get_node_or_null("ManaComponent") as ManaComponent
+	return "法力 %d"%mana.max_mp if mana and mana.can_cast() else "未觉醒"

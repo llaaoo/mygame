@@ -58,6 +58,9 @@ func live_fields() -> Array[FireSigil]:
 
 func build_plan(skill: SkillData, actor: Node2D, empower: bool = false,selection: Dictionary={}) -> CastPlan:
 	var operation:=not skill.operation_id.is_empty()
+	var spray:=skill.operation_id=="disperse"
+	var requested_modifier:=str(selection.get("modifier",supplies.modifiers.get(skill.get_id(),"")))
+	var requires_magic:=skill.requires_magic or spray and (not requested_modifier.is_empty() or empower)
 	var primary := supplies.operation_plan(skill, _manager, null, false,selection) if operation else {}
 	var basis: SkillData=primary.skill if operation else skill
 	if operation:
@@ -68,7 +71,7 @@ func build_plan(skill: SkillData, actor: Node2D, empower: bool = false,selection
 	var explicit_source:=skill.operation_id in ["attune","extract"] or (medium!=null and medium.source_kind=="field")
 	var candidate_fields:=source_fields if explicit_source else live_fields()
 	var components: Array[CastComponent] = []
-	if not skill.conditional_cast or skill.operation_id=="extract":
+	if not requires_magic or spray or not skill.conditional_cast or skill.operation_id=="extract":
 		components.append(SpellCombinationResolver.base_plan(basis))
 	elif allow_layered_fields:
 		components = SpellCombinationResolver.resolve_components(basis, candidate_fields, actor, rules, learned_rules, empower, rule_index, supplies)
@@ -81,6 +84,7 @@ func build_plan(skill: SkillData, actor: Node2D, empower: bool = false,selection
 		components[0].field=source_fields[0]
 		components[0].version=source_fields[0].revision
 	var result := CastPlan.new()
+	result.requires_magic=requires_magic
 	result.selection=selection.duplicate(true)
 	result.rule_id = components[0].rule_id
 	result.field = components[0].field
@@ -91,8 +95,8 @@ func build_plan(skill: SkillData, actor: Node2D, empower: bool = false,selection
 	result.cooldown = 0.0
 	result.preparation = 0.0
 	result.field_bonus = 0.0
-	result.action_cooldown = _manager.effective_cooldown(skill, actor, skill.cooldown)
-	result.signature = [["action_cooldown", result.action_cooldown]]
+	result.action_cooldown = _manager.effective_cooldown(skill, actor, skill.cooldown) if requires_magic else skill.cooldown
+	result.signature = [["action_cooldown", result.action_cooldown],["magic",requires_magic]]
 	if operation:
 		result.signature.append(["payload",medium.id if medium else "",selection.get("uid",supplies.prepared_uids.get(skill.get_id(),""))])
 	if skill.operation_id=="extract" and basis.buff_resource:
@@ -124,7 +128,7 @@ func build_plan(skill: SkillData, actor: Node2D, empower: bool = false,selection
 	var charged_boons: Dictionary = {}
 	var names: Array[String] = []
 	var infusion_fields: Array[FireSigil]=[]
-	if not explicit_source: infusion_fields.assign(live_fields())
+	if requires_magic and not explicit_source: infusion_fields.assign(live_fields())
 	# Active combinations have first claim; a field charge cannot fund two components.
 	for component in components:
 		if component.field != null:
@@ -149,10 +153,10 @@ func build_plan(skill: SkillData, actor: Node2D, empower: bool = false,selection
 			var entry: CastingMaterialData = supplies.catalog[material.material_id]
 			var purpose := "替代地面准备恩赐，不附加投射物改造；额外%d MP（修正前）" % entry.extra_mana if not component.substitute_material.is_empty() else entry.description
 			result.explanation.append(CastExplanationStep.new("material", entry.id, entry.title + "：" + purpose))
-		var boon := BoonSpellModifier.plan(material.skill, actor, empower)
+		var boon := BoonSpellModifier.plan(material.skill, actor, empower) if requires_magic else {"skill":material.skill,"conditions":[] as Array[CastStatusRequirement],"retained":[],"spent":[],"partial":[]}
 		component.skill = boon.skill
 		component.boon_conditions = boon.conditions
-		var infusion_cost := MediumInfusion.plan(component, actor, infusion_fields, empower)
+		var infusion_cost := MediumInfusion.plan(component, actor, infusion_fields, empower) if requires_magic else 0
 		if not component.infusion_label.is_empty():
 			result.infusions.append(component.infusion_label)
 			result.explanation.append(CastExplanationStep.new("equipment", "medium_infusion", component.infusion_label + "，额外%d MP（修正前），落点不变" % infusion_cost))
@@ -186,8 +190,11 @@ func build_plan(skill: SkillData, actor: Node2D, empower: bool = false,selection
 				var title: String = {"echo_ready": "回响印记", "resonant_guard": "共鸣护盾", "soul_charge": "蕴魂1层"}.get(component.status_id, component.status_id)
 				if title not in result.consumed_boons:
 					result.consumed_boons.append(title)
-		component.cost = _manager.effective_mana_cost(component.skill, actor, int(component.cost) + int(material.extra_mana) + boon_cost + infusion_cost)
-		component.cooldown = _manager.effective_cooldown(component.skill, actor, component.cooldown)
+		component.cost = _manager.effective_mana_cost(component.skill, actor, int(component.cost) + int(material.extra_mana) + boon_cost + infusion_cost) if requires_magic else 0
+		component.cooldown = _manager.effective_cooldown(component.skill, actor, component.cooldown) if requires_magic else component.cooldown
+		if spray:
+			component.skill=component.skill.create_runtime_variant()
+			component.skill.requires_magic=requires_magic
 		component.material_costs = material.costs
 		component.material_id = material.material_id
 		component.field_bonus = material.field_bonus
@@ -195,14 +202,20 @@ func build_plan(skill: SkillData, actor: Node2D, empower: bool = false,selection
 		result.cooldown_keys[key] = component.cooldown
 		result.cost += component.cost
 		result.cooldown = maxf(result.cooldown, component.cooldown)
-		result.preparation = maxf(result.preparation, component.preparation * fatigue_factor * (stats.preparation_multiplier if stats else 1.0) * clampf(1.0 + (equipment.casting_value("preparation_bonus") if equipment else 0.0), 0.5, 1.5))
+		result.preparation = maxf(result.preparation, component.preparation * fatigue_factor * (stats.preparation_multiplier if stats else 1.0) * clampf(1.0 + (equipment.casting_value("preparation_bonus") if equipment and requires_magic else 0.0), 0.5, 1.5))
 		result.field_bonus = maxf(result.field_bonus, component.field_bonus)
 		for id in material.costs:
 			result.material_costs[id] = int(result.material_costs.get(id, 0)) + int(material.costs[id])
 		result.signature.append(component.fingerprint())
 		result.signature.append([result.modifier_id,result.instance_costs.duplicate(true)])
 		names.append(component.skill.display_name + ("〔" + component.medium_label + "〕" if not component.medium_label.is_empty() else ""))
+	if spray and not requested_modifier.is_empty() and result.modifier_id!=requested_modifier: result.operation_reason="所选喷洒法术修饰不适配；不会改用普通喷洒"
+	if spray and empower and result.consumed_boons.is_empty() and result.partial_boons.is_empty() and result.infusions.is_empty() and requested_modifier.is_empty(): result.operation_reason="没有可释放的法术恩赐或灌注来源；不会改用普通喷洒"
 	result.skill = components[0].skill
+	if spray:
+		result.delivery_reach=maxf(1,120.0+result.skill.aoe_radius-skill.aoe_radius)
+		result.delivery_angle=60.0
+		result.signature.append(["delivery",result.delivery_reach,result.delivery_angle])
 	if explicit_source and medium and medium.source_kind=="field" and source_fields.is_empty(): result.operation_reason="所选法阵不在脚下或充能已耗尽；不会替换来源"
 	if medium and medium.required_rule and not components.any(func(component: CastComponent): return component.rule_id==medium.required_rule.id):
 		result.operation_reason=("尚未掌握这个地面组合：" if not learned_rules.has(medium.required_rule.id) else "需要：")+medium.required_rule.condition_label()
@@ -216,7 +229,7 @@ func build_plan(skill: SkillData, actor: Node2D, empower: bool = false,selection
 			if component.skill.buff_duration > 0: shape += "；本次持续%.1f秒" % component.skill.buff_duration
 		var affinity := ElementCatalog.affinity_label(component.skill.tags)
 		if "spray" in component.skill.tags:
-			shape="，前方120、60°锥形；按住持续，松开即停"
+			shape="，前方%.0f、60°锥形；按住持续，松开即停"%maxf(1,120.0+component.skill.aoe_radius-skill.aoe_radius)
 		elif component.skill.skill_type == SkillData.SkillType.AOE:
 			shape = "，半径%.0f" % (component.skill.aoe_visual.radius if component.skill.aoe_visual else component.skill.aoe_radius)
 		elif component.skill.skill_type == SkillData.SkillType.PROJECTILE:
@@ -229,7 +242,7 @@ func build_plan(skill: SkillData, actor: Node2D, empower: bool = false,selection
 	var material_label:=supplies.describe_cost(result.material_costs) if not result.material_costs.is_empty() else "无材料消耗"
 	if not result.instance_costs.is_empty():
 		material_label="每次脉冲消费所选瓶内1剂"
-	result.explanation.append(CastExplanationStep.new("cost", "total", "总计%d MP；准备%.2f秒；%s" % [result.cost, result.preparation, material_label]))
+	result.explanation.append(CastExplanationStep.new("cost", "total", "总计%s；准备%.2f秒；%s" % [result.cost_label(), result.preparation, material_label]))
 	return result
 
 func boon_hint(plan: CastPlan) -> String:
@@ -299,6 +312,7 @@ func _preview_costed(skill: SkillData, actor: Node2D, empower: bool, pulse_cost:
 	if not _manager.can_act(actor):
 		result.reason = "麻痹中，无法施法"
 	if skill.combination_only: result.reason = "组合结果须通过基础动作与现场条件触发"
+	if mana and not mana.cast_reason(result.requires_magic).is_empty(): result.reason=mana.cast_reason(result.requires_magic)
 	result.ready = result.reason.is_empty()
 	return result
 
@@ -427,6 +441,9 @@ func _commit() -> void:
 		cancel("组合条件或素材已改变，未扣费")
 		return
 	var mana := actor.get_node_or_null("ManaComponent") as ManaComponent
+	if mana and not mana.cast_reason(plan.requires_magic).is_empty():
+		cancel(mana.cast_reason(plan.requires_magic))
+		return
 	if mana and mana.mp < int(plan.cost):
 		cancel("组合总法力不足，未扣费")
 		return

@@ -1,0 +1,1539 @@
+{
+  "schema": 2,
+  "created_utc": "2026-11-11T14:26:41.653420+00:00",
+  "base": "/workspace/worldview-validation-recovered/native",
+  "status": "Recovered environment native journey completed; all four native processes and Xorg exited before parent archive/full regression.",
+  "lost_evidence_policy": "Uses only newly generated workspace evidence. Earlier/tmp evidence was lost on environment remount and is not used as proof.",
+  "versions": {
+    "mundane_and_pre_fix_terms": "d5c7e6ad34306b03c4f3b8677ea673f506d1fe7f",
+    "accept_and_resume": "dedd7702e722ef181f89899899b6663c10a065af",
+    "boundary": "Same normal game-generated character was saved at the trial site, exited, then resumed after a separately committed shared field-work cancellation fix. No new journey, save seed replacement or state injection.",
+    "native_git_archive_run": false,
+    "postfix_limit": "Post-fix native acceptance/spells/cold resume passed. The exact food-expiry event was not deliberately reproduced natively after its effect had already expired; the separate matching3/3 regression is parent evidence, not a native claim."
+  },
+  "assistance": {
+    "normal_ai": true,
+    "native_graphics": "X11 :93,1152x648,OpenGL compatibility; exact commands/platform warnings in launch.json/runtime.log",
+    "input": "Real keyboard/pointer events; known-route navigation and known-target basic movement/aim/physical cadence assistance. No human/blind-play or reaction/balance claim.",
+    "no_grants_teleports_frozen_ai_or_domain_completion_calls": true,
+    "fresh_xdg": "mundane/launch.json records all data/config/cache absent and fresh requested; runner has no seed-copy operation.",
+    "audio": "Dummy; hearing/audio quality unvalidated",
+    "timing": "Process active/wall time includes real input, reading/tool delays, failure diagnosis and deliberate recovery. Campaign clock additionally includes rescue2h and paid rest3h. None is a human30-45min/2h content-length measure."
+  },
+  "phases": {
+    "mundane": {
+      "launch": "mundane/launch.json",
+      "source_revision": "d5c7e6ad34306b03c4f3b8677ea673f506d1fe7f",
+      "source_dirty_files": [],
+      "ready": "mundane/ready.json",
+      "end": "mundane/result.json",
+      "requests": 218.0,
+      "probe_active_seconds": 1037.62376866659,
+      "ready_to_end_wall_seconds": 1075.445841,
+      "campaign_clock_before": 0.128390666666667,
+      "campaign_clock_after": 1337.69799266648,
+      "player_before": {
+        "art_window": {},
+        "attacks": 0,
+        "base": true,
+        "channel_source": "",
+        "charge_source": "",
+        "counter_remaining": 0.0,
+        "damage_taken": 0,
+        "dead": false,
+        "guarding": false,
+        "health_decreases": 0,
+        "hp": 100,
+        "max_hp": 100,
+        "max_mp": 0,
+        "max_stamina": 100.0,
+        "mode": "idle",
+        "mp": 0,
+        "position": [
+          -3700.0,
+          2100.0
+        ],
+        "stamina": 100.0,
+        "ui_blocked": true
+      },
+      "player_after": {
+        "art_window": {},
+        "attacks": 13,
+        "base": true,
+        "channel_source": "",
+        "charge_source": "",
+        "counter_remaining": 0.0,
+        "damage_taken": 166,
+        "dead": false,
+        "guarding": false,
+        "health_decreases": 176,
+        "hp": 100,
+        "max_hp": 100,
+        "max_mp": 0,
+        "max_stamina": 100.0,
+        "mode": "idle",
+        "mp": 0,
+        "position": [
+          -3209.71142578125,
+          2219.25073242188
+        ],
+        "stamina": 100.0,
+        "ui_blocked": false
+      },
+      "magic_after": {
+        "aptitude": true,
+        "awakened": false,
+        "hp_cost": 0,
+        "legacy_exempt": false,
+        "mana_base": 60,
+        "schema": 1,
+        "source_id": "",
+        "stamina_cost": 0.0
+      },
+      "exit_code": 0,
+      "driver_error": null,
+      "runtime_errors": [],
+      "warnings": [
+        "WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver."
+      ],
+      "normal_ai_in_all_command_samples": true
+    },
+    "accept-before-fix": {
+      "launch": "accept-before-fix/launch.json",
+      "source_revision": "d5c7e6ad34306b03c4f3b8677ea673f506d1fe7f",
+      "source_dirty_files": [],
+      "ready": "accept-before-fix/ready.json",
+      "end": "accept-before-fix/result.json",
+      "requests": 19.0,
+      "probe_active_seconds": 88.4284626666671,
+      "ready_to_end_wall_seconds": 91.708614,
+      "campaign_clock_before": 1337.43812666648,
+      "campaign_clock_after": 1425.84575599975,
+      "player_before": {
+        "art_window": {},
+        "attacks": 0,
+        "base": true,
+        "channel_source": "",
+        "charge_source": "",
+        "counter_remaining": 0.0,
+        "damage_taken": 0,
+        "dead": false,
+        "guarding": false,
+        "health_decreases": 0,
+        "hp": 100,
+        "max_hp": 100,
+        "max_mp": 0,
+        "max_stamina": 100.0,
+        "mode": "idle",
+        "mp": 0,
+        "position": [
+          -3209.71142578125,
+          2219.25073242188
+        ],
+        "stamina": 100.0,
+        "ui_blocked": true
+      },
+      "player_after": {
+        "art_window": {},
+        "attacks": 0,
+        "base": false,
+        "channel_source": "",
+        "charge_source": "",
+        "counter_remaining": 0.0,
+        "damage_taken": 0,
+        "dead": false,
+        "guarding": false,
+        "health_decreases": 0,
+        "hp": 100,
+        "max_hp": 100,
+        "max_mp": 0,
+        "max_stamina": 100.0,
+        "mode": "idle",
+        "mp": 0,
+        "position": [
+          -784.998107910156,
+          -486.001922607422
+        ],
+        "stamina": 100.0,
+        "ui_blocked": false
+      },
+      "magic_after": {
+        "aptitude": true,
+        "awakened": false,
+        "hp_cost": 0,
+        "legacy_exempt": false,
+        "mana_base": 60,
+        "schema": 1,
+        "source_id": "",
+        "stamina_cost": 0.0
+      },
+      "exit_code": 0,
+      "driver_error": null,
+      "runtime_errors": [],
+      "warnings": [
+        "WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver."
+      ],
+      "normal_ai_in_all_command_samples": true
+    },
+    "accept": {
+      "launch": "accept/launch.json",
+      "source_revision": "dedd7702e722ef181f89899899b6663c10a065af",
+      "source_dirty_files": [],
+      "ready": "accept/ready.json",
+      "end": "accept/result.json",
+      "requests": 30.0,
+      "probe_active_seconds": 33.9898773333334,
+      "ready_to_end_wall_seconds": 34.380922,
+      "campaign_clock_before": 1425.66450966641,
+      "campaign_clock_after": 1459.63117633306,
+      "player_before": {
+        "art_window": {},
+        "attacks": 0,
+        "base": false,
+        "channel_source": "",
+        "charge_source": "",
+        "counter_remaining": 0.0,
+        "damage_taken": 0,
+        "dead": false,
+        "guarding": false,
+        "health_decreases": 0,
+        "hp": 100,
+        "max_hp": 100,
+        "max_mp": 0,
+        "max_stamina": 100.0,
+        "mode": "idle",
+        "mp": 0,
+        "position": [
+          -784.998107910156,
+          -486.001922607422
+        ],
+        "stamina": 100.0,
+        "ui_blocked": true
+      },
+      "player_after": {
+        "art_window": {},
+        "attacks": 0,
+        "base": false,
+        "channel_source": "",
+        "charge_source": "",
+        "counter_remaining": 0.0,
+        "damage_taken": 0,
+        "dead": false,
+        "guarding": false,
+        "health_decreases": 10,
+        "hp": 90,
+        "max_hp": 90,
+        "max_mp": 60,
+        "max_stamina": 90.0,
+        "mode": "idle",
+        "mp": 34,
+        "position": [
+          -784.998107910156,
+          -491.501953125
+        ],
+        "stamina": 90.0,
+        "ui_blocked": false
+      },
+      "magic_after": {
+        "aptitude": true,
+        "awakened": true,
+        "hp_cost": 10,
+        "legacy_exempt": false,
+        "mana_base": 60,
+        "schema": 1,
+        "source_id": "awakening.archive",
+        "stamina_cost": 10.0
+      },
+      "exit_code": 0,
+      "driver_error": null,
+      "runtime_errors": [],
+      "warnings": [
+        "WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver."
+      ],
+      "normal_ai_in_all_command_samples": true
+    },
+    "resume": {
+      "launch": "resume/launch.json",
+      "source_revision": "dedd7702e722ef181f89899899b6663c10a065af",
+      "source_dirty_files": [],
+      "ready": "resume/ready.json",
+      "end": "resume/result.json",
+      "requests": 3.0,
+      "probe_active_seconds": 0.798486666666667,
+      "ready_to_end_wall_seconds": 0.656899,
+      "campaign_clock_before": 1459.54396533306,
+      "campaign_clock_after": 1460.31953533306,
+      "player_before": {
+        "art_window": {},
+        "attacks": 0,
+        "base": false,
+        "channel_source": "",
+        "charge_source": "",
+        "counter_remaining": 0.0,
+        "damage_taken": 0,
+        "dead": false,
+        "guarding": false,
+        "health_decreases": 0,
+        "hp": 90,
+        "max_hp": 90,
+        "max_mp": 60,
+        "max_stamina": 90.0,
+        "mode": "idle",
+        "mp": 34,
+        "position": [
+          -784.998107910156,
+          -491.501953125
+        ],
+        "stamina": 90.0,
+        "ui_blocked": true
+      },
+      "player_after": {
+        "art_window": {},
+        "attacks": 0,
+        "base": false,
+        "channel_source": "",
+        "charge_source": "",
+        "counter_remaining": 0.0,
+        "damage_taken": 0,
+        "dead": false,
+        "guarding": false,
+        "health_decreases": 0,
+        "hp": 90,
+        "max_hp": 90,
+        "max_mp": 60,
+        "max_stamina": 90.0,
+        "mode": "idle",
+        "mp": 34,
+        "position": [
+          -784.998107910156,
+          -491.501953125
+        ],
+        "stamina": 90.0,
+        "ui_blocked": false
+      },
+      "magic_after": {
+        "aptitude": true,
+        "awakened": true,
+        "hp_cost": 10,
+        "legacy_exempt": false,
+        "mana_base": 60,
+        "schema": 1,
+        "source_id": "awakening.archive",
+        "stamina_cost": 10.0
+      },
+      "exit_code": 0,
+      "driver_error": null,
+      "runtime_errors": [],
+      "warnings": [
+        "WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver."
+      ],
+      "normal_ai_in_all_command_samples": true
+    }
+  },
+  "battles": [
+    {
+      "snapshot": "mundane/step_0066.json",
+      "target": "river.enemy.camp.forest.3",
+      "style": "basic",
+      "killed": true,
+      "window_seconds": 3.50254183164989,
+      "window_wall_seconds": 3.743215,
+      "window_damage": 34,
+      "before_hp": 100,
+      "after_hp": 66,
+      "before_mp": 0,
+      "after_mp": 0,
+      "gear_before": [
+        {
+          "uid": "item.120",
+          "definition": "river_sabre",
+          "coating": {
+            "expires_at": 139.34872,
+            "id": "fire_rag"
+          },
+          "coating_effective_at_start": true
+        }
+      ],
+      "observed_target_statuses": {
+        "": {
+          "remaining": 0.0,
+          "t": 109.526402666667
+        },
+        "burning": {
+          "remaining": 4.0,
+          "t": 112.047806666667
+        }
+      },
+      "physical_sequence_delta": 3,
+      "spell_commits_in_window": 0
+    },
+    {
+      "snapshot": "mundane/step_0092.json",
+      "target": "river.enemy.river_archive.river_archive.1",
+      "style": "basic",
+      "killed": true,
+      "window_seconds": 3.9569627575757,
+      "window_wall_seconds": 4.159734,
+      "window_damage": 56,
+      "before_hp": 80,
+      "after_hp": 25,
+      "before_mp": 0,
+      "after_mp": 0,
+      "gear_before": [
+        {
+          "uid": "item.31",
+          "definition": "river_sabre",
+          "coating": {
+            "expires_at": 170.959610666667,
+            "id": "poison_rag"
+          },
+          "coating_effective_at_start": true
+        },
+        {
+          "uid": "item.32",
+          "definition": "river_coat",
+          "coating": null,
+          "coating_effective_at_start": false
+        }
+      ],
+      "observed_target_statuses": {
+        "": {
+          "remaining": 0.0,
+          "t": 139.376402666666
+        },
+        "poison": {
+          "remaining": 4.96904761904762,
+          "t": 141.355587714285
+        }
+      },
+      "physical_sequence_delta": 4,
+      "spell_commits_in_window": 0
+    },
+    {
+      "snapshot": "mundane/step_0101.json",
+      "target": "river.enemy.river_archive.river_archive.2",
+      "style": "basic",
+      "killed": false,
+      "window_seconds": 0.628499809523845,
+      "window_wall_seconds": 0.930069,
+      "window_damage": 13,
+      "before_hp": 13,
+      "after_hp": 0,
+      "before_mp": 0,
+      "after_mp": 0,
+      "gear_before": [
+        {
+          "uid": "item.31",
+          "definition": "river_sabre",
+          "coating": {
+            "expires_at": 170.959610666667,
+            "id": "poison_rag"
+          },
+          "coating_effective_at_start": true
+        },
+        {
+          "uid": "item.32",
+          "definition": "river_coat",
+          "coating": null,
+          "coating_effective_at_start": false
+        }
+      ],
+      "observed_target_statuses": {
+        "": {
+          "remaining": 0.0,
+          "t": 149.993031
+        }
+      },
+      "physical_sequence_delta": 1,
+      "spell_commits_in_window": 0
+    },
+    {
+      "snapshot": "mundane/step_0131.json",
+      "target": "river.enemy.river_archive.river_archive.2",
+      "style": "basic",
+      "killed": true,
+      "window_seconds": 1.31944444444491,
+      "window_wall_seconds": 1.553523,
+      "window_damage": 12,
+      "before_hp": 98,
+      "after_hp": 86,
+      "before_mp": 0,
+      "after_mp": 0,
+      "gear_before": [
+        {
+          "uid": "item.31",
+          "definition": "river_sabre",
+          "coating": {
+            "expires_at": 170.959610666667,
+            "id": "poison_rag"
+          },
+          "coating_effective_at_start": false
+        },
+        {
+          "uid": "item.32",
+          "definition": "river_coat",
+          "coating": null,
+          "coating_effective_at_start": false
+        }
+      ],
+      "observed_target_statuses": {
+        "": {
+          "remaining": 0.0,
+          "t": 626.568069333321
+        }
+      },
+      "physical_sequence_delta": 2,
+      "spell_commits_in_window": 0
+    },
+    {
+      "snapshot": "mundane/step_0143.json",
+      "target": "river.enemy.river_archive.river_archive.3",
+      "style": "basic",
+      "killed": true,
+      "window_seconds": 2.07979544444436,
+      "window_wall_seconds": 2.492368,
+      "window_damage": 12,
+      "before_hp": 110,
+      "after_hp": 98,
+      "before_mp": 0,
+      "after_mp": 0,
+      "gear_before": [
+        {
+          "uid": "item.31",
+          "definition": "river_sabre",
+          "coating": {
+            "expires_at": 170.959610666667,
+            "id": "poison_rag"
+          },
+          "coating_effective_at_start": false
+        },
+        {
+          "uid": "item.32",
+          "definition": "river_coat",
+          "coating": null,
+          "coating_effective_at_start": false
+        }
+      ],
+      "observed_target_statuses": {},
+      "physical_sequence_delta": 3,
+      "spell_commits_in_window": 0
+    }
+  ],
+  "damage_accounting": {
+    "all_five_attempt_windows": 127,
+    "successful_four_windows": 114,
+    "whole_mundane_damage_taken": 166,
+    "outside_duel_windows": 39,
+    "raw_health_decreases": 176,
+    "raw_minus_actual_damage": 10,
+    "observed_deaths": 1,
+    "note": "Second guard first attempt is an actual defeat, not a kill. Retry is the same persistent world/enemy, not a fresh-target balance sample. Food cap reduction is not combat damage."
+  },
+  "ordinary_items": {
+    "coating": {
+      "snapshot": "mundane/step_0040.json",
+      "screenshot": "mundane/worldview-02-mundane-coating.png",
+      "magic": {
+        "aptitude": true,
+        "awakened": false,
+        "hp_cost": 0,
+        "legacy_exempt": false,
+        "mana_base": 60,
+        "schema": 1,
+        "source_id": "",
+        "stamina_cost": 0.0
+      },
+      "mp": 0,
+      "max_mp": 0,
+      "player_casts": [],
+      "item_events": [
+        {
+          "data": {
+            "item": "fire_rag",
+            "weapon_uid": "item.120"
+          },
+          "kind": "item_action_committed",
+          "t": 79.2203293333333
+        }
+      ],
+      "notice": "",
+      "items": [
+        {
+          "definition": "charcoal",
+          "properties": {},
+          "quantity": 4,
+          "uid": "item.109"
+        },
+        {
+          "definition": "sap",
+          "properties": {},
+          "quantity": 2,
+          "uid": "item.113"
+        },
+        {
+          "definition": "ration",
+          "properties": {},
+          "quantity": 2,
+          "uid": "item.115"
+        },
+        {
+          "definition": "grain",
+          "properties": {},
+          "quantity": 3,
+          "uid": "item.116"
+        },
+        {
+          "definition": "herb",
+          "properties": {},
+          "quantity": 2,
+          "uid": "item.117"
+        },
+        {
+          "definition": "clean_water",
+          "properties": {},
+          "quantity": 3,
+          "uid": "item.118"
+        },
+        {
+          "definition": "cloth",
+          "properties": {},
+          "quantity": 3,
+          "uid": "item.121"
+        },
+        {
+          "definition": "resin_sprayer",
+          "properties": {
+            "doses": 3
+          },
+          "quantity": 1,
+          "uid": "item.124"
+        },
+        {
+          "definition": "oil_bottle",
+          "properties": {},
+          "quantity": 1,
+          "uid": "item.125"
+        },
+        {
+          "definition": "fire_stone",
+          "properties": {},
+          "quantity": 1,
+          "uid": "item.126"
+        }
+      ],
+      "gear": [
+        {
+          "definition": "river_sabre",
+          "properties": {
+            "coating": {
+              "expires_at": 139.34872,
+              "id": "fire_rag"
+            }
+          },
+          "quantity": 1,
+          "uid": "item.120"
+        }
+      ]
+    },
+    "spray": {
+      "snapshot": "mundane/step_0046.json",
+      "screenshot": "mundane/worldview-03-mundane-spray.png",
+      "magic": {
+        "aptitude": true,
+        "awakened": false,
+        "hp_cost": 0,
+        "legacy_exempt": false,
+        "mana_base": 60,
+        "schema": 1,
+        "source_id": "",
+        "stamina_cost": 0.0
+      },
+      "mp": 0,
+      "max_mp": 0,
+      "player_casts": [],
+      "item_events": [
+        {
+          "data": {
+            "item": "fire_rag",
+            "weapon_uid": "item.120"
+          },
+          "kind": "item_action_committed",
+          "t": 79.2203293333333
+        },
+        {
+          "data": {
+            "uid": "item.124"
+          },
+          "kind": "spray_pulse",
+          "t": 85.0413643333333
+        }
+      ],
+      "notice": "",
+      "items": [
+        {
+          "definition": "charcoal",
+          "properties": {},
+          "quantity": 4,
+          "uid": "item.109"
+        },
+        {
+          "definition": "sap",
+          "properties": {},
+          "quantity": 2,
+          "uid": "item.113"
+        },
+        {
+          "definition": "ration",
+          "properties": {},
+          "quantity": 2,
+          "uid": "item.115"
+        },
+        {
+          "definition": "grain",
+          "properties": {},
+          "quantity": 3,
+          "uid": "item.116"
+        },
+        {
+          "definition": "herb",
+          "properties": {},
+          "quantity": 2,
+          "uid": "item.117"
+        },
+        {
+          "definition": "clean_water",
+          "properties": {},
+          "quantity": 3,
+          "uid": "item.118"
+        },
+        {
+          "definition": "cloth",
+          "properties": {},
+          "quantity": 3,
+          "uid": "item.121"
+        },
+        {
+          "definition": "resin_sprayer",
+          "properties": {
+            "doses": 2
+          },
+          "quantity": 1,
+          "uid": "item.124"
+        },
+        {
+          "definition": "oil_bottle",
+          "properties": {},
+          "quantity": 1,
+          "uid": "item.125"
+        },
+        {
+          "definition": "fire_stone",
+          "properties": {},
+          "quantity": 1,
+          "uid": "item.126"
+        }
+      ],
+      "gear": [
+        {
+          "definition": "river_sabre",
+          "properties": {
+            "coating": {
+              "expires_at": 139.34872,
+              "id": "fire_rag"
+            }
+          },
+          "quantity": 1,
+          "uid": "item.120"
+        }
+      ]
+    },
+    "throw": {
+      "snapshot": "mundane/step_0051.json",
+      "screenshot": "mundane/worldview-04-mundane-throw.png",
+      "magic": {
+        "aptitude": true,
+        "awakened": false,
+        "hp_cost": 0,
+        "legacy_exempt": false,
+        "mana_base": 60,
+        "schema": 1,
+        "source_id": "",
+        "stamina_cost": 0.0
+      },
+      "mp": 0,
+      "max_mp": 0,
+      "player_casts": [],
+      "item_events": [
+        {
+          "data": {
+            "item": "fire_rag",
+            "weapon_uid": "item.120"
+          },
+          "kind": "item_action_committed",
+          "t": 79.2203293333333
+        },
+        {
+          "data": {
+            "uid": "item.124"
+          },
+          "kind": "spray_pulse",
+          "t": 85.0413643333333
+        },
+        {
+          "data": {
+            "item": "oil_bottle",
+            "weapon_uid": "item.120"
+          },
+          "kind": "item_action_committed",
+          "t": 90.9030693333332
+        }
+      ],
+      "notice": "",
+      "items": [
+        {
+          "definition": "charcoal",
+          "properties": {},
+          "quantity": 4,
+          "uid": "item.109"
+        },
+        {
+          "definition": "sap",
+          "properties": {},
+          "quantity": 2,
+          "uid": "item.113"
+        },
+        {
+          "definition": "ration",
+          "properties": {},
+          "quantity": 2,
+          "uid": "item.115"
+        },
+        {
+          "definition": "grain",
+          "properties": {},
+          "quantity": 3,
+          "uid": "item.116"
+        },
+        {
+          "definition": "herb",
+          "properties": {},
+          "quantity": 2,
+          "uid": "item.117"
+        },
+        {
+          "definition": "clean_water",
+          "properties": {},
+          "quantity": 3,
+          "uid": "item.118"
+        },
+        {
+          "definition": "cloth",
+          "properties": {},
+          "quantity": 3,
+          "uid": "item.121"
+        },
+        {
+          "definition": "resin_sprayer",
+          "properties": {
+            "doses": 2
+          },
+          "quantity": 1,
+          "uid": "item.124"
+        },
+        {
+          "definition": "fire_stone",
+          "properties": {},
+          "quantity": 1,
+          "uid": "item.126"
+        }
+      ],
+      "gear": [
+        {
+          "definition": "river_sabre",
+          "properties": {
+            "coating": {
+              "expires_at": 139.34872,
+              "id": "fire_rag"
+            }
+          },
+          "quantity": 1,
+          "uid": "item.120"
+        }
+      ]
+    },
+    "spell_refusal": {
+      "snapshot": "mundane/step_0054.json",
+      "screenshot": "mundane/worldview-05-casting-refusal.png",
+      "magic": {
+        "aptitude": true,
+        "awakened": false,
+        "hp_cost": 0,
+        "legacy_exempt": false,
+        "mana_base": 60,
+        "schema": 1,
+        "source_id": "",
+        "stamina_cost": 0.0
+      },
+      "mp": 0,
+      "max_mp": 0,
+      "player_casts": [],
+      "item_events": [
+        {
+          "data": {
+            "item": "fire_rag",
+            "weapon_uid": "item.120"
+          },
+          "kind": "item_action_committed",
+          "t": 79.2203293333333
+        },
+        {
+          "data": {
+            "uid": "item.124"
+          },
+          "kind": "spray_pulse",
+          "t": 85.0413643333333
+        },
+        {
+          "data": {
+            "item": "oil_bottle",
+            "weapon_uid": "item.120"
+          },
+          "kind": "item_action_committed",
+          "t": 90.9030693333332
+        }
+      ],
+      "notice": "火花：尚未觉醒魔力，不能施展法术",
+      "items": [
+        {
+          "definition": "charcoal",
+          "properties": {},
+          "quantity": 4,
+          "uid": "item.109"
+        },
+        {
+          "definition": "sap",
+          "properties": {},
+          "quantity": 2,
+          "uid": "item.113"
+        },
+        {
+          "definition": "ration",
+          "properties": {},
+          "quantity": 2,
+          "uid": "item.115"
+        },
+        {
+          "definition": "grain",
+          "properties": {},
+          "quantity": 3,
+          "uid": "item.116"
+        },
+        {
+          "definition": "herb",
+          "properties": {},
+          "quantity": 2,
+          "uid": "item.117"
+        },
+        {
+          "definition": "clean_water",
+          "properties": {},
+          "quantity": 3,
+          "uid": "item.118"
+        },
+        {
+          "definition": "cloth",
+          "properties": {},
+          "quantity": 3,
+          "uid": "item.121"
+        },
+        {
+          "definition": "resin_sprayer",
+          "properties": {
+            "doses": 2
+          },
+          "quantity": 1,
+          "uid": "item.124"
+        },
+        {
+          "definition": "fire_stone",
+          "properties": {},
+          "quantity": 1,
+          "uid": "item.126"
+        }
+      ],
+      "gear": [
+        {
+          "definition": "river_sabre",
+          "properties": {
+            "coating": {
+              "expires_at": 139.34872,
+              "id": "fire_rag"
+            }
+          },
+          "quantity": 1,
+          "uid": "item.120"
+        }
+      ]
+    }
+  },
+  "recovery": {
+    "defeat": "mundane/step_0101.json",
+    "defeat_capture": "mundane/step_0102.json",
+    "rescue": "mundane/step_0103.json",
+    "rescue_result": "mundane/step_0104.json",
+    "rescue_cost": "Actual game rescue advances2h; HP restored to50, qualification/maxMP remain false/0; bag left at defeat location.",
+    "misidentified_rest": "worldview-recovery-02-rest-three-hours-selected.png actually shows Hunter Notice; no rest occurred. step109 missing_button retained. Passive HP recovery while diagnosing is not credited to paid rest.",
+    "actual_rest_before": "mundane/step_0114.json",
+    "actual_rest_after": "mundane/step_0117.json",
+    "rest_rations": [
+      3,
+      2
+    ],
+    "rest_water": [
+      2,
+      1
+    ],
+    "rest_clock_delta": 185.38429699999892,
+    "actual_rest": "Moved to campfire north side, used real F/C to choose3h and clicked Start. HP already100 from passive recovery before starting; do not attribute earlier50→100 to this rest. Real ration/water/time/fatigue transaction still completed.",
+    "pack_comparison": "recovery-pack-comparison.json",
+    "retry_second_guard": "mundane/step_0131.json",
+    "pack_pickup": "mundane/step_0135.json",
+    "actual_meal_before_retry": "recovery-return-and-retry.json and associated command log; no free stat/resource changes."
+  },
+  "work_cancellation": {
+    "source_revision": "d5c7e6ad34306b03c4f3b8677ea673f506d1fe7f",
+    "before": "mundane/step_0160.json",
+    "after": "mundane/step_0161.json",
+    "before_player": {
+      "art_window": {},
+      "attacks": 13,
+      "base": false,
+      "channel_source": "",
+      "charge_source": "",
+      "counter_remaining": 0.0,
+      "damage_taken": 166,
+      "dead": false,
+      "guarding": false,
+      "health_decreases": 166,
+      "hp": 105,
+      "max_hp": 110,
+      "max_mp": 0,
+      "max_stamina": 104.0,
+      "mode": "idle",
+      "mp": 0,
+      "position": [
+        755.651977539062,
+        -404.354461669922
+      ],
+      "stamina": 104.0,
+      "ui_blocked": false
+    },
+    "after_player": {
+      "art_window": {},
+      "attacks": 13,
+      "base": false,
+      "channel_source": "",
+      "charge_source": "",
+      "counter_remaining": 0.0,
+      "damage_taken": 166,
+      "dead": false,
+      "guarding": false,
+      "health_decreases": 176,
+      "hp": 98,
+      "max_hp": 100,
+      "max_mp": 0,
+      "max_stamina": 100.0,
+      "mode": "idle",
+      "mp": 0,
+      "position": [
+        755.651977539062,
+        -404.354461669922
+      ],
+      "stamina": 100.0,
+      "ui_blocked": false
+    },
+    "notice": "受到伤害：作业取消，未扣材料",
+    "actual": "HP105/max110→98/max100 and stamina cap104→100 while accepted combat damage stays166; raw HP decreases gain10. Work reports damage and cancels without cloth payment. Food-cap expiry false-interrupt is a real pre-fix observation.",
+    "dependent_trial_refusal": "mundane/step_0169.json; screenshot worldview-failure-03-index-work-disabled.png is the trial correctly refusing its missing press prerequisite, not the index panel.",
+    "real_retry": {
+      "snapshot": "mundane/step_0178.json",
+      "player": {
+        "art_window": {},
+        "attacks": 13,
+        "base": false,
+        "channel_source": "",
+        "charge_source": "",
+        "counter_remaining": 0.0,
+        "damage_taken": 166,
+        "dead": false,
+        "guarding": false,
+        "health_decreases": 176,
+        "hp": 100,
+        "max_hp": 100,
+        "max_mp": 0,
+        "max_stamina": 100.0,
+        "mode": "idle",
+        "mp": 0,
+        "position": [
+          758.873718261719,
+          -402.076232910156
+        ],
+        "stamina": 100.0,
+        "ui_blocked": false
+      },
+      "magic": {
+        "aptitude": true,
+        "awakened": false,
+        "hp_cost": 0,
+        "legacy_exempt": false,
+        "mana_base": 60,
+        "schema": 1,
+        "source_id": "",
+        "stamina_cost": 0.0
+      },
+      "trial_claim": false,
+      "accept_claim": false,
+      "magic_events": [],
+      "notice": "压印轴重新转动，东侧搬运竖井已可返回林地。既有名册与物资仍在原处，压印台不额外生成奖励；可以带成果回镇报告并整备下一程。\n捷径已开启：搬运竖井：返回林地；使用现场出口通行。\n可回镇报告：首次出征：林下档案窖。"
+    },
+    "fix_commit": "dedd7702e722ef181f89899899b6663c10a065af",
+    "coverage_boundary": "Do not relabel the d5 failure/combats as dedd evidence."
+  },
+  "awakening": {
+    "trial_without_acceptance": {
+      "snapshot": "mundane/step_0187.json",
+      "player": {
+        "art_window": {},
+        "attacks": 13,
+        "base": false,
+        "channel_source": "",
+        "charge_source": "",
+        "counter_remaining": 0.0,
+        "damage_taken": 166,
+        "dead": false,
+        "guarding": false,
+        "health_decreases": 176,
+        "hp": 100,
+        "max_hp": 100,
+        "max_mp": 0,
+        "max_stamina": 100.0,
+        "mode": "idle",
+        "mp": 0,
+        "position": [
+          -782.414001464844,
+          -495.920288085938
+        ],
+        "stamina": 100.0,
+        "ui_blocked": false
+      },
+      "magic": {
+        "aptitude": true,
+        "awakened": false,
+        "hp_cost": 0,
+        "legacy_exempt": false,
+        "mana_base": 60,
+        "schema": 1,
+        "source_id": "",
+        "stamina_cost": 0.0
+      },
+      "trial_claim": true,
+      "accept_claim": false,
+      "magic_events": [],
+      "notice": "试感完成：尚未觉醒、未扣永久属性。可离开继续旅程；再次调查才会显示接受永久代价的选项。"
+    },
+    "pre_fix_terms": "accept-before-fix/worldview-11h-rules-bottom-track-click.png",
+    "terms_actually_visible": [
+      "permanent10HP/10stamina cap cost",
+      "60 base mana capacity",
+      "currentMP not filled instantly; gradual recovery",
+      "no respec/reversal in this version",
+      "may leave and cancel before completion"
+    ],
+    "after_fix_before_accept": {
+      "snapshot": "accept/step_0003.json",
+      "player": {
+        "art_window": {},
+        "attacks": 0,
+        "base": false,
+        "channel_source": "",
+        "charge_source": "",
+        "counter_remaining": 0.0,
+        "damage_taken": 0,
+        "dead": false,
+        "guarding": false,
+        "health_decreases": 0,
+        "hp": 100,
+        "max_hp": 100,
+        "max_mp": 0,
+        "max_stamina": 100.0,
+        "mode": "idle",
+        "mp": 0,
+        "position": [
+          -784.998107910156,
+          -486.001922607422
+        ],
+        "stamina": 100.0,
+        "ui_blocked": false
+      },
+      "magic": {
+        "aptitude": true,
+        "awakened": false,
+        "hp_cost": 0,
+        "legacy_exempt": false,
+        "mana_base": 60,
+        "schema": 1,
+        "source_id": "",
+        "stamina_cost": 0.0
+      },
+      "trial_claim": true,
+      "accept_claim": false,
+      "magic_events": [],
+      "notice": ""
+    },
+    "interrupted": {
+      "snapshot": "accept/step_0009.json",
+      "player": {
+        "art_window": {},
+        "attacks": 0,
+        "base": false,
+        "channel_source": "",
+        "charge_source": "",
+        "counter_remaining": 0.0,
+        "damage_taken": 0,
+        "dead": false,
+        "guarding": false,
+        "health_decreases": 0,
+        "hp": 100,
+        "max_hp": 100,
+        "max_mp": 0,
+        "max_stamina": 100.0,
+        "mode": "idle",
+        "mp": 0,
+        "position": [
+          -784.998107910156,
+          -618.001953125
+        ],
+        "stamina": 100.0,
+        "ui_blocked": false
+      },
+      "magic": {
+        "aptitude": true,
+        "awakened": false,
+        "hp_cost": 0,
+        "legacy_exempt": false,
+        "mana_base": 60,
+        "schema": 1,
+        "source_id": "",
+        "stamina_cost": 0.0
+      },
+      "trial_claim": true,
+      "accept_claim": false,
+      "magic_events": [],
+      "notice": "开始其他动作"
+    },
+    "accepted_once": {
+      "snapshot": "accept/step_0014.json",
+      "player": {
+        "art_window": {},
+        "attacks": 0,
+        "base": false,
+        "channel_source": "",
+        "charge_source": "",
+        "counter_remaining": 0.0,
+        "damage_taken": 0,
+        "dead": false,
+        "guarding": false,
+        "health_decreases": 10,
+        "hp": 90,
+        "max_hp": 90,
+        "max_mp": 60,
+        "max_stamina": 90.0,
+        "mode": "idle",
+        "mp": 0,
+        "position": [
+          -784.998107910156,
+          -491.501953125
+        ],
+        "stamina": 90.0,
+        "ui_blocked": false
+      },
+      "magic": {
+        "aptitude": true,
+        "awakened": true,
+        "hp_cost": 10,
+        "legacy_exempt": false,
+        "mana_base": 60,
+        "schema": 1,
+        "source_id": "awakening.archive",
+        "stamina_cost": 10.0
+      },
+      "trial_claim": true,
+      "accept_claim": true,
+      "magic_events": [
+        {
+          "data": {
+            "hp_cost": 10,
+            "mana_base": 60,
+            "source": "awakening.archive",
+            "stamina_cost": 10.0
+          },
+          "kind": "magic_awakened",
+          "t": 7.85775199999999
+        }
+      ],
+      "notice": "觉醒完成：永久代价已结算，基础法力容量已开启；当前法力会逐渐恢复，重复调查不会再次扣除。"
+    },
+    "repeat_inspection": {
+      "snapshot": "accept/step_0016.json",
+      "player": {
+        "art_window": {},
+        "attacks": 0,
+        "base": false,
+        "channel_source": "",
+        "charge_source": "",
+        "counter_remaining": 0.0,
+        "damage_taken": 0,
+        "dead": false,
+        "guarding": false,
+        "health_decreases": 10,
+        "hp": 90,
+        "max_hp": 90,
+        "max_mp": 60,
+        "max_stamina": 90.0,
+        "mode": "idle",
+        "mp": 0,
+        "position": [
+          -784.998107910156,
+          -491.501953125
+        ],
+        "stamina": 90.0,
+        "ui_blocked": false
+      },
+      "magic": {
+        "aptitude": true,
+        "awakened": true,
+        "hp_cost": 10,
+        "legacy_exempt": false,
+        "mana_base": 60,
+        "schema": 1,
+        "source_id": "awakening.archive",
+        "stamina_cost": 10.0
+      },
+      "trial_claim": true,
+      "accept_claim": true,
+      "magic_events": [
+        {
+          "data": {
+            "hp_cost": 10,
+            "mana_base": 60,
+            "source": "awakening.archive",
+            "stamina_cost": 10.0
+          },
+          "kind": "magic_awakened",
+          "t": 7.85775199999999
+        }
+      ],
+      "notice": "觉醒完成：永久代价已结算，基础法力容量已开启；当前法力会逐渐恢复，重复调查不会再次扣除。"
+    },
+    "spell_commits": [
+      {
+        "action": "ignite",
+        "charge_power": 1.0,
+        "materials": {},
+        "mp_after": 54,
+        "mp_cost": 4,
+        "position": [
+          -784.998107910156,
+          -491.501953125
+        ],
+        "result": "ignite",
+        "rule": "",
+        "t": 29.4666666666668
+      },
+      {
+        "action": "inscribe",
+        "charge_power": 1.0,
+        "materials": {
+          "fire_stone": 1
+        },
+        "mp_after": 46,
+        "mp_cost": 8,
+        "position": [
+          -784.998107910156,
+          -491.501953125
+        ],
+        "result": "inscribe",
+        "rule": "",
+        "t": 31.8831346666668
+      },
+      {
+        "action": "ignite",
+        "charge_power": 1.0,
+        "materials": {},
+        "mp_after": 34,
+        "mp_cost": 12,
+        "position": [
+          -784.998107910156,
+          -491.501953125
+        ],
+        "result": "fireball",
+        "rule": "fire_sigil_fireball",
+        "t": 33.0308056666667
+      }
+    ],
+    "fire_stone_before": 3,
+    "fire_stone_after": 2,
+    "spell_scope": "Three paid commits in safe cleared space, not post-awakening combat against new enemies."
+  },
+  "cold_restarts": {
+    "main_comparisons": [
+      "cold-mundane-comparison.json",
+      "cold-awakened-comparison.json"
+    ],
+    "extra_fix_boundary": "cold-fix-boundary-comparison.json",
+    "all_equal": true,
+    "mana_after_accept_save": 34,
+    "mana_resume_ready": 34,
+    "mana_resume_end": 34,
+    "resume_active_seconds": 0.798486666666667,
+    "fields_before": 1,
+    "fields_after": 0
+  },
+  "sale": {
+    "before": "mundane/step_0212.json",
+    "after": "mundane/step_0213.json",
+    "merchant_new_rows": [
+      {
+        "container": "river.merchant.pack",
+        "definition": "river_coat",
+        "properties": {},
+        "quantity": 1,
+        "uid": "item.131"
+      }
+    ],
+    "player_coin_before": 0,
+    "player_coin_after": 8,
+    "merchant_coin_before": 160,
+    "merchant_coin_after": 152
+  },
+  "outcomes": {
+    "normal_ai_kills": 4,
+    "observed_deaths": 1,
+    "same_real_journey_after_rescue": true,
+    "manual_index_claim": true,
+    "dossier_claim": true,
+    "trial_claim": true,
+    "first_expedition_reported": true,
+    "unawakened_mundane_end": true,
+    "final_magic": {
+      "aptitude": true,
+      "awakened": true,
+      "hp_cost": 10,
+      "legacy_exempt": false,
+      "mana_base": 60,
+      "schema": 1,
+      "source_id": "awakening.archive",
+      "stamina_cost": 10.0
+    },
+    "final_bottles": [
+      {
+        "definition": "resin_sprayer",
+        "properties": {
+          "doses": 2
+        },
+        "quantity": 1,
+        "uid": "item.124"
+      }
+    ],
+    "final_gear": [
+      {
+        "definition": "river_sabre",
+        "properties": {
+          "coating": {
+            "expires_at": 170.959610666667,
+            "id": "poison_rag"
+          }
+        },
+        "quantity": 1,
+        "uid": "item.31"
+      },
+      {
+        "definition": "river_coat",
+        "properties": {},
+        "quantity": 1,
+        "uid": "item.32"
+      }
+    ]
+  },
+  "evidence_notes": [
+    "Step JSON files/commands preserve failures and same-journey recovery; no retry from prior save.",
+    "Trial-terms screenshot filename06 was reused by the successful recovery path; the prior disabled trial remains separately preserved in failure03 and step169. Do not treat a completed/selected filename as proof.",
+    "Probe buttons/modal_texts omit FieldWorkPanel; work screenshots and claims/facts are authoritative for its actual visibility.",
+    "accept-before-fix was renamed from its original output directory accept only after its process exited; launch.json retains the original launch path.",
+    "Original169/44/3 plans were not an error-free route result: actual request counts and recovery/fix-boundary inputs are listed per phase."
+  ],
+  "save_artifacts": [
+    {
+      "path": "mundane/worldview-mundane-final.sav",
+      "bytes": 126472,
+      "sha256": "d1dff1fde7b9a2ff318ef41edaeccd01b59f12d9925fad3697c711e3019bae7a"
+    },
+    {
+      "path": "accept-before-fix/worldview-safe-pre-fix-save.sav",
+      "bytes": 127004,
+      "sha256": "803ea5b41069666c43cc54ddbc29465a8d1964d62145588ebcff4aba07ff4fae"
+    },
+    {
+      "path": "accept/worldview-awakened-final.sav",
+      "bytes": 127616,
+      "sha256": "741e650b0d249029a089a491e243aed6452aae60406c6a6adf40641c0e6b2ea0"
+    },
+    {
+      "path": "final-game-written-save_3.sav",
+      "bytes": 127616,
+      "sha256": "80298c69137d5c5f4bfa15e2ffd246141b67790e486299cc32594c91881a9131"
+    }
+  ],
+  "key_screenshots": [
+    {
+      "path": "mundane/worldview-01-unawakened.png",
+      "bytes": 149830,
+      "sha256": "45654d0fb1a9852d50206905b086c3a0490ba3df50e8b9b4d48652bba9e448d1"
+    },
+    {
+      "path": "mundane/worldview-03-mundane-spray.png",
+      "bytes": 181178,
+      "sha256": "7ae6ee765810a3ce53137667aade0b8c287b1cc0d4bb5dfee46649af89f8765a"
+    },
+    {
+      "path": "mundane/worldview-failure-01-real-defeat.png",
+      "bytes": 106733,
+      "sha256": "bb0da6bb81137ac6465f8f60cb23ea9c8a1be301e1a8e7516d19c0cd12670554"
+    },
+    {
+      "path": "mundane/worldview-recovery-04-actual-three-hour-rest.png",
+      "bytes": 197639,
+      "sha256": "61d66d317dc9dcfb8333a41a5c58e781ab5160597b5e112de1f76a371ec6e2ca"
+    },
+    {
+      "path": "mundane/worldview-08-decline-acceptance.png",
+      "bytes": 119057,
+      "sha256": "4fb8d9ba0ae82308b9dbe3f954827c89f67191d2a52f1f0ba5bcc0189a3cb8d5"
+    },
+    {
+      "path": "accept-before-fix/worldview-11h-rules-bottom-track-click.png",
+      "bytes": 143965,
+      "sha256": "e82c3765b426d69f80a77c2c0d34e9d764b18635b39abf0d093362ef7df0ba38"
+    },
+    {
+      "path": "accept/worldview-13-awakened.png",
+      "bytes": 76838,
+      "sha256": "4d063823ee1c1a4cdd46df47136ce6ffc9bc1f3adf4325daf52f971deb500f7d"
+    },
+    {
+      "path": "resume/worldview-17-awakened-cold-resume.png",
+      "bytes": 58608,
+      "sha256": "e53ee8263b13938828038fce3d3ca781cc16127a6ed6308948faea3fc2abc1f1"
+    }
+  ]
+}

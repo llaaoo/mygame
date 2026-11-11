@@ -1,0 +1,6 @@
+{
+  "status": "stopped_after_diagnosis",
+  "reason": "fieldcraft direct actor damage no longer interrupted work: refine shared injury signal rather than weaken regression",
+  "source_revision": "dedd7702e722ef181f89899899b6663c10a065af",
+  "complete": false
+}

@@ -41,7 +41,7 @@ func _process(delta: float) -> void:
 		var buildup: Dictionary=partial[id]
 		var definition:=WeaponEnchantment.definition(id)
 		text+=" · %s蓄积%.0f%%"%[ElementCatalog.affinity_label(definition.tags),100*float(buildup.value)/definition.threshold]
-	if not in_combat: text+="\nMP %d/%d"%[actor.mana_component.mp,actor.mana_component.max_mp]
+	if not in_combat and actor.mana_component.can_cast(): text+="\nMP %d/%d"%[actor.mana_component.mp,actor.mana_component.max_mp]
 	for entry in (actor.get_node("BuffManager") as BuffManager).get_active_buff_entries():
 		if entry.status_id in ["ember_focus","focus","frost_stride","resonant_guard"]:
 			text+=" · "+entry.name

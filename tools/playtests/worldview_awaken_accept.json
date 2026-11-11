@@ -1,0 +1,227 @@
+[
+  {
+    "op": "click",
+    "label": "开始河谷旅程"
+  },
+  {
+    "op": "state",
+    "capture": "worldview-10-mundane-cold-resume",
+    "phase": "B: same saved journey after full-process restart",
+    "note": "Use the same XDG from mundane, no seed/fixture. Compare UID/doses, knowledge/claims, trade and unawakened qualification; retain failures."
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3500,
+      900
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3500,
+      0
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3260,
+      -780
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3072,
+      -1200
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -2850,
+      -1500
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -2730,
+      -1850
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -2600,
+      -1800
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -780,
+      -490
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F"
+  },
+  {
+    "op": "capture",
+    "capture": "worldview-11-acceptance-preview"
+  },
+  {
+    "op": "click",
+    "label": "查看详细规则"
+  },
+  {
+    "op": "capture",
+    "capture": "worldview-11b-expanded-acceptance-rules"
+  },
+  {
+    "op": "point_click",
+    "point": [
+      1118,
+      375
+    ],
+    "note": "Real pointer page-down on visible explanation scrollbar at1152x648; no domain/UI callbacks."
+  },
+  {
+    "op": "capture",
+    "capture": "worldview-11h-rules-bottom-track-click",
+    "expect": "Actually read60 base capacity/no current-MP refill/irreversible cost/can leave or cancel"
+  },
+  {
+    "op": "click",
+    "label": "F  开始作业"
+  },
+  {
+    "op": "wait",
+    "seconds": 1
+  },
+  {
+    "op": "hold_key",
+    "key": "W"
+  },
+  {
+    "op": "wait",
+    "seconds": 0.25
+  },
+  {
+    "op": "release_key",
+    "key": "W"
+  },
+  {
+    "op": "state",
+    "capture": "worldview-12-interrupted-acceptance",
+    "expect": "No qualification/cost committed after interrupt; trial retained"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -780,
+      -490
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F"
+  },
+  {
+    "op": "click",
+    "label": "F  开始作业"
+  },
+  {
+    "op": "wait",
+    "seconds": 4.5
+  },
+  {
+    "op": "state",
+    "capture": "worldview-13-awakened",
+    "expect": "Exactly one magic_awakened(source awakening.archive,cost10HP/10stamina,base60), actual caps change once"
+  },
+  {
+    "op": "key",
+    "key": "F"
+  },
+  {
+    "op": "capture",
+    "capture": "worldview-14-no-double-payment"
+  },
+  {
+    "op": "key",
+    "key": "Escape"
+  },
+  {
+    "op": "wait",
+    "seconds": 20
+  },
+  {
+    "op": "aim",
+    "point": [
+      -580,
+      -490
+    ]
+  },
+  {
+    "op": "key",
+    "key": "R"
+  },
+  {
+    "op": "wait",
+    "seconds": 0.6
+  },
+  {
+    "op": "state",
+    "capture": "worldview-15-basic-spell"
+  },
+  {
+    "op": "wheel",
+    "key": "5",
+    "payload": "ember"
+  },
+  {
+    "op": "key",
+    "key": "5"
+  },
+  {
+    "op": "wait",
+    "seconds": 1.4
+  },
+  {
+    "op": "key",
+    "key": "R"
+  },
+  {
+    "op": "wait",
+    "seconds": 0.7
+  },
+  {
+    "op": "state",
+    "capture": "worldview-16-real-material-combo",
+    "expect": "Actual crafted firestone consumed once; real inscription and manual fireball MP/field costs"
+  },
+  {
+    "op": "save",
+    "label": "worldview-awakened-final"
+  },
+  {
+    "op": "quit"
+  }
+]

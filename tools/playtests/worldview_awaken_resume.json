@@ -1,0 +1,15 @@
+[
+  {
+    "op": "click",
+    "label": "开始河谷旅程"
+  },
+  {
+    "op": "state",
+    "capture": "worldview-17-awakened-cold-resume",
+    "phase": "C: same accepted journey cold restart",
+    "note": "Compare qualification/costs, UID/doses, knowledge/NPC/claims. HP/MP/effect time may naturally advance; do not refill/reset. No seed/helper/domain calls."
+  },
+  {
+    "op": "quit"
+  }
+]

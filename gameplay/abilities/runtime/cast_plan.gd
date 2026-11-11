@@ -1,6 +1,9 @@
 class_name CastPlan
 extends RefCounted
 
+var requires_magic := true
+var delivery_reach := 0.0
+var delivery_angle := 0.0
 var selection: Dictionary={}
 var binding_revision := -1
 
@@ -54,3 +57,6 @@ var placement_duration := 15.0
 
 func is_empty() -> bool:
 	return action == null
+
+func cost_label() -> String:
+	return "%d MP"%cost if requires_magic else "1剂喷剂" if not instance_costs.is_empty() else "实物消耗"

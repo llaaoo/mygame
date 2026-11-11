@@ -72,6 +72,7 @@ func run() -> void:
 	player=game.player; stock=game.session.inventory
 	check(not game.progress.claims.has("test.previous") and not game.progress.actions.has("water_call") and game.progress.waypoint.is_empty() and not game.progress.choices.has("river.rehearsal"),"Restart retained old knowledge/world state")
 	check(player.stats_component.level==1 and player.stats_component.attribute_points==0 and player.actor_context.martial.learned.is_empty(),"Restart retained growth or martial knowledge")
+	check(not player.actor_context.magic.awakened and not player.actor_context.magic.legacy_exempt and player.mana_component.max_mp==0 and player.mana_component.mp==0,"Restart imported fresh progress as a legacy awakened traveler")
 	check(stock.item(old_uid)==null and stock.count("player","coin")==0 and (player.get_node("BuffManager") as BuffManager).campaign_state().entries.is_empty(),"Restart retained old equipment, money or effects")
 	check(game.session.production.snapshot().jobs.is_empty(),"Restart retained old production orders")
 	check(stock.clock_seconds<10 and game.is_at_base() and player.actor_context.actions.mode=="idle","Restart retained old time/location/action")
@@ -87,6 +88,7 @@ func run() -> void:
 	game.ui.close_modal(); game._save_progress()
 	game.reload_progress(); await frames(10)
 	check(not game.progress.claims.has("test.previous") and stock.item(old_uid)==null,"Reload resurrected the archived journey")
+	check(not game.player.actor_context.magic.awakened and game.player.mana_component.max_mp==0,"Reload of a freshly restarted journey granted magic")
 	var archived:=DirAccess.open("user://journey_archive")
 	check(archived!=null and archived.get_directories().size()>0,"No journey archive exists")
 	game.ui.close_modal(); game.queue_free(); current_scene=null; await frames(6)

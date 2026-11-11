@@ -1,8 +1,10 @@
 extends "res://tests/support/input_scene_probe.gd"
+const Awake=preload("res://tests/support/awakened_actor_fixture.gd")
 const Fixture=preload("res://tests/support/grayriver_fixture.gd")
 func run() -> void:
  root.size=Vector2i(1152,648)
  var fixture:=Fixture.new(self); game=await fixture.boot()
+ check(Awake.awaken(game.player),"Magic-specific fixture could not establish explicit awakened eligibility")
  var actor:=game.player; var manager:=actor.skill_manager; var store:=game.session.inventory
  for id in ["focus","water_call","inscribe","project"]: game.progress.actions[id]=true
  for rule in manager.combinations.rules: game.progress.spell_rules[rule.id]=true

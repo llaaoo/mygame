@@ -125,9 +125,9 @@ func _process(_delta: float) -> void:
 	if not controller.pending.is_empty():
 		plan = controller.pending
 		action_name = plan.action.display_name
-	var text := ("Shift · " if empower else "") + "%s → %s · %d MP" % [action_name, plan.effect_label, plan.cost]
+	var text := ("Shift · " if empower else "") + "%s → %s · %s" % [action_name, plan.effect_label, plan.cost_label()]
 	if action.cast_type=="channel": text+="（每脉冲最多；累计结算）"
-	text += " · " + controller.effect_scope(plan.skill)
+	text += " · " + ("前方%.0f、%.0f°锥形"%[plan.delivery_reach,plan.delivery_angle] if plan.delivery_reach>0 else controller.effect_scope(plan.skill))
 	if not plan.material_costs.is_empty():
 		text += " · " + controller.supplies.describe_cost(plan.material_costs)
 	var boon_hint := controller.boon_hint(plan)
@@ -164,7 +164,7 @@ func _process(_delta: float) -> void:
 			var comparison_key := str(key) + ":comparison"
 			if not previews.has(comparison_key):
 				var alternate := _skill_manager.preview_source(_sources[i], not empower)
-				previews[comparison_key] = instance.data.display_name + "\n\n普通 · " + _brief_plan(alternate if empower else preview) + "\n\nShift · " + _brief_plan(preview if empower else alternate) + "\n\n数字为本次MP费用 · K配置此槽，未固定来源时跟随G"
+				previews[comparison_key] = instance.data.display_name + "\n\n普通 · " + _brief_plan(alternate if empower else preview) + "\n\nShift · " + _brief_plan(preview if empower else alternate) + "\n\n费用以当前预览为准；普通喷洒只耗剂量 · K配置此槽，未固定来源时跟随G"
 			var binding:=InputBindings.action_for_source(_sources[i])
 			_panels[i].tooltip_text = "按键："+InputBindings.labels(binding)+"\n"+previews[comparison_key]+"\n"+_skill_manager.spell_forms.label(_sources[i])+" · 世界滚轮切换最近动作形式\n"+QuickslotMaterials.stock_text(actor,preview.material_costs)
 		if preview:
@@ -172,7 +172,7 @@ func _process(_delta: float) -> void:
 			if _icon_keys[i] != icon_key:
 				_icons[i].texture = InterfaceIcons.skill(instance.data)
 				_icon_keys[i] = icon_key
-			_cost_labels[i].text = ("%d/次" if instance.data.cast_type=="channel" else "%d") % preview.cost
+			_cost_labels[i].text = ("%d/次"%preview.cost if instance.data.cast_type=="channel" else str(preview.cost)) if preview.requires_magic else "1剂"
 			_cost_labels[i].modulate = GameUIStyle.TEXT_MAIN if preview.ready else GameUIStyle.GOLD
 			var accent := ElementVisuals.color_for(preview.skill.tags)
 			_affinity_strips[i].color = Color(accent, .85)
@@ -304,8 +304,8 @@ func _refresh_idx(idx: int) -> void:
 		icon.modulate = Color(1, 1, 1, 0.12)
 
 	_affinity_strips[idx].color = Color(ElementVisuals.color_for(skill.tags), .8) if skill else Color.TRANSPARENT
-	_cost_labels[idx].text = str(skill.mp_cost) if skill else ""
-	_cost_labels[idx].tooltip_text = "本次法力费用"
+	_cost_labels[idx].text = (str(skill.mp_cost) if skill.requires_magic else "1剂") if skill else ""
+	_cost_labels[idx].tooltip_text = "实际费用见预览；普通喷洒只消耗所选瓶内剂量"
 	_bind_labels[idx].visible = true
 	_bind_labels[idx].text=InputBindings.label(InputBindings.action_for_source(src))
 	_panels[idx].tooltip_text = ("%s\n%s" % [skill.display_name, skill.description] if skill else "空槽")+"\n点击配置 · 按快捷键施放"
@@ -338,7 +338,7 @@ func _on_cooldown(source: String, _remaining: float, _total: float) -> void:
 			return
 
 func _brief_plan(plan: CastPlan) -> String:
-	var text := plan.effect_label + " · %d MP" % plan.cost
+	var text := plan.effect_label + " · " + plan.cost_label()
 	if not plan.material_costs.is_empty(): text += "\n" + _skill_manager.combinations.supplies.describe_cost(plan.material_costs)
 	var boon := _skill_manager.combinations.boon_hint(plan)
 	if not boon.is_empty(): text += "\n" + boon

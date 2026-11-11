@@ -13,6 +13,7 @@ var _skill: SkillData
 var _outline:=PackedVector2Array()
 func _ready() -> void:
 	_skill=SkillData.new(); _skill.id="enchantment_wave."+enchantment.id
+	_skill.requires_magic=false
 	_skill.display_name=enchantment.title+"释放"
 	_skill.skill_type=SkillData.SkillType.AOE
 	_skill.tags=enchantment.tags.duplicate(); _skill.tags.append_array(["physical","projectile","enchantment_release"])

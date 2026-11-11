@@ -17,7 +17,6 @@ var _title := ""
 var _guide := ""
 var _scope: Node
 var _generation := 0
-var _last_hp := 0
 var _refresh := 0.0
 var _committing := false
 
@@ -31,8 +30,7 @@ func _ready() -> void:
 		if not is_busy(): selected=index; _refresh_panel())
 	panel.start_button.pressed.connect(start_selected)
 	panel.cancel_button.pressed.connect(func(): cancel("已取消作业"); close_panel())
-	_last_hp = player.health_component.hp
-	player.health_component.health_changed.connect(_on_health)
+	player.health_component.damaged.connect(_on_damage)
 
 func is_busy() -> bool: return not pending.is_empty() or _committing
 
@@ -95,7 +93,6 @@ func start_selected() -> bool:
 		return false
 	player.skill_manager.combinations.cancel("现场作业：施法准备取消")
 	player.casting.cancel_all()
-	_last_hp = player.health_component.hp
 	var equipment := player.get_node("EquipmentManager") as EquipmentManager
 	pending = {"method": method, "fingerprint": method.fingerprint(), "remaining": method.duration * _efficiency(), "duration": method.duration * _efficiency(), "position": player.global_position, "attributes": player.stats_component.primary_values(), "equipment": equipment.loadout_revision,"progression":player.mastery_manager.revision}
 	player.state_machine.transition_to("work")
@@ -139,7 +136,7 @@ func _commit() -> void:
 	close_panel()
 	if accepted:
 		work_committed.emit(method)
-		if player.actor_context and not method.id.begins_with("sleep") and not method.id.begins_with("rest") and not method.id.begins_with("eat") and not method.id.begins_with("basic") and not method.id.begins_with("fill") and not method.id.begins_with("harvest") and not method.id.begins_with("cook"):
+		if player.actor_context and not method.id.begins_with("awakening:") and not method.id.begins_with("sleep") and not method.id.begins_with("rest") and not method.id.begins_with("eat") and not method.id.begins_with("basic") and not method.id.begins_with("fill") and not method.id.begins_with("harvest") and not method.id.begins_with("cook"):
 			player.actor_context.facts.publish("field_work",player.actor_context.id,{"method":method.id})
 	else:
 		work_cancelled.emit(method, "操作条件失效")
@@ -167,9 +164,9 @@ func _to_idle() -> void:
 func _in_range() -> bool:
 	return is_instance_valid(target) and target.is_inside_tree() and target.global_position.distance_to(player.global_position) <= RANGE and is_instance_valid(_scope) and _scope == CastContext.default_world(player) and GameRuntime.instance.get_region_session().is_current(_generation)
 
-func _on_health(hp: int, _maximum: int) -> void:
-	if hp < _last_hp: cancel("受到伤害：作业取消，未扣材料")
-	_last_hp = hp
+func _on_damage(actual: int) -> void:
+	# HP-cap expiry and healing do not represent incoming damage.
+	if actual>0: cancel("受到伤害：作业取消，未扣材料")
 
 func _refresh_panel() -> void:
 	if not _in_range(): return
@@ -186,5 +183,6 @@ func _refresh_panel() -> void:
 	panel.present_work(_title,summary,seconds,cost,reason,guide,1-float(pending.remaining)/float(pending.duration) if not pending.is_empty() else -1.0)
 
 func _efficiency() -> float:
+	if not methods.is_empty() and methods[selected].fixed_duration: return 1.0
 	if not methods.is_empty() and (methods[selected].id.begins_with("rest") or methods[selected].id.begins_with("sleep")): return 1.0
 	return (player.mastery_manager.activity_efficiency(SkillMastery.School.CRAFTING) if player.mastery_manager else 1.0)*float(ActorProgression.values(player).work_multiplier)

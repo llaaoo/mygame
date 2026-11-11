@@ -41,6 +41,7 @@ var trial_recorder: ElementTrialRecorder
 var workshop: CastingWorkshop
 var field_sites: FieldWorkSites
 var deliveries: SupplyDeliveryService
+var awakening: AwakeningSiteService
 var alchemy: AlchemyRepairService
 var survival: SurvivalService
 var retreat: ExpeditionRetreat
@@ -103,8 +104,9 @@ func _bootstrap() -> void:
 	saves.register_section(save_section, progress)
 	saves.progress_reload_requested.connect(reload_progress)
 	saves.before_save.connect(_sync_progress)
-	progress.deserialize_save_data(saves.read_extension(save_slot, save_section))
-	session.restore(progress.foundation)
+	var saved_progress:=saves.read_extension(save_slot, save_section)
+	progress.deserialize_save_data(saved_progress)
+	session.restore(progress.foundation,not saved_progress.is_empty() and not saved_progress.has("magic_schema"))
 	if rules.physical_inventory: WorldTime.instance.bind_elapsed(session.elapsed_seconds)
 	var load_status := saves.last_read.status
 	player.skill_manager.combinations.supplies.restore(progress.casting_supplies)
@@ -137,6 +139,7 @@ func _bootstrap() -> void:
 	field_sites = FieldWorkSites.new(self)
 	alchemy = AlchemyRepairService.new(self)
 	deliveries = SupplyDeliveryService.new(self)
+	awakening = AwakeningSiteService.new(self)
 	survival = SurvivalService.new()
 	survival.game = self
 	player.survival = survival
@@ -384,7 +387,7 @@ func reload_progress() -> void:
 	if trial_recorder: trial_recorder.active = false
 	_clear_temporary()
 	progress.deserialize_save_data(data)
-	session.restore(progress.foundation)
+	session.restore(progress.foundation,not data.is_empty() and not data.has("magic_schema"))
 	if progress.foundation.is_empty(): player.skill_manager.combinations.supplies.restore(progress.casting_supplies)
 	else: player.skill_manager.combinations.supplies.clear_selection()
 	GameRuntime.instance.get_world_runtime().state_manager.set_all_states(progress.world_states)

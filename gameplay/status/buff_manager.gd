@@ -238,6 +238,9 @@ func set_base_attributes(values: Dictionary) -> void:
 	attributes.set_bases(values)
 	attributes.rebuild(_instances)
 
+func preview_attribute_delta(key: String,base_delta := 0.0) -> float:
+	return attributes.preview_delta(key,base_delta,_instances) if attributes else 0.0
+
 func effective_primary(key: String, base: int) -> int:
 	if not attributes:
 		return base

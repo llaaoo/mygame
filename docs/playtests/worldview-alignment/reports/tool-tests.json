@@ -1,0 +1,15 @@
+{
+  "source_revision": "d5c7e6ad34306b03c4f3b8677ea673f506d1fe7f",
+  "command": [
+    "python3",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tools",
+    "-p",
+    "test_*.py"
+  ],
+  "exit_code": 0,
+  "note": "Pure Python tool fixtures; no real Godot engine launched."
+}

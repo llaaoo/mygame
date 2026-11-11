@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "revision": "d5c7e6ad34306b03c4f3b8677ea673f506d1fe7f",
+  "dirty": true,
+  "godot": "4.6.3.stable.official.7d41c59c4",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "jobs": 2,
+  "timeout": 120.0,
+  "logs": "/tmp/mygame-tests-xy5byip3",
+  "requested": [
+    "field_work",
+    "worldview_journey",
+    "magic_awakening"
+  ],
+  "results": [
+    {
+      "name": "magic_awakening",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 10.949,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_magic_awakening.gd"
+      ],
+      "log": "/tmp/mygame-tests-xy5byip3/magic_awakening.log",
+      "diagnostic": [],
+      "retained_log": "/workspace/worldview-validation-recovered/field-work-fix-logs/magic_awakening.log"
+    },
+    {
+      "name": "field_work",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 6.439,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_field_work.gd"
+      ],
+      "log": "/tmp/mygame-tests-xy5byip3/field_work.log",
+      "diagnostic": [],
+      "retained_log": "/workspace/worldview-validation-recovered/field-work-fix-logs/field_work.log"
+    },
+    {
+      "name": "worldview_journey",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 14.056,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_worldview_journey.gd"
+      ],
+      "log": "/tmp/mygame-tests-xy5byip3/worldview_journey.log",
+      "diagnostic": [],
+      "retained_log": "/workspace/worldview-validation-recovered/field-work-fix-logs/worldview_journey.log"
+    }
+  ],
+  "skipped": [],
+  "complete": true,
+  "retained_logs": "/workspace/worldview-validation-recovered/field-work-fix-logs"
+}

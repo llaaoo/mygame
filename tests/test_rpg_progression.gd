@@ -1,4 +1,5 @@
 extends SceneTree
+const Awake=preload("res://tests/support/awakened_actor_fixture.gd")
 const Fixture=preload("res://tests/support/grayriver_fixture.gd")
 var failures: Array[String]=[]
 func _init() -> void: call_deferred("run")
@@ -73,6 +74,7 @@ func run() -> void:
  # Learning during a held cast invalidates that exact plan without spending.
  game.progress.actions.inscribe=true; game._apply_knowledge()
  var rune:=SpellOperationCatalog.default_catalog().operation("inscribe").action
+ check(Awake.awaken(actor),"Spell perk phase requires explicit awakened eligibility")
  actor.skill_manager.equip_source("left",rune,{"payload":"arcane","modifier":"","uid":""})
  var mana_before:=actor.mana_component.mp; var inventory_before:=store.snapshot()
  check(actor.skill_manager.use_source("left",actor,CastContext.simple(actor,Vector2.RIGHT,rune)),"Could not prepare a real cast for revision validation")

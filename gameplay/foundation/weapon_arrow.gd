@@ -22,6 +22,7 @@ func _physics_process(delta: float) -> void:
 		if target and not target.has_method("take_damage"): target=target.owner as Node2D
 		if target and target.has_method("take_damage"):
 			var skill:=SkillData.new(); skill.id="weapon_arrow"; skill.tags=tags.duplicate(); skill.contact_statuses=statuses.duplicate()
+			skill.requires_magic=false
 			if enchantment:
 				skill.weapon_enchantment=enchantment
 				skill.enchantment_bonus=enchantment.release_damage if release_technique else enchantment.bonus_damage
