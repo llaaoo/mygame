@@ -1,0 +1,11 @@
+{
+  "kind": "Controlled composition screenshot of existing Godot project; not a natural playtest",
+  "source_scene": "res://grayriver.tscn",
+  "isolation": "Memory session, persistence disabled; separate XDG data/config/cache",
+  "engine": "Godot 4.6.3, compatibility OpenGL, Linux Xorg",
+  "external_assets_added": false,
+  "asset_ledger": "../../../content/art/THIRD_PARTY_ASSETS.md",
+  "files": {
+    "world.png": "d235116d62474e8eddba7664fe59b04c8de4fc650623b2a11c30b9792f590fac"
+  }
+}
