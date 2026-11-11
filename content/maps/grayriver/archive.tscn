@@ -23,6 +23,8 @@
 [ext_resource type="Resource" path="res://content/exploration/enemies/sentry.tres" id="21_y5pwm"]
 [ext_resource type="Script" path="res://gameplay/maps/map_furniture.gd" id="22_ihkoh"]
 [ext_resource type="Script" path="res://gameplay/maps/map_arrival.gd" id="23_3du8q"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/spell_puzzle_route.gd" id="24_index_route"]
+[ext_resource type="Script" path="res://gameplay/exploration/data/field_work_method.gd" id="25_index_work"]
 
 [sub_resource type="Resource" id="Resource_3k8nr"]
 script = ExtResource("10_0poi7")
@@ -35,8 +37,9 @@ authored_size = Vector2(2000, 1400)
 script = ExtResource("4_wq16e")
 id = "river.pulse"
 title = "搬运工的震荡记录"
-text = "震荡（1）可以破冰。先观察目标已有状态，普通近战可以保留冻结控制。"
-intro_text = "震荡（1）可以破冰。先观察目标已有状态，普通近战可以保留冻结控制。"
+text = "震荡可以破冰。先观察目标已有状态，普通近战可以保留冻结控制。西侧书架遮挡守卫视线，可在这里整备后选择北侧绕行或南侧正面。东侧受潮压印台先用水引润开，再用震荡松脱；也可付布料1擦拭撬修。修好后可从搬运竖井返回林地。原入口始终可以撤退。"
+intro_text = "已掌握震荡。先在西侧书架后整备；北侧可绕行，南侧通正面。东侧压印台可用水引→震荡，或付布料1手工清理，修好后开放返程竖井。原入口始终可撤退。"
+reading_margin = 120.0
 actions = Array[String](["pulse"])
 spell_rules = Array[String](["fire_sigil_pulse"])
 equipment = Array[String](["keeper_ring"])
@@ -140,6 +143,36 @@ script = ExtResource("13_dtyvr")
 radius = 64.0
 duration = 600.0
 
+[sub_resource type="Resource" id="ArchiveIndexWaterRoute"]
+script = ExtResource("24_index_route")
+id = "water_impact"
+steps = PackedStringArray("water", "impact")
+
+[sub_resource type="Resource" id="ArchiveIndexHandwork"]
+script = ExtResource("25_index_work")
+id = "archive.index_press.handwork"
+title = "擦拭并撬修压印台"
+duration = 3.0
+material_costs = {"cloth": 1}
+
+[sub_resource type="Resource" id="ArchiveIndexPress"]
+script = ExtResource("11_xj8ao")
+id = "archive.index_press"
+title = "受潮档案压印台"
+routes = Array[ExtResource("24_index_route")]([SubResource("ArchiveIndexWaterRoute")])
+hint = "旧纸屑与蜡封卡住了压印轴。先用水引润开，再用震荡松脱；也可消耗布料1，站定3秒擦拭撬修。附近守卫仍会打断作业，先借书架分开应对。恢复后，东侧搬运竖井可返回林地；原入口始终开放。"
+work_methods = Array[ExtResource("25_index_work")]([SubResource("ArchiveIndexHandwork")])
+completion_text = "压印轴重新转动，东侧搬运竖井已可返回林地。既有名册与物资仍在原处，压印台不额外生成奖励；可以带成果回镇报告并整备下一程。"
+
+[sub_resource type="Resource" id="ArchiveIndexReturn"]
+script = ExtResource("7_85p1h")
+id = "archive.index_return"
+target_anchor = "archive_return"
+target = "camp"
+title = "搬运竖井：返回林地"
+required_claims = PackedStringArray("archive.index_press")
+locked_message = "搬运竖井的联动轴仍卡住。先恢复旁边的受潮档案压印台；缺少材料时，西侧原入口仍可直接撤退。"
+
 [node name="林下档案窖" type="Node2D" unique_id=1101146285]
 script = ExtResource("1_h84yp")
 region_definition = SubResource("Resource_3k8nr")
@@ -218,3 +251,35 @@ position = Vector2(-820, 0)
 script = ExtResource("23_3du8q")
 default_entry = true
 minimum_enemy_distance = 600.0
+
+[node name="西侧分路书架" type="Node2D" parent="."]
+position = Vector2(-300, 0)
+script = ExtResource("22_ihkoh")
+form = "shelf"
+footprint = Vector2(96, 720)
+tint = Color(0.41, 0.37, 0.29, 1)
+
+[node name="东侧遮蔽书架" type="Node2D" parent="."]
+position = Vector2(350, 40)
+script = ExtResource("22_ihkoh")
+form = "shelf"
+footprint = Vector2(88, 440)
+tint = Color(0.41, 0.37, 0.29, 1)
+
+[node name="受潮档案压印台" type="Node2D" parent="."]
+position = Vector2(760, -400)
+script = ExtResource("16_xi24o")
+definition = SubResource("ArchiveIndexPress")
+
+[node name="搬运竖井" type="Node2D" parent="."]
+position = Vector2(840, -560)
+script = ExtResource("16_xi24o")
+definition = SubResource("ArchiveIndexReturn")
+
+[node name="搬运竖井门框" type="Node2D" parent="."]
+position = Vector2(840, -560)
+script = ExtResource("22_ihkoh")
+form = "door"
+footprint = Vector2(96, 72)
+solid = false
+caption = "搬运竖井"

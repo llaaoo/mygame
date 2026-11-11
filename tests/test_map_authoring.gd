@@ -10,7 +10,37 @@ func run() -> void:
 	var chapter:=report.chapter as ExplorationChapterData
 	var catalog:=ExplorationContentCatalog.new(chapter)
 	var expected: Variant=JSON.parse_string(FileAccess.get_file_as_string("res://tests/fixtures/archive_pre_scene_budget.json"))
-	check(Budget.archive(catalog.regions.river_archive)==expected,"Scene migration changed archive enemies, knowledge, rewards, surfaces, collision or return position")
+	var archive_budget:=Budget.archive(catalog.regions.river_archive)
+	# The adventure pass adds exactly two shelves and one conditional return.
+	# Keep the pre-scene fixture intact: every old enemy, note/reward, surface,
+	# obstacle and unconditional return must still match it exactly, except the
+	# shared landing was deliberately moved out of a live enemy's detection range.
+	check(archive_budget.obstacles.size()==expected.obstacles.size()+2 and archive_budget.exits.size()==expected.exits.size()+1,"Archive adventure changed its declared spatial additions")
+	var retained_budget:=archive_budget.duplicate(true)
+	retained_budget.obstacles=retained_budget.obstacles.slice(0,expected.obstacles.size())
+	retained_budget.exits=retained_budget.exits.slice(0,expected.exits.size())
+	var camp:=catalog.regions.camp as ExplorationRegionData
+	var shared_arrival: Vector2=camp.arrival_points.archive_return
+	check(shared_arrival==Vector2(-2700,-1800) and float(camp.map_arrival_rules.archive_return.minimum_enemy_distance)==520.0,"Archive shared return landing or declared enemy clearance changed")
+	for foe in camp.encounters:
+		check(shared_arrival.distance_to(foe.pos)>=foe.detect_range+80,"Archive return lands within enemy detection plus interaction clearance")
+	var named_returns:=0
+	for passage in catalog.regions.river_archive.exits:
+		if passage.target=="camp" and passage.target_anchor=="archive_return":
+			named_returns+=1
+			check(passage.arrival==shared_arrival,"A return copied coordinates instead of resolving the shared landing")
+	check(named_returns==2,"Original exit and new shaft do not share one named safe landing")
+	# Normalize only the explicitly asserted safety change before comparing every
+	# other old budget field; the checked-in historical fixture remains untouched.
+	retained_budget.exits[0].arrival=expected.exits[0].arrival.duplicate()
+	check(retained_budget==expected,"Archive adventure changed original enemies, knowledge, rewards, surfaces, collision or return identity")
+	# Resource.duplicate copies exported definitions, not the compiler's transient
+	# arrival dictionaries. Recompile an independent chapter so this negative case
+	# exercises the actual authored arrival rule instead of a stripped clone.
+	var unsafe_camp:=ExplorationContentCatalog.new(GrayriverDefinition.build()).regions.camp as ExplorationRegionData
+	check(unsafe_camp.map_arrival_rules.has("archive_return"),"Negative arrival fixture lost compiled map rules")
+	unsafe_camp.encounters[0].pos=shared_arrival
+	check(MapGeometry.errors(unsafe_camp).any(func(error: String):return "Enemy inside arrival clearance: archive_return" in error),"Moving an enemy onto the return landing did not fail authoring validation")
 	var missing:=MapCellCatalog.new();missing.maps=[null]
 	check(ExplorationContentValidator.new().validate(ExplorationContentCatalog.new(GrayriverDefinition.build(missing))).any(func(e):return "Missing authored map scene" in e),"A missing scene printed an error but passed the returned validation report")
 	check(AuthoredMapCell.compile(PackedScene.new())==null,"An empty scene was instantiated instead of rejected")

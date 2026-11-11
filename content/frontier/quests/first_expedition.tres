@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ExplorationQuestData" format=3]
+
+[ext_resource type="Script" path="res://gameplay/exploration/exploration_quest_data.gd" id="quest"]
+
+[resource]
+script = ExtResource("quest")
+id = "river.first_expedition"
+title = "首次出征：林下档案窖"
+description = "先领离镇口粮，在镇中工作台加工一枚火石；沿北路从西侧阅读旧猎营火阵笔记，亲手选择火石阵并试验火花。山脚的林下档案窖藏有封锁名册：入口可安全整备，借书架分开守卫，查看受潮压印台的两种修复办法。取到名册并恢复压印台后，返回河谷镇向艾妲报告。战利品可在镇中穿戴、出售或拆解；保留需要的装备，用原料补充下次远征的耗材。无需一次完成，原入口始终可撤退。"
+unlock_claims = PackedStringArray("river.handbook")
+required_claims = PackedStringArray("river.fire", "archive.index_press", "river.dossier")
+attribute_points = 1

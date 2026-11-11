@@ -209,6 +209,7 @@ static func build(map_catalog: MapCellCatalog=null,resolve_connections := true) 
 		quest.attribute_points = int(raw.points)
 		chapter.quests.append(quest)
 	chapter.quests.append(load("res://content/frontier/quests/hunting_evidence.tres") as ExplorationQuestData)
+	chapter.quests.append(load("res://content/frontier/quests/first_expedition.tres") as ExplorationQuestData)
 	return chapter
 
 static func work_method(raw: Dictionary) -> FieldWorkMethod:

@@ -58,6 +58,9 @@ func settle(n:=3) -> void:
 	for i in range(n): await physics_frame; await process_frame
 func key_event(code: Key,pressed: bool) -> void:
 	var event:=InputEventKey.new(); event.keycode=code; event.physical_keycode=code; event.pressed=pressed
+	event.ctrl_pressed=pressed if code==KEY_CTRL else bool(held.get(KEY_CTRL,false))
+	event.shift_pressed=pressed if code==KEY_SHIFT else bool(held.get(KEY_SHIFT,false))
+	event.alt_pressed=pressed if code==KEY_ALT else bool(held.get(KEY_ALT,false))
 	Input.parse_input_event(event); held[code]=pressed
 func tap(code: Key) -> void:
 	key_event(code,true); await settle(2); key_event(code,false); await settle(2)
@@ -70,6 +73,7 @@ func aim(point: Vector2) -> void:
 	var motion:=InputEventMouseMotion.new(); motion.position=screen; Input.parse_input_event(motion)
 func mouse(button: MouseButton) -> void:
 	var event:=InputEventMouseButton.new(); event.position=root.get_mouse_position(); event.button_index=button; event.pressed=true
+	event.ctrl_pressed=bool(held.get(KEY_CTRL,false)); event.shift_pressed=bool(held.get(KEY_SHIFT,false)); event.alt_pressed=bool(held.get(KEY_ALT,false))
 	Input.parse_input_event(event); await settle(2)
 	event=event.duplicate(); event.pressed=false; Input.parse_input_event(event); await settle(2)
 func walk(point: Vector2,tolerance:=24.0,seconds:=45.0) -> String:
@@ -137,14 +141,26 @@ func wheel_choice(key: String,payload: String,uid: String) -> String:
 	if not wheel.visible: return "wheel_not_open"
 	var index:=-1
 	for i in range(wheel.entries.size()):
-		if wheel.entries[i].choice.get("payload","")==payload or payload=="auto" and wheel.entries[i].choice.get("mode","")=="auto": index=i; break
+		var choice: Dictionary=wheel.entries[i].get("choice",{})
+		if wheel.entries[i].is_empty(): continue
+		if choice.get("payload","")==payload or payload=="auto" and choice.get("mode","")=="auto": index=i; break
 	if index<0: return "wheel_payload_missing"
-	var point:=wheel._ring.position+Vector2(180,180)+Vector2.from_angle(-PI/2+(index%8)*TAU/8)*125
+	var wanted_page:=index/wheel.page_size()
+	if wheel.page!=wanted_page:
+		var outside:=InputEventMouseMotion.new(); outside.position=Vector2(16,root.get_visible_rect().size.y-12)
+		if DisplayServer.get_name()!="headless": Input.warp_mouse(outside.position)
+		Input.parse_input_event(outside); await settle(2)
+		for attempt in range(ceili(float(wheel.entries.size())/wheel.page_size())):
+			if wheel.page==wanted_page: break
+			await mouse(MOUSE_BUTTON_WHEEL_DOWN)
+		if wheel.page!=wanted_page: return "wheel_page_missing"
+	var point:=wheel.entry_point(index)
 	var motion:=InputEventMouseMotion.new(); motion.position=point; Input.parse_input_event(motion); await settle(2)
 	if not uid.is_empty():
-		for attempt in range(10):
-			if wheel.entries[index].choice.get("uid","")==uid: break
+		for attempt in range(wheel.entries[index].get("alternatives",[]).size()):
+			if wheel.entries[index].get("choice",{}).get("uid","")==uid: break
 			await mouse(MOUSE_BUTTON_WHEEL_DOWN)
+		if wheel.entries[index].get("choice",{}).get("uid","")!=uid: return "wheel_uid_missing"
 	var sequence:=game.player.actor_context.actions._attack_sequence
 	await click_point(point)
 	if game.player.actor_context.actions._attack_sequence!=sequence: return "wheel_attack_leak"
@@ -216,7 +232,7 @@ func snapshot() -> Dictionary:
 	for region: ExplorationRegionData in game.catalog.regions.values():
 		for spec in region.storage: storage[spec.id]=game.session.inventory.entries(spec.id)
 	var growth: Dictionary={"level":actor.stats_component.level,"experience":actor.stats_component.experience,"attribute_points":actor.stats_component.attribute_points,"attributes":[actor.stats_component.strength,actor.stats_component.intelligence,actor.stats_component.agility,actor.stats_component.endurance],"mastery":actor.mastery_manager.serialize_state()}
-	return {"world_storage":storage,"visited":game.progress.visited.keys(),"growth":growth,"npc_accounts":accounts,"social":game.session.conversations.snapshot(),"tracked_id":game.progress.tracked_quest,"spell_affinity":actor.skill_manager.spell_forms.affinity,"effective_forms":form_snapshot(),"active_seconds":active_time,"wall_usec":Time.get_ticks_usec(),"paused":paused,"simulation":GameRuntime.instance.is_processing(),"shortcuts":actor.skill_manager.shortcuts.snapshot(),"wheel":{"visible":actor.material_wheel.visible,"source":actor.material_wheel.source},"player":{"ui_blocked":actor.ui_blocked,"attacks":actor.actor_context.actions._attack_sequence,"position":[actor.position.x,actor.position.y],"hp":actor.health_component.hp,"mp":actor.mana_component.mp,"damage_taken":damage_taken,"stamina":actor.actor_context.actions.stamina.current,"mode":actor.actor_context.actions.mode,"dead":actor.health_component.is_dead,"base":game.is_at_base(),"guarding":actor.actor_context.actions.guarding,"charge_source":actor.casting._charging_source,"channel_source":actor.casting._channeling_source},"materials":actor.skill_manager.combinations.supplies.amounts,"items":game.session.inventory.entries("player.pocket"),"gear":game.session.inventory.entries("player.gear"),"pack":game.session.inventory.entries("player.pack"),"runtime_scripts":runtime_scripts(),"claims":game.progress.claims.keys(),"loot_records":game.progress.loot_records.duplicate(true),"known_actions":actor.skill_manager.known_actions,"selected":actor.skill_manager.combinations.supplies.selected,"fields":fields,"slots":slots,"hands":{"q":actor.skill_manager.left_hand.data.get_id() if actor.skill_manager.left_hand else "","r":actor.skill_manager.right_hand.data.get_id() if actor.skill_manager.right_hand else ""},"tracker":game.frontier_hud.tracker.text,"objective":game.ui.objective.text,"notice":game.ui.message.text,"modal_texts":texts,"buttons":buttons,"enemies":enemies,"casts":casts,"melee_hits":melee_hits,"defenses":defenses,"physical_actions":physical_actions,"campaign_clock":game.session.inventory.clock_seconds,"date":WorldTime.instance.stamp(),"martial":actor.actor_context.martial.snapshot(),"save_path":ProjectSettings.globalize_path("user://save_3.sav"),"display":DisplayServer.get_name()}
+	return {"region_id":game.region_id,"normal_ai":game.active_enemies.all(func(enemy):return enemy.can_process()),"world_storage":storage,"visited":game.progress.visited.keys(),"growth":growth,"npc_accounts":accounts,"social":game.session.conversations.snapshot(),"tracked_id":game.progress.tracked_quest,"spell_affinity":actor.skill_manager.spell_forms.affinity,"effective_forms":form_snapshot(),"active_seconds":active_time,"wall_usec":Time.get_ticks_usec(),"paused":paused,"simulation":GameRuntime.instance.is_processing(),"shortcuts":actor.skill_manager.shortcuts.snapshot(),"wheel":{"visible":actor.material_wheel.visible,"source":actor.material_wheel.source},"player":{"ui_blocked":actor.ui_blocked,"attacks":actor.actor_context.actions._attack_sequence,"position":[actor.position.x,actor.position.y],"hp":actor.health_component.hp,"mp":actor.mana_component.mp,"damage_taken":damage_taken,"stamina":actor.actor_context.actions.stamina.current,"mode":actor.actor_context.actions.mode,"dead":actor.health_component.is_dead,"base":game.is_at_base(),"guarding":actor.actor_context.actions.guarding,"charge_source":actor.casting._charging_source,"channel_source":actor.casting._channeling_source},"materials":actor.skill_manager.combinations.supplies.amounts,"items":game.session.inventory.entries("player.pocket"),"gear":game.session.inventory.entries("player.gear"),"pack":game.session.inventory.entries("player.pack"),"runtime_scripts":runtime_scripts(),"claims":game.progress.claims.keys(),"loot_records":game.progress.loot_records.duplicate(true),"known_actions":actor.skill_manager.known_actions,"selected":actor.skill_manager.combinations.supplies.selected,"fields":fields,"slots":slots,"hands":{"q":actor.skill_manager.left_hand.data.get_id() if actor.skill_manager.left_hand else "","r":actor.skill_manager.right_hand.data.get_id() if actor.skill_manager.right_hand else ""},"tracker":game.frontier_hud.tracker.text,"objective":game.ui.objective.text,"notice":game.ui.message.text,"modal_texts":texts,"buttons":buttons,"enemies":enemies,"casts":casts,"melee_hits":melee_hits,"defenses":defenses,"physical_actions":physical_actions,"campaign_clock":game.session.inventory.clock_seconds,"date":WorldTime.instance.stamp(),"martial":actor.actor_context.martial.snapshot(),"save_path":ProjectSettings.globalize_path("user://save_3.sav"),"display":DisplayServer.get_name()}
 func move_input(direction: Vector2) -> void:
 	for pair in [[KEY_D,direction.x>.35],[KEY_A,direction.x<-.35],[KEY_S,direction.y>.35],[KEY_W,direction.y<-.35]]:
 		if bool(held.get(pair[0],false))!=bool(pair[1]): key_event(pair[0],pair[1])
@@ -226,6 +242,11 @@ func duel(style: String,enemy_id: String) -> String:
 		if str(enemy.get_meta("frontier_claim",""))==enemy_id: foe=enemy; break
 	if not foe: return "target_missing"
 	if paused or game.player.ui_blocked: return "menu_open"
+	if style=="martial" and game.player.actor_context.martial.learned.is_empty(): return "weapon_art_not_learned"
+	if style=="martial":
+		var context:=game.player.actor_context
+		var weapon:=context.items.equipment_definition(str(context.items.equipped(context.id).get(str(EquipmentData.SlotType.RIGHT_HAND),"")))
+		if not weapon or not weapon.moveset or not context.martial.route_choices().any(func(row): return MartialArts.definition(row.technique).weapon_type==weapon.moveset.weapon_type and context.martial.route_equipped(row.technique,row.route)): return "weapon_art_not_equipped"
 	var before:=snapshot()
 	var start:=active_time
 	var damage_before:=damage_taken
@@ -268,8 +289,10 @@ func duel(style: String,enemy_id: String) -> String:
 		else: move_input((foe.position-game.player.position).normalized() if distance>42 else Vector2.ZERO)
 		if style in ["throw","spray"] and next_attack==0 and distance<110 and not game.player.actor_context.actions.busy():
 			release_movement(); await tap(KEY_R); next_attack=active_time+.4
-		if style=="martial" and active_time>=next_technique and distance<65 and not game.player.actor_context.actions.busy():
-			await tap(KEY_E); next_technique=active_time+6.1; next_attack=active_time+.9
+		var art:=game.player.actor_context.actions.weapon_art_view() if style=="martial" else {}
+		if not art.is_empty() and str(art.get("reason","")).is_empty() and active_time>=next_technique and distance<65 and not game.player.actor_context.actions.busy():
+			key_event(KEY_CTRL,true); await mouse(MOUSE_BUTTON_LEFT); key_event(KEY_CTRL,false)
+			next_technique=active_time+.1; next_attack=active_time+.9
 		if active_time>=next_attack and (use_field or distance<65) and not game.player.actor_context.actions.busy():
 			if use_field: await tap(KEY_6)
 			else: await mouse(MOUSE_BUTTON_LEFT)
@@ -279,6 +302,7 @@ func duel(style: String,enemy_id: String) -> String:
 	var end:=active_time
 	last_duel={"style":style,"target":enemy_id,"seconds":end-start,"wall_seconds":float(Time.get_ticks_usec()-int(before.wall_usec))/1000000,"damage_taken":damage_taken-damage_before,"before":before,"after":snapshot(),"killed":not game.player.health_component.is_dead and (not is_instance_valid(foe) or foe.health_component.is_dead)}
 	write_json("duel_"+style+".json",last_duel)
+	if style=="martial" and not physical_actions.any(func(fact): return float(fact.t)>=start and not str(fact.data.get("technique","")).is_empty()): return "weapon_art_not_committed"
 	await tap(KEY_ESCAPE)
 	return "player_dead" if game.player.health_component.is_dead else ""
 func defense_sample(enemy_id: String,observe_death: bool) -> String:
