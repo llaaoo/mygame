@@ -71,7 +71,7 @@ script = ExtResource("tech")
 id = "blade_breaker"
 title = "破势斩"
 weapon_type = "blade"
-description = "站定起手、挥出时小步前踏，对正面格挡造成2.1倍体力压力，适合抓格挡和敌人收招；消耗26体力，不花MP。"
+description = "需手持刀剑。轻→重完成出招后，在1.1秒窗口中Ctrl+左键发动破势斩；轻→轻须末击有效命中，在0.9秒窗口中接截势斩。短按武技消耗26体力、不花MP；按住后松开发动重武技，消耗34体力。轻式站定起手、挥出小步前踏，对正面格挡造成2.1倍体力压力；适合抓格挡和敌人收招，别为追窗口耗尽体力。K武技页配置连招，不占快捷槽；同一组合的另一招可轻点Ctrl切换，截止时间不会刷新。"
 profile = SubResource("Attack")
 
 release_reach = 140.0

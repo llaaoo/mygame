@@ -1,0 +1,143 @@
+{
+  "schema": 1,
+  "revision": "fec9f4a678067c663cbd1e14356c30e2610b8f38",
+  "dirty": true,
+  "godot": "4.6.3.stable.official.7d41c59c4",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "jobs": 2,
+  "timeout": 300.0,
+  "logs": "/tmp/mygame-tests-2idcj1xn",
+  "requested": [
+    "content",
+    "gut_domain",
+    "enemy_disengagement",
+    "enemy_phase_input",
+    "tactical_ai",
+    "weapon_art_input"
+  ],
+  "results": [
+    {
+      "name": "content",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 2.322,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tools/validate_mvp_content.gd"
+      ],
+      "log": "/tmp/mygame-tests-2idcj1xn/content.log",
+      "diagnostic": []
+    },
+    {
+      "name": "gut_domain",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 3.627,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://addons/gut/gut_cmdln.gd",
+        "-gexit",
+        "-gdisable_colors",
+        "-gjunit_xml_file=/tmp/mygame-tests-2idcj1xn/gut-domain.xml"
+      ],
+      "log": "/tmp/mygame-tests-2idcj1xn/gut_domain.log",
+      "diagnostic": []
+    },
+    {
+      "name": "enemy_disengagement",
+      "passed": false,
+      "category": "godot_error",
+      "exit_code": 0,
+      "seconds": 4.127,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_enemy_disengagement.gd"
+      ],
+      "log": "/tmp/mygame-tests-2idcj1xn/enemy_disengagement.log",
+      "diagnostic": [
+        "ERROR: Parameter \"body->get_space()\" is null.",
+        "   at: body_test_motion (modules/godot_physics_2d/godot_physics_server_2d.cpp:997)",
+        "   GDScript backtrace (most recent call first):",
+        "       [0] _tick_idle_navigation (res://entities/enemy/enemy.gd:487)",
+        "       [1] run (res://tests/test_enemy_disengagement.gd:29)",
+        "       [2] boot (res://tests/support/grayriver_fixture.gd:21)",
+        "PASS enemy disengagement: release old guard/search input, restore stamina recovery, preserve paid attack clock and one real arrow release; controlled lifecycle fixture"
+      ]
+    },
+    {
+      "name": "tactical_ai",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 4.278,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_tactical_ai.gd"
+      ],
+      "log": "/tmp/mygame-tests-2idcj1xn/tactical_ai.log",
+      "diagnostic": []
+    },
+    {
+      "name": "enemy_phase_input",
+      "passed": false,
+      "category": "godot_error",
+      "exit_code": 1,
+      "seconds": 13.504,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_enemy_phase_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-2idcj1xn/enemy_phase_input.log",
+      "diagnostic": [
+        "ERROR: Phase labels were not backed by a committed physical action",
+        "   at: push_error (core/variant/variant_utility.cpp:1024)",
+        "   GDScript backtrace (most recent call first):",
+        "       [0] check (res://tests/support/input_scene_probe.gd:6)",
+        "       [1] run (res://tests/test_enemy_phase_input.gd:50)",
+        "       [2] pointer_button (res://tests/support/input_scene_probe.gd:26)",
+        "       [3] frames (res://tests/support/input_scene_probe.gd:10)"
+      ]
+    },
+    {
+      "name": "weapon_art_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 60.384,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_weapon_art_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-2idcj1xn/weapon_art_input.log",
+      "diagnostic": []
+    }
+  ],
+  "skipped": [],
+  "complete": true
+}

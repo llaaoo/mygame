@@ -33,6 +33,8 @@ INTEGRATION = [
     "frontier_expedition", "frontier_projects",
     "grayriver_loot",
     "archive_adventure", "enemy_observation_input",
+    "enemy_disengagement", "enemy_phase_input",
+    "combat_learning",
     "grayriver_salvage",
     "shared_characters",
     "field_work",

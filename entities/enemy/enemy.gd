@@ -450,6 +450,9 @@ func _is_out_of_leash(target: Node2D) -> bool:
 
 
 func _begin_return_home() -> void:
+	if actor_context and actor_context.actions.active():
+		# Losing a target releases controller intent, not a paid physical strike.
+		actor_context.actions.clear_input()
 	if character_definition:
 		skill_manager.combinations.cancel("目标失效：准备取消")
 		attack_preparation.cancel()
@@ -465,6 +468,10 @@ func _tick_idle_navigation(delta: float) -> void:
 		if state.phase in ["search","warning"]:
 			actor_context.actions.try_action(Action.move(state.search_direction(),self))
 			return
+	if actor_context and actor_context.actions.active():
+		# Legacy idle/home navigation owns movement here. Do not also execute the
+		# last search direction or a held guard from the previous controller phase.
+		actor_context.actions.clear_input()
 	if _suspicion_timer > 0.0:
 		_suspicion_timer = maxf(0.0, _suspicion_timer - delta)
 

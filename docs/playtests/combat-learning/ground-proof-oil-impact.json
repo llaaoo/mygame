@@ -1,0 +1,79 @@
+[
+  {
+    "cell": [
+      -3,
+      9
+    ],
+    "surface": {
+      "remaining": 7.74262485185185,
+      "source": "投掷 · 树脂喷洒",
+      "state": "oiled"
+    }
+  },
+  {
+    "cell": [
+      -2,
+      9
+    ],
+    "surface": {
+      "remaining": 7.74262485185185,
+      "source": "投掷 · 树脂喷洒",
+      "state": "oiled"
+    }
+  },
+  {
+    "cell": [
+      -2,
+      10
+    ],
+    "surface": {
+      "remaining": 7.74262485185185,
+      "source": "投掷 · 树脂喷洒",
+      "state": "oiled"
+    }
+  },
+  {
+    "cell": [
+      0,
+      1
+    ],
+    "surface": {
+      "remaining": 596.759817666667,
+      "source": "authored:river_archive",
+      "state": "wet"
+    }
+  },
+  {
+    "cell": [
+      0,
+      2
+    ],
+    "surface": {
+      "remaining": 596.759817666667,
+      "source": "authored:river_archive",
+      "state": "wet"
+    }
+  },
+  {
+    "cell": [
+      1,
+      1
+    ],
+    "surface": {
+      "remaining": 596.759817666667,
+      "source": "authored:river_archive",
+      "state": "wet"
+    }
+  },
+  {
+    "cell": [
+      1,
+      2
+    ],
+    "surface": {
+      "remaining": 596.759817666667,
+      "source": "authored:river_archive",
+      "state": "wet"
+    }
+  }
+]

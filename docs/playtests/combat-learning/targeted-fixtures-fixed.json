@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "revision": "fec9f4a678067c663cbd1e14356c30e2610b8f38",
+  "dirty": true,
+  "godot": "4.6.3.stable.official.7d41c59c4",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "jobs": 2,
+  "timeout": 300.0,
+  "logs": "/tmp/mygame-tests-9cjed52k",
+  "requested": [
+    "enemy_disengagement",
+    "enemy_phase_input",
+    "combat_learning"
+  ],
+  "results": [
+    {
+      "name": "enemy_disengagement",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 3.925,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_enemy_disengagement.gd"
+      ],
+      "log": "/tmp/mygame-tests-9cjed52k/enemy_disengagement.log",
+      "diagnostic": []
+    },
+    {
+      "name": "combat_learning",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 7.184,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_combat_learning.gd"
+      ],
+      "log": "/tmp/mygame-tests-9cjed52k/combat_learning.log",
+      "diagnostic": []
+    },
+    {
+      "name": "enemy_phase_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 13.001,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_enemy_phase_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-9cjed52k/enemy_phase_input.log",
+      "diagnostic": []
+    }
+  ],
+  "skipped": [],
+  "complete": true
+}

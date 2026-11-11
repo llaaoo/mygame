@@ -1,0 +1,156 @@
+[
+  {
+    "cell": [
+      -4,
+      9
+    ],
+    "surface": {
+      "remaining": 4.10413033333333,
+      "source": "propagation_from_(-3, 9)",
+      "state": "burning"
+    }
+  },
+  {
+    "cell": [
+      -3,
+      8
+    ],
+    "surface": {
+      "remaining": 4.10413033333333,
+      "source": "propagation_from_(-3, 9)",
+      "state": "burning"
+    }
+  },
+  {
+    "cell": [
+      -3,
+      9
+    ],
+    "surface": {
+      "remaining": 7.10413033333333,
+      "source": "propagation_from_(-2, 9)",
+      "state": "burning"
+    }
+  },
+  {
+    "cell": [
+      -3,
+      10
+    ],
+    "surface": {
+      "remaining": 4.10413033333333,
+      "source": "propagation_from_(-3, 9)",
+      "state": "burning"
+    }
+  },
+  {
+    "cell": [
+      -2,
+      8
+    ],
+    "surface": {
+      "remaining": 4.10413033333333,
+      "source": "propagation_from_(-2, 9)",
+      "state": "burning"
+    }
+  },
+  {
+    "cell": [
+      -2,
+      9
+    ],
+    "surface": {
+      "remaining": 7.076326,
+      "source": "火花",
+      "state": "burning"
+    }
+  },
+  {
+    "cell": [
+      -2,
+      10
+    ],
+    "surface": {
+      "remaining": 7.10413033333333,
+      "source": "propagation_from_(-2, 9)",
+      "state": "burning"
+    }
+  },
+  {
+    "cell": [
+      -2,
+      11
+    ],
+    "surface": {
+      "remaining": 4.15169533333333,
+      "source": "propagation_from_(-2, 10)",
+      "state": "burning"
+    }
+  },
+  {
+    "cell": [
+      -1,
+      9
+    ],
+    "surface": {
+      "remaining": 4.10413033333333,
+      "source": "propagation_from_(-2, 9)",
+      "state": "burning"
+    }
+  },
+  {
+    "cell": [
+      -1,
+      10
+    ],
+    "surface": {
+      "remaining": 4.15169533333333,
+      "source": "propagation_from_(-2, 10)",
+      "state": "burning"
+    }
+  },
+  {
+    "cell": [
+      0,
+      1
+    ],
+    "surface": {
+      "remaining": 594.174604000001,
+      "source": "authored:river_archive",
+      "state": "wet"
+    }
+  },
+  {
+    "cell": [
+      0,
+      2
+    ],
+    "surface": {
+      "remaining": 594.174604000001,
+      "source": "authored:river_archive",
+      "state": "wet"
+    }
+  },
+  {
+    "cell": [
+      1,
+      1
+    ],
+    "surface": {
+      "remaining": 594.174604000001,
+      "source": "authored:river_archive",
+      "state": "wet"
+    }
+  },
+  {
+    "cell": [
+      1,
+      2
+    ],
+    "surface": {
+      "remaining": 594.174604000001,
+      "source": "authored:river_archive",
+      "state": "wet"
+    }
+  }
+]
