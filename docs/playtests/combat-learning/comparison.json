@@ -1,0 +1,566 @@
+{
+  "initial_equal": {
+    "materials": true,
+    "items": true,
+    "pack": true,
+    "gear": true,
+    "shortcuts": true,
+    "known_actions": true,
+    "martial": true,
+    "growth": true,
+    "claims": true,
+    "npc_accounts": true,
+    "player": true,
+    "enemies": true,
+    "campaign_clock_range": [
+      173.057549222223,
+      173.103375555557
+    ],
+    "same_seed_sha256": "89746ddd2186335bd46570d07ab6a9bec6d4e5eb1beb8affb6dd3ce50ffb8a1f"
+  },
+  "samples": [
+    {
+      "style": "counter",
+      "same_seed_sha256": "89746ddd2186335bd46570d07ab6a9bec6d4e5eb1beb8affb6dd3ce50ffb8a1f",
+      "target": "river.enemy.river_archive.river_archive.2",
+      "killed": true,
+      "seconds": 4.75645766666667,
+      "confirmed_damage": 16,
+      "mp_start": 60,
+      "mp_end": 60,
+      "hp_end": 94,
+      "materials_before": {
+        "ash": 2,
+        "charcoal": 3,
+        "clean_water": 3,
+        "cloth": 2,
+        "crystal": 7,
+        "fire_stone": 1,
+        "frost_salt": 2,
+        "grain": 3,
+        "herb": 2,
+        "oil_bottle": 1,
+        "poison_rag": 1,
+        "ration": 3,
+        "sap": 9,
+        "storm_dust": 3
+      },
+      "materials_after": {
+        "ash": 2,
+        "charcoal": 3,
+        "clean_water": 3,
+        "cloth": 2,
+        "crystal": 7,
+        "fire_stone": 1,
+        "frost_salt": 2,
+        "grain": 3,
+        "herb": 2,
+        "oil_bottle": 1,
+        "poison_rag": 1,
+        "ration": 3,
+        "sap": 9,
+        "storm_dust": 3
+      },
+      "physical_actions": [
+        {
+          "data": {
+            "art_route": "",
+            "charged": false,
+            "counter": true,
+            "family": "weapon.player.1",
+            "followup": false,
+            "stamina": 11.0,
+            "stroke_count": 3,
+            "stroke_index": 0,
+            "stroke_title": "横斩",
+            "technique": "",
+            "weapon_art": false,
+            "weapon_uid": "item.31"
+          },
+          "t": 3.06197733333333
+        },
+        {
+          "data": {
+            "art_route": "",
+            "charged": false,
+            "counter": true,
+            "family": "weapon.player.2",
+            "followup": false,
+            "stamina": 11.0,
+            "stroke_count": 3,
+            "stroke_index": 0,
+            "stroke_title": "横斩",
+            "technique": "",
+            "weapon_art": false,
+            "weapon_uid": "item.31"
+          },
+          "t": 4.30699511111111
+        },
+        {
+          "data": {
+            "art_route": "",
+            "charged": false,
+            "counter": true,
+            "family": "weapon.player.3",
+            "followup": false,
+            "stamina": 11.0,
+            "stroke_count": 3,
+            "stroke_index": 0,
+            "stroke_title": "横斩",
+            "technique": "",
+            "weapon_art": false,
+            "weapon_uid": "item.31"
+          },
+          "t": 5.57269666666667
+        }
+      ],
+      "casts": [],
+      "defenses": [
+        {
+          "hp": 105,
+          "outcome": {
+            "blocked": true,
+            "damage": 5,
+            "dodged": false,
+            "guard_broken": false,
+            "interrupted": false,
+            "parried": true,
+            "pushed": false
+          },
+          "stamina": 94.4,
+          "t": 3.00444833333333
+        },
+        {
+          "hp": 99,
+          "outcome": {
+            "blocked": true,
+            "damage": 6,
+            "dodged": false,
+            "guard_broken": false,
+            "interrupted": false,
+            "parried": true,
+            "pushed": false
+          },
+          "stamina": 73.6799999999999,
+          "t": 4.28477288888889
+        },
+        {
+          "hp": 94,
+          "outcome": {
+            "blocked": true,
+            "damage": 5,
+            "dodged": false,
+            "guard_broken": false,
+            "interrupted": false,
+            "parried": true,
+            "pushed": false
+          },
+          "stamina": 57.6399999999999,
+          "t": 5.54769666666667
+        }
+      ],
+      "domain_events": [
+        {
+          "data": {
+            "family": "weapon.player.1",
+            "motion": "slash",
+            "weapon_uid": "item.31"
+          },
+          "kind": "physical_action_released",
+          "t": 3.23409966666667
+        },
+        {
+          "data": {
+            "family": "weapon.player.2",
+            "motion": "slash",
+            "weapon_uid": "item.31"
+          },
+          "kind": "physical_action_released",
+          "t": 4.468389
+        },
+        {
+          "data": {
+            "family": "weapon.player.3",
+            "motion": "slash",
+            "weapon_uid": "item.31"
+          },
+          "kind": "physical_action_released",
+          "t": 5.72676833333334
+        }
+      ],
+      "target_statuses": {
+        "": {
+          "remaining": 0.0,
+          "t": 0.995310666666667
+        }
+      }
+    },
+    {
+      "style": "martial",
+      "same_seed_sha256": "89746ddd2186335bd46570d07ab6a9bec6d4e5eb1beb8affb6dd3ce50ffb8a1f",
+      "target": "river.enemy.river_archive.river_archive.2",
+      "killed": true,
+      "seconds": 4.098927,
+      "confirmed_damage": 32,
+      "mp_start": 60,
+      "mp_end": 60,
+      "hp_end": 78,
+      "materials_before": {
+        "ash": 2,
+        "charcoal": 3,
+        "clean_water": 3,
+        "cloth": 2,
+        "crystal": 7,
+        "fire_stone": 1,
+        "frost_salt": 2,
+        "grain": 3,
+        "herb": 2,
+        "oil_bottle": 1,
+        "poison_rag": 1,
+        "ration": 3,
+        "sap": 9,
+        "storm_dust": 3
+      },
+      "materials_after": {
+        "ash": 2,
+        "charcoal": 3,
+        "clean_water": 3,
+        "cloth": 2,
+        "crystal": 7,
+        "fire_stone": 1,
+        "frost_salt": 2,
+        "grain": 3,
+        "herb": 2,
+        "oil_bottle": 1,
+        "poison_rag": 1,
+        "ration": 3,
+        "sap": 9,
+        "storm_dust": 3
+      },
+      "physical_actions": [
+        {
+          "data": {
+            "art_route": "",
+            "charged": false,
+            "counter": false,
+            "family": "weapon.player.1",
+            "followup": false,
+            "stamina": 11.0,
+            "stroke_count": 3,
+            "stroke_index": 0,
+            "stroke_title": "横斩",
+            "technique": "",
+            "weapon_art": false,
+            "weapon_uid": "item.31"
+          },
+          "t": 2.89610766666666
+        },
+        {
+          "data": {
+            "art_route": "",
+            "charged": true,
+            "counter": false,
+            "family": "weapon.player.2",
+            "followup": false,
+            "stamina": 22.0,
+            "stroke_count": 0,
+            "stroke_index": -1,
+            "stroke_title": "横斩",
+            "technique": "",
+            "weapon_art": false,
+            "weapon_uid": "item.31"
+          },
+          "t": 3.93859166666666
+        },
+        {
+          "data": {
+            "art_route": "power",
+            "charged": false,
+            "counter": false,
+            "family": "weapon.player.3",
+            "followup": false,
+            "stamina": 26.0,
+            "stroke_count": 0,
+            "stroke_index": -1,
+            "stroke_title": "",
+            "technique": "blade_breaker",
+            "weapon_art": true,
+            "weapon_uid": "item.31"
+          },
+          "t": 4.61303033333333
+        }
+      ],
+      "casts": [],
+      "defenses": [],
+      "domain_events": [
+        {
+          "data": {
+            "family": "weapon.player.1",
+            "motion": "slash",
+            "weapon_uid": "item.31"
+          },
+          "kind": "physical_action_released",
+          "t": 2.97334
+        },
+        {
+          "data": {
+            "family": "weapon.player.2",
+            "motion": "slash",
+            "weapon_uid": "item.31"
+          },
+          "kind": "physical_action_released",
+          "t": 3.99636366666666
+        },
+        {
+          "data": {
+            "family": "weapon.player.3",
+            "motion": "slash",
+            "weapon_uid": "item.31"
+          },
+          "kind": "physical_action_released",
+          "t": 5.079697
+        }
+      ],
+      "target_statuses": {
+        "": {
+          "remaining": 0.0,
+          "t": 1.00077
+        }
+      }
+    },
+    {
+      "style": "combo",
+      "same_seed_sha256": "89746ddd2186335bd46570d07ab6a9bec6d4e5eb1beb8affb6dd3ce50ffb8a1f",
+      "target": "river.enemy.river_archive.river_archive.2",
+      "killed": true,
+      "seconds": 4.693436,
+      "confirmed_damage": 0,
+      "mp_start": 60,
+      "mp_end": 28,
+      "hp_end": 110,
+      "materials_before": {
+        "ash": 2,
+        "charcoal": 3,
+        "clean_water": 3,
+        "cloth": 2,
+        "crystal": 7,
+        "fire_stone": 1,
+        "frost_salt": 2,
+        "grain": 3,
+        "herb": 2,
+        "oil_bottle": 1,
+        "poison_rag": 1,
+        "ration": 3,
+        "sap": 9,
+        "storm_dust": 3
+      },
+      "materials_after": {
+        "ash": 2,
+        "charcoal": 3,
+        "clean_water": 3,
+        "cloth": 2,
+        "crystal": 7,
+        "frost_salt": 2,
+        "grain": 3,
+        "herb": 2,
+        "oil_bottle": 1,
+        "poison_rag": 1,
+        "ration": 3,
+        "sap": 9,
+        "storm_dust": 3
+      },
+      "physical_actions": [],
+      "casts": [
+        {
+          "action": "inscribe",
+          "charge_power": 1.0,
+          "materials": {
+            "fire_stone": 1
+          },
+          "mp_after": 52,
+          "mp_cost": 8,
+          "position": [
+            -112.090339660645,
+            264.067016601562
+          ],
+          "result": "inscribe",
+          "rule": "",
+          "t": 1.81995366666667
+        },
+        {
+          "action": "ignite",
+          "charge_power": 1.0,
+          "materials": {},
+          "mp_after": 40,
+          "mp_cost": 12,
+          "position": [
+            -112.090339660645,
+            264.067016601562
+          ],
+          "result": "fireball",
+          "rule": "fire_sigil_fireball",
+          "t": 2.326336
+        },
+        {
+          "action": "ignite",
+          "charge_power": 1.0,
+          "materials": {},
+          "mp_after": 28,
+          "mp_cost": 12,
+          "position": [
+            -112.090339660645,
+            264.067016601562
+          ],
+          "result": "fireball",
+          "rule": "fire_sigil_fireball",
+          "t": 4.67561066666666
+        }
+      ],
+      "defenses": [],
+      "domain_events": [],
+      "target_statuses": {
+        "": {
+          "remaining": 0.0,
+          "t": 2.07522166666667
+        },
+        "burning": {
+          "remaining": 4.0,
+          "t": 3.537388
+        }
+      }
+    },
+    {
+      "style": "throw",
+      "same_seed_sha256": "89746ddd2186335bd46570d07ab6a9bec6d4e5eb1beb8affb6dd3ce50ffb8a1f",
+      "target": "river.enemy.river_archive.river_archive.2",
+      "killed": true,
+      "seconds": 4.94613948148148,
+      "confirmed_damage": 34,
+      "mp_start": 60,
+      "mp_end": 56,
+      "hp_end": 76,
+      "materials_before": {
+        "ash": 2,
+        "charcoal": 3,
+        "clean_water": 3,
+        "cloth": 2,
+        "crystal": 7,
+        "fire_stone": 1,
+        "frost_salt": 2,
+        "grain": 3,
+        "herb": 2,
+        "oil_bottle": 1,
+        "poison_rag": 1,
+        "ration": 3,
+        "sap": 9,
+        "storm_dust": 3
+      },
+      "materials_after": {
+        "ash": 2,
+        "charcoal": 3,
+        "clean_water": 3,
+        "cloth": 2,
+        "crystal": 7,
+        "fire_stone": 1,
+        "frost_salt": 2,
+        "grain": 3,
+        "herb": 2,
+        "poison_rag": 1,
+        "ration": 3,
+        "sap": 9,
+        "storm_dust": 3
+      },
+      "physical_actions": [
+        {
+          "data": {
+            "art_route": "",
+            "charged": false,
+            "counter": false,
+            "family": "weapon.player.1",
+            "followup": false,
+            "stamina": 11.0,
+            "stroke_count": 3,
+            "stroke_index": 0,
+            "stroke_title": "横斩",
+            "technique": "",
+            "weapon_art": false,
+            "weapon_uid": "item.31"
+          },
+          "t": 4.96666666666666
+        },
+        {
+          "data": {
+            "art_route": "",
+            "charged": false,
+            "counter": false,
+            "family": "weapon.player.2",
+            "followup": false,
+            "stamina": 13.0,
+            "stroke_count": 3,
+            "stroke_index": 1,
+            "stroke_title": "返刃",
+            "technique": "",
+            "weapon_art": false,
+            "weapon_uid": "item.31"
+          },
+          "t": 5.77893592592592
+        }
+      ],
+      "casts": [
+        {
+          "action": "ignite",
+          "charge_power": 1.0,
+          "materials": {},
+          "mp_after": 56,
+          "mp_cost": 4,
+          "position": [
+            249.594802856445,
+            -108.618141174316
+          ],
+          "result": "ignite",
+          "rule": "",
+          "t": 4.48749433333333
+        }
+      ],
+      "defenses": [],
+      "domain_events": [
+        {
+          "data": {
+            "item": "oil_bottle",
+            "weapon_uid": "item.31"
+          },
+          "kind": "item_action_committed",
+          "t": 3.782309
+        },
+        {
+          "data": {
+            "family": "weapon.player.1",
+            "motion": "slash",
+            "weapon_uid": "item.31"
+          },
+          "kind": "physical_action_released",
+          "t": 5.11380952380952
+        },
+        {
+          "data": {
+            "family": "weapon.player.2",
+            "motion": "slash",
+            "weapon_uid": "item.31"
+          },
+          "kind": "physical_action_released",
+          "t": 5.96666666666666
+        }
+      ],
+      "target_statuses": {
+        "": {
+          "remaining": 0.0,
+          "t": 4.187927
+        },
+        "burning": {
+          "remaining": 4.0,
+          "t": 4.48749433333333
+        }
+      }
+    }
+  ]
+}

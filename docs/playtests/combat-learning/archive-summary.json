@@ -1,0 +1,57 @@
+[
+  {
+    "style": "counter",
+    "exit": 0,
+    "native_exit": 0,
+    "seconds": 4.73363033333333,
+    "damage": 16,
+    "killed": true,
+    "hp": 94,
+    "mp": 60,
+    "oil_fire": 0
+  },
+  {
+    "style": "martial",
+    "exit": 0,
+    "native_exit": 0,
+    "seconds": 4.129175,
+    "damage": 34,
+    "killed": true,
+    "hp": 76,
+    "mp": 60,
+    "oil_fire": 0
+  },
+  {
+    "style": "combo",
+    "exit": 0,
+    "native_exit": 0,
+    "seconds": 4.57216440740741,
+    "damage": 0,
+    "killed": true,
+    "hp": 110,
+    "mp": 28,
+    "oil_fire": 0
+  },
+  {
+    "style": "throw",
+    "exit": 1,
+    "native_exit": 0,
+    "seconds": null,
+    "damage": null,
+    "killed": null,
+    "hp": 94,
+    "mp": 60,
+    "oil_fire": 0
+  },
+  {
+    "style": "ground",
+    "exit": 0,
+    "native_exit": 0,
+    "seconds": null,
+    "damage": null,
+    "killed": null,
+    "hp": 110,
+    "mp": 56,
+    "oil_fire": 3
+  }
+]

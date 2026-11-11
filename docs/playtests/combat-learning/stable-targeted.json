@@ -1,0 +1,163 @@
+{
+  "schema": 1,
+  "revision": "fec9f4a678067c663cbd1e14356c30e2610b8f38",
+  "dirty": true,
+  "godot": "4.6.3.stable.official.7d41c59c4",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "jobs": 2,
+  "timeout": 300.0,
+  "logs": "/tmp/mygame-tests-lksm0y3n",
+  "requested": [
+    "content",
+    "maps",
+    "gut_domain",
+    "combat_learning",
+    "enemy_disengagement",
+    "enemy_phase_input",
+    "enemy_observation_input",
+    "tactical_ai"
+  ],
+  "results": [
+    {
+      "name": "content",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 2.32,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tools/validate_mvp_content.gd"
+      ],
+      "log": "/tmp/mygame-tests-lksm0y3n/content.log",
+      "diagnostic": []
+    },
+    {
+      "name": "maps",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 2.12,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tools/validate_maps.gd"
+      ],
+      "log": "/tmp/mygame-tests-lksm0y3n/maps.log",
+      "diagnostic": []
+    },
+    {
+      "name": "gut_domain",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 3.325,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://addons/gut/gut_cmdln.gd",
+        "-gexit",
+        "-gdisable_colors",
+        "-gjunit_xml_file=/tmp/mygame-tests-lksm0y3n/gut-domain.xml"
+      ],
+      "log": "/tmp/mygame-tests-lksm0y3n/gut_domain.log",
+      "diagnostic": []
+    },
+    {
+      "name": "enemy_disengagement",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 3.925,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_enemy_disengagement.gd"
+      ],
+      "log": "/tmp/mygame-tests-lksm0y3n/enemy_disengagement.log",
+      "diagnostic": []
+    },
+    {
+      "name": "combat_learning",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 7.34,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_combat_learning.gd"
+      ],
+      "log": "/tmp/mygame-tests-lksm0y3n/combat_learning.log",
+      "diagnostic": []
+    },
+    {
+      "name": "tactical_ai",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 4.588,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_tactical_ai.gd"
+      ],
+      "log": "/tmp/mygame-tests-lksm0y3n/tactical_ai.log",
+      "diagnostic": []
+    },
+    {
+      "name": "enemy_phase_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 13.606,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_enemy_phase_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-lksm0y3n/enemy_phase_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "enemy_observation_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 4.728,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_enemy_observation_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-lksm0y3n/enemy_observation_input.log",
+      "diagnostic": []
+    }
+  ],
+  "skipped": [],
+  "complete": true
+}

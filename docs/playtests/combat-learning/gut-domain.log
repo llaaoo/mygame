@@ -1,0 +1,72 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+
+---  GUT  ---
+[1m[INFO]:  [0musing [/tmp/mygame-tests-h94gewc5/gut_domain/data/godot/app_userdata/Study] for temporary output.
+Godot version:  4.6.3
+GUT version:  9.6.1
+
+
+res://tests/unit/test_condition_contracts.gd
+* test_legacy_knowledge_fallback_respects_category
+* test_injected_knowledge_owner_receives_actual_actor_and_category
+* test_unmet_claims_do_not_report_completion
+3/3 passed.
+
+
+res://tests/unit/test_crafting_catalog.gd
+* test_all_authored_recipe_files_have_one_registration
+* test_duplicate_and_missing_recipe_ids_are_rejected
+* test_shared_recipe_definitions_do_not_grant_knowledge_or_share_stock
+3/3 passed.
+
+
+res://tests/unit/test_enemy_status_view.gd
+* test_distant_labels_skip_status_projection_and_nearby_labels_refresh
+* test_warning_exposes_actual_territory_counter_without_baiting_close_interaction
+* test_physical_labels_follow_executor_phase_and_hide_territory_repetition
+3/3 passed.
+
+
+res://tests/unit/test_inventory_contracts.gd
+* test_occupancy_counts_real_stacks_without_cloning_or_mutation
+* test_stale_transfer_has_no_partial_write_or_notification
+* test_equipped_item_transfer_preserves_identity_and_clears_slot
+* test_failed_exchange_preserves_both_inventories
+* test_full_containers_can_swap_real_items_atomically
+* test_detached_pack_invalidates_plan_and_does_not_refill
+* test_query_copies_cannot_mutate_authoritative_inventory
+7/7 passed.
+
+
+res://tests/unit/test_mcp_diagnostics.gd
+* test_final_dispose_breaks_registered_tool_core_ownership_cycle
+* test_state_chart_nested_resource_format_and_rejection_survive_cleanup_patch
+* test_named_project_types_keep_their_real_compilation_context
+* test_unsaved_named_type_reports_missing_context_instead_of_syntax_error
+* test_stdout_capture_preserves_duplicate_messages_and_closes_scope
+mcp-scope-proof
+mcp-scope-proof
+outside-mcp-scope
+* test_old_debugger_messages_cannot_complete_a_new_runtime_request
+* test_validation_worker_propagates_real_compile_failure
+7/7 passed.
+
+
+
+
+==============================================
+= Run Summary
+==============================================
+
+Totals
+------
+Scripts               5
+Tests                23
+Passing Tests        23
+Asserts             187
+Time              1.106s
+
+
+---- All tests passed! ----
+
+Results saved to /tmp/mygame-tests-h94gewc5/gut-domain.xml

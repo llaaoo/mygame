@@ -28,7 +28,11 @@ func _process(delta: float) -> void:
 	var awareness:=actor.actor_context.awareness if actor.actor_context else null
 	var warning: bool=awareness!=null and awareness.phase=="warning" and awareness.rules!=null
 	var text:=actor.enemy_name
-	if awareness:text+="\n"+awareness.caption()
+	# Observe the executor's committed phase, not the legacy preparation clock.
+	# Its direction/range drawing remains the only world telegraph.
+	var action_caption:=_action_caption(physical)
+	if not action_caption.is_empty():text+="\n"+action_caption
+	if awareness and (warning or not in_combat):text+="\n"+awareness.caption()
 	# Encounter rules live on this regional awareness, not on the shared body.
 	# Warning is the existing opportunity to read a counter and withdraw, without
 	# opening a near-range inventory panel or stopping normal AI.
@@ -50,9 +54,20 @@ func _process(delta: float) -> void:
 		_label.size.x=width
 		_label.text=text
 		_label.size.y=0
-	_label.position=Vector2(-width*.5,-54-_label.get_combined_minimum_size().y if warning else -76 if in_combat else -98)
+	var base_top: float=-76 if in_combat else -98
+	_label.position=Vector2(-width*.5,minf(base_top,-54-_label.get_combined_minimum_size().y))
 	if is_instance_valid(actor.player):
 		_label.modulate=Color("a5d5bd") if actor.story_truce else Color.WHITE
+func _action_caption(physical: ActorActionController) -> String:
+	if not physical or physical.mode!="attack" or not physical.profile:return ""
+	var snapshot:=physical.presentation_snapshot()
+	match str(snapshot.get("phase","")):
+		"windup":
+			if physical.profile.projectile_speed>0:return "远射起手"
+			return "重击起手" if physical.profile.guard_pressure>1 else "近击起手"
+		"active":return "远射释放" if physical.profile.projectile_speed>0 else "挥击中"
+		"recovery":return "收招 · 寻机还击"
+	return ""
 func _draw() -> void:
 	if actor.actor_context and actor.actor_context.rules.tactical_combat:
 		draw_rect(Rect2(-23,-30,46,3),Color(.1,.1,.1,.8))

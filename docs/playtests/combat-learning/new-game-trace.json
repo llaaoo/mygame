@@ -1,0 +1,1358 @@
+[
+  {
+    "request": {
+      "id": 1.0,
+      "label": "开始河谷旅程",
+      "note": "Planned assisted acceptance route, not a 30–45 minute measured completion. Empty isolated XDG; normal AI/default stats. No fixture or domain mutation.",
+      "op": "click",
+      "phase": "A: new save, handbook, rations and real crafting"
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 100,
+    "mp": 60,
+    "time": 1.04043833333333
+  },
+  {
+    "request": {
+      "id": 2.0,
+      "op": "walk",
+      "point": [
+        -3500.0,
+        2350.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 100,
+    "mp": 60,
+    "time": 3.12674533333333
+  },
+  {
+    "request": {
+      "capture": "adventure-01-handbook",
+      "id": 3.0,
+      "key": "F",
+      "op": "key"
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 100,
+    "mp": 60,
+    "time": 3.502523
+  },
+  {
+    "request": {
+      "id": 4.0,
+      "label": "记入日志，继续探索",
+      "op": "click"
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 100,
+    "mp": 60,
+    "time": 4.56020933333333
+  },
+  {
+    "request": {
+      "id": 5.0,
+      "key": "J",
+      "op": "key"
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 100,
+    "mp": 60,
+    "time": 5.06854133333333
+  },
+  {
+    "request": {
+      "id": 6.0,
+      "label": "委托记录",
+      "op": "click"
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 100,
+    "mp": 60,
+    "time": 6.16666666666667
+  },
+  {
+    "request": {
+      "id": 7.0,
+      "label": "首次出征：林下档案窖",
+      "op": "click"
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 100,
+    "mp": 60,
+    "time": 7.23333333333333
+  },
+  {
+    "request": {
+      "id": 8.0,
+      "label": "追踪这个委托",
+      "op": "click"
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 100,
+    "mp": 60,
+    "time": 8.27578566666667
+  },
+  {
+    "request": {
+      "id": 9.0,
+      "key": "Escape",
+      "op": "key"
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 100,
+    "mp": 60,
+    "time": 8.59032666666667
+  },
+  {
+    "request": {
+      "id": 10.0,
+      "op": "walk",
+      "point": [
+        -3850.0,
+        2300.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 100,
+    "mp": 60,
+    "time": 9.80756133333334
+  },
+  {
+    "request": {
+      "capture": "adventure-02-rations",
+      "id": 11.0,
+      "key": "F",
+      "op": "key"
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 100,
+    "mp": 60,
+    "time": 10.1833333333333
+  },
+  {
+    "request": {
+      "id": 12.0,
+      "label": "记入日志，继续探索",
+      "op": "click"
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 100,
+    "mp": 60,
+    "time": 11.25
+  },
+  {
+    "request": {
+      "action": "移至背包",
+      "capture": "adventure-03-free-pocket",
+      "id": 13.0,
+      "item": "ash",
+      "note": "Move actual ash stack; make a slot for the crafted field medium. Do not grant or reconstruct supplies.",
+      "op": "inventory",
+      "quantity": 2.0
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 100,
+    "mp": 60,
+    "time": 16.667178
+  },
+  {
+    "request": {
+      "id": 14.0,
+      "op": "walk",
+      "point": [
+        -3100.0,
+        1850.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 100,
+    "mp": 60,
+    "time": 20.389717
+  },
+  {
+    "request": {
+      "id": 15.0,
+      "key": "F",
+      "op": "key"
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 100,
+    "mp": 60,
+    "time": 20.8074073333334
+  },
+  {
+    "request": {
+      "id": 16.0,
+      "label": "火石",
+      "op": "click"
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 100,
+    "mp": 60,
+    "time": 22.0833333333333
+  },
+  {
+    "request": {
+      "id": 17.0,
+      "label": "加工：火石",
+      "op": "click"
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 100,
+    "mp": 60,
+    "time": 23.25
+  },
+  {
+    "request": {
+      "capture": "adventure-04-two-crafted-firestones",
+      "id": 18.0,
+      "label": "加工：火石",
+      "op": "click"
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 100,
+    "mp": 60,
+    "time": 24.441505
+  },
+  {
+    "request": {
+      "id": 19.0,
+      "label": "继续探索",
+      "op": "click"
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 100,
+    "mp": 60,
+    "time": 25.678458
+  },
+  {
+    "request": {
+      "id": 20.0,
+      "op": "walk",
+      "point": [
+        -3400.0,
+        1260.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 100,
+    "mp": 60,
+    "time": 28.7666666666667
+  },
+  {
+    "request": {
+      "capture": "adventure-05-north-sign",
+      "id": 21.0,
+      "key": "F",
+      "op": "key"
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 100,
+    "mp": 60,
+    "time": 29.2166666666667
+  },
+  {
+    "request": {
+      "id": 22.0,
+      "label": "记入日志，继续探索",
+      "op": "click"
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 100,
+    "mp": 60,
+    "time": 30.163158
+  },
+  {
+    "request": {
+      "id": 23.0,
+      "op": "walk",
+      "point": [
+        -3500.0,
+        900.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 100,
+    "mp": 60,
+    "time": 31.634999
+  },
+  {
+    "request": {
+      "id": 24.0,
+      "op": "walk",
+      "point": [
+        -3500.0,
+        0.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 100,
+    "mp": 60,
+    "time": 34.55
+  },
+  {
+    "request": {
+      "id": 25.0,
+      "op": "walk",
+      "point": [
+        -3260.0,
+        -780.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 100,
+    "mp": 60,
+    "time": 37.6007943703704
+  },
+  {
+    "request": {
+      "id": 26.0,
+      "op": "walk",
+      "point": [
+        -3350.0,
+        -1200.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 100,
+    "mp": 60,
+    "time": 39.4293075238095
+  },
+  {
+    "request": {
+      "capture": "adventure-06-west-safe-fire-record",
+      "id": 27.0,
+      "key": "F",
+      "op": "key"
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 100,
+    "mp": 60,
+    "time": 39.8
+  },
+  {
+    "request": {
+      "id": 28.0,
+      "label": "记入日志，继续探索",
+      "op": "click"
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 100,
+    "mp": 60,
+    "time": 40.8166666666667
+  },
+  {
+    "request": {
+      "id": 29.0,
+      "op": "walk",
+      "point": [
+        -3060.0,
+        -1200.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 100,
+    "mp": 60,
+    "time": 43.1002506666667
+  },
+  {
+    "request": {
+      "capture": "adventure-07-fire-medium",
+      "id": 30.0,
+      "key": "5",
+      "note": "Requires the current entry_point-based probe adapter. Validate selected source payload=ember; wheel confirmation alone is not a cast.",
+      "op": "wheel",
+      "payload": "ember"
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 100,
+    "mp": 60,
+    "time": 44.3931486666666
+  },
+  {
+    "request": {
+      "id": 31.0,
+      "label": "adventure-before-forest-combat",
+      "op": "save"
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 100,
+    "mp": 60,
+    "time": 44.9362026666666
+  },
+  {
+    "request": {
+      "capture": "adventure-08-forest-combat",
+      "id": 32.0,
+      "note": "Disclosed scripted actual-key assistance: helper presses 5 then 6 and aims at known test target. Check committed fire field/fireball and fire_stone consumption; do not infer success merely from helper exit.",
+      "op": "duel",
+      "style": "combo",
+      "target": "river.enemy.camp.forest.3"
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 100,
+    "mp": 30,
+    "time": 49.9666666666666
+  },
+  {
+    "request": {
+      "id": 33.0,
+      "key": "Escape",
+      "op": "key"
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 100,
+    "mp": 30,
+    "time": 50.4085939999999
+  },
+  {
+    "request": {
+      "id": 34.0,
+      "op": "walk_loot",
+      "target": "river.enemy.camp.forest.3"
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 100,
+    "mp": 32,
+    "time": 52.1666666666666
+  },
+  {
+    "request": {
+      "capture": "adventure-09-forest-real-loot",
+      "id": 35.0,
+      "key": "F",
+      "op": "key"
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 100,
+    "mp": 34,
+    "time": 52.6166666666666
+  },
+  {
+    "request": {
+      "id": 36.0,
+      "key": "T",
+      "op": "key"
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 100,
+    "mp": 35,
+    "time": 53.1451163333333
+  },
+  {
+    "request": {
+      "id": 37.0,
+      "key": "Escape",
+      "op": "key"
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 100,
+    "mp": 36,
+    "time": 53.4943316666666
+  },
+  {
+    "request": {
+      "action": "装备这件",
+      "capture": "adventure-10-real-sabre-equipped",
+      "id": 38.0,
+      "item": "river_sabre",
+      "op": "inventory"
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 100,
+    "mp": 47,
+    "time": 57.0833333333333
+  },
+  {
+    "request": {
+      "action": "装备这件",
+      "id": 39.0,
+      "item": "river_coat",
+      "op": "inventory"
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 100,
+    "mp": 58,
+    "time": 60.7639393333333
+  },
+  {
+    "request": {
+      "id": 40.0,
+      "key": "7",
+      "op": "key"
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 100,
+    "mp": 59,
+    "time": 61.1333333333333
+  },
+  {
+    "request": {
+      "id": 41.0,
+      "op": "wait",
+      "seconds": 2.5
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 110,
+    "mp": 60,
+    "time": 63.655550111111
+  },
+  {
+    "request": {
+      "id": 42.0,
+      "key": "8",
+      "op": "key"
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 110,
+    "mp": 60,
+    "time": 64.0004966666666
+  },
+  {
+    "request": {
+      "id": 43.0,
+      "op": "wait",
+      "seconds": 2.5
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 110,
+    "mp": 60,
+    "time": 66.5624926666667
+  },
+  {
+    "request": {
+      "id": 44.0,
+      "op": "walk",
+      "point": [
+        -3072.0,
+        -1200.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 110,
+    "mp": 60,
+    "time": 68.1580320000001
+  },
+  {
+    "request": {
+      "id": 45.0,
+      "op": "walk",
+      "point": [
+        -2850.0,
+        -1500.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 110,
+    "mp": 60,
+    "time": 69.6558810000002
+  },
+  {
+    "request": {
+      "id": 46.0,
+      "op": "walk",
+      "point": [
+        -2730.0,
+        -1850.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 110,
+    "mp": 60,
+    "time": 71.7100000000003
+  },
+  {
+    "request": {
+      "id": 47.0,
+      "op": "walk",
+      "point": [
+        -2600.0,
+        -1800.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 110,
+    "mp": 60,
+    "time": 72.5460321111114
+  },
+  {
+    "request": {
+      "capture": "adventure-11-archive-entry",
+      "id": 48.0,
+      "key": "F",
+      "op": "key",
+      "phase": "B: actual archive room and three normal enemies"
+    },
+    "error": "",
+    "region": "river_archive",
+    "hp": 110,
+    "mp": 60,
+    "time": 72.8833333333337
+  },
+  {
+    "request": {
+      "id": 49.0,
+      "label": "adventure-before-archive-combat",
+      "note": "Game-generated common starting point for future weapon/form/item counterplay comparisons; no fixture grants or positions.",
+      "op": "save"
+    },
+    "error": "",
+    "region": "river_archive",
+    "hp": 110,
+    "mp": 60,
+    "time": 73.2500000000004
+  },
+  {
+    "request": {
+      "id": 50.0,
+      "op": "walk",
+      "point": [
+        -780.0,
+        390.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "river_archive",
+    "hp": 110,
+    "mp": 60,
+    "time": 74.6433333333337
+  },
+  {
+    "request": {
+      "capture": "adventure-12-impact-knowledge",
+      "id": 51.0,
+      "key": "F",
+      "op": "key"
+    },
+    "error": "",
+    "region": "river_archive",
+    "hp": 110,
+    "mp": 60,
+    "time": 74.9190536666671
+  },
+  {
+    "request": {
+      "id": 52.0,
+      "label": "记入日志，继续探索",
+      "op": "click"
+    },
+    "error": "",
+    "region": "river_archive",
+    "hp": 110,
+    "mp": 60,
+    "time": 75.5811620000004
+  },
+  {
+    "request": {
+      "id": 53.0,
+      "op": "walk",
+      "point": [
+        -550.0,
+        420.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "river_archive",
+    "hp": 110,
+    "mp": 60,
+    "time": 76.5933333333338
+  },
+  {
+    "request": {
+      "capture": "adventure-13-dispatch",
+      "id": 54.0,
+      "key": "F",
+      "op": "key"
+    },
+    "error": "",
+    "region": "river_archive",
+    "hp": 110,
+    "mp": 60,
+    "time": 76.9353530000004
+  },
+  {
+    "request": {
+      "id": 55.0,
+      "label": "记入日志，继续探索",
+      "op": "click"
+    },
+    "error": "",
+    "region": "river_archive",
+    "hp": 110,
+    "mp": 60,
+    "time": 77.5168583333337
+  },
+  {
+    "request": {
+      "id": 56.0,
+      "op": "walk",
+      "point": [
+        -450.0,
+        450.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "river_archive",
+    "hp": 110,
+    "mp": 60,
+    "time": 77.9333000000004
+  },
+  {
+    "request": {
+      "id": 57.0,
+      "op": "walk",
+      "point": [
+        -170.0,
+        450.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "river_archive",
+    "hp": 110,
+    "mp": 60,
+    "time": 78.9588823333337
+  },
+  {
+    "request": {
+      "capture": "adventure-14-archive-first-guard",
+      "id": 58.0,
+      "note": "Normal weapon fight obtains a spare actual coat before the training purchase. No free kit or knowledge.",
+      "op": "duel",
+      "style": "basic",
+      "target": "river.enemy.river_archive.river_archive.1"
+    },
+    "error": "",
+    "region": "river_archive",
+    "hp": 78,
+    "mp": 60,
+    "time": 82.2391796666671
+  },
+  {
+    "request": {
+      "id": 59.0,
+      "key": "Escape",
+      "op": "key"
+    },
+    "error": "",
+    "region": "river_archive",
+    "hp": 75,
+    "mp": 60,
+    "time": 82.5608830000005
+  },
+  {
+    "request": {
+      "id": 60.0,
+      "op": "walk_loot",
+      "target": "river.enemy.river_archive.river_archive.1"
+    },
+    "error": "",
+    "region": "river_archive",
+    "hp": 75,
+    "mp": 60,
+    "time": 82.6850680000005
+  },
+  {
+    "request": {
+      "capture": "adventure-15-first-guard-loot",
+      "id": 61.0,
+      "key": "F",
+      "op": "key"
+    },
+    "error": "",
+    "region": "river_archive",
+    "hp": 75,
+    "mp": 60,
+    "time": 82.9500000000005
+  },
+  {
+    "request": {
+      "id": 62.0,
+      "key": "T",
+      "op": "key"
+    },
+    "error": "",
+    "region": "river_archive",
+    "hp": 72,
+    "mp": 60,
+    "time": 83.4571050000004
+  },
+  {
+    "request": {
+      "id": 63.0,
+      "key": "Escape",
+      "op": "key"
+    },
+    "error": "",
+    "region": "river_archive",
+    "hp": 72,
+    "mp": 60,
+    "time": 83.6117983333338
+  },
+  {
+    "request": {
+      "id": 64.0,
+      "op": "walk",
+      "point": [
+        -500.0,
+        450.0
+      ]
+    },
+    "error": "",
+    "region": "river_archive",
+    "hp": 66,
+    "mp": 60,
+    "time": 85.9333333333338
+  },
+  {
+    "request": {
+      "id": 65.0,
+      "op": "walk",
+      "point": [
+        -820.0,
+        0.0
+      ]
+    },
+    "error": "",
+    "region": "river_archive",
+    "hp": 63,
+    "mp": 60,
+    "time": 87.8566813333337
+  },
+  {
+    "request": {
+      "id": 66.0,
+      "key": "F",
+      "op": "key"
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 63,
+    "mp": 60,
+    "time": 88.1545610000004
+  },
+  {
+    "request": {
+      "id": 67.0,
+      "op": "walk",
+      "point": [
+        -2850.0,
+        -1800.0
+      ]
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 63,
+    "mp": 60,
+    "time": 88.7956228956233
+  },
+  {
+    "request": {
+      "id": 68.0,
+      "op": "walk",
+      "point": [
+        -3260.0,
+        -780.0
+      ]
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 65,
+    "mp": 60,
+    "time": 93.1311946666672
+  },
+  {
+    "request": {
+      "id": 69.0,
+      "op": "walk",
+      "point": [
+        -3500.0,
+        900.0
+      ]
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 71,
+    "mp": 60,
+    "time": 98.7320096666673
+  },
+  {
+    "request": {
+      "id": 70.0,
+      "op": "walk",
+      "point": [
+        -3500.0,
+        2000.0
+      ]
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 76,
+    "mp": 60,
+    "time": 102.277238666667
+  },
+  {
+    "request": {
+      "id": 71.0,
+      "op": "walk",
+      "point": [
+        -3210.0,
+        2000.0
+      ]
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 77,
+    "mp": 60,
+    "time": 103.344204333334
+  },
+  {
+    "request": {
+      "id": 72.0,
+      "op": "walk",
+      "point": [
+        -3210.0,
+        2220.0
+      ]
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 78,
+    "mp": 60,
+    "time": 104.166326333334
+  },
+  {
+    "request": {
+      "id": 73.0,
+      "key": "F",
+      "op": "key"
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 78,
+    "mp": 60,
+    "time": 104.566666666667
+  },
+  {
+    "request": {
+      "id": 74.0,
+      "label": "旧驿路皮甲 ×1 · 8币",
+      "op": "click"
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 80,
+    "mp": 60,
+    "time": 105.668268333334
+  },
+  {
+    "request": {
+      "capture": "combat-learning-real-coat-sale",
+      "id": 75.0,
+      "label": "出售一件 · 8币",
+      "op": "click"
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 81,
+    "mp": 60,
+    "time": 106.800000000001
+  },
+  {
+    "request": {
+      "id": 76.0,
+      "key": "Escape",
+      "op": "key"
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 82,
+    "mp": 60,
+    "time": 107.322204666667
+  },
+  {
+    "request": {
+      "id": 77.0,
+      "op": "walk",
+      "point": [
+        -3210.0,
+        2000.0
+      ]
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 83,
+    "mp": 60,
+    "time": 108.091641666667
+  },
+  {
+    "request": {
+      "id": 78.0,
+      "op": "walk",
+      "point": [
+        -3350.0,
+        2000.0
+      ]
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 83,
+    "mp": 60,
+    "time": 108.623600666667
+  },
+  {
+    "request": {
+      "id": 79.0,
+      "op": "walk",
+      "point": [
+        -3340.0,
+        2310.0
+      ],
+      "tolerance": 10.0
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 85,
+    "mp": 60,
+    "time": 109.703705666667
+  },
+  {
+    "request": {
+      "id": 80.0,
+      "key": "F",
+      "op": "key"
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 85,
+    "mp": 60,
+    "time": 110.106985000001
+  },
+  {
+    "request": {
+      "capture": "combat-learning-paid-course",
+      "id": 81.0,
+      "label": "破势斩 · 8币",
+      "op": "click"
+    },
+    "error": "missing_button: 破势斩 · 8币",
+    "region": "camp",
+    "hp": 85,
+    "mp": 60,
+    "time": 110.240458000001
+  },
+  {
+    "request": {
+      "id": 82.0,
+      "label": "学习武技与野外技艺",
+      "op": "click"
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 103,
+    "mp": 60,
+    "time": 125.171573666668
+  },
+  {
+    "request": {
+      "id": 83.0,
+      "op": "state"
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 103,
+    "mp": 60,
+    "time": 125.234000666668
+  },
+  {
+    "request": {
+      "capture": "combat-learning-paid-course",
+      "id": 84.0,
+      "label": "破势斩 · 8币",
+      "op": "click"
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 110,
+    "mp": 60,
+    "time": 138.840136000001
+  },
+  {
+    "request": {
+      "id": 85.0,
+      "key": "Escape",
+      "op": "key"
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 110,
+    "mp": 60,
+    "time": 139.286263000001
+  },
+  {
+    "request": {
+      "id": 86.0,
+      "op": "walk",
+      "point": [
+        -3100.0,
+        1850.0
+      ]
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 110,
+    "mp": 60,
+    "time": 141.537389000001
+  },
+  {
+    "request": {
+      "id": 87.0,
+      "key": "F",
+      "op": "key"
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 110,
+    "mp": 60,
+    "time": 142.050000000001
+  },
+  {
+    "request": {
+      "id": 88.0,
+      "label": "火油瓶",
+      "op": "click"
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 110,
+    "mp": 60,
+    "time": 143.287920000001
+  },
+  {
+    "request": {
+      "id": 89.0,
+      "label": "加工：火油瓶",
+      "op": "click"
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 110,
+    "mp": 60,
+    "time": 144.502961000001
+  },
+  {
+    "request": {
+      "id": 90.0,
+      "label": "继续探索",
+      "op": "click"
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 110,
+    "mp": 60,
+    "time": 145.552070333334
+  },
+  {
+    "request": {
+      "action": "Q",
+      "id": 91.0,
+      "item": "oil_bottle",
+      "op": "inventory"
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 110,
+    "mp": 60,
+    "time": 149.916666666668
+  },
+  {
+    "request": {
+      "id": 92.0,
+      "op": "walk",
+      "point": [
+        -3500.0,
+        900.0
+      ]
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 110,
+    "mp": 60,
+    "time": 153.830879000001
+  },
+  {
+    "request": {
+      "id": 93.0,
+      "op": "walk",
+      "point": [
+        -3260.0,
+        -780.0
+      ]
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 110,
+    "mp": 60,
+    "time": 159.908928000001
+  },
+  {
+    "request": {
+      "id": 94.0,
+      "op": "walk",
+      "point": [
+        -3200.0,
+        -1800.0
+      ]
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 110,
+    "mp": 60,
+    "time": 163.437389666668
+  },
+  {
+    "request": {
+      "id": 95.0,
+      "op": "walk",
+      "point": [
+        -2670.0,
+        -1800.0
+      ]
+    },
+    "error": "",
+    "region": "camp",
+    "hp": 110,
+    "mp": 60,
+    "time": 165.157216666667
+  },
+  {
+    "request": {
+      "id": 96.0,
+      "key": "F",
+      "op": "key"
+    },
+    "error": "",
+    "region": "river_archive",
+    "hp": 110,
+    "mp": 60,
+    "time": 165.466666666667
+  },
+  {
+    "request": {
+      "id": 97.0,
+      "op": "walk",
+      "point": [
+        -500.0,
+        450.0
+      ]
+    },
+    "error": "",
+    "region": "river_archive",
+    "hp": 110,
+    "mp": 60,
+    "time": 169.976859333334
+  },
+  {
+    "request": {
+      "id": 98.0,
+      "op": "walk",
+      "point": [
+        -100.0,
+        250.0
+      ]
+    },
+    "error": "",
+    "region": "river_archive",
+    "hp": 110,
+    "mp": 60,
+    "time": 171.755232333334
+  },
+  {
+    "request": {
+      "capture": "combat-learning-common-state",
+      "id": 99.0,
+      "label": "combat-learning-common-seed",
+      "op": "save"
+    },
+    "error": "",
+    "region": "river_archive",
+    "hp": 110,
+    "mp": 60,
+    "time": 172.072976666668
+  },
+  {
+    "request": {
+      "id": 100.0,
+      "op": "quit"
+    },
+    "error": "",
+    "region": "river_archive",
+    "hp": 110,
+    "mp": 60,
+    "time": 172.206335000001
+  }
+]

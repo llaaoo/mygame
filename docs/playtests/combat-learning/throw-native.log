@@ -1,0 +1,60 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:364)
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+⏰ WorldTime 启动: 08:00
+🏛️ GameRuntime: 五大 Runtime 初始化完成
+   CommandBus       : ✅
+   CombatExecutor   : ✅
+   CombatEventBus   : ✅
+   WorldRuntime     : ✅
+   SimulationRuntime: ✅
+   WorldTime        : ✅
+⚡ 已注册触发效果: OnKillBonusExp
+📊 CombatDebugger: trace enabled
+⏰ 08:00 (☀️ 白天)
+SaveManager: saved user://save_3.sav
+⏰ 10:00 (☀️ 白天)
+FIRST30 1.0 click  pos=(-112.0903, 264.067) hp=110
+SaveManager: saved user://save_3.sav
+FIRST30 2.0 save  pos=(-112.0903, 264.067) hp=110
+🔥 [OnHitApplyStatus] Player → Encounter_1 挂 燃烧
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚔️  CombatTrace  #1 | cast_ignite
+   技能: 火花 | 事件数: 23 | 最终伤害: 20
+   伤害链: StatScalingModifier(+8)
+    1. ▶  cast: 火花
+    2. ▶  PHASE: MODIFIER
+    3. ▶  PHASE: EFFECT
+    4. 💥 resolve_damage: 火花 | base=12
+    5. 📊 StatScalingModifier @ FLAT: 12 → 20 (+8)
+    6. ▶  PHASE: EVENT
+    7. ▶  PHASE: POST
+    8. ⚡ done: 火花 | success=OK ✅
+    9. ▶  PHASE: IDLE
+   10. ▶  PHASE: MODIFIER
+   11. ▶  PHASE: EFFECT
+   12. ▶  PHASE: EVENT
+   13. 📡 ON_CAST → ?  [tags=["fire", "spark", "aoe"], extra={  }]
+   14. ▶  PHASE: POST
+   15. ▶  PHASE: IDLE
+   16. ▶  PHASE: EVENT
+   17. 📡 ON_HIT → Encounter_1  [damage=20, position=(243.711, -131.8857), tags=["fire", "spark", "aoe"], hit_result=<RefCounted#-9223371255825036727>, target_statuses_before=[], source_statuses_before=["meal_fortitude", "water_recovery", "wet"]]
+   18. 📡 ON_STATUS_APPLIED → Encounter_1  [buff_name=燃烧, effect=燃烧: DOT 5/1.0s 4.0s, duration=4.0]
+   19. 📡 ON_DAMAGE → Encounter_1  [damage=18, remaining_hp=42]
+   20. ▶  PHASE: IDLE
+   21. 📡 ON_HIT → Player  [damage=13, position=(230.7496, -123.9452), tags=["melee", "physical", "poison"], hit_result=<RefCounted#-9223371245406381923>, target_statuses_before=["meal_fortitude", "water_recovery", "wet"], source_statuses_before=["burning"]]
+   22. 📡 ON_DAMAGE → Player  [damage=12, remaining_hp=98]
+   23. 📡 ON_DAMAGE → Player  [damage=4, remaining_hp=94]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚡ [OnKillBonusExp] +15 额外经验 (target=Encounter_1)
+SaveManager: saved user://save_3.sav
+FIRST30 3.0 duel  pos=(225.717, -133.6115) hp=76
+FIRST30 4.0 key  pos=(225.717, -133.6115) hp=76
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+FIRST30 5.0 save  pos=(225.717, -133.6115) hp=73
+FIRST30 6.0 quit  pos=(225.717, -133.6115) hp=73

@@ -1,0 +1,550 @@
+[
+  {
+    "op": "click",
+    "label": "开始河谷旅程",
+    "phase": "A: new save, handbook, rations and real crafting",
+    "note": "Planned assisted acceptance route, not a 30–45 minute measured completion. Empty isolated XDG; normal AI/default stats. No fixture or domain mutation."
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3500,
+      2350
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F",
+    "capture": "adventure-01-handbook"
+  },
+  {
+    "op": "click",
+    "label": "记入日志，继续探索"
+  },
+  {
+    "op": "key",
+    "key": "J"
+  },
+  {
+    "op": "click",
+    "label": "委托记录"
+  },
+  {
+    "op": "click",
+    "label": "首次出征：林下档案窖"
+  },
+  {
+    "op": "click",
+    "label": "追踪这个委托"
+  },
+  {
+    "op": "key",
+    "key": "Escape"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3850,
+      2300
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F",
+    "capture": "adventure-02-rations"
+  },
+  {
+    "op": "click",
+    "label": "记入日志，继续探索"
+  },
+  {
+    "op": "inventory",
+    "item": "ash",
+    "quantity": 2,
+    "action": "移至背包",
+    "capture": "adventure-03-free-pocket",
+    "note": "Move actual ash stack; make a slot for the crafted field medium. Do not grant or reconstruct supplies."
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3100,
+      1850
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F"
+  },
+  {
+    "op": "click",
+    "label": "火石"
+  },
+  {
+    "op": "click",
+    "label": "加工：火石"
+  },
+  {
+    "op": "click",
+    "label": "加工：火石",
+    "capture": "adventure-04-two-crafted-firestones"
+  },
+  {
+    "op": "click",
+    "label": "继续探索"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3400,
+      1260
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F",
+    "capture": "adventure-05-north-sign"
+  },
+  {
+    "op": "click",
+    "label": "记入日志，继续探索"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3500,
+      900
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3500,
+      0
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3260,
+      -780
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3350,
+      -1200
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F",
+    "capture": "adventure-06-west-safe-fire-record"
+  },
+  {
+    "op": "click",
+    "label": "记入日志，继续探索"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3060,
+      -1200
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "wheel",
+    "key": "5",
+    "payload": "ember",
+    "capture": "adventure-07-fire-medium",
+    "note": "Requires the current entry_point-based probe adapter. Validate selected source payload=ember; wheel confirmation alone is not a cast."
+  },
+  {
+    "op": "save",
+    "label": "adventure-before-forest-combat"
+  },
+  {
+    "op": "duel",
+    "style": "combo",
+    "target": "river.enemy.camp.forest.3",
+    "capture": "adventure-08-forest-combat",
+    "note": "Disclosed scripted actual-key assistance: helper presses 5 then 6 and aims at known test target. Check committed fire field/fireball and fire_stone consumption; do not infer success merely from helper exit."
+  },
+  {
+    "op": "key",
+    "key": "Escape"
+  },
+  {
+    "op": "walk_loot",
+    "target": "river.enemy.camp.forest.3"
+  },
+  {
+    "op": "key",
+    "key": "F",
+    "capture": "adventure-09-forest-real-loot"
+  },
+  {
+    "op": "key",
+    "key": "T"
+  },
+  {
+    "op": "key",
+    "key": "Escape"
+  },
+  {
+    "op": "inventory",
+    "item": "river_sabre",
+    "action": "装备这件",
+    "capture": "adventure-10-real-sabre-equipped"
+  },
+  {
+    "op": "inventory",
+    "item": "river_coat",
+    "action": "装备这件"
+  },
+  {
+    "op": "key",
+    "key": "7"
+  },
+  {
+    "op": "wait",
+    "seconds": 2.5
+  },
+  {
+    "op": "key",
+    "key": "8"
+  },
+  {
+    "op": "wait",
+    "seconds": 2.5
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3072,
+      -1200
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -2850,
+      -1500
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -2730,
+      -1850
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -2600,
+      -1800
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F",
+    "capture": "adventure-11-archive-entry",
+    "phase": "B: actual archive room and three normal enemies"
+  },
+  {
+    "op": "save",
+    "label": "adventure-before-archive-combat",
+    "note": "Game-generated common starting point for future weapon/form/item counterplay comparisons; no fixture grants or positions."
+  },
+  {
+    "op": "walk",
+    "point": [
+      -780,
+      390
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F",
+    "capture": "adventure-12-impact-knowledge"
+  },
+  {
+    "op": "click",
+    "label": "记入日志，继续探索"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -550,
+      420
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "key",
+    "key": "F",
+    "capture": "adventure-13-dispatch"
+  },
+  {
+    "op": "click",
+    "label": "记入日志，继续探索"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -450,
+      450
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -170,
+      450
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "duel",
+    "style": "basic",
+    "target": "river.enemy.river_archive.river_archive.1",
+    "capture": "adventure-14-archive-first-guard",
+    "note": "Normal weapon fight obtains a spare actual coat before the training purchase. No free kit or knowledge."
+  },
+  {
+    "op": "key",
+    "key": "Escape"
+  },
+  {
+    "op": "walk_loot",
+    "target": "river.enemy.river_archive.river_archive.1"
+  },
+  {
+    "op": "key",
+    "key": "F",
+    "capture": "adventure-15-first-guard-loot"
+  },
+  {
+    "op": "key",
+    "key": "T"
+  },
+  {
+    "op": "key",
+    "key": "Escape"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -500,
+      450
+    ]
+  },
+  {
+    "op": "walk",
+    "point": [
+      -820,
+      0
+    ]
+  },
+  {
+    "op": "key",
+    "key": "F"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -2850,
+      -1800
+    ]
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3260,
+      -780
+    ]
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3500,
+      900
+    ]
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3500,
+      2000
+    ]
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3210,
+      2000
+    ]
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3210,
+      2220
+    ]
+  },
+  {
+    "op": "key",
+    "key": "F"
+  },
+  {
+    "op": "click",
+    "label": "旧驿路皮甲 ×1 · 8币"
+  },
+  {
+    "op": "click",
+    "label": "出售一件 · 8币",
+    "capture": "combat-learning-real-coat-sale"
+  },
+  {
+    "op": "key",
+    "key": "Escape"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3210,
+      2000
+    ]
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3350,
+      2000
+    ]
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3340,
+      2310
+    ],
+    "tolerance": 10
+  },
+  {
+    "op": "key",
+    "key": "F"
+  },
+  {
+    "op": "click",
+    "label": "学习武技与野外技艺"
+  },
+  {
+    "op": "click",
+    "label": "破势斩 · 8币",
+    "capture": "combat-learning-paid-course"
+  },
+  {
+    "op": "key",
+    "key": "Escape"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3100,
+      1850
+    ]
+  },
+  {
+    "op": "key",
+    "key": "F"
+  },
+  {
+    "op": "click",
+    "label": "火油瓶"
+  },
+  {
+    "op": "click",
+    "label": "加工：火油瓶"
+  },
+  {
+    "op": "click",
+    "label": "继续探索"
+  },
+  {
+    "op": "inventory",
+    "item": "oil_bottle",
+    "action": "Q"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3500,
+      900
+    ]
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3260,
+      -780
+    ]
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3200,
+      -1800
+    ]
+  },
+  {
+    "op": "walk",
+    "point": [
+      -2670,
+      -1800
+    ]
+  },
+  {
+    "op": "key",
+    "key": "F"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -500,
+      450
+    ]
+  },
+  {
+    "op": "walk",
+    "point": [
+      -100,
+      250
+    ]
+  },
+  {
+    "op": "save",
+    "label": "combat-learning-common-seed",
+    "capture": "combat-learning-common-state"
+  },
+  {
+    "op": "quit"
+  }
+]

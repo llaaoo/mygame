@@ -1,0 +1,28 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:364)
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+⏰ WorldTime 启动: 08:00
+🏛️ GameRuntime: 五大 Runtime 初始化完成
+   CommandBus       : ✅
+   CombatExecutor   : ✅
+   CombatEventBus   : ✅
+   WorldRuntime     : ✅
+   SimulationRuntime: ✅
+   WorldTime        : ✅
+⚡ 已注册触发效果: OnKillBonusExp
+📊 CombatDebugger: trace enabled
+⏰ 08:00 (☀️ 白天)
+SaveManager: saved user://save_3.sav
+⏰ 10:00 (☀️ 白天)
+FIRST30 1.0 click  pos=(-112.0903, 264.067) hp=110
+SaveManager: saved user://save_3.sav
+FIRST30 2.0 save  pos=(-112.0903, 264.067) hp=110
+⚡ [OnKillBonusExp] +15 额外经验 (target=Encounter_1)
+SaveManager: saved user://save_3.sav
+FIRST30 3.0 duel  pos=(299.1845, -231.2743) hp=76
+FIRST30 4.0 key  pos=(299.1845, -231.2743) hp=73
+SaveManager: saved user://save_3.sav
+FIRST30 5.0 save  pos=(299.1845, -231.2743) hp=73
+FIRST30 6.0 quit  pos=(299.1845, -231.2743) hp=73

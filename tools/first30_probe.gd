@@ -16,6 +16,10 @@ var last_duel: Dictionary={}
 var melee_hits: Array[Dictionary]=[]
 var defenses: Array[Dictionary]=[]
 var physical_actions: Array[Dictionary]=[]
+var domain_events: Array[Dictionary]=[]
+var action_refusals: Array[Dictionary]=[]
+var surface_reactions: Array[Dictionary]=[]
+var _trial_guard := false
 func _init() -> void:
 	if output.is_empty(): output="/tmp/grayriver-first30/live"
 	DirAccess.make_dir_recursive_absolute(output)
@@ -32,6 +36,8 @@ func boot() -> void:
 	game.session.facts.committed.connect(observe_fact)
 	GameRuntime.instance.get_combat_executor().defense_resolved.connect(observe_defense)
 	GameRuntime.instance.get_combat_executor().damage_applied.connect(observe_damage)
+	game.player.actor_context.actions.action_refused.connect(func(reason: String): action_refusals.append({"t":active_time,"reason":reason}))
+	SurfaceManager.instance.reaction_occurred.connect(func(rule_id: String,cell: Vector2i,source: String): surface_reactions.append({"t":active_time,"rule":rule_id,"cell":[cell.x,cell.y],"source":source}))
 	write_json("ready.json",snapshot())
 	busy=false
 func _process(delta: float) -> bool:
@@ -54,6 +60,8 @@ func observe_damage(_source: Node2D,target: Node2D,amount: int) -> void:
 func observe_defense(target: Node2D,outcome: Dictionary) -> void:
 	if target==game.player: defenses.append({"t":active_time,"outcome":outcome.duplicate(),"hp":game.player.health_component.hp,"stamina":game.player.actor_context.actions.stamina.current})
 func observe_fact(fact: Dictionary) -> void:
+	if fact.source=="player" and fact.kind in ["physical_action_released","item_action_committed","spray_pulse","technique_learned"]:
+		domain_events.append({"t":active_time,"kind":fact.kind,"data":fact.data.duplicate(true)})
 	if fact.kind=="physical_action_started" and fact.source=="player": physical_actions.append({"t":active_time,"data":fact.data.duplicate(true)})
 	if fact.kind=="melee_hit" and fact.source=="player": melee_hits.append({"t":active_time,"data":fact.data.duplicate(true)})
 func observe_cast(plan: CastPlan) -> void:
@@ -240,11 +248,27 @@ func snapshot() -> Dictionary:
 	var storage: Dictionary={}
 	for region: ExplorationRegionData in game.catalog.regions.values():
 		for spec in region.storage: storage[spec.id]=game.session.inventory.entries(spec.id)
+	var art_window:=actor.actor_context.actions.weapon_art_view().duplicate()
+	art_window.erase("profile") # Only pure display values belong in test evidence.
 	var growth: Dictionary={"level":actor.stats_component.level,"experience":actor.stats_component.experience,"attribute_points":actor.stats_component.attribute_points,"attributes":[actor.stats_component.strength,actor.stats_component.intelligence,actor.stats_component.agility,actor.stats_component.endurance],"mastery":actor.mastery_manager.serialize_state()}
-	return {"region_id":game.region_id,"normal_ai":game.active_enemies.all(func(enemy):return enemy.can_process()),"world_storage":storage,"visited":game.progress.visited.keys(),"growth":growth,"npc_accounts":accounts,"social":game.session.conversations.snapshot(),"tracked_id":game.progress.tracked_quest,"spell_affinity":actor.skill_manager.spell_forms.affinity,"effective_forms":form_snapshot(),"active_seconds":active_time,"wall_usec":Time.get_ticks_usec(),"paused":paused,"simulation":GameRuntime.instance.is_processing(),"shortcuts":actor.skill_manager.shortcuts.snapshot(),"wheel":{"visible":actor.material_wheel.visible,"source":actor.material_wheel.source},"player":{"ui_blocked":actor.ui_blocked,"attacks":actor.actor_context.actions._attack_sequence,"position":[actor.position.x,actor.position.y],"hp":actor.health_component.hp,"mp":actor.mana_component.mp,"damage_taken":damage_taken,"health_decreases":health_decreases,"stamina":actor.actor_context.actions.stamina.current,"mode":actor.actor_context.actions.mode,"dead":actor.health_component.is_dead,"base":game.is_at_base(),"guarding":actor.actor_context.actions.guarding,"charge_source":actor.casting._charging_source,"channel_source":actor.casting._channeling_source},"materials":actor.skill_manager.combinations.supplies.amounts,"items":game.session.inventory.entries("player.pocket"),"gear":game.session.inventory.entries("player.gear"),"pack":game.session.inventory.entries("player.pack"),"runtime_scripts":runtime_scripts(),"claims":game.progress.claims.keys(),"loot_records":game.progress.loot_records.duplicate(true),"known_actions":actor.skill_manager.known_actions,"selected":actor.skill_manager.combinations.supplies.selected,"fields":fields,"slots":slots,"hands":{"q":actor.skill_manager.left_hand.data.get_id() if actor.skill_manager.left_hand else "","r":actor.skill_manager.right_hand.data.get_id() if actor.skill_manager.right_hand else ""},"tracker":game.frontier_hud.tracker.text,"objective":game.ui.objective.text,"notice":game.ui.message.text,"modal_texts":texts,"buttons":buttons,"enemies":enemies,"casts":casts,"melee_hits":melee_hits,"defenses":defenses,"damage_events":damage_events,"physical_actions":physical_actions,"campaign_clock":game.session.inventory.clock_seconds,"date":WorldTime.instance.stamp(),"martial":actor.actor_context.martial.snapshot(),"save_path":ProjectSettings.globalize_path("user://save_3.sav"),"display":DisplayServer.get_name()}.duplicate(true)
+	return {"region_id":game.region_id,"normal_ai":game.active_enemies.all(func(enemy):return enemy.can_process()),"world_storage":storage,"visited":game.progress.visited.keys(),"growth":growth,"npc_accounts":accounts,"social":game.session.conversations.snapshot(),"tracked_id":game.progress.tracked_quest,"spell_affinity":actor.skill_manager.spell_forms.affinity,"effective_forms":form_snapshot(),"active_seconds":active_time,"wall_usec":Time.get_ticks_usec(),"paused":paused,"simulation":GameRuntime.instance.is_processing(),"shortcuts":actor.skill_manager.shortcuts.snapshot(),"wheel":{"visible":actor.material_wheel.visible,"source":actor.material_wheel.source},"player":{"ui_blocked":actor.ui_blocked,"attacks":actor.actor_context.actions._attack_sequence,"position":[actor.position.x,actor.position.y],"hp":actor.health_component.hp,"mp":actor.mana_component.mp,"damage_taken":damage_taken,"health_decreases":health_decreases,"stamina":actor.actor_context.actions.stamina.current,"mode":actor.actor_context.actions.mode,"counter_remaining":actor.actor_context.actions.counter_remaining,"art_window":art_window,"dead":actor.health_component.is_dead,"base":game.is_at_base(),"guarding":actor.actor_context.actions.guarding,"charge_source":actor.casting._charging_source,"channel_source":actor.casting._channeling_source},"materials":actor.skill_manager.combinations.supplies.amounts,"items":game.session.inventory.entries("player.pocket"),"gear":game.session.inventory.entries("player.gear"),"pack":game.session.inventory.entries("player.pack"),"runtime_scripts":runtime_scripts(),"claims":game.progress.claims.keys(),"loot_records":game.progress.loot_records.duplicate(true),"known_actions":actor.skill_manager.known_actions,"selected":actor.skill_manager.combinations.supplies.selected,"fields":fields,"slots":slots,"hands":{"q":actor.skill_manager.left_hand.data.get_id() if actor.skill_manager.left_hand else "","r":actor.skill_manager.right_hand.data.get_id() if actor.skill_manager.right_hand else ""},"tracker":game.frontier_hud.tracker.text,"objective":game.ui.objective.text,"notice":game.ui.message.text,"modal_texts":texts,"buttons":buttons,"enemies":enemies,"casts":casts,"melee_hits":melee_hits,"defenses":defenses,"damage_events":damage_events,"physical_actions":physical_actions,"domain_events":domain_events,"action_refusals":action_refusals,"surface_reactions":surface_reactions,"campaign_clock":game.session.inventory.clock_seconds,"date":WorldTime.instance.stamp(),"martial":actor.actor_context.martial.snapshot(),"save_path":ProjectSettings.globalize_path("user://save_3.sav"),"display":DisplayServer.get_name()}.duplicate(true)
 func move_input(direction: Vector2) -> void:
 	for pair in [[KEY_D,direction.x>.35],[KEY_A,direction.x<-.35],[KEY_S,direction.y>.35],[KEY_W,direction.y<-.35]]:
 		if bool(held.get(pair[0],false))!=bool(pair[1]): key_event(pair[0],pair[1])
+func trial_guard(pressed: bool) -> void:
+	if pressed==_trial_guard: return
+	_trial_guard=pressed
+	var event:=InputEventMouseButton.new();event.position=root.get_mouse_position();event.button_index=MOUSE_BUTTON_RIGHT;event.pressed=pressed
+	Input.parse_input_event(event);Input.flush_buffered_events()
+func trial_strike(heavy := false,art := false) -> void:
+	if art: key_event(KEY_CTRL,true)
+	var event:=InputEventMouseButton.new();event.position=root.get_mouse_position();event.button_index=MOUSE_BUTTON_LEFT;event.pressed=true;event.ctrl_pressed=art
+	Input.parse_input_event(event);Input.flush_buffered_events()
+	if heavy: await create_timer(.36).timeout
+	else: await physics_frame
+	event=event.duplicate();event.pressed=false;Input.parse_input_event(event);Input.flush_buffered_events()
+	if art:key_event(KEY_CTRL,false)
+	await physics_frame
 func duel(style: String,enemy_id: String) -> String:
 	var foe: Enemy
 	for enemy in game.active_enemies:
@@ -257,16 +281,26 @@ func duel(style: String,enemy_id: String) -> String:
 		var weapon:=context.items.equipment_definition(str(context.items.equipped(context.id).get(str(EquipmentData.SlotType.RIGHT_HAND),"")))
 		if not weapon or not weapon.moveset or not context.martial.route_choices().any(func(row): return MartialArts.definition(row.technique).weapon_type==weapon.moveset.weapon_type and context.martial.route_equipped(row.technique,row.route)): return "weapon_art_not_equipped"
 	var before:=snapshot()
+	var target_outcome: Dictionary={"died":false}
+	foe.health_component.died.connect(func():target_outcome.died=true,CONNECT_ONE_SHOT)
+	var defeats_before:=game.progress.deaths
 	var start:=active_time
 	var damage_before:=damage_taken
 	var next_attack:=0.0
 	var next_technique:=0.0
+	var guard_until:=0.0
+	var last_guard_serial:=-1
+	var prefix_heavy:=false
+	var duel_error:=""
+	var observed_statuses: Dictionary={}
 	if style=="coat":
 		await tap(KEY_E); await create_timer(1.35).timeout
 		var weapon_uid: String=game.session.inventory.equipped("player").get(str(EquipmentData.SlotType.RIGHT_HAND),"")
 		if not game.session.inventory.coating(weapon_uid): return "coating_not_committed"
 	if style in ["throw","spray"]:
-		var distance_needed:=280.0 if style=="throw" else 95.0
+		# This disclosed oil/spark policy approaches before throwing: the bottle
+		# lands at a real point, while the following spark is close range.
+		var distance_needed:=160.0 if style=="throw" else 95.0
 		while is_instance_valid(foe) and not game.player.health_component.is_dead and game.player.position.distance_to(foe.position)>distance_needed:
 			if active_time-start>30: release_movement(); return "approach_timeout"
 			move_input((foe.position-game.player.position).normalized()); await physics_frame
@@ -283,35 +317,80 @@ func duel(style: String,enemy_id: String) -> String:
 		if style=="throw" and game.session.inventory.count("player","oil_bottle")==int(before.materials.get("oil_bottle",0)): return "throw_not_committed"
 		if style=="spray":
 			var bottle:=game.session.inventory.item(str(game.player.skill_manager.shortcuts.selection("slot_0").get("uid","")))
-			if bottle and bottle.properties.doses==3: return "spray_not_committed"
+			if not bottle or not domain_events.any(func(fact):return float(fact.t)>=start and fact.kind=="spray_pulse"): return "spray_not_committed"
 	if style=="combo":
 		await tap(KEY_5)
 		await create_timer(1.0).timeout
-		if game.player.skill_manager.combinations.live_fields().is_empty(): return "field_not_created"
+		if not casts.any(func(fact):return float(fact.t)>=start and fact.action=="inscribe" and fact.materials.get("fire_stone",0)==1): return "paid_fire_field_not_created"
 	while is_instance_valid(foe) and not foe.health_component.is_dead and not game.player.health_component.is_dead:
-		if active_time-start>60: release_movement(); return "combat_timeout"
+		if active_time-start>60: duel_error="combat_timeout"; break
 		aim(foe.global_position)
+		for entry in (foe.get_node("BuffManager") as BuffManager).get_active_buff_entries():
+			if not observed_statuses.has(entry.status_id):observed_statuses[entry.status_id]={"t":active_time,"remaining":entry.remaining}
 		var fields:=game.player.skill_manager.combinations.live_fields()
 		var use_field:=style=="combo" and not fields.is_empty()
 		var distance:=game.player.global_position.distance_to(foe.global_position)
+		var actions:=game.player.actor_context.actions
+		if style=="counter":
+			var threat:=foe.actor_context.actions.attack_observation() if foe.can_see(game.player) else {}
+			if not threat.is_empty() and threat.heavy and float(threat.windup)>0 and int(threat.serial)!=last_guard_serial and distance<=float(threat.reach)+30 and not actions.busy():
+				last_guard_serial=int(threat.serial);trial_guard(false)
+				move_input((foe.position-game.player.position).normalized().orthogonal());await tap(KEY_SPACE)
+				continue
+			if not threat.is_empty() and float(threat.windup)>0 and float(threat.windup)<=.13 and int(threat.serial)!=last_guard_serial and distance<=float(threat.reach)+18 and not actions.busy():
+				last_guard_serial=int(threat.serial);guard_until=active_time+.35
+				release_movement();trial_guard(true)
+			if _trial_guard:
+				release_movement()
+				if actions.counter_remaining>0 or active_time>=guard_until:
+					trial_guard(false)
+					if actions.counter_remaining>0 and not actions.busy() and distance<70: await trial_strike()
+				await physics_frame
+				continue
+			if not threat.is_empty() and float(threat.windup)>0:
+				release_movement();await physics_frame;continue
+			# Wait for the actual defensive opening; attacking while idle would
+			# turn this sample into ordinary trading before a parry can occur.
+			move_input((foe.position-game.player.position).normalized() if distance>48 else Vector2.ZERO)
+			await physics_frame;continue
 		if use_field: release_movement()
 		else: move_input((foe.position-game.player.position).normalized() if distance>42 else Vector2.ZERO)
-		if style in ["throw","spray"] and next_attack==0 and distance<110 and not game.player.actor_context.actions.busy():
-			release_movement(); await tap(KEY_R); next_attack=active_time+.4
+		if style in ["throw","spray"] and next_attack==0 and distance<48 and not game.player.actor_context.actions.busy():
+			release_movement()
+			var cast_count:=casts.size()
+			await tap(KEY_R)
+			while game.player.skill_manager.combinations.is_busy() and not game.player.health_component.is_dead and active_time-start<60:await physics_frame
+			if casts.size()==cast_count:return "ignition_not_committed"
+			next_attack=active_time+.4
 		var art:=game.player.actor_context.actions.weapon_art_view() if style=="martial" else {}
 		if not art.is_empty() and str(art.get("reason","")).is_empty() and active_time>=next_technique and distance<65 and not game.player.actor_context.actions.busy():
-			key_event(KEY_CTRL,true); await mouse(MOUSE_BUTTON_LEFT); key_event(KEY_CTRL,false)
+			await trial_strike(false,true);prefix_heavy=false
 			next_technique=active_time+.1; next_attack=active_time+.9
-		if active_time>=next_attack and (use_field or distance<65) and not game.player.actor_context.actions.busy():
+		if active_time>=next_attack and (use_field or distance<65) and not game.player.actor_context.actions.busy() and (style not in ["throw","spray"] or next_attack>0):
 			if use_field: await tap(KEY_6)
+			elif style=="martial":
+				await trial_strike(prefix_heavy);prefix_heavy=not prefix_heavy
 			else: await mouse(MOUSE_BUTTON_LEFT)
 			next_attack=active_time+(.25 if use_field else .65)
 		await physics_frame
 	release_movement()
+	trial_guard(false)
 	var end:=active_time
-	last_duel={"style":style,"target":enemy_id,"seconds":end-start,"wall_seconds":float(Time.get_ticks_usec()-int(before.wall_usec))/1000000,"damage_taken":damage_taken-damage_before,"before":before,"after":snapshot(),"killed":not game.player.health_component.is_dead and (not is_instance_valid(foe) or foe.health_component.is_dead)}
+	last_duel={"style":style,"target":enemy_id,"seconds":end-start,"wall_seconds":float(Time.get_ticks_usec()-int(before.wall_usec))/1000000,"damage_taken":damage_taken-damage_before,"before":before,"after":snapshot(),"killed":bool(target_outcome.died) and game.progress.deaths==defeats_before}
+	last_duel["observed_target_statuses"]=observed_statuses
 	write_json("duel_"+style+".json",last_duel)
-	if style=="martial" and not physical_actions.any(func(fact): return float(fact.t)>=start and not str(fact.data.get("technique","")).is_empty()): return "weapon_art_not_committed"
+	write_json("duel_"+style+"_"+enemy_id.validate_filename()+".json",last_duel)
+	if not duel_error.is_empty():return duel_error
+	if game.progress.deaths>defeats_before:return "player_defeated"
+	if not bool(target_outcome.died):return "target_lost"
+	if style=="counter" and (not defenses.any(func(fact):return float(fact.t)>=start and fact.outcome.get("parried",false)) or not physical_actions.any(func(fact):return float(fact.t)>=start and fact.data.get("counter",false))):return "counter_not_committed"
+	if style=="martial":
+		var families: Array[String]=[]
+		for fact in physical_actions:
+			if float(fact.t)>=start and not str(fact.data.get("technique","")).is_empty():families.append(str(fact.data.family))
+		if not domain_events.any(func(fact):return float(fact.t)>=start and fact.kind=="physical_action_released" and str(fact.data.get("family","")) in families) or not melee_hits.any(func(fact):return float(fact.t)>=start and str(fact.data.get("family","")) in families):return "weapon_art_not_released_and_hit"
+	if style=="combo" and not casts.any(func(fact):return float(fact.t)>=start and fact.rule=="fire_sigil_fireball" and fact.mp_cost>0):return "fireball_not_committed"
+	if style=="throw" and (not domain_events.any(func(fact):return float(fact.t)>=start and fact.kind=="item_action_committed" and fact.data.get("item","")=="oil_bottle") or not casts.any(func(fact):return float(fact.t)>=start and fact.action=="ignite" and fact.mp_cost>0)):return "oil_and_spark_not_committed"
 	await tap(KEY_ESCAPE)
 	return "player_dead" if game.player.health_component.is_dead else ""
 func defense_sample(enemy_id: String,observe_death: bool) -> String:
@@ -364,6 +443,13 @@ func execute(request: Dictionary) -> void:
 			var source:=ProjectSettings.globalize_path("user://save_3.sav")
 			if not FileAccess.file_exists(source): error="save_missing"
 			else: DirAccess.copy_absolute(source,output.path_join(str(request.get("label","checkpoint"))+".sav"))
+		"surfaces":
+			var surfaces: Array[Dictionary]=[]
+			var center:=Vector2(request.point[0],request.point[1])
+			for cell in SurfaceManager.instance.get_cells_in_radius(center,float(request.get("radius",400))):
+				var state:=SurfaceManager.instance.get_surface(cell)
+				if state.get("state","dry")!="dry":surfaces.append({"cell":[cell.x,cell.y],"surface":state.duplicate(true)})
+			write_json(str(request.get("label","surfaces"))+".json",surfaces)
 		"capture": pass
 		"quit": pass
 		_: error="unknown_op" if op!="state" else ""
