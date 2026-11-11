@@ -17,7 +17,7 @@ var _title := ""
 var _guide := ""
 var _scope: Node
 var _generation := 0
-var _last_hp := 0
+var _damage_source: CombatExecutor
 var _refresh := 0.0
 var _committing := false
 
@@ -31,8 +31,28 @@ func _ready() -> void:
 		if not is_busy(): selected=index; _refresh_panel())
 	panel.start_button.pressed.connect(start_selected)
 	panel.cancel_button.pressed.connect(func(): cancel("已取消作业"); close_panel())
-	_last_hp = player.health_component.hp
-	player.health_component.health_changed.connect(_on_health)
+	# Player readies before the sibling runtime constructs its executor.
+	call_deferred("_bind_damage_source")
+
+func _bind_damage_source() -> bool:
+	if not is_inside_tree() or is_queued_for_deletion(): return false
+	var runtime:=RuntimeRegistration.runtime_for(self)
+	var source:=runtime.get_combat_executor() if runtime else null
+	if source!=_damage_source:
+		_disconnect_damage_source()
+		_damage_source=source
+	if not is_instance_valid(_damage_source): return false
+	if not _damage_source.damage_applied.is_connected(_on_damage):
+		_damage_source.damage_applied.connect(_on_damage)
+	return true
+
+func _disconnect_damage_source() -> void:
+	if is_instance_valid(_damage_source) and _damage_source.damage_applied.is_connected(_on_damage):
+		_damage_source.damage_applied.disconnect(_on_damage)
+	_damage_source=null
+
+func _exit_tree() -> void:
+	_disconnect_damage_source()
 
 func is_busy() -> bool: return not pending.is_empty() or _committing
 
@@ -85,6 +105,9 @@ func reason_for(method: FieldWorkMethod) -> String:
 
 func start_selected() -> bool:
 	if is_busy() or methods.is_empty() or player.ui_blocked or get_tree().paused or player.health_component.is_dead: return false
+	if not _bind_damage_source():
+		feedback_requested.emit("暂时无法开始作业，请稍后重试")
+		return false
 	var method := methods[selected]
 	var reason := reason_for(method)
 	if not reason.is_empty():
@@ -95,7 +118,6 @@ func start_selected() -> bool:
 		return false
 	player.skill_manager.combinations.cancel("现场作业：施法准备取消")
 	player.casting.cancel_all()
-	_last_hp = player.health_component.hp
 	var equipment := player.get_node("EquipmentManager") as EquipmentManager
 	pending = {"method": method, "fingerprint": method.fingerprint(), "remaining": method.duration * _efficiency(), "duration": method.duration * _efficiency(), "position": player.global_position, "attributes": player.stats_component.primary_values(), "equipment": equipment.loadout_revision,"progression":player.mastery_manager.revision}
 	player.state_machine.transition_to("work")
@@ -167,9 +189,9 @@ func _to_idle() -> void:
 func _in_range() -> bool:
 	return is_instance_valid(target) and target.is_inside_tree() and target.global_position.distance_to(player.global_position) <= RANGE and is_instance_valid(_scope) and _scope == CastContext.default_world(player) and GameRuntime.instance.get_region_session().is_current(_generation)
 
-func _on_health(hp: int, _maximum: int) -> void:
-	if hp < _last_hp: cancel("受到伤害：作业取消，未扣材料")
-	_last_hp = hp
+func _on_damage(_source: Node2D, target_actor: Node2D, amount: int) -> void:
+	# HP-cap expiry and healing do not represent incoming damage.
+	if target_actor==player and amount>0: cancel("受到伤害：作业取消，未扣材料")
 
 func _refresh_panel() -> void:
 	if not _in_range(): return
