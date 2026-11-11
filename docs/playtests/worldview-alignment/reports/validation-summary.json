@@ -1,0 +1,17 @@
+{
+  "source_revision": "8797428e29d8f8c7adb26ac4b64f410f8ba10ddc",
+  "complete": true,
+  "registered_checks": 157,
+  "passed": 157,
+  "failed": 0,
+  "skipped": 0,
+  "timeouts": 0,
+  "import_passed": true,
+  "runner_exit_code": 0,
+  "gut_cases": 29,
+  "gut_asserts": 239,
+  "python_tool_tests": 20,
+  "source_export": "git archive with no initial .godot cache",
+  "runtime_changes_after_tested_commit": false,
+  "note": "Later commits change documentation and evidence only."
+}

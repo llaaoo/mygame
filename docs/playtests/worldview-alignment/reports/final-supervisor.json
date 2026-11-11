@@ -1,0 +1,22 @@
+{
+  "pid": 8179,
+  "command": [
+    "python3",
+    "tools/run_tests.py",
+    "--suite",
+    "all",
+    "--jobs",
+    "2",
+    "--timeout",
+    "300",
+    "--source-revision",
+    "8797428e29d8f8c7adb26ac4b64f410f8ba10ddc",
+    "--report",
+    "/workspace/worldview-validation-recovered/all-8797428e-final.json"
+  ],
+  "started_utc": "2026-11-11T15:09:31.814733+00:00",
+  "status": "finished",
+  "cwd": "/workspace/worldview-validation-recovered/archive-8797428e-detached",
+  "exit_code": 0,
+  "ended_utc": "2026-11-11T15:35:18.143191+00:00"
+}

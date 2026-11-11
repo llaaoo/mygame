@@ -1,6 +1,6 @@
 # 世界观落地与验收
 
-2026-11-11。验收源码：`8797428e29d8f8c7adb26ac4b64f410f8ba10ddc`；现场作业修复：`df9d24a59563b936ffc5d985b1cdda1881aa5cea`。源码与已有证据已推送。云环境现不可用，最终全量结果尚未确认；保持草稿状态，未合并主线。
+2026-11-11。验收源码：`8797428e29d8f8c7adb26ac4b64f410f8ba10ddc`；现场作业修复：`df9d24a59563b936ffc5d985b1cdda1881aa5cea`。完整干净归档回归已通过，后续提交仅更新文档与验证证据。
 
 ## 实现
 
@@ -25,7 +25,7 @@
 | Python工具检查 | d5归档20项通过，不启动真实引擎；后续修复未改工具源码。 |
 | 恢复边界专项 | restore-final.json六项6/6通过，含预设boss受伤保存/返场与独立监狱施法，complete=true；来自879提交前工作区。 |
 | 0737归档全量 | complete=true，注册检查155/157通过、2失败；另导入通过。保留完整失败记录，不能称通过。 |
-| 最终归档全量 | 源码879，初始无.godot缓存；157项注册检查另加导入。**最后读到108/157项通过，complete=false；随后云环境不可用，后续结果未知，不能宣称全量通过。** |
+| 最终归档全量 | 源码879，初始无.godot缓存；157项注册检查另加导入。**157/157通过，complete=true，退出码0，无失败、跳过或超时；初次导入通过。包含29个GUT用例、239个断言。** |
 
 最终JSON与日志由本目录证据包归档；dedd停止记录保留，不改写成通过。
 
@@ -61,18 +61,14 @@ Linux、Godot4.6.3、X11、1152×648、OpenGL兼容、Mesa llvmpipe软件渲染�
 
 未覆盖所有旧档、水利分支、打断、Windows、手柄、听觉体验或目标硬件性能。不从含诊断/救援/休息的辅助运行时间推算30–45分钟或两小时Demo。GitHub Actions保持停用。
 
-## 未完成的验收与恢复入口
+## 最终完整回归与云连接中断
 
-879首次归档运行在68项已通过、未记录失败时执行会话消失；工作区当时完整，cgroup未记录OOM，原因未确认。该次报告为`all-8797428e.json`，保持`complete=false`。随后从同一提交重新导出无缓存副本，由独立后台进程重新执行整套测试，没有拼接部分结果。
+[最终报告](reports/all-8797428e-final.json)、[监督进程退出结果](reports/final-supervisor.json)、[完整控制台](reports/all-8797428e-console.log)、[验证摘要](reports/validation-summary.json)和[原始测试日志](final-validation-logs.tar.gz)已归档。本轮从8797428e的无缓存git archive执行完整157项，另含首次导入；全部通过，complete=true、退出码0，无跳过或超时。GUT实际29用例、239断言；Python工具检查20项通过（工具源码未变）。日志包内文件名对应JSON中原日志路径的basename。
 
-最后一次成功读取显示108/157项通过、无已记录失败，随后终端报`exec-server transport disconnected`，环境标记`unavailable`。服务端同时曾观察到`running/offline`，因此既不能断言后台已经停止，也不能宣称已完成。以下本地恢复记录当时尚未来得及上传：
+879首次尝试在68项通过时执行会话消失，原因未确认；[中断记录](reports/all-8797428e-interruption.json)与[未完成报告](reports/all-8797428e.json)保留，不与最终结果拼接。
 
-- `/workspace/worldview-validation-recovered/final-supervisor.json`：监督进程状态与退出码；原PID8179不可当作恢复后的进程身份依据。
-- `/workspace/worldview-validation-recovered/all-8797428e-final.json`：本次完整回归结果；只有`complete=true`、157项全部通过且监督退出码0才满足验收。
-- `/workspace/worldview-validation-recovered/all-8797428e-console.log`：持续保存的控制台日志。
-- `/workspace/worldview-validation-recovered/archive-8797428e-detached/`：无缓存起步的提交归档；对应测试日志目录为`/tmp/mygame-tests-0kcs30dg`。
-- 已推送的[155/157旧全量记录](reports/all-0737c7cc.json)与[两项问题修后6项专项](reports/restore-final.json)是独立证据，不能替代最终全量。
+随后独立监督进程于15:09:31 UTC启动完整新一轮，在终端连接断开时继续运行，15:35:18 UTC正常完成。连接恢复后读取到同一监督进程和持续日志，进度已从108推进至144，最终157项全过。这次可确认是终端连接通道暂时不可用，没有打断后台测试。cgroup的oom/oom_kill均为0，平台未提供留存诊断记录，无法确认平台断连的具体根因，也不将更早所有中断归为同一原因。
 
-恢复后先核对工作区与日志是否仍在，保留已有改动；读取上述报告和监督结果，不依据进程名或中间PASS文字推断完成。如证据不完整，应从`8797428e29d8f8c7adb26ac4b64f410f8ba10ddc`或后续纯文档提交重新导出干净归档，执行`python3 tools/run_tests.py --suite all --jobs 2 --timeout 300 --source-revision <源码提交> --report <独立JSON路径>`，期间不修改源码或并行运行GUI。
+为降低连接中断的影响，长回归采用独立后台进程、完整stdout落盘、每项JSON结果和最终退出记录。后续恢复会话应先读取已有结果，不直接重启环境或重复整套测试。
 
-最终全量确认后，再归档结果、检查远端main与保护规则、将草稿PR转为可合并并完成合并。本次已检查main仍为`b9a90057b1070a6914e0227ba649c4bdb143579a`、无保护及规则集；这些状态须在实际合并前刷新。GitHub Actions保持停用。
+验收源码为8797428e；后续提交仅更改文档及证据，没有改变已测玩法。交付关联[PR #55](https://github.com/llaaoo/mygame/pull/55)。GitHub Actions保持停用。
