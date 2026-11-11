@@ -10,6 +10,11 @@ var cancel_button: Button
 var _titles: PackedStringArray=[]
 var _panel: PanelContainer
 var _scroll: ScrollContainer
+var _summary: Label
+var _preparation: Label
+var _cost: Label
+var _reason: Label
+var details_toggle: CheckButton
 func _ready() -> void:
 	layer = GameUIStyle.LAYER_RUN + 1
 	_panel = PanelContainer.new()
@@ -27,12 +32,18 @@ func _ready() -> void:
 	_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	_scroll.follow_focus = true
 	box.add_child(_scroll)
-	text = Label.new()
-	text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	var content:=VBoxContainer.new(); content.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	_scroll.add_child(content)
+	_summary=FoundationWidgets.label("",15); content.add_child(_summary)
+	_preparation=FoundationWidgets.label("",13,true); content.add_child(_preparation)
+	_cost=FoundationWidgets.label("",13); content.add_child(_cost)
+	_reason=FoundationWidgets.label("",13,true); content.add_child(_reason)
+	text = FoundationWidgets.label("",13,true)
 	text.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	GameUIStyle.apply_label(text, 13, GameUIStyle.TEXT_MAIN)
-	_scroll.add_child(text)
+	content.add_child(text)
+	details_toggle=CheckButton.new(); details_toggle.name="WorkDetailsToggle"; details_toggle.text="查看详细规则"
+	details_toggle.toggled.connect(func(expanded: bool): text.visible=expanded; _layout())
+	box.add_child(details_toggle)
 	bar = ProgressBar.new()
 	bar.max_value = 1
 	bar.show_percentage = false
@@ -59,7 +70,7 @@ func _layout() -> void:
 	var viewport := get_viewport().get_visible_rect().size
 	var bottom := minf(136, viewport.y*.2)
 	var width := minf(372, viewport.x-36)
-	var height := minf(360, viewport.y-bottom-18)
+	var height := minf(maxf(_panel.get_combined_minimum_size().y,400 if text.visible else 320), viewport.y-bottom-18)
 	_panel.offset_left=-width-18; _panel.offset_right=-18
 	_panel.offset_top=-height-bottom; _panel.offset_bottom=-bottom
 
@@ -68,10 +79,30 @@ func display(message: String, progress: float = -1.0) -> void:
 	var split:=message.find("\n")
 	heading.text=message.left(split) if split>=0 else "现场作业"
 	text.text=message.substr(split+1) if split>=0 else message
+	for label in [_summary,_preparation,_cost,_reason]: label.hide()
+	details_toggle.hide(); text.show(); _scroll.show()
 	bar.visible = progress >= 0
 	bar.value = maxf(0, progress)
 	start_button.text=InputBindings.label("interact")+"  开始作业"
-	show()
+	_layout(); show()
+
+func present_work(title: String,summary: String,seconds: float,cost: String,reason: String,guide: String,progress := -1.0) -> void:
+	if not visible: UIMotion.enter(_panel)
+	if heading.text!=title: details_toggle.set_pressed_no_signal(false)
+	heading.text=title
+	_summary.text=summary
+	_preparation.text=("剩余准备 %.1f 秒" if progress>=0 else "操作准备 %.1f 秒 · 可中断")%maxf(0,seconds)
+	_cost.text="消耗："+(cost if not cost.is_empty() else "无需材料")
+	_reason.text="无法开始："+reason if not reason.is_empty() else "准备完成后结算 · 世界持续运行"
+	_reason.add_theme_color_override("font_color",GameUIStyle.GOLD if not reason.is_empty() else GameUIStyle.TEXT_MUTED)
+	for label in [_summary,_preparation,_cost,_reason]: label.show()
+	text.text=guide
+	details_toggle.visible=not guide.is_empty()
+	text.visible=details_toggle.visible and details_toggle.button_pressed
+	_scroll.show()
+	bar.visible=progress>=0; bar.value=maxf(0,progress)
+	start_button.text=InputBindings.label("interact")+"  开始作业"
+	_layout(); show()
 
 func choices(methods: Array[FieldWorkMethod], selected: int, busy: bool, reason: String) -> void:
 	var titles:=PackedStringArray()

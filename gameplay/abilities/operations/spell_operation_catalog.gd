@@ -2,7 +2,6 @@ class_name SpellOperationCatalog
 extends Resource
 @export var operations: Array[SpellOperationData]=[]
 @export var rules: Array[SpellCombinationRule]=[]
-@export var recipes: Array[CraftingRecipe]=[]
 const LEGACY_ACTIONS := {"fireball":"ignite","frost_lance":"ignite","lightning_bolt":"ignite","ice_explosion":"pulse"}
 static var _default: SpellOperationCatalog
 static func default_catalog() -> SpellOperationCatalog:

@@ -56,10 +56,10 @@ func run() -> void:
 		if wheel.entries[i].get("choice",{}).get("modifier","")=="frost_salt": index=i
 	check(index>=0,"Available real material missing from live wheel")
 	if index>=0:
-		var point:=wheel._ring.position+Vector2(180,180)+Vector2.from_angle(-PI/2+(index%8)*TAU/8)*125
+		var point:=wheel.entry_point(index)
 		var motion:=InputEventMouseMotion.new(); motion.position=point; motion.global_position=point
 		root.push_input(motion,true); await frames(2)
-		check(wheel.hovered==index%8,"Real pointer did not hover the material sector")
+		check(wheel.hovered==index%wheel.page_size(),"Real pointer did not hover the material sector")
 		var selection:=actor.skill_manager.shortcuts.selection("quick_e")
 		store.pay("player",{"frost_salt":1})
 		await create_timer(.3).timeout

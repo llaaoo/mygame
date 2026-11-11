@@ -18,6 +18,7 @@
 | 学习路径 | `LearningOffer` → `TrainingCatalog`；技能书的`ItemUseDefinition.technique_id`引用同一武技ID | `TechniqueLearning`处理课程条件和付款；`MartialArts`统一检查能力前置/互斥 |
 | 店家与排产 | `MarketDefinition`首次库存；`ProductionDefinition`引用已有`CraftingRecipe` → `content/production/catalog.tres` | `ProductionService`按游戏时间排程；`InventoryService`原子加工与交易 |
 | 法术材料/组合 | 原`SpellPayloadData`/`SpellOperationData`/`SpellCombinationRule`目录 | 原`CastPlan`预览与事务、命中/表面反应链 |
+| 制造配方 | `CraftingRecipe` → `content/crafting/catalog.tres`（`CraftingCatalog`） | 原角色已学知识、现场制造与库存事务；目录登记不自动学会，NPC排产仍引用同一配方 |
 | 采集/机关/委托 | 原灰河谷定义、`SurvivalStationData`及探索Resource | 原现场作业、库存、世界事实与进度服务 |
 
 新增定义并不自动授予玩家：必须同时提供真实来源，如资源点、工作台配方、店家库存、敌人穿戴/行囊、训练师课程或技能书。只有新的空间行为、动作节奏或领域语义才需要扩展执行代码。增加地图上的服务人物仍需场景/入口装配，不能把登记目录误认为自动生成NPC。

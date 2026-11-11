@@ -45,7 +45,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if visible and event.keycode == KEY_ESCAPE:
 		close()
 		get_viewport().set_input_as_handled()
-	elif event.keycode == KEY_K:
+	elif InputBindings.menu_key(event) == KEY_K:
 		if get_tree().paused and not visible:
 			return
 		toggle()
@@ -78,7 +78,7 @@ func open_techniques() -> void:
 func open_for(skill: SkillData) -> void:
 	_selected_skill=skill; _selected_item.clear(); _selected_choice.clear(); _show_items=false; _show_techniques=false; _selected_technique=""
 	open()
-	_hint_label.text="选择来源后点击目标快捷槽；也可先绑定默认动作，再用G切换。"
+	_hint_label.text=InputBindings.menu_help("选择来源后点击目标快捷槽；也可先绑定默认动作，再用G切换。")
 
 func close() -> void:
 	_selected_skill = null
@@ -388,9 +388,9 @@ func _refresh_detail() -> void:
 
 func _format_skill_stats(skill: SkillData) -> String:
 	if not skill.operation_id.is_empty():
-		return "G轮盘按快捷槽选择来源，查看实际费用与条件。\n蓄力/引导按住所编组键，其余按设置按下或松开施放。"
+		return InputBindings.menu_help("G轮盘按快捷槽选择来源，查看实际费用与条件。\n蓄力/引导按住所编组键，其余按设置按下或松开施放。")
 	var lines: Array[String] = [
-		"%s · T%d · %s" % [_type_name(skill.skill_type), skill.tier, skill.role],
+		"%s · %s" % [_type_name(skill.skill_type), skill.role],
 		"伤害 %d  |  法力 %d  |  冷却 %.1fs" % [skill.damage, skill.mp_cost, skill.cooldown],
 	]
 	match skill.skill_type:
@@ -461,12 +461,14 @@ func _make_skill_card(skill: SkillData) -> PanelContainer:
 	vbox.add_child(nm)
 
 	var tp := Label.new()
-	tp.text = "%s · %s" % [_type_name(skill.skill_type), "%d 路" % skill.upgrades.size() if unlocked else "Lv.%d" % _unlock_level(skill)]
+	tp.text = "基础 %d MP"%skill.mp_cost+(" · %.1f秒冷却"%skill.cooldown if skill.cooldown>0 else "") if unlocked else "%s Lv.%d"%[_school_name(skill.school),_unlock_level(skill)]
 	if not skill.operation_id.is_empty():
-		tp.text="G 选材"
+		tp.text="选来源 · G"
 	elif skill.combination_only:
 		tp.text = "组合结果"
-	tp.add_theme_font_size_override("font_size", 12)
+	tp.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	tp.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	GameUIStyle.apply_font_size(tp,12)
 	tp.add_theme_color_override("font_color", GameUIStyle.TEXT_MUTED if unlocked else GameUIStyle.GOLD)
 	tp.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	vbox.add_child(tp)

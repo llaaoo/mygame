@@ -10,10 +10,23 @@ extends Resource
 @export var pending_transition_name: String = ""
 @export var pending_transition_remaining_delay: float = 0.0
 @export var pending_transition_initial_delay: float = 0.0
-@export var children: Array[SerializedStateChartState] = []
+# Keep the Inspector/resource format and runtime element guard, but do not put a
+# self-typed Array in the script's shared default values (Godot 4.6 retains the
+# script through that default Array). Each instance owns its typed Array instead.
+@export_custom(PROPERTY_HINT_TYPE_STRING, "24/17:SerializedStateChartState")
+var children: Array = []:
+	set(value):
+		for child in value:
+			if child != null and not child is SerializedStateChartState:
+				push_error("State chart children must be SerializedStateChartState resources.")
+				return
+		children = Array(value, TYPE_OBJECT, &"Resource", get_script())
 
 # Only used for history states
 @export var history: SavedState = null
+
+func _init() -> void:
+	children = Array([], TYPE_OBJECT, &"Resource", get_script())
 
 
 func _to_string() -> String:

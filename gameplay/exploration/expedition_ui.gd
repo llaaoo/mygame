@@ -35,6 +35,8 @@ var _modal_panel: PanelContainer
 var _terrain_label: Label
 var _terrain_time := 0.0
 var _survival_label: Label
+var _menu_button: Button
+var _binding_revision := -1
 
 func _ready() -> void:
 	GameUIStyle.install_theme(get_window())
@@ -68,7 +70,8 @@ func _ready() -> void:
 	footer.add_theme_stylebox_override("panel", GameUIStyle.quiet_panel(.35))
 	add_child(footer)
 	var menu:=Button.new()
-	menu.text="Tab  远征菜单"
+	_menu_button=menu
+	_refresh_binding_hints()
 	menu.tooltip_text="鼠标进入装备、补给、技能和制作；Esc返回"
 	GameUIStyle.apply_button(menu)
 	menu.pressed.connect(show_menu)
@@ -120,6 +123,7 @@ func _label(text: String, size: int) -> Label:
 	return label
 
 func _process(delta: float) -> void:
+	if _binding_revision!=InputBindings.revision: _refresh_binding_hints()
 	var actor:=get_tree().get_first_node_in_group("player") as Player
 	var selecting:=actor and is_instance_valid(actor.material_wheel) and actor.material_wheel.visible
 	_heading_panel.visible=not selecting
@@ -135,6 +139,10 @@ func _process(delta: float) -> void:
 			message.text = ""
 			_notice.hide()
 			if not _pending_notices.is_empty(): notify(_pending_notices.pop_front())
+
+func _refresh_binding_hints() -> void:
+	_binding_revision=InputBindings.revision
+	if is_instance_valid(_menu_button): _menu_button.text=InputBindings.menu_help("Tab  远征菜单")
 
 func queue_notice(text: String) -> void:
 	if text in _pending_notices: return
@@ -155,17 +163,17 @@ func _unhandled_input(event: InputEvent) -> void:
 	# An external loadout/inventory window owns its shortcuts and Escape.
 	for owner in get_tree().get_nodes_in_group("modal_ui"):
 		if owner!=modal and owner is CanvasLayer and owner.visible: return
-	if not modal_locked and shortcut_action.is_valid() and shortcut_action.call(event.keycode):
+	if not modal_locked and shortcut_action.is_valid() and shortcut_action.call(InputBindings.menu_key(event)):
 		get_viewport().set_input_as_handled()
 		return
-	if event.keycode == KEY_ESCAPE:
+	if InputBindings.menu_key(event) == KEY_ESCAPE:
 		if is_instance_valid(modal):
 			if not modal_locked:
 				close_modal()
 		else:
 			show_pause()
 		get_viewport().set_input_as_handled()
-	elif event.keycode == KEY_J:
+	elif InputBindings.menu_key(event) == KEY_J:
 		if modal_locked:
 			return
 		if is_instance_valid(modal):
@@ -173,12 +181,12 @@ func _unhandled_input(event: InputEvent) -> void:
 		else:
 			show_journal()
 		get_viewport().set_input_as_handled()
-	elif event.keycode == KEY_M and map_provider.is_valid():
+	elif InputBindings.menu_key(event) == KEY_M and map_provider.is_valid():
 		if modal_locked: return
 		if is_instance_valid(modal): close_modal()
 		else: map_provider.call()
 		get_viewport().set_input_as_handled()
-	elif event.keycode == KEY_G:
+	elif InputBindings.menu_key(event) == KEY_G:
 		if modal_locked:
 			return
 		if is_instance_valid(modal):
@@ -189,12 +197,12 @@ func _unhandled_input(event: InputEvent) -> void:
 			materials_requested.emit()
 		get_viewport().set_input_as_handled()
 
-	elif event.keycode == KEY_N:
+	elif InputBindings.menu_key(event) == KEY_N:
 		if modal_locked: return
 		if is_instance_valid(modal): close_modal()
 		else: survival_requested.emit()
 		get_viewport().set_input_as_handled()
-	elif event.keycode == KEY_O:
+	elif InputBindings.menu_key(event) == KEY_O:
 		if modal_locked:
 			return
 		if is_instance_valid(modal):
@@ -277,7 +285,7 @@ func show_panel(title: String, text: String, buttons: Array[Dictionary], locked:
 	body.scroll_active = false
 	body.selection_enabled = true
 	body.text = text
-	body.add_theme_font_size_override("normal_font_size", 15)
+	GameUIStyle.apply_reading_size(body,15)
 	body.add_theme_color_override("default_color", GameUIStyle.TEXT_MAIN)
 	body.add_theme_constant_override("line_separation", 5)
 	scroll.add_child(body)
@@ -368,7 +376,7 @@ func show_journal() -> void:
 	if journal_provider.is_valid():
 		show_panel("探索日志", journal_provider.call(), [{"title": "元素关系：线索与验证", "callback": elements_requested.emit}, {"title": "实验路线与配置记录", "callback": trials_requested.emit}, {"title": "继续探索", "callback": close_modal}])
 		return
-	var text := "行动提示\n左键攻击，右键格挡；Q/E/R与1—0独立快捷槽，K编组动作或物品。\n法阵内火花产生远程法术；新阵替换旧阵。J关闭日志。\n\n监狱路线\n营地 → 外院 → 火药库 → 重卫关隘 → 熔炉大厅\n可选支路：外院的军械档案、火药库的排水回廊。\n\n发现记录\n"
+	var text := InputBindings.menu_help("行动提示\n左键攻击，右键格挡；Q/E/R与1—0独立快捷槽，K编组动作或物品。\n法阵内火花产生远程法术；新阵替换旧阵。J关闭日志。\n\n监狱路线\n营地 → 外院 → 火药库 → 重卫关隘 → 熔炉大厅\n可选支路：外院的军械档案、火药库的排水回廊。\n\n发现记录\n")
 	for entry in progress.journal:
 		text += "\n%s\n%s\n" % [entry.title, entry.text]
 	if progress.journal.is_empty():

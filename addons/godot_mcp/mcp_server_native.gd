@@ -209,8 +209,14 @@ func _exit_tree() -> void:
 	_log_info("Godot Native MCP Plugin exiting tree...")
 	preload("res://addons/godot_mcp/utils/script_validation.gd").cancel_jobs()
 	
-	if _native_server and _native_server.is_running():
-		_native_server.stop()
+	for instance: RefCounted in _tool_instances.values():
+		if instance.has_method("dispose"):
+			instance.dispose()
+	if _native_server:
+		_native_server.dispose()
+	_tool_instances.clear()
+	if Engine.has_meta("GodotMCPPlugin") and Engine.get_meta("GodotMCPPlugin") == self:
+		Engine.remove_meta("GodotMCPPlugin")
 	
 	if _main_panel:
 		EditorInterface.get_editor_main_screen().remove_child(_main_panel)

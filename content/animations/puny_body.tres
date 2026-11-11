@@ -17,47 +17,52 @@ pose = &"walk"
 [sub_resource type="Resource" id="slash"]
 script = ExtResource("clip")
 id = &"slash"
-frames = &"gesture"
+frames = &"slash"
 pose = &"slash"
 [sub_resource type="Resource" id="slash_reverse"]
 script = ExtResource("clip")
 id = &"slash_reverse"
-frames = &"gesture"
+frames = &"slash_reverse"
 pose = &"slash_reverse"
 [sub_resource type="Resource" id="slash_heavy"]
 script = ExtResource("clip")
 id = &"slash_heavy"
-frames = &"gesture"
+frames = &"slash_heavy"
 pose = &"slash_heavy"
 [sub_resource type="Resource" id="thrust"]
 script = ExtResource("clip")
 id = &"thrust"
-frames = &"gesture"
+frames = &"thrust"
 pose = &"thrust"
 [sub_resource type="Resource" id="thrust_heavy"]
 script = ExtResource("clip")
 id = &"thrust_heavy"
-frames = &"gesture"
+frames = &"thrust_heavy"
 pose = &"thrust_heavy"
 [sub_resource type="Resource" id="sweep"]
 script = ExtResource("clip")
 id = &"sweep"
-frames = &"gesture"
+frames = &"sweep"
 pose = &"sweep"
+[sub_resource type="Resource" id="sweep_reverse"]
+script = ExtResource("clip")
+id = &"sweep_reverse"
+frames = &"sweep_reverse"
+pose = &"sweep_reverse"
 [sub_resource type="Resource" id="sweep_heavy"]
 script = ExtResource("clip")
 id = &"sweep_heavy"
-frames = &"gesture"
+frames = &"sweep_heavy"
 pose = &"sweep_heavy"
 [sub_resource type="Resource" id="shot"]
 script = ExtResource("clip")
 id = &"shot"
-frames = &"gesture"
+frames = &"shot"
 pose = &"shot"
 [sub_resource type="Resource" id="shot_heavy"]
 script = ExtResource("clip")
 id = &"shot_heavy"
-frames = &"gesture"
+frames = &"shot_heavy"
 pose = &"shot_heavy"
 [sub_resource type="Resource" id="cast"]
 script = ExtResource("clip")
@@ -77,12 +82,12 @@ pose = &"cast"
 [sub_resource type="Resource" id="guard"]
 script = ExtResource("clip")
 id = &"guard"
-frames = &"gesture"
+frames = &"guard"
 pose = &"guard"
 [sub_resource type="Resource" id="charge"]
 script = ExtResource("clip")
 id = &"charge"
-frames = &"gesture"
+frames = &"charge"
 pose = &"charge"
 [sub_resource type="Resource" id="dodge"]
 script = ExtResource("clip")
@@ -120,5 +125,6 @@ id = &"puny_body"
 title = "行路者 · 分层实物装备"
 sprite_frames = ExtResource("frames")
 poses = ExtResource("poses")
-clips = Array[ExtResource("clip")]([SubResource("idle"), SubResource("walk"), SubResource("slash"), SubResource("slash_reverse"), SubResource("slash_heavy"), SubResource("thrust"), SubResource("thrust_heavy"), SubResource("sweep"), SubResource("sweep_heavy"), SubResource("shot"), SubResource("shot_heavy"), SubResource("cast"), SubResource("throw"), SubResource("use"), SubResource("guard"), SubResource("charge"), SubResource("dodge"), SubResource("hurt"), SubResource("death"), SubResource("work_gather"), SubResource("work_craft"), SubResource("work_rest")])
+clips = Array[ExtResource("clip")]([SubResource("idle"), SubResource("walk"), SubResource("slash"), SubResource("slash_reverse"), SubResource("slash_heavy"), SubResource("thrust"), SubResource("thrust_heavy"), SubResource("sweep"), SubResource("sweep_reverse"), SubResource("sweep_heavy"), SubResource("shot"), SubResource("shot_heavy"), SubResource("cast"), SubResource("throw"), SubResource("use"), SubResource("guard"), SubResource("charge"), SubResource("dodge"), SubResource("hurt"), SubResource("death"), SubResource("work_gather"), SubResource("work_craft"), SubResource("work_rest")])
 fallback = {"spray": "cast", "channel": "cast", "aim": "charge", "item": "use", "stagger": "hurt", "sprint": "walk"}
+facing_relative_poses = Array[StringName]([&"slash", &"slash_reverse", &"slash_heavy", &"thrust", &"thrust_heavy", &"sweep", &"sweep_reverse", &"sweep_heavy", &"shot", &"shot_heavy", &"guard", &"charge"])

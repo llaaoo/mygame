@@ -2,6 +2,28 @@ extends GutTest
 const Validation=preload("res://addons/godot_mcp/utils/script_validation.gd")
 const Capture=preload("res://addons/godot_mcp/utils/diagnostic_capture.gd")
 
+func test_final_dispose_breaks_registered_tool_core_ownership_cycle() -> void:
+	var core:=MCPServerCore.new();var module:=DebugToolsNative.new()
+	module.register_tools(core)
+	var core_ref: WeakRef=weakref(core);var module_ref: WeakRef=weakref(module)
+	assert_gt(core.get_tools_count(),0)
+	# A transport stop must remain restartable and retain its registrations.
+	core.stop()
+	assert_gt(core.get_tools_count(),0)
+	module.dispose();core.dispose()
+	assert_eq(core.get_tools_count(),0)
+	module=null;core=null
+	assert_null(core_ref.get_ref(),"Final editor shutdown retained the core")
+	assert_null(module_ref.get_ref(),"Registered callbacks retained their module")
+
+func test_state_chart_nested_resource_format_and_rejection_survive_cleanup_patch() -> void:
+	var output: Array=[]
+	var code:=OS.execute(OS.get_executable_path(),PackedStringArray(["--headless","--path",ProjectSettings.globalize_path("res://"),"--script","res://tests/support/state_chart_resource_probe.gd"]),output,true)
+	assert_eq(code,0,"Nested save/restore and invalid-child rejection must hold")
+	assert_true(str(output).contains("PASS state chart resource guard"))
+	var log:=FileAccess.open(OS.get_user_data_dir().path_join("expected-state-child-rejection.log"),FileAccess.WRITE)
+	for part in output:log.store_string(str(part))
+
 class ProbeBridge extends RefCounted:
 	var fresh: Dictionary={}
 	func get_captured_messages(_count: int,_offset: int,_order: String) -> Dictionary:return {}

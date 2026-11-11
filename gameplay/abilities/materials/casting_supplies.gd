@@ -30,9 +30,8 @@ var discarded_legacy_selection := false
 func _init() -> void:
 	for id in MATERIAL_IDS:
 		catalog[id] = load("res://content/casting_materials/%s.tres" % id)
-		crafting_recipes[id] = load("res://content/crafting/%s.tres" % id)
-	for id in ["arrows","guard_tonic","clear_tonic","hide_bindings","gland_venom","fang_ward"]: crafting_recipes[id]=load("res://content/crafting/%s.tres"%id)
-	for recipe in SpellOperationCatalog.default_catalog().recipes: crafting_recipes[recipe.id]=recipe
+	for recipe in CraftingCatalog.default_catalog().recipes:
+		if recipe and not recipe.id.is_empty(): crafting_recipes[recipe.id]=recipe
 
 func count(id: String) -> int:
 	return int(amounts.get(id, 0))

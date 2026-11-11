@@ -253,6 +253,23 @@ func stop() -> void:
 	_active = false
 	_log_info("MCP Server stopped")
 
+## Final plugin teardown, distinct from a restartable transport stop.
+## Tool handlers can retain their module, which can retain this core.
+func dispose() -> void:
+	stop()
+	# A transport can exist even when startup failed before _active became true.
+	if _transport:
+		_transport.stop()
+		_transport = null
+	_tools.clear()
+	_resources.clear()
+	_prompts.clear()
+	_message_queue.clear()
+	_response_queue.clear()
+	_classifier = null
+	_state_manager = null
+	_auth_manager = null
+
 func is_running() -> bool:
 	if _transport:
 		return _transport.is_running()

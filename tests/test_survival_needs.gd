@@ -44,7 +44,7 @@ func _init() -> void:
 	var core_recipes:=supplies.crafting_recipes.values().filter(func(recipe: CraftingRecipe):return recipe.fieldcraft_skill.is_empty())
 	for recipe: CraftingRecipe in supplies.crafting_recipes.values():
 		if not recipe.fieldcraft_skill.is_empty():check(not supplies.knows_recipe(recipe.id),"Standalone supplies auto-unlocked professional recipes")
-	check(not supplies.selected.has("water_call") and supplies.catalog.size() == 7 and core_recipes.size() == CastingSupplies.MATERIAL_IDS.size()+SpellOperationCatalog.default_catalog().recipes.size()+3, "Provisions became casting materials or inflated manufacturing catalogs")
+	check(not supplies.selected.has("water_call") and supplies.catalog.size() == 7 and core_recipes.size() == CraftingCatalog.default_catalog().recipes.filter(func(recipe: CraftingRecipe):return recipe.fieldcraft_skill.is_empty()).size(), "Provisions became casting materials or inflated manufacturing catalogs")
 	var original := supplies.serialize()
 	supplies.begin_transaction()
 	supplies.pay({"grain": 1})

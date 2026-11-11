@@ -15,6 +15,13 @@ var _pending_runtime_probe_requests: Dictionary = {}
 func initialize(editor_interface: EditorInterface) -> void:
 	_editor_interface = editor_interface
 
+func dispose() -> void:
+	if _server_core and _server_core.has_signal("log_message") and _server_core.log_message.is_connected(_on_log_message):
+		_server_core.log_message.disconnect(_on_log_message)
+	_server_core = null
+	_editor_interface = null
+	_pending_runtime_probe_requests.clear()
+
 func _get_editor_interface() -> EditorInterface:
 	if _editor_interface:
 		return _editor_interface

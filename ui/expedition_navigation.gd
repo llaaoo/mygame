@@ -11,6 +11,8 @@ const PAGES := [
 ]
 var current_page := ""
 var navigate: Callable
+var _page_buttons: Dictionary={}
+var _binding_revision := -1
 func _ready() -> void:
  name="ExpeditionNavigation"
  size_flags_horizontal=Control.SIZE_EXPAND_FILL
@@ -20,19 +22,26 @@ func _ready() -> void:
   button.text=page.title; button.icon=GameUIStyle.icon(page.icon)
   button.expand_icon=true; button.add_theme_constant_override("icon_max_width",16)
   button.size_flags_horizontal=Control.SIZE_EXPAND_FILL
-  button.tooltip_text=page.caption+" · "+page.title
+  _page_buttons[page.id]=button
   button.clip_text=true; button.alignment=HORIZONTAL_ALIGNMENT_LEFT
   button.add_theme_color_override("icon_normal_color",GameUIStyle.GOLD if page.id==current_page else GameUIStyle.TEXT_MUTED)
   GameUIStyle.apply_tab(button,page.id==current_page)
   button.pressed.connect(func(): if navigate.is_valid(): navigate.call(page.id))
   add_child(button)
+ _refresh_binding_hints()
+func _process(_delta: float) -> void:
+ if _binding_revision!=InputBindings.revision: _refresh_binding_hints()
+func _refresh_binding_hints() -> void:
+ _binding_revision=InputBindings.revision
+ for page in PAGES:
+  _page_buttons[page.id].tooltip_text=InputBindings.menu_label(page.key)+" · "+page.title
 func _unhandled_input(event: InputEvent) -> void:
  if not is_visible_in_tree() or not navigate.is_valid() or not event is InputEventKey or not event.pressed or event.echo: return
  var focus:=get_viewport().gui_get_focus_owner()
  if focus is LineEdit or focus is TextEdit: return
  for page in PAGES:
-  if event.keycode!=page.key or current_page==page.id: continue
+  if InputBindings.menu_key(event)!=page.key or current_page==page.id: continue
   navigate.call(page.id); get_viewport().set_input_as_handled(); return
- if event.keycode in [KEY_O,KEY_N] and current_page!="inventory":
-  navigate.call("equipment" if event.keycode==KEY_O else "supplies")
+ if InputBindings.menu_key(event) in [KEY_O,KEY_N] and current_page!="inventory":
+  navigate.call("equipment" if InputBindings.menu_key(event)==KEY_O else "supplies")
   get_viewport().set_input_as_handled()

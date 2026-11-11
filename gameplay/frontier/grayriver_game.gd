@@ -115,7 +115,7 @@ func _process(delta: float) -> void:
 			for point in definition.landmarks:
 				if player.position.distance_to(GrayriverDefinition.vector(point.pos))<420 and not progress.claims.has("place."+point.id):
 					progress.claims["place."+point.id]=true
-					ui.notify("发现："+point.title+" · M地图，J记录")
+					ui.notify("发现："+point.title+InputBindings.menu_help(" · M地图，J记录"))
 					_queue_save()
 	if progress.claims.has("quest.river_warden") and not progress.completed:
 		progress.completed=true

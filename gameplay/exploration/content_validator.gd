@@ -9,6 +9,8 @@ func _fail(resource: Resource, message: String) -> void:
 
 func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 	failures.clear()
+	var crafting:=CraftingCatalog.default_catalog()
+	for error in crafting.validation_errors(): _fail(crafting,error)
 	for message in catalog.chapter.get_meta("map_catalog_errors",PackedStringArray()): _fail(catalog.chapter,str(message))
 	var animations:=ActorAnimationCatalog.default_catalog()
 	for error in animations.validation_errors(): _fail(animations,error)

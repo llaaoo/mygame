@@ -49,10 +49,10 @@ func _ready() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed or event.echo:
 		return
-	if visible and event.keycode == KEY_ESCAPE:
+	if visible and InputBindings.menu_key(event) == KEY_ESCAPE:
 		close()
 		get_viewport().set_input_as_handled()
-	elif event.keycode == KEY_I:
+	elif InputBindings.menu_key(event) == KEY_I:
 		if get_tree().paused and not visible:
 			return
 		if page_request.is_valid():

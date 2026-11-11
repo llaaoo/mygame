@@ -98,14 +98,14 @@ func _input(event: InputEvent) -> void:
  close(); get_viewport().set_input_as_handled()
 func _unhandled_input(event: InputEvent) -> void:
  if not visible or not event is InputEventKey or not event.pressed or event.echo: return
- if event.keycode==KEY_ESCAPE: close(); get_viewport().set_input_as_handled()
- elif event.keycode==KEY_O and not get_viewport().gui_get_focus_owner() is LineEdit:
+ if InputBindings.menu_key(event)==KEY_ESCAPE: close(); get_viewport().set_input_as_handled()
+ elif InputBindings.menu_key(event)==KEY_O and not get_viewport().gui_get_focus_owner() is LineEdit:
   mode="equipment"; selected_slot=-1; _invalidate(); get_viewport().set_input_as_handled()
- elif event.keycode==KEY_N and not get_viewport().gui_get_focus_owner() is LineEdit:
+ elif InputBindings.menu_key(event)==KEY_N and not get_viewport().gui_get_focus_owner() is LineEdit:
   mode="supplies"; selected_slot=-1; _invalidate(); get_viewport().set_input_as_handled()
- elif event.keycode in [KEY_I,KEY_TAB,KEY_K,KEY_G,KEY_J,KEY_M] and not get_viewport().gui_get_focus_owner() is LineEdit:
+ elif InputBindings.menu_key(event) in [KEY_I,KEY_TAB,KEY_K,KEY_G,KEY_J,KEY_M] and not get_viewport().gui_get_focus_owner() is LineEdit:
   close()
-  if event.keycode!=KEY_I and navigation_request.is_valid(): navigation_request.call(event.keycode)
+  if InputBindings.menu_key(event)!=KEY_I and navigation_request.is_valid(): navigation_request.call(InputBindings.menu_key(event))
   get_viewport().set_input_as_handled()
 func _build() -> void:
  var background:=ColorRect.new(); background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)

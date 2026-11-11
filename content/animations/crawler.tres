@@ -44,6 +44,11 @@ script = ExtResource("clip")
 id = &"sweep"
 frames = &"bite"
 pose = &"sweep"
+[sub_resource type="Resource" id="sweep_reverse"]
+script = ExtResource("clip")
+id = &"sweep_reverse"
+frames = &"bite"
+pose = &"sweep_reverse"
 [sub_resource type="Resource" id="sweep_heavy"]
 script = ExtResource("clip")
 id = &"sweep_heavy"
@@ -120,7 +125,8 @@ id = &"crawler"
 title = "沼甲兽"
 sprite_frames = ExtResource("frames")
 poses = ExtResource("poses")
-clips = Array[ExtResource("clip")]([SubResource("idle"), SubResource("walk"), SubResource("slash"), SubResource("slash_reverse"), SubResource("slash_heavy"), SubResource("thrust"), SubResource("thrust_heavy"), SubResource("sweep"), SubResource("sweep_heavy"), SubResource("shot"), SubResource("shot_heavy"), SubResource("cast"), SubResource("throw"), SubResource("use"), SubResource("guard"), SubResource("charge"), SubResource("dodge"), SubResource("hurt"), SubResource("death"), SubResource("work_gather"), SubResource("work_craft"), SubResource("work_rest")])
+clips = Array[ExtResource("clip")]([SubResource("idle"), SubResource("walk"), SubResource("slash"), SubResource("slash_reverse"), SubResource("slash_heavy"), SubResource("thrust"), SubResource("thrust_heavy"), SubResource("sweep"), SubResource("sweep_reverse"), SubResource("sweep_heavy"), SubResource("shot"), SubResource("shot_heavy"), SubResource("cast"), SubResource("throw"), SubResource("use"), SubResource("guard"), SubResource("charge"), SubResource("dodge"), SubResource("hurt"), SubResource("death"), SubResource("work_gather"), SubResource("work_craft"), SubResource("work_rest")])
 fallback = {"spray": "cast", "channel": "cast", "aim": "charge", "item": "use", "stagger": "hurt", "sprint": "walk"}
+facing_relative_poses = Array[StringName]([&"slash", &"slash_reverse", &"slash_heavy", &"thrust", &"thrust_heavy", &"sweep", &"sweep_reverse", &"sweep_heavy", &"shot", &"shot_heavy", &"guard", &"charge"])
 body_scale = Vector2(1.8, 1.8)
 body_offset = Vector2(0, -6)
