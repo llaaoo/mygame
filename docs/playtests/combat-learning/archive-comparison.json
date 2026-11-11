@@ -1,0 +1,199 @@
+{
+  "source_revision": "8292fe6b8a8e72ebd307b68f205b2cc31f53f852",
+  "seed_sha256": "89746ddd2186335bd46570d07ab6a9bec6d4e5eb1beb8affb6dd3ce50ffb8a1f",
+  "same_start": {
+    "region_id": true,
+    "materials": true,
+    "items": true,
+    "pack": true,
+    "gear": true,
+    "shortcuts": true,
+    "known_actions": true,
+    "martial": true,
+    "growth": true,
+    "claims": true,
+    "npc_accounts": true,
+    "enemies": true,
+    "player.hp": true,
+    "player.mp": true,
+    "player.position": true,
+    "player.stamina": true,
+    "player.mode": true,
+    "player.dead": true
+  },
+  "rows": [
+    {
+      "style": "counter",
+      "outcome": "target_killed",
+      "seconds": 4.73363033333333,
+      "damage": 16,
+      "hp_end": 94,
+      "mp_end": 60,
+      "parries": 3,
+      "counters": 3,
+      "casts": [],
+      "domain_events": [
+        {
+          "data": {
+            "family": "weapon.player.1",
+            "motion": "slash",
+            "weapon_uid": "item.31"
+          },
+          "kind": "physical_action_released",
+          "t": 3.184637
+        },
+        {
+          "data": {
+            "family": "weapon.player.2",
+            "motion": "slash",
+            "weapon_uid": "item.31"
+          },
+          "kind": "physical_action_released",
+          "t": 4.44446666666666
+        },
+        {
+          "data": {
+            "family": "weapon.player.3",
+            "motion": "slash",
+            "weapon_uid": "item.31"
+          },
+          "kind": "physical_action_released",
+          "t": 5.67791166666666
+        }
+      ],
+      "surface_reactions": []
+    },
+    {
+      "style": "martial",
+      "outcome": "target_killed",
+      "seconds": 4.129175,
+      "damage": 34,
+      "hp_end": 76,
+      "mp_end": 60,
+      "parries": 0,
+      "counters": 0,
+      "casts": [],
+      "domain_events": [
+        {
+          "data": {
+            "family": "weapon.player.1",
+            "motion": "slash",
+            "weapon_uid": "item.31"
+          },
+          "kind": "physical_action_released",
+          "t": 3.01666666666667
+        },
+        {
+          "data": {
+            "family": "weapon.player.2",
+            "motion": "slash",
+            "weapon_uid": "item.31"
+          },
+          "kind": "physical_action_released",
+          "t": 4.00523166666667
+        },
+        {
+          "data": {
+            "family": "weapon.player.3",
+            "motion": "slash",
+            "weapon_uid": "item.31"
+          },
+          "kind": "physical_action_released",
+          "t": 5.11250833333333
+        }
+      ],
+      "surface_reactions": []
+    },
+    {
+      "style": "combo",
+      "outcome": "target_killed",
+      "seconds": 4.57216440740741,
+      "damage": 0,
+      "hp_end": 110,
+      "mp_end": 28,
+      "parries": 0,
+      "counters": 0,
+      "casts": [
+        {
+          "action": "inscribe",
+          "charge_power": 1.0,
+          "materials": {
+            "fire_stone": 1
+          },
+          "mp_after": 52,
+          "mp_cost": 8,
+          "position": [
+            -112.090339660645,
+            264.067016601562
+          ],
+          "result": "inscribe",
+          "rule": "",
+          "t": 1.94194419047619
+        },
+        {
+          "action": "ignite",
+          "charge_power": 1.0,
+          "materials": {},
+          "mp_after": 40,
+          "mp_cost": 12,
+          "position": [
+            -112.090339660645,
+            264.067016601562
+          ],
+          "result": "fireball",
+          "rule": "fire_sigil_fireball",
+          "t": 2.48471733333333
+        },
+        {
+          "action": "ignite",
+          "charge_power": 1.0,
+          "materials": {},
+          "mp_after": 28,
+          "mp_cost": 12,
+          "position": [
+            -112.090339660645,
+            264.067016601562
+          ],
+          "result": "fireball",
+          "rule": "fire_sigil_fireball",
+          "t": 4.85807466666666
+        }
+      ],
+      "domain_events": [],
+      "surface_reactions": [
+        {
+          "cell": [
+            0,
+            1
+          ],
+          "rule": "wet_fire",
+          "source": "火球术",
+          "t": 2.743299
+        }
+      ]
+    },
+    {
+      "style": "throw",
+      "outcome": "ignition_not_committed",
+      "seconds": null,
+      "damage": 16,
+      "hp_end": 94,
+      "mp_end": 60,
+      "parries": 0,
+      "counters": 0,
+      "casts": [],
+      "domain_events": [
+        {
+          "data": {
+            "item": "oil_bottle",
+            "weapon_uid": "item.31"
+          },
+          "kind": "item_action_committed",
+          "t": 3.73465133333333
+        }
+      ],
+      "surface_reactions": [],
+      "request_to_abort_seconds": 3.5443033333333362
+    }
+  ]
+}
