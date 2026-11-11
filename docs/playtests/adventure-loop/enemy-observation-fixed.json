@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "revision": "1c1d4d34d20baf94a70df44c16511484daff370e",
+  "dirty": true,
+  "godot": "4.6.3.stable.official.7d41c59c4",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "jobs": 2,
+  "timeout": 300.0,
+  "logs": "/tmp/mygame-tests-skglah26",
+  "requested": [
+    "gut_domain",
+    "enemy_observation_input"
+  ],
+  "results": [
+    {
+      "name": "gut_domain",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 3.375,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://addons/gut/gut_cmdln.gd",
+        "-gexit",
+        "-gdisable_colors",
+        "-gjunit_xml_file=/tmp/mygame-tests-skglah26/gut-domain.xml"
+      ],
+      "log": "/tmp/mygame-tests-skglah26/gut_domain.log",
+      "diagnostic": []
+    },
+    {
+      "name": "enemy_observation_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 4.728,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_enemy_observation_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-skglah26/enemy_observation_input.log",
+      "diagnostic": []
+    }
+  ],
+  "skipped": [],
+  "complete": true
+}

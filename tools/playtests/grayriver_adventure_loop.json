@@ -23,6 +23,26 @@
     "label": "记入日志，继续探索"
   },
   {
+    "op": "key",
+    "key": "J"
+  },
+  {
+    "op": "click",
+    "label": "委托记录"
+  },
+  {
+    "op": "click",
+    "label": "首次出征：林下档案窖"
+  },
+  {
+    "op": "click",
+    "label": "追踪这个委托"
+  },
+  {
+    "op": "key",
+    "key": "Escape"
+  },
+  {
     "op": "walk",
     "point": [
       -3850,
@@ -245,6 +265,11 @@
     "key": "F",
     "capture": "adventure-11-archive-entry",
     "phase": "B: actual archive room and three normal enemies"
+  },
+  {
+    "op": "save",
+    "label": "adventure-before-archive-combat",
+    "note": "Game-generated common starting point for future weapon/form/item counterplay comparisons; no fixture grants or positions."
   },
   {
     "op": "walk",
@@ -486,7 +511,7 @@
   },
   {
     "op": "click",
-    "label": "开始作业"
+    "label": "F  开始作业"
   },
   {
     "op": "wait",
@@ -589,6 +614,22 @@
   {
     "op": "key",
     "key": "Escape"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3500,
+      2000
+    ],
+    "tolerance": 12
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3210,
+      2000
+    ],
+    "tolerance": 12
   },
   {
     "op": "walk",

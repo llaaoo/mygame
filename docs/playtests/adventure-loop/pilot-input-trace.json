@@ -1,0 +1,2544 @@
+[
+  {
+    "request": {
+      "id": 1.0,
+      "label": "开始河谷旅程",
+      "note": "Planned assisted acceptance route, not a 30–45 minute measured completion. Empty isolated XDG; normal AI/default stats. No fixture or domain mutation.",
+      "op": "click",
+      "phase": "A: new save, handbook, rations and real crafting"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3700.0,
+      2100.0
+    ],
+    "hp": 100,
+    "mp": 60,
+    "legacy_raw_health_decreases": 0,
+    "time": 1.04363533333333,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 2.0,
+      "op": "walk",
+      "point": [
+        -3500.0,
+        2350.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3497.763671875,
+      2346.236328125
+    ],
+    "hp": 100,
+    "mp": 60,
+    "legacy_raw_health_decreases": 0,
+    "time": 2.54690466666667,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "capture": "adventure-01-handbook",
+      "id": 3.0,
+      "key": "F",
+      "op": "key"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3497.763671875,
+      2346.236328125
+    ],
+    "hp": 100,
+    "mp": 60,
+    "legacy_raw_health_decreases": 0,
+    "time": 2.93664133333333,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 4.0,
+      "label": "记入日志，继续探索",
+      "op": "click"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3497.763671875,
+      2346.236328125
+    ],
+    "hp": 100,
+    "mp": 60,
+    "legacy_raw_health_decreases": 0,
+    "time": 4.40145633333333,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 5.0,
+      "op": "walk",
+      "point": [
+        -3850.0,
+        2300.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3857.93359375,
+      2299.56640625
+    ],
+    "hp": 100,
+    "mp": 60,
+    "legacy_raw_health_decreases": 0,
+    "time": 5.806975,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "capture": "adventure-02-rations",
+      "id": 6.0,
+      "key": "F",
+      "op": "key"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3857.93359375,
+      2299.56640625
+    ],
+    "hp": 100,
+    "mp": 60,
+    "legacy_raw_health_decreases": 0,
+    "time": 6.30392666666666,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 7.0,
+      "label": "记入日志，继续探索",
+      "op": "click"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3857.93359375,
+      2299.56640625
+    ],
+    "hp": 100,
+    "mp": 60,
+    "legacy_raw_health_decreases": 0,
+    "time": 7.38209699999999,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "action": "移至背包",
+      "capture": "adventure-03-free-pocket",
+      "id": 8.0,
+      "item": "ash",
+      "note": "Move actual ash stack; make a slot for the crafted field medium. Do not grant or reconstruct supplies.",
+      "op": "inventory",
+      "quantity": 2.0
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3857.93359375,
+      2299.56640625
+    ],
+    "hp": 100,
+    "mp": 60,
+    "legacy_raw_health_decreases": 0,
+    "time": 12.9833333333333,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 9.0,
+      "op": "walk",
+      "point": [
+        -3100.0,
+        1850.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3104.6826171875,
+      1848.43017578125
+    ],
+    "hp": 100,
+    "mp": 60,
+    "legacy_raw_health_decreases": 0,
+    "time": 17.2888291111111,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 10.0,
+      "key": "F",
+      "op": "key"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3104.6826171875,
+      1848.43017578125
+    ],
+    "hp": 100,
+    "mp": 60,
+    "legacy_raw_health_decreases": 0,
+    "time": 17.722668,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 11.0,
+      "label": "火石",
+      "op": "click"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3104.6826171875,
+      1848.43017578125
+    ],
+    "hp": 100,
+    "mp": 60,
+    "legacy_raw_health_decreases": 0,
+    "time": 18.777571,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 12.0,
+      "label": "加工：火石",
+      "op": "click"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3104.6826171875,
+      1848.43017578125
+    ],
+    "hp": 100,
+    "mp": 60,
+    "legacy_raw_health_decreases": 0,
+    "time": 19.8,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "capture": "adventure-04-two-crafted-firestones",
+      "id": 13.0,
+      "label": "加工：火石",
+      "op": "click"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3104.6826171875,
+      1848.43017578125
+    ],
+    "hp": 100,
+    "mp": 60,
+    "legacy_raw_health_decreases": 0,
+    "time": 20.854327,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 14.0,
+      "label": "继续探索",
+      "op": "click"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3104.6826171875,
+      1848.43017578125
+    ],
+    "hp": 100,
+    "mp": 60,
+    "legacy_raw_health_decreases": 0,
+    "time": 21.8277777777778,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 15.0,
+      "op": "walk",
+      "point": [
+        -3400.0,
+        1260.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3392.48046875,
+      1258.14135742188
+    ],
+    "hp": 100,
+    "mp": 60,
+    "legacy_raw_health_decreases": 0,
+    "time": 25.1214633333333,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "capture": "adventure-05-north-sign",
+      "id": 16.0,
+      "key": "F",
+      "op": "key"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3392.48046875,
+      1258.14135742188
+    ],
+    "hp": 100,
+    "mp": 60,
+    "legacy_raw_health_decreases": 0,
+    "time": 25.4833333333333,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 17.0,
+      "label": "记入日志，继续探索",
+      "op": "click"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3392.48046875,
+      1258.14135742188
+    ],
+    "hp": 100,
+    "mp": 60,
+    "legacy_raw_health_decreases": 0,
+    "time": 26.3460183333333,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 18.0,
+      "op": "walk",
+      "point": [
+        -3500.0,
+        900.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3497.48779296875,
+      905.63671875
+    ],
+    "hp": 100,
+    "mp": 60,
+    "legacy_raw_health_decreases": 0,
+    "time": 27.7228544444445,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 19.0,
+      "op": "walk",
+      "point": [
+        -3500.0,
+        0.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3497.48779296875,
+      -1.86328220367432
+    ],
+    "hp": 100,
+    "mp": 60,
+    "legacy_raw_health_decreases": 0,
+    "time": 30.6166666666667,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 20.0,
+      "op": "walk",
+      "point": [
+        -3260.0,
+        -780.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3264.13818359375,
+      -780.65283203125
+    ],
+    "hp": 100,
+    "mp": 60,
+    "legacy_raw_health_decreases": 0,
+    "time": 33.9928321111112,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 21.0,
+      "op": "walk",
+      "point": [
+        -3350.0,
+        -1200.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3353.5888671875,
+      -1201.82678222656
+    ],
+    "hp": 100,
+    "mp": 60,
+    "legacy_raw_health_decreases": 0,
+    "time": 35.6367578888889,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "capture": "adventure-06-west-safe-fire-record",
+      "id": 22.0,
+      "key": "F",
+      "op": "key"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3353.5888671875,
+      -1201.82678222656
+    ],
+    "hp": 100,
+    "mp": 60,
+    "legacy_raw_health_decreases": 0,
+    "time": 36.0333333333333,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 23.0,
+      "label": "记入日志，继续探索",
+      "op": "click"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3353.5888671875,
+      -1201.82678222656
+    ],
+    "hp": 100,
+    "mp": 60,
+    "legacy_raw_health_decreases": 0,
+    "time": 36.8,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 24.0,
+      "op": "walk",
+      "point": [
+        -3060.0,
+        -1200.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3057.140625,
+      -1201.82678222656
+    ],
+    "hp": 100,
+    "mp": 60,
+    "legacy_raw_health_decreases": 0,
+    "time": 38.05,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "capture": "adventure-07-fire-medium",
+      "id": 25.0,
+      "key": "5",
+      "note": "Requires the current entry_point-based probe adapter. Validate selected source payload=ember; wheel confirmation alone is not a cast.",
+      "op": "wheel",
+      "payload": "ember"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3057.140625,
+      -1201.82678222656
+    ],
+    "hp": 100,
+    "mp": 60,
+    "legacy_raw_health_decreases": 0,
+    "time": 38.996896,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 26.0,
+      "label": "adventure-before-forest-combat",
+      "op": "save"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3057.140625,
+      -1201.82678222656
+    ],
+    "hp": 100,
+    "mp": 60,
+    "legacy_raw_health_decreases": 0,
+    "time": 39.4843463333333,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "capture": "adventure-08-forest-combat",
+      "id": 27.0,
+      "note": "Disclosed scripted actual-key assistance: helper presses 5 then 6 and aims at known test target. Check committed fire field/fireball and fire_stone consumption; do not infer success merely from helper exit.",
+      "op": "duel",
+      "style": "combo",
+      "target": "river.enemy.camp.forest.3"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3057.140625,
+      -1201.82678222656
+    ],
+    "hp": 100,
+    "mp": 29,
+    "legacy_raw_health_decreases": 0,
+    "time": 44.2333333333333,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 28.0,
+      "key": "Escape",
+      "op": "key"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3057.140625,
+      -1201.82678222656
+    ],
+    "hp": 100,
+    "mp": 29,
+    "legacy_raw_health_decreases": 0,
+    "time": 44.591152,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 29.0,
+      "op": "walk_loot",
+      "target": "river.enemy.camp.forest.3"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -2624.41162109375,
+      -1120.15698242188
+    ],
+    "hp": 100,
+    "mp": 31,
+    "legacy_raw_health_decreases": 0,
+    "time": 46.2166666666666,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "capture": "adventure-09-forest-real-loot",
+      "id": 30.0,
+      "key": "F",
+      "op": "key"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -2624.41162109375,
+      -1120.15698242188
+    ],
+    "hp": 100,
+    "mp": 32,
+    "legacy_raw_health_decreases": 0,
+    "time": 46.5531856666666,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 31.0,
+      "key": "T",
+      "op": "key"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -2624.41162109375,
+      -1120.15698242188
+    ],
+    "hp": 100,
+    "mp": 34,
+    "legacy_raw_health_decreases": 0,
+    "time": 47.0509009999999,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 32.0,
+      "key": "Escape",
+      "op": "key"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -2624.41162109375,
+      -1120.15698242188
+    ],
+    "hp": 100,
+    "mp": 35,
+    "legacy_raw_health_decreases": 0,
+    "time": 47.3333333333333,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "action": "装备这件",
+      "capture": "adventure-10-real-sabre-equipped",
+      "id": 33.0,
+      "item": "river_sabre",
+      "op": "inventory"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -2624.41162109375,
+      -1120.15698242188
+    ],
+    "hp": 100,
+    "mp": 45,
+    "legacy_raw_health_decreases": 0,
+    "time": 50.7721183333333,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "action": "装备这件",
+      "id": 34.0,
+      "item": "river_coat",
+      "op": "inventory"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -2624.41162109375,
+      -1120.15698242188
+    ],
+    "hp": 100,
+    "mp": 56,
+    "legacy_raw_health_decreases": 0,
+    "time": 54.3666666666666,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 35.0,
+      "key": "7",
+      "op": "key"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -2624.41162109375,
+      -1120.15698242188
+    ],
+    "hp": 100,
+    "mp": 57,
+    "legacy_raw_health_decreases": 0,
+    "time": 54.7666666666666,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 36.0,
+      "op": "wait",
+      "seconds": 2.5
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -2624.41162109375,
+      -1120.15698242188
+    ],
+    "hp": 110,
+    "mp": 60,
+    "legacy_raw_health_decreases": 0,
+    "time": 57.3633333333332,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 37.0,
+      "key": "8",
+      "op": "key"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -2624.41162109375,
+      -1120.15698242188
+    ],
+    "hp": 110,
+    "mp": 60,
+    "legacy_raw_health_decreases": 0,
+    "time": 57.6744066666665,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 38.0,
+      "op": "wait",
+      "seconds": 2.5
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -2624.41162109375,
+      -1120.15698242188
+    ],
+    "hp": 110,
+    "mp": 60,
+    "legacy_raw_health_decreases": 0,
+    "time": 60.2459106666665,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 39.0,
+      "op": "walk",
+      "point": [
+        -3072.0,
+        -1200.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3070.02734375,
+      -1202.77062988281
+    ],
+    "hp": 110,
+    "mp": 60,
+    "legacy_raw_health_decreases": 0,
+    "time": 61.8941896666664,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 40.0,
+      "op": "walk",
+      "point": [
+        -2850.0,
+        -1500.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -2852.234375,
+      -1500.38830566406
+    ],
+    "hp": 110,
+    "mp": 60,
+    "legacy_raw_health_decreases": 0,
+    "time": 63.3827691111109,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 41.0,
+      "op": "walk",
+      "point": [
+        -2730.0,
+        -1850.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -2727.78125,
+      -1852.22521972656
+    ],
+    "hp": 110,
+    "mp": 60,
+    "legacy_raw_health_decreases": 0,
+    "time": 64.8387255757574,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 42.0,
+      "op": "walk",
+      "point": [
+        -2600.0,
+        -1800.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -2600.8896484375,
+      -1806.50061035156
+    ],
+    "hp": 110,
+    "mp": 60,
+    "legacy_raw_health_decreases": 0,
+    "time": 65.653409090909,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "capture": "adventure-11-archive-entry",
+      "id": 43.0,
+      "key": "F",
+      "op": "key",
+      "phase": "B: actual archive room and three normal enemies"
+    },
+    "error": "",
+    "region": "river_archive",
+    "position": [
+      -820.0,
+      0.0
+    ],
+    "hp": 110,
+    "mp": 60,
+    "legacy_raw_health_decreases": 0,
+    "time": 65.9833333333332,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 44.0,
+      "op": "walk",
+      "point": [
+        -780.0,
+        390.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "river_archive",
+    "position": [
+      -777.219909667969,
+      389.280120849609
+    ],
+    "hp": 110,
+    "mp": 60,
+    "legacy_raw_health_decreases": 0,
+    "time": 67.3564703333331,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "capture": "adventure-12-impact-knowledge",
+      "id": 45.0,
+      "key": "F",
+      "op": "key"
+    },
+    "error": "",
+    "region": "river_archive",
+    "position": [
+      -777.219909667969,
+      389.280120849609
+    ],
+    "hp": 110,
+    "mp": 60,
+    "legacy_raw_health_decreases": 0,
+    "time": 67.6666666666665,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 46.0,
+      "label": "记入日志，继续探索",
+      "op": "click"
+    },
+    "error": "",
+    "region": "river_archive",
+    "position": [
+      -777.219909667969,
+      389.280120849609
+    ],
+    "hp": 110,
+    "mp": 60,
+    "legacy_raw_health_decreases": 0,
+    "time": 68.2228206666665,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 47.0,
+      "op": "walk",
+      "point": [
+        -550.0,
+        420.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "river_archive",
+    "position": [
+      -544.218017578125,
+      424.282012939453
+    ],
+    "hp": 110,
+    "mp": 60,
+    "legacy_raw_health_decreases": 0,
+    "time": 69.1865966666665,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "capture": "adventure-13-dispatch",
+      "id": 48.0,
+      "key": "F",
+      "op": "key"
+    },
+    "error": "",
+    "region": "river_archive",
+    "position": [
+      -544.218017578125,
+      424.282012939453
+    ],
+    "hp": 110,
+    "mp": 60,
+    "legacy_raw_health_decreases": 0,
+    "time": 69.4833333333332,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 49.0,
+      "label": "记入日志，继续探索",
+      "op": "click"
+    },
+    "error": "",
+    "region": "river_archive",
+    "position": [
+      -544.218017578125,
+      424.282012939453
+    ],
+    "hp": 110,
+    "mp": 60,
+    "legacy_raw_health_decreases": 0,
+    "time": 70.1500856666665,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 50.0,
+      "op": "walk",
+      "point": [
+        -450.0,
+        450.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "river_archive",
+    "position": [
+      -456.494323730469,
+      451.505706787109
+    ],
+    "hp": 110,
+    "mp": 60,
+    "legacy_raw_health_decreases": 0,
+    "time": 70.5736111111109,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 51.0,
+      "op": "walk",
+      "point": [
+        -170.0,
+        450.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "river_archive",
+    "position": [
+      -172.105224609375,
+      447.616607666016
+    ],
+    "hp": 110,
+    "mp": 60,
+    "legacy_raw_health_decreases": 0,
+    "time": 71.5314416666664,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "capture": "adventure-14-archive-first-guard",
+      "id": 52.0,
+      "note": "Do not use a direct approach from the west entrance through the new shelf. Shared aggro can change encounter order; stop on driver failure/death and retain evidence.",
+      "op": "duel",
+      "style": "basic",
+      "target": "river.enemy.river_archive.river_archive.1"
+    },
+    "error": "",
+    "region": "river_archive",
+    "position": [
+      -122.472953796387,
+      142.811508178711
+    ],
+    "hp": 78,
+    "mp": 60,
+    "legacy_raw_health_decreases": 32,
+    "time": 74.8166666666665,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 53.0,
+      "key": "Escape",
+      "op": "key"
+    },
+    "error": "",
+    "region": "river_archive",
+    "position": [
+      -122.472953796387,
+      142.811508178711
+    ],
+    "hp": 78,
+    "mp": 60,
+    "legacy_raw_health_decreases": 32,
+    "time": 75.1533256666665,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 54.0,
+      "op": "walk_loot",
+      "target": "river.enemy.river_archive.river_archive.1"
+    },
+    "error": "",
+    "region": "river_archive",
+    "position": [
+      -122.472953796387,
+      142.811508178711
+    ],
+    "hp": 75,
+    "mp": 60,
+    "legacy_raw_health_decreases": 35,
+    "time": 75.3051925757574,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "capture": "adventure-15-first-guard-loot",
+      "id": 55.0,
+      "key": "F",
+      "op": "key"
+    },
+    "error": "",
+    "region": "river_archive",
+    "position": [
+      -122.472953796387,
+      142.811508178711
+    ],
+    "hp": 75,
+    "mp": 60,
+    "legacy_raw_health_decreases": 35,
+    "time": 75.6580709999998,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 56.0,
+      "key": "T",
+      "op": "key"
+    },
+    "error": "",
+    "region": "river_archive",
+    "position": [
+      -122.472953796387,
+      142.811508178711
+    ],
+    "hp": 75,
+    "mp": 60,
+    "legacy_raw_health_decreases": 35,
+    "time": 76.0840833333332,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 57.0,
+      "key": "Escape",
+      "op": "key"
+    },
+    "error": "",
+    "region": "river_archive",
+    "position": [
+      -122.472953796387,
+      142.811508178711
+    ],
+    "hp": 72,
+    "mp": 60,
+    "legacy_raw_health_decreases": 38,
+    "time": 76.2493106666665,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 58.0,
+      "key": "7",
+      "op": "key"
+    },
+    "error": "",
+    "region": "river_archive",
+    "position": [
+      -122.472953796387,
+      142.811508178711
+    ],
+    "hp": 72,
+    "mp": 60,
+    "legacy_raw_health_decreases": 38,
+    "time": 76.4867893333332,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 59.0,
+      "op": "wait",
+      "seconds": 2.5
+    },
+    "error": "",
+    "region": "river_archive",
+    "position": [
+      -122.472953796387,
+      142.811508178711
+    ],
+    "hp": 66,
+    "mp": 60,
+    "legacy_raw_health_decreases": 44,
+    "time": 79.0257575757577,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 60.0,
+      "op": "walk",
+      "point": [
+        120.0,
+        -250.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "river_archive",
+    "position": [
+      122.539688110352,
+      -251.644683837891
+    ],
+    "hp": 63,
+    "mp": 60,
+    "legacy_raw_health_decreases": 47,
+    "time": 81.5092592592594,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "capture": "adventure-16-archive-second-guard",
+      "id": 61.0,
+      "op": "duel",
+      "style": "basic",
+      "target": "river.enemy.river_archive.river_archive.2"
+    },
+    "error": "",
+    "region": "river_archive",
+    "position": [
+      202.990493774414,
+      -228.694427490234
+    ],
+    "hp": 29,
+    "mp": 60,
+    "legacy_raw_health_decreases": 81,
+    "time": 84.0333333333335,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 62.0,
+      "key": "Escape",
+      "op": "key"
+    },
+    "error": "",
+    "region": "river_archive",
+    "position": [
+      202.990493774414,
+      -228.694427490234
+    ],
+    "hp": 26,
+    "mp": 60,
+    "legacy_raw_health_decreases": 84,
+    "time": 84.3179230000002,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 63.0,
+      "op": "walk_loot",
+      "target": "river.enemy.river_archive.river_archive.2"
+    },
+    "error": "",
+    "region": "river_archive",
+    "position": [
+      202.990493774414,
+      -228.694427490234
+    ],
+    "hp": 26,
+    "mp": 60,
+    "legacy_raw_health_decreases": 84,
+    "time": 84.4522393333335,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "capture": "adventure-17-second-guard-loot",
+      "id": 64.0,
+      "key": "F",
+      "op": "key"
+    },
+    "error": "",
+    "region": "river_archive",
+    "position": [
+      202.990493774414,
+      -228.694427490234
+    ],
+    "hp": 26,
+    "mp": 60,
+    "legacy_raw_health_decreases": 84,
+    "time": 84.8542770000002,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 65.0,
+      "key": "T",
+      "op": "key"
+    },
+    "error": "",
+    "region": "river_archive",
+    "position": [
+      202.990493774414,
+      -228.694427490234
+    ],
+    "hp": 23,
+    "mp": 60,
+    "legacy_raw_health_decreases": 87,
+    "time": 85.3382683333335,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 66.0,
+      "key": "Escape",
+      "op": "key"
+    },
+    "error": "",
+    "region": "river_archive",
+    "position": [
+      202.990493774414,
+      -228.694427490234
+    ],
+    "hp": 23,
+    "mp": 60,
+    "legacy_raw_health_decreases": 87,
+    "time": 85.4983666666668,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 67.0,
+      "op": "walk",
+      "point": [
+        260.0,
+        -310.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "river_archive",
+    "position": [
+      257.437683105469,
+      -307.419891357422
+    ],
+    "hp": 23,
+    "mp": 60,
+    "legacy_raw_health_decreases": 87,
+    "time": 85.9825540000001,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 68.0,
+      "op": "walk",
+      "point": [
+        490.0,
+        -310.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "river_archive",
+    "position": [
+      495.272277832031,
+      -315.198089599609
+    ],
+    "hp": 20,
+    "mp": 60,
+    "legacy_raw_health_decreases": 90,
+    "time": 86.8166666666667,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 69.0,
+      "op": "walk",
+      "point": [
+        520.0,
+        -40.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "river_archive",
+    "position": [
+      526.385070800781,
+      -42.0853652954102
+    ],
+    "hp": 17,
+    "mp": 60,
+    "legacy_raw_health_decreases": 93,
+    "time": 88.0789156666667,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "capture": "adventure-18-archive-caster",
+      "id": 70.0,
+      "op": "duel",
+      "style": "basic",
+      "target": "river.enemy.river_archive.river_archive.3"
+    },
+    "error": "",
+    "region": "river_archive",
+    "position": [
+      572.087585449219,
+      31.1779403686523
+    ],
+    "hp": 2,
+    "mp": 60,
+    "legacy_raw_health_decreases": 108,
+    "time": 90.6333333333335,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 71.0,
+      "key": "Escape",
+      "op": "key"
+    },
+    "error": "",
+    "region": "river_archive",
+    "position": [
+      572.087585449219,
+      31.1779403686523
+    ],
+    "hp": 2,
+    "mp": 60,
+    "legacy_raw_health_decreases": 108,
+    "time": 90.9727420000001,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 72.0,
+      "op": "walk_loot",
+      "target": "river.enemy.river_archive.river_archive.3"
+    },
+    "error": "",
+    "region": "river_archive",
+    "position": [
+      572.087585449219,
+      31.1779403686523
+    ],
+    "hp": 2,
+    "mp": 60,
+    "legacy_raw_health_decreases": 108,
+    "time": 91.0797530000001,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "capture": "adventure-19-caster-real-remainder",
+      "id": 73.0,
+      "key": "F",
+      "op": "key"
+    },
+    "error": "",
+    "region": "river_archive",
+    "position": [
+      572.087585449219,
+      31.1779403686523
+    ],
+    "hp": 2,
+    "mp": 60,
+    "legacy_raw_health_decreases": 108,
+    "time": 91.4166666666668,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 74.0,
+      "key": "T",
+      "op": "key"
+    },
+    "error": "",
+    "region": "river_archive",
+    "position": [
+      572.087585449219,
+      31.1779403686523
+    ],
+    "hp": 2,
+    "mp": 60,
+    "legacy_raw_health_decreases": 108,
+    "time": 91.8833333333335,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 75.0,
+      "key": "Escape",
+      "op": "key"
+    },
+    "error": "",
+    "region": "river_archive",
+    "position": [
+      572.087585449219,
+      31.1779403686523
+    ],
+    "hp": 2,
+    "mp": 60,
+    "legacy_raw_health_decreases": 108,
+    "time": 92.0539133333335,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 76.0,
+      "op": "walk",
+      "point": [
+        800.0,
+        100.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "river_archive",
+    "position": [
+      805.48046875,
+      104.127014160156
+    ],
+    "hp": 2,
+    "mp": 60,
+    "legacy_raw_health_decreases": 108,
+    "time": 93.0500000000001,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "capture": "adventure-20-dossier",
+      "id": 77.0,
+      "key": "F",
+      "op": "key"
+    },
+    "error": "",
+    "region": "river_archive",
+    "position": [
+      805.48046875,
+      104.127014160156
+    ],
+    "hp": 2,
+    "mp": 60,
+    "legacy_raw_health_decreases": 108,
+    "time": 93.3377730000001,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 78.0,
+      "label": "记入日志，继续探索",
+      "op": "click"
+    },
+    "error": "",
+    "region": "river_archive",
+    "position": [
+      805.48046875,
+      104.127014160156
+    ],
+    "hp": 2,
+    "mp": 60,
+    "legacy_raw_health_decreases": 108,
+    "time": 93.9282763333334,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 79.0,
+      "op": "walk",
+      "point": [
+        600.0,
+        400.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "river_archive",
+    "position": [
+      602.3037109375,
+      398.525146484375
+    ],
+    "hp": 2,
+    "mp": 60,
+    "legacy_raw_health_decreases": 108,
+    "time": 95.4166666666667,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "capture": "adventure-21-echo-reward",
+      "id": 80.0,
+      "key": "F",
+      "op": "key"
+    },
+    "error": "",
+    "region": "river_archive",
+    "position": [
+      602.3037109375,
+      398.525146484375
+    ],
+    "hp": 3,
+    "mp": 60,
+    "legacy_raw_health_decreases": 108,
+    "time": 95.7373583333334,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 81.0,
+      "label": "记入日志，继续探索",
+      "op": "click"
+    },
+    "error": "",
+    "region": "river_archive",
+    "position": [
+      602.3037109375,
+      398.525146484375
+    ],
+    "hp": 3,
+    "mp": 60,
+    "legacy_raw_health_decreases": 108,
+    "time": 96.2792396666667,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 82.0,
+      "op": "walk",
+      "point": [
+        600.0,
+        -420.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "river_archive",
+    "position": [
+      602.3037109375,
+      -416.809478759766
+    ],
+    "hp": 6,
+    "mp": 60,
+    "legacy_raw_health_decreases": 108,
+    "time": 98.9333333333334,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "capture": "adventure-22-schematic",
+      "id": 83.0,
+      "key": "F",
+      "op": "key"
+    },
+    "error": "",
+    "region": "river_archive",
+    "position": [
+      602.3037109375,
+      -416.809478759766
+    ],
+    "hp": 7,
+    "mp": 60,
+    "legacy_raw_health_decreases": 108,
+    "time": 99.2833333333335,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 84.0,
+      "label": "记入日志，继续探索",
+      "op": "click"
+    },
+    "error": "",
+    "region": "river_archive",
+    "position": [
+      602.3037109375,
+      -416.809478759766
+    ],
+    "hp": 8,
+    "mp": 60,
+    "legacy_raw_health_decreases": 108,
+    "time": 99.8627536666668,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 85.0,
+      "op": "walk",
+      "point": [
+        760.0,
+        -400.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "river_archive",
+    "position": [
+      762.471008300781,
+      -405.142181396484
+    ],
+    "hp": 8,
+    "mp": 60,
+    "legacy_raw_health_decreases": 108,
+    "time": 100.496554242424,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "capture": "adventure-23-index-work-ready",
+      "id": 86.0,
+      "key": "F",
+      "note": "archive.index_press. Current work method 擦拭并撬修压印台: cloth1,3s. No extra reward created by the press.",
+      "op": "key",
+      "phase": "C: archive mechanism and opened route"
+    },
+    "error": "",
+    "region": "river_archive",
+    "position": [
+      762.471008300781,
+      -405.142181396484
+    ],
+    "hp": 9,
+    "mp": 60,
+    "legacy_raw_health_decreases": 108,
+    "time": 100.725819666667,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 87.0,
+      "label": "开始作业",
+      "op": "click"
+    },
+    "error": "missing_button: 开始作业",
+    "region": "river_archive",
+    "position": [
+      762.471008300781,
+      -405.142181396484
+    ],
+    "hp": 9,
+    "mp": 60,
+    "legacy_raw_health_decreases": 108,
+    "time": 100.895300666667,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 88.0,
+      "label": "F  开始作业",
+      "op": "click"
+    },
+    "error": "",
+    "region": "river_archive",
+    "position": [
+      762.471008300781,
+      -405.142181396484
+    ],
+    "hp": 82,
+    "mp": 60,
+    "legacy_raw_health_decreases": 108,
+    "time": 161.586427444445,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 89.0,
+      "op": "wait",
+      "seconds": 3.4
+    },
+    "error": "",
+    "region": "river_archive",
+    "position": [
+      762.471008300781,
+      -405.142181396484
+    ],
+    "hp": 86,
+    "mp": 60,
+    "legacy_raw_health_decreases": 108,
+    "time": 165.024996000001,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "capture": "adventure-24-index-work-completed",
+      "expect": {
+        "claim": "archive.index_press",
+        "cloth_delta": -1.0
+      },
+      "id": 90.0,
+      "note": "Expectation metadata is for reviewer checks; existing probe does not execute assertions.",
+      "op": "capture"
+    },
+    "error": "",
+    "region": "river_archive",
+    "position": [
+      762.471008300781,
+      -405.142181396484
+    ],
+    "hp": 86,
+    "mp": 60,
+    "legacy_raw_health_decreases": 108,
+    "time": 165.077005000001,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 91.0,
+      "op": "walk",
+      "point": [
+        840.0,
+        -560.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "river_archive",
+    "position": [
+      844.809387207031,
+      -557.093322753906
+    ],
+    "hp": 87,
+    "mp": 60,
+    "legacy_raw_health_decreases": 108,
+    "time": 165.879101666668,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "capture": "adventure-25-new-shaft-used",
+      "id": 92.0,
+      "key": "F",
+      "note": "archive.index_return -> camp archive_return. West entrance remains free. Leave the arrival quickly: the unfought forest hunter may be within aggro range.",
+      "op": "key"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -2700.0,
+      -1800.0
+    ],
+    "hp": 87,
+    "mp": 60,
+    "legacy_raw_health_decreases": 108,
+    "time": 166.238194333335,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 93.0,
+      "op": "walk",
+      "point": [
+        -2850.0,
+        -1800.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -2858.556640625,
+      -1806.44384765625
+    ],
+    "hp": 88,
+    "mp": 60,
+    "legacy_raw_health_decreases": 108,
+    "time": 167.066433000001,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 94.0,
+      "op": "walk",
+      "point": [
+        -3072.0,
+        -1200.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3064.68212890625,
+      -1198.27136230469
+    ],
+    "hp": 91,
+    "mp": 60,
+    "legacy_raw_health_decreases": 108,
+    "time": 169.592907131314,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 95.0,
+      "op": "walk",
+      "point": [
+        -3260.0,
+        -780.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3255.2509765625,
+      -776.706726074219
+    ],
+    "hp": 94,
+    "mp": 60,
+    "legacy_raw_health_decreases": 108,
+    "time": 171.522960333335,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 96.0,
+      "op": "walk",
+      "point": [
+        -3500.0,
+        0.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3496.37890625,
+      -5.6956934928894
+    ],
+    "hp": 97,
+    "mp": 60,
+    "legacy_raw_health_decreases": 108,
+    "time": 174.370117666668,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 97.0,
+      "op": "walk",
+      "point": [
+        -3500.0,
+        900.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3496.37890625,
+      901.804321289062
+    ],
+    "hp": 100,
+    "mp": 60,
+    "legacy_raw_health_decreases": 108,
+    "time": 177.186363636364,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 98.0,
+      "op": "walk",
+      "point": [
+        -3500.0,
+        2100.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3496.37890625,
+      2106.30444335938
+    ],
+    "hp": 105,
+    "mp": 60,
+    "legacy_raw_health_decreases": 108,
+    "time": 180.990490777778,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "capture": "adventure-26-returned-town",
+      "id": 99.0,
+      "label": "adventure-returned-with-records",
+      "op": "save",
+      "phase": "D: report, sell real duplicate, craft consumable, persist UID"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3496.37890625,
+      2106.30444335938
+    ],
+    "hp": 105,
+    "mp": 60,
+    "legacy_raw_health_decreases": 108,
+    "time": 181.437315666667,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 100.0,
+      "key": "J",
+      "op": "key"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3496.37890625,
+      2106.30444335938
+    ],
+    "hp": 106,
+    "mp": 60,
+    "legacy_raw_health_decreases": 108,
+    "time": 182.068768,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 101.0,
+      "label": "委托记录",
+      "op": "click"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3496.37890625,
+      2106.30444335938
+    ],
+    "hp": 108,
+    "mp": 60,
+    "legacy_raw_health_decreases": 108,
+    "time": 183.2,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 102.0,
+      "label": "首次出征：林下档案窖",
+      "op": "click"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3496.37890625,
+      2106.30444335938
+    ],
+    "hp": 109,
+    "mp": 60,
+    "legacy_raw_health_decreases": 108,
+    "time": 184.356713333334,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "capture": "adventure-27-first-expedition-reported",
+      "id": 103.0,
+      "label": "在镇中报告",
+      "op": "click"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3496.37890625,
+      2106.30444335938
+    ],
+    "hp": 110,
+    "mp": 60,
+    "legacy_raw_health_decreases": 108,
+    "time": 185.486550666667,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 104.0,
+      "key": "Escape",
+      "op": "key"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3496.37890625,
+      2106.30444335938
+    ],
+    "hp": 110,
+    "mp": 60,
+    "legacy_raw_health_decreases": 108,
+    "time": 185.966666666667,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 105.0,
+      "op": "walk",
+      "point": [
+        -3210.0,
+        2220.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "walk_timeout",
+    "region": "camp",
+    "position": [
+      -3314.89575195312,
+      2217.38403320312
+    ],
+    "hp": 110,
+    "mp": 60,
+    "legacy_raw_health_decreases": 108,
+    "time": 230.994756000001,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 106.0,
+      "op": "walk",
+      "point": [
+        -3500.0,
+        2000.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3497.70385742188,
+      1996.07641601562
+    ],
+    "hp": 100,
+    "mp": 60,
+    "legacy_raw_health_decreases": 118,
+    "time": 281.016666666669,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 107.0,
+      "op": "walk",
+      "point": [
+        -3210.0,
+        2000.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3208.64233398438,
+      1996.07641601562
+    ],
+    "hp": 100,
+    "mp": 60,
+    "legacy_raw_health_decreases": 118,
+    "time": 282.113033666669,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 108.0,
+      "op": "walk",
+      "point": [
+        -3210.0,
+        2220.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3208.64233398438,
+      2222.9111328125
+    ],
+    "hp": 100,
+    "mp": 60,
+    "legacy_raw_health_decreases": 118,
+    "time": 282.939770666669,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 109.0,
+      "key": "F",
+      "op": "key"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3208.64233398438,
+      2222.9111328125
+    ],
+    "hp": 100,
+    "mp": 60,
+    "legacy_raw_health_decreases": 118,
+    "time": 283.31666666667,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 110.0,
+      "label": "旧驿路皮甲 ×1 · 8币",
+      "op": "click"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3208.64233398438,
+      2222.9111328125
+    ],
+    "hp": 100,
+    "mp": 60,
+    "legacy_raw_health_decreases": 118,
+    "time": 284.370943333336,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "capture": "adventure-28-duplicate-coat-sold",
+      "id": 111.0,
+      "label": "出售一件 · 8币",
+      "note": "Click selects the first unworn duplicate row; equipped original is listed later with 已穿戴 suffix. Verify exact transferred UID and merchant/player balances in snapshots. If NPC conversation intercepts F, choose 交易与整修 manually; do not skip trade.",
+      "op": "click"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3208.64233398438,
+      2222.9111328125
+    ],
+    "hp": 100,
+    "mp": 60,
+    "legacy_raw_health_decreases": 118,
+    "time": 285.450000000003,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 112.0,
+      "key": "Escape",
+      "op": "key"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3208.64233398438,
+      2222.9111328125
+    ],
+    "hp": 100,
+    "mp": 60,
+    "legacy_raw_health_decreases": 118,
+    "time": 285.85839866667,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 113.0,
+      "op": "walk",
+      "point": [
+        -3100.0,
+        1850.0
+      ],
+      "tolerance": 12.0
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3103.63500976562,
+      1853.51477050781
+    ],
+    "hp": 100,
+    "mp": 60,
+    "legacy_raw_health_decreases": 118,
+    "time": 287.850000000003,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 114.0,
+      "key": "F",
+      "op": "key"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3103.63500976562,
+      1853.51477050781
+    ],
+    "hp": 100,
+    "mp": 60,
+    "legacy_raw_health_decreases": 118,
+    "time": 288.266666666669,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 115.0,
+      "label": "火焰抹布",
+      "op": "click"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3103.63500976562,
+      1853.51477050781
+    ],
+    "hp": 100,
+    "mp": 60,
+    "legacy_raw_health_decreases": 118,
+    "time": 289.401695333336,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "capture": "adventure-29-loot-to-crafted-rag",
+      "id": 116.0,
+      "label": "加工：火焰抹布",
+      "op": "click"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3103.63500976562,
+      1853.51477050781
+    ],
+    "hp": 100,
+    "mp": 60,
+    "legacy_raw_health_decreases": 118,
+    "time": 290.533333333336,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 117.0,
+      "label": "树脂喷剂",
+      "op": "click"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3103.63500976562,
+      1853.51477050781
+    ],
+    "hp": 100,
+    "mp": 60,
+    "legacy_raw_health_decreases": 118,
+    "time": 291.883333333336,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "capture": "adventure-30-crafted-real-bottle",
+      "id": 118.0,
+      "label": "加工：树脂喷剂",
+      "op": "click"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3103.63500976562,
+      1853.51477050781
+    ],
+    "hp": 100,
+    "mp": 60,
+    "legacy_raw_health_decreases": 118,
+    "time": 293.06666666667,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 119.0,
+      "label": "继续探索",
+      "op": "click"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3103.63500976562,
+      1853.51477050781
+    ],
+    "hp": 100,
+    "mp": 60,
+    "legacy_raw_health_decreases": 118,
+    "time": 294.24791666667,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "action": "移至背包",
+      "capture": "adventure-31-specific-bottle-to-pack",
+      "id": 120.0,
+      "item": "resin_sprayer",
+      "note": "Fresh-route budget: initial resin2, rag consumes1 and sprayer consumes1; exhausted resin pocket stack frees a slot, so crafted bottle should be in pocket. Move this actual bottle to pack; verify UID.",
+      "op": "inventory"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3103.63500976562,
+      1853.51477050781
+    ],
+    "hp": 100,
+    "mp": 60,
+    "legacy_raw_health_decreases": 118,
+    "time": 298.309191333336,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "action": "移至口袋",
+      "capture": "adventure-31b-specific-bottle-back-to-pocket",
+      "id": 121.0,
+      "item": "resin_sprayer",
+      "note": "Move the same UID back; pocket slot was freed by the preceding transfer. No replacement or refill.",
+      "op": "inventory"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3103.63500976562,
+      1853.51477050781
+    ],
+    "hp": 100,
+    "mp": 60,
+    "legacy_raw_health_decreases": 118,
+    "time": 302.57709166667,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "action": "Q",
+      "capture": "adventure-32-bind-specific-bottle",
+      "id": 122.0,
+      "item": "resin_sprayer",
+      "note": "Inventory QuickBind Q binds this exact UID; no need to assume which numeric slot contains disperse after learning pulse.",
+      "op": "inventory"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3103.63500976562,
+      1853.51477050781
+    ],
+    "hp": 100,
+    "mp": 60,
+    "legacy_raw_health_decreases": 118,
+    "time": 306.868278000003,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 123.0,
+      "op": "aim",
+      "point": [
+        -2980.0,
+        1840.0
+      ]
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3103.63500976562,
+      1853.51477050781
+    ],
+    "hp": 100,
+    "mp": 60,
+    "legacy_raw_health_decreases": 118,
+    "time": 307.215703000003,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 124.0,
+      "key": "Q",
+      "op": "hold_key"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3103.63500976562,
+      1853.51477050781
+    ],
+    "hp": 100,
+    "mp": 60,
+    "legacy_raw_health_decreases": 118,
+    "time": 307.389903666669,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 125.0,
+      "op": "wait",
+      "seconds": 0.28
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3103.63500976562,
+      1853.51477050781
+    ],
+    "hp": 100,
+    "mp": 58,
+    "legacy_raw_health_decreases": 118,
+    "time": 307.744096666669,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 126.0,
+      "key": "Q",
+      "op": "release_key"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3103.63500976562,
+      1853.51477050781
+    ],
+    "hp": 100,
+    "mp": 58,
+    "legacy_raw_health_decreases": 118,
+    "time": 308.005278666669,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "capture": "adventure-33-real-partial-bottle",
+      "expect": {
+        "resin_sprayer_doses": "1 or 2, same UID as crafted bottle; reject full/empty sample"
+      },
+      "id": 127.0,
+      "note": "Timing varies under software rendering. If bottle did not commit or emptied, stop/review this sample; never write doses or add replacement to manufacture a pass.",
+      "op": "capture"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3103.63500976562,
+      1853.51477050781
+    ],
+    "hp": 100,
+    "mp": 58,
+    "legacy_raw_health_decreases": 118,
+    "time": 308.069910666669,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "capture": "adventure-34-final-save",
+      "id": 128.0,
+      "label": "adventure-final-normal-save",
+      "note": "After this quit, restart same isolated XDG/new process. Compare same saved bottle UID/doses/properties, equipped UID, inventory quantities, quest+mechanism claims and merchant stock. F9 alone is insufficient restart evidence.",
+      "op": "save"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3103.63500976562,
+      1853.51477050781
+    ],
+    "hp": 100,
+    "mp": 58,
+    "legacy_raw_health_decreases": 118,
+    "time": 308.786935000003,
+    "normal_ai": true
+  },
+  {
+    "request": {
+      "id": 129.0,
+      "op": "quit"
+    },
+    "error": "",
+    "region": "camp",
+    "position": [
+      -3103.63500976562,
+      1853.51477050781
+    ],
+    "hp": 100,
+    "mp": 58,
+    "legacy_raw_health_decreases": 118,
+    "time": 309.050000000003,
+    "normal_ai": true
+  }
+]

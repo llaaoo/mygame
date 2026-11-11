@@ -1,0 +1,59 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:364)
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+⏰ WorldTime 启动: 08:00
+🏛️ GameRuntime: 五大 Runtime 初始化完成
+   CommandBus       : ✅
+   CombatExecutor   : ✅
+   CombatEventBus   : ✅
+   WorldRuntime     : ✅
+   SimulationRuntime: ✅
+   WorldTime        : ✅
+⚡ 已注册触发效果: OnKillBonusExp
+📊 CombatDebugger: trace enabled
+⏰ 08:00 (☀️ 白天)
+SaveManager: saved user://save_3.sav
+⏰ 13:00 (☀️ 白天)
+FIRST30 1.0 click  pos=(-3103.635, 1853.515) hp=100
+FIRST30 2.0 walk  pos=(-3220.31, 1986.686) hp=100
+FIRST30 3.0 walk  pos=(-3220.31, 2206.686) hp=100
+FIRST30 4.0 key  pos=(-3220.31, 2206.686) hp=100
+FIRST30 5.0 click missing_button: 旧驿路佩刀 ×1 · 8币 pos=(-3220.31, 2206.686) hp=100
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+⏰ 14:00 (☀️ 白天)
+FIRST30 6.0 click  pos=(-3220.31, 2206.686) hp=100
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+FIRST30 7.0 click  pos=(-3220.31, 2206.686) hp=100
+FIRST30 8.0 key  pos=(-3220.31, 2206.686) hp=100
+FIRST30 9.0 walk  pos=(-3099.746, 1862.35) hp=100
+FIRST30 10.0 key  pos=(-3099.746, 1862.35) hp=100
+FIRST30 11.0 click missing_button: 箭矢 pos=(-3099.746, 1862.35) hp=100
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+⏰ 15:00 (☀️ 白天)
+SaveManager: saved user://save_3.sav
+FIRST30 12.0 click  pos=(-3099.746, 1862.35) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 13.0 click  pos=(-3099.746, 1862.35) hp=100
+FIRST30 14.0 click  pos=(-3099.746, 1862.35) hp=100
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+FIRST30 15.0 inventory  pos=(-3099.746, 1862.35) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 16.0 inventory  pos=(-3099.746, 1862.35) hp=100
+FIRST30 17.0 inventory  pos=(-3099.746, 1862.35) hp=100
+FIRST30 18.0 wait  pos=(-3099.746, 1862.35) hp=100
+FIRST30 19.0 capture  pos=(-3099.746, 1862.35) hp=100
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+FIRST30 20.0 save  pos=(-3099.746, 1862.35) hp=100
+FIRST30 21.0 quit  pos=(-3099.746, 1862.35) hp=100

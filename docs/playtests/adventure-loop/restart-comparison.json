@@ -1,0 +1,22 @@
+{
+  "materials": true,
+  "gear": true,
+  "items": true,
+  "pack": true,
+  "shortcuts": true,
+  "loot_records": true,
+  "npc_accounts": true,
+  "claims": true,
+  "bottle": [
+    {
+      "definition": "resin_sprayer",
+      "properties": {
+        "doses": 2
+      },
+      "quantity": 1,
+      "uid": "item.145"
+    }
+  ],
+  "save_sha256": "94b638b41ab010f94d3eda496d6de8832c13ce3ce4b7bfa299b4d8169003416f",
+  "fresh_process": true
+}

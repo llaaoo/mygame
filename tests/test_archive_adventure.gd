@@ -64,8 +64,16 @@ func run() -> void:
 	game.player.position=press.position-Vector2(40,0)
 	game._save_progress()
 	var branch_save:=FileAccess.get_file_as_bytes("user://save_3.sav")
+	# Retain the game-generated pre-mechanism checkpoint for a separate controlled
+	# GUI casting sample. Its position, knowledge and defeated guards are fixtures;
+	# it must not be presented as the natural new-journey/combat evidence.
+	var debug_save:=FileAccess.open("user://archive_before_press.sav",FileAccess.WRITE)
+	check(debug_save!=null,"Could not retain the controlled pre-press checkpoint")
+	if debug_save: debug_save.store_buffer(branch_save); debug_save.close()
+	print("ARCHIVE_BRANCH_FIXTURE "+ProjectSettings.globalize_path("user://archive_before_press.sav"))
 	var before:=game.session.inventory.snapshot()
-	# The route is checked with actual hit events; native playtests cover player casting.
+	# This route is checked with hit events only. Actual player casting needs its
+	# own controlled GUI verification from the retained checkpoint above.
 	CombatExecutor.report_hit(game.player,press,0,press.position,null,["impact"])
 	check(not press.completed,"Impact alone bypassed the water-first route")
 	CombatExecutor.report_hit(game.player,press,0,press.position,null,["water"])

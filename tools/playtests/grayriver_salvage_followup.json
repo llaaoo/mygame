@@ -1,0 +1,92 @@
+[
+  {
+    "op": "click",
+    "label": "开始河谷旅程"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3210,
+      2000
+    ]
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3210,
+      2220
+    ]
+  },
+  {
+    "op": "key",
+    "key": "F"
+  },
+  {
+    "op": "click",
+    "label": "驿路短刀 ×1 · 8币"
+  },
+  {
+    "op": "click",
+    "label": "拆解 · 获得2金属碎料（销毁这件装备）",
+    "capture": "salvage-actual-sabre"
+  },
+  {
+    "op": "key",
+    "key": "Escape"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -3100,
+      1850
+    ]
+  },
+  {
+    "op": "key",
+    "key": "F"
+  },
+  {
+    "op": "click",
+    "label": "木杆箭"
+  },
+  {
+    "op": "click",
+    "label": "加工：木杆箭",
+    "capture": "salvage-scrap-to-arrows"
+  },
+  {
+    "op": "click",
+    "label": "继续探索"
+  },
+  {
+    "op": "inventory",
+    "item": "charcoal",
+    "quantity": 1,
+    "action": "移至背包"
+  },
+  {
+    "op": "inventory",
+    "item": "fire_rag",
+    "action": "移至口袋"
+  },
+  {
+    "op": "inventory",
+    "item": "fire_rag",
+    "action": "使用一份"
+  },
+  {
+    "op": "wait",
+    "seconds": 1.6
+  },
+  {
+    "op": "capture",
+    "capture": "salvage-crafted-coating-on-original-weapon"
+  },
+  {
+    "op": "save",
+    "label": "adventure-salvage-followup"
+  },
+  {
+    "op": "quit"
+  }
+]
