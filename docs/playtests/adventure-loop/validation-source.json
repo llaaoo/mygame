@@ -1,0 +1,12 @@
+{
+  "native_revision": "dcd8c9230f8166546ae125d635d7e821ba5459cc",
+  "native_archive": "/tmp/grayriver-adventure-final-dcd8c923",
+  "normal_input_steps": 133,
+  "normal_input_errors": 0,
+  "native_exit": 0,
+  "restart_exit": 0,
+  "restart_equal": true,
+  "comparator_application_changes": false,
+  "post_primary_changes": "Only test-tool snapshot deep copy and archive note wording; no domain, geometry, actors, rewards, input or costs changed",
+  "full_regression": "pending"
+}

@@ -1,0 +1,63 @@
+[
+  {
+    "op": "click",
+    "label": "开始河谷旅程"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -780,
+      390
+    ]
+  },
+  {
+    "op": "key",
+    "key": "F"
+  },
+  {
+    "op": "click",
+    "label": "记入日志，继续探索"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -550,
+      420
+    ]
+  },
+  {
+    "op": "key",
+    "key": "F"
+  },
+  {
+    "op": "click",
+    "label": "记入日志，继续探索"
+  },
+  {
+    "op": "walk",
+    "point": [
+      -450,
+      450
+    ]
+  },
+  {
+    "op": "walk",
+    "point": [
+      -170,
+      600
+    ]
+  },
+  {
+    "op": "save",
+    "label": "same-seed-before-field"
+  },
+  {
+    "op": "duel",
+    "style": "combo",
+    "target": "river.enemy.river_archive.river_archive.1",
+    "capture": "preparation-south"
+  },
+  {
+    "op": "quit"
+  }
+]

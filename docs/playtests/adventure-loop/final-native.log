@@ -1,0 +1,286 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:364)
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+⏰ WorldTime 启动: 08:00
+🏛️ GameRuntime: 五大 Runtime 初始化完成
+   CommandBus       : ✅
+   CombatExecutor   : ✅
+   CombatEventBus   : ✅
+   WorldRuntime     : ✅
+   SimulationRuntime: ✅
+   WorldTime        : ✅
+⚡ 已注册触发效果: OnKillBonusExp
+📊 CombatDebugger: trace enabled
+⏰ 08:00 (☀️ 白天)
+SaveManager: saved user://save_3.sav
+FIRST30 1.0 click  pos=(-3700.0, 2100.0) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 2.0 walk  pos=(-3501.653, 2347.847) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 3.0 key  pos=(-3501.653, 2347.847) hp=100
+FIRST30 4.0 click  pos=(-3501.653, 2347.847) hp=100
+FIRST30 5.0 key  pos=(-3501.653, 2347.847) hp=100
+FIRST30 6.0 click  pos=(-3501.653, 2347.847) hp=100
+FIRST30 7.0 click  pos=(-3501.653, 2347.847) hp=100
+FIRST30 8.0 click  pos=(-3501.653, 2347.847) hp=100
+FIRST30 9.0 key  pos=(-3501.653, 2347.847) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 10.0 walk  pos=(-3850.547, 2297.288) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 11.0 key  pos=(-3850.547, 2297.288) hp=100
+FIRST30 12.0 click  pos=(-3850.547, 2297.288) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 13.0 inventory  pos=(-3850.547, 2297.288) hp=100
+FIRST30 14.0 walk  pos=(-3096.904, 1846.152) hp=100
+FIRST30 15.0 key  pos=(-3096.904, 1846.152) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 16.0 click  pos=(-3096.904, 1846.152) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 17.0 click  pos=(-3096.904, 1846.152) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 18.0 click  pos=(-3096.904, 1846.152) hp=100
+FIRST30 19.0 click  pos=(-3096.904, 1846.152) hp=100
+FIRST30 20.0 walk  pos=(-3400.259, 1253.031) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 21.0 key  pos=(-3400.259, 1253.031) hp=100
+FIRST30 22.0 click  pos=(-3400.259, 1253.031) hp=100
+FIRST30 23.0 walk  pos=(-3497.488, 897.305) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 24.0 walk  pos=(-3497.488, 0.804992) hp=100
+FIRST30 25.0 walk  pos=(-3260.249, -777.3173) hp=100
+FIRST30 26.0 walk  pos=(-3349.7, -1198.491) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 27.0 key  pos=(-3349.7, -1198.491) hp=100
+FIRST30 28.0 click  pos=(-3349.7, -1198.491) hp=100
+FIRST30 29.0 walk  pos=(-3058.476, -1202.38) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 30.0 wheel  pos=(-3058.476, -1202.38) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 31.0 save  pos=(-3058.476, -1202.38) hp=100
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+🔥 [OnHitApplyStatus] Player → Encounter_2 挂 燃烧
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚔️  CombatTrace  #1 | cast_fireball
+   技能: 火球术 | 事件数: 19 | 最终伤害: 45
+   伤害链: StatScalingModifier(+20)
+    1. ▶  cast: 火球术
+    2. ▶  PHASE: MODIFIER
+    3. ▶  PHASE: EFFECT
+    4. 💥 resolve_damage: 火球术 | base=25
+    5. 📊 StatScalingModifier @ FLAT: 25 → 45 (+20)
+    6. ▶  PHASE: EVENT
+    7. ▶  PHASE: POST
+    8. ⚡ done: 火球术 | success=OK ✅
+    9. ▶  PHASE: IDLE
+   10. ▶  PHASE: MODIFIER
+   11. ▶  PHASE: EFFECT
+   12. ▶  PHASE: EVENT
+   13. 📡 ON_CAST → ?  [tags=["fire", "projectile"], extra={  }]
+   14. ▶  PHASE: POST
+   15. ▶  PHASE: IDLE
+   16. ▶  PHASE: EVENT
+   17. 📡 ON_HIT → Encounter_2  [damage=45, position=(-2614.357, -1103.471), tags=["fire", "projectile"], hit_result=<RefCounted#-9223369429373410556>, target_statuses_before=[], source_statuses_before=[]]
+   18. 📡 ON_STATUS_APPLIED → Encounter_2  [buff_name=燃烧, effect=燃烧: DOT 5/1.0s 4.0s, duration=4.0]
+   19. 📡 ON_DAMAGE → Encounter_2  [damage=41, remaining_hp=19]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SaveManager: saved user://save_3.sav
+⚡ [OnKillBonusExp] +15 额外经验 (target=Encounter_2)
+SaveManager: saved user://save_3.sav
+FIRST30 32.0 duel  pos=(-3058.476, -1202.38) hp=100
+FIRST30 33.0 key  pos=(-3058.476, -1202.38) hp=100
+FIRST30 34.0 walk_loot  pos=(-2634.468, -1105.154) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 35.0 key  pos=(-2634.468, -1105.154) hp=100
+SaveManager: saved user://save_3.sav
+FIRST30 36.0 key  pos=(-2634.468, -1105.154) hp=100
+FIRST30 37.0 key  pos=(-2634.468, -1105.154) hp=100
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+FIRST30 38.0 inventory  pos=(-2634.468, -1105.154) hp=100
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+FIRST30 39.0 inventory  pos=(-2634.468, -1105.154) hp=100
+FIRST30 40.0 key  pos=(-2634.468, -1105.154) hp=100
+SaveManager: saved user://save_3.sav
+⏰ 09:00 (☀️ 白天)
+FIRST30 41.0 wait  pos=(-2634.468, -1105.154) hp=110
+FIRST30 42.0 key  pos=(-2634.468, -1105.154) hp=110
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+FIRST30 43.0 wait  pos=(-2634.468, -1105.154) hp=110
+FIRST30 44.0 walk  pos=(-3078.197, -1202.38) hp=110
+FIRST30 45.0 walk  pos=(-2844.848, -1504.945) hp=110
+FIRST30 46.0 walk  pos=(-2731.119, -1858.392) hp=110
+FIRST30 47.0 walk  pos=(-2604.503, -1807.835) hp=110
+SaveManager: saved user://save_3.sav
+FIRST30 48.0 key  pos=(-820.0, 0.0) hp=110
+SaveManager: saved user://save_3.sav
+FIRST30 49.0 save  pos=(-820.0, 0.0) hp=110
+FIRST30 50.0 walk  pos=(-777.2199, 392.5019) hp=110
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+FIRST30 51.0 key  pos=(-777.2199, 392.5019) hp=110
+FIRST30 52.0 click  pos=(-777.2199, 392.5019) hp=110
+FIRST30 53.0 walk  pos=(-545.8289, 417.1711) hp=110
+SaveManager: saved user://save_3.sav
+FIRST30 54.0 key  pos=(-545.8289, 417.1711) hp=110
+FIRST30 55.0 click  pos=(-545.8289, 417.1711) hp=110
+FIRST30 56.0 walk  pos=(-454.2161, 448.2839) hp=110
+FIRST30 57.0 walk  pos=(-171.4379, 440.5057) hp=110
+SaveManager: saved user://save_3.sav
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚔️  CombatTrace  #2 | cast_focus
+   技能: 调谐 · 纯粹凝神 | 事件数: 6 | 最终伤害: 0
+   伤害链: (no modifiers)
+    1. ▶  cast: 调谐 · 纯粹凝神
+    2. ▶  PHASE: MODIFIER
+    3. ▶  PHASE: EFFECT
+    4. ▶  PHASE: EVENT
+    5. ▶  PHASE: POST
+    6. ⚡ done: 调谐 · 纯粹凝神 | success=OK ✅
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SaveManager: saved user://save_3.sav
+🔥 [OnHitApplyStatus] Player → Encounter_0 挂 燃烧
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚔️  CombatTrace  #3 | cast_fireball
+   技能: 火球术 | 事件数: 19 | 最终伤害: 45
+   伤害链: StatScalingModifier(+20)
+    1. ▶  cast: 火球术
+    2. ▶  PHASE: MODIFIER
+    3. ▶  PHASE: EFFECT
+    4. 💥 resolve_damage: 火球术 | base=25
+    5. 📊 StatScalingModifier @ FLAT: 25 → 45 (+20)
+    6. ▶  PHASE: EVENT
+    7. ▶  PHASE: POST
+    8. ⚡ done: 火球术 | success=OK ✅
+    9. ▶  PHASE: IDLE
+   10. ▶  PHASE: MODIFIER
+   11. ▶  PHASE: EFFECT
+   12. ▶  PHASE: EVENT
+   13. 📡 ON_CAST → ?  [tags=["fire", "projectile"], extra={  }]
+   14. ▶  PHASE: POST
+   15. ▶  PHASE: IDLE
+   16. ▶  PHASE: EVENT
+   17. 📡 ON_HIT → Encounter_0  [damage=45, position=(-209.6173, 443.9375), tags=["fire", "projectile"], hit_result=<RefCounted#-9223367727073188214>, target_statuses_before=[], source_statuses_before=["meal_fortitude", "water_recovery"]]
+   18. 📡 ON_STATUS_APPLIED → Encounter_0  [buff_name=燃烧, effect=燃烧: DOT 5/1.0s 4.0s, duration=4.0]
+   19. 📡 ON_DAMAGE → Encounter_0  [damage=41, remaining_hp=19]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SaveManager: saved user://save_3.sav
+⚡ [OnKillBonusExp] +15 额外经验 (target=Encounter_0)
+SaveManager: saved user://save_3.sav
+FIRST30 58.0 duel  pos=(-171.4379, 440.5057) hp=70
+FIRST30 59.0 key  pos=(-171.4379, 440.5057) hp=70
+FIRST30 60.0 walk_loot  pos=(-187.9379, 440.5057) hp=67
+FIRST30 61.0 key  pos=(-187.9379, 440.5057) hp=67
+SaveManager: saved user://save_3.sav
+FIRST30 62.0 key  pos=(-187.9379, 440.5057) hp=67
+FIRST30 63.0 key  pos=(-187.9379, 440.5057) hp=64
+FIRST30 64.0 key  pos=(-187.9379, 440.5057) hp=64
+FIRST30 65.0 wait  pos=(-187.9379, 440.5057) hp=61
+SaveManager: saved user://save_3.sav
+FIRST30 66.0 walk  pos=(119.3001, -247.1763) hp=62
+⚡ [OnKillBonusExp] +15 额外经验 (target=Encounter_1)
+SaveManager: saved user://save_3.sav
+FIRST30 67.0 duel  pos=(219.962, -225.7314) hp=28
+FIRST30 68.0 key  pos=(219.962, -225.7314) hp=25
+FIRST30 69.0 walk_loot  pos=(219.962, -225.7314) hp=25
+SaveManager: saved user://save_3.sav
+FIRST30 70.0 key  pos=(219.962, -225.7314) hp=25
+SaveManager: saved user://save_3.sav
+FIRST30 71.0 key  pos=(219.962, -225.7314) hp=22
+FIRST30 72.0 key  pos=(219.962, -225.7314) hp=22
+FIRST30 73.0 walk  pos=(258.8528, -314.1223) hp=22
+FIRST30 74.0 walk  pos=(484.3528, -314.1223) hp=19
+FIRST30 75.0 walk  pos=(527.1329, -40.3423) hp=16
+⚡ [OnKillBonusExp] +15 额外经验 (target=Encounter_2)
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+FIRST30 76.0 duel  pos=(564.0406, 56.59045) hp=1
+FIRST30 77.0 key  pos=(564.0406, 56.59045) hp=1
+FIRST30 78.0 walk_loot  pos=(564.0406, 56.59045) hp=1
+FIRST30 79.0 key  pos=(564.0406, 56.59045) hp=1
+SaveManager: saved user://save_3.sav
+FIRST30 80.0 key  pos=(564.0406, 56.59045) hp=1
+FIRST30 81.0 key  pos=(564.0406, 56.59045) hp=1
+FIRST30 82.0 walk  pos=(800.6553, 99.37045) hp=1
+SaveManager: saved user://save_3.sav
+FIRST30 83.0 key  pos=(800.6553, 99.37045) hp=1
+FIRST30 84.0 click  pos=(800.6553, 99.37045) hp=1
+FIRST30 85.0 walk  pos=(606.2003, 404.7686) hp=3
+SaveManager: saved user://save_3.sav
+FIRST30 86.0 key  pos=(606.2003, 404.7686) hp=3
+FIRST30 87.0 click  pos=(606.2003, 404.7686) hp=4
+SaveManager: saved user://save_3.sav
+FIRST30 88.0 walk  pos=(598.4221, -416.066) hp=7
+SaveManager: saved user://save_3.sav
+FIRST30 89.0 key  pos=(598.4221, -416.066) hp=8
+FIRST30 90.0 click  pos=(598.4221, -416.066) hp=8
+FIRST30 91.0 walk  pos=(763.4221, -400.5096) hp=9
+FIRST30 92.0 key  pos=(763.4221, -400.5096) hp=10
+FIRST30 93.0 click  pos=(763.4221, -400.5096) hp=10
+FIRST30 94.0 wait  pos=(763.4221, -400.5096) hp=14
+FIRST30 95.0 capture  pos=(763.4221, -400.5096) hp=14
+SaveManager: saved user://save_3.sav
+FIRST30 96.0 walk  pos=(841.8714, -559.1807) hp=16
+SaveManager: saved user://save_3.sav
+FIRST30 97.0 key  pos=(-2700.0, -1800.0) hp=16
+FIRST30 98.0 walk  pos=(-2853.057, -1800.944) hp=17
+⏰ 10:00 (☀️ 白天)
+SaveManager: saved user://save_3.sav
+FIRST30 99.0 walk  pos=(-3074.739, -1200.159) hp=20
+FIRST30 100.0 walk  pos=(-3257.529, -783.5413) hp=22
+FIRST30 101.0 walk  pos=(-3490.879, -1.530345) hp=26
+FIRST30 102.0 walk  pos=(-3498.657, 908.2479) hp=30
+SaveManager: saved user://save_3.sav
+FIRST30 103.0 walk  pos=(-3498.657, 2107.248) hp=34
+SaveManager: saved user://save_3.sav
+FIRST30 104.0 save  pos=(-3498.657, 2107.248) hp=35
+FIRST30 105.0 key  pos=(-3498.657, 2107.248) hp=35
+FIRST30 106.0 click  pos=(-3498.657, 2107.248) hp=37
+FIRST30 107.0 click  pos=(-3498.657, 2107.248) hp=38
+SaveManager: saved user://save_3.sav
+FIRST30 108.0 click  pos=(-3498.657, 2107.248) hp=39
+FIRST30 109.0 key  pos=(-3498.657, 2107.248) hp=40
+FIRST30 110.0 walk  pos=(-3498.657, 1997.248) hp=40
+FIRST30 111.0 walk  pos=(-3204.763, 2001.137) hp=42
+FIRST30 112.0 walk  pos=(-3216.431, 2221.804) hp=43
+SaveManager: saved user://save_3.sav
+FIRST30 113.0 key  pos=(-3216.431, 2221.804) hp=43
+FIRST30 114.0 click  pos=(-3216.431, 2221.804) hp=45
+SaveManager: saved user://save_3.sav
+FIRST30 115.0 click  pos=(-3216.431, 2221.804) hp=46
+FIRST30 116.0 key  pos=(-3216.431, 2221.804) hp=47
+FIRST30 117.0 walk  pos=(-3099.756, 1855.744) hp=49
+FIRST30 118.0 key  pos=(-3099.756, 1855.744) hp=50
+FIRST30 119.0 click  pos=(-3099.756, 1855.744) hp=51
+SaveManager: saved user://save_3.sav
+FIRST30 120.0 click  pos=(-3099.756, 1855.744) hp=53
+FIRST30 121.0 click  pos=(-3099.756, 1855.744) hp=54
+SaveManager: saved user://save_3.sav
+FIRST30 122.0 click  pos=(-3099.756, 1855.744) hp=56
+FIRST30 123.0 click  pos=(-3099.756, 1855.744) hp=57
+SaveManager: saved user://save_3.sav
+FIRST30 124.0 inventory  pos=(-3099.756, 1855.744) hp=62
+SaveManager: saved user://save_3.sav
+FIRST30 125.0 inventory  pos=(-3099.756, 1855.744) hp=67
+SaveManager: saved user://save_3.sav
+FIRST30 126.0 inventory  pos=(-3099.756, 1855.744) hp=73
+FIRST30 127.0 aim  pos=(-3099.756, 1855.744) hp=73
+FIRST30 128.0 hold_key  pos=(-3099.756, 1855.744) hp=73
+FIRST30 129.0 wait  pos=(-3099.756, 1855.744) hp=74
+FIRST30 130.0 release_key  pos=(-3099.756, 1855.744) hp=74
+FIRST30 131.0 capture  pos=(-3099.756, 1855.744) hp=74
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+FIRST30 132.0 save  pos=(-3099.756, 1855.744) hp=75
+FIRST30 133.0 quit  pos=(-3099.756, 1855.744) hp=75
