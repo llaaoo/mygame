@@ -23,4 +23,6 @@
 - `animation_demo_input`：动作/方向已正确，暂停时进度仍为0；时间轴位于ScrollContainer裁剪之外，测试没有像按钮 helper 那样先滚动到目标。新增显式滚入和裁剪范围断言，再发送原来的真实70%/99%点击，保留原进度和原生rig断言。
 - `visual_interface`：原断言要求空闲隐藏整个施法摘要，与本次确认的“当前形式保持可见”冲突。改为从普通新档亲手点击R、返回，核对真实CastPlan结果/费用及零消费，不再用旧显示要求否定新功能。
 
-游戏执行代码在两项验收更新前后保持不变。更新后的干净归档定向结果随后补充；以上不是一次全套绿色运行。GitHub Actions保持停用。
+游戏执行代码在两项验收更新前后保持不变。更新后的提交 `5b8d9bfa498be47321f617825bba74ddb51b24ca` 再从无`.godot`的`git archive`首次导入，执行 `python3 tools/run_tests.py --tests animation_demo_input visual_interface --jobs 1 --source-revision 5b8d9bfa498be47321f617825bba74ddb51b24ca`，**2/2通过、退出0**。[定向JSON](corrected-acceptance-results.json) · [时间轴真实点击日志](corrected-animation_demo_input.log) · [普通新档显示日志](corrected-visual_interface.log)。日志中时间轴进度大于50%，三组原生rig方向均为6，原进度/方向断言保留。
+
+严格核对两次提交差异只有文档及这两个测试脚本，游戏执行代码与本轮原生图形验证相同。因此159个检查均有该执行代码下的有效通过结果，来源逐项见[覆盖映射](coverage.json)。这不是一次159/159绿色全套运行；原始157/159/退出1结果仍如实保留，修订只做了匹配的定向复测，没有重跑未受影响的157项。GitHub Actions保持停用。

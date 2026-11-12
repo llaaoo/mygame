@@ -1,0 +1,827 @@
+{
+  "kind": "Coverage across an immutable runtime revision and two corrected acceptance scripts; not a green full-suite rerun",
+  "full_suite": {
+    "passed": 157,
+    "total": 159,
+    "exit_code": 1,
+    "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+    "report": "archive-all-results.json"
+  },
+  "corrected_subset": {
+    "passed": 2,
+    "total": 2,
+    "exit_code": 0,
+    "revision": "5b8d9bfa498be47321f617825bba74ddb51b24ca",
+    "report": "corrected-acceptance-results.json"
+  },
+  "runtime_unchanged": true,
+  "allowed_changes": [
+    "docs/playtests/ui-godot-2026-11-12/REPORT.md",
+    "docs/playtests/ui-godot-2026-11-12/archive-all-results.json",
+    "docs/playtests/ui-godot-2026-11-12/archive-controls_workflow.log",
+    "docs/playtests/ui-godot-2026-11-12/archive-import.log",
+    "docs/playtests/ui-godot-2026-11-12/archive-interface_navigation.log",
+    "docs/playtests/ui-godot-2026-11-12/archive-realtime_interaction.log",
+    "docs/playtests/ui-godot-2026-11-12/archive-ui_vertical_input.log",
+    "tests/test_animation_demo_input.gd",
+    "tests/test_visual_interface.gd"
+  ],
+  "distinct_checks_covered": 159,
+  "checks": {
+    "gut_domain": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "save_system": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "save_recovery": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "skill_catalog": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "skill_upgrades": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "room_generation": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "first_expedition_loop": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "worldview_journey": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "magic_awakening": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "mundane_spray_input": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "content_preflight": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "throw_trajectory_input": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "item_feedback_input": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "project_optimization": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "selector_feedback_input": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "accessibility_input": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "world_depth_knowledge": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "world_depth_property": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "world_depth_economy": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "world_depth_journey": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "world_depth_territory": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "world_depth_input": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "fieldcraft": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "enemy_diversity": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "fieldcraft_input": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "enemy_diversity_input": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "map_authoring": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "map_preview_input": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "save_sections": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "save_sections_game": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "town_cells": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "town_cells_input": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "presentation_system": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "presentation_input": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "actor_animation": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "animation_demo_input": {
+      "result": "passed",
+      "revision": "5b8d9bfa498be47321f617825bba74ddb51b24ca",
+      "report": "corrected-acceptance-results.json"
+    },
+    "weapon_hold": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "weapon_hold_input": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "weapon_hold_handover_input": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "weapon_art_routes": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "weapon_art_input": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "martial_followups": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "martial_followup_input": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "weapon_combos": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "weapon_combo_contacts": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "weapon_combo_input": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "weapon_response": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "weapon_response_input": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "interface_navigation": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "world_feedback": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "world_feedback_input": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "followup_fixes": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "grayriver_demo": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "spell_form_assist": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "contextual_choices": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "combat_choices_input": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "flow_input": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "provision_lifecycle": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "production_learning": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "extensibility_input": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "campaign_effects": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "inventory_stability": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "new_journey": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "weapon_enchantment": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "enchantment_input": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "counterplay": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "counterplay_input": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "counterplay_encounters": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "combat_tactics": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "tactical_ai": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "tactics_input": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "system_depth": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "weapon_actions": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "depth_input": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "slot_materials": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "inventory_lifecycle": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "realtime_interaction": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "keyboard_casting": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "visual_interface": {
+      "result": "passed",
+      "revision": "5b8d9bfa498be47321f617825bba74ddb51b24ca",
+      "report": "corrected-acceptance-results.json"
+    },
+    "controls_workflow": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "unified_quickslots": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "legacy_operation_coverage": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "input_bindings": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "world_pointer_input": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "enemy_retaliation": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "item_actions": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "spray_channel": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "reaction_sources": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "spell_operations": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "foundation_inventory": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "foundation_combat": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "foundation_systems": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "frontier_expedition": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "frontier_projects": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "grayriver_loot": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "archive_adventure": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "enemy_observation_input": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "enemy_disengagement": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "enemy_phase_input": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "combat_learning": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "grayriver_salvage": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "shared_characters": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "field_work": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "grayriver_foundation": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "grayriver_content": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "grayriver_journey": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "grayriver_routes": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "material_intent": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "retreat_ledger": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "enemy_preparation": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "field_outpost": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "expedition_feedback": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "survival_needs": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "survival_world": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "survival_rest": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "alchemy_repair": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "material_recycling": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "rpg_attributes": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "rpg_progression": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "rpg_progression_input": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "npc_interactions": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "npc_interaction_input": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "world_coherence": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "coherence_input": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "playtest_iteration": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "tactical_balance": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "normal_budget_tactics": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "content_expansion": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "environment_attunement": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "five_element_rules": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "partial_boons": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "element_knowledge": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "element_world": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "enemy_surfaces": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "element_trials": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "cast_refactor": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "status_transactions": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "content_contracts": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "region_lifecycle": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "player_components": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "soul_spell_system": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "expedition_builds": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "existing_spell_interactions": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "emergent_mediums": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "boon_choices": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "joint_interactions": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "advanced_spells": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "spell_materials": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "exploration_content": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "exploration_mvp": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "fire_combinations": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "ui_vertical_input": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "ui_system": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "run_loop": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "equipment_system": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "gameplay": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "content": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "maps": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    },
+    "startup": {
+      "result": "passed",
+      "revision": "4785b724b38b0528b19ebc4d8bd16da7fefe504b",
+      "report": "archive-all-results.json"
+    }
+  }
+}
