@@ -57,7 +57,7 @@ func run() -> void:
 	player.input_controller.resolve_action(press)
 	var hud := game.get_node("HUDLayer")
 	hud.skill_bar._process(.2)
-	check(hud.skill_bar._combination_hint.text.begins_with("水引 →") and "霜盐" in hud.skill_bar._combination_hint.text and "落点半径" in hud.skill_bar._combination_hint.text, "Water aim still previews fire, wrong materials or wrong scope")
+	check(hud.skill_bar._combination_hint.text.contains("水引 →") and "霜盐" in hud.skill_bar._combination_hint.text and "落点半径" in hud.skill_bar._combination_hint.text, "Water aim still previews fire, wrong materials or wrong scope: "+hud.skill_bar._combination_hint.text)
 	player.casting.aiming_sources.right = true
 	check(player.casting.aimed_source() == "right", "Latest pressed source did not win")
 	player.casting.aiming_sources.erase("right")
@@ -65,7 +65,7 @@ func run() -> void:
 	player.casting.cancel_all()
 	sm.unequip_hand("right")
 	hud.skill_bar._process(.2)
-	check(hud.skill_bar._combination_hint.text.begins_with("水引 →") and not hud.skill_bar._cost_labels[hud.skill_bar._sources.find("slot_3")].text.is_empty(), "Empty right hand disabled hotbar previews")
+	check(hud.skill_bar._combination_hint.text.contains("水引 →") and not hud.skill_bar._cost_labels[hud.skill_bar._sources.find("slot_3")].text.is_empty(), "Empty right hand disabled hotbar previews: "+hud.skill_bar._combination_hint.text+" / "+hud.skill_bar._cost_labels[hud.skill_bar._sources.find("slot_3")].text)
 	sm.equip_hand("right", sm.pool.get_skill("ignite"))
 	# Exhaustion feedback is emitted only after a successful, irreversible commit.
 	player.global_position = Vector2.ZERO

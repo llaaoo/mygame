@@ -46,7 +46,8 @@ func open(tab := "quests", source := "", resume := false) -> void:
 	if game.ui.modal_locked: return
 	if tab in ["equipment","supplies","inventory"] and is_instance_valid(game.inventory_screen):
 		game.ui.close_modal()
-		game.inventory_screen.open("all" if tab=="inventory" else tab)
+		if tab=="inventory": game.inventory_screen.resume()
+		else: game.inventory_screen.open(tab)
 		return
 	if _open and is_instance_valid(game.ui.modal) and game.ui.modal.get_meta("frontier_page","")==page: remember_context()
 	page=tab

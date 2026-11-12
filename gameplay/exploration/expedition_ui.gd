@@ -64,8 +64,8 @@ func _ready() -> void:
 	footer.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
 	footer.offset_left = -214
 	footer.offset_right = -18
-	footer.offset_top = -68
-	footer.offset_bottom = -18
+	footer.offset_top = -130
+	footer.offset_bottom = -80
 	footer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	footer.add_theme_stylebox_override("panel", GameUIStyle.quiet_panel(.35))
 	add_child(footer)
@@ -80,8 +80,8 @@ func _ready() -> void:
 	needs_panel.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT)
 	needs_panel.offset_left = 20
 	needs_panel.offset_right = 300
-	needs_panel.offset_top = -214
-	needs_panel.offset_bottom = -184
+	needs_panel.offset_top = -332
+	needs_panel.offset_bottom = -294
 	needs_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	needs_panel.add_theme_stylebox_override("panel", GameUIStyle.quiet_panel(.35))
 	add_child(needs_panel)
@@ -92,8 +92,8 @@ func _ready() -> void:
 	terrain.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT)
 	terrain.offset_left = 18
 	terrain.offset_right = 216
-	terrain.offset_top = -326
-	terrain.offset_bottom = -290
+	terrain.offset_top = -430
+	terrain.offset_bottom = -394
 	terrain.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	terrain.add_theme_stylebox_override("panel", GameUIStyle.quiet_panel(.35))
 	add_child(terrain)

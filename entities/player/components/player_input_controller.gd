@@ -152,6 +152,8 @@ func _poll_cast_edge(actions: Array[Action], source: String, pressed: bool) -> v
 	actions.append(action)
 
 func resolve_action(action: Action) -> void:
+	if action.action_type==Action.ActionType.CAST and not action.params.get("release",false) and is_instance_valid(player.material_wheel):
+		player.material_wheel.remember_source(action.skill_source)
 	if player.actor_context and player.actor_context.actions.active():
 		player.actor_context.actions.request_action(action)
 		return
@@ -292,9 +294,10 @@ func _try_interact(expected: Node2D = null, targeted := false) -> void:
 				CombatEventBus.instance.emit(ev)
 
 func scroll_source() -> String:
-	for source in [casting.aimed_source(),last_spell_source,player.material_wheel.last_source]:
-		if QuickslotMaterials.available(player.skill_manager,source): return source
-	return ""
+	var source:=casting.aimed_source()
+	if source.is_empty(): source=player.material_wheel.last_source
+	if source.is_empty(): source=last_spell_source
+	return source if QuickslotMaterials.available(player.skill_manager,source) else ""
 
 func _unhandled_input(event: InputEvent) -> void:
 	# UI and item aiming own their clicks before weapon gestures can see them.

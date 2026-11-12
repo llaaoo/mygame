@@ -54,7 +54,15 @@ static func comparison(current: EquipmentData, candidate: EquipmentData) -> Stri
 	var keys := before.keys()
 	for key in after:
 		if key not in keys: keys.append(key)
-	var text := "同槽效果对照：当前 → 候选（变化）\n"
+	var old_weight:=current.weight if current else 0.0
+	var weight_delta:=candidate.weight-old_weight
+	var text := "同槽效果对照：当前 → 候选（变化）\n重量   %.1f → %.1f kg  (%+.1f kg · %s)\n"%[old_weight,candidate.weight,weight_delta,"更轻" if weight_delta<0 else "更重" if weight_delta>0 else "不变"]
+	if current and current.moveset and candidate.moveset and current.moveset.weapon_type!=candidate.moveset.weapon_type:
+		text+="武器类型：%s → %s；改用新连段，武技重新验证武器条件。\n"%[WeaponMoveset.TITLES.get(current.moveset.weapon_type,current.moveset.weapon_type),WeaponMoveset.TITLES.get(candidate.moveset.weapon_type,candidate.moveset.weapon_type)]
+	if candidate.attack_profile and not candidate.attack_profile.ammo_id.is_empty():
+		var ammo:=ItemCatalog.default_catalog().definition(candidate.attack_profile.ammo_id)
+		text+="弹药：%s · 消耗真实实物。\n"%(ammo.display_name if ammo else candidate.attack_profile.ammo_id)
+	text+="只读装备定义；不换装，不转移原武器涂层。\n"
 	for key in keys:
 		if key in ["medium_infusion","partial_boon_consumption"]:
 			if bool(before.get(key,false)) or bool(after.get(key,false)):
@@ -65,7 +73,9 @@ static func comparison(current: EquipmentData, candidate: EquipmentData) -> Stri
 		var percentage: bool = "." in key or key in ["weapon_stamina_cost","impact_resistance","dodge_cost","damage_reduction","attack_speed","preparation_bonus","boon_duration_bonus","empower_damage_bonus"]
 		var factor := 100.0 if percentage else 1.0
 		var suffix := "%" if percentage else ""
-		text += "%s   %.0f%s → %.0f%s  (%+.0f%s)\n" % [labels.get(key,key),a*factor,suffix,b*factor,suffix,(b-a)*factor,suffix]
+		var lower_cost: bool=key in ["weapon_stamina_cost","dodge_cost","preparation_bonus","mana_cost.all","partial_boon_mana_cost","empower_mana_bonus","medium_infusion_cost"]
+		var impact: String="费用下降" if lower_cost and b<a else "费用上升" if lower_cost and b>a else "变化" if b!=a else "不变"
+		text += "%s   %.0f%s → %.0f%s  (%+.0f%s · %s)\n" % [labels.get(key,key),a*factor,suffix,b*factor,suffix,(b-a)*factor,suffix,impact]
 	return text+"没有直接属性差异。" if keys.is_empty() else text
 
 static func disclosure(host: Node,title: String,text: String) -> void:

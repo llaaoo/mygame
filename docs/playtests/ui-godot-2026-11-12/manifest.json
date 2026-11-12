@@ -1,0 +1,33 @@
+{
+  "base": "50bd674da0ecf3072f67a113edd912195e4c903a",
+  "platform": "Linux Xorg/X11, Godot 4.6.3, gl_compatibility, Mesa llvmpipe; Dummy audio",
+  "native_exit_code": 0,
+  "native_assertions": 89,
+  "native_checks_report": "native-verification.json",
+  "warning": "Xorg cannot change V-Sync mode; not target-device performance/audio validation",
+  "source_sha256": {
+    "ui/game_ui_style.gd": "44182b65d5a4ca458a2eac277f3d8de42ba0226ee4b358320af486ef31b78f99",
+    "ui/actor_inventory_screen.gd": "78eb277ee72eea3750b011a478cc269f17c24471b2aa24824a42733b726de577",
+    "ui/skill_bar.gd": "5c4a79a1eb350295228b860debbef1bdc037244ffed09c7882016fd544e765c2",
+    "ui/material_wheel.gd": "677a29ec9c680fbdb70369066375b24d8c2935c61f691b4fb2e8f9052893f532",
+    "ui/hud.gd": "f1000433d1aaa383063f97f2df38a2f71442e94c0d31e283724450aba2febfaf",
+    "ui/expedition_navigation.gd": "e0036152b5ad03be4d86ee78ac179a93baa63eb2b6219e4fd8ea17650a3829fc",
+    "entities/player/components/player_input_controller.gd": "0a051a6f682d91a3307d13a4a7d0d500d5e4f58f7d59797dca3521920293fdfb",
+    "gameplay/frontier/frontier_hud.gd": "4a67df6a52d0d2889aea56f70f06fcb39c427e12447ee41182a7adc6bf4fe95d",
+    "gameplay/frontier/frontier_hub.gd": "0c7ebc075023cf39aa14c66cb1fe5926bc77d4d9661c4238d525e762717b781b",
+    "gameplay/exploration/expedition_ui.gd": "e51eea87b5f6e6107fa2946c5e0f60c2417d49930ebd404af4c6befb41b796d2",
+    "gameplay/foundation/ui/widgets.gd": "c0259892a74b6aa2d38a8bfb87aa32deece6d9d81282800d8ad617b87d0e4980",
+    "gameplay/foundation/ui/actor_status_view.gd": "976cf1c8aaf14752be737ffb8577900968b453081aa8efddc61a78ba29bd0fe3",
+    "gameplay/quickslots/quickslot_view.gd": "426c83ccd96c62c47d210aca3399157a4308c38bf201d6543a5350758aa9ca6a",
+    "tests/test_ui_vertical_input.gd": "d14751a1b94286331e5cf3f1cb47707d31c1d3b72bcbdacfdf1b107e2bfe298c"
+  },
+  "captures_sha256": {
+    "item-inspection.png": "0afe2011804fe0369c65b466468cb2703b95a8ca3579c275e10c92f225bee88a",
+    "comparison-960x720-125.png": "f6f634b9487879248edcb8c95d757be33d4e9760afaff3a87fc32cc7bfc9674d",
+    "current-form-world.png": "37a83f06a6719a126b3bb6e69b616e52e6b481c1b84d26245d014b7c060a592b",
+    "world-960x540.png": "995b11a9521b6227e60fd6d187cbcfceacf123d39f0f5486d673e1445b79547e",
+    "comparison-1440x900-125.png": "1498bca6ee9ca47e9a979d0105addef05acb056c3f04291a75443b6c2cedc070",
+    "binding-960x540-125.png": "e826bde275808c6b8fb4ede0580fab322c998c2296fdcad651feef163ae22e8b",
+    "binding-1920x1080-125.png": "95b15f2d09f2ccce362b48aaad5432e631e6f4f618baae5da6ed457bb2715506"
+  }
+}

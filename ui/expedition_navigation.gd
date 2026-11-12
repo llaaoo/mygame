@@ -40,8 +40,15 @@ func _unhandled_input(event: InputEvent) -> void:
  var focus:=get_viewport().gui_get_focus_owner()
  if focus is LineEdit or focus is TextEdit: return
  for page in PAGES:
+  if page.key==KEY_TAB: continue # In a page, Tab belongs to focus navigation.
   if InputBindings.menu_key(event)!=page.key or current_page==page.id: continue
   navigate.call(page.id); get_viewport().set_input_as_handled(); return
  if InputBindings.menu_key(event) in [KEY_O,KEY_N] and current_page!="inventory":
   navigate.call("equipment" if InputBindings.menu_key(event)==KEY_O else "supplies")
   get_viewport().set_input_as_handled()
+
+func _input(event: InputEvent) -> void:
+ if not is_visible_in_tree(): return
+ var scope: Node=self
+ while scope.get_parent() and not scope is CanvasLayer: scope=scope.get_parent()
+ if scope is CanvasLayer: GameUIStyle.focus_navigation(scope,event)

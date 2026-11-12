@@ -53,10 +53,10 @@ func _build_status_panel(root: Control) -> void:
 	panel.anchor_top = 1.0
 	panel.anchor_bottom = 1.0
 	panel.offset_left = 20
-	panel.offset_top = -178
-	panel.offset_right = 220
-	panel.offset_bottom = -22
-	panel.custom_minimum_size = Vector2(200, 150)
+	panel.offset_top = -286
+	panel.offset_right = 252
+	panel.offset_bottom = -108
+	panel.custom_minimum_size = Vector2(232, 150)
 	panel.add_theme_stylebox_override("panel", GameUIStyle.quiet_panel(.56))
 	root.add_child(panel)
 
@@ -101,8 +101,8 @@ func _build_right_stack(root: Control) -> void:
 	stack.anchor_bottom = 1.0
 	stack.offset_left = 24
 	stack.offset_right = 298
-	stack.offset_top = -288
-	stack.offset_bottom = -218
+	stack.offset_top = -388
+	stack.offset_bottom = -300
 	stack.add_theme_constant_override("separation", 6)
 	root.add_child(stack)
 
@@ -119,8 +119,8 @@ func _build_skill_bar(root: Control) -> void:
 	var panel := PanelContainer.new()
 	panel.name = "SkillBarPanel"
 	panel.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-	panel.offset_left = -256
-	panel.offset_right = 256
+	panel.offset_left = -354
+	panel.offset_right = 354
 	panel.offset_top = -78
 	panel.offset_bottom = -20
 	panel.add_theme_stylebox_override("panel", GameUIStyle.quiet_panel(.48))
@@ -220,7 +220,7 @@ func _on_health_changed(current_hp: int, max_hp: int) -> void:
 
 func _on_mp_changed(current_mp: int, max_mp: int) -> void:
 	var awakened: bool=player.mana_component.can_cast()
-	mana_bar.visible=awakened
+	mana_bar.get_parent().visible=awakened
 	mana_bar.max_value = maxi(1,max_mp)
 	mana_bar.value = current_mp
 	mana_label.text = "%d / %d" % [current_mp, max_mp] if awakened else "未觉醒"

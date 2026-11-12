@@ -150,7 +150,7 @@ func run() -> void:
  await key(KEY_ESCAPE,true); await key(KEY_ESCAPE,false)
  check(not screen.visible and not actor.ui_blocked,"Focused quantity field trapped Escape instead of returning to combat")
  await key(KEY_I,true); await key(KEY_I,false)
- await item_click(coal); await set_quantity(2); await click("移至背包"); await frames(10)
+ await item_click(coal); await set_quantity(2); await click("更多"); await click("移至背包"); await frames(10)
  check(store.count_in("player.pocket","charcoal")==4 and store.count_in("player.pack","charcoal")==2,"Bulk quantity input did not move exactly two materials")
  var tile:=screen._grid.get_node("Item_"+coal.replace(".","_")) as Control
  var point_context:=tile.get_global_rect().get_center()
@@ -165,7 +165,7 @@ func run() -> void:
  await key(KEY_ESCAPE,true); await key(KEY_ESCAPE,false)
  # Real mouse drop frees capacity and F opens the same persisted ground container.
  await key(KEY_I,true); await key(KEY_I,false)
- await item_click(water); await click("丢弃整叠"); await frames(12)
+ await item_click(water); await click("更多"); await click("丢弃整叠"); await frames(12)
  var ground:=store.locate(water)
  check(ground.begins_with("ground.") and not QuickslotView.item_state(actor,{"item_id":"water_sprayer","uid":water}).ready,"Mouse drop did not remove the selected physical bottle")
  await capture("04-ground-drop")

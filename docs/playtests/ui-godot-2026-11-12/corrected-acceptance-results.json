@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "revision": "5b8d9bfa498be47321f617825bba74ddb51b24ca",
+  "dirty": null,
+  "godot": "4.6.3.stable.official.7d41c59c4",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "jobs": 1,
+  "timeout": 180,
+  "logs": "/tmp/mygame-tests-175o28vd",
+  "requested": [
+    "animation_demo_input",
+    "visual_interface"
+  ],
+  "results": [
+    {
+      "name": "import",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 20.939,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/ui-godot-acceptance-5b8d9bfa",
+        "--editor",
+        "--import",
+        "--recovery-mode"
+      ],
+      "log": "/tmp/mygame-tests-175o28vd/import.log",
+      "diagnostic": []
+    },
+    {
+      "name": "animation_demo_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 27.451,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/ui-godot-acceptance-5b8d9bfa",
+        "--script",
+        "res://tests/test_animation_demo_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-175o28vd/animation_demo_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "visual_interface",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 15.167,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/ui-godot-acceptance-5b8d9bfa",
+        "--script",
+        "res://tests/test_visual_interface.gd"
+      ],
+      "log": "/tmp/mygame-tests-175o28vd/visual_interface.log",
+      "diagnostic": []
+    }
+  ],
+  "skipped": [],
+  "complete": true
+}

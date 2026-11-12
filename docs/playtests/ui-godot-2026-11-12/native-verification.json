@@ -1,0 +1,39 @@
+{
+  "checks": 89,
+  "failures": [],
+  "scope": "Actual Godot UI with controlled inventory/knowledge/position, normal AI/time; not a natural journey or target hardware benchmark",
+  "sizes": [
+    {
+      "actual_window": "(960, 540)",
+      "binding_last_rect": "picker closed after explicit binding",
+      "font_scale": 1.25,
+      "hud_sources": 13,
+      "logical_viewport": "(960.0, 540.0)",
+      "requested_window": "(960, 540)"
+    },
+    {
+      "actual_window": "(960, 720)",
+      "binding_last_rect": "picker closed after explicit binding",
+      "font_scale": 1.25,
+      "hud_sources": 13,
+      "logical_viewport": "(960.0, 720.0)",
+      "requested_window": "(960, 720)"
+    },
+    {
+      "actual_window": "(1440, 900)",
+      "binding_last_rect": "picker closed after explicit binding",
+      "font_scale": 1.25,
+      "hud_sources": 13,
+      "logical_viewport": "(1440.0, 900.0)",
+      "requested_window": "(1440, 900)"
+    },
+    {
+      "actual_window": "(1920, 1080)",
+      "binding_last_rect": "picker closed after explicit binding",
+      "font_scale": 1.25,
+      "hud_sources": 13,
+      "logical_viewport": "(1920.0, 1080.0)",
+      "requested_window": "(1920, 1080)"
+    }
+  ]
+}

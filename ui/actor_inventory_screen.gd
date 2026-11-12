@@ -27,6 +27,13 @@ var _panel: PanelContainer
 var _columns: HBoxContainer
 var _bag: VBoxContainer
 var _details: VBoxContainer
+var _detail_column: VBoxContainer
+var _detail_actions: HFlowContainer
+var _binding_host: VBoxContainer
+var _binding_open := false
+var _compare_open := false
+var _more_open := false
+var _grid_scroll: ScrollContainer
 var _detail_scroll: ScrollContainer
 var _portrait: PaperDollView
 var _grid: GridContainer
@@ -44,6 +51,7 @@ var _last_health:=100
 var _alert: Label
 var _message := ""
 var _message_time := 0.0
+var _damage_warning_time := 0.0
 var _tiles: Dictionary={}
 var _detail_signature: Dictionary={}
 var _portrait_signature: Array=[]
@@ -60,8 +68,12 @@ func _exit_tree() -> void:
 func open(focus := "all",ground := "") -> void:
  if actor.health_component.is_dead or not GameUIStyle.can_open(self): return
  mode=focus; ground_id=ground; selected=""; selected_slot=-1; container_filter="all"
- _search.text=""; _last_health=actor.health_component.hp
- _dirty=true; show(); GameUIStyle.begin_modal(self); _refresh()
+ _search.text=""; _binding_open=false; _compare_open=false; _more_open=false; _detail_signature.clear(); _last_health=actor.health_component.hp
+ _dirty=true; show(); GameUIStyle.begin_modal(self); _refresh(); _focus_entry.call_deferred()
+func _focus_entry() -> void:
+ if not visible: return
+ var focus:=_panel.find_next_valid_focus()
+ if focus: focus.grab_focus()
 func open_item(definition_id: String, preferred_uid := "") -> void:
  open("equipment" if session.inventory.definitions.get(definition_id) is EquipmentData else "all")
  var sources:=session.inventory.actor_containers(actor.actor_context.id)
@@ -85,11 +97,20 @@ func resume() -> void:
  _search.text=str(_view_context.query)
  selected=str(_view_context.selected) if session.inventory.item(str(_view_context.selected)) else ""
  _refresh()
+ _restore_scroll.call_deferred()
+func _restore_scroll() -> void:
+ _grid_scroll.scroll_vertical=int(_view_context.get("list_scroll",0))
+ _detail_scroll.scroll_vertical=int(_view_context.get("detail_scroll",0))
 func close() -> void:
- if visible: _view_context={"mode":mode,"container":container_filter,"slot":selected_slot,"query":_search.text,"selected":selected}
+ if visible: _view_context={"mode":mode,"container":container_filter,"slot":selected_slot,"query":_search.text,"selected":selected,"list_scroll":_grid_scroll.scroll_vertical,"detail_scroll":_detail_scroll.scroll_vertical}
  _popup.hide(); hide(); GameUIStyle.end_modal(self)
 func _input(event: InputEvent) -> void:
+ if visible and GameUIStyle.focus_navigation(self,event): return
  if not visible or not event is InputEventKey or not event.pressed or event.echo or event.keycode!=KEY_ESCAPE: return
+ if _damage_warning_time>0:
+  close(); get_viewport().set_input_as_handled(); return
+ if _binding_open:
+  _binding_open=false; _detail_signature.clear(); _show_detail(); get_viewport().set_input_as_handled(); return
  # Escape dismisses a picker first; otherwise it always returns to combat,
  # including while a quantity/search field owns keyboard focus.
  if _popup.visible: return
@@ -103,7 +124,7 @@ func _unhandled_input(event: InputEvent) -> void:
   mode="equipment"; selected_slot=-1; _invalidate(); get_viewport().set_input_as_handled()
  elif InputBindings.menu_key(event)==KEY_N and not get_viewport().gui_get_focus_owner() is LineEdit:
   mode="supplies"; selected_slot=-1; _invalidate(); get_viewport().set_input_as_handled()
- elif InputBindings.menu_key(event) in [KEY_I,KEY_TAB,KEY_K,KEY_G,KEY_J,KEY_M] and not get_viewport().gui_get_focus_owner() is LineEdit:
+ elif InputBindings.menu_key(event) in [KEY_I,KEY_K,KEY_G,KEY_J,KEY_M] and not get_viewport().gui_get_focus_owner() is LineEdit:
   close()
   if InputBindings.menu_key(event)!=KEY_I and navigation_request.is_valid(): navigation_request.call(InputBindings.menu_key(event))
   get_viewport().set_input_as_handled()
@@ -113,12 +134,13 @@ func _build() -> void:
  _panel=PanelContainer.new(); _panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
  _panel.add_theme_stylebox_override("panel",GameUIStyle.panel_style(.98)); background.add_child(_panel)
  GameUIStyle.decorate(_panel)
- var root:=VBoxContainer.new(); root.add_theme_constant_override("separation",12); _panel.add_child(root)
+ var root:=VBoxContainer.new(); root.add_theme_constant_override("separation",8); _panel.add_child(root)
  var header:=HBoxContainer.new(); root.add_child(header)
- GameUIStyle.folio_title(header,"行囊与穿戴")
+ GameUIStyle.folio_title(header,"行囊")
  var close_button:=FoundationWidgets.button("关闭",close); close_button.size_flags_horizontal=Control.SIZE_SHRINK_END; header.add_child(close_button)
  _navigation=GameUIStyle.navigation(root,"inventory",page_request)
- _summary=FoundationWidgets.label("",13,true); root.add_child(_summary)
+ _summary=FoundationWidgets.label("",12,true); root.add_child(_summary)
+ root.add_child(FoundationWidgets.label("世界持续运行 · 受伤时请立即返回世界",12,true))
  _columns=HBoxContainer.new(); _columns.add_theme_constant_override("separation",18); _columns.size_flags_vertical=Control.SIZE_EXPAND_FILL; root.add_child(_columns)
  _gear_scroll=ScrollContainer.new(); _gear_scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED; _gear_scroll.follow_focus=true
  _gear_scroll.custom_minimum_size.x=238; _columns.add_child(_gear_scroll)
@@ -131,24 +153,30 @@ func _build() -> void:
  if actor.survival: gear.add_child(FoundationWidgets.button("恢复与休整",actor.survival.show_rules))
  _bag=VBoxContainer.new(); _bag.size_flags_horizontal=Control.SIZE_EXPAND_FILL; _columns.add_child(_bag)
  var category:=HBoxContainer.new(); _bag.add_child(category)
- for pair in [["全部","all"],["装备","equipment"],["补给 / 材料","supplies"]]:
+ for pair in [["全部","all"],["装备","equipment"],["补给","supplies"]]:
   var button:=FoundationWidgets.button(pair[0],func(): mode=pair[1]; selected_slot=-1; _invalidate())
   GameUIStyle.apply_tab(button,mode==pair[1]); _categories[pair[1]]=button
   category.add_child(button)
  var containers:=HBoxContainer.new(); _bag.add_child(containers)
- for pair in [["随身全部","all"],["口袋","pocket"],["背包","pack"],["地面","ground"]]:
+ for pair in [["全部来源","all"],["口袋","pocket"],["背包","pack"],["地面","ground"]]:
   var button:=FoundationWidgets.button(pair[0],func(): container_filter=pair[1]; _invalidate())
   GameUIStyle.apply_tab(button,container_filter==pair[1]); _containers[pair[1]]=button
   containers.add_child(button)
  _search=LineEdit.new(); _search.clear_button_enabled=true; _search.placeholder_text="搜索拥有的物品…"; _search.text_changed.connect(func(_text): _invalidate()); _bag.add_child(_search)
- var scroll:=ScrollContainer.new(); scroll.name="InventoryGridScroll"; scroll.size_flags_vertical=Control.SIZE_EXPAND_FILL
+ var scroll:=ScrollContainer.new(); scroll.name="InventoryGridScroll"; _grid_scroll=scroll; scroll.follow_focus=true; scroll.size_flags_vertical=Control.SIZE_EXPAND_FILL
  scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED; _bag.add_child(scroll)
  _grid=GridContainer.new(); _grid.columns=3; _grid.size_flags_horizontal=Control.SIZE_EXPAND_FILL
  _grid.add_theme_constant_override("h_separation",6); _grid.add_theme_constant_override("v_separation",6); scroll.add_child(_grid)
- _detail_scroll=ScrollContainer.new(); _detail_scroll.custom_minimum_size.x=270
+ _detail_column=VBoxContainer.new(); _detail_column.name="DetailColumn"
+ _detail_column.custom_minimum_size.x=304; _detail_column.size_flags_horizontal=Control.SIZE_EXPAND_FILL; _detail_column.size_flags_stretch_ratio=1.05
+ _columns.add_child(_detail_column)
+ _detail_scroll=ScrollContainer.new(); _detail_scroll.name="ItemReading"
+ _detail_scroll.size_flags_vertical=Control.SIZE_EXPAND_FILL
  _detail_scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED; _detail_scroll.follow_focus=true
- _columns.add_child(_detail_scroll)
+ _detail_column.add_child(_detail_scroll)
  _details=VBoxContainer.new(); _details.size_flags_horizontal=Control.SIZE_EXPAND_FILL; _details.add_theme_constant_override("separation",9); _detail_scroll.add_child(_details)
+ _binding_host=VBoxContainer.new(); _binding_host.name="BindingPicker"; _binding_host.visible=false; _detail_column.add_child(_binding_host)
+ _detail_actions=HFlowContainer.new(); _detail_actions.name="ItemActions"; _detail_actions.add_theme_constant_override("h_separation",4); _detail_actions.add_theme_constant_override("v_separation",4); _detail_column.add_child(_detail_actions)
  var drop_zone:=InventoryItemTile.new(); drop_zone.name="GroundDropZone"; drop_zone.text="拖到此处丢弃到地面 · 可拾回"
  GameUIStyle.apply_button(drop_zone,GameUIStyle.GOLD)
  drop_zone.accept_item=func(uid: String): return session.inventory.locate(uid) in session.inventory.actor_containers(actor.actor_context.id)+[actor.actor_context.id+".gear"]
@@ -164,16 +192,17 @@ func _layout() -> void:
  var extent:=Vector2(minf(1280,viewport.x-32),minf(760,viewport.y-32))
  _panel.offset_left=-extent.x*.5; _panel.offset_right=extent.x*.5; _panel.offset_top=-extent.y*.5; _panel.offset_bottom=extent.y*.5
  _gear_scroll.custom_minimum_size.x=210 if viewport.x<1080 else 250
- _detail_scroll.custom_minimum_size.x=250 if viewport.x<1080 else 290
+ _detail_column.custom_minimum_size.x=304 if viewport.x<1080 else 330
  _bag.custom_minimum_size.x=240
- _grid.columns=2 if viewport.x<1200 else 3
+ _columns.add_theme_constant_override("separation",12 if viewport.x<1080 else 20)
+ _grid.columns=1 if viewport.x<1200 else 2
 func _invalidate() -> void: _dirty=true
 func _process(delta: float) -> void:
  if not visible: return
  if actor.health_component.is_dead: close(); return
  if not ground_id.is_empty() and not session.ground_available(actor,ground_id):
   ground_id=""; _invalidate(); _message="地面物资已不在附近。"; _message_time=3
- _refresh_time+=delta; _message_time=maxf(0,_message_time-delta)
+ _refresh_time+=delta; _message_time=maxf(0,_message_time-delta); _damage_warning_time=maxf(0,_damage_warning_time-delta)
  if _dirty and _refresh_time>.1 and not get_viewport().gui_is_dragging() and not Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) and not _popup.visible: _refresh()
  var context:=actor.actor_context
  _summary.text="口袋 %d/%d格 · 背包 %d/%d格%s · 负重 %.1f / %.0fkg · 生命 %d/%d"%[session.inventory.occupied_slots(context.id+".pocket"),context.rules.pocket_capacity,session.inventory.occupied_slots(context.id+".pack"),context.rules.pack_capacity,"（已放下，不可远程整理）" if not session.inventory.is_attached(context.id+".pack") else "",session.inventory.weight(context.id),context.rules.carry_limit+float(ActorProgression.values(actor).carry_bonus),actor.health_component.hp,actor.health_component.max_hp]
@@ -189,7 +218,7 @@ func _process(delta: float) -> void:
    var definition:=session.inventory.equipment_definition(item.uid) if session.inventory.definitions.get(item.definition_id) is EquipmentData else session.inventory.definitions.get(item.definition_id) as ItemData
    if definition: _state_label.text=_item_state_text(item,definition)
 func _health_changed(hp: int,_max_hp: int) -> void:
- if visible and hp<_last_health: _message="正在受伤！Esc关闭界面返回战斗。"; _message_time=3; _alert.add_theme_color_override("font_color",GameUIStyle.DANGER)
+ if visible and hp<_last_health: _damage_warning_time=3; _message="正在受伤！Esc关闭界面返回战斗。"; _message_time=3; _alert.add_theme_color_override("font_color",GameUIStyle.DANGER)
  _last_health=hp
 func _rows() -> Array[Dictionary]:
  var rows: Array[Dictionary]=[]
@@ -229,6 +258,8 @@ func _refresh() -> void:
    tile.pressed.connect(_select.bind(row.uid)); tile.activated.connect(_activate); tile.secondary_requested.connect(_context)
    _tiles[row.uid]=tile; _grid.add_child(tile)
   var caption: String=definition.display_name+" ×%d\n"%row.quantity+{"pocket":"口袋","pack":"背包","gear":"已穿戴","ground":"地面"}[row.place]
+  if definition.use_profile and definition.use_profile.kind==ItemUseDefinition.Kind.SPRAY:
+   caption+=" · %d剂\n瓶%s"%[int(session.inventory.item(row.uid).properties.get("doses",0)),str(row.uid).trim_prefix("item.")]
   if tile.text!=caption: tile.text=caption
   tile.icon=InterfaceIcons.item(definition)
   tile.tooltip_text=definition.display_name+"\n"+session.inventory.state_text(row.uid)
@@ -255,7 +286,9 @@ func _refresh_stats() -> void:
  var stats:=actor.stats_component
  _stats.text="力量 %d · 智力 %d\n敏捷 %d · 耐力 %d\n生命 %d · %s"%[stats.effective_stat("strength"),stats.effective_stat("intelligence"),stats.effective_stat("agility"),stats.effective_stat("endurance"),actor.health_component.max_hp,QuickslotView.magic_status(actor)]
 func _select(uid: String) -> void:
- if uid!=selected and is_instance_valid(_quantity): _quantity.value=1
+ if uid!=selected:
+  if is_instance_valid(_quantity): _quantity.value=1
+  _binding_open=false; _compare_open=false; _more_open=false; _detail_scroll.scroll_vertical=0
  var previous:=selected
  selected=uid
  for key in [previous,uid]:
@@ -281,11 +314,13 @@ func _equipment_permission(item: ItemInstance) -> String:
 func _show_detail() -> void:
  var item:=_selected_item()
  var permission:=_equipment_permission(item)
- var signature: Dictionary={"permission":permission,"uid":selected,"item":item.snapshot() if item else {},"location":session.inventory.locate(selected),"gear":session.inventory.entries(actor.actor_context.id+".gear"),"accessible":session.inventory.actor_containers(actor.actor_context.id),"ground":ground_id,"shortcuts":actor.skill_manager.shortcuts.snapshot()}
+ var signature: Dictionary={"permission":permission,"uid":selected,"item":item.snapshot() if item else {},"location":session.inventory.locate(selected),"gear":session.inventory.entries(actor.actor_context.id+".gear"),"accessible":session.inventory.actor_containers(actor.actor_context.id),"ground":ground_id,"shortcuts":actor.skill_manager.shortcuts.snapshot(),"binding":_binding_open,"compare":_compare_open or Input.is_key_pressed(KEY_SHIFT),"more":_more_open}
  if signature==_detail_signature: return
  _detail_signature=signature.duplicate(true)
+ var focus:=get_viewport().gui_get_focus_owner()
+ var focus_action: String=focus.text if focus is Button and (_details.is_ancestor_of(focus) or _detail_actions.is_ancestor_of(focus) or _binding_host.is_ancestor_of(focus)) else ""
  var old_quantity:=int(_quantity.value) if is_instance_valid(_quantity) else 1
- FoundationWidgets.clear(_details); _quantity=null; _state_label=null
+ FoundationWidgets.clear(_details); FoundationWidgets.clear(_detail_actions); FoundationWidgets.clear(_binding_host); _binding_host.visible=false; _quantity=null; _state_label=null
  if not item:
   var icon:=TextureRect.new(); icon.texture=GameUIStyle.icon("backpack"); icon.modulate=Color(GameUIStyle.GOLD,.45)
   icon.custom_minimum_size=Vector2(48,64); icon.expand_mode=TextureRect.EXPAND_IGNORE_SIZE; icon.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED
@@ -299,56 +334,74 @@ func _show_detail() -> void:
  _details.add_child(FoundationWidgets.label(definition.display_name,20))
  _state_label=FoundationWidgets.label(_item_state_text(item,definition),13,true)
  _details.add_child(_state_label)
- _quantity=SpinBox.new(); _quantity.prefix="数量 "; _quantity.min_value=1; _quantity.max_value=item.quantity; _quantity.step=1; _quantity.value=mini(old_quantity,item.quantity); _quantity.visible=item.quantity>1; _details.add_child(_quantity)
+ if item.quantity>1:
+  _quantity=SpinBox.new(); _quantity.prefix="数量 "; _quantity.min_value=1; _quantity.max_value=item.quantity; _quantity.step=1; _quantity.value=mini(old_quantity,item.quantity); _detail_actions.add_child(_quantity)
  if location==ground_id and not ground_id.is_empty():
-  _details.add_child(FoundationWidgets.button("取走所选数量",func(): _result(actions.take(ground_id,selected,int(_quantity.value)))))
-  _details.add_child(FoundationWidgets.button("尽量取走这一叠",func(): _result(actions.take(ground_id,selected,item.quantity))))
+  _action("取走所选数量",func(): _result(actions.take(ground_id,selected,_amount())))
+  _action("尽量取走这一叠",func(): _result(actions.take(ground_id,selected,item.quantity)))
   return
  if location not in session.inventory.actor_containers(actor.actor_context.id)+[actor.actor_context.id+".gear"]:
   _details.add_child(FoundationWidgets.label("实物已不在随身容器。",14,true)); return
  if definition is EquipmentData:
-  if location.ends_with(".gear"):
-   _details.add_child(FoundationWidgets.button("卸下装备",func(): _result(actions.unequip(definition.slot_type)),not permission.is_empty()))
-  else: _details.add_child(FoundationWidgets.button("装备这件",_equip.bind(item.uid),not permission.is_empty()))
+  if location.ends_with(".gear"): _action("卸下装备",func(): _result(actions.unequip(definition.slot_type)),not permission.is_empty())
+  else: _action("装备这件",_equip.bind(item.uid),not permission.is_empty())
   if not permission.is_empty(): _details.add_child(FoundationWidgets.label(permission,13,true))
  elif definition.use_profile or SurvivalCatalog.FOODS.has(definition.id):
-  _details.add_child(FoundationWidgets.button("选择这瓶喷剂" if definition.use_profile and definition.use_profile.kind==ItemUseDefinition.Kind.SPRAY else "使用一份",_use.bind(item.uid)))
- if not location.ends_with(".gear"):
-  _details.add_child(FoundationWidgets.button("移至口袋" if location.ends_with(".pack") else "移至背包",_transfer_selected))
-  if item.quantity>1: _details.add_child(FoundationWidgets.button("拆分所选数量",func(): _result(actions.split(selected,int(_quantity.value)))))
- _details.add_child(FoundationWidgets.button("丢弃所选数量",func(): _drop_quantity(int(_quantity.value))))
- _details.add_child(FoundationWidgets.button("丢弃整叠",_drop_quantity.bind(item.quantity)))
- # Keep the useful action above explanations and bulk management.
- for node in _details.get_children():
-  if node is Button:
-   GameUIStyle.primary(node); _details.move_child(node,2); break
+  _action("选择这瓶喷剂" if definition.use_profile and definition.use_profile.kind==ItemUseDefinition.Kind.SPRAY else "使用一份",_use.bind(item.uid))
  if definition is EquipmentData or definition.use_profile or SurvivalCatalog.FOODS.has(definition.id):
-  var index:=_details.get_child_count()
-  _binding_picker(item,definition)
-  var caption:=_details.get_child(index); var grid:=_details.get_child(index+1)
-  _details.move_child(caption,3); _details.move_child(grid,4)
- _details.add_child(HSeparator.new())
- FoundationWidgets.disclosure(_details,"物品说明",definition.description)
+  _action("绑定快捷槽",func(): _binding_open=not _binding_open; _show_detail())
+  if _binding_open: _binding_picker(item,definition)
  if definition is EquipmentData:
-  var current:=actor.get_node("EquipmentManager").get_equipment(definition.slot_type) as EquipmentData
-  FoundationWidgets.disclosure(_details,"属性与当前装备比较",FoundationWidgets.comparison(current,definition))
+  _action("比较",func(): _compare_open=not _compare_open; _show_detail())
+ _action("更多",func(): _more_open=not _more_open; _show_detail())
+ # Main actions are outside the reading scroll; management stays deliberate.
+ if _more_open:
+  if not location.ends_with(".gear"):
+   _details.add_child(FoundationWidgets.button("移至口袋" if location.ends_with(".pack") else "移至背包",_transfer_selected))
+   if item.quantity>1: _details.add_child(FoundationWidgets.button("拆分所选数量",func(): _result(actions.split(selected,_amount()))))
+  _details.add_child(FoundationWidgets.button("丢弃所选数量",func(): _drop_quantity(_amount())))
+  _details.add_child(FoundationWidgets.button("丢弃整叠",_drop_quantity.bind(item.quantity)))
+ if definition is EquipmentData:
+  if _compare_open or Input.is_key_pressed(KEY_SHIFT):
+   var current:=actor.get_node("EquipmentManager").get_equipment(definition.slot_type) as EquipmentData
+   _details.add_child(FoundationWidgets.label("当前穿戴这件装备。" if location.ends_with(".gear") else FoundationWidgets.comparison(current,definition),14,true))
   if definition.moveset: FoundationWidgets.disclosure(_details,"武器动作",definition.moveset.describe())
  else: _material_uses(definition)
+ FoundationWidgets.disclosure(_details,"物品来历与说明",definition.description)
+ if not focus_action.is_empty(): _restore_action_focus.call_deferred(focus_action,selected)
+func _restore_action_focus(title: String, uid: String) -> void:
+ if not visible or selected!=uid: return
+ for host in [_details,_detail_actions,_binding_host]:
+  for button in host.find_children("*","Button",true,false):
+   if button.text==title and button.is_visible_in_tree() and not button.disabled: button.grab_focus(); return
+ var tile:=_tiles.get(uid) as Control
+ if is_instance_valid(tile): tile.grab_focus()
+func _action(title: String,request: Callable,disabled := false) -> void:
+ var button:=FoundationWidgets.button(title,request,disabled); button.size_flags_horizontal=Control.SIZE_FILL
+ for state in ["normal","hover","pressed","focus","disabled"]:
+  var style:=button.get_theme_stylebox(state).duplicate() as StyleBoxFlat
+  style.content_margin_left=7; style.content_margin_right=7; button.add_theme_stylebox_override(state,style)
+ _detail_actions.add_child(button)
+ if _detail_actions.get_child_count()==1: GameUIStyle.primary(button)
+func _amount() -> int: return int(_quantity.value) if is_instance_valid(_quantity) else 1
 func _binding_picker(item: ItemInstance,definition: ItemData) -> void:
- _details.add_child(FoundationWidgets.label("一键绑定快捷槽",12,true))
- var grid:=GridContainer.new(); grid.columns=7; grid.name="QuickBind"; _details.add_child(grid)
+ _binding_host.visible=true
+ _binding_host.add_child(FoundationWidgets.label("选择独立目标槽 · 只绑定，不使用",12,true))
+ var grid:=GridContainer.new(); grid.columns=7; grid.name="QuickBind"; _binding_host.add_child(grid)
  for source in QuickslotLoadout.SOURCES:
   var binding:=actor.skill_manager.shortcuts.binding(source)
   var active: bool=binding.get("kind","")=="item" and binding.get("item_id","")==definition.id and (binding.get("uid","").is_empty() or binding.get("uid","")==item.uid)
   var button:=Button.new(); button.text=InputBindings.label(InputBindings.action_for_source(source))
   button.name="Bind_"+source; button.tooltip_text="将这件实物绑定到 "+button.text
-  GameUIStyle.apply_button(button,GameUIStyle.GOLD,active); button.custom_minimum_size=Vector2(30,32)
+  GameUIStyle.apply_button(button,GameUIStyle.GOLD,active); button.custom_minimum_size=Vector2(40,40)
+  for state in ["normal","hover","pressed","focus","disabled"]:
+   var style:=button.get_theme_stylebox(state).duplicate() as StyleBoxFlat; style.content_margin_left=3; style.content_margin_right=3; button.add_theme_stylebox_override(state,style)
   button.pressed.connect(func():
    var uid:=item.uid if definition is EquipmentData or definition.use_profile and definition.use_profile.kind==ItemUseDefinition.Kind.SPRAY else ""
    var ok:=actor.skill_manager.shortcuts.bind_item(source,definition.id,uid)
    _message="已绑定到 "+button.text if ok else "无法绑定。"; _message_time=3
    if ok and actions.save_request.is_valid(): actions.save_request.call()
-   _show_detail())
+   _binding_open=false; _show_detail())
   grid.add_child(button)
 func _material_uses(definition: ItemData) -> void:
  var uses: Array[String]=[]
@@ -374,7 +427,7 @@ func _drop_quantity(quantity: int) -> void: _result(actions.drop(selected,quanti
 func _transfer_selected() -> void:
  var location:=session.inventory.locate(selected)
  var destination:=actor.actor_context.id+(".pocket" if location.ends_with(".pack") else ".pack")
- _result(actions.transfer(selected,destination,int(_quantity.value)))
+ _result(actions.transfer(selected,destination,_amount()))
 func _use(uid: String) -> void:
  if not use_request.is_valid(): return
  close(); use_request.call(uid)

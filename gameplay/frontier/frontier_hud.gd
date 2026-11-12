@@ -5,14 +5,10 @@ var tracker: Button
 var time_label: Label
 var interact: Button
 var _focus: WeakRef
-var belt: Array[Button] = []
-var _belt_grid: GridContainer
 var _clock := 0.0
 var _binding_revision := -1
 var _loadout_hint := ""
 var _journal_hint := ""
-const FOODS := ["ration","clean_water","tea","broth"]
-const BELT_ACTIONS := ["quick_item_1","quick_item_2","quick_item_3","quick_item_4"]
 func _ready() -> void:
 	process_mode=Node.PROCESS_MODE_ALWAYS
 	layer=GameUIStyle.LAYER_TRACKER
@@ -49,25 +45,6 @@ func _ready() -> void:
 	interact=FrontierWidgets.button("",_interact)
 	interact.tooltip_text="点击与F交互相同；须在目标附近"
 	prompt.add_child(interact)
-	var row:=GridContainer.new()
-	row.columns=2
-	_belt_grid=row
-	row.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
-	row.offset_left=-150
-	row.offset_right=-18
-	row.offset_top=-162
-	row.offset_bottom=-76
-	root.add_child(row)
-	for i in range(4):
-		var button:=Button.new()
-		GameUIStyle.apply_button(button)
-		button.gui_input.connect(_shortcut_mouse.bind(i))
-		button.custom_minimum_size=Vector2(62,44)
-		button.expand_icon=true
-		button.add_theme_constant_override("icon_max_width",22)
-		button.tooltip_text=SurvivalCatalog.FOODS[FOODS[i]].text
-		row.add_child(button)
-		belt.append(button)
 func _process(delta: float) -> void:
 	_clock-=delta
 	if _clock>0 or not game.ready_for_play: return
@@ -80,31 +57,6 @@ func _process(delta: float) -> void:
 	tracker.disabled=is_instance_valid(game.ui.modal)
 	var selecting:=is_instance_valid(game.player.material_wheel) and game.player.material_wheel.visible
 	tracker.visible=not selecting
-	_belt_grid.visible=not game.player.field_work.panel.visible
-	for i in range(4):
-		var source: String=QuickslotLoadout.ITEM_SOURCES[i]
-		var binding:=game.player.skill_manager.shortcuts.binding(source)
-		var inst:=game.player.skill_manager.get_instance(source)
-		var title: String=inst.data.display_name if inst else "空槽"
-		var detail: String=_loadout_hint
-		var amount: String=""
-		var ready:=inst!=null
-		if binding.get("kind","")=="technique":
-			var view:=QuickslotView.technique_state(game.player,binding)
-			title=view.title; detail=view.detail; ready=view.ready; amount="%.0f体"%view.cost
-			belt[i].icon=GameUIStyle.icon("swords")
-		elif binding.get("kind","")=="item":
-			var view:=QuickslotView.item_state(game.player,binding)
-			title=view.title; detail=view.detail; ready=view.ready; amount="×%d"%view.count
-			belt[i].icon=InterfaceIcons.item(ItemCatalog.default_catalog().definition(str(binding.item_id)))
-		elif inst:
-			var plan:=game.player.skill_manager.preview_source(source)
-			detail=inst.data.description+"\n"+plan.reason; amount=plan.cost_label(); ready=plan.ready
-			belt[i].icon=InterfaceIcons.skill(inst.data)
-		else: belt[i].icon=null
-		belt[i].text="%s  %s"%[InputBindings.label(BELT_ACTIONS[i]),amount]
-		belt[i].disabled=not ready or game.player.health_component.is_dead
-		belt[i].tooltip_text="按键："+InputBindings.labels(BELT_ACTIONS[i])+"\n"+title+"\n"+detail
 	var preparation:=game.guidance.journey.town_goal()
 	var goal:=preparation if not preparation.is_empty() else game.guidance.tracked()
 	var orienting: bool = goal.is_empty() or bool(goal.get("journey",false))
@@ -137,12 +89,6 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not event is InputEventKey and not event is InputEventMouseButton or event is InputEventKey and event.echo or game.ui.modal_locked: return
 	if event.is_action_pressed("loot_all") and is_instance_valid(game.ui.modal) and game.ui.modal.get_meta("frontier_page","")=="loot":
 		game.hub.take_all(); get_viewport().set_input_as_handled(); return
-
-func _shortcut_mouse(event: InputEvent,index: int) -> void:
-	if event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_LEFT:
-		game.player.input_controller.request_shortcut(QuickslotLoadout.ITEM_SOURCES[index],event.pressed,true)
-func use(index: int) -> void:
-	if index>=0 and index<4: game.player.input_controller.request_shortcut(QuickslotLoadout.ITEM_SOURCES[index],true)
 
 func _open_tracker() -> void:
 	if not game.guidance.journey.town_goal().is_empty(): game.hub.open_journey()

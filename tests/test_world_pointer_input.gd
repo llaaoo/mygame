@@ -60,8 +60,10 @@ func run() -> void:
 	game.survival.supplies.grant({"ration":1})
 	await frames(15)
 	sequence=actor.actor_context.actions._attack_sequence
-	await pointer(game.frontier_hud.belt[0].get_global_rect().get_center()); await left_click()
-	check(actor.field_work.is_busy(),"Global mouse input did not activate supply belt")
+	await pointer(game.get_node("HUDLayer").skill_bar._panels[9].get_global_rect().get_center()); await left_click()
+	check(actor.material_wheel.visible and not actor.field_work.is_busy(),"Global mouse input bypassed item inspection")
+	await pointer(actor.material_wheel._inspection_use.get_global_rect().get_center()); await left_click()
+	check(actor.field_work.is_busy(),"Explicit inspected food use did not activate supply action")
 	check(actor.actor_context.actions._attack_sequence==sequence,"Supply belt mouse click leaked a weapon attack")
 	actor.field_work.cancel("test"); actor.field_work.close_panel()
 	check(game.player.quest_manager==null and game.get_node_or_null("RunManager")==null,"Campaign still instantiates unused legacy quest/run owners")
