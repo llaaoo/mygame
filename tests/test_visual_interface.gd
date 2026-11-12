@@ -29,7 +29,18 @@ func run() -> void:
  check(hud._actor_status.is_visible_in_tree() and hud._actor_status.context==game.player.actor_context,"Combat resource strip never bound to campaign actor")
  check(not game.ui._survival_label.get_parent().visible,"Healthy survival information still occupies the world HUD")
  check(not game.ui._terrain_label.get_parent().visible,"Dry ground information still occupies the world HUD")
- check(not hud.skill_bar._hint_panel.visible,"Idle spell summary still occupies the world HUD")
+ # The approved UI keeps the explicitly selected form visible after the light layer closes.
+ var manager:=game.player.skill_manager
+ var before_stock:=game.session.inventory.material_amounts("player")
+ var before_mp:=game.player.mana_component.mp
+ var casts: Array[int]=[0]
+ manager.cast_committed.connect(func(_plan): casts[0]+=1)
+ await point_click(hud.skill_bar._panels[hud.skill_bar._sources.find("right")].get_global_rect().get_center())
+ check(game.player.material_wheel.visible and game.player.material_wheel.source=="right","HUD did not inspect the exact ordinary new-game R slot")
+ await key(KEY_ESCAPE,true); await key(KEY_ESCAPE,false); await frames(8)
+ var plan:=manager.preview_source("right",false)
+ check(hud.skill_bar._hint_panel.visible and hud.skill_bar._combination_hint.text.contains(plan.effect_label) and hud.skill_bar._combination_hint.text.contains(plan.cost_label()),"Selected current form/cost does not match its real CastPlan")
+ check(casts[0]==0 and game.player.mana_component.mp==before_mp and game.session.inventory.material_amounts("player")==before_stock,"Inspecting current form cast or consumed resources")
  await capture("01-world")
  await key(KEY_TAB,true); await key(KEY_TAB,false)
  check(not paused and game.player.ui_blocked and game.hub.page=="actions","Preparation navigation failed")

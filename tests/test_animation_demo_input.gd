@@ -24,6 +24,15 @@ func idle() -> void:
 func modifier(code: Key,held: bool) -> void:
 	var event:=InputEventKey.new(); event.keycode=code; event.physical_keycode=code; event.pressed=held
 	Input.parse_input_event(event); Input.flush_buffered_events()
+func reveal_slider(slider: Control) -> void:
+ var ancestor:=slider.get_parent()
+ while ancestor:
+  if ancestor is ScrollContainer: ancestor.ensure_control_visible(slider)
+  ancestor=ancestor.get_parent()
+ await frames(6)
+ var scroll:=slider.get_parent().get_parent() as ScrollContainer
+ check(root.get_visible_rect().encloses(slider.get_global_rect()) and scroll.get_global_rect().encloses(slider.get_global_rect()),"Scrub target must be visible before actual pointer input")
+ print("GALLERY_SCRUB_GEOMETRY ",str(slider.get_global_rect())," within ",str(scroll.get_global_rect()))
 func run() -> void:
 	var fixture:=Fixture.new(self); game=await fixture.boot(true)
 	GameRuntime.instance.set_process(true)
@@ -41,12 +50,15 @@ func run() -> void:
 	await click("移动"); await click("东"); await frames(5)
 	print("GALLERY_CONTROLS ",JSON.stringify({"direction":gallery.direction,"autoplay":gallery.autoplay,"state":gallery.state}))
 	check(gallery.direction==6 and not gallery.autoplay and gallery.state=="walk","Actual gallery controls did not change direction/action/playback")
-	var slider:=gallery.scrub; var point:=slider.get_global_rect().position+Vector2(slider.size.x*.7,slider.size.y*.5)
+	var slider:=gallery.scrub
+	await reveal_slider(slider)
+	var point:=slider.get_global_rect().position+Vector2(slider.size.x*.7,slider.size.y*.5)
 	await point_click(point); await frames(3)
 	print("GALLERY_SCRUB ",JSON.stringify({"progress":gallery.progress,"directions":gallery.rigs.map(func(rig): return rig.current.get("direction",-1))}))
 	check(gallery.progress>.5 and gallery.rigs.all(func(rig): return rig.current.get("direction",-1)==6),"Actual scrub/direction failed to reach native sprite players")
 	await animation_capture("animation-gallery")
 	await click("死亡"); await click("南")
+	await reveal_slider(slider)
 	await point_click(slider.get_global_rect().position+Vector2(slider.size.x*.99,slider.size.y*.5)); await frames(3)
 	check(gallery.rigs.all(func(rig): return rig.current.get("state","")=="death"),"Actual death preview did not reach all native rigs")
 	await animation_capture("animation-gallery-death")
