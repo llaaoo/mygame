@@ -1,5 +1,5 @@
 {
-  "version": "1.1",
+  "version": "1.2",
   "scope": "Standalone interactive design prototype with illustrative inventory/trade/loot state. No Godot AI, physics, saves or gameplay verification.",
   "browser": "system Chromium + Playwright real input",
   "checks_passed": 141,
@@ -165,7 +165,7 @@
       "scale": "125",
       "buttons": 17,
       "undersized": 0,
-      "min_label": 15
+      "min_label": 12
     },
     {
       "viewport": [
@@ -185,7 +185,7 @@
       "scale": "125",
       "buttons": 19,
       "undersized": 0,
-      "min_label": 15
+      "min_label": 12
     },
     {
       "viewport": [
@@ -205,16 +205,10 @@
       "scale": "125",
       "buttons": 19,
       "undersized": 0,
-      "min_label": 15
+      "min_label": 12
     }
   ],
   "errors": [],
   "missing_assets": [],
-  "historical_review": "v1 gaps remain recorded in review/audit.json; these are new acceptance results",
-  "source_sha256": {
-    "index.html": "de18d7fabbe6b508a0d79e4c3d4cf1e6f19d6b3d866526c765633ef358789c48",
-    "sample-data.js": "9c37dcb2a80570937431096b06a69385238c908ce6456a06acc11e752923f11d",
-    "ui.js": "7148743cf24f2b17e77e61dd959d0fe5710a450b729950a7bf1ac812f52c65b7",
-    "ui.css": "ace8aee3ca575a5b2384fe874b252e33e3df6857f1678120d1a8d1d6771e760a"
-  }
+  "historical_review": "v1 gaps remain recorded in review/audit.json; these are new acceptance results"
 }

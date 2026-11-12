@@ -5,7 +5,7 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--url', default='http://127.0.0.1:8768/docs/design/ui-system/')
+parser.add_argument('--url', default='http://127.0.0.1:8769/docs/design/ui-system/')
 parser.add_argument('--out', default='/tmp/grayriver-ui-check')
 args = parser.parse_args()
 out = Path(args.out)
@@ -104,7 +104,7 @@ with sync_playwright() as p:
     page.keyboard.press('i');page.locator('#item-search').fill('');page.locator('[data-item="bow"]').dblclick(delay=80)
     check('native double-click equips exact bow', '灰河短弓' in page.locator('[data-value="主手"]').get_attribute('title'))
     page.locator('[data-item="spare_coat"]').click();page.keyboard.down('Shift')
-    check('comparison uses actual same-slot stat difference', '物理减伤：+2' in page.locator('.compare-tip').inner_text())
+    check('comparison uses actual same-slot stat difference', '8 → 10%' in page.locator('.compare-tip').inner_text() and '+2% · 收益' in page.locator('.compare-tip').inner_text())
     page.keyboard.up('Shift');page.locator('[data-value="头部"]').click()
     check('empty equipment slot never selects unrelated blade', page.locator('[data-item]').count()==0 and '没有可穿戴的头部装备' in page.locator('#bag-grid').inner_text())
     page.locator('.filter-chip').click()
@@ -193,13 +193,13 @@ with sync_playwright() as p:
     page.set_viewport_size({'width':1440,'height':1000});fresh()
     for name in ['hud','combat','inventory','skills','character','journal','map','craft','dialogue','trade','loot','settings']:
         view(name);page.screenshot(path=str(out/'screenshots'/f'{name}.png'))
-    awake();view('hud');page.keyboard.press('r');page.keyboard.press('g');page.locator('[data-form="fire"]').click();page.wait_for_timeout(2500);page.screenshot(path=str(out/'screenshots'/'current-form.png'))
+    awake();view('hud');page.keyboard.press('r');page.keyboard.press('g');page.locator('[data-form="fire"]').click();page.locator('#toast.show').wait_for(state='hidden',timeout=20000);page.screenshot(path=str(out/'screenshots'/'current-form.png'))
     view('inventory');page.locator('[data-item="spray_b"]').click();page.locator('[data-action="bind-item"]').click();page.screenshot(path=str(out/'screenshots'/'inventory-binding.png'))
     page.set_viewport_size({'width':960,'height':720});view('settings');page.locator('#font-setting').select_option('125');view('inventory');page.locator('[data-item="bow"]').click();page.screenshot(path=str(out/'screenshots'/'inventory-small-large-text.png'))
     view('skills');page.screenshot(path=str(out/'screenshots'/'skills-small-large-text.png'))
     check('no browser runtime errors',not errors)
     check('no missing browser assets',not missing)
     browser.close()
-report={'version':'1.1','scope':'Standalone interactive design prototype with illustrative inventory/trade/loot state. No Godot AI, physics, saves or gameplay verification.','browser':'system Chromium + Playwright real input','checks_passed':len(checks),'checks':checks,'layouts':layouts,'errors':errors,'missing_assets':missing,'historical_review':'v1 gaps remain recorded in review/audit.json; these are new acceptance results'}
+report={'version':'1.2','scope':'Standalone interactive design prototype with illustrative inventory/trade/loot state. No Godot AI, physics, saves or gameplay verification.','browser':'system Chromium + Playwright real input','checks_passed':len(checks),'checks':checks,'layouts':layouts,'errors':errors,'missing_assets':missing,'historical_review':'v1 gaps remain recorded in review/audit.json; these are new acceptance results'}
 (out/'verification.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
 print(json.dumps({'passed':len(checks),'out':str(out)},ensure_ascii=False))

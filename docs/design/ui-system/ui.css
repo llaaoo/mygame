@@ -330,3 +330,83 @@ kbd { font:var(--xs,12px) River,sans-serif; border:1px solid #cfc9aa66; min-widt
 .base-body { display:block; position:absolute; inset:0; background:url('../../../content/art/third_party/puny/Character-Base.png') 0 0/3072px 1024px; image-rendering:pixelated }
 .paperdoll-sprite>svg { position:absolute; inset:0; width:128px; height:128px; shape-rendering:crispEdges }
 @media(max-width:1150px) { .paperdoll-sprite,.paperdoll-sprite>svg { width:96px; height:96px }.base-body { background-size:2304px 768px } }
+/* v1.2 decision support shares the original menu shell and input scopes. */
+.organize-tools { display:flex; gap:5px; margin:0 0 8px; flex-shrink:0 }
+.organize-tools select { min-width:0; flex:1; min-height:40px; border:1px solid var(--line); background:var(--surface); color:var(--text); padding:6px; font:var(--xs) River,sans-serif }
+.organize-tools button { font-size:var(--xs); white-space:nowrap; padding:6px 9px }
+.prepare-entry { width:100%; margin-bottom:8px; font-size:var(--sm); border-left:2px solid var(--gold) }
+.rule-links { display:flex; flex-wrap:wrap; gap:6px; margin-top:14px }
+.rule-links button { font-size:var(--xs) }
+.comparison-line { display:grid; grid-template-columns:1fr auto; gap:4px 10px; border-bottom:1px solid var(--line); padding:8px 0; font-size:var(--sm) }
+.comparison-line b { grid-column:1/-1; font-size:var(--xs); font-weight:400 }
+.benefit { color:#b6d4a0 }
+.tradeoff { color:#e4ac8e }
+.neutral { color:var(--muted) }
+.compatibility { font-size:var(--sm); line-height:1.8; margin:12px 0 }
+.compare-tip h3 { font-size:var(--sm); font-weight:500; margin:0 0 8px }
+.selection-mark { font-size:var(--body); color:var(--gold); min-width:20px }
+.inventory-batch { flex-shrink:0; border-top:1px solid var(--gold); padding-top:8px; margin-top:8px }
+.inventory-batch>div:first-child { display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:7px }
+.inventory-batch small { font-size:var(--xs) }
+.inventory-batch .actions-row button { font-size:var(--xs) }
+.protected-note { border-left:2px solid #d6b17a; padding-left:10px; color:#dfccab; line-height:1.8; font-size:var(--sm) }
+.fixture-note { font-size:var(--xs); color:#dec696; display:block; margin-bottom:6px }
+.goal-list { margin:12px 0 20px }
+.goal-row { display:flex; align-items:center; gap:12px; border-bottom:1px solid var(--line); padding:12px 0 }
+.goal-row>div { flex:1 }
+.goal-row b,.goal-row small { display:block }
+.goal-row small { margin-top:5px; line-height:1.8 }
+.goal-row label { display:flex; align-items:center; gap:7px; white-space:nowrap; font-size:var(--xs) }
+.goal-row input { width:65px; min-height:40px; background:var(--surface); color:var(--text); border:1px solid var(--line); padding:7px; font:inherit }
+.preparation-table { display:grid; grid-template-columns:1fr 1fr; gap:10px }
+.preparation-row { border:1px solid var(--line); border-left:2px solid #9caa85; padding:12px; background:#ffffff02 }
+.preparation-row small { display:block; margin:6px 0; line-height:1.7 }
+.need-values { display:flex; gap:12px; justify-content:space-between; padding:7px 0; font-size:var(--sm) }
+.preparation-row .hint-line { margin-bottom:0 }
+.preparation-row button { margin-top:8px; font-size:var(--xs); display:block }
+.work-actions { flex-wrap:wrap }
+.work-actions>button { font-size:var(--sm) }
+.notification-log { max-height:360px; overflow:auto }
+.log-line { padding:10px 0; border-bottom:1px solid var(--line) }
+.log-line p { font-size:var(--sm); line-height:1.8; margin:5px 0 }
+.log-line.error { border-left:2px solid #e4ac8e; padding-left:10px }
+#toast[data-priority=error] { border-color:#d89a78; background:#2b211bf7; color:#f3dbbd }
+.mode-explore .quick-hint { visibility:hidden }
+.mode-explore .quick-slot.empty { border-color:#a0ac8928; background:#10171588 }
+.mode-explore .quick-slot.empty .slot-empty { color:#5e6b57 }
+.mode-explore .quest-brief>span:last-child { display:none }
+.critical .vitals { background:#101716e8; border-left:2px solid #dfaa88; padding:10px }
+.status-strip { margin-top:12px; padding-top:10px; border-top:1px solid #d3c49a55; background:#101716e8 }
+.status-strip .eyebrow { display:block; font-size:var(--xs); padding:0 5px 5px }
+.status-entry { display:flex; align-items:center; gap:5px; position:relative; font-size:var(--xs); padding:8px 5px; border-bottom:1px solid var(--line) }
+.status-entry>span:not(.status-shape) { flex:1 }
+.status-shape { font-size:var(--sm); width:18px; text-align:center; color:#d3cda2 }
+.status-entry.buildup i { position:absolute; height:2px; width:var(--progress); left:0; bottom:0; background:#b6c48b }
+.status-entry.active .status-shape { color:#dbac94 }
+.status-entry.field .status-shape { color:#adc0c7 }
+.status-strip button { font-size:var(--xs); width:100%; border:0; text-align:left; padding-left:5px }
+#hud { --xs:calc(12px * var(--hud-scale,1)); --sm:calc(14px * var(--hud-scale,1)); --body:calc(16px * var(--hud-scale,1)) }
+#hud .quick-slot svg { width:calc(22px * var(--hud-scale,1)); height:calc(22px * var(--hud-scale,1)) }
+.settings-row input[type=range] { min-width:100px; width:180px; accent-color:var(--gold) }
+@media(max-width:1150px) {
+  .detail-actions .actions-row { gap:4px }
+  .detail-actions .actions-row button { font-size:var(--xs); padding:7px 9px }
+  .prepare-entry { font-size:var(--xs); padding:6px }
+  .organize-tools { gap:4px }
+  .organize-tools button { padding:5px }
+  .inventory-batch .actions-row { gap:4px }
+  .inventory-batch .actions-row button { padding:6px 8px }
+  .preparation-table { grid-template-columns:1fr }
+  .goal-row { gap:6px; flex-wrap:wrap }
+  .goal-row>div { min-width:180px }
+  .status-strip { max-width:215px }
+  .status-entry { gap:3px; flex-wrap:wrap }
+  .vitals:has(.status-strip) { bottom:160px }
+}
+.map-controls { position:absolute; left:16px; top:16px; display:flex; gap:5px; background:var(--ink); padding:4px }
+.map-controls button { font-size:var(--xs) }
+.map-art .rumor-area { fill:#c7af7712; stroke:#c6b889; stroke-width:2; stroke-dasharray:7 7; cursor:pointer }
+.map-card { max-height:calc(100% - 32px); overflow:auto }
+.map-card>small { display:block; line-height:1.8 }
+.map-card .actions-row { margin-top:10px }
+@media(max-width:1150px) { .current-source { left:calc(50% + 90px); width:650px; max-width:calc(100% - 250px) } }
