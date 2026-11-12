@@ -2,6 +2,18 @@
 
 [完整方案](../../UI_SYSTEM_DESIGN.md) · [复审与后续修复](../../UI_SYSTEM_REVIEW.md) · [七款成熟作品对标](../../UI_AAA_BENCHMARK.md)。当前已实现 v1.2 的决策支持优化；**正式 Godot UI 尚未替换**。所有库存、交易和搜取都是刷新重置的示例状态，不连接正式旅程。
 
+## 直接查看与下载（无需云环境）
+
+- [下载离线原型 ZIP](https://github.com/llaaoo/mygame/raw/refs/heads/main/docs/design/ui-system/downloads/grayriver-ui-v1.2.zip)：约13 MB，解压后双击 `grayriver-ui.html`，用桌面 Chrome / Edge / Firefox 打开。全部字体、图片、脚本内嵌，不需要 Python、Godot 或本地服务。所有状态仍为刷新重置的原型样例。
+- [在 GitHub 浏览说明与截图](https://github.com/llaaoo/mygame/blob/main/docs/design/ui-system/README.md)：无需运行页面。ZIP 若未直接下载，可进入[文件页](https://github.com/llaaoo/mygame/blob/main/docs/design/ui-system/downloads/grayriver-ui-v1.2.zip)，点击 **Download raw**。
+- `127.0.0.1` / `localhost` 地址仅供开发环境内部验证，不能当成外部分享链接。本会话当前没有对外端口预览工具；没有因此启用 Pages、公开部署或 Actions。
+
+离线包由 `python3 tools/export_ui_prototype.py` 从现有原型确定性生成，不改正式玩法。包内保留素材出处与字体/图集许可。打包文件重新通过141+93项交互回归；另经断网后的7项流程检查，只有首次HTML请求，后续没有网络请求。[交付验证](downloads/offline-verification.json)记录包与HTML散列。
+
+平台边界：云端受管 Chromium 以 `ERR_BLOCKED_BY_ADMINISTRATOR` 禁止 `file://`。因此本轮通过HTTP只提供这一个HTML，再断网验证交互与内嵌素材；没有声称完成用户本地浏览器或设备验收。
+
+## 开发环境运行
+
 从项目根目录启动：
 
 ```sh

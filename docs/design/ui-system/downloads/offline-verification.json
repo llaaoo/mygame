@@ -1,0 +1,30 @@
+{
+  "source": "Same self-contained HTML extracted from the distributed ZIP",
+  "zip_sha256": "0fc10f6774c07bd04631759f5c53aa17f45068754320943d3eb644b3e20414ba",
+  "html_sha256": "43d1a282cc0173e52cf071637309dec8fa926e1fde63be7ba1c75506438a9c47",
+  "checks_passed": 7,
+  "checks": [
+    "Only initial HTML fetched; embedded fonts/images/scripts require no requests",
+    "Comparison works after network disabled",
+    "UID favorite works offline",
+    "Preparation goals work offline",
+    "Map rumor boundary works offline",
+    "Settings and embedded status graphics work offline",
+    "No runtime errors or additional network requests across the flow"
+  ],
+  "requests": [
+    "http://127.0.0.1:8770/grayriver-ui.html"
+  ],
+  "errors": [],
+  "limitation": "Managed system Chromium rejects file:// with ERR_BLOCKED_BY_ADMINISTRATOR. Full acceptance uses localhost only to deliver the single HTML. This extra flow disables network after document load; no local desktop browser or device verification.",
+  "full_acceptance": {
+    "baseline": {
+      "checks_passed": 141,
+      "report": "baseline-verification.json"
+    },
+    "decision": {
+      "checks_passed": 93,
+      "report": "decision-verification.json"
+    }
+  }
+}

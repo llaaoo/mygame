@@ -1,6 +1,6 @@
 # 灰河谷 · 2D 开放区域与现场组合冒险
 
-[HUD 与 UI 重构设计 v1.2](docs/UI_SYSTEM_DESIGN.md)：十三视图交互原型，含统一行囊、纸娃娃、战斗选材，以及配装取舍、整备缺项、UID收藏/批量待售、情境HUD和线索来源。已落实[七款成熟作品对标](docs/UI_AAA_BENCHMARK.md)的原型改进，浏览器两组234项通过；[运行与证据](docs/design/ui-system/README.md)。尚未替换正式 Godot 界面。
+[HUD 与 UI 重构设计 v1.2](docs/UI_SYSTEM_DESIGN.md)：十三视图交互原型，含统一行囊、纸娃娃、战斗选材，以及配装取舍、整备缺项、UID收藏/批量待售、情境HUD和线索来源。已落实[七款成熟作品对标](docs/UI_AAA_BENCHMARK.md)的原型改进，浏览器两组234项通过；[运行与证据](docs/design/ui-system/README.md)。尚未替换正式 Godot 界面。 [下载离线交互原型](https://github.com/llaaoo/mygame/raw/refs/heads/main/docs/design/ui-system/downloads/grayriver-ui-v1.2.zip)，解压双击HTML即可；云端localhost链接不能在本机直接访问。
 
 [世界观基准 v0.2](docs/WORLDVIEW.md)：后续内容遵循略阴暗但保留温情的边境基调、少数人经探索与代价觉醒的魔法、真实神明与凡人社会。新旅程从无魔力普通旅人开始，首次探索可用武器、实物和手工作业完成；档案窖觉醒是可延后的个人选择。实现与旧档兼容见[世界观落地](docs/WORLDVIEW_ALIGNMENT.md)，数值和背景细节仍可继续调整。
 
