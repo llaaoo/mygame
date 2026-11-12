@@ -7,5 +7,13 @@
   "asset_ledger": "../../../content/art/THIRD_PARTY_ASSETS.md",
   "files": {
     "world.png": "d235116d62474e8eddba7664fe59b04c8de4fc650623b2a11c30b9792f590fac"
+  },
+  "preview_body": {
+    "path": "../../../content/art/third_party/puny/Character-Base.png",
+    "sha256": "a542332ff1ed66ce28e7eea489f2e1e304d90671aa531fc9ccf0b00b9f2857ff",
+    "author": "Shade",
+    "license": "CC0-1.0",
+    "sampling": "CSS 32x32 first unarmed body frame at integer 3x/4x scale; original PNG unchanged",
+    "equipment": "Original sample overlay driven by illustrative worn item; not production rig integration"
   }
 }
