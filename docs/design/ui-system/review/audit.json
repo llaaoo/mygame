@@ -1,0 +1,171 @@
+{
+  "scope": "v1 standalone UI concept design review; observed gaps are intentionally recorded, not treated as passing gameplay checks",
+  "prototype_base_commit": "23036506b237041c9c786019b8fba39b25cff44a",
+  "observations": [
+    {
+      "id": "keyboard-focus",
+      "requirement_met": false,
+      "evidence": {
+        "after_I_Tab": []
+      }
+    },
+    {
+      "id": "search-persistence",
+      "requirement_met": false,
+      "evidence": {
+        "matches_before": 2,
+        "matches_after_selection": 22,
+        "query_after_selection": ""
+      }
+    },
+    {
+      "id": "double-click-equip",
+      "requirement_met": false,
+      "evidence": {
+        "mainhand_after_double_click": "主手 · 驿路短刀"
+      }
+    },
+    {
+      "id": "equipment-slot-filter",
+      "requirement_met": false,
+      "evidence": {
+        "head_slot_has_no_owned_match": true,
+        "items_displayed": 5,
+        "detail_title": "驿路短刀"
+      }
+    },
+    {
+      "id": "perk-preview-first",
+      "requirement_met": false,
+      "evidence": {
+        "before": "成长 / 共同角色规则\n呼吸与力量\n1 个可用PERK点",
+        "after_one_node_click": "成长 / 共同角色规则\n呼吸与力量\n0 个可用PERK点"
+      }
+    },
+    {
+      "id": "current-form-feedback",
+      "requirement_met": false,
+      "evidence": {
+        "selection_marks_after_reopening": 0
+      }
+    },
+    {
+      "id": "confirmation-input-scope",
+      "requirement_met": false,
+      "evidence": {
+        "background_setting_after_click_with_confirmation_open": "开启",
+        "confirmation_still_open": true
+      }
+    },
+    {
+      "id": "all-slots-source-access",
+      "requirement_met": false,
+      "evidence": {
+        "selector_slot_after_selecting_1_and_G": "R / 火花"
+      }
+    },
+    {
+      "id": "bindings-visible-960",
+      "requirement_met": false,
+      "evidence": {
+        "last_slot_right": 407,
+        "clip_right": 902,
+        "last_slot_bottom": 664,
+        "clip_bottom": 610,
+        "last_slot_width": 45
+      }
+    },
+    {
+      "id": "primary-action-visible-960",
+      "requirement_met": false,
+      "evidence": {
+        "action_bottom": 746.25,
+        "detail_bottom": 610,
+        "action_width": 64.015625,
+        "action_height": 43
+      }
+    },
+    {
+      "id": "bindings-visible-1440",
+      "requirement_met": true,
+      "evidence": {
+        "last_slot_right": 971,
+        "clip_right": 1368,
+        "last_slot_bottom": 601,
+        "clip_bottom": 772,
+        "last_slot_width": 45
+      }
+    },
+    {
+      "id": "primary-action-visible-1440",
+      "requirement_met": true,
+      "evidence": {
+        "action_bottom": 748.25,
+        "detail_bottom": 772,
+        "action_width": 64.015625,
+        "action_height": 43
+      }
+    },
+    {
+      "id": "bindings-visible-1920",
+      "requirement_met": true,
+      "evidence": {
+        "last_slot_right": 971,
+        "clip_right": 1848,
+        "last_slot_bottom": 601,
+        "clip_bottom": 952,
+        "last_slot_width": 45
+      }
+    },
+    {
+      "id": "primary-action-visible-1920",
+      "requirement_met": true,
+      "evidence": {
+        "action_bottom": 712.625,
+        "detail_bottom": 952,
+        "action_width": 64.015625,
+        "action_height": 43
+      }
+    }
+  ],
+  "layout_metrics": [
+    {
+      "viewport": [
+        960,
+        720
+      ],
+      "text_scale": 1.25,
+      "buttons": 16,
+      "buttons_below_40": 11,
+      "min_label_px": 10
+    },
+    {
+      "viewport": [
+        1440,
+        900
+      ],
+      "text_scale": 1.25,
+      "buttons": 18,
+      "buttons_below_40": 1,
+      "min_label_px": 10
+    },
+    {
+      "viewport": [
+        1920,
+        1080
+      ],
+      "text_scale": 1.25,
+      "buttons": 18,
+      "buttons_below_40": 1,
+      "min_label_px": 10
+    }
+  ],
+  "palette_contrast_on_ink": {
+    "e6e1d2": 13.9,
+    "9aa59b": 7.12,
+    "b96556": 4.38,
+    "a5ae82": 7.76,
+    "82a5ac": 6.86
+  },
+  "javascript_errors": []
+}
