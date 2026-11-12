@@ -79,7 +79,9 @@ func run() -> void:
 		await point_click(pool._equip_slots[0].get_global_rect().get_center())
 	check(manager.left_hand and manager.left_hand.data.get_id()=="project","Clicking the operation icon and Q slot failed to equip")
 	var last:=pool._equip_slots.back() as Control
-	var scroll:=last.get_parent().get_parent() as ScrollContainer
+	var binding_parent:=last.get_parent()
+	while binding_parent and not binding_parent is ScrollContainer: binding_parent=binding_parent.get_parent()
+	var scroll:=binding_parent as ScrollContainer
 	scroll.ensure_control_visible(last); await frames()
 	check(root.get_visible_rect().encloses(last.get_global_rect()),"Small-window K leaves the sixth keyboard slot unreachable")
 	var visual:=OS.get_environment("LEGACY_CAST_VISUAL_OUTPUT")
