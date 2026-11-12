@@ -1,0 +1,970 @@
+{
+  "single_full_run_green": false,
+  "checks_covered": 160,
+  "checks_passed": 160,
+  "execution_code_unchanged_between_archives": true,
+  "original_full_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+  "recheck_revision": "373449853931aca1610439c3e176bb7e4b2e7340",
+  "results": [
+    {
+      "name": "gut_domain",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "save_system",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "save_recovery",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "skill_catalog",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "skill_upgrades",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "room_generation",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "first_expedition_loop",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "worldview_journey",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "magic_awakening",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "mundane_spray_input",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "content_preflight",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "throw_trajectory_input",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "item_feedback_input",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "project_optimization",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "selector_feedback_input",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "accessibility_input",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "world_depth_knowledge",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "world_depth_property",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "world_depth_economy",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "world_depth_journey",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "world_depth_territory",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "world_depth_input",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "fieldcraft",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "enemy_diversity",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "fieldcraft_input",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "enemy_diversity_input",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "map_authoring",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "map_preview_input",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "save_sections",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "save_sections_game",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "town_cells",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "town_cells_input",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "presentation_system",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "presentation_input",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "actor_animation",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "animation_demo_input",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "weapon_hold",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "weapon_hold_input",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "weapon_hold_handover_input",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "weapon_art_routes",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "weapon_art_input",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "martial_followups",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "martial_followup_input",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "weapon_combos",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "weapon_combo_contacts",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "weapon_combo_input",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "weapon_response",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "weapon_response_input",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "interface_navigation",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "world_feedback",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "world_feedback_input",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "followup_fixes",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "grayriver_demo",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "spell_form_assist",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "contextual_choices",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "combat_choices_input",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "flow_input",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "provision_lifecycle",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "production_learning",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "extensibility_input",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "campaign_effects",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "inventory_stability",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "new_journey",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "weapon_enchantment",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "enchantment_input",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "counterplay",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "counterplay_input",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "counterplay_encounters",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "combat_tactics",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "tactical_ai",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "tactics_input",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "system_depth",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "weapon_actions",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "depth_input",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "slot_materials",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "inventory_lifecycle",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "realtime_interaction",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "keyboard_casting",
+      "passed": true,
+      "source_revision": "373449853931aca1610439c3e176bb7e4b2e7340",
+      "report": "recheck-results.json"
+    },
+    {
+      "name": "visual_interface",
+      "passed": true,
+      "source_revision": "373449853931aca1610439c3e176bb7e4b2e7340",
+      "report": "recheck-results.json"
+    },
+    {
+      "name": "controls_workflow",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "unified_quickslots",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "legacy_operation_coverage",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "input_bindings",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "world_pointer_input",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "enemy_retaliation",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "item_actions",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "spray_channel",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "reaction_sources",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "spell_operations",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "foundation_inventory",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "foundation_combat",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "foundation_systems",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "frontier_expedition",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "frontier_projects",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "grayriver_loot",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "archive_adventure",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "enemy_observation_input",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "enemy_disengagement",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "enemy_phase_input",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "combat_learning",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "grayriver_salvage",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "shared_characters",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "field_work",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "grayriver_foundation",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "grayriver_content",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "grayriver_journey",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "grayriver_routes",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "material_intent",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "retreat_ledger",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "enemy_preparation",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "field_outpost",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "expedition_feedback",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "survival_needs",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "survival_world",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "survival_rest",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "alchemy_repair",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "material_recycling",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "rpg_attributes",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "rpg_progression",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "rpg_progression_input",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "npc_interactions",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "npc_interaction_input",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "world_coherence",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "coherence_input",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "playtest_iteration",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "tactical_balance",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "normal_budget_tactics",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "content_expansion",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "environment_attunement",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "five_element_rules",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "partial_boons",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "element_knowledge",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "element_world",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "enemy_surfaces",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "element_trials",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "cast_refactor",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "status_transactions",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "content_contracts",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "region_lifecycle",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "player_components",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "soul_spell_system",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "expedition_builds",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "existing_spell_interactions",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "emergent_mediums",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "boon_choices",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "joint_interactions",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "advanced_spells",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "spell_materials",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "exploration_content",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "exploration_mvp",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "fire_combinations",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "ui_vertical_input",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "ui_prototype_input",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "ui_system",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "run_loop",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "equipment_system",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "gameplay",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "content",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "maps",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    },
+    {
+      "name": "startup",
+      "passed": true,
+      "source_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+      "report": "all-results.json"
+    }
+  ]
+}

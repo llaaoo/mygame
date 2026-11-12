@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "revision": "373449853931aca1610439c3e176bb7e4b2e7340",
+  "dirty": null,
+  "godot": "4.6.3.stable.official.7d41c59c4",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "jobs": 1,
+  "timeout": 300.0,
+  "logs": "/tmp/mygame-tests-n8gut_yw",
+  "requested": [
+    "keyboard_casting",
+    "visual_interface"
+  ],
+  "results": [
+    {
+      "name": "import",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 13.772,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/ui-layout-recheck-37344985",
+        "--editor",
+        "--import",
+        "--recovery-mode"
+      ],
+      "log": "/tmp/mygame-tests-n8gut_yw/import.log",
+      "diagnostic": []
+    },
+    {
+      "name": "keyboard_casting",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 7.449,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/ui-layout-recheck-37344985",
+        "--script",
+        "res://tests/test_keyboard_casting.gd"
+      ],
+      "log": "/tmp/mygame-tests-n8gut_yw/keyboard_casting.log",
+      "diagnostic": []
+    },
+    {
+      "name": "visual_interface",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 12.315,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/ui-layout-recheck-37344985",
+        "--script",
+        "res://tests/test_visual_interface.gd"
+      ],
+      "log": "/tmp/mygame-tests-n8gut_yw/visual_interface.log",
+      "diagnostic": []
+    }
+  ],
+  "skipped": [],
+  "complete": true
+}

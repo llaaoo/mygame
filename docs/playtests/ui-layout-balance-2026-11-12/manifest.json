@@ -37,5 +37,28 @@
     "trade-1440-125.png": "d3303396eac9f0381dd8d353f64138a4815ef171c522f8abef3dd15562c3cefc",
     "hud-960-125.png": "273d815d971818ee8108c6e2d7b141f2ba91040f895339e2b6ff55b525fac61b"
   },
-  "command": "python3 tools/capture_ui.py --output /workspace/ui-layout-native-delivery --display 95"
+  "command": "python3 tools/capture_ui.py --output /workspace/ui-layout-native-delivery --display 95",
+  "regression": {
+    "full_revision": "cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c",
+    "full_report": "all-results.json",
+    "full_suite_passed": 158,
+    "full_suite_total": 160,
+    "recheck_revision": "373449853931aca1610439c3e176bb7e4b2e7340",
+    "recheck_report": "recheck-results.json",
+    "recheck_passed": 2,
+    "recheck_total": 2,
+    "coverage_report": "coverage.json",
+    "single_full_run_green": false,
+    "execution_code_unchanged_between_archives": true,
+    "first_imports_passed": true
+  },
+  "report_sha256": {
+    "all-results.json": "f0b2a4a5690dfea4c4289552b62e435ec48df933e3844ff748ed6dce3a96d5b0",
+    "recheck-results.json": "c44ca1ae9179000ae64aff519477bc6325a2cd433e610911c17ec3be43edbbf3",
+    "coverage.json": "856a7fde962c69a2362b182e0597fc62fbc736ad0e0458e7bea5c025dcc0dd6c"
+  },
+  "recheck_test_sha256": {
+    "tests/test_keyboard_casting.gd": "dd4e310882914b28ab413fac3931c2d3ab43bb6c1033942734bca8391efa50d9",
+    "tests/test_visual_interface.gd": "62dbf951cdf9201211f92f5a04c8df5daec5ba55a7ef09a9d1ce51fd379d867a"
+  }
 }

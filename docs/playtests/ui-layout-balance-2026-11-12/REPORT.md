@@ -34,10 +34,16 @@ HUD检查沿用已有分区，没有为填满空间增加常驻信息。没有�
 
 首轮定向为3/4（[原始报告](diagnostic-targeted.json)）：新居中容器使旧导航测试按两层父节点取滚动区失效；测试改为查找真实滚动祖先，保留最后一槽须可达的断言。首轮扩展原生检查还发现隐藏排序控件的测试输入及真正的低矮制造页越界（[诊断结果](diagnostic-native.json)）；排序只在其可见尺寸执行，制造页修复实际最小高度。另一次新增检查有Rect2类型推断错误，已显式标注后复测。上述失败不计入最终绿色结果。
 
-最终定向回归 `interface_navigation accessibility_input controls_workflow rpg_progression_input ui_system realtime_interaction` **6/6通过**，见[结果](targeted-results.json)。完整回归将从本轮提交的无缓存归档执行，结果另行附加，不以上轮完整回归代替本轮验证。
+最终定向回归 `interface_navigation accessibility_input controls_workflow rpg_progression_input ui_system realtime_interaction` **6/6通过**，见[结果](targeted-results.json)。本轮完整归档及旧定位测试补测结果见下文，不以上轮完整回归代替本轮验证。
 
 ## 完整归档与测试定位修正
 
 运行源码 `cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c` 从 `git archive` 解到 `/workspace/ui-layout-clean-cf08498d`，无 `.godot` 缓存；执行 `python3 tools/run_tests.py --suite all --jobs 2 --timeout 300 --source-revision cf08498d7a3e03603bd3dec8a0d9df7f2bf09e1c --report /workspace/ui-layout-final-all.json`。首次导入通过，完整结果为 **158/160**（[原始结果](all-results.json)），无跳过。
 
-`keyboard_casting` 和 `visual_interface` 都在旧的两层父节点滚动区定位处发生脚本错误，已明确记录诊断后结束各自进程；其余检查继续运行至结束。最终版改为寻找实际滚动祖先，保留原有小窗可达性、键盘施法、真实费用、绑定和世界输入断言，不改变执行代码。完整归档中的核心 UI 与扩展布局检查均已通过。两条修正测试将从新提交的干净归档补测，最终覆盖映射另附；不把原始158/160报告改写成单次全量绿色。
+`keyboard_casting` 和 `visual_interface` 都在旧的两层父节点滚动区定位处发生脚本错误，已明确记录诊断后结束各自进程；其余检查继续运行至结束。最终版改为寻找实际滚动祖先，保留原有小窗可达性、键盘施法、真实费用、绑定和世界输入断言，不改变执行代码。完整归档中的核心 UI 与扩展布局检查均已通过。两条修正测试另从新提交的干净归档补测，最终覆盖映射见下节；不把原始158/160报告改写成单次全量绿色。
+
+## 最终补测与覆盖映射
+
+补测源码 `373449853931aca1610439c3e176bb7e4b2e7340` 同样由 `git archive` 解到 `/workspace/ui-layout-recheck-37344985`，未带入 `.godot`；首次导入通过（13.8秒），执行 `python3 tools/run_tests.py --tests keyboard_casting visual_interface --jobs 1 --timeout 300 --source-revision 373449853931aca1610439c3e176bb7e4b2e7340 --report /workspace/ui-layout-recheck.json`，**2/2通过，退出码0**，见[补测结果](recheck-results.json)。
+
+两份归档之间只修改这两条测试与文档证据，实际游戏执行代码完全一致，原生验证的10个变更源码散列也保持一致。以完整运行中的158项成功结果和修正测试的2项成功结果形成[160项覆盖映射](coverage.json)；两次首次导入均通过，没有跳过。**这是覆盖全部160项的组合证据，不是单次160/160完整运行。** 最终归档仅追加文档和证据，不再修改运行代码或测试。GitHub Actions仍保持停用。
