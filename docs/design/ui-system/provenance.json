@@ -15,5 +15,11 @@
     "license": "CC0-1.0",
     "sampling": "CSS 32x32 first unarmed body frame at integer 3x/4x scale; original PNG unchanged",
     "equipment": "Original sample overlay driven by illustrative worn item; not production rig integration"
+  },
+  "prototype_additions": {
+    "version": "1.2",
+    "source": "Original code and illustrative data in decision-support.js; no external downloads",
+    "audio": "Original WebAudio oscillator UI cues, optional and disabled by default; no external recordings",
+    "fixture": "100 independent illustrative item identities; explicit sample capacity 500/120; not game save data"
   }
 }
