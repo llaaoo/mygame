@@ -2,6 +2,7 @@ class_name ActorStatusView
 extends VBoxContainer
 var compact := false
 var context: ActorContext
+var stamina_value: Label
 var stamina_bar: ProgressBar
 var stability_bar: ProgressBar
 var detail: Label
@@ -26,7 +27,11 @@ func _ready() -> void:
 		bar.mouse_filter=Control.MOUSE_FILTER_IGNORE
 		GameUIStyle.apply_progress(bar,Color("c4ac57") if title=="体力" else Color("9da7b0"),8)
 		row.add_child(bar)
-		if title=="体力": stamina_bar=bar
+		if title=="体力":
+			stamina_bar=bar
+			stamina_value=FoundationWidgets.label("",12); stamina_value.custom_minimum_size.x=54
+			stamina_value.autowrap_mode=TextServer.AUTOWRAP_OFF; stamina_value.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT
+			row.add_child(stamina_value)
 		else: stability_bar=bar
 	detail=FoundationWidgets.label("",11,true)
 	detail.visible=not compact
@@ -83,6 +88,7 @@ func _process(_delta: float) -> void:
 		enchantment_label.modulate=coating.enchantment.color.lightened(.25)
 	stamina_bar.max_value=context.actions.stamina.maximum
 	stamina_bar.value=context.actions.stamina.current
+	stamina_value.text="%.0f/%.0f"%[context.actions.stamina.current,context.actions.stamina.maximum]
 	stability_bar.value=context.actions.stability.current
 	var weight:=context.items.weight(context.id) if context.items else 0.0
 	var pack: bool=context.items and context.items.is_attached(context.id + ".pack")

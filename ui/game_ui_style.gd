@@ -10,22 +10,22 @@ const LAYER_MODAL := 180
 const LAYER_CRITICAL := 200
 const LAYER_DEBUG := 240
 
-const PANEL_BG := Color(0.075, 0.105, 0.115, 0.97)
-const PANEL_BG_SOLID := Color(0.065, 0.095, 0.105, 0.99)
-const SURFACE := Color(0.11, 0.15, 0.16, 0.94)
-const SURFACE_RAISED := Color(0.16, 0.205, 0.21, 0.98)
+const PANEL_BG := Color("101716")
+const PANEL_BG_SOLID := Color("101716")
+const SURFACE := Color("19211f")
+const SURFACE_RAISED := Color("26312c")
 const PANEL_BORDER := Color(0.31, 0.36, 0.35, 0.52)
 const BORDER_STRONG := Color(0.58, 0.55, 0.43, 0.75)
 const SLOT_BG := Color(0.025, 0.042, 0.046, 0.80)
-const TEXT_MAIN := Color(0.93, 0.92, 0.86, 1.0)
-const TEXT_MUTED := Color(0.65, 0.69, 0.66, 1.0)
-const TEXT_DISABLED := Color(0.45, 0.49, 0.48, 1.0)
-const GOLD := Color(0.82, 0.70, 0.47, 1.0)
+const TEXT_MAIN := Color("e6e1d2")
+const TEXT_MUTED := Color("a5afa3")
+const TEXT_DISABLED := Color("969f94")
+const GOLD := Color("c7af77")
 const ACCENT := Color(0.51, 0.71, 0.68, 1.0)
 const SUCCESS := Color(0.32, 0.74, 0.45, 1.0)
 const DANGER := Color(0.84, 0.27, 0.20, 1.0)
-const HEALTH := Color(0.71, 0.29, 0.25, 1.0)
-const MANA := Color(0.30, 0.53, 0.69, 1.0)
+const HEALTH := Color("b96556")
+const MANA := Color("82a5ac")
 const XP := Color(0.45, 0.70, 0.38, 1.0)
 
 
@@ -109,7 +109,7 @@ static func apply_button(button: Button, accent: Color = ACCENT, selected: bool 
 	apply_font_size(button,14)
 	if button.text=="关闭":
 		button.icon=icon("x"); button.expand_icon=true; button.add_theme_constant_override("icon_max_width",14)
-	button.custom_minimum_size.y = maxf(button.custom_minimum_size.y, 38.0)
+	button.custom_minimum_size.y = maxf(button.custom_minimum_size.y, 40.0)
 
 
 static func apply_tab(button: Button, selected := false) -> void:
@@ -281,4 +281,20 @@ static func close_gameplay_views(actor: Node) -> void:
 static func can_open(view: Node) -> bool:
 	for other in view.get_tree().get_nodes_in_group("modal_ui"):
 		if other!=view and other is CanvasLayer and other.visible and other.get_meta("locked",false): return false
+	return true
+
+## Constrain Tab to the visible page. HUD buttons are outside this focus scope.
+static func focus_navigation(owner: Node,event: InputEvent) -> bool:
+	if not event is InputEventKey or not event.pressed or event.echo or event.keycode!=KEY_TAB: return false
+	var choices: Array[Control]=[]
+	for node in owner.find_children("*","Control",true,false):
+		if not node.is_visible_in_tree() or node.focus_mode!=Control.FOCUS_ALL or node is BaseButton and node.disabled: continue
+		choices.append(node)
+	if not choices.is_empty():
+		var current:=owner.get_viewport().gui_get_focus_owner()
+		var index:=choices.find(current)
+		var step: int=-1 if event.shift_pressed else 1
+		if index<0 and event.shift_pressed: index=0
+		choices[posmod(index+step,choices.size())].grab_focus()
+	owner.get_viewport().set_input_as_handled()
 	return true

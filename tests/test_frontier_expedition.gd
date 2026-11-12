@@ -114,7 +114,7 @@ func run() -> void:
  game.guidance.set_waypoint(point)
  check(game.guidance.tracked().position==point,"Waypoint not tracked")
  game.ui.close_modal()
- game.frontier_hud.use(0)
+ game.player.input_controller.request_shortcut("item_0",true)
  check(game.player.field_work.is_busy(),"Quick supply belt did not start interruptible eating")
  game.player.field_work.cancel("test")
  game.player.field_work.close_panel()

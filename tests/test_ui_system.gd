@@ -29,7 +29,7 @@ func _run() -> void:
 		_check(status.get_global_rect().end.x <= run_top.get_global_rect().position.x, "HUD overlaps run objective")
 		_check(skill_panel.get_global_rect().end.y <= root.size.y, "skill bar leaves viewport")
 		var skill_bar := hud.get("skill_bar") as SkillBar
-		_check(skill_bar != null and (skill_bar.get("_sources") as Array).size() == 9 and "quick_e" in skill_bar._sources and "slot_0" in skill_bar._sources, "skill bar must expose independent Q/E/R and six numeric shortcuts")
+		_check(skill_bar != null and (skill_bar.get("_sources") as Array).size() == 13 and "quick_e" in skill_bar._sources and "slot_0" in skill_bar._sources and "item_3" in skill_bar._sources, "skill bar must expose independent Q/E/R and ten numeric shortcuts")
 
 	var inventory := scene.get_node_or_null("InventoryPanel") as CanvasLayer
 	var skill_pool := scene.get_node_or_null("SkillPoolUI") as CanvasLayer
@@ -205,4 +205,4 @@ func _input_frames() -> void:
 
 func _check(condition: bool, message: String) -> void:
 	if not condition:
-		_failures.append(message)
+		_failures.append(message); push_error(message)

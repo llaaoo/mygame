@@ -56,7 +56,7 @@ func run() -> void:
  var rejected:=game.inventory_actions.unequip_reason(definition.slot_type)
  var before:=game.session.inventory.snapshot()
  var remove: Button
- for node in game.inventory_screen._details.get_children():
+ for node in game.inventory_screen._detail_actions.get_children():
   if node is Button and node.text=="卸下装备": remove=node
  check(not rejected.is_empty() and remove.disabled and not game.inventory_actions.unequip(definition.slot_type).accepted and game.session.inventory.snapshot()==before,"Danger preview/commit disagree or rejected gear operation mutates UID")
  foe.position=post; await frames(15)

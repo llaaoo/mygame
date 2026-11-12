@@ -60,6 +60,12 @@ var _entry_source := ""
 var _slot_ids: Array[String]=[]
 var _preview_choices: Dictionary={}
 var _opening_pointer:=Vector2.ZERO
+var _inspection := false
+var _inspection_host: PanelContainer
+var _inspection_text: Label
+var _inspection_use: Button
+var _inspection_binding: Dictionary={}
+
 func _ready() -> void:
  layer=GameUIStyle.LAYER_MODAL+2
  add_to_group("live_selector")
@@ -85,6 +91,14 @@ func _ready() -> void:
  _detail=FoundationWidgets.label("",14); _detail.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
  _detail.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART; _detail.max_lines_visible=8
  _detail_host.add_child(_detail)
+ _inspection_host=PanelContainer.new(); _inspection_host.name="ShortcutInspector"
+ _inspection_host.add_theme_stylebox_override("panel",GameUIStyle.quiet_panel(.98)); background.add_child(_inspection_host)
+ var inspect_body:=VBoxContainer.new(); inspect_body.add_theme_constant_override("separation",12); _inspection_host.add_child(inspect_body)
+ _inspection_text=FoundationWidgets.label("",14); _inspection_text.custom_minimum_size.x=360; inspect_body.add_child(_inspection_text)
+ var inspect_actions:=HBoxContainer.new(); inspect_body.add_child(inspect_actions)
+ _inspection_use=FoundationWidgets.button("使用该物品",Callable()); _inspection_use.gui_input.connect(_use_inspected); inspect_actions.add_child(_inspection_use)
+ inspect_actions.add_child(FoundationWidgets.button("配置此槽",_configure_inspected))
+ inspect_actions.add_child(FoundationWidgets.button("返回世界",close))
  get_window().focus_exited.connect(close)
  get_viewport().size_changed.connect(_layout)
  _layout(); hide()
@@ -134,14 +148,57 @@ func _layout() -> void:
    var scale_factor:=clampf((size.y-choices_top-28)/360.0,.6,1.0)
    _ring.scale=Vector2.ONE*scale_factor
    _ring.position=Vector2(size.x*.5-180*scale_factor,choices_top)
+ _inspection_host.visible=_inspection
+ _source_host.visible=not _inspection; _title.visible=not _inspection; _detail_host.visible=not _inspection
+ if _inspection:
+  _ring.hide(); _compact_view.hide()
+  _inspection_host.position=Vector2(size.x*.5-200,maxf(90,size.y*.5-100)); _inspection_host.size=Vector2(400,0)
+func inspect_slot(value: String, aim_direction := Vector2.ZERO) -> void:
+ if QuickslotMaterials.available(player.skill_manager,value):
+  open_for_source(value,aim_direction); return
+ if value not in QuickslotLoadout.SOURCES or player.ui_blocked or player.health_component.is_dead: return
+ if visible: close()
+ _inspection=true; source=value; last_source=value; _inspection_binding=player.skill_manager.shortcuts.binding(value)
+ _opening_pointer=get_viewport().get_mouse_position()
+ opening_direction=player.get_mouse_direction() if aim_direction.is_zero_approx() else aim_direction.normalized()
+ player.cancel_active_input("查看快捷槽：取消未提交准备"); player.input_controller.suppress_held_shortcuts()
+ show(); _refresh_inspection(); _layout()
+func _refresh_inspection() -> void:
+ var binding:=player.skill_manager.shortcuts.binding(source)
+ var title:=InputBindings.label(InputBindings.action_for_source(source))+" · 快捷槽"
+ if binding!=_inspection_binding:
+  _inspection_text.text=title+"\n绑定已改变，请关闭后重新查看。"; _inspection_use.disabled=true; return
+ var item_binding: bool=binding.get("kind","")=="item"
+ var view: Dictionary=QuickslotView.item_state(player,binding) if item_binding else {}
+ var instance:=player.skill_manager.get_instance(source)
+ _inspection_text.text=title+"\n"+(str(view.title)+" · 余量%d\n"%view.count+str(view.detail) if item_binding else instance.data.display_name+"\n"+instance.data.description if instance else "空槽 · 配置已掌握动作或物品")+"\n只查看，不会施放或消费。"
+ var definition:=ItemCatalog.default_catalog().definition(str(binding.get("item_id","")))
+ var targeted: bool=definition and definition.use_profile and definition.use_profile.kind in [ItemUseDefinition.Kind.SPRAY,ItemUseDefinition.Kind.THROWABLE]
+ _inspection_use.visible=item_binding and not targeted
+ _inspection_use.disabled=not bool(view.get("ready",false))
+ if targeted: _inspection_text.text+="\n返回世界后按对应快捷键瞄准或按住喷洒。"
+func _configure_inspected() -> void:
+ var instance:=player.skill_manager.get_instance(source)
+ close()
+ if instance: player.skill_pool_ui.open_for(instance.data)
+ else: player.skill_pool_ui.open()
+func _use_inspected(event: InputEvent) -> void:
+ if not event is InputEventMouseButton or event.button_index!=MOUSE_BUTTON_LEFT or not event.pressed or _inspection_use.disabled: return
+ if player.skill_manager.shortcuts.binding(source)!=_inspection_binding: _refresh_inspection(); return
+ var chosen:=source
+ close(); player.input_controller.request_shortcut(chosen,true,true)
+ get_viewport().set_input_as_handled()
 func remember_source(value: String) -> void:
- if QuickslotMaterials.available(player.skill_manager,value): last_source=value
+ if value in QuickslotLoadout.SOURCES and not player.skill_manager.shortcuts.binding(value).is_empty(): last_source=value
 func open(held := false) -> void:
  if player.ui_blocked or player.health_component.is_dead or not player.actor_context or not player.actor_context.rules.material_operations: return
  if visible: close(); return
+ if player.skill_manager.shortcuts.binding(last_source).get("kind","")=="item":
+  inspect_slot(last_source); return
  _opening_pointer=get_viewport().get_mouse_position()
  opening_direction=player.get_mouse_direction()
  player.cancel_active_input("选择材料：取消未提交准备")
+ _inspection=false
  _hold=held; page=0; hovered=-1; _entry_source=""
  source=last_source
  if not QuickslotMaterials.available(player.skill_manager,source):
@@ -154,6 +211,7 @@ func open(held := false) -> void:
 func open_for_source(value: String, aim_direction := Vector2.ZERO) -> void:
  if not QuickslotMaterials.available(player.skill_manager,value): return
  last_source=value
+ if visible and _inspection: close()
  if visible:
   source=value; page=0; hovered=-1; _entry_source=""; _refresh()
  else:
@@ -176,7 +234,7 @@ func _refresh_sources() -> void:
   _source_list.add_child(button)
 func close() -> void:
  if not visible: return
- hide(); hovered=-1
+ hide(); hovered=-1; _inspection=false; _inspection_host.hide()
  if get_window().has_focus(): get_viewport().warp_mouse(_opening_pointer)
  player.input_controller.pointer_consumed()
  player.input_controller.suppress_held_shortcuts()
@@ -267,6 +325,17 @@ func _input(event: InputEvent) -> void:
    open(true)
    if visible: get_viewport().set_input_as_handled()
   return
+ if _inspection:
+  if event is InputEventKey and event.pressed and not event.echo:
+   if InputBindings.menu_key(event) in [KEY_ESCAPE,KEY_G]: close(); get_viewport().set_input_as_handled(); return
+   for candidate in QuickslotLoadout.SOURCES:
+    if event.is_action_pressed(InputBindings.action_for_source(candidate)):
+     inspect_slot(candidate,opening_direction); get_viewport().set_input_as_handled(); return
+  if event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_LEFT and not _inspection_host.get_global_rect().has_point(event.position):
+   player.input_controller.pointer_consumed()
+   if event.pressed: close()
+   get_viewport().set_input_as_handled()
+  return
  if event is InputEventKey and event.pressed and not event.echo:
   if InputBindings.menu_key(event) in [KEY_ESCAPE,KEY_G]: close(); get_viewport().set_input_as_handled(); return
   for candidate in QuickslotLoadout.SOURCES:
@@ -303,4 +372,7 @@ func _process(delta: float) -> void:
  if not visible: return
  if player.health_component.is_dead or player.ui_blocked: close(); return
  _elapsed+=delta
- if _elapsed>=.2: _elapsed=0; _refresh()
+ if _elapsed>=.2:
+  _elapsed=0
+  if _inspection: _refresh_inspection()
+  else: _refresh()

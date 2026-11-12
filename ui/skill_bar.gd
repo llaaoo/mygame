@@ -57,13 +57,13 @@ func _build() -> void:
 	_cost_labels.clear(); _variant_labels.clear(); _affinity_strips.clear(); _icon_keys.clear()
 	_panels.clear(); _icons.clear(); _masks.clear(); _bind_labels.clear(); _cd_labels.clear(); _sources.clear()
 
-	for source in QuickslotLoadout.COMBAT_SOURCES:
+	for source in QuickslotLoadout.SOURCES:
 		_add_item(source,InputBindings.label(InputBindings.action_for_source(source)),SLOT_SIZE)
 
 	_refresh_all()
 	_hint_panel = PanelContainer.new()
 	_hint_panel.set_as_top_level(true)
-	_hint_panel.custom_minimum_size.x = 466
+	_hint_panel.custom_minimum_size.x = 420
 	_hint_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_hint_panel.add_theme_stylebox_override("panel", GameUIStyle.panel_style(.94, 5))
 	add_child(_hint_panel)
@@ -71,7 +71,7 @@ func _build() -> void:
 	details.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_hint_panel.add_child(details)
 	_combination_hint = Label.new()
-	_combination_hint.custom_minimum_size.x = 440
+	_combination_hint.custom_minimum_size.x = 396
 	_combination_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	GameUIStyle.apply_font_size(_combination_hint,12)
 	_combination_hint.add_theme_color_override("font_color", GameUIStyle.TEXT_MAIN)
@@ -101,6 +101,10 @@ func _process(_delta: float) -> void:
 	var actor := _skill_manager.get_parent() as Player
 	var source := actor.casting.aimed_source() if actor else ""
 	if source.is_empty(): source=_hover_source
+	if source.is_empty() and actor and is_instance_valid(actor.material_wheel): source=actor.material_wheel.last_source
+	if _skill_manager.shortcuts.binding(source).get("kind","")=="item":
+		_show_item_hint(actor,source)
+		return
 	var hint_instance := _skill_manager.get_instance(source if not source.is_empty() else "right")
 	if not hint_instance:
 		for candidate in _sources:
@@ -112,7 +116,7 @@ func _process(_delta: float) -> void:
 		_hint_panel.hide()
 		return
 	_combination_hint.show()
-	_hint_panel.visible=(not source.is_empty() or not controller.pending.is_empty()) and not (actor and is_instance_valid(actor.material_wheel) and actor.material_wheel.visible)
+	_hint_panel.visible=(not source.is_empty() or not controller.pending.is_empty()) and not (actor and actor.ui_blocked) and not (actor and is_instance_valid(actor.material_wheel) and actor.material_wheel.visible)
 	var previews: Dictionary = {}
 	var hint_source:=source if not source.is_empty() and _skill_manager.get_instance(source) else "right"
 	if not _skill_manager.get_instance(hint_source):
@@ -125,13 +129,14 @@ func _process(_delta: float) -> void:
 	if not controller.pending.is_empty():
 		plan = controller.pending
 		action_name = plan.action.display_name
-	var text := ("Shift · " if empower else "") + "%s → %s · %s" % [action_name, plan.effect_label, plan.cost_label()]
+	var detailed: bool=not _hover_source.is_empty() or actor and not actor.casting.aimed_source().is_empty()
+	var text := InputBindings.label(InputBindings.action_for_source(hint_source))+" · "+("Shift · " if empower else "") + "%s → %s · %s · %s" % [action_name, plan.effect_label, plan.cost_label(),_skill_manager.spell_forms.label(hint_source)]
 	if action.cast_type=="channel": text+="（每脉冲最多；累计结算）"
-	text += " · " + ("前方%.0f、%.0f°锥形"%[plan.delivery_reach,plan.delivery_angle] if plan.delivery_reach>0 else controller.effect_scope(plan.skill))
-	if not plan.material_costs.is_empty():
+	if detailed: text += " · " + ("前方%.0f、%.0f°锥形"%[plan.delivery_reach,plan.delivery_angle] if plan.delivery_reach>0 else controller.effect_scope(plan.skill))
+	if not plan.material_costs.is_empty() and detailed:
 		text += " · " + controller.supplies.describe_cost(plan.material_costs)
 	var boon_hint := controller.boon_hint(plan)
-	if not boon_hint.is_empty():
+	if not boon_hint.is_empty() and detailed:
 		text += "\n" + boon_hint
 	if not controller.pending.is_empty():
 		text += "\n准备：%s · %.1fs" % [controller.pending.effect_label, maxf(0, controller.pending.remaining)]
@@ -141,9 +146,9 @@ func _process(_delta: float) -> void:
 	_preparation_bar.visible = not controller.pending.is_empty()
 	if _preparation_bar.visible:
 		_preparation_bar.value = 1 - controller.pending.remaining / maxf(.001, controller.pending.preparation)
-	_hint_panel.size = Vector2(466, 0)
-	_hint_panel.global_position = global_position + Vector2(0, -_hint_panel.size.y - 12)
+	_place_hint()
 	for i in range(_sources.size()):
+		if _skill_manager.shortcuts.binding(_sources[i]).get("kind","")=="item": continue
 		_bind_labels[i].text=InputBindings.label(InputBindings.action_for_source(_sources[i]))
 		var instance := _skill_manager.get_instance(_sources[i])
 		_variant_labels[i].text=""
@@ -177,7 +182,8 @@ func _process(_delta: float) -> void:
 			var accent := ElementVisuals.color_for(preview.skill.tags)
 			_affinity_strips[i].color = Color(accent, .85)
 			(_panels[i].get_theme_stylebox("panel") as StyleBoxFlat).border_color = Color(accent,.55) if not preview.rule_id.is_empty() else GameUIStyle.PANEL_BORDER
-			_icons[i].modulate=accent.lightened(.3)
+			_icons[i].modulate=accent.lightened(.3) if preview.ready else GameUIStyle.TEXT_DISABLED
+			if actor and preview.requires_magic and not actor.mana_component.can_cast(): _cost_labels[i].text="锁"
 			_cost_labels[i].visible=_hover_source==_sources[i] or source==_sources[i] or not preview.ready
 		_update_cooldown(i, preview)
 
@@ -231,7 +237,7 @@ func _add_item(source: String, label: String, size: Vector2) -> void:
 	_cost_labels.append(cost)
 	var variant:=Label.new()
 	variant.position=Vector2(3,size.y-17); variant.size=Vector2(30,15)
-	GameUIStyle.apply_font_size(variant,11)
+	GameUIStyle.apply_font_size(variant,12)
 	variant.add_theme_color_override("font_color",GameUIStyle.TEXT_MAIN)
 	variant.add_theme_color_override("font_shadow_color",Color.BLACK)
 	variant.add_theme_constant_override("shadow_offset_x",1); variant.add_theme_constant_override("shadow_offset_y",1)
@@ -257,7 +263,7 @@ func _add_item(source: String, label: String, size: Vector2) -> void:
 	_cd_labels.append(cd_label)
 
 	var bind_label := Label.new()
-	GameUIStyle.apply_font_size(bind_label,11)
+	GameUIStyle.apply_font_size(bind_label,12)
 	bind_label.add_theme_color_override("font_color", GameUIStyle.TEXT_MUTED)
 	bind_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	bind_label.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
@@ -276,11 +282,7 @@ func _slot_pointer(event: InputEvent, source: String) -> void:
 	if not actor or actor.ui_blocked or actor.health_component.is_dead: return
 	actor.input_controller.pointer_consumed()
 	accept_event()
-	if QuickslotMaterials.available(_skill_manager,source): actor.material_wheel.open_for_source(source,actor.actor_context.actions.facing)
-	else:
-		var instance:=_skill_manager.get_instance(source)
-		if instance: actor.skill_pool_ui.open_for(instance.data)
-		else: actor.skill_pool_ui.open()
+	actor.material_wheel.inspect_slot(source,actor.actor_context.actions.facing)
 
 func _refresh_all() -> void:
 	for i in range(_sources.size()):
@@ -317,7 +319,7 @@ func _update_cooldown(idx: int, plan: CastPlan = null) -> void:
 	var state := _skill_manager.get_cooldown_state(_sources[idx], plan)
 	var remaining: float = state.remaining
 	var total: float = state.duration
-	var size := HAND_SIZE if idx < 2 else SLOT_SIZE
+	var size := SLOT_SIZE
 	var mask := _masks[idx]
 	var cd_label := _cd_labels[idx]
 
@@ -369,3 +371,14 @@ func _refresh_items() -> void:
 		_cost_labels[i].visible=true
 		_panels[i].tooltip_text=view.title+"\n"+view.detail
 		_masks[i].visible=false; _affinity_strips[i].color=GameUIStyle.GOLD
+
+func _place_hint() -> void:
+	_hint_panel.size = Vector2(420, 0)
+	_hint_panel.global_position = Vector2(get_viewport_rect().size.x*.5-210,global_position.y-_hint_panel.size.y-12)
+
+func _show_item_hint(actor: Player, source: String) -> void:
+	var view:=QuickslotView.item_state(actor,_skill_manager.shortcuts.binding(source))
+	_combination_hint.text=InputBindings.label(InputBindings.action_for_source(source))+" · "+view.title+" · 余量%d · 指定实物"%view.count+("\n"+view.detail if not view.ready else "")
+	_combination_hint.show(); _preparation_bar.hide()
+	_hint_panel.visible=not actor.ui_blocked and not actor.material_wheel.visible
+	_place_hint()

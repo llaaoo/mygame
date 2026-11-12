@@ -13,7 +13,7 @@ static func item_state(actor: Node2D,binding: Dictionary) -> Dictionary:
 		if not item or item.definition_id!=id or context.items.locate(uid) not in context.items.actor_containers(context.id)+[context.id+".gear"]:
 			result.detail="绑定的实物已不在可访问库存；不会替换另一件。"; return result
 		result.count=int(item.properties.get("doses",0)) if definition.use_profile and definition.use_profile.kind==ItemUseDefinition.Kind.SPRAY else item.quantity
-		result.ready=context.items.locate(uid)==context.id+".pocket" or definition is EquipmentData
+		result.ready=(context.items.locate(uid)==context.id+".pocket" or definition is EquipmentData) and result.count>0
 		result.detail=context.items.state_text(uid)+(" · 已装备" if uid in context.items.equipped(context.id).values() else "")
 	else:
 		result.count=context.items.count(context.id,id,false,true)
