@@ -1,82 +1,664 @@
-/* UI concept only. All data below are illustrative, reset on reload and never reach Godot saves. */
-const $=s=>document.querySelector(s);
-const paths={sword:'M5 3l14 14m-5-1l4-4M3 21l4-4m-3-2l5 5M6 3l-3 3 10 10 3-3z',shield:'M12 3l8 3v6c0 5-8 9-8 9s-8-4-8-9V6z',flame:'M12 2c3 5-2 7 2 10 2-1 3-3 3-5 4 5 4 8 2 11s-10 5-13 0S8 8 12 2z',flask:'M9 2h6m-5 0v7l-5 9q-1 3 2 3h10q3 0 2-3l-5-9V2M7 15h10',bottle:'M9 2h6v5l3 4v10H6V11l3-4zM7 13h10',drop:'M12 2C9 8 4 12 4 16a8 8 0 0016 0c0-4-5-8-8-14z',coat:'M8 3l4 2 4-2 5 5-4 4v9H7v-9L3 8zM12 5v15',bag:'M7 7V5a5 5 0 0110 0v2M6 6h12l3 15H3zM8 11h8v6H8z',leaf:'M20 3C5 2 1 11 7 16c6 6 14-3 13-13zM4 21L17 6',coin:'M20 12a8 8 0 11-16 0 8 8 0 0116 0M12 7v10M8 10h8M8 14h8',book:'M3 4h7l2 2 2-2h7v16h-7l-2 2-2-2H3zM12 6v14',spark:'M12 2l2 7 7 3-7 2-2 8-2-8-8-2 8-3z',ring:'M18 13a6 6 0 11-12 0 6 6 0 0112 0M8 6l4-4 4 4-4 4z',bow:'M5 3q17 9 0 18M5 3l8 9-8 9M4 12h17m-4-3l4 3-4 3',hammer:'M3 5l5-3 8 8-5 5zM12 13l8 8',map:'M3 5l6-3 6 3 6-3v17l-6 3-6-3-6 3zM9 2v17m6-14v17',eye:'M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12M15 12a3 3 0 11-6 0 3 3 0 016 0',clock:'M20 12a8 8 0 11-16 0 8 8 0 0116 0M12 7v5l3 2',heart:'M12 21L3 12C-2 5 7-1 12 6c5-7 14-1 9 6z',stamina:'M14 2L5 13h6l-1 9 9-13h-6z',helmet:'M4 15v-5a8 8 0 0116 0v5l-4-1v7H8v-7zM4 10h16',boots:'M7 3h8v12l5 3v3H4v-7h3z',hand:'M7 21L3 12l2-1 3 4V5h2v7-9h2v9-8h2v8-6h2v11l-3 4z',arrow:'M4 20L20 4M12 4h8v8M4 13v7h7',grain:'M12 22V3M12 8C3 8 5 2 5 2s7-1 7 6m0 6C2 14 3 8 3 8s9-1 9 6m0 5c10 0 9-6 9-6s-9-1-9 6m0-11c9 0 7-6 7-6s-7-1-7 6',cloth:'M3 5l7-2 11 3-2 15-9-3-7 2zM10 3v15',rock:'M7 3l10 1 5 10-7 8L3 17 2 8zM7 3l5 9 10 2m-10-2l3 10m-3-10L2 8',cup:'M4 5h13v8a6 6 0 01-12 0zM17 7h2a3 3 0 010 6h-2M4 21h13',skull:'M5 16a9 9 0 1114 0l-2 1v5H7v-5zM8 11h1m6 0h1m-6 9v2m4-2v2',plus:'M12 4v16M4 12h16'};
-const icon=n=>`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${paths[n]||paths.rock}"/></svg>`;
-const key=x=>`<kbd>${x}</kbd>`;
-const keys=['Q','E','R','1','2','3','4','5','6','7','8','9','0'];
-const items=[
-{id:'sabre',name:'驿路短刀',type:'equipment',icon:'sword',qty:1,slot:'主手',weight:'1.8',value:8,lore:'旧驿路上回收的短刀。刃口已有磨痕，握柄仍然结实。',stats:[['物理伤害','29'],['稳定削减','24'],['轻击体力','12']],equipped:true},
-{id:'coat',name:'粗布护衣',type:'equipment',icon:'coat',qty:1,slot:'躯干',weight:'3.2',value:8,lore:'双层布料在肘部做了补缀。能挡住擦伤，挡不住一记完整的重击。',stats:[['物理减伤','8%'],['稳定抗性','12']],equipped:true},
-{id:'bow',name:'灰河短弓',type:'equipment',icon:'bow',qty:1,slot:'主手',weight:'2.1',value:12,lore:'猎队常用的短弓。放箭前仍须准备实有箭矢。',stats:[['远程伤害','25'],['有效射程','18步'],['弹药','箭矢 ×1']]},
-{id:'shield',name:'灰河木盾',type:'equipment',icon:'shield',qty:1,slot:'副手',weight:'3.0',value:9,lore:'盾面被河水浸过，边沿重新包了铁。',stats:[['格挡减伤','45%'],['稳定抗性','18'],['体力回复','−5%']]},
-{id:'spare_coat',name:'旧守路队护衣',type:'equipment',icon:'coat',qty:1,slot:'躯干',weight:'3.5',value:8,lore:'肩上的旧记号被仔细拆掉了。',stats:[['物理减伤','10%'],['稳定抗性','14']]},
-{id:'ration',name:'烤饼',type:'consumable',icon:'grain',qty:2,weight:'.3',value:2,lore:'用谷粮烤成的硬饼。能充饥，也能改善一段时间内的恢复。',stats:[['饱食恢复','+35'],['食物持续','120秒']]},
-{id:'water',name:'饮用水',type:'consumable',icon:'drop',qty:3,weight:'.5',value:1,lore:'已经净化的饮用水。喝下去的水不能再拿去加工。',stats:[['饮水恢复','+40'],['水囊容量','3 / 4']]},
-{id:'tea',name:'醒神茶',type:'consumable',icon:'cup',qty:1,weight:'.3',value:3,lore:'入口微苦。缓解疲惫，不能代替真正的休息。',stats:[['疲劳','−20']]},
-{id:'spray_a',name:'树脂喷剂 · I',type:'consumable',icon:'flask',qty:1,doses:2,weight:'.7',value:4,lore:'瓶口有一道浅刻痕。剩余剂量跟随这只瓶子，耗尽后不会自动换瓶。',stats:[['剩余剂量','2 / 3'],['投送方式','持续喷洒'],['法力消耗','0']]},
-{id:'spray_b',name:'树脂喷剂 · II',type:'consumable',icon:'flask',qty:1,doses:3,weight:'.7',value:4,lore:'尚未用过的另一只瓶子。与已编组的喷剂分别保存余量。',stats:[['剩余剂量','3 / 3'],['投送方式','持续喷洒'],['法力消耗','0']]},
-{id:'oil',name:'油瓶',type:'consumable',icon:'bottle',qty:2,weight:'.6',value:3,lore:'投出整件实物，在远处形成油性覆盖。不是持续喷洒的替代品。',stats:[['消耗','整瓶 ×1'],['投送方式','投掷']]},
-{id:'rag',name:'火抹布',type:'consumable',icon:'cloth',qty:1,weight:'.2',value:4,lore:'涂在当前具体武器上。材料所含的力量无需使用者先觉醒。',stats:[['作用','武器火焰涂附'],['消耗','抹布 ×1']]},
-{id:'broth',name:'苦叶炖汤',type:'consumable',icon:'cup',qty:1,weight:'.5',value:4,lore:'温热的苦叶汤，适合回镇后慢慢喝。',stats:[['作用','饱食与恢复']]},
-{id:'stone',name:'火石',type:'material',icon:'rock',qty:2,weight:'.2',value:3,lore:'炭屑与晶砂加工出的阵材。只有明确选择火石阵，才会在布阵时消耗。',stats:[['铭阵消耗','1火石 + 8MP'],['用途','火石阵']]},
-{id:'cloth',name:'布料',type:'material',icon:'cloth',qty:3,weight:'.1',value:1,lore:'留一份用于档案压印台的手工修复；也可制成涂附抹布。',stats:[['用途','制造 / 检修']]},
-{id:'resin',name:'树脂',type:'material',icon:'drop',qty:2,weight:'.1',value:2,lore:'从树木与旧猎营收集的粘稠树脂。',stats:[['用途','喷剂 / 涂料']]},
-{id:'charcoal',name:'炭屑',type:'material',icon:'rock',qty:2,weight:'.1',value:1,lore:'能换到一笔有限的学费，也能留作加工原料。',stats:[['用途','加工 / 燃料']]},
-{id:'herb',name:'苦叶',type:'material',icon:'leaf',qty:2,weight:'.1',value:3,lore:'苦叶可以烹煮，也可交给需要药草的镇民。',stats:[['用途','炼金 / 炊事']]},
-{id:'book',name:'封锁名册',type:'quest',icon:'book',qty:1,weight:'.1',value:0,lore:'姓名、班次与仍未撤销的命令，写在同一页上。它是一份证据，不是新的命令。',stats:[['记录','已阅读'],['归属','探索证据']]},
-{id:'coin',name:'河谷币',type:'material',icon:'coin',qty:18,weight:'0',value:1,lore:'磨损的地方铸币。钱袋里有多少，就只能付出多少。',stats:[['持有','18']]}
-];
-items.push({id:'crystal',name:'晶砂',type:'material',icon:'rock',qty:3,weight:'.2',value:3,lore:'细碎的晶体砂粒，制造与刻阵都需要真实取用。',stats:[['用途','阵材加工']]},{id:'ash',name:'炭灰',type:'material',icon:'rock',qty:3,weight:'.1',value:1,lore:'炭屑加工后的细灰。',stats:[['用途','阵材加工']]});
-items.forEach(i=>i.source=i.equipped?'gear':i.type==='consumable'&&i.id!=='spray_b'?'pocket':'pack');
-const visibleItems=()=>items.filter(i=>i.qty>0&&(state.filter==='all'||i.type===state.filter)&&(state.container==='all'||i.source===state.container));
-const totalWeight=()=>items.reduce((v,i)=>v+Number(i.weight)*i.qty,0).toFixed(1);
-const abilities={inscribe:{name:'铭刻',icon:'spark',magic:true,desc:'基础操作决定法阵的结构，当前选择的真实材料决定法阵性质。',cost:'8 MP + 1火石'},spray:{name:'喷洒',icon:'flask',magic:false,desc:'持续释放指定瓶内剂量。普通喷洒不需要魔力，魔法强化须另验资格与资源。',cost:'每次1剂 · 0 MP'},ignite:{name:'火花',icon:'flame',magic:true,desc:'独立火花与火阵内的火球来自同一操作；当前真实现场决定可用形式。',cost:'4 MP / 火阵内12 MP'},breaker:{name:'破势斩',icon:'sword',magic:false,desc:'轻→重完成后，窗口内Ctrl+左键发动。短按轻式26体力，长按重式34体力；不会占用法术或物品槽。',cost:'26 / 34体力'}};
-const state={view:'hud',lastView:'inventory',filter:'all',container:'all',selected:'sabre',skill:'inscribe',binding:false,selectedSlot:'R',awake:false,field:true,forms:false,hp:84,stamina:76,mana:43,points:1,perk:false,tracked:true,minute:8*60+42,threat:false,combat:false,art:false,mapPin:'archive',mapZoom:1,mapX:0,mapY:0,formsBySlot:{},craft:'rag',dialogue:'intro',compare:false,toastTimer:null};
-const bindings={Q:{kind:'ability',id:'inscribe'},E:{kind:'item',id:'spray_a'},R:{kind:'ability',id:'ignite'},1:{kind:'item',id:'oil'},2:{kind:'item',id:'rag'},7:{kind:'item',id:'ration'},8:{kind:'item',id:'water'},9:{kind:'item',id:'tea'},0:{kind:'item',id:'broth'}};
-const getItem=id=>items.find(i=>i.id===id);
-const equipped=slot=>items.find(i=>i.qty>0&&i.equipped&&i.slot===slot);
-const comparison=i=>{const current=equipped(i.slot);if(i.equipped)return '当前已穿戴这件装备';if(!current)return '当前同槽为空';let rows=i.stats.filter(([k,v])=>current.stats.some(x=>x[0]===k)&&Number.isFinite(parseFloat(v))).map(([k,v])=>{const old=current.stats.find(x=>x[0]===k);const d=parseFloat(v)-parseFloat(old[1]);return k+' '+(d>0?'+':'')+d});return '与'+current.name+'比较<br><br>'+rows.join('　')+'<br>重量 '+(Number(i.weight)>=Number(current.weight)?'+':'')+(Number(i.weight)-Number(current.weight)).toFixed(1)};
-const clock=()=>`第2日 ${String(Math.floor(state.minute/60)%24).padStart(2,'0')}:${String(state.minute%60).padStart(2,'0')}`;
-function toast(message){$('#toast').textContent=message;$('#toast').classList.add('show');clearTimeout(state.toastTimer);state.toastTimer=setTimeout(()=>$('#toast').classList.remove('show'),2300)}
-function bindingInfo(k){const b=bindings[k];if(!b)return null;return b.kind==='ability'?abilities[b.id]:getItem(b.id)}
-function quickbar(inMenu=false){return `<div class="${inMenu?'binding-row':'quickbar'}">${keys.map(k=>{const b=bindings[k],v=bindingInfo(k),locked=v?.magic&&!state.awake;return `<button class="${inMenu?'':'quick-slot'} ${['Q','E','R'].includes(k)&&!inMenu?'featured':''} ${!v?'empty':''} ${locked?'locked':''} ${v?.qty===0?'unavailable':''} ${state.selectedSlot===k?'selected':''}" data-${inMenu?'bind-slot':'slot'}="${k}" title="${k} · ${v?v.name:'空槽'}${locked?' · 尚未觉醒':''}" aria-label="${k}槽 ${v?v.name:'空槽'}"><small>${k}</small>${v?icon(v.icon):'<span>·</span>'}${!inMenu&&b?.kind==='item'?`<span class="count">${v.qty===0?'失效':v.doses!==undefined?v.doses+'剂':v.qty}</span>`:''}${locked?'<span class="count">锁</span>':''}<span class="element" style="--element:${b?.id==='ignite'?'#b9744f':b?.id==='spray_a'?'#9baf74':'transparent'}"></span></button>`}).join('')}</div>`}
-function renderHUD(){const combat=state.combat;$('#hud').innerHTML=`<div class="hud"><div class="compass">西北　　北　　东北<div class="ticks"><span>│</span><span>·</span><span>◇</span><span>·</span><span>│</span></div><div class="location">灰河谷 · 林地</div></div><button class="quest-brief" data-view="journal"><span class="eyebrow">首次出征</span><b>调查林下档案窖</b><span>恢复东侧压印台 · 2 / 3</span></button>${combat?`<div class="combat-target"><b>守林兵</b><div class="enemy-track"><i></i></div><small>持盾　·　正面格挡</small></div>`:''}<div class="vitals"><div class="actor-name">行者 <span style="color:#9da68c">/ 等级3</span></div>${meter('heart',state.hp,100,'var(--health)')}${meter('stamina',state.stamina,100,'var(--stamina)')}${state.awake?meter('drop',state.mana,60,'var(--mana)'):''}<div class="statuses"><button class="status-icon" title="饱食：持续改善恢复 · 剩余82秒">${icon('grain')}</button></div>${equipped('主手')?.id==='sabre'?`<div class="weapon-state">${icon('sword')} 火焰涂附 <span>52秒</span></div>`:''}</div>${quickbar()}<div class="quick-hint">${key('G')} 当前槽选材　${key('K')} 编组　·　左键轻 / 重击　右键格挡</div><div class="hud-utility"><button data-view="inventory">${icon('bag')}${key('I')}</button><button data-view="map">${icon('map')}${key('M')}</button></div>${!combat?`<div class="interaction"><button data-action="loot">${key('F')} 旧猎营记录</button></div>`:''}${state.art?`<div class="art-window"><span class="eyebrow">轻击 → 重击</span><div><b>破势斩</b>${key('Ctrl + 左键')}</div><div class="window-line"></div><span class="key-hold-hint">按住为重式 · Ctrl切换同组合武技</span></div>`:''}</div>`}
-function meter(n,v,max,color){return `<div class="meter" style="--value:${v/max*100}%;--color:${color}">${icon(n)}<div class="track"><i></i></div><span>${v} / ${max}</span></div>`}
-const sections=[['inventory','行囊','I'],['character','角色','P'],['skills','技艺','K'],['journal','手札','J'],['map','行路图','M']];
-function menuShell(title,body,footer){return `<div class="menu-shade"></div><section class="menu" aria-label="${title}"><header class="menu-top"><h1>${title}</h1><nav class="menu-tabs">${sections.map(([id,label,k])=>`<button class="${state.view===id?'active':''}" data-view="${id}">${label}<span style="margin-left:6px;opacity:.5;font-size:9px">${k}</span></button>`).join('')}</nav><button class="close" data-action="close">${key('Esc')} 返回世界</button></header><div class="menu-clock"><span class="live-dot">◇</span> 河谷时刻 <span data-clock>${clock()}</span></div><div class="menu-body">${body}</div><footer class="menu-bottom">${footer}<div class="mini-vitals"><span style="color:var(--health)">生命 ${state.hp}/100</span><span style="color:var(--stamina)">体力 ${state.stamina}/100</span>${state.awake?`<span style="color:var(--mana)">法力 ${state.mana}/60</span>`:''}</div></footer></section>`}
-function paperdoll(){return `<div class="section-label">当前穿戴</div><div class="paperdoll"><svg class="figure" viewBox="0 0 140 270" aria-label="当前穿戴示意"><path class="skin" d="M56 33Q55 9 70 10Q85 9 84 33L80 49 70 54 60 48Z"/><path d="M55 26Q48 4 70 4Q92 6 85 26L78 17 62 18Z" fill="#303930"/><path class="${equipped('躯干')?'coat':'underlayer'}" d="M58 52L45 59 32 112 43 119 55 81 51 168 89 168 85 81 97 119 108 112 95 59 82 52 70 59Z"/><path d="M52 166L54 232 67 232 70 179 73 232 86 232 88 166Z" fill="#39473d"/><path d="M54 232L52 247 66 247 67 232M73 232L74 247 89 247 86 232" fill="#5b6250"/><path class="skin" d="M33 111L30 133 37 135 43 118M98 118L103 134 111 131 108 111"/><path d="M52 119H90M70 59V148" stroke="#9d9870"/>${equipped('主手')?.id==='sabre'?'<path class="blade" d="M111 132L123 198M106 136l13-3"/>':equipped('主手')?.id==='bow'?'<path class="blade" d="M110 115Q135 145 110 180L120 148Z"/>':''}</svg>${[['头部','helmet',8,13,false],['副手','shield',4,43,false],['躯干','coat',77,36,true],['主手','sword',77,64,true],['足部','boots',5,77,false],['饰物','ring',77,7,false]].map(([label,ic,x,y,filled])=>`<button class="gear-slot ${equipped(label)?'filled':''}" style="left:${x}%;top:${y}%" data-action="gear" data-value="${label}" title="${label} · ${equipped(label)?equipped(label).name:'空槽'}">${icon(ic)}<small>${label}</small></button>`).join('')}</div><div class="gear-stat"><span>防护</span><b>${equipped('躯干')?.stats[0][1]||'0%'}</b></div><div class="gear-stat"><span>武器伤害</span><b>${equipped('主手')?.stats[0][1]||'徒手'} ${equipped('主手')?.id==='sabre'?'<small style="color:#bf8159">+ 6火</small>':''}</b></div><div class="gear-stat"><span>负重</span><b>${totalWeight()} <span class="quiet">/ 40</span></b></div>`}
-function inventory(){let visible=visibleItems();if(!getItem(state.selected)||getItem(state.selected).qty<1)state.selected=visible[0]?.id||'sabre';const item=getItem(state.selected)||items[0];const tabs=[['all','全部'],['equipment','装备'],['consumable','消耗品'],['material','材料'],['quest','任务']];return menuShell('行囊',`<div class="inventory-layout"><aside class="gear-pane">${paperdoll()}</aside><section class="bag-pane"><div class="bag-top"><span>行者的物品</span><span class="value">${icon('coin')} <span id="coin-count">${getItem('coin').qty}</span></span></div><div class="tabs-small">${[['all','全部来源'],['pocket','随身口袋'],['pack','背包']].map(([id,t])=>`<button data-container="${id}" class="${state.container===id?'active':''}">${t}</button>`).join('')}</div><div class="tabs-small">${tabs.map(([id,t])=>`<button data-filter="${id}" class="${state.filter===id?'active':''}">${t}</button>`).join('')}</div><input class="search" id="item-search" placeholder="搜索物品…" aria-label="搜索物品"><div class="bag-grid" id="bag-grid">${itemTiles(visible)}</div><div class="bag-footer"><span>${totalWeight()} / 40 负重 · ${items.filter(i=>i.qty>0&&i.source==='pack').length} / 30格</span><button data-action="sort">整理</button></div></section><aside class="detail-pane" id="item-detail">${itemDetail(item)}</aside></div>`,`${key('鼠标左键')} 选择 ${key('双击')} 使用 / 穿戴 ${key('右键')} 更多操作 ${key('Shift')} 比较`)}
-function itemTiles(list){return list.map(i=>`<button class="item-tile ${state.selected===i.id?'selected':''}" data-item="${i.id}" title="${i.name}${i.doses!==undefined?' · '+i.doses+'剂':''}" aria-label="${i.name}">${i.equipped?'<span class="equipped">已穿戴</span>':''}${icon(i.icon)}<strong>${i.doses!==undefined?i.doses+'剂':i.qty>1?i.qty:''}</strong><span class="quality"></span></button>`).join('')+Array.from({length:Math.max(0,25-list.length)},()=>'<div class="item-tile empty"></div>').join('')}
-function itemDetail(i){return `<span class="eyebrow">${i.equipped?'已穿戴 / ':''}${({equipment:'装备',consumable:'消耗品',material:'材料',quest:'任务记录'})[i.type]}</span><div class="item-hero">${icon(i.icon)}</div><h2>${i.name}</h2><div class="item-meta"><span>重量 ${i.weight}</span><span>参考价值 ${i.value}币</span><span>${i.slot||'随身物品'}</span></div><p class="item-lore">${i.lore}</p>${i.stats.map(([k,v])=>`<div class="stat-row"><span class="quiet">${k}</span><span>${k==='剩余剂量'?i.doses+' / 3':v}</span></div>`).join('')}${i.id==='sabre'?'<div class="effect">火焰涂附 · 52秒<small>普通命中附加火伤，积累燃烧。显式元素武技会消耗本武器涂层。</small></div>':''}<div class="actions-row">${i.type==='equipment'?`<button class="primary" data-action="equip">${i.equipped?'卸下':'穿戴'}</button>`:i.type==='consumable'?'<button class="primary" data-action="use">使用</button>':''}${i.type!=='quest'?'<button data-action="bind-item">放入快捷槽</button><button data-action="context">更多 ···</button>':''}</div>${state.compare&&i.type==='equipment'?'<div class="compare-tip">'+comparison(i)+'</div>':''}<div class="hint-line">费用与余量在操作前重新核对。<br>同种喷剂保留各自瓶身与剂量。</div>`}
-function skillPage(){const a=abilities[state.skill];return menuShell('技艺',`<div class="skill-layout"><aside class="list-pane"><div class="section-label">已掌握的操作</div>${Object.entries(abilities).map(([id,v])=>`<button class="list-entry ${state.skill===id?'active':''}" data-skill="${id}"><span class="eyebrow">${id==='breaker'?'武技 / 连招窗口':v.magic?'主动法术':'实物操作'}</span><b>${v.name}</b><small>${!state.awake&&v.magic?'已知公式 · 尚未觉醒':id==='breaker'?'轻→重 · Ctrl+左键':'已掌握'}</small></button>`).join('')}</aside><div class="content-scroll"><span class="eyebrow">${state.binding?'选择一个独立槽位':'知识与编组'}</span><h2 class="page-title">${state.binding?'绑定：'+getItem(state.selected).name:a.name}</h2><div class="prose"><p>${state.binding?'快捷绑定只指向这份实物。具体喷剂耗尽或离开身体后，槽位保留身份但不可使用，不会换成另一瓶。':a.desc}</p></div>${state.skill==='breaker'&&!state.binding?`<div class="source-note"><div>轻击 → 重击<br><small>完成出招后1.1秒内可接破势斩 · 每组最多同时配置两招</small></div><div>${key('Ctrl + 左键')}<small>短按轻式 / 按住重式</small></div></div><div class="actions-row"><button class="primary" data-action="technique">破势斩 · 已配置</button><button data-action="technique">＋ 另一招</button></div><p class="prose">武技由真实连招形成窗口，不占下面的动作 / 物品快捷槽。轻点Ctrl只切换当前组合的已配置武技，不刷新窗口。</p>`:`<div class="source-note"><div>当前槽 ${key(state.selectedSlot)}<small>${!state.awake&&a.magic&&!state.binding?'尚未觉醒：公式可编组，当前不能施放。':'选择动作 / 物品，再点击目标槽位。'}</small></div><div>${state.binding?'真实物品':a.cost}</div></div>`}<div class="section-label" style="margin-top:28px">动作与物品快捷槽 · 每个按键互相独立</div>${quickbar(true)}<div class="actions-row"><button class="primary" data-action="source-settings">当前槽来源设置</button><button data-action="clear-slot">清空 ${state.selectedSlot}</button></div><div class="rule-divider"></div><div class="section-label">来源策略</div><div class="prose">战斗中用G或按住中键选择当前可用形式；滚轮切换该动作的可用形式。K保留完整知识和整备目录。<br><br>“智能跟随”只调整后续形式偏好，仍须真实来源、手动准备和释放。</div></div></div>`,`${key('鼠标')} 选动作后点槽 ${key('右键')} 清槽 ${key('Esc')} 返回`)}
-function character(){return menuShell('角色',`<div class="two-pane"><aside class="list-pane"><span class="section-label">行者 / 等级3</span><button class="list-entry active"><b>属性与成长</b><small>已有点数 ${state.points}</small></button>${['武器与战技','野外与生存','制造与整修',state.awake?'魔法与传承':'魔法 · 尚未觉醒'].map(t=>`<button class="list-entry" data-action="perk-detail"><b>${t}</b><small>查看条件与实际效果</small></button>`).join('')}<div class="rule-divider"></div><p class="prose" style="font-size:11px">升级不弹出强制界面。点数可以保留，知识仍需训练或探索获得。</p></aside><div class="content-scroll"><div class="top-data"><div><span class="eyebrow">成长 / 共同角色规则</span><h2 class="page-title">呼吸与力量</h2></div><div class="eyebrow">${state.points} 个可用Perk点</div></div><div class="stat-columns"><div class="stat-block"><h3>主属性</h3>${[['力量','12'],['耐力','11'],['敏捷','10'],['智力','10']].map(([k,v])=>`<div class="stat-row"><span>${k}</span><span>${v}</span></div>`).join('')}</div><div class="stat-block"><h3>当前派生效果</h3>${[['生命上限','100'],['体力上限',state.perk?'117':'102'],['负重上限','40'],['施法资格',state.awake?'已觉醒':'未觉醒']].map(([k,v])=>`<div class="stat-row"><span>${k}</span><span>${v}</span></div>`).join('')}</div></div><div class="perk-tree"><button class="perk-node learned" style="left:calc(50% - 77px);top:22px" data-action="perk-detail">基础战斗<small>已掌握</small></button><button class="perk-node ${state.perk?'learned':''}" style="left:15%;top:156px" data-action="learn-perk">战斗调息<small>${state.perk?'已学会':'体力上限 +15 · 1点'}</small></button><button class="perk-node locked" style="right:10%;top:156px" data-action="perk-detail">连段节能<small>需要前置与实践</small></button></div></div></div>`,`${key('鼠标')} 预览节点 ${key('Esc')} 返回 · 点数不会自动分配`)}
+/* Interactive design model only. Never connects to Godot or production saves. */
+const state = {
+  view: 'hud', lastView: 'inventory', inventoryEntry: 'I', filter: 'all', container: 'all', query: '',
+  slotFilter: '', selected: 'sabre', display: 'list', skill: 'inscribe',
+  binding: false, selectedSlot: 'R', awake: false, field: true,
+  forms: false, formSnapshot: [], formsBySlot: {}, slotPanel: false,
+  hp: 84, stamina: 76, mana: 43, points: 1, perk: false, perkPreview: false,
+  tracked: true, minute: 8 * 60 + 42, threat: false, combat: false, art: false,
+  mapPin: 'archive', mapZoom: 1, mapX: 0, mapY: 0,
+  craft: 'rag', dialogue: 'intro', compare: false, context: null, focusReturn: null,
+  tradeMode: 'sell', tradeSelected: 'spare_coat', basket: {}, merchantCoins: 12,
+  capacity: 40, fullPackDemo: false, lootSelected: 'loot_spray', lootAmount: 1,
+  serial: 0, toastTimer: null, artTimer: null
+};
+const bindings = {
+  Q: {kind: 'ability', id: 'inscribe'}, E: {kind: 'item', id: 'spray_a'},
+  R: {kind: 'ability', id: 'ignite'}, 1: {kind: 'item', id: 'oil'},
+  2: {kind: 'item', id: 'rag'}, 7: {kind: 'item', id: 'ration'},
+  8: {kind: 'item', id: 'water'}, 9: {kind: 'item', id: 'tea'},
+  0: {kind: 'item', id: 'broth'}
+};
+const sections = [['inventory','行囊','I'],['character','角色','P'],['skills','技艺','K'],['journal','手札','J'],['map','行路图','M']];
+const typeNames = {equipment:'装备',consumable:'消耗品',material:'材料',quest:'任务'};
+const sourceNames = {gear:'穿戴',pocket:'随身口袋',pack:'背包',ground:'脚边',merchant:'商人'};
+const getItem = id => items.find(i => i.id === id);
+const owned = i => !!i && i.owner === 'player' && i.qty > 0;
+const equipped = slot => items.find(i => owned(i) && i.equipped && i.slot === slot);
+const totalWeight = () => items.filter(owned).reduce((v,i) => v + Number(i.weight) * i.qty, 0);
+const weightText = () => totalWeight().toFixed(1);
+const stackCount = () => items.filter(i => owned(i) && i.source === 'pack').length;
+const coins = () => getItem('coin').qty;
+const maxStamina = () => state.perk ? 115 : 100;
+const clock = () => `第${2 + Math.floor(state.minute / 1440)}日 ${String(Math.floor(state.minute / 60) % 24).padStart(2,'0')}:${String(state.minute % 60).padStart(2,'0')}`;
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const quantity = i => i.doses !== undefined ? `${i.doses}/3剂` : `×${i.qty}`;
+const bindingInfo = k => bindings[k]?.kind === 'ability' ? abilities[bindings[k].id] : getItem(bindings[k]?.id);
+const isAbility = k => bindings[k]?.kind === 'ability';
+const template = id => items.find(i => i.definition === id);
+const cloneItem = (id, overrides) => ({...template(id), stats: template(id).stats.map(r=>[...r]), ...overrides});
+items.push(
+  cloneItem('water',{id:'vendor_water',owner:'merchant',source:'merchant',qty:3,equipped:false}),
+  cloneItem('cloth',{id:'vendor_cloth',owner:'merchant',source:'merchant',qty:4,equipped:false}),
+  cloneItem('spray_a',{id:'loot_spray',name:'树脂喷剂 · III',owner:'ground',source:'ground',qty:1,doses:1,equipped:false}),
+  cloneItem('herb',{id:'loot_herb',owner:'ground',source:'ground',qty:3,equipped:false})
+);
+
+function toast(message) {
+  $('#toast').textContent = message;
+  $('#toast').classList.add('show');
+  clearTimeout(state.toastTimer);
+  state.toastTimer = setTimeout(() => $('#toast').classList.remove('show'), 2200);
+}
+
+// Filled silhouettes distinguish game objects from line navigation icons.
+function itemArt(i) {
+  const color = ({sword:'#c6c6ac',bow:'#b5a16d',shield:'#9d9471',coat:'#99a58e',flask:'#b1bd8a',bottle:'#b59b63',grain:'#c8b080',drop:'#8baeb3',leaf:'#9db184',rock:'#a7ac9a',cloth:'#c8b9a0',cup:'#c4b08b',book:'#bba987',coin:'#cfb779'})[i.icon] || '#b9b99f';
+  return `<span class="object-art object-${i.icon}" style="--object-color:${color}">${icon(i.icon)}${i.doses!==undefined?`<span class="bottle-mark">${i.name.split('·')[1]?.trim()||'I'}</span>`:''}</span>`;
+}
+
+function visibleItems() {
+  return items.filter(i => owned(i) && i.id !== 'coin'
+    && (state.filter === 'all' || i.type === state.filter)
+    && (state.container === 'all' || i.source === state.container)
+    && (!state.slotFilter || i.slot === state.slotFilter)
+    && i.name.includes(state.query));
+}
+
+function statusForSlot(k) {
+  const b = bindings[k], v = bindingInfo(k);
+  if (!v) return '空槽';
+  if (b.kind === 'item') {
+    if (!owned(v)) return v.owner === 'merchant' ? '已售出' : '来源不在身上';
+    if (v.doses === 0) return '这只瓶已空';
+    return quantity(v);
+  }
+  return v.magic && !state.awake ? '尚未觉醒' : '';
+}
+
+function formCatalog(k) {
+  const b = bindings[k], v = bindingInfo(k);
+  if (!v) return [];
+  if (b.kind === 'item' && v.doses !== undefined) return [
+    {id:'base',name:'普通喷洒',cost:'1剂 · 0 MP',source:v.name,icon:'flask',reason:!owned(v)?'指定瓶不在身上':v.doses<1?'指定瓶已空':''}
+  ];
+  if (b.kind !== 'ability') return [];
+  const locked = v.magic && !state.awake ? '尚未觉醒' : '';
+  if (b.id === 'inscribe') return [
+    {id:'base',name:'凝能阵',cost:'8 MP',source:'无材料',icon:'spark',reason:locked || (state.mana<8?'法力不足':'')},
+    {id:'fire',name:'火石阵',cost:'8 MP + 火石1',source:'背包中的火石',icon:'flame',reason:locked || (state.mana<8?'法力不足':!items.some(i=>owned(i)&&i.definition==='stone')?'缺少火石':'')}
+  ];
+  if (b.id === 'ignite') return [
+    {id:'base',name:'基础火花',cost:'4 MP',source:'自身法力',icon:'flame',reason:locked || (state.mana<4?'法力不足':'')},
+    {id:'fire',name:'火阵 → 火球',cost:'12 MP · 消耗阵能',source:'脚下火石阵',icon:'spark',reason:locked || (!state.field?'已离开火石阵':state.mana<12?'法力不足':'')}
+  ];
+  if (b.id === 'spray') return [{id:'source',name:'普通喷洒',cost:'1剂 · 0 MP',source:'尚未指定瓶',icon:'flask',reason:'请在行囊明确绑定具体喷剂'}];
+  return [];
+}
+
+function currentForm(k) {
+  const list = formCatalog(k);
+  return list.find(f => f.id === (state.formsBySlot[k] || 'base')) || null;
+}
+
+function slotSummary(k) {
+  const v = bindingInfo(k), f = currentForm(k);
+  if (!v) return '空槽 · 查看后可编组';
+  if (f) return `${f.name} · ${f.reason || f.cost} · 固定`;
+  return `${v.name} · ${statusForSlot(k)}`;
+}
+
+function quickbar(mode = 'hud') {
+  return `<div class="${mode==='hud'?'quickbar':'binding-row'}" aria-label="13个独立快捷槽">${keys.map(k => {
+    const v = bindingInfo(k), reason = statusForSlot(k);
+    const unavailable = !!v && (isAbility(k) ? v.magic && !state.awake : !owned(v) || v.doses === 0);
+    return `<button class="quick-slot ${['Q','E','R'].includes(k)?'featured':''} ${!v?'empty':''} ${unavailable?'unavailable':''} ${state.selectedSlot===k?'selected':''}"
+      data-${mode==='hud'?'slot':'bind-slot'}="${k}" title="${k} · ${v?.name||'空槽'} · ${reason}" aria-label="${k}槽 ${v?.name||'空槽'}" aria-pressed="${state.selectedSlot===k}">
+      <small>${k}</small>${v?icon(v.icon):'<span class="slot-empty">—</span>'}
+      <span class="count">${v?(unavailable?'!':bindings[k].kind==='item'?(v.doses!==undefined?`${v.doses}剂`:v.qty):''):''}</span>
+    </button>`;
+  }).join('')}</div>`;
+}
+
+function meter(name,value,max,color) {
+  return `<div class="meter" style="--value:${value/max*100}%;--color:${color}">${icon(name)}<div class="track"><i></i></div><span>${value} / ${max}</span></div>`;
+}
+
+function renderHUD() {
+  $('#hud').innerHTML = `<div class="hud">
+    <div class="compass">西北　　北　　东北<div class="ticks">│　　　·　　　◇　　　·　　　│</div><div class="location">灰河谷 · 林地</div></div>
+    ${state.tracked?'<button class="quest-brief" data-view="journal"><span class="eyebrow">首次出征</span><b>调查林下档案窖</b><span>恢复东侧压印台 · 2 / 3</span></button>':''}
+    ${state.combat?'<div class="combat-target"><b>守林兵</b><div class="enemy-track"><i></i></div><small>持盾 · 正面格挡</small></div>':''}
+    <div class="vitals"><div class="actor-name">行者 / 等级3</div>
+      ${meter('heart',state.hp,100,'var(--health)')}${meter('stamina',state.stamina,maxStamina(),'var(--stamina)')}${state.awake?meter('drop',state.mana,60,'var(--mana)'):''}
+      <div class="statuses"><button class="status-icon" data-action="buff-detail" title="饱食：持续改善恢复 · 样例82秒" aria-label="查看饱食状态">${icon('grain')}</button>
+      ${equipped('主手')?.id==='sabre'?'<span class="weapon-state">'+icon('sword')+'火焰涂附 · 样例52秒</span>':''}</div>
+    </div>
+    <button class="current-source" data-action="source-settings">${key(state.selectedSlot)} <b>${bindingInfo(state.selectedSlot)?.name||'空槽'}</b><span>${slotSummary(state.selectedSlot)}</span></button>
+    ${quickbar()}<div class="quick-hint">${key('G')} 选形式　${key('K')} 完整编组　·　选择不施放</div>
+    <div class="hud-utility"><button data-view="inventory" aria-label="打开行囊">${icon('bag')}${key('I')}</button><button data-view="map" aria-label="打开地图">${icon('map')}${key('M')}</button></div>
+    ${!state.combat?'<div class="interaction"><button data-action="read">'+key('F')+' 旧猎营记录</button></div>':''}
+    ${state.art?'<div class="art-window"><span class="eyebrow">轻击 → 重击 · 演示窗口</span><div><b>破势斩</b>'+key('Ctrl + 左键')+'</div><div class="window-line"></div><small>按住重式 · Ctrl切换第二招</small></div>':''}
+  </div>`;
+}
+
+function menuShell(title,body,footer='') {
+  return `<div class="menu-shade"></div><section class="menu" aria-label="${title}">
+    <header class="menu-top"><h1>${title}</h1><nav class="menu-tabs" aria-label="整备页">${sections.map(([id,label,k])=>`<button class="${state.view===id?'active':''}" data-view="${id}">${label}<small>${k}</small></button>`).join('')}</nav><button class="close" data-action="close">${key('Esc')} 返回世界</button></header>
+    <div class="menu-clock"><span>◇ 世界继续运行</span><span>河谷时刻 <span data-clock>${clock()}</span></span></div>
+    <div class="menu-body">${body}</div><footer class="menu-bottom"><div>${footer}</div><div class="mini-vitals"><span>生命 ${state.hp}/100</span><span>体力 ${state.stamina}/${maxStamina()}</span>${state.awake?`<span>法力 ${state.mana}/60</span>`:''}</div></footer></section>`;
+}
+
+function paperdoll() {
+  return `<div class="section-label">穿戴示意 / 读取样例实物</div><div class="equipment-preview"><div class="paperdoll-sprite" role="img" aria-label="${equipped('躯干')?.name||'未穿护衣'}，${equipped('主手')?.name||'徒手'}"><span class="base-body"></span><svg viewBox="0 0 32 32" aria-hidden="true">${equipped('躯干')?'<path d="M12 16h8v6h-8z" fill="'+(equipped('躯干').id==='spare_coat'?'#7e7a5e':'#657e70')+'" stroke="none"/>':''}${equipped('主手')?'<g transform="translate(20 14) scale(.4)" fill="#b7b59a" stroke="#ddd4b2" stroke-width="1.5"><path d="'+paths[equipped('主手').icon]+'"/></g>':''}${equipped('副手')?'<g transform="translate(6 15) scale(.35)" fill="#827b52" stroke="#c5b686" stroke-width="1.5"><path d="'+paths.shield+'"/></g>':''}</svg></div><strong>${equipped('主手')?.name||'徒手'}</strong><small>${equipped('躯干')?.name||'未穿护衣'}</small></div>
+    <div class="gear-list">${[['头部','helmet'],['躯干','coat'],['主手','sword'],['副手','shield'],['足部','boots'],['饰物','ring']].map(([slot,ic])=>`<button class="gear-slot ${equipped(slot)?'filled':''}" data-action="gear" data-value="${slot}" title="${slot} · ${equipped(slot)?.name||'空槽'}">${icon(equipped(slot)?.icon||ic)}<span><small>${slot}</small><b>${equipped(slot)?.name||'空槽'}</b></span></button>`).join('')}</div>
+    <div class="gear-stat"><span>防护</span><b>${equipped('躯干')?.stats[0][1]||'0%'}</b></div><div class="gear-stat"><span>负重</span><b>${weightText()} / ${state.capacity.toFixed(1)}</b></div>`;
+}
+
+function itemTiles(list) {
+  if (!list.length) return `<div class="empty-state"><span>◇</span><h2>${state.slotFilter?`没有可穿戴的${state.slotFilter}装备`:'没有符合条件的物品'}</h2><p>清除筛选可查看其他实物，来源不会自动切换。</p><button data-action="clear-filter">清除筛选</button></div>`;
+  return list.map(i=>`<button class="item-tile ${state.selected===i.id?'selected':''}" data-item="${i.id}" aria-pressed="${state.selected===i.id}" aria-label="${i.name}" title="${i.name} · ${quantity(i)}">
+    ${itemArt(i)}<span class="item-label"><b>${i.name}</b><small>${sourceNames[i.source]}${i.equipped?' · 已穿戴':''}${i.doses!==undefined?' · 独立瓶':''}</small></span><strong>${quantity(i)}</strong></button>`).join('');
+}
+
+function comparison(i) {
+  const current=equipped(i.slot);
+  if (i.equipped) return '当前已经穿戴这件装备';
+  if (!current) return '当前同槽为空';
+  const rows=i.stats.filter(([k,v])=>current.stats.some(x=>x[0]===k)&&Number.isFinite(parseFloat(v))).map(([k,v])=>{
+    const old=current.stats.find(x=>x[0]===k),delta=parseFloat(v)-parseFloat(old[1]);
+    return `${k}：${delta>0?'+':''}${delta}`;
+  });
+  const delta=Number(i.weight)-Number(current.weight);
+  return `对比 ${current.name}<br>${rows.join('<br>')}${rows.length?'<br>':''}重量：${delta>0?'+':''}${delta.toFixed(1)}`;
+}
+
+function itemDetail(i) {
+  if (!i || !owned(i)) return '<div class="empty-state"><h2>选择一件实物</h2><p>这里显示作用、当前余量和可执行操作。</p></div>';
+  return `<div class="detail-scroll"><div class="detail-heading">${itemArt(i)}<div><span class="eyebrow">${typeNames[i.type]} / ${sourceNames[i.source]}</span><h2>${i.name}</h2></div></div>
+    <div class="item-meta"><span>重量 ${i.weight}</span><span>参考价值 ${i.value}币</span>${i.slot?`<span>${i.slot}</span>`:''}</div>
+    ${i.stats.map(([k,v])=>`<div class="stat-row"><span>${k}</span><b>${k==='剩余剂量'?i.doses+' / 3':v}</b></div>`).join('')}
+    ${i.id==='sabre'?'<div class="effect">火焰涂附 · 样例52秒<small>附在这把短刀。普通命中附加火伤；显式元素武技消耗此涂层。</small></div>':''}
+    ${state.compare&&i.slot?`<div class="compare-tip">${comparison(i)}</div>`:''}
+    <details class="item-lore"><summary>物品来历与完整说明</summary><p>${i.lore}</p></details>
+    <p class="hint-line">同名物品保留各自身份。选材和快捷绑定不消费实物。</p></div>
+    <div class="detail-actions"><div class="actions-row">
+      ${i.type==='equipment'?`<button class="primary" data-action="equip">${i.equipped?'卸下':'穿戴'}</button>`:i.type==='consumable'?'<button class="primary" data-action="use">使用</button>':''}
+      ${i.type!=='quest'?'<button data-action="bind-item">绑定快捷槽</button><button data-action="context" aria-label="更多物品操作">更多</button>':''}
+      ${i.slot?`<button data-action="compare" aria-pressed="${state.compare}">比较</button>`:''}
+    </div></div>`;
+}
+
+function inventory() {
+  const list=visibleItems();
+  if (!list.some(i=>i.id===state.selected)) state.selected=list[0]?.id||'';
+  return menuShell('行囊',`<div class="inventory-layout"><aside class="gear-pane">${paperdoll()}</aside><section class="bag-pane">
+    <div class="bag-top"><span>行者的实物</span><span class="value">${icon('coin')} ${coins()}</span></div>
+    <div class="tabs-small">${[['all','全部来源'],['pocket','口袋'],['pack','背包']].map(([id,t])=>`<button data-container="${id}" class="${state.container===id?'active':''}">${t}</button>`).join('')}</div>
+    <div class="tabs-small categories">${[['all','全部'],['equipment','装备'],['consumable','补给'],['material','材料'],['quest','任务']].map(([id,t])=>`<button data-filter="${id}" class="${state.filter===id?'active':''}">${t}</button>`).join('')}</div>
+    <div class="search-row"><input class="search" id="item-search" placeholder="搜索名称…" aria-label="搜索物品" value="${esc(state.query)}"><button data-action="toggle-display" aria-label="切换列表或网格">${state.display==='list'?'网格':'列表'}</button></div>
+    ${state.slotFilter?`<button class="filter-chip" data-action="clear-filter">${state.slotFilter}装备 ×</button>`:''}
+    <div class="bag-grid ${state.display}" id="bag-grid">${itemTiles(list)}</div><div class="bag-footer"><span>${weightText()} / ${state.capacity.toFixed(1)} 负重 · ${stackCount()} / 30格</span><button data-action="sort">整理</button></div>
+    </section><aside class="detail-pane" id="item-detail">${itemDetail(getItem(state.selected))}</aside></div>
+    ${state.binding?`<div class="inventory-binding"><div><b>绑定：${getItem(state.selected)?.name}</b><button data-action="cancel-binding">取消</button></div>${quickbar('bind')}</div>`:''}`,
+    `${key('双击')} 使用/穿戴　${key('右键')} 更多　${key('Shift')} 比较`);
+}
+
+function skillPage() {
+  const a=abilities[state.skill];
+  return menuShell('技艺',`<div class="skill-layout"><aside class="list-pane"><div class="section-label">已掌握的操作</div>${Object.entries(abilities).map(([id,v])=>`<button class="list-entry ${state.skill===id?'active':''}" data-skill="${id}"><span class="eyebrow">${id==='breaker'?'武技 / 连招窗口':v.magic?'主动法术':'实物操作'}</span><b>${v.name}</b><small>${!state.awake&&v.magic?'公式已知 · 尚未觉醒':id==='breaker'?'轻→重 · Ctrl+左键':'已掌握'}</small></button>`).join('')}</aside>
+    <div class="skill-main"><div class="content-scroll"><span class="eyebrow">知识与编组</span><h2 class="page-title">${a.name}</h2><p class="prose">${a.desc}</p>
+    ${state.skill==='breaker'?`<div class="source-note"><div>轻击 → 重击<small>真实连招形成窗口，每组合最多配置两招</small></div><div>${key('Ctrl + 左键')}<small>短按轻式 / 按住重式</small></div></div><div class="actions-row"><button data-action="technique">破势斩 · 已配置</button><button data-action="technique">另一招</button></div><p class="prose">武技不占快捷槽。Ctrl 切换不刷新窗口；显式消耗附魔仍需 Ctrl+Shift。</p>`:
+    `<div class="source-note"><div>当前槽 ${key(state.selectedSlot)}<small>${slotSummary(state.selectedSlot)}</small></div><button data-action="source-settings">查看形式与来源</button></div><p class="prose">选择动作后，点击下方目标槽。Q/E/R 与 1—0 都可放动作或物品，彼此独立。</p>`}
+    <p class="hint-line">完整知识可在此阅读；临场 G 只显示当前满足条件的形式。选择不自动准备、不施放。</p></div>
+    <div class="skill-bindings"><div class="section-label">${state.skill==='breaker'?'武技不绑定下方槽位':'将所选动作放入独立快捷槽'}</div>${quickbar('bind')}<div class="actions-row"><button data-action="clear-slot">清空 ${state.selectedSlot}</button><button data-view="inventory">从行囊绑定实物</button></div></div></div></div>`,`${key('Tab')} 移动焦点　${key('右键')} 清槽　${key('Esc')} 返回`);
+}
+
+function character() {
+  return menuShell('角色',`<div class="two-pane"><aside class="list-pane"><span class="section-label">行者 / 等级3</span><div class="list-entry active"><b>属性与成长</b><small>已有点数 ${state.points}</small></div><p class="prose">点节点查看详情，再由你明确学习。知识仍需训练与探索。</p></aside>
+    <div class="progression-main"><div class="content-scroll"><div class="top-data"><div><span class="eyebrow">成长 / 共同角色规则</span><h2 class="page-title">呼吸与力量</h2></div><span>${state.points} 个可用Perk点</span></div>
+    <div class="stat-columns"><div>${[['力量','12'],['耐力','11'],['敏捷','10'],['智力','10']].map(([k,v])=>`<div class="stat-row"><span>${k}</span><b>${v}</b></div>`).join('')}</div><div>${[['生命上限','100'],['体力上限',maxStamina()],['负重上限','40'],['资格',state.awake?'已觉醒':'尚未觉醒']].map(([k,v])=>`<div class="stat-row"><span>${k}</span><b>${v}</b></div>`).join('')}</div></div>
+    <div class="perk-tree"><button class="perk-node learned" data-action="perk-detail">基础战斗<small>已掌握</small></button><button class="perk-node ${state.perk?'learned':''}" data-action="learn-perk">战斗调息<small>${state.perk?'已学会':'体力上限 +15 · 1点'}</small></button><button class="perk-node" data-action="perk-detail">连段节能<small>前置与实践未满足</small></button></div></div>
+    <div class="perk-preview" aria-live="polite">${state.perkPreview?`<div><b>战斗调息</b><small>体力上限 ${state.perk?'115':'100 → 115'} · 不自动回满体力</small></div><button class="primary" data-action="confirm-perk" ${state.perk||state.points<1?'disabled':''}>${state.perk?'已学会':'学习 · 1点'}</button>`:'点击节点只预览，不分配点数。'}</div></div></div>`,`${key('鼠标')} 预览节点　${key('Tab')} 移动焦点　${key('Esc')} 返回`);
+}
+
+const recipeCosts = id => id==='rag'?{resin:1,charcoal:1,cloth:1}:{ash:2,crystal:1};
+const available = definition => items.filter(i=>owned(i)&&i.definition===definition).reduce((n,i)=>n+i.qty,0);
+function recipeReady(id) {
+  return Object.entries(recipeCosts(id)).every(([def,n])=>available(def)>=n);
+}
+function crafting() {
+  const id=state.craft, output=template(id), costs=recipeCosts(id);
+  return menuShell('工作台',`<div class="two-pane"><aside class="list-pane"><span class="section-label">已学配方</span>${['rag','stone'].map(r=>`<button class="list-entry ${id===r?'active':''}" data-craft="${r}"><b>${template(r).name}</b><small>${recipeReady(r)?'原料齐备':'原料不足'} · 实物加工</small></button>`).join('')}<button class="list-entry" data-action="recipe-locked"><b>浓缩毒性喷剂</b><small>尚未学会 · 查看来源</small></button></aside>
+    <div class="work-main"><div class="content-scroll"><span class="eyebrow">制造 / 实物加工</span><h2 class="page-title">${output.name}</h2><p class="prose">${id==='rag'?'涂在当前具体武器上，无需觉醒。涂层随这件武器保存。':'阵材只提供释放来源；制造它不授予施法资格。'}</p><div class="craft-grid">${Object.entries(costs).map(([def,n])=>`<div class="ingredient">${itemArt(template(def))}<b>${template(def).name} ×${n}</b><small>可访问 ${available(def)}</small></div>`).join('')}</div><div class="source-note"><div>本次产出 ×1<small>进入背包，容量不足不扣原料</small></div><div>现有 ${available(id)}</div></div><p class="hint-line">使用身上的原料；脚边和商人库存不计入可访问材料。</p></div><div class="work-actions"><button class="primary" data-action="craft">加工1份</button><span>${recipeReady(id)?'原料齐备':'原料不足，当前不能加工'}</span></div></div></div>`,`${key('鼠标')} 选择配方　${key('Esc')} 返回`);
+}
+
+function tradePrice(i) { return state.tradeMode==='sell'?Math.max(1,Math.floor(i.value*.6)):Math.max(1,i.value); }
+function tradeList() {
+  return items.filter(i=>i.qty>0 && i.id!=='coin' && i.type!=='quest'
+    && (state.tradeMode==='sell'?i.owner==='player':i.owner==='merchant'));
+}
+function tradeTotal() {
+  return Object.entries(state.basket).reduce((sum,[id,n])=>sum+tradePrice(getItem(id))*n,0);
+}
+function trade() {
+  const list=tradeList();
+  if (!list.some(i=>i.id===state.tradeSelected)) state.tradeSelected=list[0]?.id||'';
+  const i=getItem(state.tradeSelected), total=tradeTotal();
+  return menuShell('买卖',`<div class="trade-layout"><section class="trade-items"><div class="tabs-small"><button data-trade-mode="sell" class="${state.tradeMode==='sell'?'active':''}">卖给商人</button><button data-trade-mode="buy" class="${state.tradeMode==='buy'?'active':''}">从商人购买</button></div><div class="trade-money">你有 ${coins()}币 · 商人有 ${state.merchantCoins}币</div><div class="trade-list">${list.map(it=>`<button class="trade-item ${state.tradeSelected===it.id?'selected':''}" data-trade-item="${it.id}">${itemArt(it)}<span><b>${it.name}</b><small>${it.equipped?'已穿戴 · 先卸下':quantity(it)}</small></span><strong>${tradePrice(it)}币</strong></button>`).join('')||'<p class="empty-state">没有可交易的物品</p>'}</div></section>
+    <aside class="trade-inspect">${i?`<span class="eyebrow">报价样例 / ${state.tradeMode==='sell'?'出售':'购买'}</span><h2>${i.name}</h2><div class="stat-row"><span>单件价格</span><b>${tradePrice(i)}币</b></div><div class="stat-row"><span>本件状态</span><b>${quantity(i)}</b></div><p class="prose">${i.lore}</p>${Object.entries(bindings).some(([,b])=>b.id===i.id)?'<p class="effect">这是已绑定来源。出售后槽位保留身份并失效，不自动换物。</p>':''}<button class="primary" data-action="basket-add" ${i.equipped?'disabled':''}>${i.equipped?'先卸下再出售':'加入清单 · 1件'}</button>`:'选择物品查看报价。'}</aside>
+    <aside class="trade-basket"><h2>${state.tradeMode==='sell'?'待售':'待购'}清单</h2><div class="basket-lines">${Object.entries(state.basket).map(([id,n])=>`<div class="basket-line"><span>${getItem(id).name} ×${n}</span><button data-remove-basket="${id}" aria-label="移除${getItem(id).name}">×</button></div>`).join('')||'<p class="quiet">单击查看，双击加入清单。浏览不付款。</p>'}</div><div class="basket-total"><span>${state.tradeMode==='sell'?'可得':'需付'}</span><b>${total}币</b></div><button class="primary" data-action="trade-confirm" ${total?'':'disabled'}>确认${state.tradeMode==='sell'?'出售':'购买'}</button><button data-action="basket-clear">清空清单</button><p class="hint-line">确认时重验实物、资金和容量。原型报价不代表正式游戏平衡。</p></aside></div>`,`${key('双击')} 加入清单　·　单击查看不付款`);
+}
+
+function lootDrawer() {
+  const list=items.filter(i=>i.owner==='ground'&&i.qty>0);
+  if (!list.some(i=>i.id===state.lootSelected)) state.lootSelected=list[0]?.id||'';
+  const i=getItem(state.lootSelected);
+  return `<section class="world-drawer" aria-label="搜取实物"><div class="drawer-top"><span class="eyebrow">现场 / 脚边实物</span><button data-action="close-drawer" aria-label="关闭搜取">×</button></div><h2>旧猎营遗留物</h2><div class="capacity-line">负重 ${weightText()} / ${state.capacity.toFixed(1)}<button data-action="full-pack-demo">${state.fullPackDemo?'恢复容量':'演示满包'}</button></div>
+    <div class="loot-list">${list.map(it=>`<button data-loot-item="${it.id}" class="loot-item ${it.id===state.lootSelected?'selected':''}">${itemArt(it)}<span>${it.name}<small>${quantity(it)}</small></span></button>`).join('')||'<p>这里已没有实物，不会补货。</p>'}</div>
+    ${i?`<div class="loot-detail"><b>${i.name}</b><p>单件重量 ${i.weight} · ${quantity(i)}</p><label>取走数量 <input id="loot-amount" type="number" min="1" max="${i.qty}" value="${Math.min(state.lootAmount,i.qty)}"></label><button class="primary" data-action="take-loot">取走选定数量</button></div>`:''}<p class="hint-line">容量不足留在原处。专业部位需要另验知识与工具；这里仅展示普通随身物品。</p><button data-view="inventory">查看行囊</button></section>`;
+}
+
+function renderSelector() {
+  const host=$('#selector');
+  if (state.forms) {
+    const current=currentForm(state.selectedSlot), catalog=formCatalog(state.selectedSlot);
+    const shown=state.formSnapshot.map(id=>catalog.find(f=>f.id===id)).filter(Boolean);
+    host.innerHTML=`<section class="form-selector" aria-label="选择当前可用形式"><div class="drawer-top"><span class="eyebrow">${state.selectedSlot} / ${bindingInfo(state.selectedSlot)?.name||'空槽'}</span><button data-action="cancel-forms" aria-label="关闭形式选择">×</button></div><h3>选择形式 · 不施放</h3>
+      <p class="current-form-label">当前：${current?.name||'无选材步骤'}${current?.reason?' · '+current.reason:''}</p>
+      <div class="form-options" role="group" aria-label="可执行形式">${shown.map(f=>`<button data-form="${f.id}" class="${current?.id===f.id?'selected':''}" aria-pressed="${current?.id===f.id}" ${f.reason?'disabled':''}>${icon(f.icon)}<b>${f.name}</b><small>${f.reason||f.cost}</small><small>${f.source}</small></button>`).join('')}</div>
+      ${!shown.length?`<p class="prose">${current?.reason||'此物品没有可选形式；K 可查完整知识，行囊可明确换源。'}</p>`:''}
+      <div class="selector-foot"><span>已选择身份不会被替换</span><span>动作键换槽 · Esc取消</span></div></section>`;
+  } else if (state.slotPanel) {
+    host.innerHTML=`<section class="world-drawer slot-drawer" aria-label="当前槽详情"><div class="drawer-top"><span class="eyebrow">${state.selectedSlot} / 当前快捷槽</span><button data-action="close-drawer" aria-label="关闭槽详情">×</button></div><h2>${bindingInfo(state.selectedSlot)?.name||'空槽'}</h2><p class="prose">${slotSummary(state.selectedSlot)}</p><p class="hint-line">只查看，不施放、不消费。来源失效后仍保留原身份。</p><button class="primary" data-action="source-settings">选择当前形式</button><button data-view="skills">完整技艺与编组</button></section>`;
+  } else if (state.drawer==='loot') host.innerHTML=lootDrawer();
+  else if (state.drawer==='read') host.innerHTML=`<section class="world-drawer" aria-label="旧猎营记录"><div class="drawer-top"><span class="eyebrow">现场记录</span><button data-action="close-drawer" aria-label="关闭记录">×</button></div><h2>旧猎营记录</h2><p class="prose">档案窖在林地北侧。先在营地整理食水和武器，再靠近入口；确认守林兵巡路已远离时准备阵材。</p><p class="prose">没有魔力也能前往。火石是阵材，主动铭阵仍需觉醒；凝能阵与火石阵不是同一种来源。</p><button data-view="journal">记入手札 / 查看目标</button><button data-action="loot">查看脚边实物</button></section>`;
+  else if (state.drawer==='buff') host.innerHTML=`<section class="world-drawer" aria-label="人物状态"><div class="drawer-top"><span class="eyebrow">人物状态</span><button data-action="close-drawer" aria-label="关闭状态">×</button></div><h2>饱食</h2><p class="prose">来自食物，持续改善恢复。此处剩余82秒为样例，不是武器涂层。</p></section>`;
+  else host.innerHTML='';
+}
+
+function openForms() {
+  state.slotPanel=false;state.drawer=null;
+  state.forms=true;
+  // Snapshot identities when opened. Invalidated candidates stay in place and cannot confirm.
+  state.formSnapshot=formCatalog(state.selectedSlot).filter(f=>!f.reason).map(f=>f.id);
+  renderSelector();
+}
+
+function showContext(kind,options={}) {
+  state.focusReturn=document.activeElement;
+  state.context={kind,...options};
+  renderContext();
+}
+function closeContext() {
+  state.context=null;
+  renderContext();
+  if (state.focusReturn?.isConnected) state.focusReturn.focus({preventScroll:true});
+  state.focusReturn=null;
+}
+function renderContext() {
+  const c=state.context, host=$('#context');
+  const modal=!!c && c.kind!=='menu';
+  // inert prevents actual pointer/focus access, not merely ignored click handlers.
+  for (const id of ['hud','modal','selector']) $('#'+id).inert=modal;
+  $('#demo-nav').inert=modal;$('#actor-mode').inert=modal;
+  if (!c) {host.innerHTML='';return;}
+  if (c.kind==='menu') {
+    const i=getItem(state.selected);
+    const actions=[...(i.type==='equipment'?[['使用 / 穿戴','use']]:i.type==='consumable'?[['使用','use']]:[]),['绑定快捷槽','bind-item'],['移到口袋','pocket'],...(i.qty>1?[['拆分数量','split']]:[]),['丢弃物品','drop-dialog']];
+    host.innerHTML=`<div class="context-menu" role="menu">${actions.map(([label,a])=>`<button role="menuitem" data-action="${a}">${label}</button>`).join('')}</div>`;
+    return;
+  }
+  const i=getItem(c.item), amount=c.kind==='split'||c.kind==='drop';
+  host.innerHTML=`<div class="context-backdrop"></div><section class="confirmation" role="dialog" aria-modal="true" aria-labelledby="confirm-title"><span class="eyebrow">${amount?'实物操作':'旅程'}</span><h2 id="confirm-title">${amount?(c.kind==='split'?'拆分：':'丢弃：')+i.name:'重新开始灰河谷？'}</h2>
+    ${amount?`<label>数量 <input id="context-amount" type="number" min="1" max="${i.qty}" value="1"></label><p class="prose">${c.kind==='drop'?'转移到脚边，保留实例余量。绑定来源不会自动替换。':'拆分数量，原物品状态不重置；本样例只允许可堆叠材料。'}</p>`:'<p class="prose">正式版会先归档旧旅程。此原型只会刷新示例，绝不访问正式存档。</p>'}
+    <div class="actions-row"><button class="primary" data-action="${amount?'confirm-amount':'reset-demo'}">确认${amount?'操作':'刷新示例'}</button><button data-action="cancel-context">取消</button></div></section>`;
+  host.querySelector('input,button')?.focus();
+}
 function journal(){return menuShell('手札',`<div class="two-pane"><aside class="list-pane"><div class="tabs-small"><button class="active">委托</button><button data-action="journal-info">记录</button><button data-action="journal-info">知识</button></div><button class="list-entry active"><span class="eyebrow">河谷 / 首次出征</span><b>林下档案窖</b><small>${state.tracked?'正在追踪':'未追踪'} · 已有两项线索</small></button><button class="list-entry" data-action="journal-info"><b>行路人的准备</b><small>整备与成长建议 · 非强制教程</small></button><button class="list-entry" data-action="journal-info"><b>晚归者的谷物</b><small>苇娘 · 一次性实物交付</small></button></aside><div class="content-scroll"><span class="eyebrow">艾妲 / 河谷档案</span><h2 class="page-title">首次出征：林下档案窖</h2><p class="prose">旧猎营的记录提到一份封锁名册。把它带回镇里，核对那些仍被执行的旧命令。先整理武器和食水；这趟路不要求你拥有魔力。</p><hr class="rule-divider"><div class="section-label">当前目标</div>${[['✓','阅读旧猎营记录','已记入手札，可随时重读'],['○','恢复东侧压印台','可用布料1手工检修；先确认附近安全'],['✓','取得封锁名册','持有证据，报告时不会当作新命令使用']].map(([m,t,d])=>`<div class="objective-line"><span class="mark">${m}</span><div>${t}<small>${d}</small></div></div>`).join('')}<hr class="rule-divider"><div class="section-label">回镇之后</div><p class="prose">报告原有奖励：1属性点。保留趁手装备，比较多余战利品的出售、拆解和强化；补充实际消耗的食水，再自行选择下一程。觉醒仍是另外的选择。</p><div class="actions-row"><button class="primary" data-action="track">${state.tracked?'取消追踪':'追踪委托'}</button><button data-view="map">查看已知路线</button></div></div></div>`,`${key('J')} 手札 ${key('M')} 行路图 ${key('Esc')} 返回`)}
 function mapPage(){return menuShell('行路图',`<div class="map-layout"><svg class="map-art" viewBox="${state.mapX} ${state.mapY} ${1000/state.mapZoom} ${600/state.mapZoom}" preserveAspectRatio="xMidYMid slice"><defs><pattern id="fog-lines" width="11" height="11" patternUnits="userSpaceOnUse"><path d="M0 11L11 0" stroke="#72876a" stroke-width=".6" opacity=".17"/></pattern></defs>${Array.from({length:15},(_,i)=>`<path class="contour" d="M${30+i*24} ${590-i*14}Q${160+i*10} ${60+i*15} ${410+i*18} ${40+i*5}T${940-i*6} ${520-i*12}"/>`).join('')}<path class="river" d="M750 -20Q650 90 690 180T610 310 670 420 530 650"/><path class="road" d="M200 460Q270 390 280 300T420 170L540 130M280 300Q430 310 540 340L690 420M200 460L520 500"/><path d="M470 0H1000V250Q800 230 740 300L660 270 600 120 470 90Z" class="fog"/><path d="M470 0H1000V250Q800 230 740 300L660 270 600 120 470 90Z" fill="url(#fog-lines)"/><circle class="node" cx="200" cy="460" r="9" data-map="town"/><text x="220" y="465">河谷镇</text><circle class="node" cx="280" cy="300" r="7" data-map="camp"/><text x="300" y="305">旧猎营</text><circle class="node" cx="420" cy="170" r="8" data-map="archive"/><text x="438" y="176">林下档案窖</text><circle cx="245" cy="380" r="5" fill="#d5c68f"/><path d="M245 367l-7 11h14Z" stroke="#d5c68f" stroke-width="1"/><text x="264" y="386">你</text><circle class="node" cx="540" cy="340" r="7" data-map="outpost"/><text x="556" y="345">旧驿站</text><text x="760" y="155" opacity=".4">未探索</text><path d="M420 153l-7-10 7-10 7 10Z" fill="#c7af77" stroke="none"/></svg><div class="map-legend">◇ 追踪目标　△ 当前人物<br>○ 亲历地点　⋯ 已知道路<br>滚轮缩放 · 拖动平移</div><div class="map-card"><span class="eyebrow">已知地点</span><h3 id="map-title">${({town:'河谷镇',camp:'旧猎营',archive:'林下档案窖',outpost:'旧驿站'})[state.mapPin]}</h3><p id="map-detail">${state.mapPin==='archive'?'已经发现入口。可从原路撤回；手工压印需要布料1。':'查看亲历记录与当地可用服务。地图不会提前揭示未知地点的答案。'}</p><button class="primary" data-action="waypoint">设置个人路标</button></div></div>`,`${key('M')} 返回 ${key('鼠标滚轮')} 缩放 ${key('中键 / 右键')} 拖动`)}
-function crafting(){const rag=state.craft==='rag';return menuShell('工作台',`<div class="two-pane"><aside class="list-pane"><span class="section-label">已学配方 / 实物加工</span><input class="search" placeholder="搜索产出或原料" aria-label="搜索配方"><button class="list-entry ${rag?'active':''}" data-craft="rag"><b>火抹布</b><small>武器涂附 · 原料齐备</small></button><button class="list-entry ${!rag?'active':''}" data-craft="stone"><b>火石</b><small>法阵材料 · 原料齐备</small></button><button class="list-entry" data-action="recipe-locked"><b>浓缩毒性喷剂</b><small>尚未学会 · 查看知识来源</small></button></aside><div class="content-scroll"><span class="eyebrow">${rag?'涂附材料':'阵材'}</span><h2 class="page-title">${rag?'火抹布':'火石'}</h2><div class="prose">${rag?'把真实抹布涂在当前具体武器上。使用者不需要觉醒；普通命中和显式元素武技共享这份涂层。':'用于铭刻火石阵。制造材料不授予施法资格；觉醒者仍须准备法力与现场位置。'}</div><div class="craft-grid">${(rag?[['resin','树脂',1],['charcoal','炭屑',1],['cloth','布料',1]]:[['ash','炭灰',2],['crystal','晶砂',1]]).map(([id,t,n])=>`<div class="ingredient">${icon(getItem(id)?.icon||'rock')}<b>${t} ×${n}</b><small>持有 ${getItem(id)?.qty||3}</small></div>`).join('')}</div><div class="source-note"><div>本次产出 ×1<small>进入真实背包；容量不足则不扣原料。</small></div><div>持有 ${rag?getItem('rag').qty:getItem('stone').qty}</div></div><div class="actions-row"><button class="primary" data-action="craft">加工1份</button><button data-view="inventory">查看原料与背包</button></div><p class="hint-line">先留布料1给压印台。持续制作、休息和库存整理不共享一份“免费补货”。</p></div></div>`,`${key('鼠标')} 选择配方 ${key('Esc')} 离开工作台`)}
-function dialogue(){const speech=state.dialogue==='course'?'“这门课收8币。学会以后，你仍得自己把轻击和重击接起来。力气花完了，再漂亮的招也救不了你。”':state.dialogue==='favor'?'“把药草留给需要的人，是一种准备；把它留给自己，也有你的道理。报酬从实有的钱袋里出。”':'“先把呼吸放稳。你想学招式，还是谈谈为什么总在出招后挨打？”';return menuShell('交谈',`<div class="dialogue-layout"><aside class="npc-scene"><div class="portrait-mark">${icon('sword')}</div><div><span class="eyebrow">当值 / 信任：熟悉</span><h2>河谷训练师</h2><p>武器战技与行路准备<br>没有替你准备的武器，也没有免费的力量。</p></div></aside><div class="dialogue-content"><span class="eyebrow">灰河谷 / 人物</span><div class="speech">${speech}</div><button class="choice" data-dialogue="course">我想学习破势斩。 <span class="quiet">8河谷币</span></button><button class="choice" data-dialogue="favor">学费不足，镇里有哪些活可以做？</button><button class="choice" data-dialogue="intro">先教我如何判断距离和体力。</button>${state.dialogue==='course'?'<div class="source-note" style="margin-top:22px"><div>知识：破势斩<small>刀剑 · 轻→重后的窗口接招 · 不需要MP</small></div><div>现有18币 / 费用8币</div></div><div class="actions-row"><button class="primary" data-action="course-demo">付费学习</button><button data-view="skills">先查看连招条件</button></div>':''}<button class="choice quiet" data-action="close">先告辞了。</button></div></div>`,`${key('鼠标')} 选择话题 ${key('Esc')} 结束交谈`)}
+function dialogue(){const speech=state.dialogue==='course'?'“这门课收8币。学会以后，你仍得自己把轻击和重击接起来。力气花完了，再漂亮的招也救不了你。”':state.dialogue==='favor'?'“把药草留给需要的人，是一种准备；把它留给自己，也有你的道理。报酬从实有的钱袋里出。”':'“先把呼吸放稳。你想学招式，还是谈谈为什么总在出招后挨打？”';return menuShell('交谈',`<div class="dialogue-layout"><aside class="npc-scene"><div class="portrait-mark">${icon('sword')}</div><div><span class="eyebrow">当值 / 信任：熟悉</span><h2>河谷训练师</h2><p>武器战技与行路准备<br>没有替你准备的武器，也没有免费的力量。</p></div></aside><div class="dialogue-content"><span class="eyebrow">灰河谷 / 人物</span><div class="speech">${speech}</div><button class="choice" data-dialogue="course">我想学习破势斩。 <span class="quiet">8河谷币</span></button><button class="choice" data-dialogue="favor">学费不足，镇里有哪些活可以做？</button><button class="choice" data-dialogue="intro">先教我如何判断距离和体力。</button>${state.dialogue==='course'?'<div class="source-note" style="margin-top:22px"><div>知识：破势斩<small>刀剑 · 轻→重后的窗口接招 · 不需要MP</small></div><div>现有18币 / 费用8币</div></div><div class="actions-row"><button class="primary" data-action="course-demo">付费学习</button><button data-view="skills">先查看连招条件</button></div>':''}<button class="choice" data-view="trade">我想买卖物品。</button><button class="choice quiet" data-action="close">先告辞了。</button></div></div>`,`${key('鼠标')} 选择话题 ${key('Esc')} 结束交谈`)}
 function settings(){return menuShell('系统',`<div class="two-pane"><aside class="list-pane">${[['继续旅程','close'],['保存旅程','save'],['读取旅程','load'],['重新开始','new'],['退出游戏','exit']].map(([t,a])=>`<button class="list-entry" data-action="${a}"><b>${t}</b><small>${a==='new'?'将单独确认并保留旧旅程归档':a==='save'?'记录当前地点与世界事实':''}</small></button>`).join('')}</aside><div class="content-scroll"><span class="eyebrow">偏好 / 可访问性</span><h2 class="page-title">让信息适合你</h2><div class="settings-row"><span>文字大小</span><select id="font-setting"><option value="100">标准</option><option value="112">较大</option><option value="125">大字</option></select></div><div class="settings-row"><span>界面与底色对比</span><select id="contrast-setting"><option value="normal">标准</option><option value="high">高对比</option></select></div><div class="settings-row"><span>减少动态效果</span><button data-action="motion" id="motion-setting">关闭</button></div><div class="settings-row"><span>状态提示</span><span class="quiet">图形 + 文字 + 色彩</span></div><div class="settings-row"><span>自定义按键</span><button class="primary" data-action="bindings-demo">查看冲突与改键</button></div><p class="prose" style="font-size:12px">偏好只改变呈现与操作绑定，不改变世界模拟。危险或资源拒绝信息不会因减少动态效果而消失。</p></div></div>`,`${key('Esc')} 继续旅程`)}
-function render(){renderHUD();const view=state.view;$('#modal').innerHTML=view==='hud'?'':({inventory,skills:skillPage,character,journal,map:mapPage,craft:crafting,dialogue,settings})[view]();$('#hud').style.display=view==='hud'?'':'none';$('#stage').classList.toggle('threat',state.threat);$('#danger').textContent='受到威胁 · '+keyText('Esc')+'立即返回世界';renderSelector();renderStudio();if(view==='settings'){const scale=$('#stage').style.getPropertyValue('--type-scale');$('#font-setting').value=String(Math.round((Number(scale)||1)*100));$('#contrast-setting').value=$('#stage').style.getPropertyValue('--line')==='#d9d6bf70'?'high':'normal';$('#motion-setting').textContent=document.body.classList.contains('reduced')?'开启':'关闭'}}
-function keyText(x){return '['+x+'] '}
-function renderStudio(){$('#demo-nav').innerHTML=[['hud','探索'],['combat','战斗'],['inventory','行囊'],['skills','技艺'],['character','成长'],['journal','手札'],['map','地图'],['craft','制造'],['dialogue','交谈'],['settings','系统']].map(([id,t])=>`<button data-demo="${id}" class="${state.view===id||id==='combat'&&state.combat&&state.view==='hud'?'active':''}">${t}</button>`).join('')}
-function openView(v){state.forms=false;$('#context').innerHTML='';if(v==='combat'){state.view='hud';state.combat=true;state.art=true;setTimeout(()=>{state.art=false;renderHUD()},1100)}else{state.view=v;if(v==='hud')state.combat=false;else state.lastView=v}render()}
-function renderSelector(){if(!state.forms){$('#selector').innerHTML='';return}const b=bindings[state.selectedSlot],v=bindingInfo(state.selectedSlot);let opts=[],reason='当前物品没有选材步骤。用Q/E/R选择可选材动作。';if(b?.kind==='ability'&&v.magic&&!state.awake)reason='尚未觉醒，当前不能主动施法。按E可查看普通喷洒。';else if(b?.id==='inscribe')opts=[['base','凝能阵','8 MP · 无材料','spark'],...(getItem('stone').qty>0?[['fire','火石阵','8 MP + 火石1','flame']]:[])];else if(b?.id==='ignite')opts=[['base','基础火花','4 MP','flame'],...(state.field?[['fire','火阵 → 火球','12 MP · 消耗阵能','spark']]:[])];else if(v?.doses!==undefined){reason='选定的这瓶喷剂已耗尽，不能自动换瓶。';if(v.qty>0&&v.doses>0)opts=[['base','普通喷洒','0 MP · '+v.name+' · '+v.doses+'剂','flask']]}
-$('#selector').innerHTML=`<div class="selector-shade"></div><section class="form-selector" aria-label="选择当前可用形式"><span class="eyebrow">${state.selectedSlot} / ${v?.name||'空槽'}</span><h3>${opts.length?'当前可释放的形式':'当前没有可用形式'}</h3>${opts.length?`<div class="form-options">${opts.map(([id,t,c,ic])=>`<button data-form="${id}">${icon(ic)}${t}<small>${c}</small></button>`).join('')}</div>`:`<p class="prose">${reason}</p>`}<div class="selector-foot"><span>选择不消费、不施放</span><span>按动作键换槽 · Esc取消</span></div></section>`}
-function contextMenu(){const i=getItem(state.selected);$('#context').innerHTML=`<div class="context-menu" role="menu">${[['使用 / 穿戴','use'],['放入快捷槽','bind-item'],['移动到口袋','pocket'],['拆分数量','split'],['丢弃1件','drop-item']].map(([t,a])=>`<button role="menuitem" data-action="${a}">${t}</button>`).join('')}</div>`}
-function useItem(){const i=getItem(state.selected);if(!i||i.qty<1)return;if(i.type==='equipment'){const next=!i.equipped;if(next)items.filter(j=>j.slot===i.slot&&j.id!==i.id).forEach(j=>{j.equipped=false;j.source='pack'});i.equipped=next;i.source=i.equipped?'gear':'pack';toast((i.equipped?'已穿戴：':'已卸下：')+i.name)}else if(i.doses!==undefined){if(i.doses<1){toast('这只瓶子已空，请明确选择其他来源');return}i.doses--;toast(i.name+' · 剩余'+i.doses+'剂')}else{i.qty--;toast('已使用：'+i.name+' · 剩余'+i.qty)}$('#context').innerHTML='';render()}
-function onAction(a){const i=getItem(state.selected);switch(a){case'close':openView('hud');break;case'equip':case'use':useItem();break;case'context':contextMenu();break;case'bind-item':state.binding=true;state.view='skills';render();break;case'clear-slot':delete bindings[state.selectedSlot];render();toast('已清空 '+state.selectedSlot+'，物品仍保留');break;case'gear':state.filter='equipment';state.selected=i?.id||'sabre';render();toast('只筛选适配的实有装备');break;case'sort':render();toast('已按类别整理 · 数量和实例状态保留');break;case'drop-item':if(i.qty>0){i.qty--;if(i.qty===0)i.equipped=false;render();toast('已放在脚边，绑定来源不会自动替换')}$('#context').innerHTML='';break;case'pocket':i.source='pocket';state.container='pocket';render();toast('物品移到随身口袋');break;case'split':toast('数量选择：1 / '+i.qty+' · 确认后转移到明确来源');break;case'source-settings':state.forms=true;renderSelector();break;case'technique':toast('每个组合最多配置两招 · 切换不刷新截止时间');break;case'learn-perk':if(state.perk||state.points<1){toast('已掌握或点数不足');break}state.perk=true;state.points--;render();toast('战斗调息已学习 · 体力上限 +15');break;case'perk-detail':toast('先预览效果与条件，再由玩家确认学习');break;case'track':state.tracked=!state.tracked;render();toast(state.tracked?'已追踪：林下档案窖':'已取消追踪');break;case'waypoint':toast('已设置个人路标 · 不揭示未知地形');break;case'craft':{const costs=state.craft==='rag'?{resin:1,charcoal:1,cloth:1}:{ash:2,crystal:1};if(Object.entries(costs).some(([id,n])=>getItem(id).qty<n)){toast('原料不足，未扣除任何物品');break}for(const [id,n]of Object.entries(costs))getItem(id).qty-=n;getItem(state.craft).qty++;render();toast('加工完成 · 原料已实际扣除');break}case'course-demo':toast('学习请求：8币 · 实现时由训练服务重新核验');break;case'loot':toast('F：阅读当前记录 · 关闭时不会触发攻击');break;case'recipe-locked':toast('知识来源：探索记录或师承 · 不能只凭原料制造');break;case'journal-info':toast('同一份手札：正式委托、人物人情与亲历记录分组');break;case'save':toast('保存入口 · 原型不会写入正式存档');break;case'load':toast('读档入口 · 在此选择槽位与真实时间地点');break;case'new':$('#context').innerHTML='<div class="form-selector" style="z-index:12"><h3>重新开始灰河谷？</h3><p class="prose">旧旅程先归档，新旅程从普通旅人开始。操作偏好保留。</p><div class="actions-row"><button data-action="reset-demo">确认新旅程</button><button data-action="cancel-context">取消</button></div></div>';break;case'reset-demo':state.awake=false;$('#actor-mode').value='ordinary';$('#context').innerHTML='';openView('hud');toast('原型已切回未觉醒展示');break;case'cancel-context':$('#context').innerHTML='';break;case'exit':toast('退出入口 · 不关闭你的浏览器');break;case'motion':document.body.classList.toggle('reduced');document.querySelectorAll('.world-light,.window-line').forEach(n=>n.style.animationPlayState=document.body.classList.contains('reduced')?'paused':'running');$('#motion-setting').textContent=document.body.classList.contains('reduced')?'开启':'关闭';break;case'bindings-demo':toast('冲突必须说明并明确处理；E与1始终为两个独立槽');break}}
-document.addEventListener('click',e=>{const b=e.target.closest('button');const map=e.target.closest('[data-map]');if(map){state.mapPin=map.dataset.map;render();return}if(!b)return;if(b.dataset.demo){openView(b.dataset.demo);return}if(b.dataset.view){state.binding=false;openView(b.dataset.view);return}if(b.dataset.item){state.selected=b.dataset.item;render();return}if(b.dataset.filter){state.filter=b.dataset.filter;render();return}if(b.dataset.container){state.container=b.dataset.container;render();return}if(b.dataset.slot){state.selectedSlot=b.dataset.slot;state.binding=false;openView('skills');return}if(b.dataset.bindSlot){if(state.skill==='breaker'&&!state.binding){toast('武技由连招接招，不绑定快捷槽');return}const k=b.dataset.bindSlot;state.selectedSlot=k;bindings[k]=state.binding?{kind:'item',id:state.selected}:{kind:'ability',id:state.skill};state.binding=false;render();toast('已将 '+bindingInfo(k).name+' 放入 '+k+' · 其他槽未变');return}if(b.dataset.skill){state.skill=b.dataset.skill;state.binding=false;render();return}if(b.dataset.form){state.formsBySlot[state.selectedSlot]=b.dataset.form;state.forms=false;render();toast('已选定形式，仍需手动按 '+state.selectedSlot+' 释放');return}if(b.dataset.craft){state.craft=b.dataset.craft;render();return}if(b.dataset.dialogue){state.dialogue=b.dataset.dialogue;render();return}if(b.dataset.action==='gear'){const current=equipped(b.dataset.value);state.filter='equipment';state.container='all';state.selected=current?.id||items.find(i=>i.slot===b.dataset.value)?.id||state.selected;render();return}if(b.dataset.action)onAction(b.dataset.action)});
-document.addEventListener('contextmenu',e=>{const b=e.target.closest('[data-item],[data-bind-slot]');if(!b)return;e.preventDefault();if(b.dataset.item){state.selected=b.dataset.item;render();contextMenu()}else{delete bindings[b.dataset.bindSlot];render();toast('快捷绑定已清空')}});
-document.addEventListener('dblclick',e=>{const b=e.target.closest('[data-item]');if(b){state.selected=b.dataset.item;useItem()}});
-document.addEventListener('input',e=>{if(e.target.id==='item-search'){const q=e.target.value;$('#bag-grid').innerHTML=itemTiles(visibleItems().filter(i=>i.name.includes(q)))}});
-document.addEventListener('change',e=>{if(e.target.id==='actor-mode'){state.awake=e.target.value==='awakened';render()}if(e.target.id==='font-setting'){$('#stage').style.setProperty('--type-scale',Number(e.target.value)/100);toast('已更新文字尺寸，世界比例保持不变')}if(e.target.id==='contrast-setting'){$('#stage').style.setProperty('--line',e.target.value==='high'?'#d9d6bf70':'#c8b98b30');toast('已更新界面对比偏好')}});
-$('#threat-demo').addEventListener('click',()=>{state.threat=!state.threat;$('#stage').classList.toggle('threat',state.threat);$('#danger').textContent='附近出现威胁 · [Esc] 立即返回世界';if(state.threat)state.hp=Math.max(1,state.hp-8);render()});
-document.addEventListener('keydown',e=>{if(e.target.matches('input,select')){if(e.key==='Escape'){e.target.blur();openView('hud')}return}if(e.repeat)return;const k=e.key.toUpperCase();if(k==='ESCAPE'){e.preventDefault();if($('#context').innerHTML){$('#context').innerHTML='';return}if(state.forms){state.forms=false;renderSelector();return}openView(state.view==='hud'?'settings':'hud');return}if(k==='SHIFT'){state.compare=true;if(state.view==='inventory')$('#item-detail').innerHTML=itemDetail(getItem(state.selected));return}if(k==='G'&&state.view==='hud'){e.preventDefault();if(!['Q','E','R'].includes(state.selectedSlot))state.selectedSlot='R';state.forms=!state.forms;renderSelector();return}if(state.forms&&keys.includes(k)){state.selectedSlot=k;renderSelector();return}const dest={I:'inventory',O:'inventory',N:'inventory',K:'skills',P:'character',J:'journal',M:'map',TAB:state.lastView};if(dest[k]){e.preventDefault();if(k==='O')state.filter='equipment';else if(k==='N')state.filter='consumable';else if(k==='I')state.filter='all';state.binding=false;openView(state.view===dest[k]?'hud':dest[k]);return}if(k==='F'&&state.view==='hud')onAction('loot')});
-document.addEventListener('keyup',e=>{if(e.key==='Shift'){state.compare=false;if(state.view==='inventory')$('#item-detail').innerHTML=itemDetail(getItem(state.selected))}});
-let mapDrag=null;
-document.addEventListener('wheel',e=>{const map=e.target.closest('.map-art');if(!map)return;e.preventDefault();state.mapZoom=Math.min(2.5,Math.max(1,state.mapZoom+(e.deltaY<0?.15:-.15)));map.setAttribute('viewBox',`${state.mapX} ${state.mapY} ${1000/state.mapZoom} ${600/state.mapZoom}`)},{passive:false});
-document.addEventListener('pointerdown',e=>{const map=e.target.closest('.map-art');if(!map||![1,2].includes(e.button))return;e.preventDefault();mapDrag={x:e.clientX,y:e.clientY,ox:state.mapX,oy:state.mapY,map};map.setPointerCapture(e.pointerId)});
-document.addEventListener('pointermove',e=>{if(!mapDrag)return;const d=mapDrag,ratio=1000/state.mapZoom/d.map.getBoundingClientRect().width;state.mapX=Math.max(-200,Math.min(800,d.ox-(e.clientX-d.x)*ratio));state.mapY=Math.max(-150,Math.min(480,d.oy-(e.clientY-d.y)*ratio));d.map.setAttribute('viewBox',`${state.mapX} ${state.mapY} ${1000/state.mapZoom} ${600/state.mapZoom}`)});
-document.addEventListener('pointerup',()=>mapDrag=null);
-document.addEventListener('contextmenu',e=>{if(e.target.closest('.map-art'))e.preventDefault()});
-setInterval(()=>{state.minute++;document.querySelectorAll('[data-clock]').forEach(n=>n.textContent=clock())},1000);
-render();
+
+function captureView() {
+  const scrolls=[...document.querySelectorAll('.bag-grid,.detail-scroll,.content-scroll,.trade-list,.list-pane')].map((n,index)=>({index,top:n.scrollTop}));
+  const node=document.activeElement;
+  let selector='';
+  if (node?.id) selector='#'+CSS.escape(node.id);
+  else if (node?.dataset) for (const attr of ['item','action','bindSlot','skill','tradeItem']) {
+    if (node.dataset[attr]) {selector=`[data-${attr.replace(/[A-Z]/g,c=>'-'+c.toLowerCase())}="${CSS.escape(node.dataset[attr])}"]`;break;}
+  }
+  return {scrolls,selector};
+}
+function restoreView(saved) {
+  const nodes=document.querySelectorAll('.bag-grid,.detail-scroll,.content-scroll,.trade-list,.list-pane');
+  saved.scrolls.forEach(s=>{if(nodes[s.index]) nodes[s.index].scrollTop=s.top;});
+  if (saved.selector) $(saved.selector)?.focus({preventScroll:true});
+}
+
+function render(preserve=true) {
+  const saved=preserve?captureView():null;
+  renderHUD();
+  const renderers={inventory,skills:skillPage,character,journal,map:mapPage,craft:crafting,dialogue,settings,trade};
+  $('#modal').innerHTML=state.view==='hud'?'':renderers[state.view]();
+  $('#hud').style.display=state.view==='hud'?'':'none';
+  $('#stage').classList.toggle('threat',state.threat);
+  $('#stage').classList.toggle('binding-open',state.view==='inventory'&&state.binding);
+  $('#danger').textContent='受到威胁 · [Esc] 取消界面准备并返回世界';
+  renderSelector();renderStudio();
+  if(state.view==='settings') {
+    $('#font-setting').value=String(Math.round((Number($('#stage').style.getPropertyValue('--type-scale'))||1)*100));
+    $('#contrast-setting').value=$('#stage').classList.contains('high-contrast')?'high':'normal';
+    $('#motion-setting').textContent=document.body.classList.contains('reduced')?'开启':'关闭';
+  }
+  if(saved) restoreView(saved);
+}
+
+function renderStudio() {
+  $('#demo-nav').innerHTML=[['hud','探索'],['combat','战斗'],['inventory','行囊'],['skills','技艺'],['character','成长'],['journal','手札'],['map','地图'],['craft','制造'],['dialogue','交谈'],['trade','买卖'],['loot','搜取'],['settings','系统']].map(([id,t])=>`<button data-demo="${id}" class="${state.view===id||id==='combat'&&state.combat&&state.view==='hud'?'active':''}">${t}</button>`).join('');
+}
+function openView(v) {
+  closeContext();state.forms=false;state.slotPanel=false;state.drawer=null;state.binding=false;
+  clearTimeout(state.artTimer);state.art=false;
+  if(v==='combat') {
+    state.view='hud';state.combat=true;state.art=true;
+    state.artTimer=setTimeout(()=>{state.art=false;renderHUD();},1100);
+  } else if(v==='loot') {state.view='hud';state.drawer='loot';state.combat=false;}
+  else {state.view=v;state.combat=false;if(v!=='hud') state.lastView=v;}
+  render(false);
+  if(state.view!=='hud') $('.menu .close')?.focus({preventScroll:true});
+}
+function returnToWorld() {
+  closeContext();state.forms=false;state.drawer=null;state.slotPanel=false;state.binding=false;
+  openView('hud');
+}
+
+function selectInventoryItem(id) {
+  state.selected=id;
+  // Selection must not replace the clicked node: native dblclick and focus remain intact.
+  document.querySelectorAll('[data-item]').forEach(n=>{
+    n.classList.toggle('selected',n.dataset.item===id);
+    n.setAttribute('aria-pressed',String(n.dataset.item===id));
+  });
+  $('#item-detail').innerHTML=itemDetail(getItem(id));
+}
+function refreshInventoryList() {
+  const list=visibleItems();
+  if(!list.some(i=>i.id===state.selected)) state.selected=list[0]?.id||'';
+  $('#bag-grid').innerHTML=itemTiles(list);
+  $('#item-detail').innerHTML=itemDetail(getItem(state.selected));
+}
+function updateHUDOnly() {
+  renderHUD();renderSelector();
+}
+
+function useItem() {
+  const i=getItem(state.selected);
+  if(!owned(i)) {toast('来源不在身上，未执行');return;}
+  if(i.type==='equipment') {
+    const next=!i.equipped;
+    if(next) items.filter(j=>owned(j)&&j.slot===i.slot).forEach(j=>{j.equipped=false;j.source='pack';});
+    i.equipped=next;i.source=next?'gear':'pack';
+    toast((next?'已穿戴：':'已卸下：')+i.name);
+  } else if(i.type==='consumable') {
+    if(i.doses!==undefined) {
+      if(i.doses<1) {toast('指定瓶已空，请明确选择其他来源');return;}
+      i.doses--;toast(`${i.name} · 剩余${i.doses}剂`);
+    } else {i.qty--;toast(`已使用：${i.name} · 剩余${i.qty}`);}
+  } else {toast('这件物品不能直接使用');return;}
+  closeContext();render();
+}
+function canCarry(delta,extraStacks=0) {
+  return totalWeight()+delta<=state.capacity+0.00001 && stackCount()+extraStacks<=30;
+}
+function transferQuantity(i,n,owner,source) {
+  if(n===i.qty) {i.owner=owner;i.source=source;i.equipped=false;return i;}
+  i.qty-=n;
+  const moved={...i,id:`${i.definition}_copy_${++state.serial}`,qty:n,owner,source,equipped:false,stats:i.stats.map(r=>[...r])};
+  items.push(moved);return moved;
+}
+function confirmAmount() {
+  const c=state.context,i=getItem(c.item),n=Number($('#context-amount').value);
+  if(!owned(i)||!Number.isInteger(n)||n<1||n>i.qty) {toast('数量或来源失效，未转移');return;}
+  if(c.kind==='split') {
+    if(i.doses!==undefined||i.slot||n===i.qty) {toast('只能拆分可堆叠物品的一部分');return;}
+    if(stackCount()>=30) {toast('背包格数不足，未拆分');return;}
+    transferQuantity(i,n,'player','pack');toast('已拆分，数量守恒');
+  } else {
+    if(i.type==='quest'||i.id==='coin') {toast('这件物品不能通过此入口丢弃');return;}
+    transferQuantity(i,n,'ground','ground');toast('已放在脚边，可从搜取页取回');
+  }
+  closeContext();render();
+}
+function takeLoot() {
+  const i=getItem(state.lootSelected),n=Number($('#loot-amount')?.value);
+  if(!i||i.owner!=='ground'||!Number.isInteger(n)||n<1||n>i.qty) {toast('来源或数量失效，未取走');return;}
+  if(!canCarry(Number(i.weight)*n,1)) {toast('容量不足，物品仍在原处');return;}
+  transferQuantity(i,n,'player','pack');state.lootAmount=1;render();toast('已取走实物，余量保持');
+}
+function addToBasket(id) {
+  const i=getItem(id),n=(state.basket[id]||0)+1;
+  if(!i||i.equipped||n>i.qty) {toast('无法加入：已穿戴或数量不足');return;}
+  state.basket[id]=n;render();
+}
+function confirmTrade() {
+  const entries=Object.entries(state.basket),sell=state.tradeMode==='sell';
+  if(!entries.length) return;
+  const valid=entries.every(([id,n])=>{
+    const i=getItem(id);
+    return i && i.owner===(sell?'player':'merchant') && !i.equipped && i.type!=='quest' && Number.isInteger(n)&&n>0&&n<=i.qty;
+  });
+  if(!valid) {toast('清单来源失效，未付款或转移');return;}
+  const total=tradeTotal();
+  if((sell?state.merchantCoins:coins())<total) {toast(sell?'商人资金不足，实物与钱币未变':'钱币不足，实物与钱币未变');return;}
+  const weight=entries.reduce((sum,[id,n])=>sum+Number(getItem(id).weight)*n,0);
+  if(!sell&&!canCarry(weight,entries.length)) {toast('背包容量不足，未付款');return;}
+  // All requirements precede the illustrative commit. No events expose a half-trade.
+  for(const [id,n] of entries) transferQuantity(getItem(id),n,sell?'merchant':'player',sell?'merchant':'pack');
+  getItem('coin').qty+=sell?total:-total;state.merchantCoins+=sell?-total:total;
+  state.basket={};render();toast(sell?`出售完成 · 获得${total}币`:`购买完成 · 支付${total}币`);
+}
+function craft() {
+  const costs=recipeCosts(state.craft),output=template(state.craft);
+  if(!recipeReady(state.craft)) {toast('原料不足，未扣除任何物品');return;}
+  const delta=Number(output.weight)-Object.entries(costs).reduce((w,[id,n])=>w+Number(template(id).weight)*n,0);
+  const target=items.find(i=>i.owner==='player'&&i.definition===state.craft);
+  if(!canCarry(delta,target?0:1)) {toast('产出容量不足，未扣原料');return;}
+  for(const [def,n] of Object.entries(costs)) {
+    let remaining=n;
+    for(const i of items.filter(i=>owned(i)&&i.definition===def)) {const take=Math.min(remaining,i.qty);i.qty-=take;remaining-=take;if(!remaining) break;}
+  }
+  if(target) target.qty++;
+  else items.push(cloneItem(state.craft,{id:`crafted_${++state.serial}`,owner:'player',source:'pack',qty:1,equipped:false}));
+  render();toast('加工完成 · 原料扣除，产出进入背包');
+}
+
+function onAction(a) {
+  const i=getItem(state.selected);
+  switch(a) {
+    case 'close': returnToWorld();break;
+    case 'equip':case 'use':useItem();break;
+    case 'compare':state.compare=!state.compare;$('#item-detail').innerHTML=itemDetail(i);break;
+    case 'context':if(owned(i)) showContext('menu');break;
+    case 'cancel-context':closeContext();break;
+    case 'bind-item':closeContext();state.binding=true;render();break;
+    case 'cancel-binding':state.binding=false;render();break;
+    case 'clear-slot':delete bindings[state.selectedSlot];delete state.formsBySlot[state.selectedSlot];render();toast('快捷槽清空，物品保留');break;
+    case 'sort':items.sort((a,b)=>a.type.localeCompare(b.type)||a.name.localeCompare(b.name));render();toast('已整理，身份和余量保留');break;
+    case 'toggle-display':state.display=state.display==='list'?'grid':'list';render();break;
+    case 'clear-filter':state.query='';state.filter='all';state.slotFilter='';state.container='all';render();break;
+    case 'pocket':if(i?.equipped) {toast('先卸下这件装备');break;}if(owned(i)) i.source='pocket';closeContext();render();break;
+    case 'split':if(owned(i)&&i.qty>1) showContext('split',{item:i.id});break;
+    case 'drop-dialog':if(owned(i)) showContext('drop',{item:i.id});break;
+    case 'confirm-amount':confirmAmount();break;
+    case 'source-settings':openForms();break;
+    case 'cancel-forms':state.forms=false;renderSelector();break;
+    case 'close-drawer':state.slotPanel=false;state.drawer=null;renderSelector();break;
+    case 'read':state.drawer='read';state.forms=false;state.slotPanel=false;renderSelector();break;
+    case 'loot':state.drawer='loot';state.forms=false;state.slotPanel=false;renderSelector();break;
+    case 'buff-detail':state.drawer='buff';state.forms=false;state.slotPanel=false;renderSelector();break;
+    case 'take-loot':takeLoot();break;
+    case 'full-pack-demo':state.fullPackDemo=!state.fullPackDemo;state.capacity=state.fullPackDemo?totalWeight():40;render();toast(state.fullPackDemo?'容量设为当前重量，仅用于满包样例':'恢复样例容量40');break;
+    case 'learn-perk':state.perkPreview=true;render();break;
+    case 'confirm-perk':if(!state.perk&&state.points>0) {state.perk=true;state.points--;render();toast('已学习战斗调息，未回满体力');}break;
+    case 'perk-detail':toast('预览条件：已掌握基础，其他节点仅为布局示例');break;
+    case 'technique':toast('武技每组合最多两招，不占快捷槽');break;
+    case 'track':state.tracked=!state.tracked;render();toast(state.tracked?'已追踪目标':'已取消追踪');break;
+    case 'waypoint':toast('个人路标示意，不揭示未知地形');break;
+    case 'craft':craft();break;
+    case 'basket-add':addToBasket(state.tradeSelected);break;
+    case 'basket-clear':state.basket={};render();break;
+    case 'trade-confirm':confirmTrade();break;
+    case 'recipe-locked':toast('尚未学会：需探索记录或训练，原料不会授予知识');break;
+    case 'course-demo':toast('课程入口示意：正式版由训练服务核验并付款');break;
+    case 'journal-info':toast('此处展示手札分组，示例记录没有更多分支');break;
+    case 'save':case 'load':toast('存读档入口示意，不访问正式存档');break;
+    case 'new':showContext('new');break;
+    case 'reset-demo':location.reload();break;
+    case 'exit':toast('退出入口示意，不关闭浏览器');break;
+    case 'motion':document.body.classList.toggle('reduced');$('#motion-setting').textContent=document.body.classList.contains('reduced')?'开启':'关闭';break;
+    case 'bindings-demo':toast('改键入口示意；E 与 1 始终为两个独立槽');break;
+  }
+}
+
+function modalOpen() {return !!state.context && state.context.kind!=='menu';}
+function trapTab(e,root) {
+  const nodes=[...root.querySelectorAll('button:not(:disabled),input:not(:disabled),select,summary')].filter(n=>n.getClientRects().length&&!n.closest('[inert]'));
+  if(!nodes.length) return;
+  const at=nodes.indexOf(document.activeElement);
+  if(at<0||!e.shiftKey&&at===nodes.length-1||e.shiftKey&&at===0) {e.preventDefault();nodes[e.shiftKey?nodes.length-1:0].focus();}
+}
+
+// Capture input before view handlers when an exclusive confirmation is open.
+document.addEventListener('click',e=>{
+  if(modalOpen()&&!e.target.closest('#context')&&!e.target.closest('#threat-demo')) {e.preventDefault();e.stopImmediatePropagation();return;}
+  const map=e.target.closest('[data-map]');
+  if(map) {state.mapPin=map.dataset.map;render();return;}
+  const b=e.target.closest('button');
+  if(!b||b.disabled) return;
+  if(state.context?.kind==='menu'&&!b.closest('#context')) closeContext();
+  if(b.dataset.demo) {openView(b.dataset.demo);return;}
+  if(b.dataset.view) {openView(b.dataset.view);return;}
+  if(b.dataset.item) {selectInventoryItem(b.dataset.item);return;}
+  if(b.dataset.filter) {state.filter=b.dataset.filter;state.slotFilter='';render();return;}
+  if(b.dataset.container) {state.container=b.dataset.container;render();return;}
+  if(b.dataset.skill) {state.skill=b.dataset.skill;render();return;}
+  if(b.dataset.slot) {state.selectedSlot=b.dataset.slot;state.forms=false;state.drawer=null;state.slotPanel=true;updateHUDOnly();return;}
+  if(b.dataset.bindSlot) {
+    const k=b.dataset.bindSlot;
+    if(!state.binding&&state.skill==='breaker') {toast('武技由连招发动，不绑定快捷槽');return;}
+    if(state.binding&&!owned(getItem(state.selected))) {toast('指定来源失效');return;}
+    bindings[k]=state.binding?{kind:'item',id:state.selected}:{kind:'ability',id:state.skill};
+    delete state.formsBySlot[k];state.selectedSlot=k;state.binding=false;render();toast(`已绑定 ${k}，其他槽未变`);return;
+  }
+  if(b.dataset.form) {
+    const f=formCatalog(state.selectedSlot).find(f=>f.id===b.dataset.form);
+    if(!f||f.reason) {toast(f?.reason||'形式已失效');return;}
+    state.formsBySlot[state.selectedSlot]=f.id;state.forms=false;state.slotPanel=false;if(state.view==='hud') updateHUDOnly();else render();toast(`已固定：${f.name} · 未施放，未消费`);return;
+  }
+  if(b.dataset.craft) {state.craft=b.dataset.craft;render();return;}
+  if(b.dataset.dialogue) {state.dialogue=b.dataset.dialogue;render();return;}
+  if(b.dataset.tradeMode) {state.tradeMode=b.dataset.tradeMode;state.basket={};render();return;}
+  if(b.dataset.tradeItem) {
+    state.tradeSelected=b.dataset.tradeItem;
+    // Keep the clicked entry alive until native dblclick has been delivered.
+    document.querySelectorAll('[data-trade-item]').forEach(n=>n.classList.toggle('selected',n===b));
+    const temp=document.createElement('div');temp.innerHTML=trade();
+    $('.trade-inspect').innerHTML=temp.querySelector('.trade-inspect').innerHTML;return;
+  }
+  if(b.dataset.removeBasket) {delete state.basket[b.dataset.removeBasket];render();return;}
+  if(b.dataset.lootItem) {state.lootSelected=b.dataset.lootItem;state.lootAmount=1;renderSelector();return;}
+  if(b.dataset.action==='gear') {state.slotFilter=b.dataset.value;state.filter='equipment';state.container='all';state.query='';render();return;}
+  if(b.dataset.action) onAction(b.dataset.action);
+},true);
+
+document.addEventListener('dblclick',e=>{
+  if(modalOpen()) return;
+  const tile=e.target.closest('[data-item]'), sale=e.target.closest('[data-trade-item]');
+  if(tile) {state.selected=tile.dataset.item;useItem();}
+  if(sale) addToBasket(sale.dataset.tradeItem);
+});
+document.addEventListener('contextmenu',e=>{
+  if(modalOpen()) {e.preventDefault();return;}
+  const tile=e.target.closest('[data-item]'),slot=e.target.closest('[data-bind-slot]');
+  if(tile) {e.preventDefault();selectInventoryItem(tile.dataset.item);showContext('menu');}
+  else if(slot) {e.preventDefault();delete bindings[slot.dataset.bindSlot];delete state.formsBySlot[slot.dataset.bindSlot];render();toast('已清除这个槽的绑定');}
+  else if(e.target.closest('.map-art')) e.preventDefault();
+});
+document.addEventListener('input',e=>{
+  if(modalOpen()&&!e.target.closest('#context')) return;
+  if(e.target.id==='item-search') {state.query=e.target.value;refreshInventoryList();}
+  if(e.target.id==='loot-amount') state.lootAmount=Number(e.target.value);
+});
+document.addEventListener('change',e=>{
+  if(modalOpen()) return;
+  if(e.target.id==='actor-mode') {state.awake=e.target.value==='awakened';render();}
+  if(e.target.id==='font-setting') $('#stage').style.setProperty('--type-scale',Number(e.target.value)/100);
+  if(e.target.id==='contrast-setting') $('#stage').classList.toggle('high-contrast',e.target.value==='high');
+});
+$('#threat-demo').addEventListener('click',()=>{state.threat=!state.threat;if(state.threat) state.hp=Math.max(1,state.hp-8);render();});
+$('#field-demo').addEventListener('click',()=>{if(modalOpen())return;state.field=!state.field;$('#field-demo').textContent=state.field?'火阵条件：有':'火阵条件：无';render();});
+
+document.addEventListener('keydown',e=>{
+  const k=e.key.toUpperCase();
+  if(k==='ESCAPE') {
+    e.preventDefault();
+    if(state.threat) {returnToWorld();return;}
+    if(state.context) {closeContext();return;}
+    if(state.forms||state.slotPanel||state.drawer) {state.forms=false;state.slotPanel=false;state.drawer=null;renderSelector();return;}
+    if(state.binding) {state.binding=false;render();return;}
+    openView(state.view==='hud'?'settings':'hud');return;
+  }
+  if(modalOpen()) {if(k==='TAB') trapTab(e,$('#context'));else if(!e.target.matches('input,button')) e.preventDefault();return;}
+  if(k==='TAB'&&(state.forms||state.slotPanel||state.drawer)) {trapTab(e,$('#selector'));return;}
+  if(k==='TAB'&&state.view!=='hud') {trapTab(e,$('.menu'));return;}
+  if(e.target.matches('input,select,textarea')||e.repeat) return;
+  if(k==='SHIFT'&&state.view==='inventory') {state.compare=true;$('#item-detail').innerHTML=itemDetail(getItem(state.selected));return;}
+  if(state.forms&&keys.includes(k)) {e.preventDefault();state.selectedSlot=k;openForms();renderHUD();return;}
+  if(k==='G'&&state.view==='hud') {e.preventDefault();if(state.forms){state.forms=false;renderSelector();}else openForms();return;}
+  const dest={I:'inventory',O:'inventory',N:'inventory',K:'skills',P:'character',J:'journal',M:'map'};
+  if(dest[k]) {
+    e.preventDefault();
+    if(['I','O','N'].includes(k)) {
+      const closing=state.view==='inventory'&&state.inventoryEntry===k;
+      state.inventoryEntry=k;state.filter=k==='O'?'equipment':k==='N'?'consumable':'all';state.slotFilter='';state.container='all';
+      openView(closing?'hud':'inventory');return;
+    }
+    openView(state.view===dest[k]?'hud':dest[k]);return;
+  }
+  if(k==='TAB'&&state.view==='hud') {e.preventDefault();openView(state.lastView);return;}
+  if(k==='F'&&state.view==='hud') {onAction('read');return;}
+  if(keys.includes(k)&&state.view==='hud') {state.selectedSlot=k;updateHUDOnly();toast('原型只预览当前槽，未施放或消费');}
+});
+document.addEventListener('keyup',e=>{if(e.key==='Shift'&&state.compare) {state.compare=false;if(state.view==='inventory') $('#item-detail').innerHTML=itemDetail(getItem(state.selected));}});
+window.addEventListener('blur',()=>{state.compare=false;mapDrag=null;if(middleHeld){middleHeld=false;state.forms=false;renderSelector();}});
+
+let mapDrag=null, middleHeld=false;
+document.addEventListener('wheel',e=>{
+  if(modalOpen()) return;
+  const map=e.target.closest('.map-art');
+  if(map) {e.preventDefault();state.mapZoom=Math.min(2.5,Math.max(1,state.mapZoom+(e.deltaY<0?.15:-.15)));map.setAttribute('viewBox',`${state.mapX} ${state.mapY} ${1000/state.mapZoom} ${600/state.mapZoom}`);return;}
+  if(state.view!=='hud'||state.forms||state.drawer||state.slotPanel||!e.target.closest('#stage')) return;
+  const ready=formCatalog(state.selectedSlot).filter(f=>!f.reason);
+  if(!ready.length) return;
+  e.preventDefault();const at=ready.findIndex(f=>f.id===currentForm(state.selectedSlot)?.id),next=ready[(Math.max(0,at)+(e.deltaY>0?1:ready.length-1))%ready.length];
+  state.formsBySlot[state.selectedSlot]=next.id;updateHUDOnly();
+},{passive:false});
+document.addEventListener('pointerdown',e=>{
+  if(modalOpen()) return;
+  const map=e.target.closest('.map-art');
+  if(map&&[1,2].includes(e.button)) {e.preventDefault();mapDrag={x:e.clientX,y:e.clientY,ox:state.mapX,oy:state.mapY,map};map.setPointerCapture(e.pointerId);return;}
+  if(e.button===1&&state.view==='hud'&&e.target.closest('#stage')) {e.preventDefault();middleHeld=true;openForms();}
+});
+document.addEventListener('pointermove',e=>{if(!mapDrag) return;const d=mapDrag,ratio=1000/state.mapZoom/d.map.getBoundingClientRect().width;state.mapX=Math.max(-200,Math.min(800,d.ox-(e.clientX-d.x)*ratio));state.mapY=Math.max(-150,Math.min(480,d.oy-(e.clientY-d.y)*ratio));d.map.setAttribute('viewBox',`${state.mapX} ${state.mapY} ${1000/state.mapZoom} ${600/state.mapZoom}`);});
+document.addEventListener('pointerup',e=>{
+  mapDrag=null;
+  if(e.button!==1||!middleHeld) return;
+  middleHeld=false;
+  const target=e.target.closest('[data-form]');
+  const form=target?formCatalog(state.selectedSlot).find(f=>f.id===target.dataset.form):null;
+  if(form&&!form.reason) state.formsBySlot[state.selectedSlot]=form.id;
+  state.forms=false;updateHUDOnly();
+});
+setInterval(()=>{state.minute++;document.querySelectorAll('[data-clock]').forEach(n=>n.textContent=clock());},1000);
+render(false);
