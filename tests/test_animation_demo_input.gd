@@ -25,14 +25,14 @@ func modifier(code: Key,held: bool) -> void:
 	var event:=InputEventKey.new(); event.keycode=code; event.physical_keycode=code; event.pressed=held
 	Input.parse_input_event(event); Input.flush_buffered_events()
 func reveal_slider(slider: Control) -> void:
- var ancestor:=slider.get_parent()
- while ancestor:
-  if ancestor is ScrollContainer: ancestor.ensure_control_visible(slider)
-  ancestor=ancestor.get_parent()
- await frames(6)
- var scroll:=slider.get_parent().get_parent() as ScrollContainer
- check(root.get_visible_rect().encloses(slider.get_global_rect()) and scroll.get_global_rect().encloses(slider.get_global_rect()),"Scrub target must be visible before actual pointer input")
- print("GALLERY_SCRUB_GEOMETRY ",str(slider.get_global_rect())," within ",str(scroll.get_global_rect()))
+	var ancestor:=slider.get_parent()
+	while ancestor:
+		if ancestor is ScrollContainer: ancestor.ensure_control_visible(slider)
+		ancestor=ancestor.get_parent()
+	await frames(6)
+	var scroll:=slider.get_parent().get_parent() as ScrollContainer
+	check(root.get_visible_rect().encloses(slider.get_global_rect()) and scroll.get_global_rect().encloses(slider.get_global_rect()),"Scrub target must be visible before actual pointer input")
+	print("GALLERY_SCRUB_GEOMETRY ",str(slider.get_global_rect())," within ",str(scroll.get_global_rect()))
 func run() -> void:
 	var fixture:=Fixture.new(self); game=await fixture.boot(true)
 	GameRuntime.instance.set_process(true)
