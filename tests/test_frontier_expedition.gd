@@ -96,7 +96,10 @@ func run() -> void:
   await frames()
   if tab in ["equipment","supplies"]:
    check(game.inventory_screen.visible and game.inventory_screen.mode==tab and game.player.ui_blocked and not paused,"Unified inventory route missing: "+tab)
-   check(game.inventory_screen._portrait.size.x>=240 and game.inventory_screen._grid.size.x>100,"Paper doll / inventory columns collapsed")
+   var inventory:=game.inventory_screen
+   var panes: Array[Control]=[inventory._gear_scroll,inventory._bag,inventory._detail_column]
+   for pane in panes: check(pane.size.x>=140 and root.get_visible_rect().encloses(pane.get_global_rect()),"Inventory pane is too narrow or outside the viewport")
+   check(panes[0].get_global_rect().end.x<=panes[1].global_position.x and panes[1].get_global_rect().end.x<=panes[2].global_position.x,"Inventory reading areas overlap")
   else:
    check(is_instance_valid(game.ui.modal) and game.ui.modal.get_meta("frontier_page")==tab,"Hub tab missing: "+tab)
    check(game.hub._rows.size.x>100 and game.hub._detail.size.x>100,"Hub columns collapsed")

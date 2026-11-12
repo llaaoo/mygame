@@ -23,6 +23,10 @@ enum ItemType {
 ## 图标
 @export var icon: Texture2D
 
+## Inspection art loads only when selected, so the catalog does not retain every large image.
+## The compact icon remains independent; instance state stays on ItemInstance.
+@export_file("*.png","*.webp","*.jpg","*.jpeg","*.svg") var illustration_path := ""
+
 ## 描述文本
 @export_multiline var description: String = ""
 
@@ -40,3 +44,9 @@ enum ItemType {
 
 ## 出售价格
 @export var sell_price: int = 0
+
+func illustration_error() -> String:
+	if illustration_path.is_empty(): return ""
+	if not illustration_path.begins_with("res://") or illustration_path.get_extension().to_lower() not in ["png","webp","jpg","jpeg","svg"] or not ResourceLoader.exists(illustration_path,"Texture2D"):
+		return "Invalid item artwork: %s [%s]"%[id,illustration_path]
+	return ""

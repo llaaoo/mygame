@@ -93,7 +93,7 @@ func present_work(title: String,summary: String,seconds: float,cost: String,reas
 	_summary.text=summary
 	_preparation.text=("剩余准备 %.1f 秒" if progress>=0 else "操作准备 %.1f 秒 · 可中断")%maxf(0,seconds)
 	_cost.text="消耗："+(cost if not cost.is_empty() else "无需材料")
-	_reason.text="无法开始："+reason if not reason.is_empty() else "准备完成后结算 · 世界持续运行"
+	_reason.text="无法开始："+reason if not reason.is_empty() else "准备就绪"
 	_reason.add_theme_color_override("font_color",GameUIStyle.GOLD if not reason.is_empty() else GameUIStyle.TEXT_MUTED)
 	for label in [_summary,_preparation,_cost,_reason]: label.show()
 	text.text=guide

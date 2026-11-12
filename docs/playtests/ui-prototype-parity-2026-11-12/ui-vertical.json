@@ -1,5 +1,5 @@
 {
-  "checks": 109,
+  "checks": 110,
   "failures": [],
   "scope": "Actual Godot UI with controlled inventory/knowledge/position, normal AI/time; not a natural journey or target hardware benchmark",
   "sizes": [

@@ -11,14 +11,16 @@ var _preview: Control
 var _worn_caption: Label
 func _ready() -> void:
  add_theme_constant_override("separation",5)
- _preview=Control.new(); _preview.custom_minimum_size=Vector2(0,150); _preview.mouse_filter=Control.MOUSE_FILTER_IGNORE; add_child(_preview)
+ _preview=Control.new(); _preview.custom_minimum_size=Vector2(0,200); _preview.mouse_filter=Control.MOUSE_FILTER_IGNORE; add_child(_preview)
+ var backdrop:=Panel.new(); backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+ backdrop.mouse_filter=Control.MOUSE_FILTER_IGNORE; backdrop.add_theme_stylebox_override("panel",GameUIStyle.quiet_panel(.22)); _preview.add_child(backdrop)
  _body=Node2D.new(); _preview.add_child(_body)
  _visual=ActorEquipmentVisual.new()
  _visual.animator=(load("res://gameplay/presentation/actors/actor_animation_rig.tscn") as PackedScene).instantiate()
  _visual.animator.preview={"state":"idle","phase":"loop","direction":Vector2.DOWN,"token":"paper-doll"}
  var worn_visual:=actor.get_node_or_null("EquipmentVisual") as ActorEquipmentVisual
  if worn_visual and worn_visual.animator: _visual.animator.profile=worn_visual.animator.profile
- _visual.add_child(_visual.animator); _body.add_child(_visual); _body.scale=Vector2(2,2)
+ _visual.add_child(_visual.animator); _body.add_child(_visual); _body.scale=Vector2(3,3)
  _worn_caption=FoundationWidgets.label("",14,true); _worn_caption.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER; add_child(_worn_caption)
  for slot in range(9):
   var button:=InventoryItemTile.new(); button.name="GearSlot_%d"%slot
@@ -35,7 +37,12 @@ func _ready() -> void:
  for index in range(order.size()): move_child(slots[order[index]],index+2)
  _preview.resized.connect(_layout); _layout(); refresh()
 func _layout() -> void:
- if _body: _body.position=Vector2(_preview.size.x*.5,76)
+ if _body:
+  _body.position=Vector2(_preview.size.x*.5,_preview.size.y*.52)
+  _body.scale=Vector2.ONE*(2 if _preview.size.x<180 or _preview.size.y<130 else 3)
+func set_compact(compact: bool) -> void:
+ _preview.custom_minimum_size.y=112 if compact else 200
+ _layout()
 func refresh() -> void:
  if not is_instance_valid(actor) or not actor.actor_context or not _visual: return
  var context:=actor.actor_context
@@ -45,7 +52,7 @@ func refresh() -> void:
  var names: PackedStringArray=[]
  for slot in range(9):
   var uid:=str(worn.get(str(slot),"")); var item:=context.items.item(uid)
-  var definition:=context.items.definitions.get(item.definition_id) as EquipmentData if item else null
+  var definition:=context.items.equipment_definition(uid) if item else null
   var button:=slots[slot]; button.item_uid=uid
   button.present(InterfaceIcons.item(definition) if definition else GameUIStyle.icon("shield"),definition.display_name if definition else "空槽",EquipmentManager.slot_name(slot))
   button._title.get_parent().move_child(button._subtitle,0)
@@ -54,5 +61,5 @@ func refresh() -> void:
   if definition:
    _visual.items.append(definition); _visual.display_uids.append(uid)
    if slot in [EquipmentData.SlotType.RIGHT_HAND,EquipmentData.SlotType.CHEST]: names.append(definition.display_name)
- _worn_caption.text="\n".join(names) if not names.is_empty() else "尚未穿戴装备"
+ _worn_caption.text="\n".join(names); _worn_caption.visible=not names.is_empty()
  _visual.queue_redraw()

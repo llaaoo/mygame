@@ -17,7 +17,7 @@ func run() -> void:
 	await at(Vector2(250,230));await tap(KEY_F)
 	await click("剥取小刀 ×1");await click("取整组到背包")
 	await click("猎人入门：剥皮 ×1");await click("取整组到背包");await tap(KEY_ESCAPE)
-	await tap(KEY_I);await click("猎人入门：剥皮 ×1");await click("更多"); await click("移至口袋");await click("使用一份");await create_timer(2.4).timeout
+	await tap(KEY_I);await click_identity({"ui_action":"inventory_item","item_uid":game.session.inventory.find_owned("player","book_skinning")});await click("更多"); await click("移至口袋");await click("使用一份");await create_timer(2.4).timeout
 	check(game.session.fieldcraft.knows("player","skinning"),"Real finite book did not teach actual hunting knowledge")
 	await at(Vector2(0,330));await tap(KEY_F)
 	await at(Vector2(-3500,2550));await tap(KEY_F)

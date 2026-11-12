@@ -78,7 +78,7 @@ func run() -> void:
   verify(inventory.visible and root.get_visible_rect().encloses(inventory._panel.get_global_rect()),"Large-font inventory leaves viewport: "+str(extent))
   await click("比较"); await frames(4)
   var comparison:=inventory._details.find_child("EquipmentComparison",true,false)
-  verify(comparison!=null and comparison.get_meta("candidate_id","")==store.item(weapon).definition_id,"Comparison lost selected equipment identity")
+  verify(comparison!=null and comparison.get_meta("candidate_id","")==store.item(weapon).definition_id,"Comparison lost selected equipment identity: size=%s selected=%s open=%s"%[str(extent),inventory.selected,inventory._compare_open])
   if comparison:
    var weight_rows:=comparison.get_children().filter(func(n): return n.has_meta("stat_key") and n.get_meta("stat_key")=="weight")
    verify(weight_rows.size()==1 and is_equal_approx(float(weight_rows[0].get_meta("after")),store.equipment_definition(weapon).weight),"Comparison weight does not project the real instance definition")
@@ -104,6 +104,10 @@ func run() -> void:
   verify(root.gui_get_focus_owner()==first,"Shift+Tab did not return to previous focus")
   await point_click(bind.get_global_rect().get_center()); await frames(6)
   verify(manager.shortcuts.binding("quick_e").get("uid","")==weapon and not inventory._binding_open and casts==0,"In-place binding cast, stayed expanded or lost physical UID")
+  if extent==Vector2i(960,720):
+   var action_rect:=inventory._detail_actions.get_global_rect()
+   await create_timer(3.2).timeout
+   verify(action_rect==inventory._detail_actions.get_global_rect(),"Binding confirmation expiry moves live action targets")
   await capture("comparison-"+str(extent.x)+"x"+str(extent.y)+"-125")
   var item_before:=store.item(weapon).snapshot()
   await point_click(inventory._grid_toggle.get_global_rect().get_center()); await frames(8)

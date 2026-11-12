@@ -27,7 +27,6 @@ func setup(domain: NpcConversationService,handle: Dictionary,services: Callable,
 	_screen.search.placeholder_text="搜索话题、服务或委托…"
 	_screen.search.text_changed.connect(func(_query: String): _rows())
 	add_child(_screen)
-	_screen.footer.add_child(W.label("世界与日程继续推进 · 对话不额外跳时 · 交易、训练和交付需当值 · Esc离开",12,true))
 	_screen.footer.add_child(W.button("结束交谈",_close))
 	tree_exiting.connect(func(): conversation.end(token))
 	_refresh()
@@ -109,7 +108,7 @@ func _update_favor() -> void:
 	var refused:=conversation.handle_reason(token,true)
 	if refused.is_empty(): refused=conversation.topic_reason(npc_id,entry)
 	if refused.is_empty() and state in ["accepted","waiting"]: refused=conversation.favor_reason(npc_id,entry)
-	if entry.repeat_hours>0:_stock_label.text+="\n最多%d批，每批间隔%.1f游戏小时；报酬取自对方实有钱袋。"%[entry.maximum_deliveries,entry.repeat_hours]
+	if entry.repeat_hours>0:_stock_label.text+="\n最多%d批，每批间隔%.1f小时；报酬由委托人支付。"%[entry.maximum_deliveries,entry.repeat_hours]
 	_reason_label.text=refused; _reason_label.visible=not refused.is_empty()
 	_favor_button.text="接受委托" if state.is_empty() else "交付物资并领取报酬"
 	_favor_button.visible=state!="completed"

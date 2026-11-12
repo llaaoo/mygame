@@ -47,7 +47,7 @@ static func render(host: Node,current: EquipmentData,candidate: EquipmentData,co
   var panel:=PanelContainer.new(); var style:=GameUIStyle.surface_style()
   style.bg_color=Color("adb18d0b"); style.set_border_width_all(0); style.border_width_left=2; style.border_color=Color("9cac80")
   panel.add_theme_stylebox_override("panel",style); host.remove_child(box); host.add_child(panel); panel.add_child(box)
-  box.add_child(FoundationWidgets.label("对比 "+(current.display_name if current else "空槽"),14))
+  box.add_child(FoundationWidgets.label(candidate.display_name+" · 对比 "+(current.display_name if current else "空槽"),14))
  for row in rows(current,candidate):
   if not compare and row.key=="weight": continue
   var line:=HBoxContainer.new(); line.set_meta("stat_key",row.key); line.set_meta("before",row.before); line.set_meta("after",row.after); box.add_child(line)

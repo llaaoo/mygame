@@ -54,7 +54,7 @@ func _refresh() -> void:
  var data:=ActorProgression.values(actor)
  var recovery:=ActorProgression.stamina_values(actor)
  _overview.text="角色 Lv.%d · 经验 %d / %d    属性点 %d    Perk点 %d\n生命 %d · %s · 体力 %.0f · 当前回复 %.1f/秒（基础%.1f） · 负重承受 %.0f"%[stats.level,stats.experience,stats.exp_to_next,stats.attribute_points,mastery.get_available_perk_points(),actor.health_component.max_hp,QuickslotView.magic_status(actor),recovery.maximum,recovery.regeneration,recovery.base_regeneration,actor.actor_context.rules.carry_limit+data.carry_bonus]
- _overview.tooltip_text="升级：3属性点＋1Perk点；成功实践提升分支熟练度。回复仍受消耗延迟与格挡限制。世界持续运行。"
+ _overview.tooltip_text="升级：3属性点＋1Perk点；成功实践提升分支熟练度。回复仍受消耗延迟与格挡限制。"
  _experience_bar.max_value=maxi(1,stats.exp_to_next); _experience_bar.value=stats.experience
  if _branch_buttons.is_empty():
   _branches.add_child(FoundationWidgets.button("属性与派生",_show_attributes))
@@ -122,7 +122,7 @@ func _draw_attributes() -> void:
  column.minimum_size_changed.connect(_fit_attributes.bind(column))
  _fit_attributes(column)
  _detail.add_child(FoundationWidgets.label("属性准备",19))
- _detail.add_child(FoundationWidgets.label("主属性由基础值、真实装备与增益共同计算。加点不补满资源；耐力会立即改变体力上限。\n\n任务、现场作业与施法检查有效属性；永久Perk要求基础属性，不能借临时增益点亮。\n\n力量支撑近战与携带；敏捷支撑远射、机动与准备；智力支撑作业与觉醒后的施法；学习和属性不替代觉醒；耐力支撑生存与体力。",14,true))
+ _detail.add_child(FoundationWidgets.label("主属性由基础值、穿戴装备与增益共同计算。加点不补满资源；耐力会立即改变体力上限。\n\n任务、现场作业与施法检查有效属性；永久Perk要求基础属性，不能借临时增益点亮。\n\n力量支撑近战与携带；敏捷支撑远射、机动与准备；智力支撑作业与觉醒后的施法；学习和属性不替代觉醒；耐力支撑生存与体力。",14,true))
 func _train(key: String) -> void:
  if train_request.is_valid(): train_request.call(key)
  _refresh()

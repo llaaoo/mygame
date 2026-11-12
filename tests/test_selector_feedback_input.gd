@@ -55,7 +55,7 @@ func run() -> void:
  var clock:=store.clock_seconds
  await key(KEY_F,true); await key(KEY_F,false)
  var panel:=actor.field_work.panel
- check(panel.visible and panel._summary.text.contains("1 小时（游戏时间）") and panel._preparation.text.contains("准备") and panel._preparation.text.contains("秒"),"Rest hides game hours behind preparation seconds")
+ check(panel.visible and panel._summary.text.contains("1 小时") and panel._preparation.text.contains("准备") and panel._preparation.text.contains("秒"),"Rest hides game hours behind preparation seconds")
  check(panel.start_button.disabled and panel._reason.text.begins_with("无法开始：") and not panel.text.visible,"Missing rest supplies were not clear or detailed rules opened by default")
  await capture("rest-summary")
  await point_click(panel.details_toggle.get_global_rect().get_center())

@@ -100,3 +100,7 @@
 人物的交易/排产话题必须有同actor_id的NpcProfile.market，课程话题必须有同actor_id的training；绑定自己的MarketDefinition/TrainingCatalog，不能借主商店默认配置。地区、前置事实、导航引用与日程须通过跨目录校验；独立派生的交涉事实由章节显式登记。NPC导航用navigation_hints引用地点，不再在response复制坐标与方位。J人情追踪由真实物资、已知采集点与人物生命/日程派生，新增世界条件仍由原进度服务持有。规则与验证见[世界衔接](WORLD_SYSTEM_COHERENCE.md)。
 
 首次远征整备与返镇反馈见[首程闭环](FIRST_EXPEDITION_LOOP.md)。任务可选`completion_hint`只在实际报告中记录，不授予额外奖励；清单复用既有事实与库存，新增人情报酬须来自NPC实有钱袋。
+
+## 物品检视图与穿戴外观
+
+物品可用`ItemData.illustration_path`配置独立检视插画；按选中时加载，小图标和实际穿戴外观分别沿用原来源。插画不进实例存档，也不自动覆盖角色装备图层。路径、资源预算、许可与所见即所得边界见[物品表现接入](ITEM_PRESENTATION.md)。

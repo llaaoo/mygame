@@ -31,6 +31,8 @@ func _ready() -> void:
 	add_to_group("modal_ui")
 	hide()
 	_build_ui()
+	get_viewport().size_changed.connect(_layout_menu)
+	_layout_menu()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -100,11 +102,12 @@ func _build_ui() -> void:
 	GameUIStyle.decorate(_panel)
 	var margin:=MarginContainer.new()
 	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	for side in ["left","right","top","bottom"]: margin.add_theme_constant_override("margin_"+side,16)
+	for side in ["left","right"]: margin.add_theme_constant_override("margin_"+side,24)
+	margin.add_theme_constant_override("margin_top",14); margin.add_theme_constant_override("margin_bottom",12)
 	_panel.add_child(margin)
 	var root:=VBoxContainer.new(); root.add_theme_constant_override("separation",10); margin.add_child(root)
 	_navigation=GameUIStyle.menu_header(root,"技艺","loadout",close,navigation_request)
-	root.add_child(FoundationWidgets.label("◇ 世界继续运行 · 选择内容后绑定独立快捷槽",12,true))
+	root.add_child(FoundationWidgets.label("所学技艺与随身物品",12,true))
 	var content:=HBoxContainer.new(); content.size_flags_vertical=Control.SIZE_EXPAND_FILL
 	content.add_theme_constant_override("separation",12); root.add_child(content)
 	var library:=VBoxContainer.new(); library.custom_minimum_size.x=260
@@ -139,6 +142,10 @@ func _build_ui() -> void:
 	_hint_label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	root.add_child(_hint_label)
 
+
+func _layout_menu() -> void:
+	var inset:=20 if get_viewport().get_visible_rect().size.x<1100 else 32
+	_panel.offset_left=inset; _panel.offset_right=-inset; _panel.offset_top=inset; _panel.offset_bottom=-inset
 
 func _make_section_label(text: String) -> Label:
 	var lbl := Label.new()
@@ -192,7 +199,7 @@ func _bind_to_source(source: String) -> void:
 		_hint_label.text="先在左侧选择要放入这个槽位的内容。"
 		return
 	_refresh_all()
-	if accepted: _hint_label.text="已绑定到 "+InputBindings.labels(InputBindings.action_for_source(source))+" · 世界仍在运行，Esc返回。"
+	if accepted: _hint_label.text="已绑定到 "+InputBindings.labels(InputBindings.action_for_source(source))+""
 
 
 func _equip(source: String, skill: SkillData) -> bool:
@@ -271,7 +278,7 @@ func _refresh_detail() -> void:
 		return
 	if not _selected_skill:
 		var empty := Label.new()
-		empty.text = "动作与物品：选择真实来源，再点击下方快捷槽。E与1独立。\n\n武技：按连招配置，每个组合最多两招；轻点Ctrl切换，Ctrl+左键发动。"
+		empty.text = "挑选一门技艺，备好所需材料；也可将随身物品放到下方。\n\n武技随武器与连招施展，选择招式可查看用法。"
 		empty.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 		empty.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 		GameUIStyle.apply_label(empty, 10, GameUIStyle.TEXT_MUTED)
@@ -320,8 +327,8 @@ func _refresh_detail() -> void:
 					if _selected_choice.get("modifier","")==material.id: modifiers.select(modifiers.item_count-1)
 			modifiers.item_selected.connect(func(index: int): _selected_choice["modifier"]=modifier_ids[index])
 			_detail_box.add_child(modifiers)
-			var source_hint: String="脚下"+FireSigil.title_for(payload.source_field) if payload.source_kind=="field" else "附近真实残魂" if payload.source_kind=="soul" else ""
-			_detail_box.add_child(FoundationWidgets.label(payload.describe(_skill_manager.get_parent().actor_context.rules.timed_fields if _skill_manager.get_parent().get("actor_context") else false)+"\n必需来源："+(source_hint if not source_hint.is_empty() else "无额外场地来源")+"\n实物："+(_skill_manager.combinations.supplies.title(payload.material_id)+" ×"+str(payload.quantity) if not payload.material_id.is_empty() else "不消耗材料")+"\n绑定后固定此来源；不自动准备条件或串联动作。",11,true))
+			var source_hint: String="脚下"+FireSigil.title_for(payload.source_field) if payload.source_kind=="field" else "附近残魂" if payload.source_kind=="soul" else ""
+			_detail_box.add_child(FoundationWidgets.label(payload.describe(_skill_manager.get_parent().actor_context.rules.timed_fields if _skill_manager.get_parent().get("actor_context") else false)+"\n必需来源："+(source_hint if not source_hint.is_empty() else "无额外场地来源")+"\n实物："+(_skill_manager.combinations.supplies.title(payload.material_id)+" ×"+str(payload.quantity) if not payload.material_id.is_empty() else "不消耗材料")+"\n施术前请备好场地与材料。",11,true))
 	var owner:=_skill_manager.get_parent() as Player
 	if _selected_skill.requires_magic and owner and not owner.mana_component.can_cast():
 		_detail_box.add_child(FoundationWidgets.label("主动施法需要觉醒。已学知识与快捷编组保留，当前不能施放。",12,true))

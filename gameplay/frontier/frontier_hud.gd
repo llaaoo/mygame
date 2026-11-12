@@ -66,6 +66,7 @@ func _process(delta: float) -> void:
 	var goal:=preparation if not preparation.is_empty() else game.guidance.tracked()
 	var orienting: bool = goal.is_empty() or bool(goal.get("journey",false))
 	if goal.is_empty(): goal = game.guidance.town_orientation()
+	tracker.visible=tracker.visible and not goal.is_empty()
 	tracker.text=_journal_hint
 	if not goal.is_empty():
 		tracker.text=("镇中整备\n" if orienting else "追踪委托\n")+goal.title

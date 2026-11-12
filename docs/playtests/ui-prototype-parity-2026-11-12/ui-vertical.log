@@ -25,10 +25,9 @@ SaveManager: saved user://save_3.sav
 SaveManager: saved user://save_3.sav
 SaveManager: saved user://save_3.sav
 SaveManager: saved user://save_3.sav
-SaveManager: saved user://save_3.sav
-SaveManager: saved user://save_3.sav
 ⏳ [Charge] 开始蓄力: 聚能投射 (1.0s 满蓄)
 ⏹️ [Charge] 取消蓄力: 聚能投射
+SaveManager: saved user://save_3.sav
 SaveManager: saved user://save_3.sav
 ⏰ WorldTime 启动: 08:00
 🏛️ GameRuntime: 五大 Runtime 初始化完成
@@ -42,4 +41,4 @@ SaveManager: saved user://save_3.sav
 📊 CombatDebugger: trace enabled
 ⏰ 08:00 (☀️ 白天)
 SaveManager: saved user://save_3.sav
-PASS UI vertical slice: 109 checks, 13 sources, live item inspection, exact UID failure, typed comparison, fixed actions, binding/cancel/focus/context, 4 large-text sizes, form preview and disk reload
+PASS UI vertical slice: 110 checks, 13 sources, live item inspection, exact UID failure, typed comparison, fixed actions, binding/cancel/focus/context, 4 large-text sizes, form preview and disk reload

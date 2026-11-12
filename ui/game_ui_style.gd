@@ -147,7 +147,7 @@ static func menu_header(host: VBoxContainer,title: String,page: String,close_req
 	var caption: String={"整备与制作":"整备","角色成长":"角色","委托与旅程":"手札"}.get(title,title)
 	var heading:=folio_title(header,caption); heading.size_flags_horizontal=Control.SIZE_SHRINK_BEGIN
 	var navigation_bar:=navigation(header,page,route_request)
-	var close_button:=Button.new(); close_button.name="ReturnToWorld"; close_button.text="Esc 返回世界"
+	var close_button:=Button.new(); close_button.name="ReturnToWorld"; close_button.text="Esc 收起"
 	apply_tab(close_button); close_button.pressed.connect(close_request); header.add_child(close_button)
 	host.add_child(HSeparator.new())
 	return navigation_bar

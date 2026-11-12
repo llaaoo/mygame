@@ -348,7 +348,8 @@ func _update_stats_display() -> void:
 func _process(_delta: float) -> void:
 	if _bindings_revision!=InputBindings.revision:
 		_bindings_revision=InputBindings.revision
-		_quick_help.text=InputBindings.menu_help("G 选形式   K 完整编组   ·   选择不施放")
+		_quick_help.text=InputBindings.menu_help("G 选形式   K 技艺")
+	_quick_help.visible=is_instance_valid(player) and not player.ui_blocked and is_instance_valid(skill_bar) and not skill_bar._hover_source.is_empty()
 	# Campaign actor binding completes after the base HUD enters the tree.
 	if _actor_status and is_instance_valid(player) and _actor_status.context!=player.actor_context:
 		_actor_status.context=player.actor_context

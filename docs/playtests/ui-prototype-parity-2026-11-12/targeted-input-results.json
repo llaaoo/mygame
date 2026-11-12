@@ -1,0 +1,109 @@
+{
+  "schema": 1,
+  "revision": "c0469366fb0558b6ca9a5385e439c13fa851062b",
+  "dirty": true,
+  "godot": "4.6.3.stable.official.7d41c59c4",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "jobs": 2,
+  "timeout": 300.0,
+  "logs": "/tmp/mygame-tests-_3f_sx3a",
+  "requested": [
+    "controls_workflow",
+    "ui_system",
+    "ui_vertical_input",
+    "ui_prototype_input",
+    "gut_domain"
+  ],
+  "results": [
+    {
+      "name": "gut_domain",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 5.534,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://addons/gut/gut_cmdln.gd",
+        "-gexit",
+        "-gdisable_colors",
+        "-gjunit_xml_file=/tmp/mygame-tests-_3f_sx3a/gut-domain.xml"
+      ],
+      "log": "/tmp/mygame-tests-_3f_sx3a/gut_domain.log",
+      "diagnostic": []
+    },
+    {
+      "name": "controls_workflow",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 18.288,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_controls_workflow.gd"
+      ],
+      "log": "/tmp/mygame-tests-_3f_sx3a/controls_workflow.log",
+      "diagnostic": []
+    },
+    {
+      "name": "ui_system",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 6.54,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_ui_system.gd"
+      ],
+      "log": "/tmp/mygame-tests-_3f_sx3a/ui_system.log",
+      "diagnostic": []
+    },
+    {
+      "name": "ui_vertical_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 31.263,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_ui_vertical_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-_3f_sx3a/ui_vertical_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "ui_prototype_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 20.475,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_ui_prototype_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-_3f_sx3a/ui_prototype_input.log",
+      "diagnostic": []
+    }
+  ],
+  "skipped": [],
+  "complete": true
+}
