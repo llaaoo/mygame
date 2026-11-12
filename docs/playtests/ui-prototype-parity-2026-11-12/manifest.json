@@ -67,5 +67,16 @@
     "page-77-1440-125.png": "3f6a3e7dc2c55cd711aa11e09838a1f646d3c80ff9c4e542c2b4ef0c00ecef60",
     "hud-960-125.png": "7dcca8a517ed66e3041958a8cdb965883ce3c25391be3fab02d94c2b6f630c9a"
   },
-  "reference_capture": "Chromium; review toolbar/footer hidden, full 1440x900 stage, menu inset32, font125%. Original prototype retained; later item-art/immersion extensions deliberately go beyond its small item icon."
+  "reference_capture": "Chromium; review toolbar/footer hidden, full 1440x900 stage, menu inset32, font125%. Original prototype retained; later item-art/immersion extensions deliberately go beyond its small item icon.",
+  "full_regression": {
+    "source_revision": "20e73954afdd2ef0cce6a1ef6e4223574ad2fb16",
+    "archive": "/workspace/ui-immersive-clean-20e73954",
+    "report": "all-results.json",
+    "report_sha256": "14170e0c1c6e24222d8d92a492382f7e9f19abc6dd57f54b28889c2aac01230f",
+    "suite_checks": 160,
+    "suite_passed": 160,
+    "first_import_passed": true,
+    "complete": true,
+    "exit_code": 0
+  }
 }

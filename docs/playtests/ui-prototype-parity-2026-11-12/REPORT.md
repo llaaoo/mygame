@@ -58,3 +58,17 @@ python3 tools/run_tests.py --suite all --jobs 2 --timeout 300 --source-revision 
 另一项揭示确认消息消失时操作区可能发生重排；修复为固定消息区，并增加真实绑定提示到期后的按钮矩形检查。最终归档的完整结果另行记录，不把这份失败报告算作绿色。
 
 沉浸展示复测还修复共享页搜索框吞Esc的问题：退出在模态输入边界处理，保留展开选择器与锁定确认的优先级。较大的物品图会增加阅读长度，点击比较会定位到差异标题，收起后恢复原位置；界面关闭、换选与异步阅读回调以视图代际和UID校验。
+
+## 最终干净归档回归
+
+最终运行源码为 `20e73954afdd2ef0cce6a1ef6e4223574ad2fb16`。由 `git archive` 解到 `/workspace/ui-immersive-clean-20e73954`，在未带入 `.godot` 缓存的归档内执行：
+
+```sh
+python3 tools/run_tests.py --suite all --jobs 2 --timeout 300 \
+  --source-revision 20e73954afdd2ef0cce6a1ef6e4223574ad2fb16 \
+  --report /workspace/ui-immersive-final-all.json
+```
+
+首次导入通过（14.366秒），**160/160项完整检查通过，退出码0，无跳过**。JSON另外记录首次导入，因此共161条成功结果；见[完整结果](all-results.json)。首份归档的五个失败项均在最终归档中通过，GUT包含31个用例。该回归主要为headless领域与真实输入集成检查，不能替代前述原生图形验证或自然新档试玩。
+
+最终归档、原生截图使用的运行时/测试源码散列已与提交核对一致；报告归档只追加文档和证据，不再修改运行代码。GitHub Actions保持停用。
