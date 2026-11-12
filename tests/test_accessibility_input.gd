@@ -37,7 +37,7 @@ func run() -> void:
 	if not is_instance_valid(game.ui.modal):await fixture.close();quit(1);return
 	var reading:=game.ui.modal.find_children("*","RichTextLabel",true,false)
 	check(not reading.is_empty() and reading.all(func(label):return label.get_theme_font_size("normal_font_size")==19),"Main reading/dialogue text ignored font scale")
-	check(game.frontier_hud.tracker.get_theme_font_size("font_size")==18,"Persistent HUD text ignored font scale")
+	check(game.frontier_hud.tracker.get_theme_font_size("font_size")==GameUIStyle.font_size(12),"Persistent HUD text ignored font scale")
 	await key(KEY_ESCAPE,true);await key(KEY_ESCAPE,false)
 	await key(KEY_TAB,true);await key(KEY_TAB,false);await click("操作设置")
 	await click("施法与快捷操作")

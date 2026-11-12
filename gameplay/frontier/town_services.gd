@@ -262,13 +262,13 @@ func show_production() -> void:
 	var screen:=preload("res://gameplay/foundation/ui/expedition_screen.tscn").instantiate() as ExpeditionScreen
 	screen.get_node("Navigation/Caption").text="店内排产"
 	screen.search.placeholder_text="搜索配方或原料…"
-	screen.status.text="原料与成品属于店家 · 可出售采集材料供货，再购买真实成品"
+	screen.status.text="原料与成品属于店家 · 可出售采集材料供货，再购买成品"
 	screen.footer.add_child(W.button("回到整修铺",show.bind(false)))
 	var live_rows: Array[Dictionary]=[]
 	for definition in game.session.production.catalog.entries:
 		if definition.actor_id!=market.actor_id: continue
 		var title:=game.player.skill_manager.combinations.supplies.title(definition.recipe.output_id)
-		var card:=W.card(screen.rows,title+" ×%d"%definition.recipe.output_count,"每批%.0f游戏小时"%definition.work_hours)
+		var card:=W.card(screen.rows,title+" ×%d"%definition.recipe.output_count,"每批%.0f小时"%definition.work_hours)
 		var input_label:=W.label("",14,true); card.add_child(input_label)
 		var label:=W.label("",14,true); card.add_child(label)
 		var button:=W.button("",Callable()); card.add_child(button)
@@ -280,7 +280,7 @@ func show_production() -> void:
 	var timer:=Timer.new(); timer.wait_time=1; timer.autostart=true; screen.add_child(timer)
 	timer.timeout.connect(func():
 		for row in live_rows: _refresh_production_row(row))
-	screen.detail.add_child(W.label("排产不预扣原料、不预留货品。工期完成时检查店家真实库存并加工；缺料或满库会等候，恢复后重新计工期。停止不会扣原料；已完成成品留在店内。休息推进工期，离线不推进，不会补满货物或生成河谷币。",14,true))
+	screen.detail.add_child(W.label("排产不预扣原料、不预留货品。工期完成时检查店内库存并加工；缺料或满库会等候，恢复后重新计工期。停止不会扣原料；已完成成品留在店内。休息推进工期，离线不推进，不会补满货物或生成河谷币。",14,true))
 	game.ui.show_view(service_title(market.actor_id,"整修铺")+" · 店内排产",screen)
 func _refresh_production_row(row: Dictionary) -> void:
 	var state:=game.session.production.status(row.id)
@@ -291,7 +291,7 @@ func _refresh_production_row(row: Dictionary) -> void:
 	row.inputs.text="原料："+" · ".join(inputs)
 	var detail: String="未排产"
 	if state.scheduled:
-		detail="等候原料/库容；恢复后重新计工期" if state.blocked else "剩余%.1f游戏小时 · %d批"%[state.remaining*WorldTime.instance.time_scale/3600.0,state.batches]
+		detail="等候原料/库容；恢复后重新计工期" if state.blocked else "剩余%.1f小时 · %d批"%[state.remaining*WorldTime.instance.time_scale/3600.0,state.batches]
 	if not str(state.reason).is_empty(): detail+=" · "+str({"materials":"缺少配方原料","capacity":"成品库容不足","producer_dead":"生产者已死亡，排产终止"}.get(state.reason,state.reason))
 	row.label.text="店存%d · "%state.stock+detail
 	row.button.text="停止排产" if state.scheduled else "安排一批 · "+str(row.title)

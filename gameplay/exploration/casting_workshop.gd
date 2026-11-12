@@ -11,7 +11,7 @@ func show_materials() -> void:
 	screen.tabs.add_child(FoundationWidgets.button("快捷栏编组",func(): game.ui.close_modal(); game.player.skill_pool_ui.open()))
 	screen.tabs.add_child(FoundationWidgets.button("营地加工",show_crafts,not game.is_at_base()))
 	screen.tabs.add_child(FoundationWidgets.button("调和台回收",show_recycling,not recycling_available()))
-	screen.status.text="选择基础动作 · 查看真实费用与释放来源"
+	screen.status.text="选择基础动作 · 备料与施术所需"
 	screen.search.placeholder_text="搜索已学动作…"
 	screen.search.text_changed.connect(func(value: String): _source_rows(screen,value))
 	game.ui.show_view("材料与释放来源",screen)
@@ -96,8 +96,8 @@ func show_crafts() -> void:
 	screen.get_node("Navigation/Caption").text="工作台"
 	screen.tabs.add_child(FoundationWidgets.label("配方加工",20))
 	screen.tabs.add_child(FoundationWidgets.label("探索解锁配方
-制造消费真实材料
-休息不会补货",13,true))
+原料取自随身行囊
+备好下一程的补给",13,true))
 	screen.search.text=query
 	screen.search.placeholder_text="查找配方或原料…"
 	var selection:=selected
@@ -239,7 +239,7 @@ func show_payloads(skill: SkillData) -> void:
 		card.add_child(FoundationWidgets.label(payload.describe(game.rules.timed_fields),14))
 		var cost:="无需材料" if payload.material_id.is_empty() else supplies.describe_cost({payload.material_id:payload.quantity})
 		if payload.source_kind=="field": cost="脚下"+FireSigil.title_for(payload.source_field)+" · 消耗1次实际充能"
-		if payload.source_kind=="soul": cost="附近真实残魂 · 消耗1个"
+		if payload.source_kind=="soul": cost="附近残魂 · 消耗1个"
 		if skill.operation_id=="disperse": cost="每0.5秒：2 MP＋该瓶1剂；每瓶3剂"
 		card.add_child(FoundationWidgets.label(cost,14,true))
 	if not plan.ready: card.add_child(FoundationWidgets.label(plan.reason,14))

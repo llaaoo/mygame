@@ -14,7 +14,7 @@ class TooltipSlot extends PanelContainer:
 		panel.add_child(label)
 		return panel
 
-const SLOT_SIZE := Vector2(46, 46)
+const SLOT_SIZE := Vector2(44, 58)
 const HAND_SIZE := Vector2(50, 46)
 
 var _skill_manager: SkillManager = null
@@ -63,17 +63,18 @@ func _build() -> void:
 	_refresh_all()
 	_hint_panel = PanelContainer.new()
 	_hint_panel.set_as_top_level(true)
-	_hint_panel.custom_minimum_size.x = 420
+	_hint_panel.custom_minimum_size.x = 0
 	_hint_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_hint_panel.add_theme_stylebox_override("panel", GameUIStyle.panel_style(.94, 5))
+	_hint_panel.add_theme_stylebox_override("panel", GameUIStyle.quiet_panel(.86))
 	add_child(_hint_panel)
 	var details := VBoxContainer.new()
 	details.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_hint_panel.add_child(details)
 	_combination_hint = Label.new()
-	_combination_hint.custom_minimum_size.x = 396
+	_combination_hint.custom_minimum_size.x = 0
+	_combination_hint.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
 	_combination_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	GameUIStyle.apply_font_size(_combination_hint,12)
+	GameUIStyle.apply_font_size(_combination_hint,14)
 	_combination_hint.add_theme_color_override("font_color", GameUIStyle.TEXT_MAIN)
 	_combination_hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	details.add_child(_combination_hint)
@@ -213,8 +214,8 @@ func _add_item(source: String, label: String, size: Vector2) -> void:
 	panel.add_child(inner)
 
 	var icon := TextureRect.new()
-	icon.size = size-Vector2(16,20)
-	icon.position=Vector2(8,5)
+	icon.size = Vector2(24,24)
+	icon.position=Vector2(10,19)
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	icon.modulate = Color(1, 1, 1, 0.3)
@@ -227,7 +228,8 @@ func _add_item(source: String, label: String, size: Vector2) -> void:
 	inner.add_child(strip)
 	_affinity_strips.append(strip)
 	var cost := Label.new()
-	cost.position = Vector2(2, 3)
+	cost.position = Vector2(0, size.y-18)
+	cost.size=Vector2(size.x-3,18); cost.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT
 	GameUIStyle.apply_label(cost, 10, GameUIStyle.TEXT_MAIN)
 	cost.add_theme_color_override("font_shadow_color", Color.BLACK)
 	cost.add_theme_constant_override("shadow_offset_x", 1)
@@ -236,7 +238,8 @@ func _add_item(source: String, label: String, size: Vector2) -> void:
 	inner.add_child(cost)
 	_cost_labels.append(cost)
 	var variant:=Label.new()
-	variant.position=Vector2(3,size.y-17); variant.size=Vector2(30,15)
+	variant.position=Vector2(2,size.y-17); variant.size=Vector2(36,15)
+	variant.hide()
 	GameUIStyle.apply_font_size(variant,12)
 	variant.add_theme_color_override("font_color",GameUIStyle.TEXT_MAIN)
 	variant.add_theme_color_override("font_shadow_color",Color.BLACK)
@@ -265,8 +268,8 @@ func _add_item(source: String, label: String, size: Vector2) -> void:
 	var bind_label := Label.new()
 	GameUIStyle.apply_font_size(bind_label,12)
 	bind_label.add_theme_color_override("font_color", GameUIStyle.TEXT_MUTED)
-	bind_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	bind_label.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
+	bind_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	bind_label.vertical_alignment = VERTICAL_ALIGNMENT_TOP
 	bind_label.size = Vector2(size.x - 2, size.y - 2)
 	bind_label.position = Vector2.ZERO
 	bind_label.text = label
@@ -367,14 +370,16 @@ func _refresh_items() -> void:
 		var definition:=ItemCatalog.default_catalog().definition(str(binding.item_id))
 		_icons[i].texture=InterfaceIcons.item(definition); _icons[i].modulate=Color.WHITE if view.ready else GameUIStyle.TEXT_DISABLED
 		_cost_labels[i].text="×%d"%view.count
-		_cd_labels[i].text=str(view.title).left(3); _cd_labels[i].visible=false
+		_cd_labels[i].text=""; _cd_labels[i].visible=false
 		_cost_labels[i].visible=true
 		_panels[i].tooltip_text=view.title+"\n"+view.detail
 		_masks[i].visible=false; _affinity_strips[i].color=GameUIStyle.GOLD
 
 func _place_hint() -> void:
-	_hint_panel.size = Vector2(420, 0)
-	_hint_panel.global_position = Vector2(get_viewport_rect().size.x*.5-210,global_position.y-_hint_panel.size.y-12)
+	var width:=minf(620,get_viewport_rect().size.x-560)
+	width=maxf(360,width)
+	_hint_panel.size = Vector2(width, 0)
+	_hint_panel.global_position = Vector2(get_viewport_rect().size.x*.5-width*.5,global_position.y-_hint_panel.size.y-12)
 
 func _show_item_hint(actor: Player, source: String) -> void:
 	var view:=QuickslotView.item_state(actor,_skill_manager.shortcuts.binding(source))

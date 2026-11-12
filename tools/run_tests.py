@@ -63,7 +63,7 @@ INTEGRATION = [
     "element_trials",
     "cast_refactor", "status_transactions", "content_contracts", "region_lifecycle", "player_components", "soul_spell_system", "expedition_builds", "existing_spell_interactions", "emergent_mediums", "boon_choices", "joint_interactions", "advanced_spells",
     "spell_materials", "exploration_content", "exploration_mvp", "fire_combinations",
-    "ui_vertical_input", "ui_system", "run_loop", "equipment_system", "gameplay",
+    "ui_vertical_input", "ui_prototype_input", "ui_system", "run_loop", "equipment_system", "gameplay",
 ]
 CHECKS = ["content", "maps", "startup"]
 DIAGNOSTIC = re.compile(r"^(?:SCRIPT ERROR:|ERROR:|WARNING:)", re.MULTILINE)

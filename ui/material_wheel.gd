@@ -98,7 +98,7 @@ func _ready() -> void:
  var inspect_actions:=HBoxContainer.new(); inspect_body.add_child(inspect_actions)
  _inspection_use=FoundationWidgets.button("使用该物品",Callable()); _inspection_use.gui_input.connect(_use_inspected); inspect_actions.add_child(_inspection_use)
  inspect_actions.add_child(FoundationWidgets.button("配置此槽",_configure_inspected))
- inspect_actions.add_child(FoundationWidgets.button("返回世界",close))
+ inspect_actions.add_child(FoundationWidgets.button("收起",close))
  get_window().focus_exited.connect(close)
  get_viewport().size_changed.connect(_layout)
  _layout(); hide()
@@ -132,7 +132,7 @@ func _layout() -> void:
  else:
   _detail_host.position=Vector2(size.x*.5+185,_ring.position.y+68); _detail_host.size=Vector2(minf(260,size.x*.5-205),200)
  if size.x<900:
-  _title.text="选择释放形式 · 世界持续运行"
+  _title.text="释放形式"
   # Stack source navigation and the short explanation above the choices.
   # Only presentation scales; pointer projection uses the same transform.
   var source_width:=minf(190,size.x*.3)
@@ -152,7 +152,9 @@ func _layout() -> void:
  _source_host.visible=not _inspection; _title.visible=not _inspection; _detail_host.visible=not _inspection
  if _inspection:
   _ring.hide(); _compact_view.hide()
-  _inspection_host.position=Vector2(size.x*.5-200,maxf(90,size.y*.5-100)); _inspection_host.size=Vector2(400,0)
+  _inspection_host.size=Vector2(400,0)
+  var anchor:=_opening_pointer if _opening_pointer.y>size.y*.65 else Vector2(size.x*.5,size.y-100)
+  _inspection_host.position=Vector2(clampf(anchor.x-200,20,size.x-420),maxf(24,size.y-112-_inspection_host.size.y))
 func inspect_slot(value: String, aim_direction := Vector2.ZERO) -> void:
  if QuickslotMaterials.available(player.skill_manager,value):
   open_for_source(value,aim_direction); return
@@ -171,12 +173,12 @@ func _refresh_inspection() -> void:
  var item_binding: bool=binding.get("kind","")=="item"
  var view: Dictionary=QuickslotView.item_state(player,binding) if item_binding else {}
  var instance:=player.skill_manager.get_instance(source)
- _inspection_text.text=title+"\n"+(str(view.title)+" · 余量%d\n"%view.count+str(view.detail) if item_binding else instance.data.display_name+"\n"+instance.data.description if instance else "空槽 · 配置已掌握动作或物品")+"\n只查看，不会施放或消费。"
+ _inspection_text.text=title+"\n"+(str(view.title)+" · 余量%d\n"%view.count+str(view.detail) if item_binding else instance.data.display_name+"\n"+instance.data.description if instance else "空槽 · 配置已掌握动作或物品")
  var definition:=ItemCatalog.default_catalog().definition(str(binding.get("item_id","")))
  var targeted: bool=definition and definition.use_profile and definition.use_profile.kind in [ItemUseDefinition.Kind.SPRAY,ItemUseDefinition.Kind.THROWABLE]
  _inspection_use.visible=item_binding and not targeted
  _inspection_use.disabled=not bool(view.get("ready",false))
- if targeted: _inspection_text.text+="\n返回世界后按对应快捷键瞄准或按住喷洒。"
+ if targeted: _inspection_text.text+="\n收起后按对应快捷键瞄准或按住喷洒。"
 func _configure_inspected() -> void:
  var instance:=player.skill_manager.get_instance(source)
  close()
@@ -267,7 +269,7 @@ func _refresh() -> void:
  page=clampi(page,0,maxi(0,(entries.size()-1)/page_size()))
  # Keep even an emptied page in place; only explicit scrolling changes pages.
  var instance:=player.skill_manager.get_instance(source)
- _title.text="选择释放形式\n仅列当前可用来源 · 选择后手动施放 · 世界持续运行"
+ _title.text="释放形式 · 当前可用来源"
  _refresh_sources()
  _center.text=(InputBindings.label(InputBindings.action_for_source(source))+"\n"+instance.data.display_name) if instance else InputBindings.menu_help("尚无选材动作\nK编组已学动作")
  for i in range(8):

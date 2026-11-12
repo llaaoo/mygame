@@ -35,6 +35,17 @@ content_margin_top = 1.0
 [resource]
 default_font = ExtResource("font")
 default_font_size = 15
+Label/fonts/font = ExtResource("font")
+Button/fonts/font = ExtResource("font")
+LineEdit/fonts/font = ExtResource("font")
+OptionButton/fonts/font = ExtResource("font")
+PopupMenu/fonts/font = ExtResource("font")
+TooltipLabel/fonts/font = ExtResource("font")
+RichTextLabel/fonts/normal_font = ExtResource("font")
+RichTextLabel/fonts/bold_font = ExtResource("font")
+RichTextLabel/fonts/italics_font = ExtResource("font")
+RichTextLabel/fonts/bold_italics_font = ExtResource("font")
+
 Label/colors/font_color = Color(0.93,0.92,0.86,1)
 RichTextLabel/colors/default_color = Color(0.86,0.90,0.87,1)
 LineEdit/styles/normal = SubResource("field")

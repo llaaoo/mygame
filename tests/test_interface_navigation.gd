@@ -43,7 +43,7 @@ func run() -> void:
   check(screen.visible and screen._navigation.visible and root.get_visible_rect().encloses(screen._panel.get_global_rect()),"Inventory chrome outside viewport: "+str(resolution))
   await select_item(food); await frames(8)
   await capture("inventory-"+str(resolution.x))
-  await click("技法"); await frames(8)
+  await click_identity({"ui_action":"menu_route","page":"loadout"}); await frames(8)
   var pool:=actor.skill_pool_ui
   check(pool.visible and pool._navigation.visible and root.get_visible_rect().encloses(pool._panel.get_global_rect()),"Shared navigation failed to reach loadout")
   var last:=pool._equip_slots.back() as Control
@@ -51,10 +51,10 @@ func run() -> void:
   slots.ensure_control_visible(last); await frames()
   check(slots.get_global_rect().encloses(last.get_global_rect()),"Last shortcut cannot be reached at "+str(resolution))
   await capture("loadout-"+str(resolution.x))
-  await click("委托与旅程"); await frames(8)
+  await click_identity({"ui_action":"menu_route","page":"quests"}); await frames(8)
   check(is_instance_valid(game.ui.modal) and game.hub.page=="quests" and root.get_visible_rect().encloses(game.ui._modal_panel.get_global_rect()),"Journal chrome outside viewport")
   await capture("journal-"+str(resolution.x))
-  await click("行路图"); await frames(8)
+  await click_identity({"ui_action":"menu_route","page":"map"}); await frames(8)
   check(root.get_visible_rect().encloses(game.ui._modal_panel.get_global_rect()),"Map chrome outside viewport")
   var map: GrayriverMap
   for node in game.ui.modal.find_children("*","Control",true,false):
@@ -85,9 +85,9 @@ func run() -> void:
  check(screen.visible and screen._search.text=="烤e" and casts==0,"Search typing navigated or cast an action")
  await key(KEY_M,true,109);await key(KEY_M,false)
  check(screen.visible and screen._search.text=="烤em" and not is_instance_valid(game.ui.modal),"Typing M in inventory search opened the map")
- await click("委托与旅程"); await click("行囊"); await frames(8)
+ await click_identity({"ui_action":"menu_route","page":"quests"}); await click_identity({"ui_action":"menu_route","page":"inventory"}); await frames(8)
  check(screen.visible and screen.selected==food and screen._search.text=="烤em","Navigation discarded search/selected UID context")
- await click("技法"); await select_skill("ignite")
+ await click_identity({"ui_action":"menu_route","page":"loadout"}); await select_skill("ignite")
  var before_stock:=store.material_amounts("player")
  await key(KEY_E,true); await key(KEY_E,false)
  check(manager.shortcuts.binding("quick_e").get("skill_id","")=="ignite" and manager.shortcuts.binding("slot_0").get("uid","")==weapon,"Keyboard binding failed or overwrote another slot")

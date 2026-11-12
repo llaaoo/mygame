@@ -19,7 +19,7 @@ func run() -> void:
 	await click("猎人入门：剥皮 ×1");await click("取整组到背包");await tap(KEY_ESCAPE)
 	var store:=game.session.inventory;var knife:=store.find_owned("player","field_knife")
 	check(not knife.is_empty() and store.entries("storage.town.workshop.fieldcraft").is_empty(),"Real public supply chest did not transfer finite knife/book")
-	await tap(KEY_I);await click("猎人入门：剥皮 ×1");await click("更多"); await click("移至口袋");await click("使用一份")
+	await tap(KEY_I);await click_identity({"ui_action":"inventory_item","item_uid":game.session.inventory.find_owned("player","book_skinning")});await click("更多"); await click("移至口袋");await click("使用一份")
 	await capture("01-learning-skinning");await create_timer(2.4).timeout
 	check(game.session.fieldcraft.knows("player","skinning") and store.count("player","book_skinning")==0 and not paused,"Real inventory book use failed or paused world")
 	await at(Vector2(0,330));await tap(KEY_F);await frames(6)

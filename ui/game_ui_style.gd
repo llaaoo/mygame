@@ -14,7 +14,7 @@ const PANEL_BG := Color("101716")
 const PANEL_BG_SOLID := Color("101716")
 const SURFACE := Color("19211f")
 const SURFACE_RAISED := Color("26312c")
-const PANEL_BORDER := Color(0.31, 0.36, 0.35, 0.52)
+const PANEL_BORDER := Color("c8b98b38")
 const BORDER_STRONG := Color(0.58, 0.55, 0.43, 0.75)
 const SLOT_BG := Color(0.025, 0.042, 0.046, 0.80)
 const TEXT_MAIN := Color("e6e1d2")
@@ -39,7 +39,7 @@ static func panel_style(
 	sb.bg_color = Color(PANEL_BG.r, PANEL_BG.g, PANEL_BG.b, alpha)
 	sb.set_border_width_all(border_width)
 	sb.border_color = border_color
-	sb.set_corner_radius_all(mini(radius,4))
+	sb.set_corner_radius_all(mini(radius,1))
 	sb.shadow_color = Color(0, 0, 0, .32)
 	sb.shadow_size = 18
 	sb.shadow_offset = Vector2(0, 8)
@@ -66,28 +66,24 @@ static func surface_style(highlight: bool = false, radius: int = 5) -> StyleBoxF
 static func slot_style(highlight: bool = false) -> StyleBoxFlat:
 	var sb := surface_style(highlight, 4)
 	sb.bg_color = Color(0.10, 0.14, 0.13, 0.94) if highlight else SLOT_BG
-	sb.content_margin_left = 3
-	sb.content_margin_right = 3
-	sb.content_margin_top = 3
-	sb.content_margin_bottom = 3
+	sb.content_margin_left = 0
+	sb.content_margin_right = 0
+	sb.content_margin_top = 0
+	sb.content_margin_bottom = 0
 	return sb
 
 
 static func button_style(state: String = "normal", accent: Color = ACCENT, selected: bool = false) -> StyleBoxFlat:
 	var sb := StyleBoxFlat.new()
-	var bg := SURFACE_RAISED if selected else SURFACE
+	var bg := Color(GOLD,.07) if selected else Color.TRANSPARENT
 	match state:
-		"hover": bg = bg.lightened(0.08)
-		"pressed": bg = bg.darkened(0.08)
+		"hover": bg = Color(GOLD,.08)
+		"pressed": bg = Color(GOLD,.13)
 		"disabled": bg = Color(SURFACE.r, SURFACE.g, SURFACE.b, 0.55)
 	sb.bg_color = bg
 	sb.set_border_width_all(1)
-	sb.border_color = Color(accent,.85) if selected or state == "hover" else Color(PANEL_BORDER,.25)
-	sb.border_width_left=2 if selected else 0
-	sb.border_width_top=1 if selected else 0
-	sb.border_width_bottom=1
-	sb.border_width_right=1 if selected else 0
-	sb.set_corner_radius_all(2)
+	sb.border_color = Color(accent,.85) if selected or state in ["hover","focus"] else PANEL_BORDER
+	sb.set_corner_radius_all(0)
 	sb.content_margin_left = 12
 	sb.content_margin_right = 12
 	sb.content_margin_top = 8
@@ -139,15 +135,31 @@ static func navigation(host: Node, page: String, request: Callable) -> Expeditio
 	return bar
 
 static func folio_title(host: Node, title: String) -> Label:
-	var box:=VBoxContainer.new(); box.size_flags_horizontal=Control.SIZE_EXPAND_FILL
-	box.add_theme_constant_override("separation",2); host.add_child(box)
-	var kicker:=Label.new(); kicker.text="灰 河 谷    /    行 路 者 手 册"
-	apply_label(kicker,12,GOLD); box.add_child(kicker)
 	var heading:=Label.new(); heading.text=title
-	heading.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS
 	heading.size_flags_horizontal=Control.SIZE_EXPAND_FILL
-	apply_label(heading,26,TEXT_MAIN); box.add_child(heading)
+	apply_label(heading,25,TEXT_MAIN); host.add_child(heading)
 	return heading
+
+## Common prototype shell. It only presents routes/time; no duplicate game state.
+static func menu_header(host: VBoxContainer,title: String,page: String,close_request: Callable,route_request: Callable) -> ExpeditionNavigation:
+	var header:=HBoxContainer.new(); header.name="MenuHeader"
+	header.add_theme_constant_override("separation",20); host.add_child(header)
+	var caption: String={"整备与制作":"整备","角色成长":"角色","委托与旅程":"手札"}.get(title,title)
+	var heading:=folio_title(header,caption); heading.size_flags_horizontal=Control.SIZE_SHRINK_BEGIN
+	var navigation_bar:=navigation(header,page,route_request)
+	var close_button:=Button.new(); close_button.name="ReturnToWorld"; close_button.text="Esc 收起"
+	apply_tab(close_button); close_button.pressed.connect(close_request); header.add_child(close_button)
+	host.add_child(HSeparator.new())
+	return navigation_bar
+
+static func menu_style() -> StyleBoxFlat:
+	var style:=panel_style(1,0)
+	style.content_margin_left=24; style.content_margin_right=24
+	style.content_margin_top=14; style.content_margin_bottom=12
+	return style
+
+static func menu_extent(viewport: Vector2) -> Vector2:
+	return viewport-Vector2.ONE*(40 if viewport.x<1100 else 64)
 
 static func bar_fill(color: Color) -> StyleBoxFlat:
 	var sb := StyleBoxFlat.new()
@@ -158,9 +170,8 @@ static func bar_fill(color: Color) -> StyleBoxFlat:
 
 static func bar_bg() -> StyleBoxFlat:
 	var sb := StyleBoxFlat.new()
-	sb.bg_color = Color(0.008, 0.01, 0.014, 0.92)
-	sb.set_border_width_all(1)
-	sb.border_color = Color(0.13, 0.15, 0.18, 1.0)
+	sb.bg_color = Color("dce3ce25")
+	sb.set_border_width_all(0)
 	sb.set_corner_radius_all(2)
 	return sb
 
@@ -179,9 +190,11 @@ static func apply_label(label: Label, size: int = 12, color: Color = TEXT_MAIN) 
 static func font_size(base: int) -> int:
 	return roundi(base*float(PresentationPreferences.value("text_scale")))
 static func apply_font_size(control: Control,base: int) -> void:
+	control.add_theme_font_override("font",font())
 	control.set_meta("ui_base_font_size",base)
 	control.add_theme_font_size_override("font_size",font_size(base))
 static func apply_reading_size(control: RichTextLabel,base: int) -> void:
+	for name in ["normal_font","bold_font","italics_font","bold_italics_font","mono_font"]: control.add_theme_font_override(name,font())
 	control.set_meta("ui_base_reading_size",base)
 	for name in ["normal_font_size","bold_font_size","italics_font_size","bold_italics_font_size","mono_font_size"]:
 		control.add_theme_font_size_override(name,font_size(base))
@@ -212,6 +225,8 @@ static func modal_backdrop(alpha: float = 0.72) -> Color:
 
 
 static func begin_modal(owner: CanvasLayer) -> void:
+	install_theme(owner.get_window())
+	_theme_roots(owner,owner.get_window().theme)
 	owner.process_mode = Node.PROCESS_MODE_ALWAYS
 	owner.add_to_group("modal_ui")
 	var panels:=owner.find_children("*","PanelContainer",true,false)
@@ -271,6 +286,13 @@ static func install_theme(window: Window) -> void:
 		for name in theme.get_font_size_list(type): theme.set_font_size(name,type,font_size(theme.get_font_size(name,type)))
 	window.theme=theme
 	window.set_meta("ui_text_scale",scale)
+	_theme_roots(window,theme)
+
+## CanvasLayer/Node boundaries do not inherit a Control's theme owner.
+static func _theme_roots(node: Node,theme: Theme) -> void:
+	if node is Control and not node.get_parent() is Control: node.theme=theme
+	for child in node.get_children(): _theme_roots(child,theme)
+
 
 static func close_gameplay_views(actor: Node) -> void:
 	for view in actor.get_tree().get_nodes_in_group("modal_ui"):

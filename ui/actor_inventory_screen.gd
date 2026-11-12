@@ -14,6 +14,7 @@ var page_request: Callable:
   if is_instance_valid(_navigation): _navigation.navigate=value; _navigation.visible=value.is_valid()
 var configure_request: Callable
 var _view_context: Dictionary={}
+var _view_generation := 0
 var _categories: Dictionary={}
 var _containers: Dictionary={}
 var _gear_column: VBoxContainer
@@ -32,6 +33,7 @@ var _detail_actions: HFlowContainer
 var _binding_host: VBoxContainer
 var _binding_open := false
 var _compare_open := false
+var _compare_return_scroll := 0
 var _more_open := false
 var _grid_scroll: ScrollContainer
 var _detail_scroll: ScrollContainer
@@ -39,9 +41,17 @@ var _portrait: PaperDollView
 var _grid: GridContainer
 var _search: LineEdit
 var _summary: Label
+var _mini_vitals: Label
+var _clock_label: Label
+var _place_label: Label
+var _coins_label: Label
+var _sort: OptionButton
+var _grid_toggle: Button
+var _grid_mode := false
 var _stats: Label
 var _needs_label: Label
 var _state_label: Label
+var _item_art: ItemArtView
 var _quantity: SpinBox
 var _popup: PopupMenu
 var _dirty := true
@@ -67,6 +77,7 @@ func _exit_tree() -> void:
  if session and session.inventory.changed.is_connected(_invalidate): session.inventory.changed.disconnect(_invalidate)
 func open(focus := "all",ground := "") -> void:
  if actor.health_component.is_dead or not GameUIStyle.can_open(self): return
+ _view_generation+=1
  mode=focus; ground_id=ground; selected=""; selected_slot=-1; container_filter="all"
  _search.text=""; _binding_open=false; _compare_open=false; _more_open=false; _detail_signature.clear(); _last_health=actor.health_component.hp
  _dirty=true; show(); GameUIStyle.begin_modal(self); _refresh(); _focus_entry.call_deferred()
@@ -95,6 +106,7 @@ func resume() -> void:
  open(str(_view_context.mode))
  container_filter=str(_view_context.container); selected_slot=int(_view_context.slot)
  _search.text=str(_view_context.query)
+ _grid_mode=bool(_view_context.get("grid",false)); _sort.select(int(_view_context.get("sort",0))); _grid_toggle.text="列表" if _grid_mode else "网格"; _layout()
  selected=str(_view_context.selected) if session.inventory.item(str(_view_context.selected)) else ""
  _refresh()
  _restore_scroll.call_deferred()
@@ -102,7 +114,8 @@ func _restore_scroll() -> void:
  _grid_scroll.scroll_vertical=int(_view_context.get("list_scroll",0))
  _detail_scroll.scroll_vertical=int(_view_context.get("detail_scroll",0))
 func close() -> void:
- if visible: _view_context={"mode":mode,"container":container_filter,"slot":selected_slot,"query":_search.text,"selected":selected,"list_scroll":_grid_scroll.scroll_vertical,"detail_scroll":_detail_scroll.scroll_vertical}
+ if visible: _view_context={"mode":mode,"container":container_filter,"slot":selected_slot,"query":_search.text,"selected":selected,"list_scroll":_grid_scroll.scroll_vertical,"detail_scroll":_detail_scroll.scroll_vertical,"grid":_grid_mode,"sort":_sort.selected}
+ _view_generation+=1
  _popup.hide(); hide(); GameUIStyle.end_modal(self)
 func _input(event: InputEvent) -> void:
  if visible and GameUIStyle.focus_navigation(self,event): return
@@ -130,72 +143,91 @@ func _unhandled_input(event: InputEvent) -> void:
   get_viewport().set_input_as_handled()
 func _build() -> void:
  var background:=ColorRect.new(); background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
- background.color=GameUIStyle.modal_backdrop(.6); add_child(background)
- _panel=PanelContainer.new(); _panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
- _panel.add_theme_stylebox_override("panel",GameUIStyle.panel_style(.98)); background.add_child(_panel)
- GameUIStyle.decorate(_panel)
- var root:=VBoxContainer.new(); root.add_theme_constant_override("separation",8); _panel.add_child(root)
- var header:=HBoxContainer.new(); root.add_child(header)
- GameUIStyle.folio_title(header,"行囊")
- var close_button:=FoundationWidgets.button("关闭",close); close_button.size_flags_horizontal=Control.SIZE_SHRINK_END; header.add_child(close_button)
- _navigation=GameUIStyle.navigation(root,"inventory",page_request)
- _summary=FoundationWidgets.label("",12,true); root.add_child(_summary)
- root.add_child(FoundationWidgets.label("世界持续运行 · 受伤时请立即返回世界",12,true))
- _columns=HBoxContainer.new(); _columns.add_theme_constant_override("separation",18); _columns.size_flags_vertical=Control.SIZE_EXPAND_FILL; root.add_child(_columns)
+ background.color=GameUIStyle.modal_backdrop(.55); add_child(background)
+ _panel=PanelContainer.new(); _panel.name="InventoryMenu"; _panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+ _panel.add_theme_stylebox_override("panel",GameUIStyle.menu_style()); background.add_child(_panel)
+ var root:=VBoxContainer.new(); root.add_theme_constant_override("separation",10); _panel.add_child(root)
+ _navigation=GameUIStyle.menu_header(root,"行囊","inventory",close,page_request)
+ var ribbon:=HBoxContainer.new(); root.add_child(ribbon)
+ _place_label=FoundationWidgets.label(_place_title(),12,true); ribbon.add_child(_place_label)
+ _alert=FoundationWidgets.label("",12); _alert.modulate.a=0; ribbon.add_child(_alert)
+ _clock_label=FoundationWidgets.label("",12,true); _clock_label.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT; ribbon.add_child(_clock_label)
+ for label in [_place_label,_alert,_clock_label]:
+  label.autowrap_mode=TextServer.AUTOWRAP_OFF; label.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS
+ _columns=HBoxContainer.new(); _columns.add_theme_constant_override("separation",22); _columns.size_flags_vertical=Control.SIZE_EXPAND_FILL; root.add_child(_columns)
  _gear_scroll=ScrollContainer.new(); _gear_scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED; _gear_scroll.follow_focus=true
- _gear_scroll.custom_minimum_size.x=238; _columns.add_child(_gear_scroll)
+ _columns.add_child(_gear_scroll)
  var gear:=VBoxContainer.new(); _gear_column=gear; gear.size_flags_horizontal=Control.SIZE_EXPAND_FILL; _gear_scroll.add_child(gear)
- gear.add_child(FoundationWidgets.label("当前穿戴",18))
- _portrait=PaperDollView.new(); _portrait.actor=actor; _portrait.select_slot=_select_slot; _portrait.equip_uid=_equip
- gear.add_child(_portrait)
- _stats=FoundationWidgets.label("",13,true); gear.add_child(_stats)
+ gear.add_child(FoundationWidgets.label("当前穿戴",12,true))
+ _portrait=PaperDollView.new(); _portrait.actor=actor; _portrait.select_slot=_select_slot; _portrait.equip_uid=_equip; gear.add_child(_portrait)
+ _stats=FoundationWidgets.label("",12,true); gear.add_child(_stats)
  _needs_label=FoundationWidgets.label("",12,true); gear.add_child(_needs_label)
  if actor.survival: gear.add_child(FoundationWidgets.button("恢复与休整",actor.survival.show_rules))
- _bag=VBoxContainer.new(); _bag.size_flags_horizontal=Control.SIZE_EXPAND_FILL; _columns.add_child(_bag)
- var category:=HBoxContainer.new(); _bag.add_child(category)
- for pair in [["全部","all"],["装备","equipment"],["补给","supplies"]]:
-  var button:=FoundationWidgets.button(pair[0],func(): mode=pair[1]; selected_slot=-1; _invalidate())
-  GameUIStyle.apply_tab(button,mode==pair[1]); _categories[pair[1]]=button
-  category.add_child(button)
+ _columns.add_child(VSeparator.new())
+ _bag=VBoxContainer.new(); _bag.add_theme_constant_override("separation",7); _bag.size_flags_horizontal=Control.SIZE_EXPAND_FILL; _bag.size_flags_stretch_ratio=1.1; _columns.add_child(_bag)
+ var bag_heading:=HBoxContainer.new(); bag_heading.name="BagHeading"; _bag.add_child(bag_heading)
+ bag_heading.add_child(FoundationWidgets.label("随身物品",16))
+ _coins_label=FoundationWidgets.label("",14); _coins_label.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT; _coins_label.add_theme_color_override("font_color",GameUIStyle.GOLD); bag_heading.add_child(_coins_label)
  var containers:=HBoxContainer.new(); _bag.add_child(containers)
  for pair in [["全部来源","all"],["口袋","pocket"],["背包","pack"],["地面","ground"]]:
   var button:=FoundationWidgets.button(pair[0],func(): container_filter=pair[1]; _invalidate())
-  GameUIStyle.apply_tab(button,container_filter==pair[1]); _containers[pair[1]]=button
-  containers.add_child(button)
- _search=LineEdit.new(); _search.clear_button_enabled=true; _search.placeholder_text="搜索拥有的物品…"; _search.text_changed.connect(func(_text): _invalidate()); _bag.add_child(_search)
- var scroll:=ScrollContainer.new(); scroll.name="InventoryGridScroll"; _grid_scroll=scroll; scroll.follow_focus=true; scroll.size_flags_vertical=Control.SIZE_EXPAND_FILL
- scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED; _bag.add_child(scroll)
- _grid=GridContainer.new(); _grid.columns=3; _grid.size_flags_horizontal=Control.SIZE_EXPAND_FILL
- _grid.add_theme_constant_override("h_separation",6); _grid.add_theme_constant_override("v_separation",6); scroll.add_child(_grid)
+  GameUIStyle.apply_tab(button,container_filter==pair[1]); _containers[pair[1]]=button; containers.add_child(button)
+ var category:=HBoxContainer.new(); _bag.add_child(category)
+ for pair in [["全部","all"],["装备","equipment"],["补给","supplies"],["材料","materials"]]:
+  var button:=FoundationWidgets.button(pair[0],func(): mode=pair[1]; selected_slot=-1; _invalidate())
+  GameUIStyle.apply_tab(button,mode==pair[1]); _categories[pair[1]]=button; category.add_child(button)
+ var tools:=HBoxContainer.new(); _bag.add_child(tools)
+ _search=LineEdit.new(); _search.size_flags_horizontal=Control.SIZE_EXPAND_FILL; _search.clear_button_enabled=true; _search.placeholder_text="搜索名称…"
+ _search.text_changed.connect(func(_text): _invalidate()); tools.add_child(_search)
+ _grid_toggle=FoundationWidgets.button("网格",func(): _grid_mode=not _grid_mode; _grid_toggle.text="列表" if _grid_mode else "网格"; _layout(); _invalidate())
+ _grid_toggle.size_flags_horizontal=Control.SIZE_SHRINK_END; tools.add_child(_grid_toggle)
+ _sort=OptionButton.new(); _sort.name="InventorySort"
+ for title in ["按类别","按名称","按总重","按参考总值"]: _sort.add_item(title)
+ GameUIStyle.apply_font_size(_sort,12); _sort.item_selected.connect(func(_index): _invalidate()); _bag.add_child(_sort)
+ _grid_scroll=ScrollContainer.new(); _grid_scroll.name="InventoryGridScroll"; _grid_scroll.follow_focus=true; _grid_scroll.size_flags_vertical=Control.SIZE_EXPAND_FILL
+ _grid_scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED; _bag.add_child(_grid_scroll)
+ _grid=GridContainer.new(); _grid.columns=1; _grid.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+ _grid.add_theme_constant_override("h_separation",6); _grid.add_theme_constant_override("v_separation",5); _grid_scroll.add_child(_grid)
+ _summary=FoundationWidgets.label("",12,true); _bag.add_child(_summary)
+ _columns.add_child(VSeparator.new())
  _detail_column=VBoxContainer.new(); _detail_column.name="DetailColumn"
- _detail_column.custom_minimum_size.x=304; _detail_column.size_flags_horizontal=Control.SIZE_EXPAND_FILL; _detail_column.size_flags_stretch_ratio=1.05
- _columns.add_child(_detail_column)
- _detail_scroll=ScrollContainer.new(); _detail_scroll.name="ItemReading"
- _detail_scroll.size_flags_vertical=Control.SIZE_EXPAND_FILL
- _detail_scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED; _detail_scroll.follow_focus=true
- _detail_column.add_child(_detail_scroll)
- _details=VBoxContainer.new(); _details.size_flags_horizontal=Control.SIZE_EXPAND_FILL; _details.add_theme_constant_override("separation",9); _detail_scroll.add_child(_details)
+ _detail_column.size_flags_horizontal=Control.SIZE_EXPAND_FILL; _columns.add_child(_detail_column)
+ _detail_scroll=ScrollContainer.new(); _detail_scroll.name="ItemReading"; _detail_scroll.size_flags_vertical=Control.SIZE_EXPAND_FILL
+ _detail_scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED; _detail_scroll.follow_focus=true; _detail_column.add_child(_detail_scroll)
+ _details=VBoxContainer.new(); _details.size_flags_horizontal=Control.SIZE_EXPAND_FILL; _details.add_theme_constant_override("separation",12); _detail_scroll.add_child(_details)
  _binding_host=VBoxContainer.new(); _binding_host.name="BindingPicker"; _binding_host.visible=false; _detail_column.add_child(_binding_host)
- _detail_actions=HFlowContainer.new(); _detail_actions.name="ItemActions"; _detail_actions.add_theme_constant_override("h_separation",4); _detail_actions.add_theme_constant_override("v_separation",4); _detail_column.add_child(_detail_actions)
- var drop_zone:=InventoryItemTile.new(); drop_zone.name="GroundDropZone"; drop_zone.text="拖到此处丢弃到地面 · 可拾回"
- GameUIStyle.apply_button(drop_zone,GameUIStyle.GOLD)
+ _detail_column.add_child(HSeparator.new())
+ _detail_actions=HFlowContainer.new(); _detail_actions.name="ItemActions"; _detail_actions.add_theme_constant_override("h_separation",6); _detail_actions.add_theme_constant_override("v_separation",6); _detail_column.add_child(_detail_actions)
+ root.add_child(HSeparator.new())
+ var footer:=HBoxContainer.new(); footer.add_theme_constant_override("separation",12); root.add_child(footer)
+ footer.add_child(FoundationWidgets.label("双击 使用/穿戴 · 右键 更多 · Shift 比较",12,true))
+ var drop_zone:=InventoryItemTile.new(); drop_zone.name="GroundDropZone"; drop_zone.text="拖放丢弃"
+ GameUIStyle.apply_button(drop_zone,GameUIStyle.GOLD); drop_zone.tooltip_text="将实物拖到这里丢弃；保留在附近地面，可拾回。"
  drop_zone.accept_item=func(uid: String): return session.inventory.locate(uid) in session.inventory.actor_containers(actor.actor_context.id)+[actor.actor_context.id+".gear"]
  drop_zone.request_drop=func(uid: String): _select(uid); _drop_quantity(session.inventory.item(uid).quantity)
- var footer:=HBoxContainer.new(); footer.add_theme_constant_override("separation",14); root.add_child(footer)
- footer.add_child(FoundationWidgets.label("双击使用 / 换装 · 右键操作\nEsc 返回世界 · 界面不暂停",12,true))
  footer.add_child(drop_zone)
- _alert=FoundationWidgets.label("",14); root.add_child(_alert)
+ _mini_vitals=FoundationWidgets.label("",12); _mini_vitals.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT; footer.add_child(_mini_vitals)
  _popup=PopupMenu.new(); add_child(_popup); _popup.id_pressed.connect(_context_action)
 func _layout() -> void:
  if not _panel: return
  var viewport:=get_viewport().get_visible_rect().size
- var extent:=Vector2(minf(1280,viewport.x-32),minf(760,viewport.y-32))
+ var extent:=GameUIStyle.menu_extent(viewport)
  _panel.offset_left=-extent.x*.5; _panel.offset_right=extent.x*.5; _panel.offset_top=-extent.y*.5; _panel.offset_bottom=extent.y*.5
- _gear_scroll.custom_minimum_size.x=210 if viewport.x<1080 else 250
- _detail_column.custom_minimum_size.x=304 if viewport.x<1080 else 330
- _bag.custom_minimum_size.x=240
- _columns.add_theme_constant_override("separation",12 if viewport.x<1080 else 20)
- _grid.columns=1 if viewport.x<1200 else 2
+ _gear_scroll.custom_minimum_size.x=154 if viewport.x<1100 else 210
+ _detail_column.custom_minimum_size.x=250 if viewport.x<1100 else 300
+ _bag.custom_minimum_size.x=230
+ _columns.add_theme_constant_override("separation",10 if viewport.x<1100 else 18)
+ _grid.columns=2 if _grid_mode and viewport.x>=1200 else 1
+ _bag.get_node("BagHeading").visible=viewport.y>=650
+ _sort.visible=viewport.y>=650
+ if _portrait and _portrait._preview: _portrait.set_compact(viewport.y<650)
+ if is_instance_valid(_item_art): _item_art.custom_minimum_size.y=_art_height()
+func _art_height() -> float:
+ var height:=get_viewport().get_visible_rect().size.y
+ return 96.0 if height<650 else 140.0 if height<800 else 180.0
+func _place_title() -> String:
+ var place:=session.catalog.regions.get(session.region.id) as ExplorationRegionData
+ return place.title if place else "行装"
 func _invalidate() -> void: _dirty=true
 func _process(delta: float) -> void:
  if not visible: return
@@ -205,8 +237,13 @@ func _process(delta: float) -> void:
  _refresh_time+=delta; _message_time=maxf(0,_message_time-delta); _damage_warning_time=maxf(0,_damage_warning_time-delta)
  if _dirty and _refresh_time>.1 and not get_viewport().gui_is_dragging() and not Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) and not _popup.visible: _refresh()
  var context:=actor.actor_context
- _summary.text="口袋 %d/%d格 · 背包 %d/%d格%s · 负重 %.1f / %.0fkg · 生命 %d/%d"%[session.inventory.occupied_slots(context.id+".pocket"),context.rules.pocket_capacity,session.inventory.occupied_slots(context.id+".pack"),context.rules.pack_capacity,"（已放下，不可远程整理）" if not session.inventory.is_attached(context.id+".pack") else "",session.inventory.weight(context.id),context.rules.carry_limit+float(ActorProgression.values(actor).carry_bonus),actor.health_component.hp,actor.health_component.max_hp]
- _alert.text=_message if _message_time>0 else ""
+ _summary.text="%.1f / %.0f负重 · %d / %d格%s"%[session.inventory.weight(context.id),context.rules.carry_limit+float(ActorProgression.values(actor).carry_bonus),session.inventory.occupied_slots(context.id+".pack"),context.rules.pack_capacity," · 背包已放下" if not session.inventory.is_attached(context.id+".pack") else ""]
+ _summary.tooltip_text="口袋 %d/%d格 · 背包 %d/%d格"%[session.inventory.occupied_slots(context.id+".pocket"),context.rules.pocket_capacity,session.inventory.occupied_slots(context.id+".pack"),context.rules.pack_capacity]
+ _coins_label.text="◉ %d"%session.inventory.count(context.id,"coin")
+ _place_label.text=_place_title()
+ _clock_label.text=WorldTime.instance.stamp() if WorldTime.instance else ""
+ _mini_vitals.text="生命 %d/%d   体力 %.0f/%.0f"%[actor.health_component.hp,actor.health_component.max_hp,context.actions.stamina.current,context.actions.stamina.maximum]
+ _alert.text=_message if _message_time>0 else ""; _alert.modulate.a=1 if _message_time>0 else 0; _alert.tooltip_text=_alert.text
  _refresh_stats()
  _detail_clock+=delta
  if _detail_clock>=.15:
@@ -216,9 +253,9 @@ func _process(delta: float) -> void:
   var item:=_selected_item()
   if item:
    var definition:=session.inventory.equipment_definition(item.uid) if session.inventory.definitions.get(item.definition_id) is EquipmentData else session.inventory.definitions.get(item.definition_id) as ItemData
-   if definition: _state_label.text=_item_state_text(item,definition)
+   if definition: _state_label.text=_item_state_text(item,definition); _state_label.visible=not _state_label.text.is_empty()
 func _health_changed(hp: int,_max_hp: int) -> void:
- if visible and hp<_last_health: _damage_warning_time=3; _message="正在受伤！Esc关闭界面返回战斗。"; _message_time=3; _alert.add_theme_color_override("font_color",GameUIStyle.DANGER)
+ if visible and hp<_last_health: _damage_warning_time=3; _message="遭到袭击 · Esc 合上行囊"; _message_time=3; _alert.add_theme_color_override("font_color",GameUIStyle.DANGER)
  _last_health=hp
 func _rows() -> Array[Dictionary]:
  var rows: Array[Dictionary]=[]
@@ -232,16 +269,23 @@ func _rows() -> Array[Dictionary]:
   for row in session.inventory.entries(container):
    var definition:=session.inventory.equipment_definition(row.uid) if session.inventory.definitions.get(row.definition) is EquipmentData else session.inventory.definitions.get(row.definition) as ItemData
    if not definition: continue
-   if mode=="equipment" and not definition is EquipmentData or mode=="supplies" and definition is EquipmentData: continue
+   var supply: bool=definition.use_profile!=null or SurvivalCatalog.FOODS.has(definition.id) or definition.item_type==ItemData.ItemType.CONSUMABLE
+   if mode=="equipment" and not definition is EquipmentData or mode=="supplies" and not supply or mode=="materials" and (definition is EquipmentData or supply): continue
    if selected_slot>=0 and (not definition is EquipmentData or definition.slot_type!=selected_slot): continue
    if not _search.text.is_empty() and not (definition.display_name+definition.description).contains(_search.text): continue
    var record:=row.duplicate(true); record["container"]=container; record["place"]=kind; rows.append(record)
+ if _sort.selected>0:
+  rows.sort_custom(func(a: Dictionary,b: Dictionary):
+   var left: ItemData=session.inventory.definitions[a.definition]; var right: ItemData=session.inventory.definitions[b.definition]
+   var av: Variant=left.display_name if _sort.selected==1 else left.weight*a.quantity if _sort.selected==2 else left.sell_price*a.quantity
+   var bv: Variant=right.display_name if _sort.selected==1 else right.weight*b.quantity if _sort.selected==2 else right.sell_price*b.quantity
+   return str(a.uid)<str(b.uid) if av==bv else av<bv if _sort.selected==1 else av>bv)
  return rows
 func _refresh() -> void:
  _dirty=false; _refresh_time=0
  for id in _categories: GameUIStyle.apply_tab(_categories[id],mode==id)
  for id in _containers: GameUIStyle.apply_tab(_containers[id],container_filter==id)
- var gear: Array=[session.inventory.entries(actor.actor_context.id+".gear"),session.inventory.is_attached(actor.actor_context.id+".pack")]
+ var gear: Array=[session.inventory.entries(actor.actor_context.id+".gear"),session.inventory.is_attached(actor.actor_context.id+".pack"),PresentationPreferences.value("text_scale")]
  if gear!=_portrait_signature:
   _portrait_signature=gear.duplicate(true); _portrait.refresh()
  _refresh_stats()
@@ -252,18 +296,19 @@ func _refresh() -> void:
   var definition:=session.inventory.equipment_definition(row.uid) if session.inventory.definitions.get(row.definition) is EquipmentData else session.inventory.definitions.get(row.definition) as ItemData
   var tile:=_tiles.get(row.uid) as InventoryItemTile
   if not is_instance_valid(tile):
-   tile=InventoryItemTile.new(); tile.item_uid=row.uid; tile.name="Item_"+row.uid.replace(".","_")
-   tile.expand_icon=true; tile.add_theme_constant_override("icon_max_width",34)
-   tile.custom_minimum_size=Vector2(112,84); tile.size_flags_horizontal=Control.SIZE_EXPAND_FILL; tile.clip_text=true
+   tile=InventoryItemTile.new(); tile.item_uid=row.uid; tile.set_meta("ui_action","inventory_item"); tile.set_meta("item_uid",row.uid); tile.name="Item_"+row.uid.replace(".","_")
+   tile.custom_minimum_size.x=0; tile.size_flags_horizontal=Control.SIZE_EXPAND_FILL; tile.clip_text=true
    tile.pressed.connect(_select.bind(row.uid)); tile.activated.connect(_activate); tile.secondary_requested.connect(_context)
    _tiles[row.uid]=tile; _grid.add_child(tile)
-  var caption: String=definition.display_name+" ×%d\n"%row.quantity+{"pocket":"口袋","pack":"背包","gear":"已穿戴","ground":"地面"}[row.place]
+  var subtitle: String={"pocket":"随身口袋","pack":"背包","gear":"已穿戴","ground":"地面"}[row.place]
+  for source in QuickslotLoadout.SOURCES:
+   var binding:=actor.skill_manager.shortcuts.binding(source)
+   if binding.get("kind","")=="item" and binding.get("item_id","")==definition.id and (str(binding.get("uid","")).is_empty() or binding.uid==row.uid): subtitle+=" · 已绑定"; break
   if definition.use_profile and definition.use_profile.kind==ItemUseDefinition.Kind.SPRAY:
-   caption+=" · %d剂\n瓶%s"%[int(session.inventory.item(row.uid).properties.get("doses",0)),str(row.uid).trim_prefix("item.")]
-  if tile.text!=caption: tile.text=caption
-  tile.icon=InterfaceIcons.item(definition)
+   subtitle+=" · 瓶%s · %d剂"%[str(row.uid).trim_prefix("item."),int(session.inventory.item(row.uid).properties.get("doses",0))]
+  tile.present(InterfaceIcons.item(definition),definition.display_name,subtitle,"×%d"%row.quantity,_grid_mode)
   tile.tooltip_text=definition.display_name+"\n"+session.inventory.state_text(row.uid)
-  GameUIStyle.apply_button(tile,GameUIStyle.ACCENT,selected==row.uid)
+  GameUIStyle.apply_button(tile,GameUIStyle.GOLD,selected==row.uid)
   if tile.get_index()!=index: _grid.move_child(tile,index)
   retained[row.uid]=true
  for uid in _tiles.keys():
@@ -287,19 +332,20 @@ func _refresh_stats() -> void:
  _stats.text="力量 %d · 智力 %d\n敏捷 %d · 耐力 %d\n生命 %d · %s"%[stats.effective_stat("strength"),stats.effective_stat("intelligence"),stats.effective_stat("agility"),stats.effective_stat("endurance"),actor.health_component.max_hp,QuickslotView.magic_status(actor)]
 func _select(uid: String) -> void:
  if uid!=selected:
+  _view_generation+=1
   if is_instance_valid(_quantity): _quantity.value=1
   _binding_open=false; _compare_open=false; _more_open=false; _detail_scroll.scroll_vertical=0
  var previous:=selected
  selected=uid
  for key in [previous,uid]:
-  if _tiles.has(key): GameUIStyle.apply_button(_tiles[key],GameUIStyle.ACCENT,key==selected)
+  if _tiles.has(key): GameUIStyle.apply_button(_tiles[key],GameUIStyle.GOLD,key==selected)
  _show_detail()
 func _select_slot(slot: int) -> void:
  selected_slot=slot; mode="equipment"; container_filter="all"
  selected=str(session.inventory.equipped(actor.actor_context.id).get(str(slot),"")); _invalidate()
 func _selected_item() -> ItemInstance: return session.inventory.item(selected)
 func _item_state_text(item: ItemInstance,definition: ItemData) -> String:
- var text:=session.inventory.state_text(item.uid)+"\n单件重量 %.1fkg · 数量 %d"%[definition.weight,item.quantity]
+ var text:=session.inventory.state_text(item.uid)
  if SurvivalCatalog.FOODS.has(definition.id):
   var food: Dictionary=SurvivalCatalog.FOODS[definition.id]
   text+="\n食用：饱食%+.0f · 饮水%+.0f · 疲劳%+.0f"%[food.nutrition,food.hydration,food.fatigue]
@@ -316,24 +362,37 @@ func _show_detail() -> void:
  var permission:=_equipment_permission(item)
  var signature: Dictionary={"permission":permission,"uid":selected,"item":item.snapshot() if item else {},"location":session.inventory.locate(selected),"gear":session.inventory.entries(actor.actor_context.id+".gear"),"accessible":session.inventory.actor_containers(actor.actor_context.id),"ground":ground_id,"shortcuts":actor.skill_manager.shortcuts.snapshot(),"binding":_binding_open,"compare":_compare_open or Input.is_key_pressed(KEY_SHIFT),"more":_more_open}
  if signature==_detail_signature: return
+ var was_comparing: bool=_detail_signature.get("uid","")==selected and bool(_detail_signature.get("compare",false))
+ var comparing:=bool(signature.compare)
+ if comparing and not was_comparing: _compare_return_scroll=_detail_scroll.scroll_vertical
  _detail_signature=signature.duplicate(true)
  var focus:=get_viewport().gui_get_focus_owner()
  var focus_action: String=focus.text if focus is Button and (_details.is_ancestor_of(focus) or _detail_actions.is_ancestor_of(focus) or _binding_host.is_ancestor_of(focus)) else ""
  var old_quantity:=int(_quantity.value) if is_instance_valid(_quantity) else 1
- FoundationWidgets.clear(_details); FoundationWidgets.clear(_detail_actions); FoundationWidgets.clear(_binding_host); _binding_host.visible=false; _quantity=null; _state_label=null
+ FoundationWidgets.clear(_details); FoundationWidgets.clear(_detail_actions); FoundationWidgets.clear(_binding_host); _binding_host.visible=false; _quantity=null; _state_label=null; _item_art=null
  if not item:
   var icon:=TextureRect.new(); icon.texture=GameUIStyle.icon("backpack"); icon.modulate=Color(GameUIStyle.GOLD,.45)
   icon.custom_minimum_size=Vector2(48,64); icon.expand_mode=TextureRect.EXPAND_IGNORE_SIZE; icon.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED
   _details.add_child(icon)
   _details.add_child(FoundationWidgets.label("为下一程做好准备",20))
-  _details.add_child(FoundationWidgets.label("选择物品查看用途与操作；点身体部位筛选同槽装备。",14,true))
+  _details.add_child(FoundationWidgets.label("清点随身物品，挑选下一程的行装。",14,true))
   FoundationWidgets.disclosure(_details,"行囊操作","双击使用或换装，右键管理。材料可查看已知用途；实物可直接绑定快捷槽。物品满载时，可丢弃到地面并随后拾回。")
   return
  var location:=session.inventory.locate(item.uid)
  var definition:=session.inventory.equipment_definition(item.uid) if session.inventory.definitions.get(item.definition_id) is EquipmentData else session.inventory.definitions.get(item.definition_id) as ItemData
- _details.add_child(FoundationWidgets.label(definition.display_name,20))
+ var item_heading:=HBoxContainer.new(); item_heading.add_theme_constant_override("separation",12); _details.add_child(item_heading)
+ var words:=VBoxContainer.new(); words.size_flags_horizontal=Control.SIZE_EXPAND_FILL; item_heading.add_child(words)
+ var kind: String="装备" if definition is EquipmentData else "补给" if definition.use_profile or SurvivalCatalog.FOODS.has(definition.id) else "材料"
+ var eyebrow:=FoundationWidgets.label(kind+" / "+{"pocket":"口袋","pack":"背包","gear":"穿戴","ground":"地面"}.get("gear" if location.ends_with(".gear") else "pocket" if location.ends_with(".pocket") else "pack" if location.ends_with(".pack") else "ground",""),12,true)
+ eyebrow.add_theme_color_override("font_color",GameUIStyle.GOLD); words.add_child(eyebrow)
+ words.add_child(FoundationWidgets.label(definition.display_name,22))
+ _item_art=ItemArtView.new(); _item_art.name="ItemArtwork"; _details.add_child(_item_art)
+ _item_art.present(definition,item.uid); _item_art.custom_minimum_size.y=_art_height()
+ _details.add_child(FoundationWidgets.label("重量 %.1f · 参考价值 %d币%s"%[definition.weight,definition.sell_price," · "+EquipmentManager.slot_name(definition.slot_type) if definition is EquipmentData else ""],12,true))
+ if definition is EquipmentData: EquipmentStatView.render(_details,null,definition,false)
+
  _state_label=FoundationWidgets.label(_item_state_text(item,definition),13,true)
- _details.add_child(_state_label)
+ _state_label.visible=not _state_label.text.is_empty(); _details.add_child(_state_label)
  if item.quantity>1:
   _quantity=SpinBox.new(); _quantity.prefix="数量 "; _quantity.min_value=1; _quantity.max_value=item.quantity; _quantity.step=1; _quantity.value=mini(old_quantity,item.quantity); _detail_actions.add_child(_quantity)
  if location==ground_id and not ground_id.is_empty():
@@ -351,9 +410,8 @@ func _show_detail() -> void:
  if definition is EquipmentData or definition.use_profile or SurvivalCatalog.FOODS.has(definition.id):
   _action("绑定快捷槽",func(): _binding_open=not _binding_open; _show_detail())
   if _binding_open: _binding_picker(item,definition)
- if definition is EquipmentData:
-  _action("比较",func(): _compare_open=not _compare_open; _show_detail())
  _action("更多",func(): _more_open=not _more_open; _show_detail())
+ if definition is EquipmentData: _action("比较",func(): _compare_open=not _compare_open; _show_detail())
  # Main actions are outside the reading scroll; management stays deliberate.
  if _more_open:
   if not location.ends_with(".gear"):
@@ -364,11 +422,26 @@ func _show_detail() -> void:
  if definition is EquipmentData:
   if _compare_open or Input.is_key_pressed(KEY_SHIFT):
    var current:=actor.get_node("EquipmentManager").get_equipment(definition.slot_type) as EquipmentData
-   _details.add_child(FoundationWidgets.label("当前穿戴这件装备。" if location.ends_with(".gear") else FoundationWidgets.comparison(current,definition),14,true))
+   if location.ends_with(".gear"):
+    var note:=FoundationWidgets.label("当前穿戴这件装备。",14,true); note.name="EquipmentComparison"; _details.add_child(note)
+   else: EquipmentStatView.render(_details,current,definition,true)
   if definition.moveset: FoundationWidgets.disclosure(_details,"武器动作",definition.moveset.describe())
  else: _material_uses(definition)
  FoundationWidgets.disclosure(_details,"物品来历与说明",definition.description)
+ if comparing!=was_comparing: _comparison_reading_after_layout.call_deferred(selected,comparing)
  if not focus_action.is_empty(): _restore_action_focus.call_deferred(focus_action,selected)
+func _comparison_reading_after_layout(uid: String,reveal: bool) -> void:
+ var owner_ref: WeakRef=weakref(self)
+ var generation:=_view_generation
+ await get_tree().process_frame
+ var screen:=owner_ref.get_ref() as ActorInventoryScreen
+ if not screen or not screen.visible or screen._view_generation!=generation or screen.selected!=uid or bool(screen._detail_signature.get("compare",false))!=reveal: return
+ if not reveal:
+  screen._detail_scroll.scroll_vertical=screen._compare_return_scroll
+  return
+ var comparison:=screen._details.find_child("EquipmentComparison",true,false) as Control
+ if comparison:
+  screen._detail_scroll.scroll_vertical+=roundi(comparison.global_position.y-screen._detail_scroll.global_position.y-8)
 func _restore_action_focus(title: String, uid: String) -> void:
  if not visible or selected!=uid: return
  for host in [_details,_detail_actions,_binding_host]:
@@ -386,7 +459,7 @@ func _action(title: String,request: Callable,disabled := false) -> void:
 func _amount() -> int: return int(_quantity.value) if is_instance_valid(_quantity) else 1
 func _binding_picker(item: ItemInstance,definition: ItemData) -> void:
  _binding_host.visible=true
- _binding_host.add_child(FoundationWidgets.label("选择独立目标槽 · 只绑定，不使用",12,true))
+ _binding_host.add_child(FoundationWidgets.label("选择快捷键",12,true))
  var grid:=GridContainer.new(); grid.columns=7; grid.name="QuickBind"; _binding_host.add_child(grid)
  for source in QuickslotLoadout.SOURCES:
   var binding:=actor.skill_manager.shortcuts.binding(source)

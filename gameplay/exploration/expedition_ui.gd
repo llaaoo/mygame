@@ -36,7 +36,11 @@ var _terrain_label: Label
 var _terrain_time := 0.0
 var _survival_label: Label
 var _menu_button: Button
+var _map_button: Button
+var _utility: PanelContainer
 var _binding_revision := -1
+var _menu_clock: Label
+var _menu_resources: Label
 
 func _ready() -> void:
 	GameUIStyle.install_theme(get_window())
@@ -47,35 +51,47 @@ func _ready() -> void:
 	panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
 	panel.offset_left = -210
 	panel.offset_right = 210
-	panel.offset_top = 8
-	panel.add_theme_stylebox_override("panel", GameUIStyle.quiet_panel(.25))
+	panel.offset_top = 20
+	panel.add_theme_stylebox_override("panel", GameUIStyle.quiet_panel(0))
 	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(panel)
 	var box := VBoxContainer.new()
 	panel.add_child(box)
-	heading = _label("余烬监狱", 18)
+	var compass:=_label("西北     ·     北     ·     东北",12)
+	compass.modulate=Color("e6ddc6"); box.add_child(compass)
+	box.add_child(HSeparator.new())
+	heading = _label("余烬监狱", 14)
 	objective = _label("", 12)
 	objective.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	objective.max_lines_visible=1
 	objective.modulate=GameUIStyle.TEXT_MUTED
 	box.add_child(heading)
 	box.add_child(objective)
-	var footer := PanelContainer.new()
+	objective.hide() # The live tracker owns objectives; keep the text as a tooltip.
+	heading.mouse_entered.connect(func(): heading.tooltip_text=objective.text)
+	var footer := PanelContainer.new(); _utility=footer
 	footer.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
-	footer.offset_left = -214
+	footer.offset_left = -148
 	footer.offset_right = -18
-	footer.offset_top = -130
-	footer.offset_bottom = -80
+	footer.offset_top = -86
+	footer.offset_bottom = -38
 	footer.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	footer.add_theme_stylebox_override("panel", GameUIStyle.quiet_panel(.35))
+	footer.add_theme_stylebox_override("panel", GameUIStyle.quiet_panel(0))
 	add_child(footer)
 	var menu:=Button.new()
-	_menu_button=menu
+	_menu_button=menu; menu.set_meta("ui_action","open_inventory")
 	_refresh_binding_hints()
-	menu.tooltip_text="鼠标进入装备、补给、技能和制作；Esc返回"
+	menu.tooltip_text="查看行囊与穿戴；Esc返回世界"
+	menu.icon=GameUIStyle.icon("backpack"); menu.expand_icon=true; menu.add_theme_constant_override("icon_max_width",20)
 	GameUIStyle.apply_button(menu)
-	menu.pressed.connect(show_menu)
-	footer.add_child(menu)
+	menu.pressed.connect(func():
+		if shortcut_action.is_valid(): shortcut_action.call(KEY_I)
+		else: show_menu())
+	var utilities:=HBoxContainer.new(); footer.add_child(utilities); utilities.add_child(menu)
+	_map_button=FoundationWidgets.button("M 地图",func(): if map_provider.is_valid(): map_provider.call())
+	_map_button.icon=GameUIStyle.icon("compass"); _map_button.expand_icon=true; _map_button.add_theme_constant_override("icon_max_width",20)
+	_map_button.set_meta("ui_action","open_map"); utilities.add_child(_map_button)
+	_refresh_binding_hints()
 	var needs_panel := PanelContainer.new()
 	needs_panel.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT)
 	needs_panel.offset_left = 20
@@ -126,11 +142,14 @@ func _process(delta: float) -> void:
 	if _binding_revision!=InputBindings.revision: _refresh_binding_hints()
 	var actor:=get_tree().get_first_node_in_group("player") as Player
 	var selecting:=actor and is_instance_valid(actor.material_wheel) and actor.material_wheel.visible
-	_heading_panel.visible=not selecting
+	_heading_panel.visible=not selecting and not (actor and actor.ui_blocked)
 	_terrain_time += delta
 	if _terrain_time >= .2:
 		_terrain_time = 0
 		_update_terrain()
+		if is_instance_valid(_menu_clock): _menu_clock.text=WorldTime.instance.stamp() if WorldTime.instance else ""
+		if is_instance_valid(_menu_resources) and actor:
+			_menu_resources.text="生命 %d/%d   体力 %.0f/%.0f"%[actor.health_component.hp,actor.health_component.max_hp,actor.actor_context.actions.stamina.current,actor.actor_context.actions.stamina.maximum]
 	if not get_tree().paused:
 		_message_time -= delta
 		_notice.modulate.a=clampf(_message_time/.35,0,1)
@@ -142,7 +161,8 @@ func _process(delta: float) -> void:
 
 func _refresh_binding_hints() -> void:
 	_binding_revision=InputBindings.revision
-	if is_instance_valid(_menu_button): _menu_button.text=InputBindings.menu_help("Tab  远征菜单")
+	if is_instance_valid(_menu_button): _menu_button.text=InputBindings.menu_help("I 行囊")
+	if is_instance_valid(_map_button): _map_button.text=InputBindings.menu_help("M 地图")
 
 func queue_notice(text: String) -> void:
 	if text in _pending_notices: return
@@ -156,6 +176,17 @@ func notify(text: String) -> void:
 
 func set_survival_status(text: String) -> void:
 	if _survival_label: _survival_label.tooltip_text=text
+
+func _input(event: InputEvent) -> void:
+	if not is_instance_valid(modal) or not modal.visible or modal_locked: return
+	if not event is InputEventKey or not event.pressed or event.echo or event.keycode!=KEY_ESCAPE: return
+	for other in get_tree().get_nodes_in_group("modal_ui"):
+		if other!=modal and other is CanvasLayer and other.visible: return
+	# A dropdown owns its first Escape. Otherwise leave the page even when
+	# a search/quantity field would consume ui_cancel before unhandled input.
+	for popup in modal.find_children("*","PopupMenu",true,false):
+		if popup.visible: return
+	close_modal(); get_viewport().set_input_as_handled()
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed or event.echo:
@@ -243,12 +274,12 @@ func show_panel(title: String, text: String, buttons: Array[Dictionary], locked:
 	panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
 	_modal_panel = panel
 	panel.name = "ContentPanel"
-	panel.add_theme_stylebox_override("panel", GameUIStyle.panel_style(0.99, 2,GameUIStyle.PANEL_BORDER))
+	panel.add_theme_stylebox_override("panel", GameUIStyle.menu_style())
 	GameUIStyle.decorate(panel)
 	backdrop.add_child(panel)
 	var margin := MarginContainer.new()
 	for side in ["left", "right", "top", "bottom"]:
-		margin.add_theme_constant_override("margin_" + side, 24)
+		margin.add_theme_constant_override("margin_" + side, 0)
 	panel.add_child(margin)
 	var box := VBoxContainer.new()
 	box.name="ModalBody"
@@ -327,12 +358,16 @@ func show_panel(title: String, text: String, buttons: Array[Dictionary], locked:
 
 func _layout_modal() -> void:
 	var viewport := get_viewport().get_visible_rect().size
+	if is_instance_valid(_utility):
+		_utility.offset_left=-230; _utility.offset_right=-24
+		_utility.offset_bottom=-128 if viewport.x<1100 else -38
+		_utility.offset_top=_utility.offset_bottom-46
 	if is_instance_valid(_heading_panel):
-		var width := minf(420, viewport.x - 580)
+		var width := minf(330, viewport.x - 580)
 		_heading_panel.offset_left = -width * .5
 		_heading_panel.offset_right = width * .5
 	if not is_instance_valid(_modal_panel): return
-	var extent := Vector2(minf(_modal_extent.x, viewport.x - 48), minf(_modal_extent.y, viewport.y - 48))
+	var extent := GameUIStyle.menu_extent(viewport) if _modal_panel.get_meta("full_menu",false) else Vector2(minf(_modal_extent.x, viewport.x - 48), minf(_modal_extent.y, viewport.y - 48))
 	_modal_panel.offset_left = -extent.x * .5
 	_modal_panel.offset_right = extent.x * .5
 	_modal_panel.offset_top = -extent.y * .5
@@ -388,9 +423,21 @@ func show_journal() -> void:
 func show_view(title: String, content: Control, page := "") -> void:
 	show_panel(title,"",[],false,Vector2(1080,660))
 	var box:=_modal_panel.find_child("ModalBody",true,false) as VBoxContainer
-	if not page.is_empty():
-		var navigation:=GameUIStyle.navigation(box,page,navigation_request)
-		box.move_child(navigation,2)
+	_modal_panel.set_meta("full_menu",true)
+	var old_header:=box.get_child(0)
+	box.remove_child(old_header); old_header.queue_free()
+	var old_separator:=box.get_child(0); box.remove_child(old_separator); old_separator.queue_free()
+	var header_host:=VBoxContainer.new(); box.add_child(header_host); box.move_child(header_host,0)
+	GameUIStyle.menu_header(header_host,title,page,close_modal,navigation_request)
+	var ribbon:=HBoxContainer.new(); header_host.add_child(ribbon)
+	ribbon.add_child(FoundationWidgets.label(heading.text,12,true))
+	_menu_clock=FoundationWidgets.label(WorldTime.instance.stamp() if WorldTime.instance else "",12,true)
+	_menu_clock.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT; ribbon.add_child(_menu_clock)
+	box.add_child(HSeparator.new())
+	var footer:=HBoxContainer.new(); box.add_child(footer)
+	footer.add_child(FoundationWidgets.label("Tab 切换焦点 · Esc 收起",12,true))
+	_menu_resources=FoundationWidgets.label("",12); _menu_resources.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT; footer.add_child(_menu_resources)
+	_layout_modal()
 	var scroll := _modal_panel.find_child("BodyScroll",true,false) as ScrollContainer
 	var old := scroll.get_child(0)
 	scroll.remove_child(old)

@@ -1,0 +1,88 @@
+{
+  "schema": 1,
+  "revision": "28681af0d793b43292228bb9575c8b8476b79cd3",
+  "dirty": true,
+  "godot": "4.6.3.stable.official.7d41c59c4",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "jobs": 2,
+  "timeout": 300.0,
+  "logs": "/tmp/mygame-tests-9po29wos",
+  "requested": [
+    "interface_navigation",
+    "accessibility_input",
+    "visual_interface",
+    "ui_prototype_input"
+  ],
+  "results": [
+    {
+      "name": "interface_navigation",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 22.238,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_interface_navigation.gd"
+      ],
+      "log": "/tmp/mygame-tests-9po29wos/interface_navigation.log",
+      "diagnostic": []
+    },
+    {
+      "name": "accessibility_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 8.593,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_accessibility_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-9po29wos/accessibility_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "visual_interface",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 12.31,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_visual_interface.gd"
+      ],
+      "log": "/tmp/mygame-tests-9po29wos/visual_interface.log",
+      "diagnostic": []
+    },
+    {
+      "name": "ui_prototype_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 19.181,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_ui_prototype_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-9po29wos/ui_prototype_input.log",
+      "diagnostic": []
+    }
+  ],
+  "skipped": [],
+  "complete": true
+}

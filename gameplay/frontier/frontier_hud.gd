@@ -22,12 +22,16 @@ func _ready() -> void:
 	tracker.offset_right=-18
 	tracker.offset_top=24
 	tracker.offset_bottom=116
-	tracker.alignment=HORIZONTAL_ALIGNMENT_LEFT
+	tracker.alignment=HORIZONTAL_ALIGNMENT_RIGHT
 	tracker.add_theme_stylebox_override("normal",StyleBoxEmpty.new())
 	tracker.add_theme_stylebox_override("disabled",StyleBoxEmpty.new())
-	GameUIStyle.apply_font_size(tracker,14)
+	GameUIStyle.apply_font_size(tracker,12)
+	for state in ["normal","hover","pressed","focus"]:
+		var style:=GameUIStyle.quiet_panel(.3); style.border_width_right=2; style.border_color=GameUIStyle.GOLD
+		tracker.add_theme_stylebox_override(state,style)
 	root.add_child(tracker)
-	time_label=FoundationWidgets.label("",13,true)
+	time_label=FoundationWidgets.label("",12,true)
+	time_label.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT
 	time_label.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
 	time_label.offset_left=-276; time_label.offset_right=-18
 	time_label.offset_top=4; time_label.offset_bottom=24
@@ -56,11 +60,13 @@ func _process(delta: float) -> void:
 	time_label.text=WorldTime.instance.stamp()
 	tracker.disabled=is_instance_valid(game.ui.modal)
 	var selecting:=is_instance_valid(game.player.material_wheel) and game.player.material_wheel.visible
-	tracker.visible=not selecting
+	tracker.visible=not selecting and not game.player.ui_blocked
+	time_label.visible=tracker.visible
 	var preparation:=game.guidance.journey.town_goal()
 	var goal:=preparation if not preparation.is_empty() else game.guidance.tracked()
 	var orienting: bool = goal.is_empty() or bool(goal.get("journey",false))
 	if goal.is_empty(): goal = game.guidance.town_orientation()
+	tracker.visible=tracker.visible and not goal.is_empty()
 	tracker.text=_journal_hint
 	if not goal.is_empty():
 		tracker.text=("镇中整备\n" if orienting else "追踪委托\n")+goal.title

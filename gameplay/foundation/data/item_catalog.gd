@@ -25,6 +25,8 @@ func validation_errors() -> Array[String]:
 			errors.append("Missing or duplicate item definition")
 			continue
 		seen[item.id]=true
+		var art_error:=item.illustration_error()
+		if not art_error.is_empty(): errors.append(art_error)
 		if not is_finite(item.weight) or item.weight<0 or item.max_stack<1: errors.append("Invalid item capacity/weight: "+item.id)
 		if item is EquipmentData and item.attack_profile and not item.attack_profile.valid(): errors.append("Invalid attack profile: "+item.id)
 		if item is EquipmentData and item.moveset:

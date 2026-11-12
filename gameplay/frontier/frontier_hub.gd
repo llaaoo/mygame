@@ -102,9 +102,9 @@ func entries() -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	match page:
 		"actions":
-			result.append({"id":"journey","title":"首次远征 · 整备与成长","text":"按真实持有、已学知识与报告成果更新。每项都可跳过，清单不自动执行操作。","subtitle":"出发 → 探索 → 返镇 → 下一程"})
+			result.append({"id":"journey","title":"首次远征 · 整备与成长","text":"出门前清点行装，记下想学的手艺；返镇后向委托人报告。","subtitle":"出发 → 探索 → 返镇 → 下一程"})
 			result.append({"id":"loadout","title":"快捷栏编组","text":"用鼠标选择已学动作，再选择Q/E/R或数字槽。E和1是两个独立快捷槽；动作和物品均可绑定。","subtitle":"战斗准备"})
-			result.append({"id":"sources","title":"材料与释放来源","text":"选择真实材料、法阵或残魂；选择本身不扣物资，不自动准备组合。","subtitle":"施法准备"})
+			result.append({"id":"sources","title":"材料与释放来源","text":"备好材料，寻一处适合布阵的空地；不同介质会改变施术的结果。","subtitle":"施法准备"})
 			result.append({"id":"crafts","title":"制作配方","text":"查看已学配方与原料。到附近工作台交互，再用鼠标加工；口袋与背包余量来自同一库存。","subtitle":"营地加工"})
 			result.append({"id":"supplies","title":"饮食与背包","text":"用鼠标使用、换装和整理；Q/E/R与1—0均可绑定动作或物品；用鼠标编组后，按对应键使用。","subtitle":"生存整备"})
 			var target:=game.player.input_controller.interaction_target(true)

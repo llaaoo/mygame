@@ -155,6 +155,8 @@ func validate(catalog: ExplorationContentCatalog) -> Array[String]:
 		if not item or item.id.is_empty() or not item.get_icon_texture() or not item.casting_profile:
 			_fail(catalog.chapter, "Invalid exploration equipment")
 			continue
+		var art_error:=item.illustration_error()
+		if not art_error.is_empty(): _fail(item,art_error)
 		var profile := item.casting_profile
 		if absf(profile.preparation_bonus) > 0.5 or profile.soul_capacity_bonus < 0 or profile.soul_capacity_bonus > 5 or absf(profile.field_radius_bonus) > 84 or profile.boon_duration_bonus < -0.75:
 			_fail(item, "Equipment profile exceeds supported bounds")
