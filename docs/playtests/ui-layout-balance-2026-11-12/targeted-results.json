@@ -1,0 +1,124 @@
+{
+  "schema": 1,
+  "revision": "a0cea3fcc3a2ced32624b011d5742090bce8785e",
+  "dirty": true,
+  "godot": "4.6.3.stable.official.7d41c59c4",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "jobs": 1,
+  "timeout": 180,
+  "logs": "/tmp/mygame-tests-yjqi5c45",
+  "requested": [
+    "interface_navigation",
+    "accessibility_input",
+    "controls_workflow",
+    "rpg_progression_input",
+    "ui_system",
+    "realtime_interaction"
+  ],
+  "results": [
+    {
+      "name": "interface_navigation",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 22.952,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_interface_navigation.gd"
+      ],
+      "log": "/tmp/mygame-tests-yjqi5c45/interface_navigation.log",
+      "diagnostic": []
+    },
+    {
+      "name": "accessibility_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 9.148,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_accessibility_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-yjqi5c45/accessibility_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "controls_workflow",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 18.437,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_controls_workflow.gd"
+      ],
+      "log": "/tmp/mygame-tests-yjqi5c45/controls_workflow.log",
+      "diagnostic": []
+    },
+    {
+      "name": "rpg_progression_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 16.218,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_rpg_progression_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-yjqi5c45/rpg_progression_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "ui_system",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 6.084,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_ui_system.gd"
+      ],
+      "log": "/tmp/mygame-tests-yjqi5c45/ui_system.log",
+      "diagnostic": []
+    },
+    {
+      "name": "realtime_interaction",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 33.475,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_realtime_interaction.gd"
+      ],
+      "log": "/tmp/mygame-tests-yjqi5c45/realtime_interaction.log",
+      "diagnostic": []
+    }
+  ],
+  "skipped": [],
+  "complete": true
+}

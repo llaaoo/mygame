@@ -110,7 +110,8 @@ func _build_ui() -> void:
 	root.add_child(FoundationWidgets.label("所学技艺与随身物品",12,true))
 	var content:=HBoxContainer.new(); content.size_flags_vertical=Control.SIZE_EXPAND_FILL
 	content.add_theme_constant_override("separation",12); root.add_child(content)
-	var library:=VBoxContainer.new(); library.custom_minimum_size.x=260
+	var library:=VBoxContainer.new(); library.custom_minimum_size.x=280
+	library.size_flags_horizontal=Control.SIZE_EXPAND_FILL; library.size_flags_stretch_ratio=.34
 	content.add_child(library)
 	var tabs:=HBoxContainer.new(); library.add_child(tabs)
 	for pair in [["基础动作",0],["可用物品",1],["武技",2]]:
@@ -126,26 +127,31 @@ func _build_ui() -> void:
 	scroll.add_child(_skill_grid)
 	var detail_scroll:=ScrollContainer.new(); detail_scroll.custom_minimum_size.x=230
 	detail_scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED; detail_scroll.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	detail_scroll.size_flags_stretch_ratio=.66
 	content.add_child(VSeparator.new())
 	content.add_child(detail_scroll)
 	_detail_box=VBoxContainer.new(); _detail_box.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 	_detail_box.add_theme_constant_override("separation",12); detail_scroll.add_child(_detail_box)
 	root.add_child(HSeparator.new())
-	root.add_child(_make_section_label("独立快捷槽 · 点击绑定所选内容 / 右键清空"))
+	var slots_title:=_make_section_label("独立快捷槽 · 点击绑定所选内容 / 右键清空"); slots_title.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER; root.add_child(slots_title)
 	var slots_scroll:=ScrollContainer.new(); slots_scroll.custom_minimum_size.y=80
 	slots_scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED
 	root.add_child(slots_scroll)
-	var slots:=GridContainer.new(); slots.columns=13; slots.add_theme_constant_override("h_separation",5); slots_scroll.add_child(slots)
+	var slots_center:=CenterContainer.new(); slots_center.size_flags_horizontal=Control.SIZE_EXPAND_FILL; slots_scroll.add_child(slots_center)
+	var slots:=GridContainer.new(); slots.columns=13; slots.add_theme_constant_override("h_separation",5); slots_center.add_child(slots)
 	for source in QuickslotLoadout.SOURCES: _add_equip_slot(slots,source,InputBindings.label(InputBindings.action_for_source(source)))
 	_hint_label=Label.new(); GameUIStyle.apply_label(_hint_label,12,GameUIStyle.TEXT_MUTED)
 	_hint_label.text="选择内容 → 按快捷键或点击下方槽位绑定   /   右键清空   /   Esc返回世界"
 	_hint_label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	_hint_label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
 	root.add_child(_hint_label)
 
 
 func _layout_menu() -> void:
-	var inset:=20 if get_viewport().get_visible_rect().size.x<1100 else 32
-	_panel.offset_left=inset; _panel.offset_right=-inset; _panel.offset_top=inset; _panel.offset_bottom=-inset
+	var viewport:=get_viewport().get_visible_rect().size
+	var extent:=GameUIStyle.menu_extent(viewport)
+	var inset: Vector2=(viewport-extent)*.5
+	_panel.offset_left=inset.x; _panel.offset_right=-inset.x; _panel.offset_top=inset.y; _panel.offset_bottom=-inset.y
 
 func _make_section_label(text: String) -> Label:
 	var lbl := Label.new()

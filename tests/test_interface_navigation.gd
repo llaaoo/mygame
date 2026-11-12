@@ -47,7 +47,9 @@ func run() -> void:
   var pool:=actor.skill_pool_ui
   check(pool.visible and pool._navigation.visible and root.get_visible_rect().encloses(pool._panel.get_global_rect()),"Shared navigation failed to reach loadout")
   var last:=pool._equip_slots.back() as Control
-  var slots:=last.get_parent().get_parent() as ScrollContainer
+  var ancestor:=last.get_parent()
+  while ancestor and not ancestor is ScrollContainer: ancestor=ancestor.get_parent()
+  var slots:=ancestor as ScrollContainer
   slots.ensure_control_visible(last); await frames()
   check(slots.get_global_rect().encloses(last.get_global_rect()),"Last shortcut cannot be reached at "+str(resolution))
   await capture("loadout-"+str(resolution.x))

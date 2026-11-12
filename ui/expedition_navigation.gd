@@ -29,13 +29,14 @@ func _ready() -> void:
   button.pressed.connect(func(): if navigate.is_valid(): navigate.call(page.id))
   add_child(button)
  _refresh_binding_hints()
+ get_viewport().size_changed.connect(_refresh_binding_hints)
 func _process(_delta: float) -> void:
  if _binding_revision!=InputBindings.revision: _refresh_binding_hints()
 func _refresh_binding_hints() -> void:
  _binding_revision=InputBindings.revision
  for page in PAGES:
   _page_buttons[page.id].tooltip_text=InputBindings.menu_label(page.key)+" · "+page.title
-  _page_buttons[page.id].text=page.title+" "+InputBindings.menu_label(page.key)
+  _page_buttons[page.id].text=page.title+(" "+InputBindings.menu_label(page.key) if get_viewport().get_visible_rect().size.x>=1100 else "")
 func _unhandled_input(event: InputEvent) -> void:
  if not is_visible_in_tree() or not navigate.is_valid() or not event is InputEventKey or not event.pressed or event.echo: return
  var focus:=get_viewport().gui_get_focus_owner()

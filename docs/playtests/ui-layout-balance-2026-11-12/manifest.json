@@ -1,0 +1,41 @@
+{
+  "base": "a0cea3fcc3a2ced32624b011d5742090bce8785e",
+  "capture_worktree_dirty": true,
+  "platform": {
+    "os": "Linux Xorg/X11",
+    "godot": "4.6.3",
+    "renderer": "gl_compatibility / Mesa llvmpipe",
+    "audio": "Dummy"
+  },
+  "source_sha256": {
+    "gameplay/foundation/ui/expedition_screen.gd": "d78f968a1fdb5d831193ead82a11b0d6fb8cc640e413d41f7c339c27f22c2b2e",
+    "gameplay/foundation/ui/expedition_screen.tscn": "aee84b67fca82bb31471e19287ec8d36e0636f10f8ccf3c753548fbceb54e94b",
+    "tests/test_interface_navigation.gd": "b8e3ac7642c3f9e159a9dc398da8b941c0ba333a5295a3272fa2894364ae6d1c",
+    "tests/test_ui_prototype_input.gd": "d103e654bac3f147e1952a86dccb14fccc85d7e53fe7d50a7692344844657866",
+    "ui/actor_inventory_screen.gd": "2df6a38f2c714e89188b9f0185f03cebf1c6c7d56c5db3db48b05d7120af2849",
+    "ui/character_progression_screen.gd": "fea30c4098c13d937240f198e6cbdefa5a0134c74d8d7cb8d9be41dad2c8d311",
+    "ui/expedition_navigation.gd": "16c04dc10d0931572508a8b085b4ab42c2cd4acd840d3bd2db119c93a3813f07",
+    "ui/game_ui_style.gd": "82746ac717e369dfe06534f0a206f5958566a17794d31ffc54a44264dd2fab65",
+    "ui/paper_doll_view.gd": "033a3530e274f82dfbcd24c58e9a3e8786e57c2c0967028e3834891cc347c063",
+    "ui/skill_pool_ui.gd": "ec17f1adba9499800cf58758861bb4b2b76e12fcf28c514945fdb90de2d363f2"
+  },
+  "captures_sha256": {
+    "item-layout-1440-125.png": "fecc20f36785fd3708fed3e9d14046bf097f8d07283c99ba4fea5f1c29587576",
+    "item-layout-960-540-125.png": "0424ca7241e500eaeb11b4cb305c2f31cd4218352e720c6ac4ee7a60bd26cc5a",
+    "item-layout-1920-125.png": "84ee883eb4842b96bb4713820649f70e08e9376bce195222d64dda65f5c3bad6",
+    "inventory-list-1440-125.png": "f37a90dc9df79459c7d7ec030cf2c2e3ad8c52efa46b83e127fe047d4007d6aa",
+    "equipped-character-1440-100.png": "7ae63bfa1d73d246d744f8bfd336ef3271bf83ee8be2ee6041d3024443fddeb1",
+    "page-80-1440-125.png": "27924d69b11d6bfd42e216cd8a5bd0b21bac0cfc90b6a875d9e90b550cafb964",
+    "page-80-960-540-125.png": "e7b381acd8c3c1ed678d5a2c9912298c842006f13727654261184ce26dab863e",
+    "page-80-1920-125.png": "c678d1a1444ab6c41ede8ba72910001b6d46b6f956bd43a2721d0daa3a0b3606",
+    "page-75-1440-125.png": "52ac5666af3ed70fad4a666a9b6ef8aa83522048c94daa612053be8cfe865375",
+    "page-75-960-540-125.png": "51bd556598d70d5f6ad91828438af7cbe258fcbc08e03aa7d807110553f4c7d9",
+    "page-74-1440-125.png": "e39dd79276789eb8b33e091836689fc667a687eef235d12955c55065d7d48c69",
+    "page-77-1440-125.png": "72aca3af2e51c1fd5119a8e413152bd200d8e8bc6482ffb2c75ee5824c2beccd",
+    "crafting-1440-125.png": "2223e78ee5dfd1fa54744ad36aa83e92b6a628055ec5e2ea23a570ff320bba3e",
+    "crafting-960-125.png": "c37ecdb88a1934aa6f478556b0c1ab5649485bafdec31e00448d13ecc9374490",
+    "trade-1440-125.png": "d3303396eac9f0381dd8d353f64138a4815ef171c522f8abef3dd15562c3cefc",
+    "hud-960-125.png": "273d815d971818ee8108c6e2d7b141f2ba91040f895339e2b6ff55b525fac61b"
+  },
+  "command": "python3 tools/capture_ui.py --output /workspace/ui-layout-native-delivery --display 95"
+}

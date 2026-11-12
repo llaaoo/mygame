@@ -37,7 +37,7 @@ layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 18
 [node name="List" type="ScrollContainer" parent="Content/Columns"]
-custom_minimum_size = Vector2(218,160)
+custom_minimum_size = Vector2(218,80)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -49,7 +49,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 4
 [node name="Details" type="ScrollContainer" parent="Content/Columns"]
-custom_minimum_size = Vector2(270,160)
+custom_minimum_size = Vector2(270,80)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
