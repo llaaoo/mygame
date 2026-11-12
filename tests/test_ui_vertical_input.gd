@@ -77,7 +77,13 @@ func run() -> void:
   await tap(KEY_I); await select_item(weapon)
   verify(inventory.visible and root.get_visible_rect().encloses(inventory._panel.get_global_rect()),"Large-font inventory leaves viewport: "+str(extent))
   await click("比较"); await frames(4)
-  verify(inventory._details.get_children().any(func(n):return n is Label and n.text.contains("只读装备定义")),"Comparison is not a real definition projection")
+  var comparison:=inventory._details.find_child("EquipmentComparison",true,false)
+  verify(comparison!=null and comparison.get_meta("candidate_id","")==store.item(weapon).definition_id,"Comparison lost selected equipment identity")
+  if comparison:
+   var weight_rows:=comparison.get_children().filter(func(n): return n.has_meta("stat_key") and n.get_meta("stat_key")=="weight")
+   verify(weight_rows.size()==1 and is_equal_approx(float(weight_rows[0].get_meta("after")),store.equipment_definition(weapon).weight),"Comparison weight does not project the real instance definition")
+  verify(inventory._grid.columns==1 and inventory._tiles[weapon]._title.horizontal_alignment==HORIZONTAL_ALIGNMENT_LEFT,"Inventory default is not the prototype left-aligned list")
+  verify(inventory._columns.global_position.y-inventory._panel.global_position.y<150,"Inventory header consumes the content area")
   await click("绑定快捷槽"); await frames(4)
   var bind:=inventory._binding_host.get_node_or_null("QuickBind/Bind_quick_e") as Button
   var last:=inventory._binding_host.get_node_or_null("QuickBind/Bind_item_3") as Button
@@ -99,6 +105,11 @@ func run() -> void:
   await point_click(bind.get_global_rect().get_center()); await frames(6)
   verify(manager.shortcuts.binding("quick_e").get("uid","")==weapon and not inventory._binding_open and casts==0,"In-place binding cast, stayed expanded or lost physical UID")
   await capture("comparison-"+str(extent.x)+"x"+str(extent.y)+"-125")
+  var item_before:=store.item(weapon).snapshot()
+  await point_click(inventory._grid_toggle.get_global_rect().get_center()); await frames(8)
+  verify(inventory._grid_mode and inventory.selected==weapon and store.item(weapon).snapshot()==item_before,"View toggle changed selection or physical item")
+  await point_click(inventory._grid_toggle.get_global_rect().get_center()); await frames(8)
+  verify(not inventory._grid_mode and inventory._grid.columns==1,"List toggle failed")
   var binding:=manager.shortcuts.binding("quick_e")
   await click("绑定快捷槽"); await tap(KEY_ESCAPE)
   verify(inventory.visible and not inventory._binding_open and manager.shortcuts.binding("quick_e")==binding,"Esc did not close only uncommitted picker")

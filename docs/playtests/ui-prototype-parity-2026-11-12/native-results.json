@@ -1,0 +1,40 @@
+[
+  {
+    "test": "ui_vertical_input",
+    "exit_code": 0,
+    "errors": [],
+    "command": [
+      "godot",
+      "--path",
+      "/workspace/mygame",
+      "--rendering-method",
+      "gl_compatibility",
+      "--audio-driver",
+      "Dummy",
+      "--resolution",
+      "1152x648",
+      "--script",
+      "res://tests/test_ui_vertical_input.gd"
+    ],
+    "passed": true
+  },
+  {
+    "test": "ui_prototype_input",
+    "exit_code": 0,
+    "errors": [],
+    "command": [
+      "godot",
+      "--path",
+      "/workspace/mygame",
+      "--rendering-method",
+      "gl_compatibility",
+      "--audio-driver",
+      "Dummy",
+      "--resolution",
+      "1152x648",
+      "--script",
+      "res://tests/test_ui_prototype_input.gd"
+    ],
+    "passed": true
+  }
+]

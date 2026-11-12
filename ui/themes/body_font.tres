@@ -2,4 +2,4 @@
 [ext_resource type="FontFile" path="res://content/art/fonts/NotoSansSC.ttf" id="font"]
 [resource]
 base_font = ExtResource("font")
-variation_opentype = {2003265652: 450.0}
+variation_opentype = {2003265652: 400.0}

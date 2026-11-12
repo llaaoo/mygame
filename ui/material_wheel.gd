@@ -152,7 +152,9 @@ func _layout() -> void:
  _source_host.visible=not _inspection; _title.visible=not _inspection; _detail_host.visible=not _inspection
  if _inspection:
   _ring.hide(); _compact_view.hide()
-  _inspection_host.position=Vector2(size.x*.5-200,maxf(90,size.y*.5-100)); _inspection_host.size=Vector2(400,0)
+  _inspection_host.size=Vector2(400,0)
+  var anchor:=_opening_pointer if _opening_pointer.y>size.y*.65 else Vector2(size.x*.5,size.y-100)
+  _inspection_host.position=Vector2(clampf(anchor.x-200,20,size.x-420),maxf(24,size.y-112-_inspection_host.size.y))
 func inspect_slot(value: String, aim_direction := Vector2.ZERO) -> void:
  if QuickslotMaterials.available(player.skill_manager,value):
   open_for_source(value,aim_direction); return

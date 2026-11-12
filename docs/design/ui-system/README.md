@@ -1,6 +1,6 @@
 # 灰河谷 UI 交互原型 v1.2
 
-[完整方案](../../UI_SYSTEM_DESIGN.md) · [复审与后续修复](../../UI_SYSTEM_REVIEW.md) · [七款成熟作品对标](../../UI_AAA_BENCHMARK.md)。当前已实现 v1.2 的决策支持优化；**第一批Godot核心路径已接入，其他页面仍待迁移**（[正式实现及证据](../../UI_GODOT_IMPLEMENTATION.md)）。所有库存、交易和搜取都是刷新重置的示例状态，不连接正式旅程。
+[完整方案](../../UI_SYSTEM_DESIGN.md) · [复审与后续修复](../../UI_SYSTEM_REVIEW.md) · [七款成熟作品对标](../../UI_AAA_BENCHMARK.md)。当前已实现 v1.2 的决策支持优化；**Godot核心路径已接入并按原型重排视觉，扩展功能仍待迁移**（[正式实现及证据](../../UI_GODOT_IMPLEMENTATION.md)）。所有库存、交易和搜取都是刷新重置的示例状态，不连接正式旅程。
 
 ## 直接查看与下载（无需云环境）
 

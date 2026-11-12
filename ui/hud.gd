@@ -18,6 +18,8 @@ var level_up_ui: LevelUpUI = null
 
 var _death_active: bool = false
 var _actor_status: ActorStatusView
+var _quick_help: Label
+var _bindings_revision := -1
 
 
 func _ready() -> void:
@@ -32,11 +34,13 @@ func _ready() -> void:
 func _build_ui() -> void:
 	var margin := $MarginContainer as MarginContainer
 	margin.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	for side in ["left","right","top","bottom"]: margin.add_theme_constant_override("margin_"+side,0)
 	for child in margin.get_children():
 		child.queue_free()
 
 	var root := Control.new()
 	root.name = "HUDRoot"
+	root.theme=get_window().theme
 	root.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	root.set_anchors_preset(Control.PRESET_FULL_RECT)
 	margin.add_child(root)
@@ -44,6 +48,8 @@ func _build_ui() -> void:
 	_build_status_panel(root)
 	_build_right_stack(root)
 	_build_skill_bar(root)
+	get_viewport().size_changed.connect(_layout_hud)
+	_layout_hud()
 
 
 func _build_status_panel(root: Control) -> void:
@@ -56,11 +62,14 @@ func _build_status_panel(root: Control) -> void:
 	panel.offset_top = -286
 	panel.offset_right = 252
 	panel.offset_bottom = -108
-	panel.custom_minimum_size = Vector2(232, 150)
-	panel.add_theme_stylebox_override("panel", GameUIStyle.quiet_panel(.56))
+	panel.custom_minimum_size = Vector2(220, 0)
+	var transparent:=GameUIStyle.quiet_panel(0)
+	for side in ["left","right","top","bottom"]: transparent.set("content_margin_"+side,0)
+	panel.add_theme_stylebox_override("panel",transparent)
 	root.add_child(panel)
 
 	var vbox := VBoxContainer.new()
+	vbox.alignment=BoxContainer.ALIGNMENT_END
 	vbox.add_theme_constant_override("separation", 5)
 	panel.add_child(vbox)
 
@@ -71,7 +80,7 @@ func _build_status_panel(root: Control) -> void:
 	var title := Label.new()
 	title.text = "行者"
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	GameUIStyle.apply_label(title, 15, GameUIStyle.GOLD)
+	GameUIStyle.apply_label(title, 12, GameUIStyle.TEXT_MUTED)
 	title_row.add_child(title)
 
 	stats_label = Label.new()
@@ -88,9 +97,11 @@ func _build_status_panel(root: Control) -> void:
 	_actor_status=ActorStatusView.new()
 	_actor_status.compact=true
 	vbox.add_child(_actor_status)
+	vbox.move_child(mana_bar.get_parent(),3)
 	xp_bar=_make_bar(GameUIStyle.XP)
 	GameUIStyle.apply_progress(xp_bar,GameUIStyle.XP,2)
 	xp_bar.modulate.a=.45
+	xp_bar.hide()
 	vbox.add_child(xp_bar)
 
 
@@ -123,14 +134,34 @@ func _build_skill_bar(root: Control) -> void:
 	panel.offset_right = 354
 	panel.offset_top = -78
 	panel.offset_bottom = -20
-	panel.add_theme_stylebox_override("panel", GameUIStyle.quiet_panel(.48))
+	var transparent:=GameUIStyle.quiet_panel(0)
+	for side in ["left","right","top","bottom"]: transparent.set("content_margin_"+side,0)
+	panel.add_theme_stylebox_override("panel",transparent)
 	root.add_child(panel)
+	_quick_help=Label.new(); _quick_help.name="QuickHelp"
+	_quick_help.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
+	_quick_help.offset_left=-310; _quick_help.offset_right=310; _quick_help.offset_top=-26; _quick_help.offset_bottom=-3
+	_quick_help.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER; _quick_help.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	GameUIStyle.apply_label(_quick_help,12,GameUIStyle.TEXT_MUTED); root.add_child(_quick_help)
 
 	skill_bar = SkillBar.new()
 	skill_bar.name = "SkillBar"
 	skill_bar.alignment = BoxContainer.ALIGNMENT_CENTER
-	skill_bar.add_theme_constant_override("separation", 5)
+	skill_bar.add_theme_constant_override("separation", 4)
 	panel.add_child(skill_bar)
+
+
+func _layout_hud() -> void:
+	var viewport:=get_viewport().get_visible_rect().size
+	var compact:=viewport.x<1200
+	var status:=get_node("MarginContainer/HUDRoot/StatusPanel") as Control
+	status.offset_left=18 if compact else 28; status.offset_right=status.offset_left+220
+	status.offset_bottom=-120 if compact else -38; status.offset_top=status.offset_bottom-150
+	var quick:=get_node("MarginContainer/HUDRoot/SkillBarPanel") as Control
+	quick.offset_left=-310; quick.offset_right=310; quick.offset_top=-92; quick.offset_bottom=-34
+	var stack:=get_node("MarginContainer/HUDRoot/RightStatusStack") as Control
+	stack.offset_left=status.offset_left; stack.offset_right=status.offset_right
+	stack.offset_bottom=status.offset_top-10; stack.offset_top=stack.offset_bottom-72
 
 
 func _add_resource_row(parent: VBoxContainer, label_text: String, bar: ProgressBar, color: Color) -> Label:
@@ -152,7 +183,7 @@ func _add_resource_row(parent: VBoxContainer, label_text: String, bar: ProgressB
 	row.add_child(bar)
 
 	var value := Label.new()
-	value.custom_minimum_size = Vector2(54, 0)
+	value.custom_minimum_size = Vector2(68, 0)
 	value.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	GameUIStyle.apply_label(value, 12, GameUIStyle.TEXT_MAIN)
 	row.add_child(value)
@@ -161,11 +192,11 @@ func _add_resource_row(parent: VBoxContainer, label_text: String, bar: ProgressB
 
 func _make_bar(color: Color) -> ProgressBar:
 	var bar := ProgressBar.new()
-	bar.custom_minimum_size = Vector2(0, 11)
+	bar.custom_minimum_size = Vector2(0, 6)
 	bar.show_percentage = false
 	bar.max_value = 100
 	bar.value = 100
-	GameUIStyle.apply_progress(bar, color, 11)
+	GameUIStyle.apply_progress(bar, color, 6)
 	return bar
 
 
@@ -215,7 +246,7 @@ func _setup_skill_tree_ui() -> void:
 func _on_health_changed(current_hp: int, max_hp: int) -> void:
 	health_bar.max_value = max_hp
 	health_bar.value = current_hp
-	health_label.text = "%d / %d" % [current_hp, max_hp]
+	health_label.text = "%d/%d" % [current_hp, max_hp]
 
 
 func _on_mp_changed(current_mp: int, max_mp: int) -> void:
@@ -223,7 +254,7 @@ func _on_mp_changed(current_mp: int, max_mp: int) -> void:
 	mana_bar.get_parent().visible=awakened
 	mana_bar.max_value = maxi(1,max_mp)
 	mana_bar.value = current_mp
-	mana_label.text = "%d / %d" % [current_mp, max_mp] if awakened else "未觉醒"
+	mana_label.text = "%d/%d" % [current_mp, max_mp] if awakened else "未觉醒"
 
 
 func _on_player_died() -> void:
@@ -315,6 +346,9 @@ func _update_stats_display() -> void:
 		xp_bar.value = s.experience
 
 func _process(_delta: float) -> void:
+	if _bindings_revision!=InputBindings.revision:
+		_bindings_revision=InputBindings.revision
+		_quick_help.text=InputBindings.menu_help("G 选形式   K 完整编组   ·   选择不施放")
 	# Campaign actor binding completes after the base HUD enters the tree.
 	if _actor_status and is_instance_valid(player) and _actor_status.context!=player.actor_context:
 		_actor_status.context=player.actor_context

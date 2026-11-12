@@ -53,7 +53,8 @@ func _refresh() -> void:
  var stats:=actor.stats_component; var mastery:=actor.mastery_manager
  var data:=ActorProgression.values(actor)
  var recovery:=ActorProgression.stamina_values(actor)
- _overview.text="角色 Lv.%d · 经验 %d / %d    属性点 %d    Perk点 %d\n生命 %d · %s · 体力 %.0f · 当前回复 %.1f/秒（基础%.1f） · 负重承受 %.0f\n升级：3属性点＋1Perk点；成功实践提升分支熟练度。回复仍受消耗延迟与格挡限制。世界持续运行。"%[stats.level,stats.experience,stats.exp_to_next,stats.attribute_points,mastery.get_available_perk_points(),actor.health_component.max_hp,QuickslotView.magic_status(actor),recovery.maximum,recovery.regeneration,recovery.base_regeneration,actor.actor_context.rules.carry_limit+data.carry_bonus]
+ _overview.text="角色 Lv.%d · 经验 %d / %d    属性点 %d    Perk点 %d\n生命 %d · %s · 体力 %.0f · 当前回复 %.1f/秒（基础%.1f） · 负重承受 %.0f"%[stats.level,stats.experience,stats.exp_to_next,stats.attribute_points,mastery.get_available_perk_points(),actor.health_component.max_hp,QuickslotView.magic_status(actor),recovery.maximum,recovery.regeneration,recovery.base_regeneration,actor.actor_context.rules.carry_limit+data.carry_bonus]
+ _overview.tooltip_text="升级：3属性点＋1Perk点；成功实践提升分支熟练度。回复仍受消耗延迟与格挡限制。世界持续运行。"
  _experience_bar.max_value=maxi(1,stats.exp_to_next); _experience_bar.value=stats.experience
  if _branch_buttons.is_empty():
   _branches.add_child(FoundationWidgets.button("属性与派生",_show_attributes))

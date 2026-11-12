@@ -15,21 +15,26 @@ func _ready() -> void:
 		var row:=HBoxContainer.new()
 		row.mouse_filter=Control.MOUSE_FILTER_IGNORE
 		add_child(row)
-		var caption:=FoundationWidgets.label(title,12,true)
-		caption.custom_minimum_size.x=34
-		caption.autowrap_mode=TextServer.AUTOWRAP_OFF
-		row.add_child(caption)
+		row.add_theme_constant_override("separation",8)
+		if compact:
+			var glyph:=TextureRect.new(); glyph.texture=GameUIStyle.icon("zap" if title=="体力" else "shield")
+			glyph.custom_minimum_size=Vector2(18,18); glyph.expand_mode=TextureRect.EXPAND_IGNORE_SIZE; glyph.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			glyph.modulate=Color("a5ae82") if title=="体力" else Color("9da7b0"); glyph.mouse_filter=Control.MOUSE_FILTER_IGNORE; row.add_child(glyph)
+		else:
+			var caption:=FoundationWidgets.label(title,12,true); caption.custom_minimum_size.x=34
+			caption.autowrap_mode=TextServer.AUTOWRAP_OFF; row.add_child(caption)
 		var bar:=ProgressBar.new()
-		bar.custom_minimum_size=Vector2(100,10)
+		bar.custom_minimum_size=Vector2(0 if compact else 100,6)
 		bar.size_flags_vertical=Control.SIZE_SHRINK_CENTER
 		bar.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 		bar.show_percentage=false
 		bar.mouse_filter=Control.MOUSE_FILTER_IGNORE
-		GameUIStyle.apply_progress(bar,Color("c4ac57") if title=="体力" else Color("9da7b0"),8)
+		GameUIStyle.apply_progress(bar,Color("a5ae82") if title=="体力" else Color("9da7b0"),6)
 		row.add_child(bar)
 		if title=="体力":
 			stamina_bar=bar
-			stamina_value=FoundationWidgets.label("",12); stamina_value.custom_minimum_size.x=54
+			stamina_value=FoundationWidgets.label("",12); stamina_value.custom_minimum_size.x=68
+			stamina_value.size_flags_horizontal=Control.SIZE_SHRINK_END
 			stamina_value.autowrap_mode=TextServer.AUTOWRAP_OFF; stamina_value.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT
 			row.add_child(stamina_value)
 		else: stability_bar=bar
@@ -90,6 +95,7 @@ func _process(_delta: float) -> void:
 	stamina_bar.value=context.actions.stamina.current
 	stamina_value.text="%.0f/%.0f"%[context.actions.stamina.current,context.actions.stamina.maximum]
 	stability_bar.value=context.actions.stability.current
+	stability_bar.get_parent().visible=not compact or context.actions.stability.current<99.9 or context.actions.guarding
 	var weight:=context.items.weight(context.id) if context.items else 0.0
 	var pack: bool=context.items and context.items.is_attached(context.id + ".pack")
 	var state: String={"idle":"就绪","attack":"攻击中","dodge":"闪避中","stagger":"失衡","item":"使用物品","aim_item":"瞄准 · 松开出手","spray":"喷洒中 · 松开即停","recovery":"动作恢复"}.get(context.actions.mode,"")

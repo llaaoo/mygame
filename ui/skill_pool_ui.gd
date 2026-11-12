@@ -89,7 +89,7 @@ func close() -> void:
 func _build_ui() -> void:
 	_background=ColorRect.new()
 	_background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	_background.color=GameUIStyle.modal_backdrop(.82)
+	_background.color=GameUIStyle.modal_backdrop(.55)
 	add_child(_background)
 	_panel=Panel.new()
 	_panel.anchor_left=0; _panel.anchor_right=1; _panel.offset_left=16; _panel.offset_right=-16
@@ -102,14 +102,12 @@ func _build_ui() -> void:
 	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	for side in ["left","right","top","bottom"]: margin.add_theme_constant_override("margin_"+side,16)
 	_panel.add_child(margin)
-	var root:=VBoxContainer.new(); root.add_theme_constant_override("separation",16); margin.add_child(root)
-	var header:=HBoxContainer.new(); root.add_child(header)
-	GameUIStyle.folio_title(header,"技法与快捷编组")
-	var close_button:=FoundationWidgets.button("关闭",close); close_button.size_flags_horizontal=Control.SIZE_SHRINK_END; header.add_child(close_button)
-	_navigation=GameUIStyle.navigation(root,"loadout",navigation_request)
+	var root:=VBoxContainer.new(); root.add_theme_constant_override("separation",10); margin.add_child(root)
+	_navigation=GameUIStyle.menu_header(root,"技艺","loadout",close,navigation_request)
+	root.add_child(FoundationWidgets.label("◇ 世界继续运行 · 选择内容后绑定独立快捷槽",12,true))
 	var content:=HBoxContainer.new(); content.size_flags_vertical=Control.SIZE_EXPAND_FILL
 	content.add_theme_constant_override("separation",12); root.add_child(content)
-	var library:=VBoxContainer.new(); library.size_flags_horizontal=Control.SIZE_EXPAND_FILL; library.custom_minimum_size.x=250
+	var library:=VBoxContainer.new(); library.custom_minimum_size.x=260
 	content.add_child(library)
 	var tabs:=HBoxContainer.new(); library.add_child(tabs)
 	for pair in [["基础动作",0],["可用物品",1],["武技",2]]:
@@ -120,25 +118,24 @@ func _build_ui() -> void:
 	var scroll:=ScrollContainer.new(); scroll.size_flags_vertical=Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED
 	library.add_child(scroll)
-	_skill_grid=GridContainer.new(); _skill_grid.columns=2; _skill_grid.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	_skill_grid=GridContainer.new(); _skill_grid.columns=1; _skill_grid.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 	_skill_grid.add_theme_constant_override("h_separation",8); _skill_grid.add_theme_constant_override("v_separation",8)
 	scroll.add_child(_skill_grid)
 	var detail_scroll:=ScrollContainer.new(); detail_scroll.custom_minimum_size.x=230
 	detail_scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED; detail_scroll.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	content.add_child(VSeparator.new())
 	content.add_child(detail_scroll)
 	_detail_box=VBoxContainer.new(); _detail_box.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 	_detail_box.add_theme_constant_override("separation",12); detail_scroll.add_child(_detail_box)
-	var slots_scroll:=ScrollContainer.new(); slots_scroll.custom_minimum_size.x=210
+	root.add_child(HSeparator.new())
+	root.add_child(_make_section_label("独立快捷槽 · 点击绑定所选内容 / 右键清空"))
+	var slots_scroll:=ScrollContainer.new(); slots_scroll.custom_minimum_size.y=80
 	slots_scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED
-	content.add_child(slots_scroll)
-	var slots:=VBoxContainer.new(); slots.size_flags_horizontal=Control.SIZE_EXPAND_FILL
-	slots.add_theme_constant_override("separation",5); slots_scroll.add_child(slots)
-	slots.add_child(_make_section_label("选择目标快捷键"))
-	for source in QuickslotLoadout.COMBAT_SOURCES: _add_equip_slot(slots,source,InputBindings.label(InputBindings.action_for_source(source)))
-	slots.add_child(_make_section_label("同样可放动作或物品"))
-	for source in QuickslotLoadout.ITEM_SOURCES: _add_equip_slot(slots,source,InputBindings.label(InputBindings.action_for_source(source)))
+	root.add_child(slots_scroll)
+	var slots:=GridContainer.new(); slots.columns=13; slots.add_theme_constant_override("h_separation",5); slots_scroll.add_child(slots)
+	for source in QuickslotLoadout.SOURCES: _add_equip_slot(slots,source,InputBindings.label(InputBindings.action_for_source(source)))
 	_hint_label=Label.new(); GameUIStyle.apply_label(_hint_label,12,GameUIStyle.TEXT_MUTED)
-	_hint_label.text="选择内容 → 按快捷键或点击右侧槽位绑定   /   右键清空   /   Esc返回世界"
+	_hint_label.text="选择内容 → 按快捷键或点击下方槽位绑定   /   右键清空   /   Esc返回世界"
 	_hint_label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	root.add_child(_hint_label)
 
@@ -152,40 +149,17 @@ func _make_section_label(text: String) -> Label:
 
 func _add_equip_slot(parent: Control, source: String, label: String) -> void:
 	var panel := PanelContainer.new()
-	panel.custom_minimum_size = Vector2(198, 48)
+	panel.custom_minimum_size = Vector2(46, 68)
 	panel.add_theme_stylebox_override("panel", _make_slot_bg())
 	panel.set_meta("display_label", label)
-	parent.add_child(panel)
-	_equip_slots.append(panel)
-	_equip_sources.append(source)
-
-	var hbox := HBoxContainer.new()
-	hbox.add_theme_constant_override("separation", 8)
-	panel.add_child(hbox)
-
-	var icon := TextureRect.new()
-	icon.name = "Icon"
-	icon.custom_minimum_size = Vector2(24, 24)
-	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	hbox.add_child(icon)
-
-	var info := VBoxContainer.new()
-	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	hbox.add_child(info)
-
-	var name_lbl := Label.new()
-	name_lbl.name = "Name"
-	GameUIStyle.apply_label(name_lbl, 14, GameUIStyle.TEXT_MAIN)
-	name_lbl.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS
-	info.add_child(name_lbl)
-
-	var sub_lbl := Label.new()
-	sub_lbl.name = "Sub"
-	GameUIStyle.apply_label(sub_lbl, 12, GameUIStyle.TEXT_MUTED)
-	sub_lbl.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS
-	sub_lbl.text = label
-	info.add_child(sub_lbl)
+	parent.add_child(panel); _equip_slots.append(panel); _equip_sources.append(source)
+	var inner:=Control.new(); inner.name="Inner"; inner.custom_minimum_size=Vector2(40,60); panel.add_child(inner)
+	var icon:=TextureRect.new(); icon.name="Icon"; icon.position=Vector2(8,22); icon.size=Vector2(24,24)
+	icon.expand_mode=TextureRect.EXPAND_IGNORE_SIZE; icon.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED; inner.add_child(icon)
+	var name_lbl:=Label.new(); name_lbl.name="Name"; name_lbl.position=Vector2(0,40); name_lbl.size=Vector2(40,18)
+	name_lbl.hide(); inner.add_child(name_lbl)
+	var sub_lbl:=Label.new(); sub_lbl.name="Sub"; sub_lbl.size=Vector2(40,20)
+	sub_lbl.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER; sub_lbl.text=label; GameUIStyle.apply_label(sub_lbl,12); inner.add_child(sub_lbl)
 
 	for child in panel.find_children("*","Control",true,false): child.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	panel.gui_input.connect(_on_slot_clicked.bind(source))
@@ -293,11 +267,11 @@ func _refresh_detail() -> void:
 	if not _selected_item.is_empty():
 		var view:=QuickslotView.item_state(_skill_manager.get_parent(),_selected_item)
 		heading.text=view.title
-		_detail_box.add_child(FoundationWidgets.label(view.detail+"\n点击右侧任一快捷槽绑定；右键清空。",11,true))
+		_detail_box.add_child(FoundationWidgets.label(view.detail+"\n点击下方任一快捷槽绑定；右键清空。",11,true))
 		return
 	if not _selected_skill:
 		var empty := Label.new()
-		empty.text = "动作与物品：选择真实来源，再点击右侧快捷槽。E与1独立。\n\n武技：按连招配置，每个组合最多两招；轻点Ctrl切换，Ctrl+左键发动。"
+		empty.text = "动作与物品：选择真实来源，再点击下方快捷槽。E与1独立。\n\n武技：按连招配置，每个组合最多两招；轻点Ctrl切换，Ctrl+左键发动。"
 		empty.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 		empty.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 		GameUIStyle.apply_label(empty, 10, GameUIStyle.TEXT_MUTED)
@@ -419,7 +393,7 @@ func _format_skill_stats(skill: SkillData) -> String:
 func _refresh_grid() -> void:
 	for child in _skill_grid.get_children():
 		child.queue_free()
-	_skill_grid.columns=2
+	_skill_grid.columns=1
 	if _show_techniques:
 		_refresh_techniques(); return
 	if _show_items:
@@ -442,28 +416,29 @@ func _refresh_grid() -> void:
 func _make_skill_card(skill: SkillData) -> PanelContainer:
 	var unlocked := _is_skill_unlocked(skill)
 	var card := PanelContainer.new()
-	card.custom_minimum_size = Vector2(116, 112)
+	card.custom_minimum_size = Vector2(0, 78)
 	card.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 	card.add_theme_stylebox_override("panel", _make_card_bg(skill == _selected_skill))
 
-	var vbox := VBoxContainer.new()
+	var row:=HBoxContainer.new(); row.add_theme_constant_override("separation",12); card.add_child(row)
+	var vbox := VBoxContainer.new(); vbox.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 	vbox.add_theme_constant_override("separation", 2)
-	card.add_child(vbox)
 
 	var icon := TextureRect.new()
-	icon.custom_minimum_size = Vector2(40, 40)
+	icon.custom_minimum_size = Vector2(32, 32)
 	icon.texture = InterfaceIcons.skill(skill)
 	icon.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	icon.modulate = Color.WHITE if unlocked else Color(0.34, 0.36, 0.4, 0.78)
-	icon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	vbox.add_child(icon)
+	icon.size_flags_vertical=Control.SIZE_SHRINK_CENTER
+	row.add_child(icon); row.add_child(vbox)
 
 	var nm := Label.new()
 	nm.text = skill.display_name
 	GameUIStyle.apply_label(nm, 14, GameUIStyle.TEXT_MAIN)
-	nm.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	nm.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	nm.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS
 	vbox.add_child(nm)
 
 	var tp := Label.new()
@@ -478,7 +453,7 @@ func _make_skill_card(skill: SkillData) -> PanelContainer:
 	tp.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 	GameUIStyle.apply_font_size(tp,12)
 	tp.add_theme_color_override("font_color", GameUIStyle.TEXT_MUTED if unlocked else GameUIStyle.GOLD)
-	tp.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	tp.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	vbox.add_child(tp)
 
 	for child in card.find_children("*","Control",true,false): child.mouse_filter=Control.MOUSE_FILTER_IGNORE
@@ -501,17 +476,17 @@ func _refresh_equip_slots() -> void:
 	for i in range(_equip_sources.size()):
 		var src := _equip_sources[i]
 		var panel := _equip_slots[i]
+		panel.tooltip_text=""
 		var skill: SkillData = null
 		var inst: SkillInstance = null
 		inst = _skill_manager.get_instance(src)
 		if inst:
 			skill = inst.data
 
-		var hbox := panel.get_child(0) as HBoxContainer
-		var tex := hbox.get_node("Icon") as TextureRect
-		var vbox := hbox.get_child(1) as VBoxContainer
-		var name_lbl := vbox.get_node("Name") as Label
-		var sub_lbl := vbox.get_node("Sub") as Label
+		var inner:=panel.get_node("Inner")
+		var tex:=inner.get_node("Icon") as TextureRect
+		var name_lbl:=inner.get_node("Name") as Label
+		var sub_lbl:=inner.get_node("Sub") as Label
 		var action:=InputBindings.action_for_source(src)
 		var display_label := "快捷键 "+InputBindings.labels(action)
 
@@ -543,6 +518,9 @@ func _refresh_equip_slots() -> void:
 			name_lbl.text = "空"
 			sub_lbl.text = display_label
 
+		panel.tooltip_text=name_lbl.text+"\n"+sub_lbl.text+"\n"+panel.tooltip_text
+		sub_lbl.text=InputBindings.label(InputBindings.action_for_source(src))
+
 		if _selected_skill and skill and skill.get_id() == _selected_skill.get_id():
 			panel.add_theme_stylebox_override("panel", _make_slot_bg(Color(0.3, 0.5, 0.3)))
 		else:
@@ -552,7 +530,7 @@ func _refresh_equip_slots() -> void:
 ## ── 样式 ──
 
 func _make_panel_bg() -> StyleBoxFlat:
-	return GameUIStyle.panel_style(0.985, 6, GameUIStyle.BORDER_STRONG, 1)
+	return GameUIStyle.menu_style()
 
 
 func _make_card_bg(selected: bool = false) -> StyleBoxFlat:
