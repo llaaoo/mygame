@@ -48,12 +48,14 @@ func run() -> void:
  await click("快捷栏编组"); await click("打开快捷栏编组")
  var pool:=game.player.skill_pool_ui
  check(pool._equip_slots.size()==13,"Binder lost mixed quickslots")
- # Selecting a card must keep target shortcuts in their independent scroll column.
+ # Selecting a card must keep shortcuts in their independently scrollable row.
  var card:=pool._skill_grid.get_child(0) as Control
  await point_click(card.get_global_rect().get_center())
  await frames()
  var last: Control=pool._equip_slots.back()
- var scroll:=last.get_parent().get_parent() as ScrollContainer
+ var binding_parent:=last.get_parent()
+ while binding_parent and not binding_parent is ScrollContainer: binding_parent=binding_parent.get_parent()
+ var scroll:=binding_parent as ScrollContainer
  scroll.ensure_control_visible(last); await frames()
  check(scroll.get_global_rect().encloses(last.get_global_rect()),"Final shortcut clipped after selecting a skill")
  check(pool._panel.get_global_rect().encloses(scroll.get_global_rect()),"Binder target column extends outside modal")
@@ -92,7 +94,7 @@ func run() -> void:
  if learned:
   await point_click(learned.get_global_rect().get_center())
   var target_slot: Control=pool._equip_slots[pool._equip_sources.find("quick_e")]
-  (target_slot.get_parent().get_parent() as ScrollContainer).ensure_control_visible(target_slot); await frames()
+  scroll.ensure_control_visible(target_slot); await frames()
   await point_click(target_slot.get_global_rect().get_center())
  await key(KEY_ESCAPE,true); await key(KEY_ESCAPE,false)
  var before:=game.session.inventory.snapshot()

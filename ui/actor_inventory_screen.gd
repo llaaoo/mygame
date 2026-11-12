@@ -29,7 +29,7 @@ var _columns: HBoxContainer
 var _bag: VBoxContainer
 var _details: VBoxContainer
 var _detail_column: VBoxContainer
-var _detail_actions: HFlowContainer
+var _detail_actions: GridContainer
 var _binding_host: VBoxContainer
 var _binding_open := false
 var _compare_open := false
@@ -156,6 +156,7 @@ func _build() -> void:
   label.autowrap_mode=TextServer.AUTOWRAP_OFF; label.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS
  _columns=HBoxContainer.new(); _columns.add_theme_constant_override("separation",22); _columns.size_flags_vertical=Control.SIZE_EXPAND_FILL; root.add_child(_columns)
  _gear_scroll=ScrollContainer.new(); _gear_scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED; _gear_scroll.follow_focus=true
+ _gear_scroll.size_flags_horizontal=Control.SIZE_EXPAND_FILL; _gear_scroll.size_flags_stretch_ratio=.26
  _columns.add_child(_gear_scroll)
  var gear:=VBoxContainer.new(); _gear_column=gear; gear.size_flags_horizontal=Control.SIZE_EXPAND_FILL; _gear_scroll.add_child(gear)
  gear.add_child(FoundationWidgets.label("当前穿戴",12,true))
@@ -164,7 +165,7 @@ func _build() -> void:
  _needs_label=FoundationWidgets.label("",12,true); gear.add_child(_needs_label)
  if actor.survival: gear.add_child(FoundationWidgets.button("恢复与休整",actor.survival.show_rules))
  _columns.add_child(VSeparator.new())
- _bag=VBoxContainer.new(); _bag.add_theme_constant_override("separation",7); _bag.size_flags_horizontal=Control.SIZE_EXPAND_FILL; _bag.size_flags_stretch_ratio=1.1; _columns.add_child(_bag)
+ _bag=VBoxContainer.new(); _bag.add_theme_constant_override("separation",7); _bag.size_flags_horizontal=Control.SIZE_EXPAND_FILL; _bag.size_flags_stretch_ratio=.34; _columns.add_child(_bag)
  var bag_heading:=HBoxContainer.new(); bag_heading.name="BagHeading"; _bag.add_child(bag_heading)
  bag_heading.add_child(FoundationWidgets.label("随身物品",16))
  _coins_label=FoundationWidgets.label("",14); _coins_label.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT; _coins_label.add_theme_color_override("font_color",GameUIStyle.GOLD); bag_heading.add_child(_coins_label)
@@ -191,13 +192,13 @@ func _build() -> void:
  _summary=FoundationWidgets.label("",12,true); _bag.add_child(_summary)
  _columns.add_child(VSeparator.new())
  _detail_column=VBoxContainer.new(); _detail_column.name="DetailColumn"
- _detail_column.size_flags_horizontal=Control.SIZE_EXPAND_FILL; _columns.add_child(_detail_column)
+ _detail_column.size_flags_horizontal=Control.SIZE_EXPAND_FILL; _detail_column.size_flags_stretch_ratio=.40; _columns.add_child(_detail_column)
  _detail_scroll=ScrollContainer.new(); _detail_scroll.name="ItemReading"; _detail_scroll.size_flags_vertical=Control.SIZE_EXPAND_FILL
  _detail_scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED; _detail_scroll.follow_focus=true; _detail_column.add_child(_detail_scroll)
  _details=VBoxContainer.new(); _details.size_flags_horizontal=Control.SIZE_EXPAND_FILL; _details.add_theme_constant_override("separation",12); _detail_scroll.add_child(_details)
  _binding_host=VBoxContainer.new(); _binding_host.name="BindingPicker"; _binding_host.visible=false; _detail_column.add_child(_binding_host)
  _detail_column.add_child(HSeparator.new())
- _detail_actions=HFlowContainer.new(); _detail_actions.name="ItemActions"; _detail_actions.add_theme_constant_override("h_separation",6); _detail_actions.add_theme_constant_override("v_separation",6); _detail_column.add_child(_detail_actions)
+ _detail_actions=GridContainer.new(); _detail_actions.columns=2; _detail_actions.name="ItemActions"; _detail_actions.add_theme_constant_override("h_separation",6); _detail_actions.add_theme_constant_override("v_separation",6); _detail_column.add_child(_detail_actions)
  root.add_child(HSeparator.new())
  var footer:=HBoxContainer.new(); footer.add_theme_constant_override("separation",12); root.add_child(footer)
  footer.add_child(FoundationWidgets.label("双击 使用/穿戴 · 右键 更多 · Shift 比较",12,true))
@@ -213,8 +214,8 @@ func _layout() -> void:
  var viewport:=get_viewport().get_visible_rect().size
  var extent:=GameUIStyle.menu_extent(viewport)
  _panel.offset_left=-extent.x*.5; _panel.offset_right=extent.x*.5; _panel.offset_top=-extent.y*.5; _panel.offset_bottom=extent.y*.5
- _gear_scroll.custom_minimum_size.x=154 if viewport.x<1100 else 210
- _detail_column.custom_minimum_size.x=250 if viewport.x<1100 else 300
+ _gear_scroll.custom_minimum_size.x=182 if viewport.x<1100 else 260
+ _detail_column.custom_minimum_size.x=300
  _bag.custom_minimum_size.x=230
  _columns.add_theme_constant_override("separation",10 if viewport.x<1100 else 18)
  _grid.columns=2 if _grid_mode and viewport.x>=1200 else 1
@@ -450,7 +451,7 @@ func _restore_action_focus(title: String, uid: String) -> void:
  var tile:=_tiles.get(uid) as Control
  if is_instance_valid(tile): tile.grab_focus()
 func _action(title: String,request: Callable,disabled := false) -> void:
- var button:=FoundationWidgets.button(title,request,disabled); button.size_flags_horizontal=Control.SIZE_FILL
+ var button:=FoundationWidgets.button(title,request,disabled); button.clip_text=true
  for state in ["normal","hover","pressed","focus","disabled"]:
   var style:=button.get_theme_stylebox(state).duplicate() as StyleBoxFlat
   style.content_margin_left=7; style.content_margin_right=7; button.add_theme_stylebox_override(state,style)

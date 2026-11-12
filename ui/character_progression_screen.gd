@@ -29,6 +29,10 @@ var _perk_buttons: Dictionary={}
 var _practice_label: Label
 var _perk_reason: Label
 var _learn_button: Button
+var _branch_scroll: ScrollContainer
+var _graph_scroll: ScrollContainer
+var _detail_scroll: ScrollContainer
+var _attribute_column: VBoxContainer
 func setup(player: Player,save: Callable,train: Callable,attributes := false) -> void:
  actor=player; save_request=save; train_request=train; _attributes=attributes
  size_flags_horizontal=Control.SIZE_EXPAND_FILL; size_flags_vertical=Control.SIZE_EXPAND_FILL
@@ -36,12 +40,14 @@ func setup(player: Player,save: Callable,train: Callable,attributes := false) ->
  _overview=FoundationWidgets.label("",14); add_child(_overview)
  _experience_bar=ProgressBar.new(); _experience_bar.custom_minimum_size.y=7; _experience_bar.show_percentage=false; add_child(_experience_bar)
  _body=HBoxContainer.new(); _body.size_flags_vertical=Control.SIZE_EXPAND_FILL; _body.add_theme_constant_override("separation",12); add_child(_body)
- var side:=ScrollContainer.new(); side.custom_minimum_size.x=146; side.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED; side.follow_focus=true; _body.add_child(side)
- _branches=VBoxContainer.new(); _branches.size_flags_horizontal=Control.SIZE_EXPAND_FILL; side.add_child(_branches)
- var scroller:=ScrollContainer.new(); scroller.size_flags_horizontal=Control.SIZE_EXPAND_FILL; scroller.size_flags_vertical=Control.SIZE_EXPAND_FILL; scroller.follow_focus=true; _body.add_child(scroller)
- _canvas=BranchGraph.new(); _canvas.custom_minimum_size=Vector2(470,450); scroller.add_child(_canvas)
- var details:=ScrollContainer.new(); details.custom_minimum_size.x=240; details.size_flags_vertical=Control.SIZE_EXPAND_FILL; details.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED; details.follow_focus=true; _body.add_child(details)
- _detail=VBoxContainer.new(); _detail.size_flags_horizontal=Control.SIZE_EXPAND_FILL; _detail.add_theme_constant_override("separation",10); details.add_child(_detail)
+ _branch_scroll=ScrollContainer.new(); _branch_scroll.custom_minimum_size.x=180; _branch_scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED; _branch_scroll.follow_focus=true; _body.add_child(_branch_scroll)
+ _branches=VBoxContainer.new(); _branches.size_flags_horizontal=Control.SIZE_EXPAND_FILL; _branch_scroll.add_child(_branches)
+ _graph_scroll=ScrollContainer.new(); _graph_scroll.size_flags_horizontal=Control.SIZE_EXPAND_FILL; _graph_scroll.size_flags_stretch_ratio=.64; _graph_scroll.size_flags_vertical=Control.SIZE_EXPAND_FILL; _graph_scroll.follow_focus=true; _body.add_child(_graph_scroll)
+ _canvas=BranchGraph.new(); _canvas.size_flags_horizontal=Control.SIZE_EXPAND_FILL; _canvas.custom_minimum_size=Vector2(475,450); _graph_scroll.add_child(_canvas)
+ _detail_scroll=ScrollContainer.new(); _detail_scroll.custom_minimum_size.x=260; _detail_scroll.size_flags_horizontal=Control.SIZE_EXPAND_FILL; _detail_scroll.size_flags_stretch_ratio=.36; _detail_scroll.size_flags_vertical=Control.SIZE_EXPAND_FILL; _detail_scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED; _detail_scroll.follow_focus=true; _body.add_child(_detail_scroll)
+ _detail=VBoxContainer.new(); _detail.size_flags_horizontal=Control.SIZE_EXPAND_FILL; _detail.add_theme_constant_override("separation",10); _detail_scroll.add_child(_detail)
+ resized.connect(_layout_regions); _canvas.resized.connect(_layout_graph)
+ _layout_regions()
  _refresh()
 func _process(delta: float) -> void:
  if not is_visible_in_tree() or not is_instance_valid(actor): return
@@ -107,6 +113,7 @@ func _show_attributes() -> void:
 func _select_school(school: int) -> void:
  _attributes=false; _school=school; _selected=""; _layout_key=""; _refresh()
 func _clear_canvas() -> void:
+ _attribute_column=null
  FoundationWidgets.clear(_canvas); _canvas.links=[]; _canvas.queue_redraw()
  _attribute_labels.clear(); _attribute_buttons.clear(); _perk_buttons.clear()
  _learn_button=null; _practice_label=null; _perk_reason=null
@@ -114,7 +121,7 @@ func _clear_canvas() -> void:
 func _draw_attributes() -> void:
  _clear_canvas(); FoundationWidgets.clear(_detail)
  _canvas.custom_minimum_size=Vector2(400,480)
- var column:=VBoxContainer.new(); column.position=Vector2(8,8); column.size=Vector2(380,470); column.add_theme_constant_override("separation",10); _canvas.add_child(column)
+ var column:=VBoxContainer.new(); _attribute_column=column; column.position=Vector2(8,8); column.size=Vector2(380,470); column.add_theme_constant_override("separation",10); _canvas.add_child(column)
  column.add_child(FoundationWidgets.label("下一点基础派生变化",20))
  for key in Buff.PRIMARY_STATS:
   var label:=FoundationWidgets.label("",14); column.add_child(label); _attribute_labels[key]=label
@@ -129,24 +136,51 @@ func _train(key: String) -> void:
 func _draw_tree() -> void:
  _clear_canvas()
  var mastery:=actor.mastery_manager; var tree:=mastery.get_tree_data(_school)
- var rows:=0; var positions: Dictionary={}
+ var rows:=0
  for perk: SkillPerkData in tree.perks:
   rows=maxi(rows,perk.row)
-  positions[perk.perk_id]=Vector2(10+perk.column*155,18+perk.row*112)
  _canvas.custom_minimum_size=Vector2(475,maxi(450,rows*112+120))
  for perk: SkillPerkData in tree.perks:
-  for required in perk.prerequisite_ids:
-   if positions.has(required): _canvas.links.append({"id":perk.perk_id,"from":positions[required]+Vector2(72,64),"to":positions[perk.perk_id]+Vector2(72,0),"learned":mastery.has_perk(perk.perk_id)})
   var known:=mastery.has_perk(perk.perk_id)
   var ready:=mastery.can_unlock_perk(perk.perk_id)
   var button:=FoundationWidgets.button(perk.display_name+"\n"+("已学习" if known else "可学习" if ready else "条件未满足"),_select_perk.bind(perk.perk_id))
-  button.position=positions[perk.perk_id]; button.size=Vector2(145,64); button.clip_text=true
+  button.custom_minimum_size=Vector2(145,68); button.clip_text=true
   button.tooltip_text=perk.description+"\n"+mastery.requirement_text(perk)
   GameUIStyle.apply_button(button,GameUIStyle.ACCENT if known else GameUIStyle.GOLD if ready else GameUIStyle.TEXT_MUTED,perk.perk_id==_selected)
   _canvas.add_child(button)
   _perk_buttons[perk.perk_id]=button
  if _selected.is_empty() and not tree.perks.is_empty(): _selected=(tree.perks[0] as SkillPerkData).perk_id
- _canvas.queue_redraw(); _show_perk_detail()
+ _layout_graph(); _show_perk_detail()
+func _layout_regions() -> void:
+ if not _branch_scroll: return
+ _branch_scroll.custom_minimum_size.x=180 if size.x<1100 else 208
+ _layout_graph()
+func _layout_graph() -> void:
+ if not _canvas: return
+ if _attributes:
+  if is_instance_valid(_attribute_column):
+   _attribute_column.size.x=maxf(380,minf(580,_canvas.size.x-24))
+   _attribute_column.position.x=maxf(8,(_canvas.size.x-_attribute_column.size.x)*.5)
+  return
+ if _perk_buttons.is_empty(): return
+ var tree:=actor.mastery_manager.get_tree_data(_school)
+ var columns:=0; var rows:=0; var node_height:=68.0
+ for perk: SkillPerkData in tree.perks:
+  columns=maxi(columns,perk.column); rows=maxi(rows,perk.row)
+  node_height=maxf(node_height,_perk_buttons[perk.perk_id].get_combined_minimum_size().y)
+ var grid_width:=float(columns*165+145)
+ _canvas.custom_minimum_size=Vector2(grid_width+24,maxf(360,(rows+1)*(node_height+44)+24))
+ var origin:=maxf(12,(_canvas.size.x-grid_width)*.5)
+ for perk: SkillPerkData in tree.perks:
+  var button:=_perk_buttons[perk.perk_id] as Button
+  button.position=Vector2(origin+perk.column*165,24+perk.row*(node_height+44)); button.size=Vector2(145,node_height)
+ _canvas.links.clear()
+ for perk: SkillPerkData in tree.perks:
+  for required in perk.prerequisite_ids:
+   if not _perk_buttons.has(required): continue
+   var before:=_perk_buttons[required] as Button; var after:=_perk_buttons[perk.perk_id] as Button
+   _canvas.links.append({"id":perk.perk_id,"from":before.position+Vector2(before.size.x*.5,before.size.y),"to":after.position+Vector2(after.size.x*.5,0),"learned":actor.mastery_manager.has_perk(perk.perk_id)})
+ _canvas.queue_redraw()
 func _select_perk(id: String) -> void:
  _selected=id; _show_perk_detail(); _update_existing()
 func _show_perk_detail() -> void:
@@ -169,6 +203,7 @@ func _learn(id: String) -> void:
 func _fit_attributes(column: VBoxContainer) -> void:
  if not _attributes or not is_instance_valid(column) or column.is_queued_for_deletion(): return
  _canvas.custom_minimum_size=Vector2(400,maxf(480,column.get_combined_minimum_size().y+20))
+ _layout_graph()
 func _attribute_text(key: String) -> String:
  var stats:=actor.stats_component; var current:=stats.derived_values(); var next:=stats.derived_values({key:int(stats.get(key))+1})
  match key:

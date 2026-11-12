@@ -159,7 +159,9 @@ static func menu_style() -> StyleBoxFlat:
 	return style
 
 static func menu_extent(viewport: Vector2) -> Vector2:
-	return viewport-Vector2.ONE*(40 if viewport.x<1100 else 64)
+	var extent:=viewport-Vector2.ONE*(40 if viewport.x<1100 else 64)
+	extent.x=minf(extent.x,1600)
+	return extent
 
 static func bar_fill(color: Color) -> StyleBoxFlat:
 	var sb := StyleBoxFlat.new()
