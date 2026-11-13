@@ -1,0 +1,2971 @@
+{
+  "schema": 1,
+  "revision": "83fe0a9d5187ddb6b8a162577e2c8e41afd15098",
+  "dirty": null,
+  "godot": "4.6.3.stable.official.7d41c59c4",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "jobs": 2,
+  "timeout": 300.0,
+  "logs": "/tmp/mygame-tests-zsw2_xn2",
+  "requested": [
+    "gut_domain",
+    "save_system",
+    "save_recovery",
+    "skill_catalog",
+    "skill_upgrades",
+    "room_generation",
+    "first_expedition_loop",
+    "worldview_journey",
+    "magic_awakening",
+    "mundane_spray_input",
+    "content_preflight",
+    "throw_trajectory_input",
+    "item_feedback_input",
+    "project_optimization",
+    "selector_feedback_input",
+    "accessibility_input",
+    "world_depth_knowledge",
+    "world_depth_property",
+    "world_depth_economy",
+    "world_depth_journey",
+    "world_depth_territory",
+    "world_depth_input",
+    "fieldcraft",
+    "enemy_diversity",
+    "fieldcraft_input",
+    "enemy_diversity_input",
+    "map_authoring",
+    "map_preview_input",
+    "save_sections",
+    "save_sections_game",
+    "town_cells",
+    "town_cells_input",
+    "presentation_system",
+    "presentation_input",
+    "actor_animation",
+    "animation_demo_input",
+    "weapon_hold",
+    "weapon_hold_input",
+    "weapon_hold_handover_input",
+    "weapon_art_routes",
+    "weapon_art_input",
+    "martial_followups",
+    "martial_followup_input",
+    "weapon_combos",
+    "weapon_combo_contacts",
+    "weapon_combo_input",
+    "weapon_response",
+    "weapon_response_input",
+    "interface_navigation",
+    "world_feedback",
+    "world_feedback_input",
+    "followup_fixes",
+    "grayriver_demo",
+    "spell_form_assist",
+    "contextual_choices",
+    "combat_choices_input",
+    "flow_input",
+    "provision_lifecycle",
+    "production_learning",
+    "extensibility_input",
+    "campaign_effects",
+    "inventory_stability",
+    "new_journey",
+    "weapon_enchantment",
+    "enchantment_input",
+    "counterplay",
+    "counterplay_input",
+    "counterplay_encounters",
+    "combat_tactics",
+    "tactical_ai",
+    "tactics_input",
+    "system_depth",
+    "weapon_actions",
+    "depth_input",
+    "slot_materials",
+    "inventory_lifecycle",
+    "realtime_interaction",
+    "keyboard_casting",
+    "visual_interface",
+    "controls_workflow",
+    "unified_quickslots",
+    "legacy_operation_coverage",
+    "input_bindings",
+    "world_pointer_input",
+    "enemy_retaliation",
+    "item_actions",
+    "spray_channel",
+    "reaction_sources",
+    "spell_operations",
+    "foundation_inventory",
+    "foundation_combat",
+    "foundation_systems",
+    "frontier_expedition",
+    "frontier_projects",
+    "grayriver_loot",
+    "archive_adventure",
+    "enemy_observation_input",
+    "enemy_disengagement",
+    "enemy_phase_input",
+    "combat_learning",
+    "grayriver_salvage",
+    "shared_characters",
+    "field_work",
+    "grayriver_foundation",
+    "grayriver_content",
+    "grayriver_journey",
+    "grayriver_routes",
+    "material_intent",
+    "retreat_ledger",
+    "enemy_preparation",
+    "field_outpost",
+    "expedition_feedback",
+    "survival_needs",
+    "survival_world",
+    "survival_rest",
+    "alchemy_repair",
+    "material_recycling",
+    "rpg_attributes",
+    "rpg_progression",
+    "rpg_progression_input",
+    "npc_interactions",
+    "npc_interaction_input",
+    "world_coherence",
+    "coherence_input",
+    "playtest_iteration",
+    "tactical_balance",
+    "normal_budget_tactics",
+    "content_expansion",
+    "environment_attunement",
+    "five_element_rules",
+    "partial_boons",
+    "element_knowledge",
+    "element_world",
+    "enemy_surfaces",
+    "element_trials",
+    "cast_refactor",
+    "status_transactions",
+    "content_contracts",
+    "region_lifecycle",
+    "player_components",
+    "soul_spell_system",
+    "expedition_builds",
+    "existing_spell_interactions",
+    "emergent_mediums",
+    "boon_choices",
+    "joint_interactions",
+    "advanced_spells",
+    "spell_materials",
+    "exploration_content",
+    "exploration_mvp",
+    "fire_combinations",
+    "ui_vertical_input",
+    "ui_prototype_input",
+    "immersive_ui_input",
+    "ui_system",
+    "run_loop",
+    "equipment_system",
+    "gameplay",
+    "content",
+    "maps",
+    "startup"
+  ],
+  "results": [
+    {
+      "name": "import",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 12.203,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--editor",
+        "--import",
+        "--recovery-mode"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/import.log",
+      "diagnostic": []
+    },
+    {
+      "name": "content",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 3.931,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tools/validate_mvp_content.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/content.log",
+      "diagnostic": []
+    },
+    {
+      "name": "maps",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 3.626,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tools/validate_maps.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/maps.log",
+      "diagnostic": []
+    },
+    {
+      "name": "gut_domain",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 3.826,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://addons/gut/gut_cmdln.gd",
+        "-gexit",
+        "-gdisable_colors",
+        "-gjunit_xml_file=/tmp/mygame-tests-zsw2_xn2/gut-domain.xml"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/gut_domain.log",
+      "diagnostic": []
+    },
+    {
+      "name": "save_system",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 1.87,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_save_system.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/save_system.log",
+      "diagnostic": []
+    },
+    {
+      "name": "save_recovery",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 4.126,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_save_recovery.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/save_recovery.log",
+      "diagnostic": []
+    },
+    {
+      "name": "skill_catalog",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 2.773,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_skill_catalog.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/skill_catalog.log",
+      "diagnostic": []
+    },
+    {
+      "name": "room_generation",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 0.566,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_room_generation.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/room_generation.log",
+      "diagnostic": []
+    },
+    {
+      "name": "skill_upgrades",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 1.77,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_skill_upgrades.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/skill_upgrades.log",
+      "diagnostic": []
+    },
+    {
+      "name": "magic_awakening",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 10.701,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_magic_awakening.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/magic_awakening.log",
+      "diagnostic": []
+    },
+    {
+      "name": "world_depth_knowledge",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 12.606,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_world_depth_knowledge.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/world_depth_knowledge.log",
+      "diagnostic": []
+    },
+    {
+      "name": "world_depth_property",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 10.143,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_world_depth_property.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/world_depth_property.log",
+      "diagnostic": []
+    },
+    {
+      "name": "content_preflight",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 37.982,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_content_preflight.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/content_preflight.log",
+      "diagnostic": []
+    },
+    {
+      "name": "world_depth_economy",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 10.802,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_world_depth_economy.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/world_depth_economy.log",
+      "diagnostic": []
+    },
+    {
+      "name": "world_depth_territory",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 6.738,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_world_depth_territory.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/world_depth_territory.log",
+      "diagnostic": []
+    },
+    {
+      "name": "world_depth_journey",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 18.548,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_world_depth_journey.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/world_depth_journey.log",
+      "diagnostic": []
+    },
+    {
+      "name": "fieldcraft",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 9.043,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_fieldcraft.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/fieldcraft.log",
+      "diagnostic": []
+    },
+    {
+      "name": "map_authoring",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 5.431,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_map_authoring.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/map_authoring.log",
+      "diagnostic": []
+    },
+    {
+      "name": "enemy_diversity",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 9.345,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_enemy_diversity.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/enemy_diversity.log",
+      "diagnostic": []
+    },
+    {
+      "name": "save_sections",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 2.326,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_save_sections.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/save_sections.log",
+      "diagnostic": []
+    },
+    {
+      "name": "town_cells",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 7.588,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_town_cells.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/town_cells.log",
+      "diagnostic": []
+    },
+    {
+      "name": "save_sections_game",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 10.347,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_save_sections_game.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/save_sections_game.log",
+      "diagnostic": []
+    },
+    {
+      "name": "presentation_system",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 6.54,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_presentation_system.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/presentation_system.log",
+      "diagnostic": []
+    },
+    {
+      "name": "actor_animation",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 8.945,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_actor_animation.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/actor_animation.log",
+      "diagnostic": []
+    },
+    {
+      "name": "weapon_hold",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 7.191,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_weapon_hold.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/weapon_hold.log",
+      "diagnostic": []
+    },
+    {
+      "name": "weapon_art_routes",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 7.744,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_weapon_art_routes.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/weapon_art_routes.log",
+      "diagnostic": []
+    },
+    {
+      "name": "martial_followups",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 8.497,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_martial_followups.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/martial_followups.log",
+      "diagnostic": []
+    },
+    {
+      "name": "weapon_combos",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 6.885,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_weapon_combos.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/weapon_combos.log",
+      "diagnostic": []
+    },
+    {
+      "name": "weapon_combo_contacts",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 6.433,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_weapon_combo_contacts.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/weapon_combo_contacts.log",
+      "diagnostic": []
+    },
+    {
+      "name": "weapon_response",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 6.333,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_weapon_response.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/weapon_response.log",
+      "diagnostic": []
+    },
+    {
+      "name": "world_feedback",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 12.22,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_world_feedback.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/world_feedback.log",
+      "diagnostic": []
+    },
+    {
+      "name": "spell_form_assist",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 8.888,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_spell_form_assist.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/spell_form_assist.log",
+      "diagnostic": []
+    },
+    {
+      "name": "contextual_choices",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 6.842,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_contextual_choices.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/contextual_choices.log",
+      "diagnostic": []
+    },
+    {
+      "name": "grayriver_demo",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 38.36,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_grayriver_demo.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/grayriver_demo.log",
+      "diagnostic": []
+    },
+    {
+      "name": "provision_lifecycle",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 17.363,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_provision_lifecycle.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/provision_lifecycle.log",
+      "diagnostic": []
+    },
+    {
+      "name": "production_learning",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 13.364,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_production_learning.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/production_learning.log",
+      "diagnostic": []
+    },
+    {
+      "name": "weapon_enchantment",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 12.261,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_weapon_enchantment.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/weapon_enchantment.log",
+      "diagnostic": []
+    },
+    {
+      "name": "campaign_effects",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 22.299,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_campaign_effects.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/campaign_effects.log",
+      "diagnostic": []
+    },
+    {
+      "name": "counterplay",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 8.051,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_counterplay.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/counterplay.log",
+      "diagnostic": []
+    },
+    {
+      "name": "combat_tactics",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 8.401,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_combat_tactics.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/combat_tactics.log",
+      "diagnostic": []
+    },
+    {
+      "name": "tactical_ai",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 7.747,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_tactical_ai.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/tactical_ai.log",
+      "diagnostic": []
+    },
+    {
+      "name": "system_depth",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 12.22,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_system_depth.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/system_depth.log",
+      "diagnostic": []
+    },
+    {
+      "name": "weapon_actions",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 8.407,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_weapon_actions.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/weapon_actions.log",
+      "diagnostic": []
+    },
+    {
+      "name": "slot_materials",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 10.937,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_slot_materials.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/slot_materials.log",
+      "diagnostic": []
+    },
+    {
+      "name": "inventory_lifecycle",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 13.729,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_inventory_lifecycle.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/inventory_lifecycle.log",
+      "diagnostic": []
+    },
+    {
+      "name": "legacy_operation_coverage",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 10.354,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_legacy_operation_coverage.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/legacy_operation_coverage.log",
+      "diagnostic": []
+    },
+    {
+      "name": "enemy_retaliation",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 7.847,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_enemy_retaliation.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/enemy_retaliation.log",
+      "diagnostic": []
+    },
+    {
+      "name": "spray_channel",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 7.847,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_spray_channel.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/spray_channel.log",
+      "diagnostic": []
+    },
+    {
+      "name": "reaction_sources",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 7.343,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_reaction_sources.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/reaction_sources.log",
+      "diagnostic": []
+    },
+    {
+      "name": "foundation_inventory",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 3.525,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_foundation_inventory.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/foundation_inventory.log",
+      "diagnostic": []
+    },
+    {
+      "name": "spell_operations",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 6.534,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_spell_operations.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/spell_operations.log",
+      "diagnostic": []
+    },
+    {
+      "name": "foundation_combat",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 5.882,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_foundation_combat.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/foundation_combat.log",
+      "diagnostic": []
+    },
+    {
+      "name": "foundation_systems",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 15.118,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_foundation_systems.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/foundation_systems.log",
+      "diagnostic": []
+    },
+    {
+      "name": "grayriver_loot",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 16.413,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_grayriver_loot.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/grayriver_loot.log",
+      "diagnostic": []
+    },
+    {
+      "name": "enemy_disengagement",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 6.23,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_enemy_disengagement.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/enemy_disengagement.log",
+      "diagnostic": []
+    },
+    {
+      "name": "archive_adventure",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 14.158,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_archive_adventure.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/archive_adventure.log",
+      "diagnostic": []
+    },
+    {
+      "name": "combat_learning",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 10.248,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_combat_learning.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/combat_learning.log",
+      "diagnostic": []
+    },
+    {
+      "name": "grayriver_salvage",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 13.864,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_grayriver_salvage.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/grayriver_salvage.log",
+      "diagnostic": []
+    },
+    {
+      "name": "shared_characters",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 7.645,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_shared_characters.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/shared_characters.log",
+      "diagnostic": []
+    },
+    {
+      "name": "grayriver_routes",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 3.423,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_grayriver_routes.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/grayriver_routes.log",
+      "diagnostic": []
+    },
+    {
+      "name": "grayriver_foundation",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 7.188,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_grayriver_foundation.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/grayriver_foundation.log",
+      "diagnostic": []
+    },
+    {
+      "name": "material_intent",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 3.482,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_material_intent.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/material_intent.log",
+      "diagnostic": []
+    },
+    {
+      "name": "retreat_ledger",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 4.045,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_retreat_ledger.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/retreat_ledger.log",
+      "diagnostic": []
+    },
+    {
+      "name": "enemy_preparation",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 3.585,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_enemy_preparation.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/enemy_preparation.log",
+      "diagnostic": []
+    },
+    {
+      "name": "field_outpost",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 4.234,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_field_outpost.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/field_outpost.log",
+      "diagnostic": []
+    },
+    {
+      "name": "expedition_feedback",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 4.028,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_expedition_feedback.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/expedition_feedback.log",
+      "diagnostic": []
+    },
+    {
+      "name": "survival_needs",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 2.027,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_survival_needs.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/survival_needs.log",
+      "diagnostic": []
+    },
+    {
+      "name": "survival_rest",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 3.076,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_survival_rest.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/survival_rest.log",
+      "diagnostic": []
+    },
+    {
+      "name": "survival_world",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 4.381,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_survival_world.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/survival_world.log",
+      "diagnostic": []
+    },
+    {
+      "name": "material_recycling",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 3.928,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_material_recycling.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/material_recycling.log",
+      "diagnostic": []
+    },
+    {
+      "name": "alchemy_repair",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 6.868,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_alchemy_repair.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/alchemy_repair.log",
+      "diagnostic": []
+    },
+    {
+      "name": "rpg_attributes",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 3.929,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_rpg_attributes.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/rpg_attributes.log",
+      "diagnostic": []
+    },
+    {
+      "name": "rpg_progression",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 6.985,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_rpg_progression.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/rpg_progression.log",
+      "diagnostic": []
+    },
+    {
+      "name": "npc_interactions",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 10.145,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_npc_interactions.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/npc_interactions.log",
+      "diagnostic": []
+    },
+    {
+      "name": "playtest_iteration",
+      "passed": false,
+      "category": "godot_error",
+      "exit_code": 1,
+      "seconds": 5.132,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_playtest_iteration.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/playtest_iteration.log",
+      "diagnostic": [
+        "ERROR: First reading still dumps advanced instructions",
+        "   at: push_error (core/variant/variant_utility.cpp:1024)",
+        "   GDScript backtrace (most recent call first):",
+        "       [0] check (res://tests/test_playtest_iteration.gd:12)",
+        "       [1] run (res://tests/test_playtest_iteration.gd:46)",
+        "       [2] boot (res://tests/support/mvp_fixture.gd:20)",
+        "ERROR: Full notes were lost or rereading repeated rewards",
+        "   at: push_error (core/variant/variant_utility.cpp:1024)"
+      ]
+    },
+    {
+      "name": "world_coherence",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 12.1,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_world_coherence.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/world_coherence.log",
+      "diagnostic": []
+    },
+    {
+      "name": "normal_budget_tactics",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 6.539,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_normal_budget_tactics.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/normal_budget_tactics.log",
+      "diagnostic": []
+    },
+    {
+      "name": "content_expansion",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 10.406,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_content_expansion.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/content_expansion.log",
+      "diagnostic": []
+    },
+    {
+      "name": "tactical_balance",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 20.479,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_tactical_balance.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/tactical_balance.log",
+      "diagnostic": []
+    },
+    {
+      "name": "environment_attunement",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 4.038,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_environment_attunement.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/environment_attunement.log",
+      "diagnostic": []
+    },
+    {
+      "name": "five_element_rules",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 3.931,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_five_element_rules.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/five_element_rules.log",
+      "diagnostic": []
+    },
+    {
+      "name": "partial_boons",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 3.625,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_partial_boons.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/partial_boons.log",
+      "diagnostic": []
+    },
+    {
+      "name": "element_knowledge",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 3.926,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_element_knowledge.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/element_knowledge.log",
+      "diagnostic": []
+    },
+    {
+      "name": "element_world",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 4.277,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_element_world.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/element_world.log",
+      "diagnostic": []
+    },
+    {
+      "name": "enemy_surfaces",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 3.278,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_enemy_surfaces.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/enemy_surfaces.log",
+      "diagnostic": []
+    },
+    {
+      "name": "status_transactions",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 3.376,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_status_transactions.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/status_transactions.log",
+      "diagnostic": []
+    },
+    {
+      "name": "element_trials",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 5.687,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_element_trials.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/element_trials.log",
+      "diagnostic": []
+    },
+    {
+      "name": "player_components",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 3.275,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_player_components.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/player_components.log",
+      "diagnostic": []
+    },
+    {
+      "name": "soul_spell_system",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 3.729,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_soul_spell_system.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/soul_spell_system.log",
+      "diagnostic": []
+    },
+    {
+      "name": "content_contracts",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 8.59,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_content_contracts.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/content_contracts.log",
+      "diagnostic": []
+    },
+    {
+      "name": "emergent_mediums",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 3.082,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_emergent_mediums.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/emergent_mediums.log",
+      "diagnostic": []
+    },
+    {
+      "name": "expedition_builds",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 4.578,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_expedition_builds.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/expedition_builds.log",
+      "diagnostic": []
+    },
+    {
+      "name": "advanced_spells",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 35.554,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_advanced_spells.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/advanced_spells.log",
+      "diagnostic": []
+    },
+    {
+      "name": "joint_interactions",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 36.961,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_joint_interactions.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/joint_interactions.log",
+      "diagnostic": []
+    },
+    {
+      "name": "spell_materials",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 31.264,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_spell_materials.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/spell_materials.log",
+      "diagnostic": []
+    },
+    {
+      "name": "exploration_content",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 31.078,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_exploration_content.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/exploration_content.log",
+      "diagnostic": []
+    },
+    {
+      "name": "equipment_system",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 4.385,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_equipment_system.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/equipment_system.log",
+      "diagnostic": []
+    },
+    {
+      "name": "run_loop",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 4.489,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_run_loop.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/run_loop.log",
+      "diagnostic": []
+    },
+    {
+      "name": "gameplay",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 5.289,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_gameplay.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/gameplay.log",
+      "diagnostic": []
+    },
+    {
+      "name": "startup",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 8.501,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--quit-after",
+        "180"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/startup.log",
+      "diagnostic": []
+    },
+    {
+      "name": "first_expedition_loop",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 19.742,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_first_expedition_loop.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/first_expedition_loop.log",
+      "diagnostic": []
+    },
+    {
+      "name": "worldview_journey",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 14.868,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_worldview_journey.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/worldview_journey.log",
+      "diagnostic": []
+    },
+    {
+      "name": "mundane_spray_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 8.494,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_mundane_spray_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/mundane_spray_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "throw_trajectory_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 12.752,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_throw_trajectory_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/throw_trajectory_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "item_feedback_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 19.628,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_item_feedback_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/item_feedback_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "project_optimization",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 7.104,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_project_optimization.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/project_optimization.log",
+      "diagnostic": []
+    },
+    {
+      "name": "selector_feedback_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 9.848,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_selector_feedback_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/selector_feedback_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "accessibility_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 10.445,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_accessibility_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/accessibility_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "world_depth_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 40.315,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_world_depth_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/world_depth_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "fieldcraft_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 29.614,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_fieldcraft_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/fieldcraft_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "enemy_diversity_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 39.866,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_enemy_diversity_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/enemy_diversity_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "map_preview_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 16.015,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_map_preview_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/map_preview_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "town_cells_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 28.961,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_town_cells_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/town_cells_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "presentation_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 23.094,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_presentation_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/presentation_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "animation_demo_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 24.593,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_animation_demo_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/animation_demo_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "weapon_hold_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 107.556,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_weapon_hold_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/weapon_hold_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "weapon_hold_handover_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 9.946,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_weapon_hold_handover_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/weapon_hold_handover_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "weapon_art_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 62.771,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_weapon_art_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/weapon_art_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "martial_followup_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 32.764,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_martial_followup_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/martial_followup_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "weapon_combo_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 31.911,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_weapon_combo_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/weapon_combo_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "weapon_response_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 14.721,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_weapon_response_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/weapon_response_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "interface_navigation",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 23.641,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_interface_navigation.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/interface_navigation.log",
+      "diagnostic": []
+    },
+    {
+      "name": "world_feedback_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 11.456,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_world_feedback_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/world_feedback_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "followup_fixes",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 7.54,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_followup_fixes.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/followup_fixes.log",
+      "diagnostic": []
+    },
+    {
+      "name": "combat_choices_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 15.474,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_combat_choices_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/combat_choices_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "flow_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 29.758,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_flow_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/flow_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "extensibility_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 21.684,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_extensibility_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/extensibility_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "inventory_stability",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 8.752,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_inventory_stability.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/inventory_stability.log",
+      "diagnostic": []
+    },
+    {
+      "name": "new_journey",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 11.253,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_new_journey.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/new_journey.log",
+      "diagnostic": []
+    },
+    {
+      "name": "enchantment_input",
+      "passed": false,
+      "category": "godot_error",
+      "exit_code": 1,
+      "seconds": 15.92,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_enchantment_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/enchantment_input.log",
+      "diagnostic": [
+        "ERROR: First actual LMB did not leave partial fire buildup",
+        "   at: push_error (core/variant/variant_utility.cpp:1024)",
+        "   GDScript backtrace (most recent call first):",
+        "       [0] check (res://tests/support/input_scene_probe.gd:6)",
+        "       [1] run (res://tests/test_enchantment_input.gd:36)",
+        "ERROR: Second LMB failed to trigger burning while preserving the coating",
+        "   at: push_error (core/variant/variant_utility.cpp:1024)",
+        "   GDScript backtrace (most recent call first):"
+      ]
+    },
+    {
+      "name": "counterplay_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 15.126,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_counterplay_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/counterplay_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "counterplay_encounters",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 31.178,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_counterplay_encounters.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/counterplay_encounters.log",
+      "diagnostic": []
+    },
+    {
+      "name": "tactics_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 9.695,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_tactics_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/tactics_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "depth_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 23.541,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_depth_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/depth_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "realtime_interaction",
+      "passed": false,
+      "category": "godot_error",
+      "exit_code": 1,
+      "seconds": 35.726,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_realtime_interaction.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/realtime_interaction.log",
+      "diagnostic": [
+        "ERROR: F did not open nearby ground loot in real time",
+        "   at: push_error (core/variant/variant_utility.cpp:1024)",
+        "   GDScript backtrace (most recent call first):",
+        "       [0] check (res://tests/support/input_scene_probe.gd:6)",
+        "       [1] run (res://tests/test_realtime_interaction.gd:174)",
+        "       [2] key (res://tests/support/input_scene_probe.gd:13)",
+        "       [3] frames (res://tests/support/input_scene_probe.gd:10)",
+        "ERROR: Missing inventory tile: item.112"
+      ]
+    },
+    {
+      "name": "keyboard_casting",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 10.359,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_keyboard_casting.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/keyboard_casting.log",
+      "diagnostic": []
+    },
+    {
+      "name": "visual_interface",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 13.756,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_visual_interface.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/visual_interface.log",
+      "diagnostic": []
+    },
+    {
+      "name": "controls_workflow",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 19.525,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_controls_workflow.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/controls_workflow.log",
+      "diagnostic": []
+    },
+    {
+      "name": "unified_quickslots",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 34.324,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_unified_quickslots.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/unified_quickslots.log",
+      "diagnostic": []
+    },
+    {
+      "name": "input_bindings",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 0.365,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_input_bindings.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/input_bindings.log",
+      "diagnostic": []
+    },
+    {
+      "name": "world_pointer_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 9.044,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_world_pointer_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/world_pointer_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "item_actions",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 10.805,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_item_actions.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/item_actions.log",
+      "diagnostic": []
+    },
+    {
+      "name": "frontier_expedition",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 16.389,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_frontier_expedition.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/frontier_expedition.log",
+      "diagnostic": []
+    },
+    {
+      "name": "frontier_projects",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 8.765,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_frontier_projects.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/frontier_projects.log",
+      "diagnostic": []
+    },
+    {
+      "name": "enemy_observation_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 6.991,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_enemy_observation_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/enemy_observation_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "enemy_phase_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 16.032,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_enemy_phase_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/enemy_phase_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "field_work",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 6.001,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_field_work.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/field_work.log",
+      "diagnostic": []
+    },
+    {
+      "name": "grayriver_content",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 17.128,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_grayriver_content.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/grayriver_content.log",
+      "diagnostic": []
+    },
+    {
+      "name": "grayriver_journey",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 11.761,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_grayriver_journey.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/grayriver_journey.log",
+      "diagnostic": []
+    },
+    {
+      "name": "rpg_progression_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 18.752,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_rpg_progression_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/rpg_progression_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "npc_interaction_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 17.622,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_npc_interaction_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/npc_interaction_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "coherence_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 17.717,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_coherence_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/coherence_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "cast_refactor",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 3.829,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_cast_refactor.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/cast_refactor.log",
+      "diagnostic": []
+    },
+    {
+      "name": "region_lifecycle",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 5.532,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_region_lifecycle.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/region_lifecycle.log",
+      "diagnostic": []
+    },
+    {
+      "name": "existing_spell_interactions",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 3.276,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_existing_spell_interactions.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/existing_spell_interactions.log",
+      "diagnostic": []
+    },
+    {
+      "name": "boon_choices",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 33.583,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_boon_choices.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/boon_choices.log",
+      "diagnostic": []
+    },
+    {
+      "name": "exploration_mvp",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 11.665,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_exploration_mvp.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/exploration_mvp.log",
+      "diagnostic": []
+    },
+    {
+      "name": "fire_combinations",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 18.173,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_fire_combinations.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/fire_combinations.log",
+      "diagnostic": []
+    },
+    {
+      "name": "ui_vertical_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 34.473,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_ui_vertical_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/ui_vertical_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "ui_prototype_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 35.492,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_ui_prototype_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/ui_prototype_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "immersive_ui_input",
+      "passed": false,
+      "category": "godot_error",
+      "exit_code": 1,
+      "seconds": 20.288,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_immersive_ui_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/immersive_ui_input.log",
+      "diagnostic": [
+        "ERROR: Mouse wheel cannot scroll overflow or shifts fully visible reading",
+        "   at: push_error (core/variant/variant_utility.cpp:1024)",
+        "   GDScript backtrace (most recent call first):",
+        "       [0] check (res://tests/support/input_scene_probe.gd:6)",
+        "       [1] verify (res://tests/test_ui_vertical_input.gd:9)",
+        "       [2] run (res://tests/test_immersive_ui_input.gd:26)",
+        "       [3] frames (res://tests/support/input_scene_probe.gd:10)",
+        "⚡ [OnKillBonusExp] +15 额外经验 (target=Encounter_2)"
+      ]
+    },
+    {
+      "name": "ui_system",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 7.191,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-clean-83fe0a9d",
+        "--script",
+        "res://tests/test_ui_system.gd"
+      ],
+      "log": "/tmp/mygame-tests-zsw2_xn2/ui_system.log",
+      "diagnostic": []
+    }
+  ],
+  "skipped": [],
+  "complete": true
+}

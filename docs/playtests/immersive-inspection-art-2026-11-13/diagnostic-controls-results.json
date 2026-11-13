@@ -1,0 +1,154 @@
+{
+  "schema": 1,
+  "revision": "f2ea0f00b431e3af6b740d8de222ed44e6181633",
+  "dirty": true,
+  "godot": "4.6.3.stable.official.7d41c59c4",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "jobs": 1,
+  "timeout": 180.0,
+  "logs": "/tmp/mygame-tests-xs0y2gbc",
+  "requested": [
+    "content",
+    "maps",
+    "gut_domain",
+    "fieldcraft_input",
+    "world_depth_input",
+    "controls_workflow",
+    "enemy_diversity_input"
+  ],
+  "results": [
+    {
+      "name": "content",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 4.428,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tools/validate_mvp_content.gd"
+      ],
+      "log": "/tmp/mygame-tests-xs0y2gbc/content.log",
+      "diagnostic": []
+    },
+    {
+      "name": "maps",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 4.036,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tools/validate_maps.gd"
+      ],
+      "log": "/tmp/mygame-tests-xs0y2gbc/maps.log",
+      "diagnostic": []
+    },
+    {
+      "name": "gut_domain",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 3.927,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://addons/gut/gut_cmdln.gd",
+        "-gexit",
+        "-gdisable_colors",
+        "-gjunit_xml_file=/tmp/mygame-tests-xs0y2gbc/gut-domain.xml"
+      ],
+      "log": "/tmp/mygame-tests-xs0y2gbc/gut_domain.log",
+      "diagnostic": []
+    },
+    {
+      "name": "fieldcraft_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 27.364,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_fieldcraft_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-xs0y2gbc/fieldcraft_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "world_depth_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 40.095,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_world_depth_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-xs0y2gbc/world_depth_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "controls_workflow",
+      "passed": false,
+      "category": "godot_error",
+      "exit_code": 1,
+      "seconds": 18.525,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_controls_workflow.gd"
+      ],
+      "log": "/tmp/mygame-tests-xs0y2gbc/controls_workflow.log",
+      "diagnostic": [
+        "ERROR: Expected one visible button for { \"ui_action\": \"open_inventory\" }, found 0",
+        "   at: push_error (core/variant/variant_utility.cpp:1024)",
+        "   GDScript backtrace (most recent call first):",
+        "       [0] check (res://tests/support/input_scene_probe.gd:6)",
+        "       [1] button_by_identity (res://tests/support/input_scene_probe.gd:53)",
+        "       [2] click_identity (res://tests/support/input_scene_probe.gd:56)",
+        "       [3] run (res://tests/test_controls_workflow.gd:58)",
+        "       [4] point_click (res://tests/support/input_scene_probe.gd:32)"
+      ]
+    },
+    {
+      "name": "enemy_diversity_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 42.537,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_enemy_diversity_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-xs0y2gbc/enemy_diversity_input.log",
+      "diagnostic": []
+    }
+  ],
+  "skipped": [],
+  "complete": true
+}

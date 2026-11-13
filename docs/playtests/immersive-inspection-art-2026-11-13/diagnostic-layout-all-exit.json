@@ -1,0 +1,1 @@
+{"returncode": 1, "seconds": 1707.9165654182434, "command": ["python3", "tools/run_tests.py", "--suite", "all", "--jobs", "2", "--timeout", "300", "--source-revision", "ec02972287b8b619f01d7e2fe3a6a19c5e21c9de", "--report", "/workspace/immersive-art-release-all.json"]}

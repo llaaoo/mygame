@@ -1,0 +1,66 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+
+⏰ WorldTime 启动: 08:00
+🏛️ GameRuntime: 五大 Runtime 初始化完成
+   CommandBus       : ✅
+   CombatExecutor   : ✅
+   CombatEventBus   : ✅
+   WorldRuntime     : ✅
+   SimulationRuntime: ✅
+   WorldTime        : ✅
+⚡ 已注册触发效果: OnKillBonusExp
+📊 CombatDebugger: trace enabled
+⏰ 08:00 (☀️ 白天)
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+ENCHANT_INPUT_BEFORE { "actor": (-4000.0, 800.0), "target": (-3955.0, 800.0), "mouse": (621.0, 324.0), "screen": [X: (1.0, 0.0), Y: (0.0, 1.0), O: (0.0, 0.0)], "direction": (1.0, 0.0), "mode": "idle", "blocked": false, "over_ui": false, "hover": <Object#null> }
+ENCHANT_PRESS { "active": true, "hold": {  }, "edges": [], "suppressed": false, "stamina": 100.0, "process": true, "controlled": false, "provider": true }
+ENCHANT_RELEASE { "hold": {  }, "mode": "idle", "sequence": 0 }
+SaveManager: saved user://save_3.sav
+ENCHANT_INPUT_AFTER { "actor": (-4000.0, 800.0), "target": (-3955.0, 800.0), "mouse": (621.0, 324.0), "direction": (1.0, 0.0), "mode": "idle", "sequence": 0, "hp": 55, "over_ui": false, "hover": <Object#null> }
+ERROR: First actual LMB did not leave partial fire buildup
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/support/input_scene_probe.gd:6)
+       [1] run (res://tests/test_enchantment_input.gd:36)
+ENCHANT_PRESS { "active": true, "hold": {  }, "edges": [], "suppressed": true, "stamina": 100.0, "process": true, "controlled": false, "provider": true }
+ENCHANT_RELEASE { "hold": {  }, "mode": "idle", "sequence": 0 }
+ERROR: Second LMB failed to trigger burning while preserving the coating
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/support/input_scene_probe.gd:6)
+       [1] run (res://tests/test_enchantment_input.gd:39)
+ERROR: Ctrl+Shift+LMB did not preserve coating during its windup
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/support/input_scene_probe.gd:6)
+       [1] run (res://tests/test_enchantment_input.gd:60)
+       [2] pointer_button (res://tests/support/input_scene_probe.gd:26)
+       [3] frames (res://tests/support/input_scene_probe.gd:10)
+ERROR: Latched Shift intent failed to release/consume the real enchantment without MP
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/support/input_scene_probe.gd:6)
+       [1] run (res://tests/test_enchantment_input.gd:69)
+       [2] frames (res://tests/support/input_scene_probe.gd:10)
+SaveManager: saved user://save_3.sav
+Enchantment input sample: {"coating_remaining":true,"guard_hp_after":60,"guard_hp_before":60,"guard_stamina":84.0,"kind":"controlled kit/positions; LMB target decisions disabled, wave target normal AI","mp":0,"triggered":[],"wave_captured":false}
+SaveManager: saved user://save_3.sav
+⏰ WorldTime 启动: 08:00
+🏛️ GameRuntime: 五大 Runtime 初始化完成
+   CommandBus       : ✅
+   CombatExecutor   : ✅
+   CombatEventBus   : ✅
+   WorldRuntime     : ✅
+   SimulationRuntime: ✅
+   WorldTime        : ✅
+⚡ 已注册触发效果: OnKillBonusExp
+📊 CombatDebugger: trace enabled
+⏰ 08:00 (☀️ 白天)
+SaveManager: saved user://save_3.sav
+ERROR: Actual reentry restored a consumed enchantment or replaced weapon UID
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/support/input_scene_probe.gd:6)
+       [1] run (res://tests/test_enchantment_input.gd:76)
+       [2] boot (res://tests/support/grayriver_fixture.gd:21)

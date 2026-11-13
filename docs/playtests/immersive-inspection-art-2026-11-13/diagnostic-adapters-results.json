@@ -1,0 +1,115 @@
+{
+  "schema": 1,
+  "revision": "2215b35f51cf4948dc7d42295a3ce0aa52f13d76",
+  "dirty": null,
+  "godot": "4.6.3.stable.official.7d41c59c4",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "jobs": 1,
+  "timeout": 300.0,
+  "logs": "/tmp/mygame-tests-z69z0uhe",
+  "requested": [
+    "playtest_iteration",
+    "enchantment_input",
+    "realtime_interaction",
+    "immersive_ui_input"
+  ],
+  "results": [
+    {
+      "name": "import",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 14.164,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-adapters-clean-2215b35",
+        "--editor",
+        "--import",
+        "--recovery-mode"
+      ],
+      "log": "/tmp/mygame-tests-z69z0uhe/import.log",
+      "diagnostic": []
+    },
+    {
+      "name": "playtest_iteration",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 4.942,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-adapters-clean-2215b35",
+        "--script",
+        "res://tests/test_playtest_iteration.gd"
+      ],
+      "log": "/tmp/mygame-tests-z69z0uhe/playtest_iteration.log",
+      "diagnostic": []
+    },
+    {
+      "name": "enchantment_input",
+      "passed": false,
+      "category": "godot_error",
+      "exit_code": 1,
+      "seconds": 15.925,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-adapters-clean-2215b35",
+        "--script",
+        "res://tests/test_enchantment_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-z69z0uhe/enchantment_input.log",
+      "diagnostic": [
+        "ERROR: First actual LMB did not leave partial fire buildup",
+        "   at: push_error (core/variant/variant_utility.cpp:1024)",
+        "   GDScript backtrace (most recent call first):",
+        "       [0] check (res://tests/support/input_scene_probe.gd:6)",
+        "       [1] run (res://tests/test_enchantment_input.gd:32)",
+        "ERROR: Second LMB failed to trigger burning while preserving the coating",
+        "   at: push_error (core/variant/variant_utility.cpp:1024)",
+        "   GDScript backtrace (most recent call first):"
+      ]
+    },
+    {
+      "name": "realtime_interaction",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 36.129,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-adapters-clean-2215b35",
+        "--script",
+        "res://tests/test_realtime_interaction.gd"
+      ],
+      "log": "/tmp/mygame-tests-z69z0uhe/realtime_interaction.log",
+      "diagnostic": []
+    },
+    {
+      "name": "immersive_ui_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 20.485,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/immersive-art-adapters-clean-2215b35",
+        "--script",
+        "res://tests/test_immersive_ui_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-z69z0uhe/immersive_ui_input.log",
+      "diagnostic": []
+    }
+  ],
+  "skipped": [],
+  "complete": true
+}
