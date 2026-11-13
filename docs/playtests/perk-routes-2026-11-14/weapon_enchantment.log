@@ -1,0 +1,30 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+
+⏰ WorldTime 启动: 08:00
+🏛️ GameRuntime: 五大 Runtime 初始化完成
+   CommandBus       : ✅
+   CombatExecutor   : ✅
+   CombatEventBus   : ✅
+   WorldRuntime     : ✅
+   SimulationRuntime: ✅
+   WorldTime        : ✅
+⚡ 已注册触发效果: OnKillBonusExp
+📊 CombatDebugger: trace enabled
+⏰ 08:00 (☀️ 白天)
+SaveManager: saved user://save_3.sav
+🧪 Surface: oiled + ["fire"] → burning (8.0s) [火附魔释放]
+SaveManager: saved user://save_3.sav
+⏰ WorldTime 启动: 08:00
+🏛️ GameRuntime: 五大 Runtime 初始化完成
+   CommandBus       : ✅
+   CombatExecutor   : ✅
+   CombatEventBus   : ✅
+   WorldRuntime     : ✅
+   SimulationRuntime: ✅
+   WorldTime        : ✅
+⚡ 已注册触发效果: OnKillBonusExp
+📊 CombatDebugger: trace enabled
+⏰ 08:00 (☀️ 白天)
+SaveManager: saved user://save_3.sav
+Enchantment reentry: {"coating_loaded":{"expires_at":61.0,"id":"fire_rag"},"coating_saved":{"expires_at":61.0,"id":"fire_rag"},"loaded":{"flame":{"delay":2.68083333333333,"value":50.0}},"saved":{"flame":{"delay":3.0,"value":50.0}}}
+PASS weapon enchantment: split damage, threshold/decay/immunity/DOT, six melee combinations, source interruption, deduplication, atomic arrows and actual persistent partial buildup

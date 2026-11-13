@@ -1,0 +1,21 @@
+[
+  {
+    "test": "rpg_progression_input",
+    "exit_code": 0,
+    "errors": [],
+    "command": [
+      "godot",
+      "--path",
+      "/workspace/perk-routes-clean",
+      "--rendering-method",
+      "gl_compatibility",
+      "--audio-driver",
+      "Dummy",
+      "--resolution",
+      "1152x648",
+      "--script",
+      "res://tests/test_rpg_progression_input.gd"
+    ],
+    "passed": true
+  }
+]
