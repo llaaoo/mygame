@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "revision": "f2ea0f00b431e3af6b740d8de222ed44e6181633",
+  "dirty": true,
+  "godot": "4.6.3.stable.official.7d41c59c4",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "jobs": 1,
+  "timeout": 90.0,
+  "logs": "/tmp/mygame-tests-tnp2lvot",
+  "requested": [
+    "immersive_ui_input"
+  ],
+  "results": [
+    {
+      "name": "immersive_ui_input",
+      "passed": false,
+      "category": "godot_error",
+      "exit_code": 1,
+      "seconds": 20.136,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_immersive_ui_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-tnp2lvot/immersive_ui_input.log",
+      "diagnostic": [
+        "ERROR: Active status icons are hidden or positioned outside the world HUD",
+        "   at: push_error (core/variant/variant_utility.cpp:1024)",
+        "   GDScript backtrace (most recent call first):",
+        "       [0] check (res://tests/support/input_scene_probe.gd:6)",
+        "       [1] verify (res://tests/test_ui_vertical_input.gd:9)",
+        "       [2] run (res://tests/test_immersive_ui_input.gd:82)",
+        "       [3] frames (res://tests/support/input_scene_probe.gd:10)",
+        "STATUS_LAYOUT (960, 540) resources=[P: (18.0, 270.0), S: (220.0, 150.0)] stack=[P: (18.0, 543.0), S: (220.0, 77.0)] buffs=[P: (18.0, 543.0), S: (220.0, 77.0)] visible=true entries=1"
+      ]
+    }
+  ],
+  "skipped": [],
+  "complete": true
+}

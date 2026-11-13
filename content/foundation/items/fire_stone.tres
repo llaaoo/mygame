@@ -1,5 +1,6 @@
-[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3]
 [ext_resource type="Script" path="res://gameplay/inventory/data/item_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://content/art/items/grayriver/fire_stone.tres" id="item_art"]
 [resource]
 script = ExtResource("1")
 id = "fire_stone"
@@ -8,3 +9,7 @@ description = "铭刻火阵或形成火系投射核心时消耗；存续、触�
 weight = 0.2
 stackable = true
 max_stack = 99
+
+icon = ExtResource("item_art")
+illustration_path = "res://content/art/items/grayriver/frontier_items.png"
+illustration_region = Rect2i(314, 627, 313, 313)

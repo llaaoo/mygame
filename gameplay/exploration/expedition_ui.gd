@@ -41,6 +41,8 @@ var _utility: PanelContainer
 var _binding_revision := -1
 var _menu_clock: Label
 var _menu_resources: Label
+var _inspection_valid: Callable
+var _inspection_notice: Label
 
 func _ready() -> void:
 	GameUIStyle.install_theme(get_window())
@@ -139,10 +141,12 @@ func _label(text: String, size: int) -> Label:
 	return label
 
 func _process(delta: float) -> void:
+	if is_instance_valid(modal) and modal.get_meta("inspection",false) and _inspection_valid.is_valid() and not _inspection_valid.call(): close_modal()
 	if _binding_revision!=InputBindings.revision: _refresh_binding_hints()
 	var actor:=get_tree().get_first_node_in_group("player") as Player
 	var selecting:=actor and is_instance_valid(actor.material_wheel) and actor.material_wheel.visible
 	_heading_panel.visible=not selecting and not (actor and actor.ui_blocked)
+	_utility.visible=not (actor and actor.ui_blocked)
 	_terrain_time += delta
 	if _terrain_time >= .2:
 		_terrain_time = 0
@@ -153,7 +157,11 @@ func _process(delta: float) -> void:
 	if not get_tree().paused:
 		_message_time -= delta
 		_notice.modulate.a=clampf(_message_time/.35,0,1)
-		_notice.visible=_message_time>0 and not selecting
+		var local_notice: bool=is_instance_valid(_inspection_notice) and is_instance_valid(modal) and bool(modal.get_meta("inspection",false))
+		_notice.visible=_message_time>0 and not selecting and not local_notice
+		if local_notice:
+			_inspection_notice.text=message.text if _message_time>0 else ""
+			_inspection_notice.tooltip_text=_inspection_notice.text
 		if _message_time <= 0:
 			message.text = ""
 			_notice.hide()
@@ -179,9 +187,10 @@ func set_survival_status(text: String) -> void:
 
 func _input(event: InputEvent) -> void:
 	if not is_instance_valid(modal) or not modal.visible or modal_locked: return
-	if not event is InputEventKey or not event.pressed or event.echo or event.keycode!=KEY_ESCAPE: return
 	for other in get_tree().get_nodes_in_group("modal_ui"):
 		if other!=modal and other is CanvasLayer and other.visible: return
+	if modal.get_meta("inspection",false) and GameUIStyle.focus_navigation(modal,event): return
+	if not event is InputEventKey or not event.pressed or event.echo or event.keycode!=KEY_ESCAPE: return
 	# A dropdown owns its first Escape. Otherwise leave the page even when
 	# a search/quantity field would consume ui_cancel before unhandled input.
 	for popup in modal.find_children("*","PopupMenu",true,false):
@@ -247,6 +256,10 @@ func show_menu() -> void:
 	else: show_journal()
 
 func close_modal() -> void:
+	_inspection_valid=Callable()
+	_inspection_notice=null
+	var actor:=get_tree().get_first_node_in_group("player") as Player
+	if actor and actor.health_component.damaged.is_connected(_inspection_damaged): actor.health_component.damaged.disconnect(_inspection_damaged)
 	if is_instance_valid(modal):
 		modal.hide()
 		GameUIStyle.end_modal(modal)
@@ -254,6 +267,42 @@ func close_modal() -> void:
 	modal = null
 	_modal_panel = null
 	modal_locked = false
+
+func _inspection_damaged(_amount: int) -> void:
+	if is_instance_valid(modal) and modal.get_meta("inspection",false): close_modal()
+
+func show_inspection(title: String,text: String,buttons: Array[Dictionary],validity := Callable()) -> VBoxContainer:
+	# Reuse the existing modal input boundary; only the presentation is lighter.
+	show_panel(title,"",[])
+	modal.set_meta("inspection",true)
+	_inspection_valid=validity
+	var backdrop:=_modal_panel.get_parent() as ColorRect
+	backdrop.color=Color.TRANSPARENT
+	backdrop.gui_input.connect(func(event: InputEvent):
+		if event is InputEventMouseButton and event.pressed and event.button_index==MOUSE_BUTTON_LEFT and is_instance_valid(_modal_panel) and not _modal_panel.get_global_rect().has_point(event.position):
+			close_modal(); get_viewport().set_input_as_handled())
+	var box:=_modal_panel.find_child("ModalBody",true,false) as VBoxContainer
+	FoundationWidgets.clear(box)
+	var header:=HBoxContainer.new(); box.add_child(header)
+	header.add_child(FoundationWidgets.label(title,20))
+	var close:=FoundationWidgets.button("Esc 收起",close_modal); close.size_flags_horizontal=Control.SIZE_SHRINK_END; header.add_child(close)
+	box.add_child(HSeparator.new())
+	_inspection_notice=FoundationWidgets.label("",12,true); _inspection_notice.custom_minimum_size.y=24
+	_inspection_notice.autowrap_mode=TextServer.AUTOWRAP_OFF; _inspection_notice.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS
+	box.add_child(_inspection_notice)
+	var scroll:=ScrollContainer.new(); scroll.name="InspectionReading"; scroll.size_flags_vertical=Control.SIZE_EXPAND_FILL
+	scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED; scroll.follow_focus=true; box.add_child(scroll)
+	var content:=VBoxContainer.new(); content.name="InspectionContent"; content.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	content.add_theme_constant_override("separation",10); scroll.add_child(content)
+	if not text.is_empty(): content.add_child(FoundationWidgets.label(text,14))
+	box.add_child(HSeparator.new())
+	for action in buttons:
+		var button:=FoundationWidgets.button(str(action.title),action.callback,bool(action.get("disabled",false)))
+		button.clip_text=true; box.add_child(button)
+	_layout_modal()
+	var actor:=get_tree().get_first_node_in_group("player") as Player
+	if actor and not actor.health_component.damaged.is_connected(_inspection_damaged): actor.health_component.damaged.connect(_inspection_damaged)
+	return content
 
 func show_panel(title: String, text: String, buttons: Array[Dictionary], locked: bool = false, extent := Vector2(960,570)) -> void:
 	close_modal()
@@ -367,6 +416,15 @@ func _layout_modal() -> void:
 		_heading_panel.offset_left = -width * .5
 		_heading_panel.offset_right = width * .5
 	if not is_instance_valid(_modal_panel): return
+	if is_instance_valid(modal) and modal.get_meta("inspection",false):
+		var extent:=Vector2(minf(440,viewport.x*.43),viewport.y-100)
+		var actor:=get_tree().get_first_node_in_group("player") as Node2D
+		var actor_x:=actor.get_global_transform_with_canvas().origin.x if actor else viewport.x*.5
+		var left:=18.0 if actor_x>viewport.x*.66 else viewport.x-extent.x-18
+		_modal_panel.set_anchors_preset(Control.PRESET_TOP_LEFT)
+		_modal_panel.offset_left=left; _modal_panel.offset_right=left+extent.x
+		_modal_panel.offset_top=30; _modal_panel.offset_bottom=30+extent.y
+		return
 	var extent := GameUIStyle.menu_extent(viewport) if _modal_panel.get_meta("full_menu",false) else Vector2(minf(_modal_extent.x, viewport.x - 48), minf(_modal_extent.y, viewport.y - 48))
 	_modal_panel.offset_left = -extent.x * .5
 	_modal_panel.offset_right = extent.x * .5

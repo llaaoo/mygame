@@ -83,14 +83,22 @@ func _draw() -> void:
 				draw_circle(Vector2(18, -24), 4, c)
 			"shield":
 				draw_colored_polygon(PackedVector2Array([Vector2(-25,-8),Vector2(-11,-8),Vector2(-11,8),Vector2(-18,15),Vector2(-25,8)]), c)
-				draw_line(Vector2(-18,-6), Vector2(-18,10), Color("d4bf91"), 2)
+				draw_polyline(PackedVector2Array([Vector2(-24,-7),Vector2(-12,-7),Vector2(-12,7),Vector2(-18,13),Vector2(-24,7),Vector2(-24,-7)]),Color("8e9390"),1.5)
+				draw_line(Vector2(-23,1),Vector2(-13,1),Color("443b2e"),2)
+				draw_line(Vector2(-22,-3),Vector2(-22,5),Color("443b2e"),2)
+				draw_line(Vector2(-14,-3),Vector2(-14,5),Color("443b2e"),2)
 			"coat":
 				draw_rect(Rect2(-9, -10, 18, 22), Color("17212a"))
 				draw_rect(Rect2(-7, -8, 14, 18), c)
 				draw_line(Vector2(0,-8),Vector2(0,10),Color("b8a47e"),2)
+				draw_line(Vector2(-7,4),Vector2(7,4),Color("493727"),3)
+				draw_rect(Rect2(-2,3,4,3),Color("a28b58"),false,1)
+				for y in [-5,-1,8]: draw_line(Vector2(-6,y),Vector2(-3,y+1),c.lightened(.22),1)
 			"boots":
 				draw_rect(Rect2(-10,14,8,6),c)
 				draw_rect(Rect2(2,14,8,6),c)
+				draw_line(Vector2(-10,20),Vector2(-2,20),Color("352e27"),2)
+				draw_line(Vector2(2,20),Vector2(10,20),Color("352e27"),2)
 			"gloves":
 				draw_rect(Rect2(-15,0,6,8),c)
 				draw_rect(Rect2(9,0,6,8),c)

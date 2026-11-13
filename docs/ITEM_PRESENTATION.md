@@ -20,6 +20,8 @@ illustration_path = "res://content/art/items/your_item.webp"
 
 目录只持有路径，选中物品后才加载大图。界面保留当前选中图片，不让整个物品目录提前持有所有大插画。`ItemArtView`按比例适配区域，不裁物体，也不拉伸比例；切换物品会清除旧图像引用。小图仍有独立用途。无插画时使用已有图形，不宣称已经绘制了所有物品插画。
 
+共用图集可以另设`illustration_region = Rect2i(x, y, width, height)`；空区域仍表示完整图片。小图使用对应AtlasTexture资源，大图只在选择时通过`illustration_texture()`读取同一格，越界不采样相邻物品。该元数据不进入实例或存档。当前16件[灰河谷样本](../content/art/items/grayriver/SOURCE_NOTICE.md)使用一张约1.75MB的原始RGBA图集，原图不作物理裁切；完整目录仍保留原图形回退。
+
 `ItemData.illustration_error()`与物品/探索内容校验检查本地资源路径和支持格式。坏路径是作者诊断，不放到正常检视界面。物品实例仍只保存UID、数量与实例属性；添加插画不修改存档格式，不把资源或Node写入旅程快照。
 
 ## 穿戴外观

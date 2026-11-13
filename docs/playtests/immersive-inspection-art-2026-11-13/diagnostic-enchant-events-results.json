@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "revision": "2215b35f51cf4948dc7d42295a3ce0aa52f13d76",
+  "dirty": true,
+  "godot": "4.6.3.stable.official.7d41c59c4",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "jobs": 1,
+  "timeout": 180.0,
+  "logs": "/tmp/mygame-tests-vvbcd818",
+  "requested": [
+    "enchantment_input"
+  ],
+  "results": [
+    {
+      "name": "enchantment_input",
+      "passed": false,
+      "category": "godot_error",
+      "exit_code": 1,
+      "seconds": 16.115,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_enchantment_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-vvbcd818/enchantment_input.log",
+      "diagnostic": [
+        "ERROR: First actual LMB did not leave partial fire buildup",
+        "   at: push_error (core/variant/variant_utility.cpp:1024)",
+        "   GDScript backtrace (most recent call first):",
+        "       [0] check (res://tests/support/input_scene_probe.gd:6)",
+        "       [1] run (res://tests/test_enchantment_input.gd:36)",
+        "ENCHANT_PRESS { \"active\": true, \"hold\": {  }, \"edges\": [], \"suppressed\": true, \"stamina\": 100.0, \"process\": true, \"controlled\": false, \"provider\": true }",
+        "ENCHANT_RELEASE { \"hold\": {  }, \"mode\": \"idle\", \"sequence\": 0 }",
+        "ERROR: Second LMB failed to trigger burning while preserving the coating"
+      ]
+    }
+  ],
+  "skipped": [],
+  "complete": true
+}

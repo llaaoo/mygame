@@ -3,14 +3,10 @@ extends "res://tests/support/input_scene_probe.gd"
 const Fixture:=preload("res://tests/support/grayriver_fixture.gd")
 var triggered: Array[String]=[]
 func aim_at(point: Vector2) -> void:
-	var screen:=root.get_canvas_transform()*point
-	if DisplayServer.get_name()!="headless": Input.warp_mouse(screen)
-	var event:=InputEventMouseMotion.new(); event.position=screen; event.global_position=screen
-	Input.parse_input_event(event); Input.flush_buffered_events()
+	await aim_world(point)
 func swing() -> void:
-	var event:=InputEventMouseButton.new(); event.position=root.get_mouse_position(); event.global_position=event.position; event.button_index=MOUSE_BUTTON_LEFT; event.pressed=true
-	Input.parse_input_event(event); Input.flush_buffered_events(); await frames(1)
-	event=event.duplicate(); event.pressed=false; Input.parse_input_event(event); Input.flush_buffered_events()
+	await pointer_button(MOUSE_BUTTON_LEFT,true)
+	await pointer_button(MOUSE_BUTTON_LEFT,false)
 func on_trigger(_target: Node2D,title: String) -> void: triggered.append(title)
 func run() -> void:
 	root.size=Vector2i(1152,648)
@@ -27,15 +23,17 @@ func run() -> void:
 	target.state_chart.process_mode=Node.PROCESS_MODE_DISABLED; target.set_process(false)
 	GameRuntime.instance.set_process(true)
 	CombatExecutor.instance.enchantment_triggered.connect(on_trigger)
-	await frames(5); aim_at(target.position)
+	await frames(5); await aim_at(target.position)
 	var mp:=actor.mana_component.mp
 	await key(KEY_Q,true); await key(KEY_Q,false); await create_timer(1.3).timeout
 	check(stock.coating(uid)!=null and stock.count("player","fire_rag")==0,"Real Q did not coat the actual weapon")
+	var prompt:=game.frontier_hud.interact.get_parent() as Control
+	check(not prompt.is_visible_in_tree() or not prompt.get_global_rect().has_point(root.get_canvas_transform()*target.position),"Nearby interaction captures the close-range enemy aim point")
 	await swing(); await create_timer(.9).timeout
 	var buffs:=target.get_node("BuffManager") as BuffManager
 	check(not buffs.has_buff("burning") and buffs.buildup.snapshot().has("flame"),"First actual LMB did not leave partial fire buildup")
 	await capture("enchantment-partial-buildup")
-	aim_at(target.position); await swing(); await create_timer(.5).timeout
+	await aim_at(target.position); await swing(); await create_timer(.5).timeout
 	check(triggered.size()==1 and buffs.has_buff("burning") and stock.coating(uid)!=null,"Second LMB failed to trigger burning while preserving the coating")
 	await capture("enchantment-threshold-trigger")
 	await create_timer(.7).timeout
@@ -55,7 +53,8 @@ func run() -> void:
 	if not foe: await fixture.close(); quit(1); return
 	foe.position=base+Vector2(210,0); foe._home_position=foe.position; foe.process_mode=Node.PROCESS_MODE_INHERIT
 	var hp:=foe.health_component.hp
-	await frames(4); aim_at(foe.position)
+	await frames(4); await aim_at(foe.position)
+	check(not prompt.is_visible_in_tree() or not prompt.get_global_rect().has_point(root.get_canvas_transform()*foe.position),"Nearby interaction captures the ranged technique aim point")
 	await key(KEY_CTRL,true); await key(KEY_SHIFT,true); await pointer_button(MOUSE_BUTTON_LEFT,true); await pointer_button(MOUSE_BUTTON_LEFT,false)
 	check(actor.actor_context.actions.mode=="attack" and stock.coating(uid)!=null,"Ctrl+Shift+LMB did not preserve coating during its windup")
 	await capture("enchantment-wave-warning")

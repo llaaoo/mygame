@@ -1,0 +1,88 @@
+{
+  "schema": 1,
+  "revision": "2215b35f51cf4948dc7d42295a3ce0aa52f13d76",
+  "dirty": true,
+  "godot": "4.6.3.stable.official.7d41c59c4",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "jobs": 1,
+  "timeout": 180.0,
+  "logs": "/tmp/mygame-tests-mktz5sww",
+  "requested": [
+    "enchantment_input",
+    "immersive_ui_input",
+    "controls_workflow",
+    "world_pointer_input"
+  ],
+  "results": [
+    {
+      "name": "enchantment_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 17.425,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_enchantment_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-mktz5sww/enchantment_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "immersive_ui_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 19.827,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_immersive_ui_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-mktz5sww/immersive_ui_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "controls_workflow",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 19.473,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_controls_workflow.gd"
+      ],
+      "log": "/tmp/mygame-tests-mktz5sww/controls_workflow.log",
+      "diagnostic": []
+    },
+    {
+      "name": "world_pointer_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 9.296,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_world_pointer_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-mktz5sww/world_pointer_input.log",
+      "diagnostic": []
+    }
+  ],
+  "skipped": [],
+  "complete": true
+}

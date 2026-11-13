@@ -34,7 +34,7 @@ func inspect(corpse_id: String,uid: String) -> void:
 	if not refusal.is_empty(): game.ui.notify(refusal);return
 	game.ui.close_modal()
 	var method:=FieldWorkMethod.new();method.id="harvest.corpse."+uid;method.title=part.title;method.duration=float(part.duration);method.animation_id=&"work_gather"
-	game.player.field_work.inspect(game.loot.corpses[corpse_id],part.title,[method],func(_method):return reason(corpse_id,uid,part,tool_uid),func(_method):return complete(corpse_id,uid,part,tool_uid),"处理真实遗骸部位；世界继续运行，工具不消耗。")
+	game.player.field_work.inspect(game.loot.corpses[corpse_id],part.title,[method],func(_method):return reason(corpse_id,uid,part,tool_uid),func(_method):return complete(corpse_id,uid,part,tool_uid),"沿切口仔细处理；移动或受伤会中断，未处理的部位保留。")
 func complete(corpse_id: String,uid: String,part: Dictionary,tool_uid: String) -> bool:
 	if not reason(corpse_id,uid,part,tool_uid).is_empty(): return false
 	var result:=game.session.inventory.process_anatomy("player",corpse_id,uid)

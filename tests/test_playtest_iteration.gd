@@ -25,7 +25,8 @@ func find_interaction(title: String) -> ExplorationInteractable:
 	return null
 func modal_text() -> String:
 	var text := ""
-	for label in game.ui.modal.find_children("*", "RichTextLabel", true, false): text += label.text
+	for label in game.ui.modal.find_children("*", "Control", true, false):
+		if label is Label or label is RichTextLabel: text += label.text
 	return text
 func run() -> void:
 	var fixture := Fixture.new(self)

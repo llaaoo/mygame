@@ -1,0 +1,24 @@
+[
+  {
+    "test": "immersive_ui_input",
+    "exit_code": 1,
+    "errors": [
+      "ERROR: Reading keyboard focus escapes into world controls",
+      "ERROR: Reverse focus escapes the lightweight modal"
+    ],
+    "command": [
+      "godot",
+      "--path",
+      "/workspace/mygame",
+      "--rendering-method",
+      "gl_compatibility",
+      "--audio-driver",
+      "Dummy",
+      "--resolution",
+      "1152x648",
+      "--script",
+      "res://tests/test_immersive_ui_input.gd"
+    ],
+    "passed": false
+  }
+]

@@ -1,0 +1,33 @@
+[
+  {
+    "test": "immersive_ui_input",
+    "exit_code": 1,
+    "errors": [
+      "ERROR: Button disappeared before mouse input",
+      "ERROR: Quick loot lost the selected weapon UID/coating or took a different item",
+      "ERROR: Missing owned UID tile: item.31",
+      "ERROR: Missing visible button: 装备这件",
+      "ERROR: Inventory character does not show real recovered equipment",
+      "ERROR: Weapon coating and ground energy are confused with personal buffs",
+      "ERROR: Missing owned UID tile: item.31",
+      "ERROR: Dropping the shown weapon lost its actual identity or coating",
+      "ERROR: Ground item F still forces full inventory management",
+      "ERROR: Expected one visible button for { \"ui_action\": \"quick_take\", \"item_uid\": \"item.31\" }, found 0",
+      "ERROR: Quick ground recovery changed or lost the original weapon"
+    ],
+    "command": [
+      "godot",
+      "--path",
+      "/workspace/mygame",
+      "--rendering-method",
+      "gl_compatibility",
+      "--audio-driver",
+      "Dummy",
+      "--resolution",
+      "1152x648",
+      "--script",
+      "res://tests/test_immersive_ui_input.gd"
+    ],
+    "passed": false
+  }
+]

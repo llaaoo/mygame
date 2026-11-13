@@ -1,0 +1,91 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+
+⏰ WorldTime 启动: 08:00
+🏛️ GameRuntime: 五大 Runtime 初始化完成
+   CommandBus       : ✅
+   CombatExecutor   : ✅
+   CombatEventBus   : ✅
+   WorldRuntime     : ✅
+   SimulationRuntime: ✅
+   WorldTime        : ✅
+⚡ 已注册触发效果: OnKillBonusExp
+📊 CombatDebugger: trace enabled
+⏰ 08:00 (☀️ 白天)
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚔️  CombatTrace  #1 | cast_fireball
+   技能: 火球术 | 事件数: 16 | 最终伤害: 45
+   伤害链: StatScalingModifier(+20)
+    1. ▶  cast: 火球术
+    2. ▶  PHASE: MODIFIER
+    3. ▶  PHASE: EFFECT
+    4. 💥 resolve_damage: 火球术 | base=25
+    5. 📊 StatScalingModifier @ FLAT: 25 → 45 (+20)
+    6. ▶  PHASE: EVENT
+    7. ▶  PHASE: POST
+    8. ⚡ done: 火球术 | success=OK ✅
+    9. ▶  PHASE: IDLE
+   10. ▶  PHASE: MODIFIER
+   11. ▶  PHASE: EFFECT
+   12. ▶  PHASE: EVENT
+   13. 📡 ON_CAST → ?  [tags=["fire", "projectile"], extra={  }]
+   14. ▶  PHASE: POST
+   15. ▶  PHASE: IDLE
+   16. 📡 MISS (timeout) →
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+ERROR: F did not open nearby ground loot in real time
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/support/input_scene_probe.gd:6)
+       [1] run (res://tests/test_realtime_interaction.gd:174)
+       [2] key (res://tests/support/input_scene_probe.gd:13)
+       [3] frames (res://tests/support/input_scene_probe.gd:10)
+ERROR: Missing inventory tile: item.112
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/support/input_scene_probe.gd:6)
+       [1] item_click (res://tests/test_realtime_interaction.gd:27)
+       [2] run (res://tests/test_realtime_interaction.gd:175)
+       [3] key (res://tests/support/input_scene_probe.gd:13)
+       [4] frames (res://tests/support/input_scene_probe.gd:10)
+ERROR: Missing visible button: 尽量取走这一叠
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/support/input_scene_probe.gd:6)
+       [1] click (res://tests/support/input_scene_probe.gd:37)
+       [2] run (res://tests/test_realtime_interaction.gd:175)
+       [3] key (res://tests/support/input_scene_probe.gd:13)
+       [4] frames (res://tests/support/input_scene_probe.gd:10)
+ERROR: Mouse pickup replaced/refilled the unspent bottle
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/support/input_scene_probe.gd:6)
+       [1] run (res://tests/test_realtime_interaction.gd:176)
+       [2] frames (res://tests/support/input_scene_probe.gd:10)
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+REALTIME_UI_AI_DAMAGE 26
+SaveManager: saved user://save_3.sav
+⏰ WorldTime 启动: 08:00
+🏛️ GameRuntime: 五大 Runtime 初始化完成
+   CommandBus       : ✅
+   CombatExecutor   : ✅
+   CombatEventBus   : ✅
+   WorldRuntime     : ✅
+   SimulationRuntime: ✅
+   WorldTime        : ✅
+⚡ 已注册触发效果: OnKillBonusExp
+📊 CombatDebugger: trace enabled
+⏰ 08:00 (☀️ 白天)
+SaveManager: saved user://save_3.sav
+COMBO_COMMITS [{"cost":8,"label":"铭刻法阵 · 火石阵","source":"left"},{"cost":12,"label":"火球术","source":"right"},{"cost":12,"label":"火球术","source":"right"}]

@@ -1,0 +1,45 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+
+⏰ WorldTime 启动: 08:00
+🏛️ GameRuntime: 五大 Runtime 初始化完成
+   CommandBus       : ✅
+   CombatExecutor   : ✅
+   CombatEventBus   : ✅
+   WorldRuntime     : ✅
+   SimulationRuntime: ✅
+   WorldTime        : ✅
+⚡ 已注册触发效果: OnKillBonusExp
+📊 CombatDebugger: trace enabled
+⏰ 08:00 (☀️ 白天)
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+⚡ [OnKillBonusExp] +15 额外经验 (target=Encounter_2)
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+ERROR: Nearby interaction overlaps the inventory/map mouse controls
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/support/input_scene_probe.gd:6)
+       [1] verify (res://tests/test_ui_vertical_input.gd:9)
+       [2] run (res://tests/test_immersive_ui_input.gd:102)
+       [3] frames (res://tests/support/input_scene_probe.gd:10)
+STATUS_LAYOUT (960, 540) resources=[P: (18.0, 270.0), S: (220.0, 150.0)] stack=[P: (18.0, 183.0), S: (220.0, 77.0)] buffs=[P: (18.0, 183.0), S: (220.0, 77.0)] visible=true entries=1
+STATUS_LAYOUT (1440, 900) resources=[P: (28.0, 712.0), S: (220.0, 150.0)] stack=[P: (28.0, 625.0), S: (220.0, 77.0)] buffs=[P: (28.0, 625.0), S: (220.0, 77.0)] visible=true entries=1
+SaveManager: saved user://save_3.sav
+SaveManager: saved user://save_3.sav
+⏰ WorldTime 启动: 08:00
+🏛️ GameRuntime: 五大 Runtime 初始化完成
+   CommandBus       : ✅
+   CombatExecutor   : ✅
+   CombatEventBus   : ✅
+   WorldRuntime     : ✅
+   SimulationRuntime: ✅
+   WorldTime        : ✅
+⚡ 已注册触发效果: OnKillBonusExp
+📊 CombatDebugger: trace enabled
+⏰ 08:00 (☀️ 白天)
+SaveManager: saved user://save_3.sav

@@ -10,7 +10,7 @@ import subprocess
 import time
 
 ROOT = Path(__file__).resolve().parents[1]
-TESTS = ("ui_vertical_input", "ui_prototype_input")
+TESTS = ("ui_vertical_input", "ui_prototype_input", "immersive_ui_input")
 
 
 def main():

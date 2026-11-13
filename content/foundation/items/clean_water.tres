@@ -1,10 +1,15 @@
-[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3]
 [ext_resource type="Script" path="res://gameplay/inventory/data/item_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://content/art/items/grayriver/clean_water.tres" id="item_art"]
 [resource]
 script = ExtResource("1")
 id = "clean_water"
 display_name = "饮用水"
-description = "随身物资；数量与位置保存在真实容器中。"
+description = "装在皮套水瓶里的清水。出镇前补足，途中可直接饮用。"
 weight = 1
 stackable = true
 max_stack = 99
+
+icon = ExtResource("item_art")
+illustration_path = "res://content/art/items/grayriver/frontier_items.png"
+illustration_region = Rect2i(0, 627, 314, 313)

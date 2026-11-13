@@ -12,7 +12,7 @@ func _ready() -> void:
 func present(definition: ItemData,uid: String) -> void:
  item_id=definition.id; set_meta("item_uid",uid)
  texture=null
- if not definition.illustration_path.is_empty() and definition.illustration_error().is_empty(): texture=load(definition.illustration_path) as Texture2D
+ texture=definition.illustration_texture()
  uses_illustration=texture!=null
  if not uses_illustration: texture=InterfaceIcons.item(definition)
  texture_filter=CanvasItem.TEXTURE_FILTER_LINEAR if uses_illustration or not texture is AtlasTexture else CanvasItem.TEXTURE_FILTER_NEAREST

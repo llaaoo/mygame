@@ -191,6 +191,7 @@ func _bootstrap() -> void:
 	await super._bootstrap()
 	session.equipment_page=hub.open.bind("equipment","")
 	session.supply_page=hub.open.bind("supplies","")
+	session.ground_page=loot.inspect_ground
 	if inventory_screen:
 		inventory_screen.navigation_request=_inventory_navigation
 		inventory_screen.page_request=open_interface

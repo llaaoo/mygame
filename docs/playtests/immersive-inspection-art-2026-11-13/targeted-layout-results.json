@@ -1,0 +1,124 @@
+{
+  "schema": 1,
+  "revision": "ec02972287b8b619f01d7e2fe3a6a19c5e21c9de",
+  "dirty": true,
+  "godot": "4.6.3.stable.official.7d41c59c4",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "jobs": 1,
+  "timeout": 300.0,
+  "logs": "/tmp/mygame-tests-fuqjujau",
+  "requested": [
+    "immersive_ui_input",
+    "enchantment_input",
+    "controls_workflow",
+    "world_pointer_input",
+    "ui_vertical_input",
+    "ui_prototype_input"
+  ],
+  "results": [
+    {
+      "name": "immersive_ui_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 20.768,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_immersive_ui_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-fuqjujau/immersive_ui_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "enchantment_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 17.575,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_enchantment_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-fuqjujau/enchantment_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "controls_workflow",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 19.679,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_controls_workflow.gd"
+      ],
+      "log": "/tmp/mygame-tests-fuqjujau/controls_workflow.log",
+      "diagnostic": []
+    },
+    {
+      "name": "world_pointer_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 9.242,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_world_pointer_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-fuqjujau/world_pointer_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "ui_vertical_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 33.423,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_ui_vertical_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-fuqjujau/ui_vertical_input.log",
+      "diagnostic": []
+    },
+    {
+      "name": "ui_prototype_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 34.432,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/mygame",
+        "--script",
+        "res://tests/test_ui_prototype_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-fuqjujau/ui_prototype_input.log",
+      "diagnostic": []
+    }
+  ],
+  "skipped": [],
+  "complete": true
+}

@@ -1,10 +1,15 @@
-[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3]
 [ext_resource type="Script" path="res://gameplay/inventory/data/item_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://content/art/items/grayriver/cloth.tres" id="item_art"]
 [resource]
 script = ExtResource("1")
 id = "cloth"
 display_name = "布料"
-description = "制作涂附抹布；来自真实补给、行囊或加工后的兽皮缚带。"
+description = "边缘磨毛的亚麻布，折叠后用细线扎紧。可用于现场修整与加工。"
 stackable = true
 max_stack = 99
 weight = 0.1
+
+icon = ExtResource("item_art")
+illustration_path = "res://content/art/items/grayriver/frontier_items.png"
+illustration_region = Rect2i(940, 627, 314, 313)

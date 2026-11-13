@@ -80,7 +80,11 @@ func _available(id: String) -> bool:
 func inspect(id: String) -> void:
 	if not _available(id): return
 	if game.hub:
-		game.hub.open("loot",id)
+		var view:=QuickLootView.new(); view.game=game; view.source_id=id
+		var content:=game.ui.show_inspection(str(game.progress.loot_records[id].title),"",[
+			{"title":InputBindings.label("loot_all")+"  尽量全部取走","callback":view.take_all},
+			{"title":"展开整理与详情","callback":game.hub.open.bind("loot",id)}],func():return _available(id))
+		game.ui.modal.set_meta("quick_loot",id); game.ui.modal.set_meta("take_all_request",view.take_all); content.add_child(view)
 		return
 	var record: Dictionary = game.progress.loot_records[id]
 	var text := "物品来自死者实际穿戴与剩余行囊。已消耗的材料不会再出现；未取走的东西会留在这里。\n\n"
@@ -97,6 +101,14 @@ func inspect(id: String) -> void:
 	else: buttons.push_front({"title":"尽量全部取走","callback":_take_and_show.bind(id,"","")})
 	buttons.append({"title":"留下物品，继续探索","callback":game.ui.close_modal})
 	game.ui.show_panel(record.title,text,buttons)
+
+func inspect_ground(id: String) -> void:
+	if not game.session.ground_available(game.player,id): return
+	var view:=QuickLootView.new(); view.game=game; view.source_id=id; view.ground=true
+	var content:=game.ui.show_inspection("地上物品","",[
+		{"title":InputBindings.label("loot_all")+"  尽量全部取走","callback":view.take_all},
+		{"title":"展开行囊整理","callback":func(): game.ui.close_modal(); game.inventory_screen.open("all",id)}],func():return game.session.ground_available(game.player,id))
+	game.ui.modal.set_meta("quick_ground",id); game.ui.modal.set_meta("take_all_request",view.take_all); content.add_child(view)
 
 func _take_and_show(id: String, kind: String, item: String) -> void:
 	var taken := take(id,kind,item)

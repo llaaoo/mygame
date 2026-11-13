@@ -25,3 +25,20 @@ func test_selected_art_can_change_back_to_an_unillustrated_item_without_stale_im
  assert_eq(illustrated.illustration_path,ART)
  assert_eq(plain.illustration_path,"")
  assert_null(plain.icon,"Rendering a fallback must not write it into the shared definition")
+
+func test_sample_icons_and_inspection_share_the_same_original_atlas_cell() -> void:
+ for id in ["river_sabre","river_spear","river_staff","river_bow","river_coat","river_shield","river_boots","ration","clean_water","fire_stone","herb","cloth","oil_bottle","fire_rag","charcoal","metal_scrap"]:
+  var item:=ItemCatalog.default_catalog().definition(id)
+  var icon:=InterfaceIcons.item(item) as AtlasTexture
+  var art:=item.illustration_texture() as AtlasTexture
+  assert_not_null(icon,id); assert_not_null(art,id)
+  if icon and art:
+   assert_eq(icon.atlas,art.atlas,id)
+   assert_eq(icon.region,art.region,id)
+   assert_eq(item.illustration_error(),"",id)
+func test_bad_atlas_region_never_spills_into_another_item() -> void:
+ var item:=ItemData.new(); item.id="region-contract"; item.illustration_path=ART
+ item.illustration_region=Rect2i(-1,0,12,12)
+ assert_false(item.illustration_error().is_empty())
+ item.illustration_region=Rect2i(0,0,100000,100000)
+ assert_null(item.illustration_texture())

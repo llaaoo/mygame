@@ -7,6 +7,7 @@ static func skill(data: SkillData) -> Texture2D:
 	return GameUIStyle.icon(id)
 static func item(data: ItemData) -> Texture2D:
 	if not data: return GameUIStyle.icon("backpack")
+	if data.icon: return data.icon
 	if data is EquipmentData: return data.get_icon_texture()
 	var id: String={"ration":"utensils","broth":"utensils","tea":"flask-conical","clean_water":"droplet","dirty_water":"droplet","herb":"leaf","sap":"leaf","resin":"droplet","charcoal":"flame","fire_stone":"flame","ash":"flame","frost_salt":"snowflake","storm_dust":"zap","crystal":"hexagon","metal_scrap":"anvil","grain":"utensils","cloth":"wind"}.get(data.id,"backpack")
 	if data.use_profile:
