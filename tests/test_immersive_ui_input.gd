@@ -99,7 +99,7 @@ func run() -> void:
   verify(active.is_visible_in_tree() and root.get_visible_rect().encloses(active.get_global_rect()),"Active status icons are hidden or positioned outside the world HUD")
   var prompt:=game.frontier_hud.interact.get_parent() as Control
   if prompt.is_visible_in_tree() and hud.skill_bar._hint_panel.is_visible_in_tree(): verify(not prompt.get_global_rect().intersects(hud.skill_bar._hint_panel.get_global_rect()),"Nearby interaction hides the selected spell form/cost")
-  if prompt.is_visible_in_tree() and game.ui._utility.is_visible_in_tree(): verify(not prompt.get_global_rect().intersects(game.ui._utility.get_global_rect()),"Nearby interaction overlaps the inventory/map mouse controls")
+  if prompt.is_visible_in_tree() and game.ui._utility.is_visible_in_tree(): verify(not prompt.get_global_rect().intersects(game.ui._utility.get_global_rect()),"Nearby interaction overlaps inventory/map controls at %s: %s / %s"%[extent,prompt.get_global_rect(),game.ui._utility.get_global_rect()])
   print("STATUS_LAYOUT ",str(extent)," resources=",resources.get_global_rect()," stack=",effects.get_global_rect()," buffs=",active.get_global_rect()," visible=",active.is_visible_in_tree()," entries=",active._rows.size())
   await capture("combat-status-"+str(extent.x))
  var before:=field.remaining

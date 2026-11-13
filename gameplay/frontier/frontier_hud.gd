@@ -53,6 +53,9 @@ func _ready() -> void:
 	interact.tooltip_text="点击与F交互相同；须在目标附近"
 	prompt.add_child(interact)
 func _process(delta: float) -> void:
+	# Layout follows current canvas geometry every visible frame; target queries
+	# remain throttled. A resize/font update must not wait for the AI/UI query tick.
+	if is_instance_valid(interact) and interact.get_parent().is_visible_in_tree(): _layout_prompt()
 	_clock-=delta
 	if _clock>0 or not game.ready_for_play: return
 	_clock=.15
