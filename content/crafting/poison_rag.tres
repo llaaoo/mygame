@@ -6,3 +6,5 @@ id = "poison_rag"
 inputs = {"venom_extract":1, "cloth":1}
 output_id = "poison_rag"
 output_count = 1
+
+alchemical = true

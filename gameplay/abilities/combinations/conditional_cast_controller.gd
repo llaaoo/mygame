@@ -84,6 +84,7 @@ func build_plan(skill: SkillData, actor: Node2D, empower: bool = false,selection
 		components[0].field=source_fields[0]
 		components[0].version=source_fields[0].revision
 	var result := CastPlan.new()
+	result.actor=actor
 	result.requires_magic=requires_magic
 	result.selection=selection.duplicate(true)
 	result.rule_id = components[0].rule_id
@@ -240,6 +241,9 @@ func build_plan(skill: SkillData, actor: Node2D, empower: bool = false,selection
 	if stats and stats.preparation_multiplier < 1.0:
 		result.explanation.append(CastExplanationStep.new("attributes", "agility", "敏捷%d：准备时间×%.2f，另与装备准备修正相乘" % [stats.effective_stat("agility"), stats.preparation_multiplier]))
 	var material_label:=supplies.describe_cost(result.material_costs) if not result.material_costs.is_empty() else "无材料消耗"
+	if not result.skill.field_type.is_empty():
+		var budget:=result.field_budget()
+		result.explanation.append(CastExplanationStep.new("field_budget",result.skill.field_type,"本次法阵存续%.0f秒；每次组合消耗%.1f秒"%[budget.duration,budget.use_seconds] if budget.use_seconds>0 else "本次法阵存续%.0f秒；每次消耗1充能"%budget.duration))
 	if not result.instance_costs.is_empty():
 		material_label="每次脉冲消费所选瓶内1剂"
 	result.explanation.append(CastExplanationStep.new("cost", "total", "总计%s；准备%.2f秒；%s" % [result.cost_label(), result.preparation, material_label]))
@@ -469,9 +473,8 @@ func _commit() -> void:
 		next.field_type = plan.skill.field_type
 		next.charges=plan.skill.field_charges
 		next.radius = plan.placement_radius
-		next.remaining = (clampf(plan.skill.field_duration+plan.placement_duration-15,5,40) if not plan.action.operation_id.is_empty() else plan.placement_duration) + float(plan.field_bonus)
-		if "actor_context" in actor and actor.actor_context and actor.actor_context.rules.timed_fields:
-			next.configure_budget((120.0 if next.field_type=="arcane" else 180.0)+maxf(0,plan.placement_duration-15.0)+plan.field_bonus,40.0 if next.field_type=="arcane" else 30.0)
+		var budget:=plan.field_budget()
+		next.configure_budget(budget.duration,budget.use_seconds)
 		if allow_layered_fields:
 			clear_field_type(next.field_type)
 		else:

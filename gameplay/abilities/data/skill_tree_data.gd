@@ -8,3 +8,5 @@ extends Resource
 @export var accent_color: Color = Color.WHITE
 @export var skill_ids: Array[String] = []
 @export var perks: Array[Resource] = []
+## Existing practice records are read together, never pooled or awarded twice.
+@export var practice_schools: Array[int] = []

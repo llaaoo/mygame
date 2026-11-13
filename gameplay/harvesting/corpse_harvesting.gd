@@ -9,7 +9,7 @@ func entries(corpse_id: String) -> Array[Dictionary]:
 		var part: Variant=row.properties.get("harvest")
 		if not HarvestPart.valid(part): continue
 		var refusal:=reason(corpse_id,row.uid,part)
-		result.append({"id":"harvest:"+row.uid,"uid":row.uid,"kind":"harvest","item":row.definition,"title":part.title,"text":"需要技艺：%s\n工具：%s\n完成后得到：%s\n\n未学会的部位会保留，可学习后回来处理。移动、受伤、离区或失去工具会中断，不消耗部位。"%[FieldcraftCatalog.default_catalog().skill(part.skill).title,ItemCatalog.default_catalog().definition(part.tool).display_name,game.survival.supplies.describe_cost(part.outputs)],"subtitle":refusal if not refusal.is_empty() else "可处理 · %.1f秒"%float(part.duration),"part":part.duplicate(true)})
+		result.append({"id":"harvest:"+row.uid,"uid":row.uid,"kind":"harvest","item":row.definition,"title":part.title,"text":"需要技艺：%s\n工具：%s\n完成后得到：%s\n\n未学会的部位会保留，可学习后回来处理。移动、受伤、离区或失去工具会中断，不消耗部位。"%[FieldcraftCatalog.default_catalog().skill(part.skill).title,ItemCatalog.default_catalog().definition(part.tool).display_name,game.survival.supplies.describe_cost(game.session.inventory.anatomy_outputs("player",part))],"subtitle":refusal if not refusal.is_empty() else "可处理 · %.1f秒"%float(part.duration),"part":part.duplicate(true)})
 	return result
 func reason(corpse_id: String,uid: String,expected: Dictionary,tool_uid := "") -> String:
 	if not HarvestPart.valid(expected): return "部位配置无效"
@@ -40,6 +40,6 @@ func complete(corpse_id: String,uid: String,part: Dictionary,tool_uid: String) -
 	var result:=game.session.inventory.process_anatomy("player",corpse_id,uid)
 	if not result.accepted: return false
 	game.loot.corpses[corpse_id].refresh()
-	game.ui.notify("完成"+str(part.title)+"："+game.survival.supplies.describe_cost(part.outputs))
+	game.ui.notify("完成"+str(part.title)+"："+game.survival.supplies.describe_cost(game.session.inventory.anatomy_outputs("player",part)))
 	game._save_progress()
 	return true

@@ -6,3 +6,5 @@ id = "oil_bottle"
 inputs = {"resin":2}
 output_id = "oil_bottle"
 output_count = 1
+
+alchemical = true

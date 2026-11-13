@@ -19,6 +19,8 @@ var _school := -1
 var _selected := ""
 var _elapsed := 0.0
 var _attributes := false
+var _legacy_view := false
+var _legacy_button: Button
 var _layout_key := ""
 var _controls_signature := ""
 var _tab_signature := ""
@@ -64,28 +66,33 @@ func _refresh() -> void:
  _experience_bar.max_value=maxi(1,stats.exp_to_next); _experience_bar.value=stats.experience
  if _branch_buttons.is_empty():
   _branches.add_child(FoundationWidgets.button("属性与派生",_show_attributes))
-  for school in mastery.TREE_RESOURCE_PATHS:
+  for school in mastery.get_active_schools():
    var button:=FoundationWidgets.button("",_select_school.bind(school)); button.clip_text=true
    _branches.add_child(button); _branch_buttons[school]=button
- for school in mastery.TREE_RESOURCE_PATHS:
+  _legacy_button=FoundationWidgets.button("既有传承",_show_legacy); _branches.add_child(_legacy_button)
+ var inherited:=mastery.get_legacy_perks()
+ _legacy_button.visible=not inherited.is_empty(); _legacy_button.text="既有传承 · %d"%inherited.size()
+ for school in mastery.get_active_schools():
   var tree:=mastery.get_tree_data(school)
-  var level:=mastery.get_mastery(school).level
+  var level:=mastery.get_branch_mastery(school).level
   var button: Button=_branch_buttons[school]
   button.text=tree.display_name+"\n熟练度 %d"%level
-  if _tab_signature!=str([_attributes,_school]): GameUIStyle.apply_tab(button,not _attributes and school==_school)
- _tab_signature=str([_attributes,_school])
+  if _tab_signature!=str([_attributes,_legacy_view,_school]): GameUIStyle.apply_tab(button,not _attributes and not _legacy_view and school==_school)
+ _tab_signature=str([_attributes,_legacy_view,_school])
  if _school<0: _school=SkillMastery.School.MELEE
- var layout_key: String="attributes" if _attributes else str(_school)
+ var layout_key: String="attributes" if _attributes else "legacy" if _legacy_view else str(_school)
  if layout_key!=_layout_key:
   _layout_key=layout_key
   if _attributes: _draw_attributes()
+  elif _legacy_view: _draw_legacy()
   else: _draw_tree()
  _update_existing()
 func _update_existing() -> void:
  var stats:=actor.stats_component; var levels: Array=[]
  for mastery in actor.mastery_manager.get_all_masteries(): levels.append(mastery.level)
  var magic:=actor.actor_context.magic
- var signature:=str([_layout_key,_selected,stats.level,stats.attribute_points,[stats.strength,stats.intelligence,stats.agility,stats.endurance],stats.primary_values(),actor.mastery_manager.revision,levels,actor.mastery_manager.get_mastery(_school).xp,actor.health_component.is_dead,magic.awakened,magic.mana_base,magic.hp_cost,magic.stamina_cost,actor.mana_component.max_mp,actor.health_component.max_hp,actor.actor_context.actions.stamina.maximum])
+ var reasons:=actor.mastery_manager.get_perks_for_school(_school).map(func(perk): return actor.mastery_manager.unlock_reason(perk.perk_id))
+ var signature:=str([_layout_key,_selected,stats.level,stats.attribute_points,[stats.strength,stats.intelligence,stats.agility,stats.endurance],stats.primary_values(),actor.mastery_manager.revision,levels,actor.mastery_manager.get_branch_mastery(_school).xp,reasons,actor.health_component.is_dead,magic.awakened,magic.mana_base,magic.hp_cost,magic.stamina_cost,actor.mana_component.max_mp,actor.health_component.max_hp,actor.actor_context.actions.stamina.maximum])
  if signature==_controls_signature: return
  _controls_signature=signature
  if _attributes:
@@ -104,14 +111,16 @@ func _update_existing() -> void:
  _canvas.queue_redraw()
  if is_instance_valid(_learn_button):
   var perk:=mastery.get_perk(_selected); var reason:=mastery.unlock_reason(_selected)
-  var practice:=mastery.get_mastery(_school)
-  _practice_label.text=mastery.get_tree_data(_school).description+"\n熟练度%d · %.0f / %.0f实践经验"%[practice.level,practice.xp,practice.xp_to_next]
+  var practice:=mastery.get_branch_mastery(_school)
+  _practice_label.text="旧旅程已经学会的传承保留原效果与花费，不再提供新学习。" if _legacy_view else mastery.get_tree_data(_school).description+"\n熟练度%d · %.0f / %.0f实践经验"%[practice.level,practice.xp,practice.xp_to_next]
   _perk_reason.text=reason if not reason.is_empty() else "条件已满足，确认学习才扣点。"
   _learn_button.disabled=not reason.is_empty(); _learn_button.text="学习："+perk.display_name
 func _show_attributes() -> void:
- _attributes=true; _refresh()
+ _attributes=true; _legacy_view=false; _refresh()
+func _show_legacy() -> void:
+ _attributes=false; _legacy_view=true; _selected=""; _layout_key=""; _refresh()
 func _select_school(school: int) -> void:
- _attributes=false; _school=school; _selected=""; _layout_key=""; _refresh()
+ _attributes=false; _legacy_view=false; _school=school; _selected=""; _layout_key=""; _refresh()
 func _clear_canvas() -> void:
  _attribute_column=null
  FoundationWidgets.clear(_canvas); _canvas.links=[]; _canvas.queue_redraw()
@@ -137,10 +146,10 @@ func _draw_tree() -> void:
  _clear_canvas()
  var mastery:=actor.mastery_manager; var tree:=mastery.get_tree_data(_school)
  var rows:=0
- for perk: SkillPerkData in tree.perks:
+ for perk: SkillPerkData in mastery.get_perks_for_school(_school):
   rows=maxi(rows,perk.row)
  _canvas.custom_minimum_size=Vector2(475,maxi(450,rows*112+120))
- for perk: SkillPerkData in tree.perks:
+ for perk: SkillPerkData in mastery.get_perks_for_school(_school):
   var known:=mastery.has_perk(perk.perk_id)
   var ready:=mastery.can_unlock_perk(perk.perk_id)
   var button:=FoundationWidgets.button(perk.display_name+"\n"+("已学习" if known else "可学习" if ready else "条件未满足"),_select_perk.bind(perk.perk_id))
@@ -149,7 +158,8 @@ func _draw_tree() -> void:
   GameUIStyle.apply_button(button,GameUIStyle.ACCENT if known else GameUIStyle.GOLD if ready else GameUIStyle.TEXT_MUTED,perk.perk_id==_selected)
   _canvas.add_child(button)
   _perk_buttons[perk.perk_id]=button
- if _selected.is_empty() and not tree.perks.is_empty(): _selected=(tree.perks[0] as SkillPerkData).perk_id
+ var perks:=mastery.get_perks_for_school(_school)
+ if _selected.is_empty() and not perks.is_empty(): _selected=perks[0].perk_id
  _layout_graph(); _show_perk_detail()
 func _layout_regions() -> void:
  if not _branch_scroll: return
@@ -157,6 +167,7 @@ func _layout_regions() -> void:
  _layout_graph()
 func _layout_graph() -> void:
  if not _canvas: return
+ if _legacy_view: return
  if _attributes:
   if is_instance_valid(_attribute_column):
    _attribute_column.size.x=maxf(380,minf(580,_canvas.size.x-24))
@@ -165,17 +176,17 @@ func _layout_graph() -> void:
  if _perk_buttons.is_empty(): return
  var tree:=actor.mastery_manager.get_tree_data(_school)
  var columns:=0; var rows:=0; var node_height:=68.0
- for perk: SkillPerkData in tree.perks:
+ for perk: SkillPerkData in actor.mastery_manager.get_perks_for_school(_school):
   columns=maxi(columns,perk.column); rows=maxi(rows,perk.row)
   node_height=maxf(node_height,_perk_buttons[perk.perk_id].get_combined_minimum_size().y)
  var grid_width:=float(columns*165+145)
  _canvas.custom_minimum_size=Vector2(grid_width+24,maxf(360,(rows+1)*(node_height+44)+24))
  var origin:=maxf(12,(_canvas.size.x-grid_width)*.5)
- for perk: SkillPerkData in tree.perks:
+ for perk: SkillPerkData in actor.mastery_manager.get_perks_for_school(_school):
   var button:=_perk_buttons[perk.perk_id] as Button
   button.position=Vector2(origin+perk.column*165,24+perk.row*(node_height+44)); button.size=Vector2(145,node_height)
  _canvas.links.clear()
- for perk: SkillPerkData in tree.perks:
+ for perk: SkillPerkData in actor.mastery_manager.get_perks_for_school(_school):
   for required in perk.prerequisite_ids:
    if not _perk_buttons.has(required): continue
    var before:=_perk_buttons[required] as Button; var after:=_perk_buttons[perk.perk_id] as Button
@@ -187,8 +198,8 @@ func _show_perk_detail() -> void:
  FoundationWidgets.clear(_detail)
  var mastery:=actor.mastery_manager; var perk:=mastery.get_perk(_selected)
  if not perk: return
- var tree:=mastery.get_tree_data(_school); var practice:=mastery.get_mastery(_school)
- _detail.add_child(FoundationWidgets.label(tree.display_name,20))
+ var tree:=mastery.get_tree_data(_school); var practice:=mastery.get_branch_mastery(_school)
+ _detail.add_child(FoundationWidgets.label("既有传承" if _legacy_view else tree.display_name,20))
  _practice_label=FoundationWidgets.label(tree.description+"\n熟练度%d · %.0f / %.0f实践经验"%[practice.level,practice.xp,practice.xp_to_next],14,true); _detail.add_child(_practice_label)
  _detail.add_child(HSeparator.new()); _detail.add_child(FoundationWidgets.label(perk.display_name,19))
  _detail.add_child(FoundationWidgets.label(perk.description,14))
@@ -196,6 +207,17 @@ func _show_perk_detail() -> void:
  var reason:=mastery.unlock_reason(perk.perk_id)
  _perk_reason=FoundationWidgets.label(reason if not reason.is_empty() else "条件已满足，确认学习才扣点。",14,true); _detail.add_child(_perk_reason)
  _learn_button=FoundationWidgets.button("学习："+perk.display_name,_learn.bind(perk.perk_id),not reason.is_empty()); _learn_button.clip_text=true; _detail.add_child(_learn_button)
+ _learn_button.visible=not _legacy_view
+func _draw_legacy() -> void:
+ _clear_canvas(); FoundationWidgets.clear(_detail)
+ var perks:=actor.mastery_manager.get_legacy_perks()
+ _canvas.custom_minimum_size=Vector2(400,maxi(450,perks.size()*90+24))
+ for i in range(perks.size()):
+  var perk: SkillPerkData=perks[i]
+  var button:=FoundationWidgets.button(perk.display_name+" · 已承继",_select_perk.bind(perk.perk_id))
+  button.position=Vector2(12,12+i*90); button.size=Vector2(370,68); _canvas.add_child(button); _perk_buttons[perk.perk_id]=button
+ if not perks.is_empty(): _selected=perks[0].perk_id
+ _show_perk_detail()
 func _learn(id: String) -> void:
  if actor.mastery_manager.unlock_perk(id) and save_request.is_valid(): save_request.call()
  _refresh()

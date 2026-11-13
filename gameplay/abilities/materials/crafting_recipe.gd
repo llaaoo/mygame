@@ -9,3 +9,4 @@ extends Resource
 @export var fieldcraft_skill := ""
 
 @export var ammunition := false
+@export var alchemical := false

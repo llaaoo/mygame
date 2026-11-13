@@ -72,6 +72,38 @@ modifier_bonuses = {"combat.impact": 0.15}
 column = 2
 row = 2
 
+[sub_resource type="Resource" id="coating_care"]
+script = ExtResource("perk")
+perk_id = "coating_care"
+school = 5
+display_name = "涂层保养"
+description = "亲手涂附的武器涂层存续延长25%；原瓶、武器和整层释放消耗保留。"
+required_level = 8
+required_character_level = 7
+required_attributes = {"endurance": 14}
+prerequisite_ids = Array[String](["economical_strokes"])
+modifier_bonuses = {"coating.duration": 0.25}
+column = 0
+row = 3
+requires_awakening = false
+required_knowledge = Array[String]([])
+
+[sub_resource type="Resource" id="elemental_finisher"]
+script = ExtResource("perk")
+perk_id = "elemental_finisher"
+school = 5
+display_name = "元素收招"
+description = "显式消耗涂层释放武技时，元素释放伤害提高15%；普通附魔命中不重复受益。"
+required_level = 8
+required_character_level = 7
+required_attributes = {"endurance": 14}
+prerequisite_ids = Array[String](["forceful_impact"])
+modifier_bonuses = {"enchantment.release_damage": 0.15}
+column = 2
+row = 3
+requires_awakening = false
+required_knowledge = Array[String]([])
+
 [resource]
 script = ExtResource("tree")
 tree_id = "melee"
@@ -79,4 +111,4 @@ display_name = "武器与武技"
 description = "有效武器命中提升熟练度；附魔和材料依然需要真实来源。"
 school = 5
 accent_color = Color(0.72,0.61,0.35,1)
-perks = [SubResource("battle_conditioning"), SubResource("economical_strokes"), SubResource("art_focus"), SubResource("counter_mastery"), SubResource("forceful_impact")]
+perks = [SubResource("battle_conditioning"), SubResource("economical_strokes"), SubResource("art_focus"), SubResource("counter_mastery"), SubResource("forceful_impact"), SubResource("coating_care"), SubResource("elemental_finisher")]

@@ -112,7 +112,8 @@ func commit() -> bool:
 	if profile.kind==ItemUseDefinition.Kind.COATING:
 		var weapon:=context.items.item(weapon_uid)
 		if not weapon: transaction.rollback(); cancel("主手武器已改变，涂附中断"); return false
-		var props:=weapon.properties.duplicate(true); props.coating={"id":profile.id,"expires_at":context.items.clock_seconds+profile.coating_seconds}
+		var duration:=profile.coating_seconds*clampf(1+ActorProgression.modifier(context.actor,"coating.duration"),.5,2)
+		var props:=weapon.properties.duplicate(true); props.coating={"id":profile.id,"expires_at":context.items.clock_seconds+duration}
 		context.items.set_properties(weapon_uid,props)
 	elif profile.kind==ItemUseDefinition.Kind.CONSUMABLE:
 		var buffs:=context.actor.get_node("BuffManager") as BuffManager

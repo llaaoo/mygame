@@ -13,8 +13,9 @@ const XP_BUFF_BASE: float = 10.0
 const XP_SUMMON_BASE: float = 15.0
 const XP_CHANNEL_TICK: float = 2.0
 const XP_KILL_BONUS: float = 5.0
-const MODIFIER_KEYS := ["buff.duration.all", "buff.ice_armor.duration", "carry.maximum", "combat.counter_damage", "combat.impact", "cooldown.dash", "craft.ammunition", "damage.all", "damage.fire", "damage.ice", "damage.lightning", "damage.shadow", "harvest.herbs", "mana_cost.all", "mana_cost.fire", "mana_cost.ice", "mana_cost.shadow", "rest.fatigue", "salvage.scrap", "stamina.art", "stamina.attack", "stamina.dodge", "stamina.guard", "stamina.guarding_regen", "stamina.maximum", "stamina.regeneration", "stamina.sprint", "status.burning_duration", "status.frozen_duration", "status.poison_duration", "summon.damage_multiplier", "summon.duration_multiplier", "summon.hp_multiplier", "summon.max_count", "survival.fed_regen", "survival.needs", "upgrade.coin_discount", "work.duration"]
+const MODIFIER_KEYS := ["coating.duration", "enchantment.release_damage", "field.duration", "field.use_cost", "craft.alchemy", "harvest.anatomy", "cooldown.project", "cooldown.step", "buff.duration.all", "buff.ice_armor.duration", "carry.maximum", "combat.counter_damage", "combat.impact", "cooldown.dash", "craft.ammunition", "damage.all", "damage.fire", "damage.ice", "damage.lightning", "damage.shadow", "harvest.herbs", "mana_cost.all", "mana_cost.fire", "mana_cost.ice", "mana_cost.shadow", "rest.fatigue", "salvage.scrap", "stamina.art", "stamina.attack", "stamina.dodge", "stamina.guard", "stamina.guarding_regen", "stamina.maximum", "stamina.regeneration", "stamina.sprint", "status.burning_duration", "status.frozen_duration", "status.poison_duration", "summon.damage_multiplier", "summon.duration_multiplier", "summon.hp_multiplier", "summon.max_count", "survival.fed_regen", "survival.needs", "upgrade.coin_discount", "work.duration"]
 const ICE_ARMOR_NAME := "ice_armor"
+const ACTIVE_ORDER := [SkillMastery.School.MELEE,SkillMastery.School.DEFENSE,SkillMastery.School.CRAFTING,SkillMastery.School.SURVIVAL,SkillMastery.School.DESTRUCTION,SkillMastery.School.ALTERATION]
 const TREE_RESOURCE_PATHS := {
 	SkillMastery.School.DESTRUCTION: "res://gameplay/abilities/data/trees/destruction_tree.tres",
 	SkillMastery.School.CONJURATION: "res://gameplay/abilities/data/trees/conjuration_tree.tres",
@@ -78,7 +79,28 @@ func get_all_masteries() -> Array[SkillMastery]:
 func get_perks_for_school(school: SkillMastery.School) -> Array[SkillPerkData]:
 	var result: Array[SkillPerkData] = []
 	for perk in _trees.get(school, []):
-		result.append(perk as SkillPerkData)
+		if not perk.legacy_only: result.append(perk as SkillPerkData)
+	return result
+
+func get_active_schools() -> Array[int]:
+	var result: Array[int]=[]
+	for school in ACTIVE_ORDER:
+		if not get_perks_for_school(school).is_empty(): result.append(school)
+	return result
+
+func get_branch_mastery(school: int) -> SkillMastery:
+	var result:=get_mastery(school)
+	var tree:=get_tree_data(school)
+	if tree:
+		for source in tree.practice_schools:
+			var candidate:=get_mastery(source)
+			if candidate and (not result or candidate.level>result.level or candidate.level==result.level and candidate.get_progress()>result.get_progress()): result=candidate
+	return result
+
+func get_legacy_perks() -> Array[SkillPerkData]:
+	var result: Array[SkillPerkData]=[]
+	for perk: SkillPerkData in _perk_catalog.values():
+		if perk.legacy_only and has_perk(perk.perk_id): result.append(perk)
 	return result
 
 
@@ -93,7 +115,7 @@ func get_spells_for_school(school: SkillMastery.School) -> Array[SkillData]:
 		return result
 	for skill in player.skill_manager.pool.skills:
 		if skill and player.skill_manager.material_operations and SpellOperationCatalog.default_catalog().canonical(skill.get_id())!=skill.get_id(): continue
-		if skill and skill.school == school:
+		if skill and (skill.get_id() in get_tree_data(school).skill_ids if not get_tree_data(school).skill_ids.is_empty() else skill.school == school):
 			result.append(skill)
 	result.sort_custom(func(a: SkillData, b: SkillData):
 		if a.tier == b.tier:
@@ -141,9 +163,16 @@ func unlock_reason(perk_id: String) -> String:
 	var perk:=_find_perk(perk_id)
 	if not perk: return "未知Perk"
 	if has_perk(perk_id): return "已学习"
+	if perk.legacy_only: return "旧传承仅保留已学内容，请选择当前成长路线"
 	if _owner_entity and _owner_entity.get_node("HealthComponent").is_dead: return "死亡时无法学习"
+	if perk.requires_awakening:
+		var mana:=_owner_entity.get_node_or_null("ManaComponent") as ManaComponent if _owner_entity else null
+		if not mana or not mana.magic_state.awakened: return "需要先经历觉醒；Perk不能赋予魔力"
+	for key in perk.required_knowledge:
+		var context: ActorContext=_owner_entity.actor_context if _owner_entity and "actor_context" in _owner_entity else null
+		if not context or not context.learning_query or not context.learning_query.knows(key): return "先掌握："+knowledge_title(key)
 	if get_character_level()<perk.required_character_level: return "需要角色等级%d"%perk.required_character_level
-	var mastery:=get_mastery(perk.school)
+	var mastery:=get_branch_mastery(perk.school)
 	if not mastery or mastery.level<perk.required_level: return "需要分支熟练度%d"%perk.required_level
 	for key in perk.required_attributes:
 		if not _stats() or int(_stats().get(key))<int(perk.required_attributes[key]): return "需要基础%s%d"%[StatsComponent.primary_title(key),perk.required_attributes[key]]
@@ -327,6 +356,8 @@ func _recompute_totals() -> void:
 
 
 func _guess_school(skill: SkillData) -> SkillMastery.School:
+	if skill.operation_id in ["inscribe","attune","shape","extract","sustain"]: return SkillMastery.School.ALTERATION
+	if not skill.operation_id.is_empty(): return SkillMastery.School.DESTRUCTION
 	return skill.school
 
 
@@ -359,9 +390,24 @@ func activity_efficiency(school: SkillMastery.School) -> float:
 
 func requirement_text(perk: SkillPerkData) -> String:
 	var parts:=PackedStringArray(["角色%d级"%perk.required_character_level,"分支熟练度%d"%perk.required_level,"花费%d点"%perk.cost])
+	if perk.requires_awakening: parts.append("已经觉醒")
+	for key in perk.required_knowledge: parts.append("掌握："+knowledge_title(key))
 	for key in perk.required_attributes: parts.append("基础%s%d"%[StatsComponent.primary_title(key),perk.required_attributes[key]])
 	for id in perk.prerequisite_ids: parts.append("前置："+_find_perk(id).display_name)
 	return " · ".join(parts)
+
+static func knowledge_title(key: String) -> String:
+	var fieldcraft:=FieldcraftCatalog.default_catalog().skill(key)
+	if fieldcraft: return fieldcraft.title
+	for operation in SpellOperationCatalog.default_catalog().operations:
+		if operation.action.get_id()==key: return operation.action.display_name
+	var technique:=MartialArts.definition(key)
+	if technique: return technique.title
+	var recipe:=CraftingCatalog.default_catalog().definition(key)
+	if recipe:
+		var item:=ItemCatalog.default_catalog().definition(recipe.output_id)
+		return recipe.title if not recipe.title.is_empty() else item.display_name if item else recipe.id
+	return key
 
 static func definitions() -> Dictionary:
 	var result: Dictionary={}
@@ -408,17 +454,29 @@ static func validate_catalog() -> Array[String]:
 	for school in TREE_RESOURCE_PATHS:
 		var tree:=load(TREE_RESOURCE_PATHS[school]) as SkillTreeData
 		if not tree or tree.school!=school or tree.perks.is_empty(): errors.append("Invalid perk tree"); continue
+		var occupied: Dictionary={}
+		for source in tree.practice_schools:
+			if source not in TREE_RESOURCE_PATHS: errors.append("Invalid practice source")
 		for raw in tree.perks:
 			var perk:=raw as SkillPerkData
 			if not perk or perk.perk_id.is_empty() or catalog.has(perk.perk_id) or perk.school!=school: errors.append("Invalid/duplicate perk"); continue
 			catalog[perk.perk_id]=perk
+			if not perk.legacy_only:
+				var cell:=Vector2i(perk.column,perk.row)
+				if occupied.has(cell) or school not in ACTIVE_ORDER: errors.append("Invalid/overlapping active perk: "+perk.perk_id)
+				occupied[cell]=true
+			for key in perk.required_knowledge:
+				if knowledge_title(key)==key: errors.append("Unknown perk knowledge: "+key)
 			if perk.display_name.is_empty() or perk.cost<1 or perk.cost>9 or perk.required_level<1 or perk.required_level>100 or perk.required_character_level<1 or perk.required_character_level>100 or not StatsComponent.valid_requirements(perk.required_attributes) or perk.row<0 or perk.row>20 or perk.column<0 or perk.column>6: errors.append("Invalid perk requirements: "+perk.perk_id)
 			if perk.grants_trigger() or perk.modifier_bonuses.is_empty(): errors.append("Perk requires an implemented, cost-respecting effect: "+perk.perk_id)
 			for key in perk.modifier_bonuses:
 				if key not in MODIFIER_KEYS: errors.append("Unsupported perk effect: "+str(key))
 				var value: Variant=perk.modifier_bonuses[key]
 				if typeof(value) not in [TYPE_FLOAT,TYPE_INT] or not is_finite(float(value)): errors.append("Invalid perk modifier")
-	for id in catalog: _visit_perk(id,catalog,[],errors)
+	for id in catalog:
+		_visit_perk(id,catalog,[],errors)
+		for required in catalog[id].prerequisite_ids:
+			if not catalog[id].legacy_only and catalog.has(required) and catalog[required].legacy_only: errors.append("Active perk requires retired purchase: "+id)
 	return errors
 
 static func _visit_perk(id: String,catalog: Dictionary,path: Array[String],errors: Array[String]) -> void:

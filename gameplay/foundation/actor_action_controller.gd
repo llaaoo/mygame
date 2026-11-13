@@ -609,7 +609,7 @@ func contact(target: Node2D) -> HitResult:
 	if _enchantment:
 		tags.append_array(_enchantment.tags)
 		skill.weapon_enchantment=_enchantment
-		skill.enchantment_bonus=_enchantment.release_damage if _release_technique else _enchantment.bonus_damage
+		skill.enchantment_bonus=_enchantment.release_value(context.actor) if _release_technique else _enchantment.bonus_damage
 		skill.enchantment_buildup=_enchantment.release_buildup if _release_technique else _enchantment.buildup
 	skill.tags=tags
 	var damage:=ActorCombatModel.weapon_damage(context.actor,profile)

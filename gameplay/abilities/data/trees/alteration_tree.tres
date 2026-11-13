@@ -6,6 +6,7 @@
 [sub_resource type="Resource" id="Perk_GuardedSkin"]
 script = ExtResource("2_perk")
 perk_id = "alteration_guarded_skin"
+legacy_only = true
 row = 0
 column = 1
 school = 3
@@ -19,6 +20,7 @@ modifier_bonuses = {
 [sub_resource type="Resource" id="Perk_Shatter"]
 script = ExtResource("2_perk")
 perk_id = "alteration_shatter"
+legacy_only = true
 row = 1
 column = 1
 school = 3
@@ -34,6 +36,7 @@ trigger_required_buff_name = "ice_armor"
 [sub_resource type="Resource" id="Perk_StoneStride"]
 script = ExtResource("2_perk")
 perk_id = "alteration_stone_stride"
+legacy_only = true
 row = 2
 column = 1
 school = 3
@@ -48,6 +51,7 @@ modifier_bonuses = {
 [sub_resource type="Resource" id="Perk_FrozenEdge"]
 script = ExtResource("2_perk")
 perk_id = "alteration_frozen_edge"
+legacy_only = true
 row = 3
 column = 1
 school = 3
@@ -59,12 +63,126 @@ modifier_bonuses = {
 "damage.ice": 0.15
 }
 
+[sub_resource type="Resource" id="sigil_foundations"]
+script = ExtResource("2_perk")
+perk_id = "sigil_foundations"
+school = 3
+display_name = "稳固铭阵"
+description = "新铭刻法阵的初始存续延长20%；自然流逝与每次触发消耗继续结算。"
+required_level = 1
+required_character_level = 2
+required_attributes = {}
+prerequisite_ids = Array[String]([])
+modifier_bonuses = {"field.duration": 0.2}
+column = 1
+row = 0
+requires_awakening = true
+required_knowledge = Array[String](["inscribe"])
+
+[sub_resource type="Resource" id="sigil_economy"]
+script = ExtResource("2_perk")
+perk_id = "sigil_economy"
+school = 3
+display_name = "阵能整流"
+description = "新法阵每次组合消耗的存续时间降低15%；材料和法力照常支付。"
+required_level = 3
+required_character_level = 3
+required_attributes = {"intelligence": 12}
+prerequisite_ids = Array[String](["sigil_foundations"])
+modifier_bonuses = {"field.use_cost": -0.15}
+column = 0
+row = 1
+requires_awakening = true
+required_knowledge = Array[String](["inscribe"])
+
+[sub_resource type="Resource" id="attunement_lore"]
+script = ExtResource("2_perk")
+perk_id = "attunement_lore"
+school = 3
+display_name = "调谐稳持"
+description = "法术施加的个人增益持续时间延长20%；不延长食品、药剂或已经存在的状态。"
+required_level = 3
+required_character_level = 3
+required_attributes = {"intelligence": 12}
+prerequisite_ids = Array[String](["sigil_foundations"])
+modifier_bonuses = {"buff.duration.all": 0.2}
+column = 2
+row = 1
+requires_awakening = true
+required_knowledge = Array[String](["focus"])
+
+[sub_resource type="Resource" id="sigil_reservoir"]
+script = ExtResource("2_perk")
+perk_id = "sigil_reservoir"
+school = 3
+display_name = "阵纹续存"
+description = "新法阵初始存续再延长15%；收回、替换与离区仍遵循原规则。"
+required_level = 6
+required_character_level = 5
+required_attributes = {"intelligence": 14}
+prerequisite_ids = Array[String](["sigil_economy"])
+modifier_bonuses = {"field.duration": 0.15}
+column = 0
+row = 2
+requires_awakening = true
+required_knowledge = Array[String](["inscribe"])
+
+[sub_resource type="Resource" id="boon_economy"]
+script = ExtResource("2_perk")
+perk_id = "boon_economy"
+school = 3
+display_name = "调谐节能"
+description = "实际法术总耗魔降低5%；调谐不会代替布阵或自动取得恩赐。"
+required_level = 6
+required_character_level = 5
+required_attributes = {"intelligence": 14}
+prerequisite_ids = Array[String](["attunement_lore"])
+modifier_bonuses = {"mana_cost.all": -0.05}
+column = 2
+row = 2
+requires_awakening = true
+required_knowledge = Array[String](["focus"])
+
+[sub_resource type="Resource" id="construct_care"]
+script = ExtResource("2_perk")
+perk_id = "construct_care"
+school = 3
+display_name = "塑形维系"
+description = "塑形产生的召唤物生命、存续各提高20%；临时存在且不会留下永久物资。"
+required_level = 8
+required_character_level = 7
+required_attributes = {"intelligence": 14}
+prerequisite_ids = Array[String](["sigil_reservoir"])
+modifier_bonuses = {"summon.hp_multiplier": 0.2, "summon.duration_multiplier": 0.2}
+column = 0
+row = 3
+requires_awakening = true
+required_knowledge = Array[String](["shape"])
+
+[sub_resource type="Resource" id="echo_binding"]
+script = ExtResource("2_perk")
+perk_id = "echo_binding"
+school = 3
+display_name = "回响整持"
+description = "召唤物伤害提高15%，法术个人增益再延长10%；汲取仍须有真实能量来源。"
+required_level = 8
+required_character_level = 7
+required_attributes = {"intelligence": 14}
+prerequisite_ids = Array[String](["boon_economy"])
+modifier_bonuses = {"summon.damage_multiplier": 0.15, "buff.duration.all": 0.1}
+column = 2
+row = 3
+requires_awakening = true
+required_knowledge = Array[String](["soul_harvest"])
+
 [resource]
 script = ExtResource("1_tree")
 tree_id = "alteration"
-display_name = "变化学派"
-description = "以冰霜塑形、护盾和奥术位移控制战场，擅长冻结后再由火焰融解。"
+display_name = "铭阵与调谐"
+description = "铭阵、调谐、塑形、汲取与维持的实践取最高熟练度；学习改进技艺，不授予觉醒、公式或永久物资。"
 school = 3
 accent_color = Color(0.38, 0.68, 0.95, 1)
-skill_ids = ["frost_lance", "glacial_orb", "ice_armor", "ice_storm", "ice_explosion", "blizzard", "arcane_dash"]
-perks = [SubResource("Perk_GuardedSkin"), SubResource("Perk_Shatter"), SubResource("Perk_StoneStride"), SubResource("Perk_FrozenEdge")]
+skill_ids = ["inscribe", "focus", "shape", "soul_harvest", "sustain"]
+perks = [SubResource("Perk_GuardedSkin"), SubResource("Perk_Shatter"), SubResource("Perk_StoneStride"), SubResource("Perk_FrozenEdge"), SubResource("sigil_foundations"), SubResource("sigil_economy"), SubResource("attunement_lore"), SubResource("sigil_reservoir"), SubResource("boon_economy"), SubResource("construct_care"), SubResource("echo_binding")]
+
+practice_schools = Array[int]([0, 1, 2, 3])

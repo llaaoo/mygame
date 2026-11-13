@@ -25,7 +25,7 @@ func _physics_process(delta: float) -> void:
 			skill.requires_magic=false
 			if enchantment:
 				skill.weapon_enchantment=enchantment
-				skill.enchantment_bonus=enchantment.release_damage if release_technique else enchantment.bonus_damage
+				skill.enchantment_bonus=enchantment.release_value(context.actor) if release_technique else enchantment.bonus_damage
 				skill.enchantment_buildup=enchantment.release_buildup if release_technique else enchantment.buildup
 			var result:=CombatExecutor.report_hit(context.actor,target,damage,hit.position,skill,skill.tags,family,profile.impact,profile,Vector2(hit.position)-direction*8)
 			if is_instance_valid(context.actions): context.actions.confirm_weapon_hit(family,result,target)
