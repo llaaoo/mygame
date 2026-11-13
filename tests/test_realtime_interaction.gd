@@ -171,8 +171,8 @@ func run() -> void:
  await capture("04-ground-drop")
  await key(KEY_ESCAPE,true); await key(KEY_ESCAPE,false)
  await key(KEY_F,true); await key(KEY_F,false)
- check(screen.visible and screen.ground_id==ground and not paused,"F did not open nearby ground loot in real time")
- await item_click(water); await click("尽量取走这一叠"); await frames(12)
+ check(is_instance_valid(game.ui.modal) and game.ui.modal.get_meta("quick_ground","")==ground and actor.ui_blocked and not paused,"F did not open the same nearby ground source in real time")
+ await click_identity({"ui_action":"quick_take","item_uid":water}); await frames(12)
  check(store.locate(water)=="player.pocket" and int(store.item(water).properties.doses)==3,"Mouse pickup replaced/refilled the unspent bottle")
  await key(KEY_ESCAPE,true); await key(KEY_ESCAPE,false)
  # Observe a real authored guard with normal AI attack through an open inventory.

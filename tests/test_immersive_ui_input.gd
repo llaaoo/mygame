@@ -22,7 +22,13 @@ func run() -> void:
   var before_scroll:=reading.scroll_vertical
   var overflowing:=reading.get_v_scroll_bar().max_value>reading.size.y+1
   if extent.y==540: verify(overflowing,"The small-window fixture no longer exercises overflow reading")
-  await pointer_button(MOUSE_BUTTON_WHEEL_DOWN,true); await pointer_button(MOUSE_BUTTON_WHEEL_DOWN,false); await frames(4)
+  # Explicit target coordinates: push_input clicks do not set Input's native
+  # cursor on headless displays; the wheel must still address the reading area.
+  for held in [true,false]:
+   var wheel:=InputEventMouseButton.new(); wheel.button_index=MOUSE_BUTTON_WHEEL_DOWN; wheel.pressed=held
+   wheel.position=root.get_screen_transform()*reading.get_global_rect().get_center(); wheel.global_position=wheel.position
+   Input.parse_input_event(wheel); Input.flush_buffered_events(); await frames(1)
+  await frames(4)
   verify(reading.scroll_vertical>before_scroll if overflowing else reading.scroll_vertical==0,"Mouse wheel cannot scroll overflow or shifts fully visible reading")
   await capture("reading-"+str(extent.x))
  await tap(KEY_TAB)
