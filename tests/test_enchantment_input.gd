@@ -27,6 +27,8 @@ func run() -> void:
 	var mp:=actor.mana_component.mp
 	await key(KEY_Q,true); await key(KEY_Q,false); await create_timer(1.3).timeout
 	check(stock.coating(uid)!=null and stock.count("player","fire_rag")==0,"Real Q did not coat the actual weapon")
+	var prompt:=game.frontier_hud.interact.get_parent() as Control
+	check(not prompt.is_visible_in_tree() or not prompt.get_global_rect().has_point(root.get_canvas_transform()*target.position),"Nearby interaction captures the close-range enemy aim point")
 	await swing(); await create_timer(.9).timeout
 	var buffs:=target.get_node("BuffManager") as BuffManager
 	check(not buffs.has_buff("burning") and buffs.buildup.snapshot().has("flame"),"First actual LMB did not leave partial fire buildup")
@@ -52,6 +54,7 @@ func run() -> void:
 	foe.position=base+Vector2(210,0); foe._home_position=foe.position; foe.process_mode=Node.PROCESS_MODE_INHERIT
 	var hp:=foe.health_component.hp
 	await frames(4); await aim_at(foe.position)
+	check(not prompt.is_visible_in_tree() or not prompt.get_global_rect().has_point(root.get_canvas_transform()*foe.position),"Nearby interaction captures the ranged technique aim point")
 	await key(KEY_CTRL,true); await key(KEY_SHIFT,true); await pointer_button(MOUSE_BUTTON_LEFT,true); await pointer_button(MOUSE_BUTTON_LEFT,false)
 	check(actor.actor_context.actions.mode=="attack" and stock.coating(uid)!=null,"Ctrl+Shift+LMB did not preserve coating during its windup")
 	await capture("enchantment-wave-warning")

@@ -37,9 +37,9 @@ func _ready() -> void:
 	time_label.offset_top=4; time_label.offset_bottom=24
 	root.add_child(time_label)
 	var prompt:=PanelContainer.new()
-	prompt.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
-	prompt.offset_left=-210
-	prompt.offset_right=210
+	prompt.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
+	prompt.offset_left=-326
+	prompt.offset_right=-18
 	prompt.offset_top=-188
 	prompt.offset_bottom=-148
 	prompt.visible=false
@@ -94,9 +94,15 @@ func _process(delta: float) -> void:
 func _layout_prompt() -> void:
 	var prompt:=interact.get_parent() as Control
 	var viewport:=get_viewport().get_visible_rect().size
-	var bottom:=viewport.y-148.0
+	# Mouse interaction belongs beside the bottom HUD, outside combat aiming.
+	# Moving it above spell details alone can put it directly over an enemy.
+	var width:=minf(260,viewport.x*.23)
+	var bottom:=viewport.y-100.0
 	var hud:=game.get_node_or_null("HUDLayer")
-	if hud and hud.skill_bar and hud.skill_bar._hint_panel.is_visible_in_tree(): bottom=minf(bottom,hud.skill_bar._hint_panel.global_position.y-10)
+	if hud and hud.skill_bar and hud.skill_bar._hint_panel.is_visible_in_tree():
+		width=minf(width,viewport.x-18-hud.skill_bar._hint_panel.get_global_rect().end.x-12)
+	prompt.offset_right=-18
+	prompt.offset_left=-18-maxf(100,width)
 	prompt.grow_vertical=Control.GROW_DIRECTION_BEGIN
 	prompt.offset_bottom=bottom-viewport.y
 	prompt.offset_top=prompt.offset_bottom-maxf(40,prompt.get_combined_minimum_size().y)
