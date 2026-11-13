@@ -72,6 +72,38 @@ modifier_bonuses = {"stamina.maximum": 20, "stamina.regeneration": 2}
 column = 2
 row = 2
 
+[sub_resource type="Resource" id="travelling_breath"]
+script = ExtResource("perk")
+perk_id = "travelling_breath"
+school = 6
+display_name = "行进调息"
+description = "冲刺再省10%体力、闪避再省5%；仍须手动移动与闪避。"
+required_level = 8
+required_character_level = 7
+required_attributes = {"endurance": 14}
+prerequisite_ids = Array[String](["road_runner"])
+modifier_bonuses = {"stamina.sprint": -0.1, "stamina.dodge": -0.05}
+column = 0
+row = 3
+requires_awakening = false
+required_knowledge = Array[String]([])
+
+[sub_resource type="Resource" id="settled_guard"]
+script = ExtResource("perk")
+perk_id = "settled_guard"
+school = 6
+display_name = "稳盾卸压"
+description = "格挡体力再省8%，格挡回气比例再加10%；消耗后的回复延迟保留。"
+required_level = 8
+required_character_level = 7
+required_attributes = {"endurance": 14}
+prerequisite_ids = Array[String](["deep_reserve"])
+modifier_bonuses = {"stamina.guard": -0.08, "stamina.guarding_regen": 0.1}
+column = 2
+row = 3
+requires_awakening = false
+required_knowledge = Array[String]([])
+
 [resource]
 script = ExtResource("tree")
 tree_id = "defense"
@@ -79,4 +111,4 @@ display_name = "防御与机动"
 description = "有效防御积累经验；闪避和防御仍保留动作承诺。"
 school = 6
 accent_color = Color(0.72,0.61,0.35,1)
-perks = [SubResource("steadfast_guard"), SubResource("light_step"), SubResource("guarded_breath"), SubResource("road_runner"), SubResource("deep_reserve")]
+perks = [SubResource("steadfast_guard"), SubResource("light_step"), SubResource("guarded_breath"), SubResource("road_runner"), SubResource("deep_reserve"), SubResource("travelling_breath"), SubResource("settled_guard")]

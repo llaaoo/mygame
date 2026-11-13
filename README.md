@@ -1,5 +1,7 @@
 # 灰河谷 · 2D 开放区域与现场组合冒险
 
+当前成长路线与兼容规则见[灰河谷Perk路线](docs/PERK_ROUTES.md)。
+
 [轻量交互与物品样本](docs/IMMERSIVE_INSPECTION_AND_FEEDBACK.md)：现场阅读、遗骸与地上物品使用侧边抽屉，保留完整整理入口；区分异常积累、生效状态、武器涂层与法阵余能。16件常用物品接入插画和小图，真实穿戴、遗骸与地面继续读取同一实物。
 
 [HUD 与 UI 重构设计 v1.2](docs/UI_SYSTEM_DESIGN.md)：十三视图交互原型，含统一行囊、纸娃娃、战斗选材，以及配装取舍、整备缺项、UID收藏/批量待售、情境HUD和线索来源。已落实[七款成熟作品对标](docs/UI_AAA_BENCHMARK.md)的原型改进，浏览器两组234项通过；[运行与证据](docs/design/ui-system/README.md)。第一批已[接入Godot正式操作路径](docs/UI_GODOT_IMPLEMENTATION.md)：统一13槽、当前来源、固定行囊操作、原位绑定与实时返回；其他原型视图继续分批迁移。 [下载离线交互原型](https://github.com/llaaoo/mygame/raw/refs/heads/main/docs/design/ui-system/downloads/grayriver-ui-v1.2.zip)，解压双击HTML即可；云端localhost链接不能在本机直接访问。

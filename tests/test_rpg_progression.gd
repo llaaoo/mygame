@@ -11,8 +11,10 @@ func run() -> void:
  var fixture:=Fixture.new(self); var game: GrayriverGame=await fixture.boot(true,true)
  var actor:=game.player; var stats:=actor.stats_component; var manager:=actor.mastery_manager
  var store:=game.session.inventory; var actions:=actor.actor_context.actions
- check(manager.definitions().size()==40 and manager.validate_catalog().is_empty(),"Perk resources are missing, malformed, untyped or cyclic")
+ check(manager.definitions().size()==62 and manager.validate_catalog().is_empty(),"Perk resources are missing, malformed, untyped or cyclic")
  check(manager.get_character_level()==stats.level and manager.get_available_perk_points()==0,"Fresh character has a duplicate level or free perk budget")
+ check(manager.get_active_schools()==[5,6,7,8,0,3] and manager.get_active_schools().all(func(school):return manager.get_perks_for_school(school).size()==7),"Current routes were not consolidated into six complete seven-node branches")
+ check(not manager.can_unlock_perk("destruction_scorch") and manager.unlock_reason("spell_discipline").contains("觉醒"),"Legacy nodes remain purchasable or ordinary growth bypasses awakening")
  actions.stamina.current=60; stats.attribute_points=1
  check(stats.spend_attribute_point("endurance") and actions.stamina.maximum==102 and actions.stamina.current==60,"Endurance investment failed to change stamina immediately or refilled it")
  var buffs:=actor.get_node("BuffManager") as BuffManager
@@ -120,9 +122,9 @@ func run() -> void:
   game.survival.inspect(station,spec)
   check(not actor.field_work.start_selected(),"Exhausted resource point could be farmed again immediately")
   actor.field_work.close_panel()
- # Original spell nodes now load as real typed Resources and enter shared fee/status rules.
+ # Current operation routes replace the old spell-specific purchase entry.
  manager.on_deal_damage(SkillMastery.School.DESTRUCTION,5000)
- learn(manager,"destruction_scorch"); learn(manager,"destruction_firestorm")
+ learn(manager,"spell_discipline")
  store.receive_into("player.pocket","fire_stone",1)
  actor.skill_manager.shortcuts.set_selection("left",{"payload":"ember","modifier":"","uid":""})
  var plan:=actor.skill_manager.preview_source("left")
@@ -143,11 +145,90 @@ func run() -> void:
  var no_rewards:=manager.serialize_state(); manager.record_activity("recipe_crafted",1000)
  check(manager.serialize_state()==no_rewards,"No-reward rehearsal granted progression")
  actor.actor_context.reward_eligible=true
+ # Additional earned-XP fixture funds the added routes; spending still uses the sole real budget.
+ while manager.get_available_perk_points()<12:
+  CombatExecutor.report_exp_bonus(actor,maxi(1,stats.exp_to_next-stats.experience))
+ # Additional route consumers: source-bound field budget, physical coating, batch manufacture and finite professional harvest.
+ var existing_field:=actor.skill_manager.combinations.field
+ var existing_life:=existing_field.remaining
+ learn(manager,"sigil_foundations"); learn(manager,"sigil_economy")
+ check(existing_field.remaining==existing_life,"Buying field perks retroactively refilled an existing field")
+ var field_plan:=actor.skill_manager.preview_source("left")
+ # The prior stone was spent: explicitly choose the known material-free rune, never auto-substitute.
+ actor.skill_manager.shortcuts.set_selection("left",{"payload":"arcane","modifier":"","uid":""})
+ field_plan=actor.skill_manager.preview_source("left")
+ var budget:=field_plan.field_budget()
+ check(is_equal_approx(budget.duration,144) and is_equal_approx(budget.use_seconds,34),"Field perk preview did not derive 120x1.2 and 40x.85")
+ actor.skill_manager.combinations.tick(10)
+ check(actor.skill_manager.use_source("left",actor,CastContext.simple(actor,Vector2.RIGHT,rune)),"Qualified perk rune refused")
+ actor.skill_manager.combinations.tick(1)
+ var sigil:=actor.skill_manager.combinations.field
+ check(is_equal_approx(sigil.initial_duration,144) and is_equal_approx(sigil.use_seconds,34),"Actual rune disagreed with field-budget preview")
+ var life:=sigil.remaining
+ check(sigil.consume(actor,sigil.revision,77777) and is_equal_approx(sigil.remaining,life-34),"Combination did not consume the perk-adjusted real field energy")
+ learn(manager,"coating_care"); learn(manager,"elemental_finisher")
+ learn(manager,"workshop_rhythm"); learn(manager,"coating_workflow"); learn(manager,"alchemical_batch")
+ supplies.known_recipes.fire_rag=true
+ store.receive("player","resin",2); store.receive("player","charcoal",2); store.receive("player","cloth",2)
+ var before_rags:=store.count("player","fire_rag"); var before_resin:=store.count("player","resin")
+ check(supplies.craft("fire_rag") and store.count("player","fire_rag")==before_rags+2 and store.count("player","resin")==before_resin-1,"Alchemy batch did not agree with real full-input/two-output transaction")
+ check(supplies.recycle_preview("fire_rag").is_empty(),"Bonus consumables can be reversed into a lossless resource/practice loop")
+ store.receive("player","river_staff",1); var coated_uid:=store.find_owned("player","river_staff")
+ store.equip("player",coated_uid)
+ var rag_uid:=store.find_owned("player","fire_rag")
+ if store.locate(rag_uid)!="player.pocket": game.inventory_actions.transfer(rag_uid,"player.pocket",1)
+ actions.cancel(); actions.stamina.current=100
+ var use:=actor.actor_context.item_actions; use.set_physics_process(false)
+ check(use.begin("fire_rag"),"Qualified physical coating refused")
+ use.advance(2)
+ var coating:=store.coating_state(coated_uid)
+ check(not coating.is_empty() and is_equal_approx(coating.expires_at-store.clock_seconds,84),"New UID coating did not include both maintenance perks")
+ check(WeaponEnchantment.definition("flame").release_value(actor)==21 and WeaponEnchantment.definition("flame").release_damage==18,"Release perk missed the actual common query or mutated shared chemistry")
+ # An actual manual technique releases the same real coating into a travelling wave.
+ actor.position=Vector2(-4000,800); foe.position=actor.position+Vector2(210,0)
+ # Keep collision registered for the travelling-wave query; only the static
+ # target's decisions are frozen, rather than disabling its whole physics body.
+ foe.process_mode=Node.PROCESS_MODE_INHERIT; foe.set_process(false); foe.set_physics_process(false)
+ foe.state_chart.process_mode=Node.PROCESS_MODE_DISABLED; foe.get_node("ActorComponents").process_mode=Node.PROCESS_MODE_DISABLED
+ for i in range(3): await physics_frame
+ var wave_hp:=foe.health_component.hp; var wave_mp:=actor.mana_component.mp
+ actor.actor_context.martial.learn("staff_sweep")
+ actions.cancel(); actions.stamina.current=100
+ var release:=Action.new(); release.action_type=Action.ActionType.TECHNIQUE; release.skill_id="staff_sweep"; release.direction=Vector2.RIGHT; release.params={"release_enchantment":true}
+ check(actions.try_action(release).accepted,"Qualified element technique refused its real coating")
+ actions.advance(.6)
+ for i in range(40): await physics_frame
+ print("PERK_WAVE ",JSON.stringify({"before":wave_hp,"after":foe.health_component.hp,"expected":ActorCombatModel.incoming_damage(foe,21),"coating":store.coating_state(coated_uid),"mp_before":wave_mp,"mp_after":actor.mana_component.mp,"position":foe.position,"mode":actions.mode}))
+ check(store.coating(coated_uid)==null and actor.mana_component.mp==wave_mp and wave_hp-foe.health_component.hp==ActorCombatModel.incoming_damage(foe,21),"Actual wave did not apply the perk damage once, consume its coating or preserve MP")
+ coating=store.coating_state(coated_uid)
+ check(not manager.can_unlock_perk("projection_rhythm") and manager.unlock_reason("projection_rhythm").contains("先掌握"),"Route perk granted unavailable operation knowledge")
+ game.progress.actions.project=true; game._apply_knowledge(); learn(manager,"projection_rhythm")
+ check(is_equal_approx(CastCostPolicy.cooldown(SpellOperationCatalog.default_catalog().operation("project").action,actor,5),4.25),"Operation-specific rhythm missed the actual cooldown policy")
+ var before_hunter:=manager.serialize_state()
+ check(not manager.unlock_perk("careful_harvester") and manager.serialize_state()==before_hunter,"Hunter perk bypassed separate professional knowledge")
+ actor.actor_context.fieldcraft.learn("player","skinning")
+ learn(manager,"careful_harvester")
+ var hound_id:="river.enemy.camp.fieldcraft.hound.v1"
+ var hound: Enemy
+ for candidate in game.active_enemies:
+  if candidate.actor_context.id==hound_id: hound=candidate; break
+ check(hound!=null,"Original finite hound missing")
+ if hound:
+  actor.position=hound.position+Vector2(25,0); hound.take_damage(1000)
+  for i in range(3): await process_frame
+  var raw: Dictionary=store.entries(hound_id+".anatomy").filter(func(row):return row.definition=="raw_hide")[0]
+  var part: Dictionary=raw.properties.harvest.duplicate(true)
+  store.receive("player","field_knife",1); var knife:=store.find_owned("player","field_knife")
+  var hides:=store.count("player","beast_hide")
+  var expected:=store.anatomy_outputs("player",part)
+  check(expected.beast_hide==int(part.outputs.beast_hide)+1 and store.process_anatomy("player",hound_id,raw.uid,false).accepted and store.item(raw.uid)!=null,"Hunter preview mutated/deleted the real part")
+  check(game.loot.harvesting.complete(hound_id,raw.uid,part,knife) and store.item(raw.uid)==null and store.count("player","beast_hide")==hides+int(expected.beast_hide),"Qualified professional harvest disagreed with boosted preview")
+  check(not game.loot.harvesting.complete(hound_id,raw.uid,part,knife),"Hunter perk duplicated an already-consumed anatomical UID")
  var saved:=manager.serialize_state(); var points:=manager.get_available_perk_points()
  game._save_progress(); await fixture.close()
  fixture=Fixture.new(self); game=await fixture.boot(true,true)
  manager=game.player.mastery_manager
- check(manager.serialize_state()==saved and manager.get_available_perk_points()==points and game.session.inventory.item(weapon)==null,"Real re-entry lost purchases, granted points or restored dismantled gear")
+ check(manager.serialize_state()==saved and manager.get_available_perk_points()==points and game.session.inventory.item(weapon)==null and game.session.inventory.coating_state(coated_uid)==coating,"Real re-entry lost purchases, granted points or restored dismantled gear")
  var invalid:=saved.duplicate(true); invalid.unlocked_perks["5"].append("battle_conditioning")
  check(not SkillMasteryManager.valid_state(invalid),"Save accepted duplicate purchased nodes")
  invalid=saved.duplicate(true); invalid.unlocked_perks["5"].append("unknown.perk")
@@ -161,7 +242,7 @@ func run() -> void:
  var old:=SkillMasteryManager.new(); owner.add_child(old); old.setup(owner)
  var legacy: Dictionary={"masteries":{"0":{"level":5,"xp":0.0,"xp_to_next":45.0,"perk_points":2}},"unlocked_perks":{"0":["destruction_scorch"]}}
  old.restore_state(legacy)
- check(old.get_available_perk_points()==2 and old.get_character_level()==1 and old.has_perk("destruction_scorch"),"Legacy migration erased points/knowledge or fabricated actor levels")
+ check(old.get_available_perk_points()==2 and old.get_character_level()==1 and old.has_perk("destruction_scorch") and old.get_legacy_perks().size()==1 and is_equal_approx(old.get_modifier_value("damage.fire"),.15) and not old.can_unlock_perk("destruction_firestorm"),"Legacy migration erased points/knowledge or fabricated actor levels")
  var migrated:=old.serialize_state(); old.restore_state(migrated)
  check(old.serialize_state()==migrated and old.get_available_perk_points()==2,"Repeated restoration duplicated legacy credit")
  owner.queue_free()

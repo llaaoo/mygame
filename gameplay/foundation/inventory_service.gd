@@ -702,6 +702,12 @@ func dismantle_instance(actor: String,uid: String) -> OperationResult:
 	_publish("equipment_dismantled",actor,{"uid":uid,"scrap":amount})
 	return OperationResult.success(amount)
 
+func anatomy_outputs(actor: String,part: Dictionary) -> Dictionary:
+	var result: Dictionary=part.outputs.duplicate(true)
+	var bonus:=clampi(int(perk_value(actor,"harvest.anatomy")),0,1)
+	for key in result: result[key]=int(result[key])+bonus
+	return result
+
 func process_anatomy(actor: String,owner_id: String,uid: String,commit_result := true) -> OperationResult:
 	var source:=owner_id+".anatomy"
 	var entry:=item(uid)
@@ -712,12 +718,13 @@ func process_anatomy(actor: String,owner_id: String,uid: String,commit_result :=
 	var raw:=scratch._instance(uid)
 	scratch._containers[source].items.erase(raw);scratch._unindex(raw);scratch._touch(source)
 	var amount:=0
-	for key in part.outputs:
-		if scratch.receive(actor,key,int(part.outputs[key]))!=int(part.outputs[key]): return OperationResult.reject("capacity")
-		amount+=int(part.outputs[key])
+	var outputs:=anatomy_outputs(actor,part)
+	for key in outputs:
+		if scratch.receive(actor,key,int(outputs[key]))!=int(outputs[key]): return OperationResult.reject("capacity")
+		amount+=int(outputs[key])
 	if commit_result:
 		_adopt(scratch,[actor,owner_id])
-		_publish("corpse_harvested",actor,{"corpse":owner_id,"part":part.id,"skill":part.skill,"raw_uid":uid,"family":uid,"outputs":part.outputs.duplicate(true)})
+		_publish("corpse_harvested",actor,{"corpse":owner_id,"part":part.id,"skill":part.skill,"raw_uid":uid,"family":uid,"outputs":outputs})
 	return OperationResult.success(amount)
 
 func upgrade_instance(actor: String,uid: String,path := "") -> OperationResult:

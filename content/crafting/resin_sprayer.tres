@@ -6,3 +6,5 @@ id = "resin_sprayer"
 inputs = {"resin":1, "clean_water":1}
 output_id = "resin_sprayer"
 output_count = 1
+
+alchemical = true

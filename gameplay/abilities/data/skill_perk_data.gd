@@ -13,6 +13,9 @@ extends Resource
 @export var row: int = 0
 @export var prerequisite_ids: Array[String] = []
 @export var modifier_bonuses: Dictionary = {}
+@export var legacy_only := false
+@export var requires_awakening := false
+@export var required_knowledge: Array[String] = []
 @export var trigger_event: CombatEvent.Type = CombatEvent.Type.ON_KILL
 @export var trigger_skill_id: String = ""
 @export var trigger_required_tag: String = ""

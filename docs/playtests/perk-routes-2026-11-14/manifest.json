@@ -1,0 +1,136 @@
+{
+  "source_revision": "d879bd26389657db313145b229057863c973e19e",
+  "base_revision": "41402a8a97963546eca65e6aa9f78400360783f6",
+  "source_sha256": {
+    "AGENTS.md": "a450b9903f3dc40b44ce7717ae0e1c8b3436b96a1d66615428b69cfcd5da9d1e",
+    "README.md": "1f3a200b9bfa256308ecde30246af664d4800176d66acff4cebe544f543cee91",
+    "content/crafting/fire_rag.tres": "95c66a9d808bd1c82932b5f7ca97b9bedc7f0170527ca1029bce10d3c472b069",
+    "content/crafting/oil_bottle.tres": "be4f8edece45e3abc8832ca253098cda46dcd10cca705917e235a0e6b3f2fcb3",
+    "content/crafting/paralytic_bottle.tres": "96e3d597ef97a39fd2c586cf4cfbef490a2c94ba295eee95da1895cdd295e7e4",
+    "content/crafting/paralytic_sprayer.tres": "8c3dabe4d58f73b88517e9bc98e4e43f862ba5e53510c00a2e2ba2a2502c8184",
+    "content/crafting/poison_rag.tres": "fa74ca6418158d633c690faad4d0cba507f4be31c8bcfcb35a1ff9f07ff04864",
+    "content/crafting/potent_sprayer.tres": "de7c013fc1913b9a9cee557b459775fe80370285ecf1f5adb8ae80784e9effbe",
+    "content/crafting/resin_sprayer.tres": "6698c5331e0af9b00c1000cbaf0be6245d14034858bedab84456dc94b4e1893d",
+    "content/crafting/venom_bottle.tres": "0cd0d0ba6016a7305675e179e22e8a9e479b4f86d00e320681ccd6c5c1879804",
+    "content/crafting/venom_sprayer.tres": "70cf0fb081aaa9b34a365068637074e8cf5b63e0945120cb3623abfe2be9b96a",
+    "content/crafting/water_sprayer.tres": "feaed0bc4d11c591825353eeb164d031d4c87d435d36035a8a45a8cc71154152",
+    "docs/DEVELOPMENT_TOOLS.md": "508a1c054bd499565d937760256ed2ad6310bd099cc8113cb4b0305368c530d5",
+    "docs/PERK_ROUTES.md": "6775ca02c0f71c38156aa1e884d242792260c59d7f9ad3e36270161e673cb8aa",
+    "docs/RPG_PROGRESSION_SYSTEM.md": "fe0d6c9c00bda5bac537cb33a2c044dd22c5b535d20c8e4d4d573a0045bb0a09",
+    "gameplay/abilities/combinations/conditional_cast_controller.gd": "ddff404cd5b664da28250a546d7f8d24ae567a1cabadb5a0fefee78912bdec98",
+    "gameplay/abilities/data/skill_perk_data.gd": "a3ba5d8a7ff6fca731f3be57944fe8d4034a59aaeabbdf799eb6913e62676099",
+    "gameplay/abilities/data/skill_tree_data.gd": "b7b24bae7d922f5f8cc674270320b3a0b41c631ddedf22b552b6fe6b800cddc1",
+    "gameplay/abilities/data/trees/alteration_tree.tres": "0541863cab12e444dd30a4b0d90d086c3c915dca2c59e404e08e45f34a61a3c9",
+    "gameplay/abilities/data/trees/conjuration_tree.tres": "16863aa6a226dfa772f0800e8e013770f70947a3bee3f004452cd7c5dc9015da",
+    "gameplay/abilities/data/trees/crafting_tree.tres": "24ca14bcb8e5b77a7596cfd21d0ce189bfb3e4b17d30e002199865c3f29a4377",
+    "gameplay/abilities/data/trees/defense_tree.tres": "5b8927084a0f6cfc1f803fd8796cb580b1426a5d6f9a0b91215e3d7c398d3b8c",
+    "gameplay/abilities/data/trees/destruction_tree.tres": "cddf75e40cd48a17cd8e610f3b2a3a688526ab836668698f3815785322f5bedb",
+    "gameplay/abilities/data/trees/illusion_tree.tres": "06bac2cdc4f63936e165af30ceba541623c427bbee7baeae7d1b91476571ce07",
+    "gameplay/abilities/data/trees/melee_tree.tres": "b9c19f6f89186aa230db51cb939e7c1d2991cc43d16b3a6051030ac70e4eb0e6",
+    "gameplay/abilities/data/trees/restoration_tree.tres": "baa610a05dee522d36fa5406aecfe0012734a6b48c6c1ceb09b8d06ef251d0dc",
+    "gameplay/abilities/data/trees/survival_tree.tres": "9a2257c39b2a0e6ec0ad4597771503d44b8a6235ac4b2ab40c425962e727fe82",
+    "gameplay/abilities/manager/skill_mastery_manager.gd": "c3b418f5eab4fd509982360f4e501577732c2d2d895606c3c2c40b2da16ffb3c",
+    "gameplay/abilities/materials/casting_supplies.gd": "def96be0b56368a1cf823714ec8da02b921f661339f5925e688442977f9e5037",
+    "gameplay/abilities/materials/crafting_catalog.gd": "8010e54bb48fa25527ec9a92210055056047327aae9f360ae33017c0baabd7f8",
+    "gameplay/abilities/materials/crafting_recipe.gd": "4d630e1feff5eeb98583744411102b241937e886dee489f16af7d63c7719d3aa",
+    "gameplay/abilities/runtime/cast_plan.gd": "ed2d62ec6399892cfcacd78c5afd8d4b039711b29f4d5042ec117a5fa5c11fde",
+    "gameplay/foundation/actor_action_controller.gd": "5411719a17cb9facc5d8e920f6c9f7f256496128bef3867d3d17cc82d3fa4ac3",
+    "gameplay/foundation/inventory_service.gd": "65fe72ae50cdd2f2f642b4091622f5f1b0065d707931b10ec237cf21a926da33",
+    "gameplay/foundation/ui/actor_status_view.gd": "85045e5132ebf889d6b17154e67342d8e6003eef3f8fd926dd920cbfa99e1424",
+    "gameplay/foundation/weapon_arrow.gd": "57f97fe7ae6a55425464379858125c8df3c9bdec7fce478b579642cb7d35786f",
+    "gameplay/harvesting/corpse_harvesting.gd": "3a9ca43d7a0bcd32405623cb5285ee7c97f55341d81fff150092d80592c04735",
+    "gameplay/items/item_action_controller.gd": "c1c3210bbfc4680a63f5c6db9a1f838bf7db38e75d2c29ca843335f83ef23df5",
+    "gameplay/items/weapon_enchantment.gd": "b60af1fca7ff0d9544e0327abe2822c8a45970fd1cb807e3ed5ad2236b0aec4f",
+    "gameplay/martial/enchantment_wave.gd": "fab3a4f19350155737742fceef0de6c974829d6d62fb315693bfc77b903a2ddd",
+    "tests/test_rpg_progression.gd": "96ed3570c4432ef38102b9ee4a4156169ec3a45808fb3d4f4a063d9ea4044921",
+    "tests/test_rpg_progression_input.gd": "8c1ccdcb199a2c47b568387925fd07377fed0fc2ec9fbc31f07b78a92202d892",
+    "tests/unit/test_crafting_catalog.gd": "841ba3b4089f3cfd8fec557dfa22ee136f19ca776f84f7fffb6b1942855488c1",
+    "ui/character_progression_screen.gd": "dab93ac6fcf202e97ee8feb32c8765e31c40af8082090f2f176c23d170224bd7",
+    "ui/skill_tree_ui.gd": "9362223b9afd3c0e22232717920c7d5a385801d9dcc503dbd13b47ec9d5c8139"
+  },
+  "requested_tests": [
+    "content",
+    "gut_domain",
+    "rpg_progression",
+    "weapon_enchantment",
+    "fieldcraft",
+    "spell_operations",
+    "rpg_progression_input"
+  ],
+  "first_import": true,
+  "full_suite_run": false,
+  "scope": "Targeted verification selected by actual perk dependencies; no full-suite claim. Normal AI/time for input, explicit earned-XP/knowledge/awakening/stock fixtures; static collision-enabled domain target for exact wave measurement.",
+  "log_normalization": "Strip trailing horizontal whitespace in checked-in text logs; result JSON and original paths are retained.",
+  "native": {
+    "passed": true,
+    "source_revision": "d879bd26389657db313145b229057863c973e19e",
+    "platform": "Godot 4.6.3 / Xorg/X11 / gl_compatibility / Mesa llvmpipe / Dummy audio",
+    "normal_ai_and_time": true,
+    "controlled_fixture": "Earned XP, practice, knowledge, explicit awakening, stock and safe positions. Not a natural journey or balance measurement.",
+    "warnings": [
+      "WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver."
+    ],
+    "capture_dimensions": {
+      "weapon-tree-requirements.png": [
+        1152,
+        648
+      ],
+      "survival-tree-small.png": [
+        960,
+        540
+      ],
+      "rune-tree-learned.png": [
+        960,
+        540
+      ],
+      "stamina-investment.png": [
+        1152,
+        648
+      ],
+      "rune-tree-unawakened.png": [
+        1152,
+        648
+      ],
+      "harvest-tree-small.png": [
+        960,
+        540
+      ],
+      "ammo-output-preview.png": [
+        960,
+        540
+      ],
+      "legacy-inherited.png": [
+        960,
+        540
+      ],
+      "craft-tree.png": [
+        1152,
+        648
+      ]
+    }
+  },
+  "evidence_sha256": {
+    "REPORT.md": "fcb1c6797ff0a509a7282e76ca42a138b6ba0469e724a97c5f22a5cae75ee9fb",
+    "ammo-output-preview.png": "bd72887ef864150401d3e6439f5108f802db0118cb6621f7b2fcc02e4d9c32d8",
+    "content.log": "a1d3f4574e9e2a34a7cf5804f21fc60e0a3a5ca65d805ed78411fccfd239e62d",
+    "craft-tree.png": "8a7900f8f054ea07dcb45c6b39ef505b9164f64cc23c812bbd7ada977ea9e821",
+    "fieldcraft.log": "c04055178fdf0f96f073a356a51683d65480ea96541a48c8bcfa14226f6dc578",
+    "gut-domain.xml": "f64e66717fb92787470f4c3c816b72d9968bd94be140875579227114ed9a7507",
+    "gut_domain.log": "2bc523d899332e313d44ee843e3451d98006548b92633e1485d9f707045cb711",
+    "harvest-tree-small.png": "1b5357f88783d5c32366af3d3dcdf8aad8fb0934b86b7c555fa5cee003693352",
+    "import.log": "14eafbba1dad9f98353a4ea557a46d4e061f2a8959dbb2021932ea97a054aeb2",
+    "legacy-inherited.png": "da9c6460a12dc21b6d6d791e5fcc57efb8ffe658580ec9ded03e0c103af9517f",
+    "native-input.log": "48fd2231941a1f09777b9461a1cbd3624e31d02fd0829fb2b2babd22c19e2398",
+    "native-results.json": "08df4a510d3a8ea03e7deb356e950b8ace3ee465195ef4063f046c711a0d42eb",
+    "rpg_progression.log": "f917615ff300f97330e6e6ae82170a8c49d988a64006438805e5b5d17b2d8b47",
+    "rpg_progression_input.log": "5df48fdc28e71ffe115087027d9c69f3867a0bdd72e9c99aee69c002a614e887",
+    "rune-tree-learned.png": "e8150178a5797f20b0df76ce4aa5e6e37af2060bc515e8a2f4c054dd5ed406a3",
+    "rune-tree-unawakened.png": "4214d741dbb5aa94a5612d2152a89e3dedf87a5880a4b8b925273dba5c11410b",
+    "spell_operations.log": "6cacd0c9e50a3ccd43f1e6f9064a1597927f1b7f90ee1d0f45ed116b1c87fe1c",
+    "stamina-investment.png": "c9708c5d9f90cfb671cc445b04c1385148afd1ab8321857869a4b5405ee4d43e",
+    "survival-tree-small.png": "cceb1200bdde6f62786766775d0a45c1d62ec779a3ce03b3a016a6acadb0d7cc",
+    "targeted-results.json": "de83f0165f985e24f041bb823b0f5a9670ef661cb6be135cb04a0ffd65c739ba",
+    "weapon-tree-requirements.png": "90366d34de8f9c39f0415a8cf3ff87072dd4098b07365c6b9742ce1fa44489e0",
+    "weapon_enchantment.log": "570ae299c1537c2fc895f1183887fdccda96b1228cebc19ec3b1014cd8415cd3"
+  }
+}

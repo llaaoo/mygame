@@ -55,6 +55,15 @@ var soul_revision := -1
 var placement_radius := 96.0
 var placement_duration := 15.0
 
+func field_budget() -> Dictionary:
+	var timed: bool=is_instance_valid(actor) and "actor_context" in actor and actor.actor_context and actor.actor_context.rules.timed_fields
+	var duration: float=(clampf(skill.field_duration+placement_duration-15,5,40) if not skill.operation_id.is_empty() else placement_duration)+field_bonus
+	var use_cost:=0.0
+	if timed:
+		duration=(120.0 if skill.field_type=="arcane" else 180.0)+maxf(0,placement_duration-15.0)+field_bonus
+		use_cost=(40.0 if skill.field_type=="arcane" else 30.0)*clampf(1+ActorProgression.modifier(actor,"field.use_cost"),.5,1.5)
+	return {"duration":duration*clampf(1+ActorProgression.modifier(actor,"field.duration"),.5,2),"use_seconds":use_cost}
+
 func is_empty() -> bool:
 	return action == null
 

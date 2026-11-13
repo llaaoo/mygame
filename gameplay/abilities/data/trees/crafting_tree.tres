@@ -72,6 +72,38 @@ modifier_bonuses = {"work.duration": -0.1}
 column = 2
 row = 2
 
+[sub_resource type="Resource" id="alchemical_batch"]
+script = ExtResource("perk")
+perk_id = "alchemical_batch"
+school = 7
+display_name = "炼剂分装"
+description = "亲手制造已学炼金配方时，每批额外产出1份，最多翻倍；仍付完整原料，不授予配方。"
+required_level = 8
+required_character_level = 7
+required_attributes = {"endurance": 14}
+prerequisite_ids = Array[String](["careful_smith"])
+modifier_bonuses = {"craft.alchemy": 1}
+column = 0
+row = 3
+requires_awakening = false
+required_knowledge = Array[String]([])
+
+[sub_resource type="Resource" id="coating_workflow"]
+script = ExtResource("perk")
+perk_id = "coating_workflow"
+school = 7
+display_name = "涂附工序"
+description = "使用抹布与涂料时，实际武器涂层存续延长15%；不改变已存在的截止时刻。"
+required_level = 8
+required_character_level = 7
+required_attributes = {"endurance": 14}
+prerequisite_ids = Array[String](["workshop_rhythm"])
+modifier_bonuses = {"coating.duration": 0.15}
+column = 2
+row = 3
+requires_awakening = false
+required_knowledge = Array[String]([])
+
 [resource]
 script = ExtResource("tree")
 tree_id = "crafting"
@@ -79,4 +111,4 @@ display_name = "制造与整修"
 description = "成功制造、烹饪及现场作业提高熟练度；失败与取消不奖励。"
 school = 7
 accent_color = Color(0.72,0.61,0.35,1)
-perks = [SubResource("tool_familiarity"), SubResource("arrow_fletcher"), SubResource("salvage_eye"), SubResource("careful_smith"), SubResource("workshop_rhythm")]
+perks = [SubResource("tool_familiarity"), SubResource("arrow_fletcher"), SubResource("salvage_eye"), SubResource("careful_smith"), SubResource("workshop_rhythm"), SubResource("alchemical_batch"), SubResource("coating_workflow")]

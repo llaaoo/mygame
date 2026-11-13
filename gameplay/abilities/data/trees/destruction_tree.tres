@@ -6,6 +6,7 @@
 [sub_resource type="Resource" id="Perk_Scorch"]
 script = ExtResource("2_perk")
 perk_id = "destruction_scorch"
+legacy_only = true
 row = 0
 column = 1
 school = 0
@@ -19,6 +20,7 @@ modifier_bonuses = {
 [sub_resource type="Resource" id="Perk_Firestorm"]
 script = ExtResource("2_perk")
 perk_id = "destruction_firestorm"
+legacy_only = true
 row = 1
 column = 1
 school = 0
@@ -34,6 +36,7 @@ trigger_required_tag = "fire"
 [sub_resource type="Resource" id="Perk_StormWeb"]
 script = ExtResource("2_perk")
 perk_id = "destruction_storm_web"
+legacy_only = true
 row = 2
 column = 1
 school = 0
@@ -48,6 +51,7 @@ modifier_bonuses = {
 [sub_resource type="Resource" id="Perk_DeepFreeze"]
 script = ExtResource("2_perk")
 perk_id = "destruction_deepfreeze"
+legacy_only = true
 row = 3
 column = 1
 school = 0
@@ -60,12 +64,126 @@ modifier_bonuses = {
 "status.frozen_duration": 0.5
 }
 
+[sub_resource type="Resource" id="spell_discipline"]
+script = ExtResource("2_perk")
+perk_id = "spell_discipline"
+school = 0
+display_name = "术式调息"
+description = "基础操作及组合总耗魔降低10%；真实介质和现场条件仍须满足。"
+required_level = 1
+required_character_level = 2
+required_attributes = {}
+prerequisite_ids = Array[String]([])
+modifier_bonuses = {"mana_cost.all": -0.1}
+column = 1
+row = 0
+requires_awakening = true
+required_knowledge = Array[String]([])
+
+[sub_resource type="Resource" id="element_weaving"]
+script = ExtResource("2_perk")
+perk_id = "element_weaving"
+school = 0
+display_name = "元素研习"
+description = "火、冰、雷法术伤害各提高8%；按实际释放元素生效。"
+required_level = 3
+required_character_level = 3
+required_attributes = {"intelligence": 12}
+prerequisite_ids = Array[String](["spell_discipline"])
+modifier_bonuses = {"damage.fire": 0.08, "damage.ice": 0.08, "damage.lightning": 0.08}
+column = 0
+row = 1
+requires_awakening = true
+required_knowledge = Array[String]([])
+
+[sub_resource type="Resource" id="projection_rhythm"]
+script = ExtResource("2_perk")
+perk_id = "projection_rhythm"
+school = 0
+display_name = "投射节律"
+description = "聚能投射的冷却缩短15%；仍需蓄力、材料和有效来源。"
+required_level = 3
+required_character_level = 3
+required_attributes = {"intelligence": 12}
+prerequisite_ids = Array[String](["spell_discipline"])
+modifier_bonuses = {"cooldown.project": -0.15}
+column = 2
+row = 1
+requires_awakening = true
+required_knowledge = Array[String](["project"])
+
+[sub_resource type="Resource" id="medium_shelter"]
+script = ExtResource("2_perk")
+perk_id = "medium_shelter"
+school = 0
+display_name = "介质防护"
+description = "受到的燃烧、中毒持续时间缩短20%；不免疫接触、伤害或异常积累。"
+required_level = 6
+required_character_level = 5
+required_attributes = {"intelligence": 14}
+prerequisite_ids = Array[String](["element_weaving"])
+modifier_bonuses = {"status.burning_duration": -0.2, "status.poison_duration": -0.2}
+column = 0
+row = 2
+requires_awakening = true
+required_knowledge = Array[String]([])
+
+[sub_resource type="Resource" id="phase_practice"]
+script = ExtResource("2_perk")
+perk_id = "phase_practice"
+school = 0
+display_name = "移行研习"
+description = "移行冷却缩短15%；不自动躲避，不消除实际准备与费用。"
+required_level = 6
+required_character_level = 5
+required_attributes = {"intelligence": 14}
+prerequisite_ids = Array[String](["projection_rhythm"])
+modifier_bonuses = {"cooldown.step": -0.15}
+column = 2
+row = 2
+requires_awakening = true
+required_knowledge = Array[String](["step"])
+
+[sub_resource type="Resource" id="reaction_focus"]
+script = ExtResource("2_perk")
+perk_id = "reaction_focus"
+school = 0
+display_name = "反应专注"
+description = "实际法术伤害再提高8%；仍按原命中、格挡与表面反应结算。"
+required_level = 8
+required_character_level = 7
+required_attributes = {"intelligence": 14}
+prerequisite_ids = Array[String](["medium_shelter"])
+modifier_bonuses = {"damage.all": 0.08}
+column = 0
+row = 3
+requires_awakening = true
+required_knowledge = Array[String]([])
+
+[sub_resource type="Resource" id="measured_casting"]
+script = ExtResource("2_perk")
+perk_id = "measured_casting"
+school = 0
+display_name = "量能施术"
+description = "法术总耗魔再省5%；不省材料、喷剂剂量或法阵余能。"
+required_level = 8
+required_character_level = 7
+required_attributes = {"intelligence": 14}
+prerequisite_ids = Array[String](["phase_practice"])
+modifier_bonuses = {"mana_cost.all": -0.05}
+column = 2
+row = 3
+requires_awakening = true
+required_knowledge = Array[String]([])
+
 [resource]
 script = ExtResource("1_tree")
 tree_id = "destruction"
-display_name = "毁灭学派"
-description = "操纵火焰、闪电与毒素，围绕燃烧、潮湿和中毒构筑连锁爆发。"
+display_name = "术式与反应"
+description = "火花、脉冲、聚能投射与移行的实践汇入此路；需要觉醒，具体形式仍从知识、材料和现场条件取得。"
 school = 0
 accent_color = Color(0.94, 0.32, 0.16, 1)
-skill_ids = ["fireball", "cinder_volley", "solar_spear", "magma_pool", "ember_orb", "flame_storm", "lightning_bolt", "thunder_orb", "storm_field", "static_nova", "poison_cloud", "plague_bolt", "venom_burst", "miasma_ring", "charged_fireball"]
-perks = [SubResource("Perk_Scorch"), SubResource("Perk_Firestorm"), SubResource("Perk_StormWeb"), SubResource("Perk_DeepFreeze")]
+skill_ids = ["ignite", "pulse", "project", "step", "disperse"]
+perks = [SubResource("Perk_Scorch"), SubResource("Perk_Firestorm"), SubResource("Perk_StormWeb"), SubResource("Perk_DeepFreeze"), SubResource("spell_discipline"), SubResource("element_weaving"), SubResource("projection_rhythm"), SubResource("medium_shelter"), SubResource("phase_practice"), SubResource("reaction_focus"), SubResource("measured_casting")]
+
+practice_schools = Array[int]([0, 4])

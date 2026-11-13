@@ -40,7 +40,7 @@ func _physics_process(delta: float) -> void:
 		var distance:=global_position.distance_to(target.global_position)
 		if distance+14<old or not ConeCoverage.contains(self,global_position,direction,target.global_position,radius+14,technique.release_angle): continue
 		hit_targets[target.get_instance_id()]=true
-		var result:=CombatExecutor.report_hit(context.actor,target,enchantment.release_damage,target.global_position,_skill,_skill.tags,family,0.0,null,global_position)
+		var result:=CombatExecutor.report_hit(context.actor,target,enchantment.release_value(context.actor),target.global_position,_skill,_skill.tags,family,0.0,null,global_position)
 		if result.damage_dealt>0 and not result.blocked: ActorCombatModel.apply_melee_surface(target,enchantment.tags)
 	var surfaces:=SurfaceManager.instance
 	if surfaces:

@@ -18,4 +18,7 @@ func validation_errors() -> Array[String]:
 			errors.append("Invalid manufacturing recipe registration"); continue
 		if seen.has(recipe.id): errors.append("Duplicate manufacturing recipe ID: "+recipe.id)
 		seen[recipe.id]=true
+		if recipe.alchemical:
+			var output:=ItemCatalog.default_catalog().definition(recipe.output_id)
+			if recipe.ammunition or not output or not output.use_profile or output.use_profile.kind not in [ItemUseDefinition.Kind.COATING,ItemUseDefinition.Kind.THROWABLE,ItemUseDefinition.Kind.SPRAY,ItemUseDefinition.Kind.CONSUMABLE]: errors.append("Alchemy bonus requires a non-recyclable consumable: "+recipe.id)
 	return errors

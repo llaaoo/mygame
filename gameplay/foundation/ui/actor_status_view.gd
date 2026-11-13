@@ -92,7 +92,7 @@ func _process(_delta: float) -> void:
 	enchantment_label.visible=coating!=null and coating.enchantment!=null
 	if enchantment_label.visible:
 		enchantment_label.text="涂层 · %s · %.0f秒"%[coating.enchantment.title,float(context.items.coating_state(uid).expires_at)-context.items.clock_seconds]
-		enchantment_label.tooltip_text=coating.enchantment.describe()
+		enchantment_label.tooltip_text=coating.enchantment.describe(context.actor)
 		enchantment_label.modulate=coating.enchantment.color.lightened(.25)
 	stamina_bar.max_value=context.actions.stamina.maximum
 	stamina_bar.value=context.actions.stamina.current

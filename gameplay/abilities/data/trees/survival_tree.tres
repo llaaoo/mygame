@@ -72,6 +72,38 @@ modifier_bonuses = {"survival.fed_regen": 2}
 column = 2
 row = 2
 
+[sub_resource type="Resource" id="journey_rations"]
+script = ExtResource("perk")
+perk_id = "journey_rations"
+school = 8
+display_name = "耐途补给"
+description = "需求损耗再减5%；有效食物期间体力额外回复1/秒。准备、进食与时间仍需亲自安排。"
+required_level = 8
+required_character_level = 7
+required_attributes = {"endurance": 14}
+prerequisite_ids = Array[String](["campcraft"])
+modifier_bonuses = {"survival.needs": -0.05, "survival.fed_regen": 1}
+column = 0
+row = 3
+requires_awakening = false
+required_knowledge = Array[String]([])
+
+[sub_resource type="Resource" id="careful_harvester"]
+script = ExtResource("perk")
+perk_id = "careful_harvester"
+school = 8
+display_name = "猎材精取"
+description = "处理已掌握技艺的真实遗骸部位时，每类产物多1份；仍需对应知识、工具与完整携带空间。"
+required_level = 8
+required_character_level = 7
+required_attributes = {"endurance": 14}
+prerequisite_ids = Array[String](["provisioned_recovery"])
+modifier_bonuses = {"harvest.anatomy": 1}
+column = 2
+row = 3
+requires_awakening = false
+required_knowledge = Array[String](["skinning"])
+
 [resource]
 script = ExtResource("tree")
 tree_id = "survival"
@@ -79,4 +111,4 @@ display_name = "野外与补给"
 description = "首次发现与真实资源采集提高熟练度；饮食与休息不能原地刷经验。"
 school = 8
 accent_color = Color(0.72,0.61,0.35,1)
-perks = [SubResource("field_lore"), SubResource("pack_habit"), SubResource("botanical_eye"), SubResource("campcraft"), SubResource("provisioned_recovery")]
+perks = [SubResource("field_lore"), SubResource("pack_habit"), SubResource("botanical_eye"), SubResource("campcraft"), SubResource("provisioned_recovery"), SubResource("journey_rations"), SubResource("careful_harvester")]

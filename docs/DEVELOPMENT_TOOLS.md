@@ -62,9 +62,11 @@ python3 tools/run_tests.py --tests gut_domain
 # 先做和改动对应的集成检查
 python3 tools/run_tests.py --tests foundation_inventory world_depth_knowledge
 
-# 代码稳定后，从干净提交归档做一次完整回归
+# 只有广泛基础契约变化、未知影响或用户明确要求时才扩大到全量
 python3 tools/run_tests.py --suite all --jobs 2 --timeout 300 --report /tmp/grayriver-results.json
 ```
+
+默认按影响范围选择定向检查：规则/目录改动覆盖校验和实际消费者；涉及成长持久化就加保存重进；涉及操作就加真实输入、小窗口和焦点。新增资源可在干净提交归档中只跑相关检查。定向通过后不为证据或文档更新重复运行；未跑全量要明确记录。
 
 同一检出目录由OS文件锁防止两个runner同时启动；进程退出自动释放锁。首次导入采用recovery模式，不启动编辑器插件。选中`content/maps/gut_domain`时先执行这些前置，失败就停止后续；其他检查按`--jobs`并行，继承真实输入探针或含输入事件的脚本放到最后串行，避免短战斗窗口与其他Godot进程竞争。`--tests`仍只运行指定项目，不悄悄扩大全量。
 

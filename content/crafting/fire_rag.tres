@@ -6,3 +6,5 @@ id = "fire_rag"
 inputs = {"resin":1, "charcoal":1, "cloth":1}
 output_id = "fire_rag"
 output_count = 1
+
+alchemical = true

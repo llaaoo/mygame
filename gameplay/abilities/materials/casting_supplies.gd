@@ -262,4 +262,5 @@ func configure_modifier(action: SkillData,id: String) -> bool:
 
 func craft_output(recipe: CraftingRecipe) -> int:
 	var bonus:=inventory_store.perk_value(actor_id,"craft.ammunition") if inventory_store and recipe.ammunition else 0.0
-	return recipe.output_count+floori(recipe.output_count*clampf(bonus,0,.5))
+	var extra:=clampi(int(inventory_store.perk_value(actor_id,"craft.alchemy")),0,recipe.output_count) if inventory_store and recipe.alchemical else 0
+	return recipe.output_count+floori(recipe.output_count*clampf(bonus,0,.5))+extra

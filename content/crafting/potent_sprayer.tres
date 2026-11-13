@@ -6,3 +6,5 @@ id = "potent_sprayer"
 inputs = {"potent_venom":1, "clean_water":1}
 output_id = "potent_sprayer"
 output_count = 1
+
+alchemical = true

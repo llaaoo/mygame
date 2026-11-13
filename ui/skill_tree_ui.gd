@@ -137,11 +137,17 @@ func _refresh() -> void:
 	for child in _content.get_children():
 		child.queue_free()
 	_level_label.text = "角色 Lv.%d" % _mastery_manager.get_character_level()
-	for mastery in _mastery_manager.get_all_masteries():
-		_content.add_child(_make_school_column(mastery))
+	for school in _mastery_manager.get_active_schools():
+		_content.add_child(_make_school_column(school))
+	var inherited:=_mastery_manager.get_legacy_perks()
+	if not inherited.is_empty():
+		var column:=VBoxContainer.new(); column.custom_minimum_size.x=198; _content.add_child(column)
+		column.add_child(FoundationWidgets.label("既有传承",16))
+		for perk in inherited: column.add_child(_make_perk_card(perk))
 
 
-func _make_school_column(mastery: SkillMastery) -> Control:
+func _make_school_column(school: int) -> Control:
+	var mastery:=_mastery_manager.get_branch_mastery(school)
 	var panel := PanelContainer.new()
 	panel.custom_minimum_size = Vector2(198, 0)
 	panel.add_theme_stylebox_override("panel", GameUIStyle.slot_style(mastery.level >= 5))
@@ -151,8 +157,8 @@ func _make_school_column(mastery: SkillMastery) -> Control:
 	panel.add_child(vbox)
 
 	var title := Label.new()
-	var tree_data := _mastery_manager.get_tree_data(mastery.school)
-	title.text = tree_data.display_name if tree_data else _school_display_name(mastery.school)
+	var tree_data := _mastery_manager.get_tree_data(school)
+	title.text = tree_data.display_name if tree_data else _school_display_name(school)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	GameUIStyle.apply_label(title, 14, GameUIStyle.GOLD)
 	vbox.add_child(title)
@@ -169,7 +175,7 @@ func _make_school_column(mastery: SkillMastery) -> Control:
 	progress.max_value = maxf(1.0, mastery.xp_to_next)
 	progress.value = mastery.xp
 	progress.add_theme_stylebox_override("background", GameUIStyle.bar_bg())
-	progress.add_theme_stylebox_override("fill", GameUIStyle.bar_fill(_school_color(mastery.school)))
+	progress.add_theme_stylebox_override("fill", GameUIStyle.bar_fill(_school_color(school)))
 	vbox.add_child(progress)
 
 	var xp := Label.new()
@@ -179,10 +185,10 @@ func _make_school_column(mastery: SkillMastery) -> Control:
 	vbox.add_child(xp)
 
 	var spell_header := Label.new()
-	spell_header.text = "法术目录"
+	spell_header.text = "基础操作（知识另行取得）"
 	GameUIStyle.apply_label(spell_header, 11, GameUIStyle.GOLD)
 	vbox.add_child(spell_header)
-	for skill in _mastery_manager.get_spells_for_school(mastery.school):
+	for skill in _mastery_manager.get_spells_for_school(school):
 		vbox.add_child(_make_spell_row(skill))
 
 	var perk_header := Label.new()
@@ -190,7 +196,7 @@ func _make_school_column(mastery: SkillMastery) -> Control:
 	GameUIStyle.apply_label(perk_header, 11, GameUIStyle.GOLD)
 	vbox.add_child(perk_header)
 
-	for perk in _mastery_manager.get_perks_for_school(mastery.school):
+	for perk in _mastery_manager.get_perks_for_school(school):
 		vbox.add_child(_make_perk_card(perk))
 
 	return panel

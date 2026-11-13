@@ -1,4 +1,13 @@
 extends GutTest
+func test_alchemy_bonus_cannot_be_assigned_to_recyclable_materials_or_ammunition() -> void:
+	var catalog:=CraftingCatalog.new()
+	var recipe:=CraftingRecipe.new(); recipe.id="test.alchemy"; recipe.alchemical=true; recipe.output_id="fire_stone"
+	catalog.recipes=[recipe]
+	assert_false(catalog.validation_errors().is_empty(),"A recyclable material could create a manufacture/recycle loop")
+	recipe.output_id="fire_rag"
+	assert_true(catalog.validation_errors().is_empty())
+	recipe.ammunition=true
+	assert_false(catalog.validation_errors().is_empty(),"Two yield bonuses may not stack past the safe batch bound")
 ## The registry holds definitions, not a second source of actor knowledge or stock.
 func test_all_authored_recipe_files_have_one_registration() -> void:
 	var catalog:=CraftingCatalog.default_catalog()

@@ -1,0 +1,163 @@
+{
+  "schema": 1,
+  "revision": "d879bd26389657db313145b229057863c973e19e",
+  "dirty": null,
+  "godot": "4.6.3.stable.official.7d41c59c4",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "jobs": 2,
+  "timeout": 120.0,
+  "logs": "/tmp/mygame-tests-bco5jdza",
+  "requested": [
+    "content",
+    "gut_domain",
+    "rpg_progression",
+    "weapon_enchantment",
+    "fieldcraft",
+    "spell_operations",
+    "rpg_progression_input"
+  ],
+  "results": [
+    {
+      "name": "import",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 17.055,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/perk-routes-clean",
+        "--editor",
+        "--import",
+        "--recovery-mode"
+      ],
+      "log": "/tmp/mygame-tests-bco5jdza/import.log",
+      "diagnostic": []
+    },
+    {
+      "name": "content",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 3.832,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/perk-routes-clean",
+        "--script",
+        "res://tools/validate_mvp_content.gd"
+      ],
+      "log": "/tmp/mygame-tests-bco5jdza/content.log",
+      "diagnostic": []
+    },
+    {
+      "name": "gut_domain",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 4.487,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/perk-routes-clean",
+        "--script",
+        "res://addons/gut/gut_cmdln.gd",
+        "-gexit",
+        "-gdisable_colors",
+        "-gjunit_xml_file=/tmp/mygame-tests-bco5jdza/gut-domain.xml"
+      ],
+      "log": "/tmp/mygame-tests-bco5jdza/gut_domain.log",
+      "diagnostic": []
+    },
+    {
+      "name": "rpg_progression",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 8.703,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/perk-routes-clean",
+        "--script",
+        "res://tests/test_rpg_progression.gd"
+      ],
+      "log": "/tmp/mygame-tests-bco5jdza/rpg_progression.log",
+      "diagnostic": []
+    },
+    {
+      "name": "weapon_enchantment",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 10.057,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/perk-routes-clean",
+        "--script",
+        "res://tests/test_weapon_enchantment.gd"
+      ],
+      "log": "/tmp/mygame-tests-bco5jdza/weapon_enchantment.log",
+      "diagnostic": []
+    },
+    {
+      "name": "spell_operations",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 7.093,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/perk-routes-clean",
+        "--script",
+        "res://tests/test_spell_operations.gd"
+      ],
+      "log": "/tmp/mygame-tests-bco5jdza/spell_operations.log",
+      "diagnostic": []
+    },
+    {
+      "name": "fieldcraft",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 9.802,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/perk-routes-clean",
+        "--script",
+        "res://tests/test_fieldcraft.gd"
+      ],
+      "log": "/tmp/mygame-tests-bco5jdza/fieldcraft.log",
+      "diagnostic": []
+    },
+    {
+      "name": "rpg_progression_input",
+      "passed": true,
+      "category": "passed",
+      "exit_code": 0,
+      "seconds": 24.253,
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/perk-routes-clean",
+        "--script",
+        "res://tests/test_rpg_progression_input.gd"
+      ],
+      "log": "/tmp/mygame-tests-bco5jdza/rpg_progression_input.log",
+      "diagnostic": []
+    }
+  ],
+  "skipped": [],
+  "complete": true
+}
