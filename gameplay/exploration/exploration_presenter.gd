@@ -182,7 +182,7 @@ func inspect_discovery(entry: ExplorationDiscoveryData, node: ExplorationInterac
 			var received := game.progress.claims.has("equipment."+entry.id+"."+id)
 			text += "\n\n%s：%s\n%s\n按O查看实物与穿戴；安全时可整备。" % ["已领取装备" if received else "装备留在此处（背包已满）", item.display_name, item.description]
 			buttons.append({"title": "查看：" + item.display_name, "callback": game.equipment_service.show_detail.bind(id)})
-	game.ui.show_panel(entry.title, text, buttons)
+	game.ui.show_inspection(entry.title,text,buttons,func():return entry in game.current_data.discoveries and game.player.global_position.distance_to(entry.pos)<180)
 
 func inspect_puzzle(spec: SpellPuzzleData, completed: bool) -> void:
 	game.ui.show_panel(spec.title, "机关已解开，奖励已保存。" if completed else spec.hint, [{"title": "继续探索", "callback": game.ui.close_modal}])

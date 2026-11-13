@@ -1,0 +1,192 @@
+{
+  "origin": "OpenAI image generation in this task; original Grayriver item sheet",
+  "generated_on": "2026-11-13",
+  "source_file": "exec-5cae356b-d1b6-4476-a89e-e6ef3dcc27b9.png",
+  "path": "content/art/items/grayriver/frontier_items.png",
+  "sha256": "a54c4356d27c232ccc3e01b32b50aae881204191b257a7e0b8d52572344405e2",
+  "bytes": 1749439,
+  "size": [
+    1254,
+    1254
+  ],
+  "modifications": "PNG copied byte-for-byte; Godot AtlasTexture regions reference original pixels. No image crop/repaint.",
+  "rights": "AI-generated output; commercial use subject to applicable OpenAI output terms. No third-party asset license or exclusivity claimed.",
+  "items": [
+    {
+      "id": "river_sabre",
+      "cell": [
+        0,
+        0,
+        314,
+        314
+      ],
+      "definition": "content/frontier/equipment/river_sabre.tres",
+      "icon": "content/art/items/grayriver/river_sabre.tres"
+    },
+    {
+      "id": "river_spear",
+      "cell": [
+        314,
+        0,
+        313,
+        314
+      ],
+      "definition": "content/frontier/equipment/river_spear.tres",
+      "icon": "content/art/items/grayriver/river_spear.tres"
+    },
+    {
+      "id": "river_staff",
+      "cell": [
+        627,
+        0,
+        313,
+        314
+      ],
+      "definition": "content/frontier/equipment/river_staff.tres",
+      "icon": "content/art/items/grayriver/river_staff.tres"
+    },
+    {
+      "id": "river_bow",
+      "cell": [
+        940,
+        0,
+        314,
+        314
+      ],
+      "definition": "content/frontier/equipment/river_bow.tres",
+      "icon": "content/art/items/grayriver/river_bow.tres"
+    },
+    {
+      "id": "river_coat",
+      "cell": [
+        0,
+        314,
+        314,
+        313
+      ],
+      "definition": "content/frontier/equipment/river_coat.tres",
+      "icon": "content/art/items/grayriver/river_coat.tres"
+    },
+    {
+      "id": "river_shield",
+      "cell": [
+        314,
+        314,
+        313,
+        313
+      ],
+      "definition": "content/frontier/equipment/river_shield.tres",
+      "icon": "content/art/items/grayriver/river_shield.tres"
+    },
+    {
+      "id": "river_boots",
+      "cell": [
+        627,
+        314,
+        313,
+        313
+      ],
+      "definition": "content/frontier/equipment/river_boots.tres",
+      "icon": "content/art/items/grayriver/river_boots.tres"
+    },
+    {
+      "id": "ration",
+      "cell": [
+        940,
+        314,
+        314,
+        313
+      ],
+      "definition": "content/foundation/items/ration.tres",
+      "icon": "content/art/items/grayriver/ration.tres"
+    },
+    {
+      "id": "clean_water",
+      "cell": [
+        0,
+        627,
+        314,
+        313
+      ],
+      "definition": "content/foundation/items/clean_water.tres",
+      "icon": "content/art/items/grayriver/clean_water.tres"
+    },
+    {
+      "id": "fire_stone",
+      "cell": [
+        314,
+        627,
+        313,
+        313
+      ],
+      "definition": "content/foundation/items/fire_stone.tres",
+      "icon": "content/art/items/grayriver/fire_stone.tres"
+    },
+    {
+      "id": "herb",
+      "cell": [
+        627,
+        627,
+        313,
+        313
+      ],
+      "definition": "content/foundation/items/herb.tres",
+      "icon": "content/art/items/grayriver/herb.tres"
+    },
+    {
+      "id": "cloth",
+      "cell": [
+        940,
+        627,
+        314,
+        313
+      ],
+      "definition": "content/foundation/items/cloth.tres",
+      "icon": "content/art/items/grayriver/cloth.tres"
+    },
+    {
+      "id": "oil_bottle",
+      "cell": [
+        0,
+        940,
+        314,
+        314
+      ],
+      "definition": "content/foundation/items/oil_bottle.tres",
+      "icon": "content/art/items/grayriver/oil_bottle.tres"
+    },
+    {
+      "id": "fire_rag",
+      "cell": [
+        314,
+        940,
+        313,
+        314
+      ],
+      "definition": "content/foundation/items/fire_rag.tres",
+      "icon": "content/art/items/grayriver/fire_rag.tres"
+    },
+    {
+      "id": "charcoal",
+      "cell": [
+        627,
+        940,
+        313,
+        314
+      ],
+      "definition": "content/foundation/items/charcoal.tres",
+      "icon": "content/art/items/grayriver/charcoal.tres"
+    },
+    {
+      "id": "metal_scrap",
+      "cell": [
+        940,
+        940,
+        314,
+        314
+      ],
+      "definition": "content/foundation/items/metal_scrap.tres",
+      "icon": "content/art/items/grayriver/metal_scrap.tres"
+    }
+  ]
+}

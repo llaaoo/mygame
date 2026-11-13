@@ -1,11 +1,16 @@
 [gd_resource type="Resource" script_class="ItemData" format=3]
 [ext_resource type="Script" path="res://gameplay/inventory/data/item_data.gd" id="item"]
+[ext_resource type="Texture2D" path="res://content/art/items/grayriver/metal_scrap.tres" id="item_art"]
 [resource]
 script = ExtResource("item")
 id = "metal_scrap"
 display_name = "金属碎料"
-description = "矿脉采集或拆解装备获得，可整修武器和护具。"
+description = "几片弯曲的铁料和旧铆钉，清理后仍可用于整修。"
 weight = 0.15
 stackable = true
 max_stack = 999
 sell_price = 1
+
+icon = ExtResource("item_art")
+illustration_path = "res://content/art/items/grayriver/frontier_items.png"
+illustration_region = Rect2i(940, 940, 314, 314)

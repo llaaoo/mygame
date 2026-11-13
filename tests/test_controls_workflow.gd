@@ -49,7 +49,7 @@ func run() -> void:
 		check(game.frontier_hud.interact.is_visible_in_tree(),"Nearby mouse interaction hidden")
 		await point_click(game.frontier_hud.interact.get_global_rect().get_center())
 		check(not paused and game.player.ui_blocked and is_instance_valid(game.ui.modal),"Clicking nearby station failed to open crafting")
-		game.ui.close_modal()
+		await key(KEY_ESCAPE,true); await key(KEY_ESCAPE,false)
 		var recipe:=supplies.crafting_recipes["fire_stone"] as CraftingRecipe
 		supplies.known_recipes["fire_stone"]=true; supplies.grant(recipe.inputs)
 		var before:=supplies.count("fire_stone")

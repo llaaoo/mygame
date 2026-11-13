@@ -26,6 +26,8 @@ enum ItemType {
 ## Inspection art loads only when selected, so the catalog does not retain every large image.
 ## The compact icon remains independent; instance state stays on ItemInstance.
 @export_file("*.png","*.webp","*.jpg","*.jpeg","*.svg") var illustration_path := ""
+## Optional atlas cell; an empty rect uses the full image. Does not enter ItemInstance.
+@export var illustration_region := Rect2i()
 
 ## 描述文本
 @export_multiline var description: String = ""
@@ -46,7 +48,17 @@ enum ItemType {
 @export var sell_price: int = 0
 
 func illustration_error() -> String:
+	if illustration_region.position.x<0 or illustration_region.position.y<0 or illustration_region.size.x<0 or illustration_region.size.y<0 or (illustration_region.size.x==0)!=(illustration_region.size.y==0): return "Invalid artwork region: "+id
+	if illustration_region.has_area() and illustration_path.is_empty(): return "Artwork region requires an image: "+id
 	if illustration_path.is_empty(): return ""
 	if not illustration_path.begins_with("res://") or illustration_path.get_extension().to_lower() not in ["png","webp","jpg","jpeg","svg"] or not ResourceLoader.exists(illustration_path,"Texture2D"):
 		return "Invalid item artwork: %s [%s]"%[id,illustration_path]
 	return ""
+
+func illustration_texture() -> Texture2D:
+	if illustration_path.is_empty() or not illustration_error().is_empty(): return null
+	var texture:=load(illustration_path) as Texture2D
+	if not texture or not illustration_region.has_area(): return texture
+	if not Rect2i(Vector2i.ZERO,Vector2i(texture.get_size())).encloses(illustration_region): return null
+	var cell:=AtlasTexture.new(); cell.atlas=texture; cell.region=Rect2(illustration_region); cell.filter_clip=true
+	return cell

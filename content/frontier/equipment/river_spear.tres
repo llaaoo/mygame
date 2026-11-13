@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://gameplay/inventory/data/casting_equipment_profile.gd" id="profile"]
 [ext_resource type="Script" path="res://gameplay/foundation/data/attack_profile.gd" id="attack"]
 [ext_resource type="Resource" path="res://content/weapons/spear.tres" id="moveset"]
+[ext_resource type="Texture2D" path="res://content/art/items/grayriver/river_spear.tres" id="item_art"]
 [sub_resource type="Resource" id="Profile"]
 script = ExtResource("profile")
 [sub_resource type="Resource" id="Attack"]
@@ -27,3 +28,7 @@ combat_modifiers = {}
 world_shape = "spear"
 world_color = Color(0.72549, 0.70196, 0.61176, 1)
 casting_profile = SubResource("Profile")
+
+icon = ExtResource("item_art")
+illustration_path = "res://content/art/items/grayriver/frontier_items.png"
+illustration_region = Rect2i(314, 0, 313, 314)

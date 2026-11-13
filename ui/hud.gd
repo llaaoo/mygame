@@ -48,6 +48,7 @@ func _build_ui() -> void:
 	_build_status_panel(root)
 	_build_right_stack(root)
 	_build_skill_bar(root)
+	get_node("MarginContainer/HUDRoot/StatusPanel").resized.connect(_layout_status_stack)
 	get_viewport().size_changed.connect(_layout_hud)
 	_layout_hud()
 
@@ -155,13 +156,22 @@ func _layout_hud() -> void:
 	var viewport:=get_viewport().get_visible_rect().size
 	var compact:=viewport.x<1200
 	var status:=get_node("MarginContainer/HUDRoot/StatusPanel") as Control
+	status.grow_vertical=Control.GROW_DIRECTION_BEGIN
 	status.offset_left=18 if compact else 28; status.offset_right=status.offset_left+220
 	status.offset_bottom=-120 if compact else -38; status.offset_top=status.offset_bottom-150
 	var quick:=get_node("MarginContainer/HUDRoot/SkillBarPanel") as Control
 	quick.offset_left=-310; quick.offset_right=310; quick.offset_top=-92; quick.offset_bottom=-34
+	_layout_status_stack()
+
+func _layout_status_stack() -> void:
+	var status:=get_node("MarginContainer/HUDRoot/StatusPanel") as Control
 	var stack:=get_node("MarginContainer/HUDRoot/RightStatusStack") as Control
+	stack.grow_vertical=Control.GROW_DIRECTION_BEGIN
 	stack.offset_left=status.offset_left; stack.offset_right=status.offset_right
-	stack.offset_bottom=status.offset_top-10; stack.offset_top=stack.offset_bottom-72
+	# Both share bottom anchors. Use offsets rather than a viewport position
+	# sampled before the parent container has finished a window resize.
+	stack.offset_bottom=status.offset_top-10
+	stack.offset_top=stack.offset_bottom-maxf(72,stack.get_combined_minimum_size().y)
 
 
 func _add_resource_row(parent: VBoxContainer, label_text: String, bar: ProgressBar, color: Color) -> Label:
@@ -346,6 +356,7 @@ func _update_stats_display() -> void:
 		xp_bar.value = s.experience
 
 func _process(_delta: float) -> void:
+	if is_instance_valid(player) and is_instance_valid(skill_bar): skill_bar.get_parent().visible=not player.ui_blocked
 	if _bindings_revision!=InputBindings.revision:
 		_bindings_revision=InputBindings.revision
 		_quick_help.text=InputBindings.menu_help("G 选形式   K 技艺")

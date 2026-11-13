@@ -44,9 +44,12 @@ func _ready() -> void:
 	prompt.offset_bottom=-148
 	prompt.visible=false
 	prompt.mouse_filter=Control.MOUSE_FILTER_IGNORE
-	prompt.add_theme_stylebox_override("panel",GameUIStyle.quiet_panel(.65))
+	var prompt_style:=GameUIStyle.quiet_panel(.65)
+	prompt_style.content_margin_top=4; prompt_style.content_margin_bottom=4
+	prompt.add_theme_stylebox_override("panel",prompt_style)
 	root.add_child(prompt)
 	interact=FrontierWidgets.button("",_interact)
+	interact.clip_text=true; interact.set_meta("ui_action","world_interact")
 	interact.tooltip_text="点击与F交互相同；须在目标附近"
 	prompt.add_child(interact)
 func _process(delta: float) -> void:
@@ -82,17 +85,30 @@ func _process(delta: float) -> void:
 	_focus=weakref(target) if is_instance_valid(target) else null
 	var physical:=game.player.actor_context.actions
 	var fighting:=physical.mode in ["attack","dodge","stagger"] or physical.guarding or physical.counter_remaining>0
-	interact.get_parent().visible=not fighting and is_instance_valid(target) and not game.player.health_component.is_dead and not get_tree().paused and not selecting and game.player.casting.aimed_source().is_empty() and not game.player.skill_manager.combinations.is_busy()
+	interact.get_parent().visible=not game.player.ui_blocked and not fighting and is_instance_valid(target) and not game.player.health_component.is_dead and not get_tree().paused and not selecting and game.player.casting.aimed_source().is_empty() and not game.player.skill_manager.combinations.is_busy()
 	if is_instance_valid(target):
 		var title: String=target.title if "title" in target else target.enemy_name if target is Enemy else target.spec.title if target is SpellWorldObject else "调查"
 		interact.text=InputBindings.label("interact")+"  "+title
 		interact.tooltip_text="点击与"+InputBindings.label("interact")+"交互相同；须在目标附近"
+		_layout_prompt()
+func _layout_prompt() -> void:
+	var prompt:=interact.get_parent() as Control
+	var viewport:=get_viewport().get_visible_rect().size
+	var bottom:=viewport.y-148.0
+	var hud:=game.get_node_or_null("HUDLayer")
+	if hud and hud.skill_bar and hud.skill_bar._hint_panel.is_visible_in_tree(): bottom=minf(bottom,hud.skill_bar._hint_panel.global_position.y-10)
+	prompt.grow_vertical=Control.GROW_DIRECTION_BEGIN
+	prompt.offset_bottom=bottom-viewport.y
+	prompt.offset_top=prompt.offset_bottom-maxf(40,prompt.get_combined_minimum_size().y)
 func _interact() -> void:
 	if get_tree().paused or not _focus: return
 	var target:=_focus.get_ref() as Node2D
 	if not game.player.input_controller.request_interaction(target): game.ui.notify("当前无法交互，请靠近目标或结束当前动作。")
 func _unhandled_input(event: InputEvent) -> void:
 	if not event is InputEventKey and not event is InputEventMouseButton or event is InputEventKey and event.echo or game.ui.modal_locked: return
+	if event.is_action_pressed("loot_all") and is_instance_valid(game.ui.modal) and game.ui.modal.has_meta("take_all_request"):
+		(game.ui.modal.get_meta("take_all_request") as Callable).call()
+		get_viewport().set_input_as_handled(); return
 	if event.is_action_pressed("loot_all") and is_instance_valid(game.ui.modal) and game.ui.modal.get_meta("frontier_page","")=="loot":
 		game.hub.take_all(); get_viewport().set_input_as_handled(); return
 

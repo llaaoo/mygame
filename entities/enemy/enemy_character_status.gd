@@ -37,10 +37,10 @@ func _process(delta: float) -> void:
 	# Warning is the existing opportunity to read a counter and withdraw, without
 	# opening a near-range inventory panel or stopping normal AI.
 	if warning: text+="\n"+awareness.rules.observation
-	for id in partial:
-		var buildup: Dictionary=partial[id]
-		var definition:=WeaponEnchantment.definition(id)
-		text+=" · %s蓄积%.0f%%"%[ElementCatalog.affinity_label(definition.tags),100*float(buildup.value)/definition.threshold]
+	var buildup_text:=StatusPresentation.buildup_text(buffs)
+	var harmful_text:=StatusPresentation.harmful_text(buffs)
+	if not buildup_text.is_empty(): text+="\n"+buildup_text
+	if not harmful_text.is_empty(): text+="\n"+harmful_text
 	if not in_combat and actor.mana_component.can_cast(): text+="\nMP %d/%d"%[actor.mana_component.mp,actor.mana_component.max_mp]
 	for entry in (actor.get_node("BuffManager") as BuffManager).get_active_buff_entries():
 		if entry.status_id in ["ember_focus","focus","frost_stride","resonant_guard"]:

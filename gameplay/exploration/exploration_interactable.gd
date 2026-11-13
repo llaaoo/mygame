@@ -95,6 +95,7 @@ func _update_proximity() -> void:
 		set_title(title)
 		queue_redraw()
 	_label.visible = not world_art and (near or (kind in ["passage", "person"] and distance < 180*180))
+	if _player is Player and _player.ui_blocked: _label.visible=false
 	_label.modulate.a = 1.0 if near else .7
 	var fuel_hint:=get_node_or_null("FuelHint") as Label
 	if fuel_hint: fuel_hint.visible=distance<180*180

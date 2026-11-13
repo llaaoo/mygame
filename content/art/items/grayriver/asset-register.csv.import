@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://hrk731o2rovo"
+
+[deps]
+
+files=["res://content/art/items/grayriver/asset-register.origin.translation", "res://content/art/items/grayriver/asset-register.url.translation", "res://content/art/items/grayriver/asset-register.license.translation", "res://content/art/items/grayriver/asset-register.credit.translation", "res://content/art/items/grayriver/asset-register.path.translation", "res://content/art/items/grayriver/asset-register.modifications.translation", "res://content/art/items/grayriver/asset-register.verification.translation"]
+
+source_file="res://content/art/items/grayriver/asset-register.csv"
+dest_files=["res://content/art/items/grayriver/asset-register.origin.translation", "res://content/art/items/grayriver/asset-register.url.translation", "res://content/art/items/grayriver/asset-register.license.translation", "res://content/art/items/grayriver/asset-register.credit.translation", "res://content/art/items/grayriver/asset-register.path.translation", "res://content/art/items/grayriver/asset-register.modifications.translation", "res://content/art/items/grayriver/asset-register.verification.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

@@ -115,4 +115,7 @@ func _draw_offhand(context: ActorContext) -> void:
 	draw_colored_polygon(PackedVector2Array([Vector2(-8,-10),Vector2(8,-10),Vector2(8,5),Vector2(0,14),Vector2(-8,5)]),Color("292e29"))
 	draw_colored_polygon(PackedVector2Array([Vector2(-6,-8),Vector2(6,-8),Vector2(6,4),Vector2(0,11),Vector2(-6,4)]),shield.world_color)
 	draw_line(Vector2(0,-6),Vector2(0,8),Color("d4bf91"),2,true)
+	draw_line(Vector2(-4,-2),Vector2(4,-2),Color("443b2e"),1.5,true)
+	draw_line(Vector2(-4,-5),Vector2(-4,3),Color("443b2e"),1.5,true)
+	draw_line(Vector2(4,-5),Vector2(4,3),Color("443b2e"),1.5,true)
 	draw_set_transform(Vector2.ZERO)

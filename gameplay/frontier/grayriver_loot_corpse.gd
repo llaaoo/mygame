@@ -39,9 +39,10 @@ func refresh() -> void:
 	gear.display_uids.clear()
 	var sources:=gear.inventory_store.actor_containers(loot_id); sources.append(loot_id+".gear")
 	for source in sources:
-		for row in gear.inventory_store.entries(source): gear.display_uids.append(row.uid)
-	for id in record.equipment:
-		if service.game.catalog.equipment.has(id): gear.items.append(service.game.catalog.equipment[id])
+		for row in gear.inventory_store.entries(source):
+			gear.display_uids.append(row.uid)
+			var definition:=gear.inventory_store.equipment_definition(str(row.uid))
+			if definition: gear.items.append(definition)
 	gear.queue_redraw()
 	queue_redraw()
 
@@ -50,6 +51,12 @@ func _draw() -> void:
 	if loot_id.begins_with("cache."):
 		draw_rect(Rect2(-18,-10,36,28), Color("493f2d"))
 		draw_rect(Rect2(-18,-10,36,28), Color("b69c67"), false, 2)
+		var store:=service.game.session.inventory
+		var entries:=store.entries(loot_id+".pack")
+		if not entries.is_empty():
+			var definition:=store.definitions.get(str(entries[0].definition)) as ItemData
+			var icon:=InterfaceIcons.item(definition)
+			if icon: draw_texture_rect(icon,Rect2(-14,-14,28,28),false)
 		if _near: draw_arc(Vector2.ZERO,27,0,TAU,32,Color("d5b66c"),1,true)
 		return
 	if not gear or not gear.animator:

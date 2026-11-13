@@ -9,6 +9,7 @@ var detail: Label
 var enchantment_label: Label
 var combo_label: Label
 var art_label: Label
+var buildup_label: Label
 func _ready() -> void:
 	mouse_filter=Control.MOUSE_FILTER_IGNORE
 	for title in ["体力","稳定"]:
@@ -41,6 +42,7 @@ func _ready() -> void:
 	detail=FoundationWidgets.label("",11,true)
 	detail.visible=not compact
 	add_child(detail)
+	buildup_label=FoundationWidgets.label("",12,true); add_child(buildup_label)
 	enchantment_label=FoundationWidgets.label("",11,true)
 	enchantment_label.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	add_child(enchantment_label)
@@ -89,7 +91,8 @@ func _process(_delta: float) -> void:
 	var coating:=context.items.coating(uid)
 	enchantment_label.visible=coating!=null and coating.enchantment!=null
 	if enchantment_label.visible:
-		enchantment_label.text="%s · %.0f秒"%[coating.enchantment.title,float(context.items.coating_state(uid).expires_at)-context.items.clock_seconds]
+		enchantment_label.text="涂层 · %s · %.0f秒"%[coating.enchantment.title,float(context.items.coating_state(uid).expires_at)-context.items.clock_seconds]
+		enchantment_label.tooltip_text=coating.enchantment.describe()
 		enchantment_label.modulate=coating.enchantment.color.lightened(.25)
 	stamina_bar.max_value=context.actions.stamina.maximum
 	stamina_bar.value=context.actions.stamina.current
@@ -101,15 +104,14 @@ func _process(_delta: float) -> void:
 	var state: String={"idle":"就绪","attack":"攻击中","dodge":"闪避中","stagger":"失衡","item":"使用物品","aim_item":"瞄准 · 松开出手","spray":"喷洒中 · 松开即停","recovery":"动作恢复"}.get(context.actions.mode,"")
 	if context.spray and context.spray.active: state+=" · "+context.items.state_text(context.spray.uid)
 	detail.text="%.1f / %.0fkg · %s · %s"%[weight,(context.rules.carry_limit+float(ActorProgression.values(context.actor).carry_bonus)),"背包随身" if pack else "背包已放下",state]
-	var partial: Dictionary=(context.actor.get_node("BuffManager") as BuffManager).buildup.snapshot()
-	for id in partial:
-		var definition:=WeaponEnchantment.definition(id)
-		detail.text+=" · %s蓄积%.0f%%"%[ElementCatalog.affinity_label(definition.tags),100*float(partial[id].value)/definition.threshold]
+	buildup_label.text=StatusPresentation.buildup_text(context.actor.get_node("BuffManager") as BuffManager)
+	buildup_label.visible=not buildup_label.text.is_empty()
+	buildup_label.tooltip_text="积累达到阈值才施加对应状态；停止接触后按原规则消退。"
 	tooltip_text=detail.text
 	if compact:
 		var constrained:=context.actions.counter_remaining>0 or context.actions.mode in ["stagger","recovery","item","aim_item","spray"]
 		var queued:=context.actions.buffered_action_label()
-		detail.visible=constrained or not partial.is_empty() or not pack or weight>(context.rules.carry_limit+float(ActorProgression.values(context.actor).carry_bonus)) or not queued.is_empty()
+		detail.visible=constrained or not pack or weight>(context.rules.carry_limit+float(ActorProgression.values(context.actor).carry_bonus)) or not queued.is_empty()
 		if not queued.is_empty(): detail.text=queued+" · 收招后尝试"
 		if constrained:
 			detail.text="反击机会 · %.1f秒"%context.actions.counter_remaining if context.actions.counter_remaining>0 else state

@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="ItemData" load_steps=4 format=3]
 [ext_resource type="Script" path="res://gameplay/inventory/data/item_data.gd" id="1"]
 [ext_resource type="Resource" path="res://content/item_uses/fire_rag.tres" id="use"]
+[ext_resource type="Texture2D" path="res://content/art/items/grayriver/fire_rag.tres" id="item_art"]
 [resource]
 script = ExtResource("1")
 id = "fire_rag"
@@ -10,3 +11,7 @@ use_profile = ExtResource("use")
 weight = 0.3
 stackable = true
 max_stack = 20
+
+icon = ExtResource("item_art")
+illustration_path = "res://content/art/items/grayriver/frontier_items.png"
+illustration_region = Rect2i(314, 940, 313, 314)

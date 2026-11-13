@@ -28,9 +28,10 @@ func _ready() -> void:
 	_label.position = Vector2(-100, -radius - 25 - offset)
 	_label.size.x = 200
 	_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_label.add_theme_font_size_override("font_size", 13)
+	GameUIStyle.apply_label(_label,12)
 	add_child(_label)
 	_update_label()
+	queue_redraw()
 	queue_redraw()
 
 func tick(delta: float) -> void:
@@ -40,6 +41,7 @@ func tick(delta: float) -> void:
 		expire()
 		return
 	_update_label()
+	queue_redraw()
 
 func is_available_to(actor: Node2D) -> bool:
 	return is_inside_tree() and not is_queued_for_deletion() and remaining > 0 and charges > 0 and actor == caster and global_position.distance_to(actor.global_position) <= radius
@@ -74,7 +76,10 @@ func expire() -> void:
 
 func _update_label() -> void:
 	if not is_instance_valid(_label): return
-	_label.text = ("%s · %.0f秒 · 每次-%.0f秒"%[title_for(field_type),remaining,use_seconds]) if use_seconds>0 else "%s · %d 次 · %.0fs" % [title_for(field_type), charges, remaining]
+	_label.visible=is_instance_valid(caster) and caster.is_in_group("player") and caster.global_position.distance_to(global_position)<=radius+80
+	if not _label.visible: return
+	var text: String=("%s余能 · %d秒\n触发消耗%d秒"%[title_for(field_type),ceili(remaining),ceili(use_seconds)]) if use_seconds>0 else "%s余能 · %d次 · %d秒"%[title_for(field_type),charges,ceili(remaining)]
+	if _label.text!=text: _label.text=text
 
 static func title_for(type: String) -> String:
 	return {"arcane": "凝能阵", "fire": "火阵", "frost": "霜阵", "storm": "雷阵", "ward":"守护阵"}.get(type, type)
