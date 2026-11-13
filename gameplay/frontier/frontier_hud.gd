@@ -98,6 +98,8 @@ func _layout_prompt() -> void:
 	# Moving it above spell details alone can put it directly over an enemy.
 	var width:=minf(260,viewport.x*.23)
 	var bottom:=viewport.y-100.0
+	if is_instance_valid(game.ui._utility) and game.ui._utility.is_visible_in_tree():
+		bottom=minf(bottom,game.ui._utility.get_global_rect().position.y-10)
 	var hud:=game.get_node_or_null("HUDLayer")
 	if hud and hud.skill_bar and hud.skill_bar._hint_panel.is_visible_in_tree():
 		width=minf(width,viewport.x-18-hud.skill_bar._hint_panel.get_global_rect().end.x-12)
